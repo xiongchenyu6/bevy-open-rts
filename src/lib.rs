@@ -4419,6 +4419,17 @@ fn build_real_menu_match_app(match_start: RealMenuMatchStart) -> App {
     app
 }
 
+fn build_real_default_menu_match_app() -> App {
+    let mut app = build_game_app(GameAppMode::Headless);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
+    ));
+    app.update();
+
+    drive_main_menu_action(&mut app, MainMenuAction::StartMatch, 3);
+    app
+}
+
 pub fn run_capture_match_proof_for_faction(
     faction: CaptureProofFaction,
     max_frames: usize,
@@ -4492,6 +4503,20 @@ pub fn run_real_menu_victory_proof_for_faction(
         std::time::Duration::from_secs_f32(1.0),
     ));
     run_real_menu_victory_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_default_menu_victory_proof(max_frames: usize) -> CaptureVictoryProof {
+    let mut app = build_real_default_menu_match_app();
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_victory_proof_with_target_units(
+        &mut app,
+        CaptureProofFaction::Human,
+        max_frames,
+        PRODUCTION_QUEUE_LIMIT + 1,
+        false,
+    )
 }
 
 pub fn run_real_menu_economy_victory_proof_for_faction(
@@ -5120,10 +5145,25 @@ fn run_real_menu_victory_proof(
     faction: CaptureProofFaction,
     max_frames: usize,
 ) -> CaptureVictoryProof {
+    run_real_menu_victory_proof_with_target_units(
+        app,
+        faction,
+        max_frames,
+        faction.mouse_victory_vehicle_target(),
+        true,
+    )
+}
+
+fn run_real_menu_victory_proof_with_target_units(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+    target_units: usize,
+    grant_resources: bool,
+) -> CaptureVictoryProof {
     let max_frames = max_frames.max(1);
     let team = faction.team();
     let product_id = faction.proof_vehicle();
-    let target_units = faction.mouse_victory_vehicle_target();
     let mut frames = 0usize;
     let mut attack_orders = 0u32;
 
@@ -5138,7 +5178,7 @@ fn run_real_menu_victory_proof(
             attack_orders,
         );
     };
-    {
+    if grant_resources {
         let mut economies = app.world_mut().resource_mut::<Economies>();
         let economy = economies.get_mut(team);
         economy.ore = economy
@@ -6160,11 +6200,24 @@ fn capture_world_left_click(app: &mut App, position: Vec3) -> bool {
     capture_world_mouse_click(app, position, MouseButton::Left)
 }
 
+fn capture_world_left_click_additive(app: &mut App, position: Vec3) -> bool {
+    capture_world_mouse_click_with_shift(app, position, MouseButton::Left, true)
+}
+
 fn capture_world_right_click(app: &mut App, position: Vec3) -> bool {
     capture_world_mouse_click(app, position, MouseButton::Right)
 }
 
 fn capture_world_mouse_click(app: &mut App, position: Vec3, button: MouseButton) -> bool {
+    capture_world_mouse_click_with_shift(app, position, button, false)
+}
+
+fn capture_world_mouse_click_with_shift(
+    app: &mut App,
+    position: Vec3,
+    button: MouseButton,
+    shift_pressed: bool,
+) -> bool {
     if !capture_attach_window_to_main_camera(app, position) {
         return false;
     }
@@ -6197,7 +6250,11 @@ fn capture_world_mouse_click(app: &mut App, position: Vec3, button: MouseButton)
     }
     {
         let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
-        keyboard.release(KeyCode::ShiftLeft);
+        if shift_pressed {
+            keyboard.press(KeyCode::ShiftLeft);
+        } else {
+            keyboard.release(KeyCode::ShiftLeft);
+        }
         keyboard.release(KeyCode::ShiftRight);
         keyboard.clear();
     }
@@ -6215,6 +6272,11 @@ fn capture_world_mouse_click(app: &mut App, position: Vec3, button: MouseButton)
     app.world_mut()
         .resource_mut::<ButtonInput<MouseButton>>()
         .clear();
+    {
+        let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
+        keyboard.release(KeyCode::ShiftLeft);
+        keyboard.clear();
+    }
     true
 }
 
@@ -6544,42 +6606,65 @@ fn capture_mouse_order_attackers_to_target(
         })
         .collect::<Vec<_>>();
 
-    let mut ordered = 0usize;
-    for (attacker, position) in positions {
-        let target_health_before = app
-            .world()
-            .get::<Health>(target)
-            .map(|health| health.current);
-        let selected = capture_world_left_click(app, position)
-            && app
-                .world()
-                .get_entity(attacker)
-                .is_ok_and(|entity| entity.get::<Selected>().is_some());
-        let clicked = selected && capture_world_right_click(app, target_position);
-        if !clicked {
+    if positions.is_empty() {
+        return 0;
+    }
+
+    for (index, (_, position)) in positions.iter().copied().enumerate() {
+        let selected = if index == 0 {
+            capture_world_left_click(app, position)
+        } else {
+            capture_world_left_click_additive(app, position)
+        };
+        if !selected {
             continue;
         }
-        let target_health_after = app
-            .world()
-            .get::<Health>(target)
-            .map(|health| health.current);
-        let target_destroyed = app.world().get_entity(target).is_err();
-        let attacker_has_attack_or_chase = app.world().get_entity(attacker).is_ok_and(|entity| {
-            entity
-                .get::<AttackOrder>()
-                .is_some_and(|order| order.target == target)
-                || entity
-                    .get::<MoveOrder>()
-                    .is_some_and(|order| xz_distance(order.target, target_position) <= 8.0)
-        });
-        let target_damaged = target_health_before
-            .zip(target_health_after)
-            .is_some_and(|(before, after)| after < before);
-        if target_destroyed || attacker_has_attack_or_chase || target_damaged {
-            ordered += 1;
-        }
     }
-    ordered
+
+    let selected_attackers = positions
+        .iter()
+        .filter(|(entity, _)| {
+            app.world()
+                .get_entity(*entity)
+                .is_ok_and(|entity_ref| entity_ref.get::<Selected>().is_some())
+        })
+        .map(|(entity, _)| *entity)
+        .collect::<Vec<_>>();
+    if selected_attackers.is_empty() {
+        return 0;
+    }
+
+    let target_health_before = app
+        .world()
+        .get::<Health>(target)
+        .map(|health| health.current);
+    if !capture_world_right_click(app, target_position) {
+        return 0;
+    }
+    let target_health_after = app
+        .world()
+        .get::<Health>(target)
+        .map(|health| health.current);
+    let target_destroyed = app.world().get_entity(target).is_err();
+    let target_damaged = target_health_before
+        .zip(target_health_after)
+        .is_some_and(|(before, after)| after < before);
+
+    selected_attackers
+        .iter()
+        .filter(|attacker| {
+            target_destroyed
+                || target_damaged
+                || app.world().get_entity(**attacker).is_ok_and(|entity| {
+                    entity
+                        .get::<AttackOrder>()
+                        .is_some_and(|order| order.target == target)
+                        || entity
+                            .get::<MoveOrder>()
+                            .is_some_and(|order| xz_distance(order.target, target_position) <= 8.0)
+                })
+        })
+        .count()
 }
 
 fn capture_first_enemy_anchor(world: &mut World, player_team: Team) -> Option<(Entity, Vec3)> {
@@ -33460,6 +33545,22 @@ mod tests {
                 "victory proof should produce the faction's target attack group; proof={proof:?}"
             );
         }
+    }
+
+    #[test]
+    fn real_default_menu_victory_proof_starts_cargo_run_defaults_and_wins() {
+        let proof = run_real_default_menu_victory_proof(3600);
+
+        assert!(
+            proof.succeeded(),
+            "default cargo-run menu proof should start without changing setup options, train combat vehicles from the real command panel, right-click enemy anchors, and win; proof={proof:?}"
+        );
+        assert_eq!(proof.faction, CaptureProofFaction::Human);
+        assert_eq!(proof.product_id, CaptureProofFaction::Human.proof_vehicle());
+        assert!(
+            proof.produced_units >= proof.target_units,
+            "default menu proof should produce its full attack group without proof-side resource grants; proof={proof:?}"
+        );
     }
 
     #[test]

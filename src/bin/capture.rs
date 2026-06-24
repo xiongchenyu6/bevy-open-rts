@@ -7,13 +7,14 @@ use std::{
 
 use bevy_open_rts::{
     CaptureEntityKind, CaptureMatchPhase, CaptureMatchSnapshot, CapturePlayableProof,
-    CaptureProofFaction, CaptureTeam, advance_capture_match, advance_capture_match_proof_frame,
-    build_capture_match_app, build_capture_match_app_for_faction, capture_match_proof_status,
-    capture_match_snapshot, capture_proof_unit_count, run_capture_match_proof_for_faction,
-    run_real_menu_ai_pressure_proof_for_faction, run_real_menu_build_proof_for_faction,
-    run_real_menu_dual_harvest_proof_for_faction, run_real_menu_economy_victory_proof_for_faction,
-    run_real_menu_harvest_proof_for_faction, run_real_menu_match_proof_for_faction,
-    run_real_menu_playable_proof_for_faction,
+    CaptureProofFaction, CaptureTeam, CaptureVictoryProof, advance_capture_match,
+    advance_capture_match_proof_frame, build_capture_match_app,
+    build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
+    capture_proof_unit_count, run_capture_match_proof_for_faction,
+    run_real_default_menu_victory_proof, run_real_menu_ai_pressure_proof_for_faction,
+    run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
+    run_real_menu_economy_victory_proof_for_faction, run_real_menu_harvest_proof_for_faction,
+    run_real_menu_match_proof_for_faction, run_real_menu_playable_proof_for_faction,
     run_real_menu_three_faction_playable_proof_for_faction,
     run_real_menu_victory_proof_for_faction,
 };
@@ -320,25 +321,25 @@ fn run() -> Result<(), String> {
                 .map_err(|error| format!("invalid max frame count: {error}"))?;
             let faction = parse_optional_faction(args.next())?;
             let proof = run_real_menu_victory_proof_for_faction(faction, max_frames);
-            println!(
-                "[capture] real-victory-proof faction={} label={} phase={:?} frames={} product={} target_units={} produced_units={} attack_orders={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
-                proof.faction.key(),
-                proof.faction.label(),
-                proof.phase,
-                proof.frames,
-                proof.product_id,
-                proof.target_units,
-                proof.produced_units,
-                proof.attack_orders,
-                proof.player_units,
-                proof.enemy_units_destroyed,
-                proof.enemy_structures_destroyed,
-                proof.remaining_teams,
-                proof.remaining_anchors
-            );
+            print_victory_proof("real-victory-proof", &proof);
             if !proof.succeeded() {
                 return Err(format!(
                     "real menu victory proof did not train, attack, and win within {max_frames} frames"
+                ));
+            }
+        }
+        Some("real-default-victory-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("3600")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let proof = run_real_default_menu_victory_proof(max_frames);
+            print_victory_proof("real-default-victory-proof", &proof);
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real default menu victory proof did not train, attack, and win within {max_frames} frames"
                 ));
             }
         }
@@ -460,6 +461,26 @@ fn print_playable_proof(command: &str, proof: &CapturePlayableProof) {
     );
 }
 
+fn print_victory_proof(command: &str, proof: &CaptureVictoryProof) {
+    println!(
+        "[capture] {} faction={} label={} phase={:?} frames={} product={} target_units={} produced_units={} attack_orders={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
+        command,
+        proof.faction.key(),
+        proof.faction.label(),
+        proof.phase,
+        proof.frames,
+        proof.product_id,
+        proof.target_units,
+        proof.produced_units,
+        proof.attack_orders,
+        proof.player_units,
+        proof.enemy_units_destroyed,
+        proof.enemy_structures_destroyed,
+        proof.remaining_teams,
+        proof.remaining_anchors
+    );
+}
+
 fn print_help() {
     println!("Usage:");
     println!("  cargo run --bin capture");
@@ -475,6 +496,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-ai-pressure-proof 1200 human");
     println!("  cargo run --bin capture -- real-build-proof 900 human");
     println!("  cargo run --bin capture -- real-victory-proof 3600 human");
+    println!("  cargo run --bin capture -- real-default-victory-proof 3600");
     println!("  cargo run --bin capture -- real-economy-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-playable-proof 4200 human");
     println!("  cargo run --bin capture -- real-three-faction-playable-proof 7200 human");
