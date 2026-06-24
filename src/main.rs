@@ -38894,6 +38894,81 @@ mod tests {
     }
 
     #[test]
+    fn default_menu_factory_rally_point_sends_new_tanks_to_target() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let (factory, _, factory_position, constructed) =
+            structure_snapshots_by_id(&mut app, "VehicleFactory")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .expect(
+                    "default playable skirmish should spawn a constructed player VehicleFactory",
+                );
+        assert!(constructed);
+        select_only_entities(&mut app, &[factory]);
+        app.update();
+
+        let (rally_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::SetRallyPoint);
+        click_command_button(&mut app, rally_button);
+        assert!(
+            app.world().resource::<CommandMode>().rally_point,
+            "clicking the production structure rally command should arm rally targeting"
+        );
+
+        let rally_target = factory_position + Vec3::new(10.0, 0.0, -4.0);
+        attach_test_window_to_main_camera(&mut app, rally_target);
+        right_click_order_at_world(&mut app, rally_target);
+        let rally_point = *app
+            .world()
+            .entity(factory)
+            .get::<RallyPoint>()
+            .expect("VehicleFactory should carry RallyPoint");
+        assert!(
+            rally_point
+                .target
+                .is_some_and(|target| xz_distance(target, rally_target) < 0.05),
+            "right-clicking a terrain target in rally mode should set the factory rally point"
+        );
+        assert_eq!(rally_point.target_unit, None);
+
+        let tanks_before = unit_count_by_id(&mut app, Team::Human, "Tank");
+        let (tank_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Tank"));
+        click_command_button(&mut app, tank_button);
+        for _ in 0..120 {
+            app.update();
+            if unit_count_by_id(&mut app, Team::Human, "Tank") > tanks_before {
+                break;
+            }
+        }
+
+        let world = app.world_mut();
+        let mut tanks = world.query::<(Entity, &Team, &Unit, &Transform, Option<&MoveOrder>)>();
+        let rallying_tanks = tanks
+            .iter(world)
+            .filter(|(_, team, unit, _, move_order)| {
+                **team == Team::Human
+                    && unit.id == "Tank"
+                    && move_order
+                        .is_some_and(|order| xz_distance(order.target, rally_target) < 0.05)
+            })
+            .map(|(entity, _, _, transform, _)| (entity, transform.translation))
+            .collect::<Vec<_>>();
+        assert!(
+            !rallying_tanks.is_empty(),
+            "a Tank produced after setting a factory rally point should receive MoveOrder toward the rally target"
+        );
+    }
+
+    #[test]
     fn default_menu_skirmish_can_produce_tank_and_finish_visible_enemy_match() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
