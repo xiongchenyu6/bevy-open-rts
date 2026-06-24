@@ -41868,10 +41868,10 @@ mod tests {
                     "{:?} should keep combat units alive to finish the match",
                     expected_faction
                 );
-                let selected_attackers = mouse_select_some_entities(
+                let selected_attackers = drag_select_some_entities(
                     &mut app,
                     &attackers,
-                    "left-clicking selected race combat units should select an attack group",
+                    "drag-selecting selected race combat units should select an attack group",
                 );
                 app.world_mut()
                     .entity_mut(target)
