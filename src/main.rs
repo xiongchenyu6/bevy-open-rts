@@ -86,6 +86,7 @@ const UNIT_ADHERENCE_MARGIN_M: f32 = 0.3;
 const CAPTURE_ENTRY_MARGIN_M: f32 = 1.3;
 const FOLLOW_TARGET_DISTANCE_MARGIN_M: f32 = UNIT_ADHERENCE_MARGIN_M;
 const RESOURCE_ENTRY_MARGIN_M: f32 = UNIT_ADHERENCE_MARGIN_M;
+const RESOURCE_DROPOFF_ENTRY_MARGIN_M: f32 = 1.2;
 const REPAIR_ADHERENCE_MARGIN_M: f32 = UNIT_ADHERENCE_MARGIN_M;
 const REPAIR_ENTRY_MARGIN_M: f32 = 1.0;
 const RESOURCE_SEARCH_RADIUS_M: f32 = 30.0;
@@ -4747,7 +4748,7 @@ struct ConstructOrder {
     target: Entity,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum HarvestState {
     MovingToResource,
     Collecting,
@@ -20913,7 +20914,8 @@ fn update_harvest_orders(
                     continue;
                 };
 
-                let entry_range = selectable.radius + dropoff_radius + RESOURCE_ENTRY_MARGIN_M;
+                let entry_range =
+                    selectable.radius + dropoff_radius + RESOURCE_DROPOFF_ENTRY_MARGIN_M;
                 if xz_distance(transform.translation, dropoff_position) > entry_range {
                     if unit.speed <= 0.0 {
                         commands
@@ -29073,6 +29075,25 @@ mod tests {
         query
             .iter(world)
             .map(|(node, transform)| (node.kind, node.amount, transform.translation))
+            .collect()
+    }
+
+    fn runtime_resource_node_snapshots(
+        app: &mut App,
+    ) -> Vec<(Entity, ResourceKind, i32, Vec3, bool)> {
+        let world = app.world_mut();
+        let mut query = world.query::<(Entity, &ResourceNode, &Transform, &VisibilityState)>();
+        query
+            .iter(world)
+            .map(|(entity, node, transform, visibility)| {
+                (
+                    entity,
+                    node.kind,
+                    node.amount,
+                    transform.translation,
+                    visibility.visible,
+                )
+            })
             .collect()
     }
 
@@ -38648,6 +38669,125 @@ mod tests {
                 .get::<ResourceNode>()
                 .is_some_and(|resource| resource.amount < 8),
             "resource node should lose ore during the loop"
+        );
+    }
+
+    #[test]
+    fn default_menu_collectors_right_click_visible_ore_and_deliver() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+        for _ in 0..3 {
+            app.update();
+        }
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let worker = first_unit_by_id(&mut app, Team::Human, "Worker")
+            .expect("default playable skirmish should spawn a player Worker");
+        let ore_harvester = first_unit_by_id(&mut app, Team::Human, "OreHarvester")
+            .expect("default playable skirmish should spawn a player OreHarvester");
+        let harvester_position = unit_position(&app, ore_harvester);
+        let (resource, _, resource_amount_before, resource_position, resource_visible) =
+            runtime_resource_node_snapshots(&mut app)
+                .into_iter()
+                .filter(|(_, kind, amount, _, visible)| {
+                    *kind == ResourceKind::Ore && *amount > 0 && *visible
+                })
+                .min_by(|(_, _, _, lhs, _), (_, _, _, rhs, _)| {
+                    xz_distance(*lhs, harvester_position)
+                        .partial_cmp(&xz_distance(*rhs, harvester_position))
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
+                .expect("default player start should reveal at least one nearby ore node");
+        assert!(
+            resource_visible,
+            "default player start should reveal the clicked ore node"
+        );
+
+        select_only_entities(&mut app, &[worker, ore_harvester]);
+        attach_test_window_to_main_camera(&mut app, resource_position);
+        right_click_order_at_world(&mut app, resource_position);
+
+        for entity in [worker, ore_harvester] {
+            assert!(
+                app.world()
+                    .entity(entity)
+                    .get::<HarvestOrder>()
+                    .is_some_and(|order| order.resource == Some(resource)),
+                "right-clicking visible ore in the default match should order both selected collectors to harvest"
+            );
+        }
+
+        let ore_before = app.world().resource::<Economies>().get(Team::Human).ore;
+        for _ in 0..120 {
+            app.update();
+            let ore_after = app.world().resource::<Economies>().get(Team::Human).ore;
+            if ore_after > ore_before {
+                break;
+            }
+        }
+        let ore_after = app.world().resource::<Economies>().get(Team::Human).ore;
+        let resource_after = app
+            .world()
+            .get::<ResourceNode>(resource)
+            .map_or(0, |resource| resource.amount);
+        let collector_summary = {
+            let world = app.world_mut();
+            let mut collectors = world.query::<(
+                Entity,
+                &Team,
+                &Unit,
+                &Transform,
+                Option<&ResourceCargo>,
+                Option<&HarvestOrder>,
+                Option<&MoveOrder>,
+            )>();
+            collectors
+                .iter(world)
+                .filter_map(|(entity, team, unit, transform, cargo, harvest, move_order)| {
+                    (entity == worker || entity == ore_harvester).then(|| {
+                        let cargo_text = cargo.map_or_else(
+                            || "cargo=none".to_string(),
+                            |cargo| {
+                                format!(
+                                    "cargo={}/{}/{}",
+                                    cargo.ore + cargo.crystal,
+                                    cargo.ore,
+                                    cargo.crystal
+                                )
+                            },
+                        );
+                        let harvest_text = harvest.map_or_else(
+                            || "harvest=none".to_string(),
+                            |harvest| format!("harvest={:?}", harvest.state),
+                        );
+                        let move_text = move_order.map_or_else(
+                            || "move=none".to_string(),
+                            |order| format!("move=({:.1},{:.1})", order.target.x, order.target.z),
+                        );
+                        format!(
+                            "{entity:?}:{:?}:{}@({:.1},{:.1}) {cargo_text} {harvest_text} {move_text}",
+                            team,
+                            unit.id,
+                            transform.translation.x,
+                            transform.translation.z
+                        )
+                    })
+                })
+                .collect::<Vec<_>>()
+                .join("; ")
+        };
+        assert!(
+            resource_after < resource_amount_before,
+            "default collectors should mine the clicked ore node before delivery"
+        );
+        assert!(
+            ore_after > ore_before,
+            "default resource collectors should deliver mined ore back to the player economy; ore {ore_before}->{ore_after}, resource {resource_amount_before}->{resource_after}; {collector_summary}"
         );
     }
 
