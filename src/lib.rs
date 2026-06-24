@@ -4048,6 +4048,27 @@ impl CaptureDualHarvestProof {
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct CaptureAiPressureProof {
+    pub faction: CaptureProofFaction,
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub ai_team: CaptureTeam,
+    pub ai_units_before: u32,
+    pub ai_units_peak: u32,
+    pub ai_attack_orders: u32,
+    pub player_health_before: f32,
+    pub player_health_after: f32,
+}
+
+impl CaptureAiPressureProof {
+    pub fn succeeded(&self) -> bool {
+        self.ai_units_peak > self.ai_units_before
+            && self.ai_attack_orders > 0
+            && self.player_health_after < self.player_health_before
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CaptureBuildProof {
     pub faction: CaptureProofFaction,
@@ -4387,6 +4408,17 @@ pub fn run_real_menu_dual_harvest_proof_for_faction(
         std::time::Duration::from_secs_f32(1.0),
     ));
     run_real_menu_dual_harvest_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_ai_pressure_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureAiPressureProof {
+    let mut app = build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Hard);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_ai_pressure_proof(&mut app, faction, max_frames)
 }
 
 pub fn run_real_menu_build_proof_for_faction(
@@ -4741,6 +4773,82 @@ fn capture_dual_harvest_proof_status(
         crystal_after: player_stats.crystal,
         ore_harvest_ordered,
         crystal_harvest_ordered,
+    }
+}
+
+fn run_real_menu_ai_pressure_proof(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureAiPressureProof {
+    let max_frames = max_frames.max(1);
+    let player_team = faction.team();
+    let Some(ai_team) = capture_primary_active_enemy_team(app.world(), player_team) else {
+        return capture_ai_pressure_proof_status(app, faction, 0, Team::Neutral, 0, 0, 0, 0.0, 0.0);
+    };
+
+    let ai_units_before = capture_alive_unit_count(app.world_mut(), ai_team) as u32;
+    let player_health_before = capture_team_total_health(app.world_mut(), player_team);
+    let mut ai_units_peak = ai_units_before;
+    let mut ai_attack_orders_peak = 0u32;
+    let mut player_health_min = player_health_before;
+    let mut frames = 0usize;
+
+    while frames < max_frames && app.world().resource::<MatchState>().phase == MatchPhase::Running {
+        frames += 1;
+        app.update();
+        ai_units_peak =
+            ai_units_peak.max(capture_alive_unit_count(app.world_mut(), ai_team) as u32);
+        ai_attack_orders_peak = ai_attack_orders_peak.max(capture_attack_orders_against_team(
+            app.world_mut(),
+            ai_team,
+            player_team,
+        ) as u32);
+        player_health_min =
+            player_health_min.min(capture_team_total_health(app.world_mut(), player_team));
+        if ai_units_peak > ai_units_before
+            && ai_attack_orders_peak > 0
+            && player_health_min < player_health_before
+        {
+            break;
+        }
+    }
+
+    capture_ai_pressure_proof_status(
+        app,
+        faction,
+        frames,
+        ai_team,
+        ai_units_before,
+        ai_units_peak,
+        ai_attack_orders_peak,
+        player_health_before,
+        player_health_min,
+    )
+}
+
+fn capture_ai_pressure_proof_status(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    frames: usize,
+    ai_team: Team,
+    ai_units_before: u32,
+    ai_units_peak: u32,
+    ai_attack_orders: u32,
+    player_health_before: f32,
+    player_health_after: f32,
+) -> CaptureAiPressureProof {
+    let snapshot = capture_match_snapshot(app);
+    CaptureAiPressureProof {
+        faction,
+        phase: snapshot.phase,
+        frames,
+        ai_team: capture_team_from_team(ai_team),
+        ai_units_before,
+        ai_units_peak,
+        ai_attack_orders,
+        player_health_before,
+        player_health_after,
     }
 }
 
@@ -6145,6 +6253,63 @@ fn capture_stats_for_faction(
         CaptureProofFaction::Demon => snapshot.demon,
         CaptureProofFaction::Chaos => snapshot.chaos,
     }
+}
+
+fn capture_team_from_team(team: Team) -> CaptureTeam {
+    match team {
+        Team::Human => CaptureTeam::Human,
+        Team::Demon => CaptureTeam::Demon,
+        Team::Chaos => CaptureTeam::Chaos,
+        Team::Neutral => CaptureTeam::Neutral,
+    }
+}
+
+fn capture_primary_active_enemy_team(world: &World, player_team: Team) -> Option<Team> {
+    let relations = world.resource::<TeamRelations>();
+    let active_teams = world.resource::<ActiveTeams>();
+    Team::all().into_iter().find(|team| {
+        team_is_active(*team, Some(active_teams)) && relations.are_enemies(player_team, *team)
+    })
+}
+
+fn capture_alive_unit_count(world: &mut World, team: Team) -> usize {
+    let mut units = world.query::<(&Team, &Health, &Unit)>();
+    units
+        .iter(world)
+        .filter(|(unit_team, health, _)| **unit_team == team && health.current > 0.0)
+        .count()
+}
+
+fn capture_team_total_health(world: &mut World, team: Team) -> f32 {
+    let mut health_q = world.query::<(&Team, &Health)>();
+    health_q
+        .iter(world)
+        .filter_map(|(entity_team, health)| {
+            (*entity_team == team && health.current > 0.0).then_some(health.current)
+        })
+        .sum()
+}
+
+fn capture_attack_orders_against_team(
+    world: &mut World,
+    attacker_team: Team,
+    target_team: Team,
+) -> usize {
+    let mut units = world.query::<(&Team, &Health, &AttackOrder)>();
+    let targets = units
+        .iter(world)
+        .filter_map(|(team, health, attack_order)| {
+            (*team == attacker_team && health.current > 0.0).then_some(attack_order.target)
+        })
+        .collect::<Vec<_>>();
+    targets
+        .into_iter()
+        .filter(|target| {
+            world
+                .get::<Team>(*target)
+                .is_some_and(|team| *team == target_team)
+        })
+        .count()
 }
 
 fn capture_queue_player_units(
@@ -33149,6 +33314,31 @@ mod tests {
             assert!(
                 proof.crystal_after > proof.crystal_before,
                 "dual harvest proof should increase crystal through a real harvest order; proof={proof:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn real_menu_ai_pressure_proof_produces_attacks_and_damages_player() {
+        for faction in CaptureProofFaction::ALL {
+            let proof = run_real_menu_ai_pressure_proof_for_faction(faction, 1200);
+
+            assert!(
+                proof.succeeded(),
+                "real menu AI pressure proof should let Hard AI produce units, issue attacks, and damage the selected player for {:?}; proof={proof:?}",
+                faction
+            );
+            assert!(
+                proof.ai_units_peak > proof.ai_units_before,
+                "AI pressure proof should prove runtime AI production increased army size; proof={proof:?}"
+            );
+            assert!(
+                proof.ai_attack_orders > 0,
+                "AI pressure proof should prove runtime AI issued attack orders; proof={proof:?}"
+            );
+            assert!(
+                proof.player_health_after < proof.player_health_before,
+                "AI pressure proof should prove runtime combat damaged the selected player; proof={proof:?}"
             );
         }
     }

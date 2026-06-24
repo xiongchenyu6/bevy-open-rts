@@ -23,6 +23,7 @@
   - `real-match-proof`: direct production/order proof from a menu-started match.
   - `real-harvest-proof`: mouse select collector, right-click ore, harvest, then train.
   - `real-dual-harvest-proof`: low-resource menu start, mouse-order both Ore and Crystal gathering, and require both player resource totals to increase.
+  - `real-ai-pressure-proof`: menu-started Hard AI match that requires AI production growth, AI attack orders, and real damage to the selected player's army/base.
   - `real-build-proof`: mouse select worker, place and construct Barracks, then train.
   - `real-victory-proof`: mouse select VehicleFactory, train combat vehicles, right-click enemy anchors, and win.
   - `real-economy-victory-proof`: low-resource menu start, mouse harvest required resources, train combat vehicles, right-click enemy anchors, and win without proof-side resource injection.

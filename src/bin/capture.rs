@@ -10,10 +10,10 @@ use bevy_open_rts::{
     advance_capture_match, advance_capture_match_proof_frame, build_capture_match_app,
     build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
     capture_proof_unit_count, run_capture_match_proof_for_faction,
-    run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
-    run_real_menu_economy_victory_proof_for_faction, run_real_menu_harvest_proof_for_faction,
-    run_real_menu_match_proof_for_faction, run_real_menu_playable_proof_for_faction,
-    run_real_menu_victory_proof_for_faction,
+    run_real_menu_ai_pressure_proof_for_faction, run_real_menu_build_proof_for_faction,
+    run_real_menu_dual_harvest_proof_for_faction, run_real_menu_economy_victory_proof_for_faction,
+    run_real_menu_harvest_proof_for_faction, run_real_menu_match_proof_for_faction,
+    run_real_menu_playable_proof_for_faction, run_real_menu_victory_proof_for_faction,
 };
 
 const WIDTH: u32 = 1280;
@@ -252,6 +252,34 @@ fn run() -> Result<(), String> {
                 ));
             }
         }
+        Some("real-ai-pressure-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("1200")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let faction = parse_optional_faction(args.next())?;
+            let proof = run_real_menu_ai_pressure_proof_for_faction(faction, max_frames);
+            println!(
+                "[capture] real-ai-pressure-proof faction={} label={} phase={:?} frames={} ai_team={:?} ai_units={}=>{} ai_attack_orders={} player_health={:.1}->{:.1}",
+                proof.faction.key(),
+                proof.faction.label(),
+                proof.phase,
+                proof.frames,
+                proof.ai_team,
+                proof.ai_units_before,
+                proof.ai_units_peak,
+                proof.ai_attack_orders,
+                proof.player_health_before,
+                proof.player_health_after,
+            );
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real menu AI pressure proof did not produce, attack, and damage the player within {max_frames} frames"
+                ));
+            }
+        }
         Some("real-build-proof") => {
             let max_frames = args
                 .next()
@@ -421,6 +449,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-match-proof 7200 human");
     println!("  cargo run --bin capture -- real-harvest-proof 900 human");
     println!("  cargo run --bin capture -- real-dual-harvest-proof 1800 human");
+    println!("  cargo run --bin capture -- real-ai-pressure-proof 1200 human");
     println!("  cargo run --bin capture -- real-build-proof 900 human");
     println!("  cargo run --bin capture -- real-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-economy-victory-proof 3600 human");
