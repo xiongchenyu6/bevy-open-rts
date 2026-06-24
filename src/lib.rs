@@ -27905,6 +27905,24 @@ mod tests {
             .collect()
     }
 
+    fn queued_train_jobs_for_producer(
+        app: &App,
+        team: Team,
+        producer_entity: Entity,
+        product_id: &'static str,
+    ) -> usize {
+        app.world()
+            .resource::<BuildQueue>()
+            .0
+            .iter()
+            .filter(|job| {
+                job.team == team
+                    && job.producer_entity == producer_entity
+                    && matches!(job.action, BuildAction::Train(id) if id == product_id)
+            })
+            .count()
+    }
+
     fn anchor_targets_by_team(app: &mut App, team: Team) -> Vec<(Entity, Vec3)> {
         let mut targets = Vec::new();
         {
@@ -39862,6 +39880,155 @@ mod tests {
             app.world().entity(tank).get::<MoveOrder>().is_none(),
             "movement should pause while the attack-move target is being engaged"
         );
+    }
+
+    fn selected_race_vehicle_skirmish_can_train_and_win(
+        player_team: Team,
+        product_id: &'static str,
+        produced_count: usize,
+    ) {
+        let selection = skirmish_menu_selection(
+            0,
+            player_team,
+            DEFAULT_STARTING_RESOURCE_INDEX,
+            SkirmishMatchMode::OneVsOne,
+            AiDifficulty::Beginner,
+        );
+        let expected_faction = SkirmishFaction::from_team(player_team);
+        let mut app = stateful_match_flow_test_app(selection.match_setup());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        assert_eq!(
+            app.world().resource::<VisiblePlayer>().team,
+            player_team,
+            "menu-selected race should become the controlled player slot"
+        );
+        assert_eq!(
+            app.world()
+                .resource::<PlayerFactions>()
+                .slot_faction(player_team),
+            expected_faction,
+            "controlled player slot should use its selected faction roster"
+        );
+        assert!(
+            faction_def(expected_faction)
+                .and_then(|faction| faction.production_for("VehicleFactory"))
+                .is_some_and(|products| products.contains(&product_id)),
+            "{:?} VehicleFactory roster should expose {product_id}",
+            expected_faction
+        );
+        if product_id != "Tank" {
+            assert!(
+                !faction_def(expected_faction)
+                    .and_then(|faction| faction.production_for("VehicleFactory"))
+                    .is_some_and(|products| products.contains(&"Tank")),
+                "{:?} should not silently fall back to the default Tank vehicle roster",
+                expected_faction
+            );
+        }
+
+        let (factory, _, _, _) = structure_snapshots_by_id(&mut app, "VehicleFactory")
+            .into_iter()
+            .find(|(_, team, _, constructed)| *team == player_team && *constructed)
+            .expect("selected race should spawn a constructed player VehicleFactory");
+        select_only_entities(&mut app, &[factory]);
+        app.update();
+        let (train_button, slot_index, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train(product_id));
+
+        for _ in 0..720 {
+            let produced = unit_count_by_id(&mut app, player_team, product_id);
+            if produced >= produced_count {
+                break;
+            }
+            let started =
+                produced + queued_train_jobs_for_producer(&app, player_team, factory, product_id);
+            if started < produced_count {
+                click_command_button(&mut app, train_button);
+            }
+            app.update();
+        }
+        assert!(
+            unit_count_by_id(&mut app, player_team, product_id) >= produced_count,
+            "{:?} should produce {produced_count} {product_id} units through command slot {slot_index}",
+            expected_faction
+        );
+
+        let enemy_teams = Team::all()
+            .into_iter()
+            .filter(|team| {
+                app.world()
+                    .resource::<TeamRelations>()
+                    .are_enemies(player_team, *team)
+            })
+            .collect::<Vec<_>>();
+        for enemy_team in enemy_teams {
+            for _ in 0..32 {
+                if app.world().resource::<MatchState>().phase != MatchPhase::Running {
+                    break;
+                }
+                let Some((target, target_position)) = anchor_targets_by_team(&mut app, enemy_team)
+                    .into_iter()
+                    .next()
+                else {
+                    break;
+                };
+                let attackers = alive_weapon_units_by_team(&mut app, player_team);
+                assert!(
+                    !attackers.is_empty(),
+                    "{:?} should keep combat units alive to finish the match",
+                    expected_faction
+                );
+                select_only_entities(&mut app, &attackers);
+                app.world_mut()
+                    .entity_mut(target)
+                    .insert((VisibilityState { visible: true }, Visibility::Visible));
+                attach_test_window_to_main_camera(&mut app, target_position);
+                right_click_order_at_world(&mut app, target_position);
+                for _ in 0..260 {
+                    app.update();
+                    if app.world().get_entity(target).is_err()
+                        || app.world().resource::<MatchState>().phase != MatchPhase::Running
+                    {
+                        break;
+                    }
+                }
+            }
+            assert!(
+                anchor_targets_by_team(&mut app, enemy_team).is_empty(),
+                "{:?} player should be able to destroy {enemy_team:?} anchors with produced {product_id} units",
+                expected_faction
+            );
+        }
+
+        for _ in 0..8 {
+            app.update();
+            if app.world().resource::<MatchState>().phase == MatchPhase::HumanVictory {
+                break;
+            }
+        }
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::HumanVictory,
+            "{:?} selected from the menu should be able to finish a real skirmish",
+            expected_faction
+        );
+    }
+
+    #[test]
+    fn demon_menu_skirmish_can_train_tanks_and_finish_match() {
+        selected_race_vehicle_skirmish_can_train_and_win(Team::Demon, "Tank", 5);
+    }
+
+    #[test]
+    fn chaos_menu_skirmish_can_train_rovers_and_finish_match() {
+        selected_race_vehicle_skirmish_can_train_and_win(Team::Chaos, "ScoutRover", 8);
     }
 
     #[test]
