@@ -3737,6 +3737,26 @@ pub fn enter_shared_match_scene(app: &mut App) {
     }
 }
 
+fn add_headless_game_plugins(app: &mut App) -> &mut App {
+    app.add_plugins((
+        MinimalPlugins,
+        bevy::state::app::StatesPlugin,
+        AssetPlugin {
+            meta_check: AssetMetaCheck::Never,
+            ..default()
+        },
+        bevy::gizmos::GizmoPlugin,
+    ))
+    .add_message::<MouseMotion>()
+    .add_message::<MouseWheel>()
+    .init_resource::<Assets<Mesh>>()
+    .init_resource::<Assets<StandardMaterial>>()
+    .init_asset::<bevy::mesh::skinning::SkinnedMeshInverseBindposes>()
+    .init_asset::<WorldAsset>()
+    .init_asset::<Font>()
+    .init_asset::<bevy::audio::AudioSource>()
+}
+
 pub fn build_game_app(mode: GameAppMode) -> App {
     let mut app = App::new();
     match mode {
@@ -3769,23 +3789,7 @@ pub fn build_game_app(mode: GameAppMode) -> App {
             );
         }
         GameAppMode::Headless => {
-            app.add_plugins((
-                MinimalPlugins,
-                bevy::state::app::StatesPlugin,
-                AssetPlugin {
-                    meta_check: AssetMetaCheck::Never,
-                    ..default()
-                },
-                bevy::gizmos::GizmoPlugin,
-            ))
-            .add_message::<MouseMotion>()
-            .add_message::<MouseWheel>()
-            .init_resource::<Assets<Mesh>>()
-            .init_resource::<Assets<StandardMaterial>>()
-            .init_asset::<bevy::mesh::skinning::SkinnedMeshInverseBindposes>()
-            .init_asset::<WorldAsset>()
-            .init_asset::<Font>()
-            .init_asset::<bevy::audio::AudioSource>();
+            add_headless_game_plugins(&mut app);
         }
     };
     app.insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
@@ -3804,24 +3808,7 @@ pub fn build_capture_match_app() -> App {
 
 fn build_capture_match_app_with_settings(settings: MatchSetupSettings) -> App {
     let mut app = App::new();
-    app.add_plugins((
-        MinimalPlugins,
-        bevy::state::app::StatesPlugin,
-        AssetPlugin {
-            meta_check: AssetMetaCheck::Never,
-            ..default()
-        },
-        bevy::gizmos::GizmoPlugin,
-    ))
-    .add_message::<MouseMotion>()
-    .add_message::<MouseWheel>()
-    .init_state::<AppScreen>()
-    .init_resource::<Assets<Mesh>>()
-    .init_resource::<Assets<StandardMaterial>>()
-    .init_asset::<bevy::mesh::skinning::SkinnedMeshInverseBindposes>()
-    .init_asset::<WorldAsset>()
-    .init_asset::<Font>()
-    .init_asset::<bevy::audio::AudioSource>();
+    add_headless_game_plugins(&mut app);
     app.insert_resource(settings);
     add_shared_match_scene(&mut app);
     start_default_match_for_capture(&mut app);
