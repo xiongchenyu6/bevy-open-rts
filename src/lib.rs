@@ -4519,6 +4519,23 @@ pub fn run_real_default_menu_victory_proof(max_frames: usize) -> CaptureVictoryP
     )
 }
 
+pub fn run_real_menu_selected_faction_victory_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureVictoryProof {
+    let mut app = build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Beginner);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_victory_proof_with_target_units(
+        &mut app,
+        faction,
+        max_frames,
+        faction.mouse_victory_vehicle_target(),
+        false,
+    )
+}
+
 pub fn run_real_menu_economy_victory_proof_for_faction(
     faction: CaptureProofFaction,
     max_frames: usize,
@@ -33561,6 +33578,29 @@ mod tests {
             proof.produced_units >= proof.target_units,
             "default menu proof should produce its full attack group without proof-side resource grants; proof={proof:?}"
         );
+    }
+
+    #[test]
+    fn real_menu_selected_faction_victory_proof_wins_without_resource_grants() {
+        for faction in CaptureProofFaction::ALL {
+            let proof = run_real_menu_selected_faction_victory_proof_for_faction(faction, 3600);
+
+            assert!(
+                proof.succeeded(),
+                "selected-faction real menu proof should pick the faction in the setup UI, train its vehicle roster through command buttons without proof-side resource grants, right-click enemy anchors, and win; proof={proof:?}"
+            );
+            assert_eq!(proof.faction, faction);
+            assert_eq!(proof.product_id, faction.proof_vehicle());
+            assert_eq!(
+                proof.target_units,
+                faction.mouse_victory_vehicle_target() as u32,
+                "selected-faction proof should use the same faction-specific attack group target as mouse victory tests; proof={proof:?}"
+            );
+            assert!(
+                proof.produced_units >= proof.target_units,
+                "selected-faction proof should produce the full faction-specific attack group; proof={proof:?}"
+            );
+        }
     }
 
     #[test]

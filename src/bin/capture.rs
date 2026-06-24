@@ -15,6 +15,7 @@ use bevy_open_rts::{
     run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
     run_real_menu_economy_victory_proof_for_faction, run_real_menu_harvest_proof_for_faction,
     run_real_menu_match_proof_for_faction, run_real_menu_playable_proof_for_faction,
+    run_real_menu_selected_faction_victory_proof_for_faction,
     run_real_menu_three_faction_playable_proof_for_faction,
     run_real_menu_victory_proof_for_faction,
 };
@@ -343,6 +344,23 @@ fn run() -> Result<(), String> {
                 ));
             }
         }
+        Some("real-selected-faction-victory-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("3600")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let faction = parse_optional_faction(args.next())?;
+            let proof =
+                run_real_menu_selected_faction_victory_proof_for_faction(faction, max_frames);
+            print_victory_proof("real-selected-faction-victory-proof", &proof);
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real selected-faction victory proof did not train, attack, and win within {max_frames} frames"
+                ));
+            }
+        }
         Some("real-economy-victory-proof") => {
             let max_frames = args
                 .next()
@@ -497,6 +515,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-build-proof 900 human");
     println!("  cargo run --bin capture -- real-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-default-victory-proof 3600");
+    println!("  cargo run --bin capture -- real-selected-faction-victory-proof 3600 chaos");
     println!("  cargo run --bin capture -- real-economy-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-playable-proof 4200 human");
     println!("  cargo run --bin capture -- real-three-faction-playable-proof 7200 human");
