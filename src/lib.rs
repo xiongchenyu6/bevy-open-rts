@@ -43647,6 +43647,88 @@ mod tests {
     }
 
     #[test]
+    fn multi_selected_barracks_hotkey_queues_and_spawns_infantry_for_each_like_godot() {
+        let mut app = playable_production_shortcut_test_app();
+        let infantry_def =
+            registry::entity("LightRifleInfantry").expect("registry should include infantry");
+        spawn_test_structure(
+            &mut app,
+            "CommandCenter",
+            Team::Human,
+            Vec3::new(0.0, 0.0, -8.0),
+        );
+        let barracks_a =
+            spawn_test_structure(&mut app, "Barracks", Team::Human, Vec3::new(-8.0, 0.0, 0.0));
+        let barracks_b =
+            spawn_test_structure(&mut app, "Barracks", Team::Human, Vec3::new(8.0, 0.0, 0.0));
+        app.world_mut().entity_mut(barracks_a).insert(Selected);
+        app.world_mut().entity_mut(barracks_b).insert(Selected);
+        {
+            let mut economies = app.world_mut().resource_mut::<Economies>();
+            let economy = economies.get_mut(Team::Human);
+            economy.ore = 100;
+            economy.crystal = 100;
+        }
+
+        app.update();
+
+        let (_, infantry_slot_index, infantry_hotkey) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("LightRifleInfantry"));
+        let before = app.world().resource::<Economies>().get(Team::Human).clone();
+
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .press(infantry_hotkey.key_code);
+        app.update();
+
+        {
+            let queue = app.world().resource::<BuildQueue>();
+            assert_eq!(
+                queue.0.len(),
+                2,
+                "slot {infantry_slot_index} should enqueue once for each selected Barracks"
+            );
+            assert_eq!(producer_build_queue_len(queue, barracks_a), 1);
+            assert_eq!(producer_build_queue_len(queue, barracks_b), 1);
+            assert!(queue.0.iter().all(|job| job.team == Team::Human));
+            assert!(
+                queue
+                    .0
+                    .iter()
+                    .all(|job| matches!(job.action, BuildAction::Train("LightRifleInfantry")))
+            );
+        }
+        let after_reservation = app.world().resource::<Economies>().get(Team::Human);
+        assert_eq!(
+            after_reservation.ore,
+            before.ore - infantry_def.cost.ore * 2
+        );
+        assert_eq!(
+            after_reservation.crystal,
+            before.crystal - infantry_def.cost.crystal * 2
+        );
+
+        {
+            let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
+            keyboard.release(infantry_hotkey.key_code);
+            keyboard.clear();
+        }
+        for _ in 0..(infantry_def.build_seconds.ceil() as usize + 2) {
+            app.update();
+        }
+
+        assert!(
+            app.world().resource::<BuildQueue>().0.is_empty(),
+            "multi-barracks infantry queue should complete from both selected producers"
+        );
+        assert_eq!(
+            unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry"),
+            2,
+            "Godot multi-barracks production should spawn one infantry per selected Barracks"
+        );
+    }
+
+    #[test]
     fn selected_vehicle_factory_button_click_queues_and_spawns_tank_through_panel() {
         let mut app = playable_production_shortcut_test_app();
         let tank_def = registry::entity("Tank").expect("registry should include Tank");
