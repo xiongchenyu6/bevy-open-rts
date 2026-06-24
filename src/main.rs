@@ -26161,6 +26161,7 @@ mod tests {
         .init_asset::<WorldAsset>()
         .insert_resource(VisiblePlayer::per_player(Team::Human))
         .init_resource::<ButtonInput<KeyCode>>()
+        .init_resource::<ButtonInput<MouseButton>>()
         .init_resource::<BuildQueue>()
         .init_resource::<CommandMode>()
         .init_resource::<Economies>()
@@ -26174,6 +26175,7 @@ mod tests {
             (
                 refresh_command_panel,
                 command_shortcuts,
+                command_buttons,
                 advance_test_time,
                 process_build_queue,
             )
@@ -26190,6 +26192,28 @@ mod tests {
             ));
         }
         app
+    }
+
+    fn enabled_command_slot_for_action(
+        app: &mut App,
+        target: BuildAction,
+    ) -> (Entity, usize, CommandHotkey) {
+        let world = app.world_mut();
+        let mut slots =
+            world.query::<(Entity, &CommandSlot, &BuildAction, &CommandSlotAvailability)>();
+        slots
+            .iter(world)
+            .find_map(|(entity, slot, action, availability)| {
+                (*action == target && availability.enabled).then(|| {
+                    (
+                        entity,
+                        slot.0,
+                        command_action_hotkey(slot.0, *action)
+                            .expect("enabled command slot should have a hotkey"),
+                    )
+                })
+            })
+            .expect("selected command panel should expose the requested enabled command")
     }
 
     fn issue_orders_click_test_app(visible_player: VisiblePlayer) -> App {
@@ -38217,22 +38241,8 @@ mod tests {
 
         app.update();
 
-        let (tank_slot_index, tank_hotkey) = {
-            let world = app.world_mut();
-            let mut slots = world.query::<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>();
-            slots
-                .iter(world)
-                .find_map(|(slot, action, availability)| {
-                    (*action == BuildAction::Train("Tank") && availability.enabled).then(|| {
-                        (
-                            slot.0,
-                            command_action_hotkey(slot.0, *action)
-                                .expect("enabled command slot should have a hotkey"),
-                        )
-                    })
-                })
-                .expect("selected VehicleFactory should expose an enabled Tank command")
-        };
+        let (_, tank_slot_index, tank_hotkey) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Tank"));
         let before = app.world().resource::<Economies>().get(Team::Human).clone();
 
         app.world_mut()
@@ -38271,6 +38281,62 @@ mod tests {
             unit_count_by_id(&mut app, Team::Human, "Tank"),
             1,
             "player-facing VehicleFactory command should spawn a playable Tank"
+        );
+    }
+
+    #[test]
+    fn selected_vehicle_factory_button_click_queues_and_spawns_tank_through_panel() {
+        let mut app = playable_production_shortcut_test_app();
+        let tank_def = registry::entity("Tank").expect("registry should include Tank");
+        let factory_origin = Vec3::new(0.0, 0.0, 0.0);
+        let factory = spawn_test_structure(&mut app, "VehicleFactory", Team::Human, factory_origin);
+        app.world_mut().entity_mut(factory).insert(Selected);
+
+        app.update();
+
+        let (button, tank_slot_index, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Tank"));
+        let before = app.world().resource::<Economies>().get(Team::Human).clone();
+
+        app.world_mut()
+            .entity_mut(button)
+            .insert(Interaction::Pressed);
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .press(MouseButton::Left);
+        app.update();
+
+        {
+            let queue = app.world().resource::<BuildQueue>();
+            assert_eq!(queue.0.len(), 1);
+            assert_eq!(queue.0[0].team, Team::Human);
+            assert!(matches!(queue.0[0].action, BuildAction::Train("Tank")));
+            assert_eq!(queue.0[0].producer_entity, factory);
+        }
+        let after_reservation = app.world().resource::<Economies>().get(Team::Human);
+        assert_eq!(after_reservation.ore, before.ore - tank_def.cost.ore);
+        assert_eq!(
+            after_reservation.crystal,
+            before.crystal - tank_def.cost.crystal
+        );
+
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.release(MouseButton::Left);
+            mouse.clear();
+        }
+        for _ in 0..(tank_def.build_seconds.ceil() as usize + 2) {
+            app.update();
+        }
+
+        assert!(
+            app.world().resource::<BuildQueue>().0.is_empty(),
+            "clicked Tank button from slot {tank_slot_index} should complete production"
+        );
+        assert_eq!(
+            unit_count_by_id(&mut app, Team::Human, "Tank"),
+            1,
+            "left-clicking the VehicleFactory command button should spawn a playable Tank"
         );
     }
 
