@@ -31156,6 +31156,172 @@ mod tests {
     }
 
     #[test]
+    fn headless_game_app_mouse_produce_tanks_and_right_click_enemy_base_to_win() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+        press_main_menu_button(&mut app, MainMenuAction::StartMatch, 3);
+
+        assert_eq!(
+            app_screen(&app),
+            AppScreen::InMatch,
+            "real headless app should enter the shared match scene before combat"
+        );
+        let (factory, _, _, constructed) = structure_snapshots_by_id(&mut app, "VehicleFactory")
+            .into_iter()
+            .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+            .expect("default real match should spawn a constructed player VehicleFactory");
+        assert!(constructed);
+        assert!(
+            structure_snapshots_by_id(&mut app, "CommandCenter")
+                .into_iter()
+                .any(|(_, team, _, constructed)| team == Team::Demon && constructed),
+            "default real match should spawn a constructed enemy anchor"
+        );
+
+        mouse_select_entities(
+            &mut app,
+            &[factory],
+            "mouse-selecting the real app VehicleFactory should select it before queuing Tanks",
+        );
+        app.update();
+        let target_tank_count = PRODUCTION_QUEUE_LIMIT + 1;
+        let (tank_button, tank_slot_index, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Tank"));
+        for batch in 0..2 {
+            let expected_total = if batch == 0 {
+                PRODUCTION_QUEUE_LIMIT
+            } else {
+                target_tank_count
+            };
+            let mut queue_attempts = 0;
+            while queue_attempts < 120 {
+                let queued_tanks = {
+                    let queue = app.world().resource::<BuildQueue>();
+                    queue
+                        .0
+                        .iter()
+                        .filter(|job| {
+                            job.team == Team::Human
+                                && job.producer_entity == factory
+                                && matches!(job.action, BuildAction::Train("Tank"))
+                        })
+                        .count()
+                };
+                if unit_count_by_id(&mut app, Team::Human, "Tank") + queued_tanks >= expected_total
+                {
+                    break;
+                }
+                queue_attempts += 1;
+                click_command_button(&mut app, tank_button);
+                for _ in 0..8 {
+                    app.update();
+                }
+            }
+            let queued_tanks = {
+                let queue = app.world().resource::<BuildQueue>();
+                queue
+                    .0
+                    .iter()
+                    .filter(|job| {
+                        job.team == Team::Human
+                            && job.producer_entity == factory
+                            && matches!(job.action, BuildAction::Train("Tank"))
+                    })
+                    .count()
+            };
+            let started_tanks = unit_count_by_id(&mut app, Team::Human, "Tank") + queued_tanks;
+            let human = app.world().resource::<Economies>().get(Team::Human);
+            assert!(
+                started_tanks >= expected_total,
+                "real app Tank command slot {tank_slot_index} should start {expected_total} Tanks after mining funds the queue; started={started_tanks} queued={queued_tanks} ore={} crystal={} power={}/{} attempts={queue_attempts}",
+                human.ore,
+                human.crystal,
+                human.power_used,
+                human.power_capacity
+            );
+            for _ in 0..220 {
+                app.update();
+                if unit_count_by_id(&mut app, Team::Human, "Tank") >= expected_total {
+                    break;
+                }
+            }
+        }
+        assert!(
+            unit_count_by_id(&mut app, Team::Human, "Tank") >= target_tank_count,
+            "real app should produce a Tank attack group through mouse command buttons"
+        );
+
+        for _ in 0..24 {
+            if app.world().resource::<MatchState>().phase != MatchPhase::Running {
+                break;
+            }
+            let Some((target, target_position)) = anchor_targets_by_team(&mut app, Team::Demon)
+                .into_iter()
+                .next()
+            else {
+                break;
+            };
+            let attackers = alive_weapon_units_by_team(&mut app, Team::Human);
+            assert!(
+                !attackers.is_empty(),
+                "real app should keep player attack units alive before issuing the attack order"
+            );
+            let selected_attackers = drag_select_some_entities(
+                &mut app,
+                &attackers,
+                "drag-selecting real app player attack units should select an attack group",
+            );
+            app.world_mut()
+                .entity_mut(target)
+                .insert((VisibilityState { visible: true }, Visibility::Visible));
+            attach_test_window_to_main_camera(&mut app, target_position);
+            right_click_order_at_world(&mut app, target_position);
+            let ordered_attackers = attackers
+                .iter()
+                .filter(|entity| {
+                    app.world()
+                        .get_entity(**entity)
+                        .is_ok_and(|entity_ref| entity_ref.get::<AttackOrder>().is_some())
+                })
+                .count();
+            if app.world().get_entity(target).is_ok() {
+                let order_summary = order_summary_for_entities(&app, &attackers, target);
+                assert!(
+                    ordered_attackers > 0,
+                    "right-clicking the real app enemy anchor should issue AttackOrder from mouse-selected units; selected={selected_attackers}; orders={order_summary}"
+                );
+            }
+            for _ in 0..220 {
+                app.update();
+                if app.world().get_entity(target).is_err()
+                    || app.world().resource::<MatchState>().phase != MatchPhase::Running
+                {
+                    break;
+                }
+            }
+        }
+        for _ in 0..8 {
+            app.update();
+            if app.world().resource::<MatchState>().phase == MatchPhase::HumanVictory {
+                break;
+            }
+        }
+
+        assert!(
+            anchor_targets_by_team(&mut app, Team::Demon).is_empty(),
+            "real app mouse-produced Tank group should destroy all default enemy anchors"
+        );
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::HumanVictory,
+            "real cargo-run app path should finish the match after mouse-selected units right-click the enemy base"
+        );
+    }
+
+    #[test]
     fn headless_game_app_menu_selection_enters_shared_match_with_chosen_setup() {
         let mut app = build_game_app(GameAppMode::Headless);
         app.update();
