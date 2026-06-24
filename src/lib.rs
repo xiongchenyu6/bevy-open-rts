@@ -50,8 +50,6 @@ const CAMERA_PAN_SPEED_MULTIPLIER: f32 = 0.48;
 const CAMERA_MOUSE_ROTATION_SPEED: f32 = 0.005;
 const CAMERA_START_PRIMARY_UNITS: &[&str] = &["MobileConstructionVehicle"];
 const CAMERA_START_PRIMARY_STRUCTURES: &[&str] = &["CommandCenter"];
-const CAMERA_START_RESOURCE_FOCUS_BLEND: f32 = 0.32;
-const CAMERA_START_RESOURCE_MAX_DISTANCE: f32 = 14.0;
 const HUMAN_BASE: Vec3 = Vec3::new(-12.0, 0.0, -9.0);
 const DEMON_BASE: Vec3 = Vec3::new(12.0, 0.0, 9.0);
 const CHAOS_BASE: Vec3 = Vec3::new(10.0, 0.0, -11.0);
@@ -3381,9 +3379,7 @@ fn team_start_camera_focus_for_faction(
     loadout: StartupLoadoutMode,
 ) -> Vec3 {
     let base = team_start_position(map, team);
-    let base_anchor =
-        base + startup_camera_focus_offset(faction_startup_for_loadout(faction, loadout));
-    opening_camera_work_area_focus(map, base_anchor)
+    base + startup_camera_focus_offset(faction_startup_for_loadout(faction, loadout))
 }
 
 fn startup_camera_focus_offset(startup: &TeamStartup) -> Vec3 {
@@ -3419,23 +3415,6 @@ fn startup_aabb_pivot_offset(spawns: &[SpawnSpec]) -> Option<Vec3> {
 
 fn spawn_offset_to_ground_vec(spawn: &SpawnSpec) -> Vec3 {
     Vec3::new(spawn.offset.0, 0.0, spawn.offset.1)
-}
-
-fn opening_camera_work_area_focus(map: &SkirmishMapDef, base_anchor: Vec3) -> Vec3 {
-    let Some(resource_position) = nearest_resource_position(map, base_anchor) else {
-        return base_anchor;
-    };
-    if xz_distance(base_anchor, resource_position) > CAMERA_START_RESOURCE_MAX_DISTANCE {
-        return base_anchor;
-    }
-    base_anchor.lerp(resource_position, CAMERA_START_RESOURCE_FOCUS_BLEND)
-}
-
-fn nearest_resource_position(map: &SkirmishMapDef, from: Vec3) -> Option<Vec3> {
-    map.resources
-        .iter()
-        .map(|resource| map_local_to_world(map, resource.position))
-        .min_by(|a, b| xz_distance_squared(*a, from).total_cmp(&xz_distance_squared(*b, from)))
 }
 
 const HUMAN_AI_PRODUCTION_PRIORITY: &[&str] = &[
@@ -27975,31 +27954,34 @@ mod tests {
     }
 
     #[test]
-    fn selected_team_camera_focus_frames_player_base_work_area() {
+    fn selected_team_camera_focus_starts_over_player_base_anchor() {
         let map = skirmish_map_by_path("res://source/match/maps/PlainAndSimple.tscn")
             .expect("test map should exist");
         let human_base = team_start_position(map, Team::Human);
-        let nearest_resource = nearest_resource_position(map, human_base)
-            .expect("Plain & Simple should have a nearby starting resource patch");
-        let expected_focus = human_base.lerp(nearest_resource, CAMERA_START_RESOURCE_FOCUS_BLEND);
+        let godot_focus = human_base
+            + startup_camera_focus_offset(faction_startup_for_loadout(
+                SkirmishFaction::Alliance,
+                StartupLoadoutMode::GodotSkirmish,
+            ));
+        let expanded_focus = human_base
+            + startup_camera_focus_offset(faction_startup_for_loadout(
+                SkirmishFaction::Alliance,
+                StartupLoadoutMode::PlaytestExpanded,
+            ));
 
         assert!(
             xz_distance(
                 team_start_camera_focus(map, Team::Human, StartupLoadoutMode::GodotSkirmish),
-                expected_focus
+                godot_focus
             ) < 0.01,
-            "the opening camera should frame the player's base and nearest resource patch"
+            "the opening camera should start above the player's primary base anchor"
         );
         assert!(
             xz_distance(
                 team_start_camera_focus(map, Team::Human, StartupLoadoutMode::PlaytestExpanded),
-                expected_focus
+                expanded_focus
             ) < 0.01,
-            "expanded Bevy loadouts should still open on the base work area"
-        );
-        assert!(
-            xz_distance(expected_focus, human_base) < xz_distance(nearest_resource, human_base),
-            "the opening focus should remain closer to the base than to the resource patch"
+            "expanded Bevy loadouts should still open on the primary base anchor"
         );
     }
 
@@ -32490,6 +32472,17 @@ mod tests {
             .collect()
     }
 
+    fn actual_player_base_camera_anchor(app: &mut App, team: Team) -> Option<Vec3> {
+        runtime_unit_positions(app, team, "MobileConstructionVehicle")
+            .into_iter()
+            .next()
+            .or_else(|| {
+                runtime_structure_positions(app, team, "CommandCenter")
+                    .into_iter()
+                    .next()
+            })
+    }
+
     fn runtime_structure_counts_by_team(
         app: &mut App,
         team: Team,
@@ -33777,11 +33770,17 @@ mod tests {
             SkirmishFaction::Chaos,
             app.world().resource::<MatchSetupSettings>().startup_loadout,
         );
+        let actual_base_anchor = actual_player_base_camera_anchor(&mut app, Team::Chaos)
+            .expect("selected Chaos match should spawn a player base camera anchor");
         {
             let camera_state = app.world().resource::<RtsCamera>();
             assert!(
                 xz_distance(camera_state.focus, expected_focus) < 0.01,
-                "selected Chaos match should open the camera over the selected base work area"
+                "selected Chaos match should open the camera over the selected base anchor"
+            );
+            assert!(
+                xz_distance(camera_state.focus, actual_base_anchor) < 0.01,
+                "selected Chaos match camera should match the actual spawned base anchor"
             );
             assert_eq!(
                 camera_state.distance, CAMERA_DEFAULT_DISTANCE,
@@ -33868,10 +33867,22 @@ mod tests {
                     expected_faction,
                     app.world().resource::<MatchSetupSettings>().startup_loadout,
                 );
+                let actual_base_anchor = actual_player_base_camera_anchor(&mut app, player_team)
+                    .unwrap_or_else(|| {
+                        panic!(
+                            "{} {expected_faction:?} should spawn a player base camera anchor",
+                            map.id
+                        )
+                    });
                 let camera_state = app.world().resource::<RtsCamera>();
                 assert!(
                     xz_distance(camera_state.focus, expected_focus) < 0.01,
-                    "{} {expected_faction:?} should open the camera over the selected base work area",
+                    "{} {expected_faction:?} should open the camera over the selected base anchor",
+                    map.id
+                );
+                assert!(
+                    xz_distance(camera_state.focus, actual_base_anchor) < 0.01,
+                    "{} {expected_faction:?} camera should match the actual spawned base anchor",
                     map.id
                 );
                 assert_eq!(
@@ -35057,17 +35068,20 @@ mod tests {
     }
 
     #[test]
-    fn runtime_setup_places_opening_camera_on_selected_player_work_area() {
+    fn runtime_setup_places_opening_camera_on_selected_player_base_anchor() {
         let map = skirmish_map_by_path("res://source/match/maps/TechDivide.tscn")
             .expect("Tech Divide should be registered");
-        let settings = MatchSetupSettings::default()
+        let mut settings = MatchSetupSettings::default()
             .with_map(map.godot_path)
             .with_visible_player(VisiblePlayer::per_player(Team::Chaos));
+        settings.active_teams = [true; 3];
         let mut app = runtime_setup_test_app_with_settings(settings);
 
         app.update();
 
         let expected_focus = team_start_camera_focus(map, Team::Chaos, settings.startup_loadout);
+        let actual_base_anchor = actual_player_base_camera_anchor(&mut app, Team::Chaos)
+            .expect("runtime setup should spawn a selected player base camera anchor");
         let (camera_focus, expected_transform) = {
             let camera_state = app.world().resource::<RtsCamera>();
             (
@@ -35077,7 +35091,11 @@ mod tests {
         };
         assert!(
             xz_distance(camera_focus, expected_focus) < 0.01,
-            "camera resource should open over the selected player's base work area"
+            "camera resource should open over the selected player's base anchor"
+        );
+        assert!(
+            xz_distance(camera_focus, actual_base_anchor) < 0.01,
+            "camera resource should match the selected player's actual spawned base anchor"
         );
         let mut camera_q = app
             .world_mut()
