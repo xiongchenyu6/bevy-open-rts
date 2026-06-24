@@ -3627,6 +3627,94 @@ pub fn run_game_app() {
     build_game_app(GameAppMode::Interactive).run();
 }
 
+fn add_shared_match_resources(app: &mut App) -> &mut App {
+    app.init_state::<AppScreen>()
+        .init_resource::<Economies>()
+        .init_resource::<TeamRelations>()
+        .init_resource::<BuildQueue>()
+        .init_resource::<NextSpawnId>()
+        .init_resource::<AiDirector>()
+        .init_resource::<AiDifficultySettings>()
+        .init_resource::<ActiveTeams>()
+        .init_resource::<PlayerFactions>()
+        .init_resource::<PlayerColorSlots>()
+        .init_resource::<VisiblePlayer>()
+        .init_resource::<SelectedSkirmishMap>()
+        .init_resource::<MatchSetupSettings>()
+        .init_resource::<SkirmishMenuSelection>()
+        .init_resource::<RandomMapCursor>()
+        .init_resource::<MapBounds>()
+        .init_resource::<CommandMode>()
+        .init_resource::<StructurePlacementFeedback>()
+        .init_resource::<MatchMenuState>()
+        .init_resource::<MatchSpeed>()
+        .init_resource::<MatchBriefingState>()
+        .init_resource::<SelectionDragState>()
+        .init_resource::<UnitGroups>()
+        .init_resource::<CameraBookmarks>()
+        .init_resource::<CameraMouseRotation>()
+        .init_resource::<DoubleClickState>()
+        .init_resource::<ButtonInput<KeyCode>>()
+        .init_resource::<ButtonInput<MouseButton>>()
+        .init_resource::<LatestBattleEvent>()
+        .insert_resource(MatchFlow { active: false })
+        .init_resource::<MatchState>()
+        .init_resource::<SupportCooldowns>()
+        .init_resource::<KillCredits>()
+        .init_resource::<BattleLog>()
+        .init_resource::<AudioFeedback>()
+        .init_resource::<ObjectiveTrackerState>()
+        .insert_resource(RtsCamera::default())
+}
+
+fn add_main_menu_scene(app: &mut App) -> &mut App {
+    app.add_systems(
+        OnEnter(AppScreen::MainMenu),
+        (
+            restore_main_menu_selection_from_match_setup,
+            setup_main_menu,
+        )
+            .chain(),
+    )
+    .add_systems(
+        Update,
+        (
+            main_menu_scroll,
+            main_menu_buttons,
+            update_main_menu_summary,
+            update_skirmish_map_preview,
+        )
+            .chain()
+            .run_if(in_state(AppScreen::MainMenu)),
+    )
+}
+
+fn add_shared_match_scene(app: &mut App) -> &mut App {
+    add_shared_match_resources(app)
+        .add_systems(
+            OnEnter(AppScreen::InMatch),
+            (
+                apply_match_setup_settings,
+                begin_match_from_setup,
+                setup_support_cooldowns,
+                setup,
+            )
+                .chain(),
+        )
+        .add_systems(OnEnter(AppScreen::RestartingMatch), advance_match_restart)
+        .add_systems(
+            OnExit(AppScreen::InMatch),
+            (
+                stop_match_flow_on_exit,
+                reset_match_speed_on_exit,
+                cleanup_match_scoped_entities,
+            )
+                .chain(),
+        );
+    add_runtime_systems(app);
+    app
+}
+
 pub fn build_game_app(mode: GameAppMode) -> App {
     let mut app = App::new();
     let primary_window = match mode {
@@ -3670,84 +3758,9 @@ pub fn build_game_app(mode: GameAppMode) -> App {
             JsonAssetPlugin::<RtsDataManifest>::new(&["rts.json"]),
             RonAssetPlugin::<RtsDataManifest>::new(&["rts.ron"]),
         ))
-        .insert_resource(RenderErrorHandler(handle_render_error))
-        .init_state::<AppScreen>()
-        .init_resource::<Economies>()
-        .init_resource::<TeamRelations>()
-        .init_resource::<BuildQueue>()
-        .init_resource::<NextSpawnId>()
-        .init_resource::<AiDirector>()
-        .init_resource::<AiDifficultySettings>()
-        .init_resource::<ActiveTeams>()
-        .init_resource::<PlayerFactions>()
-        .init_resource::<PlayerColorSlots>()
-        .init_resource::<VisiblePlayer>()
-        .init_resource::<SelectedSkirmishMap>()
-        .init_resource::<MatchSetupSettings>()
-        .init_resource::<SkirmishMenuSelection>()
-        .init_resource::<RandomMapCursor>()
-        .init_resource::<MapBounds>()
-        .init_resource::<CommandMode>()
-        .init_resource::<StructurePlacementFeedback>()
-        .init_resource::<MatchMenuState>()
-        .init_resource::<MatchSpeed>()
-        .init_resource::<MatchBriefingState>()
-        .init_resource::<SelectionDragState>()
-        .init_resource::<UnitGroups>()
-        .init_resource::<CameraBookmarks>()
-        .init_resource::<CameraMouseRotation>()
-        .init_resource::<DoubleClickState>()
-        .init_resource::<ButtonInput<KeyCode>>()
-        .init_resource::<ButtonInput<MouseButton>>()
-        .init_resource::<LatestBattleEvent>()
-        .insert_resource(MatchFlow { active: false })
-        .init_resource::<MatchState>()
-        .init_resource::<SupportCooldowns>()
-        .init_resource::<KillCredits>()
-        .init_resource::<BattleLog>()
-        .init_resource::<AudioFeedback>()
-        .init_resource::<ObjectiveTrackerState>()
-        .insert_resource(RtsCamera::default())
-        .add_systems(
-            OnEnter(AppScreen::MainMenu),
-            (
-                restore_main_menu_selection_from_match_setup,
-                setup_main_menu,
-            )
-                .chain(),
-        )
-        .add_systems(
-            Update,
-            (
-                main_menu_scroll,
-                main_menu_buttons,
-                update_main_menu_summary,
-                update_skirmish_map_preview,
-            )
-                .chain()
-                .run_if(in_state(AppScreen::MainMenu)),
-        )
-        .add_systems(
-            OnEnter(AppScreen::InMatch),
-            (
-                apply_match_setup_settings,
-                begin_match_from_setup,
-                setup_support_cooldowns,
-                setup,
-            )
-                .chain(),
-        )
-        .add_systems(OnEnter(AppScreen::RestartingMatch), advance_match_restart)
-        .add_systems(
-            OnExit(AppScreen::InMatch),
-            (
-                stop_match_flow_on_exit,
-                reset_match_speed_on_exit,
-                cleanup_match_scoped_entities,
-            )
-                .chain(),
-        );
-    add_runtime_systems(&mut app);
+        .insert_resource(RenderErrorHandler(handle_render_error));
+    add_shared_match_scene(&mut app);
+    add_main_menu_scene(&mut app);
     app
 }
 
@@ -3770,63 +3783,8 @@ pub fn build_capture_match_app() -> App {
     .init_asset::<bevy::mesh::skinning::SkinnedMeshInverseBindposes>()
     .init_asset::<WorldAsset>()
     .init_asset::<Font>()
-    .init_asset::<bevy::audio::AudioSource>()
-    .init_resource::<Economies>()
-    .init_resource::<TeamRelations>()
-    .init_resource::<BuildQueue>()
-    .init_resource::<NextSpawnId>()
-    .init_resource::<AiDirector>()
-    .init_resource::<AiDifficultySettings>()
-    .init_resource::<ActiveTeams>()
-    .init_resource::<PlayerFactions>()
-    .init_resource::<PlayerColorSlots>()
-    .init_resource::<VisiblePlayer>()
-    .init_resource::<SelectedSkirmishMap>()
-    .init_resource::<MatchSetupSettings>()
-    .init_resource::<SkirmishMenuSelection>()
-    .init_resource::<RandomMapCursor>()
-    .init_resource::<MapBounds>()
-    .init_resource::<CommandMode>()
-    .init_resource::<StructurePlacementFeedback>()
-    .init_resource::<MatchMenuState>()
-    .init_resource::<MatchSpeed>()
-    .init_resource::<MatchBriefingState>()
-    .init_resource::<SelectionDragState>()
-    .init_resource::<UnitGroups>()
-    .init_resource::<CameraBookmarks>()
-    .init_resource::<CameraMouseRotation>()
-    .init_resource::<DoubleClickState>()
-    .init_resource::<ButtonInput<KeyCode>>()
-    .init_resource::<ButtonInput<MouseButton>>()
-    .init_resource::<LatestBattleEvent>()
-    .insert_resource(MatchFlow { active: false })
-    .init_resource::<MatchState>()
-    .init_resource::<SupportCooldowns>()
-    .init_resource::<KillCredits>()
-    .init_resource::<BattleLog>()
-    .init_resource::<AudioFeedback>()
-    .init_resource::<ObjectiveTrackerState>()
-    .insert_resource(RtsCamera::default())
-    .add_systems(
-        OnEnter(AppScreen::InMatch),
-        (
-            apply_match_setup_settings,
-            begin_match_from_setup,
-            setup_support_cooldowns,
-            setup,
-        )
-            .chain(),
-    )
-    .add_systems(
-        OnExit(AppScreen::InMatch),
-        (
-            stop_match_flow_on_exit,
-            reset_match_speed_on_exit,
-            cleanup_match_scoped_entities,
-        )
-            .chain(),
-    );
-    add_runtime_systems(&mut app);
+    .init_asset::<bevy::audio::AudioSource>();
+    add_shared_match_scene(&mut app);
     start_default_match_for_capture(&mut app);
     app
 }
