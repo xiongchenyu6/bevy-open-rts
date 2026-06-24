@@ -6,7 +6,7 @@ use std::{
 };
 
 use bevy_open_rts::{
-    CaptureEntityKind, CaptureMatchSnapshot, CaptureTeam, advance_capture_match,
+    CaptureEntityKind, CaptureMatchPhase, CaptureMatchSnapshot, CaptureTeam, advance_capture_match,
     build_capture_match_app, capture_match_snapshot,
 };
 
@@ -158,7 +158,7 @@ fn render_frame(frame: usize, total_frames: usize, snapshot: &CaptureMatchSnapsh
 
     draw_ground(&mut pixels);
     draw_snapshot(&mut pixels, snapshot, seconds);
-    draw_ui(&mut pixels, frame, total_frames);
+    draw_ui(&mut pixels, frame, total_frames, snapshot);
     pixels
 }
 
@@ -309,8 +309,9 @@ fn draw_unit(pixels: &mut [u8], world: Vec2, body: Rgba, ring: Rgba) {
     );
 }
 
-fn draw_ui(pixels: &mut [u8], frame: usize, total_frames: usize) {
+fn draw_ui(pixels: &mut [u8], frame: usize, total_frames: usize, snapshot: &CaptureMatchSnapshot) {
     fill_rect(pixels, 0, 0, WIDTH as i32, 43, Rgba::rgba(14, 20, 23, 218));
+    draw_match_status(pixels, snapshot);
     fill_rect(
         pixels,
         0,
@@ -346,6 +347,94 @@ fn draw_ui(pixels: &mut [u8], frame: usize, total_frames: usize) {
         12,
         12,
         Rgba::rgb(101, 168, 245),
+    );
+}
+
+fn draw_match_status(pixels: &mut [u8], snapshot: &CaptureMatchSnapshot) {
+    let phase_color = match snapshot.phase {
+        CaptureMatchPhase::Running => Rgba::rgb(95, 196, 142),
+        CaptureMatchPhase::HumanVictory => Rgba::rgb(104, 178, 255),
+        CaptureMatchPhase::HumanDefeat => Rgba::rgb(230, 82, 74),
+        CaptureMatchPhase::MatchFinished => Rgba::rgb(214, 192, 112),
+    };
+    fill_rect(pixels, 12, 11, 8, 21, phase_color);
+
+    let time_fill = ((snapshot.elapsed_seconds / 180.0).clamp(0.0, 1.0) * 170.0) as i32;
+    fill_rect(pixels, 28, 11, 174, 7, Rgba::rgba(62, 78, 82, 230));
+    fill_rect(pixels, 30, 13, time_fill, 3, Rgba::rgb(126, 201, 232));
+
+    let anchors_fill = (snapshot.remaining_anchors.min(8) as i32 * 17).max(2);
+    fill_rect(pixels, 28, 25, 140, 6, Rgba::rgba(62, 78, 82, 230));
+    fill_rect(pixels, 30, 27, anchors_fill, 2, Rgba::rgb(221, 210, 138));
+
+    let teams_fill = (snapshot.remaining_teams.min(3) as i32 * 28).max(2);
+    fill_rect(pixels, 176, 25, 86, 6, Rgba::rgba(62, 78, 82, 230));
+    fill_rect(pixels, 178, 27, teams_fill, 2, Rgba::rgb(156, 227, 181));
+
+    draw_team_status_row(
+        pixels,
+        292,
+        snapshot.human.units,
+        snapshot.human.structures,
+        snapshot.human.ore + snapshot.human.crystal,
+        Rgba::rgb(85, 155, 245),
+    );
+    draw_team_status_row(
+        pixels,
+        508,
+        snapshot.demon.units,
+        snapshot.demon.structures,
+        snapshot.demon.ore + snapshot.demon.crystal,
+        Rgba::rgb(242, 63, 58),
+    );
+    draw_team_status_row(
+        pixels,
+        724,
+        snapshot.chaos.units,
+        snapshot.chaos.structures,
+        snapshot.chaos.ore + snapshot.chaos.crystal,
+        Rgba::rgb(174, 93, 245),
+    );
+
+    let destroyed_width =
+        ((snapshot.enemy_units_destroyed + snapshot.enemy_structures_destroyed).min(24) as i32 * 5)
+            .max(2);
+    fill_rect(pixels, 948, 18, 124, 8, Rgba::rgba(62, 78, 82, 230));
+    fill_rect(pixels, 950, 20, destroyed_width, 4, Rgba::rgb(244, 147, 90));
+}
+
+fn draw_team_status_row(
+    pixels: &mut [u8],
+    x: i32,
+    units: u32,
+    structures: u32,
+    resources: i32,
+    color: Rgba,
+) {
+    fill_rect(pixels, x, 11, 176, 22, Rgba::rgba(34, 47, 50, 210));
+    fill_rect(pixels, x + 7, 16, 8, 8, color);
+    let unit_width = (units.min(24) as i32 * 4).max(2);
+    let structure_width = (structures.min(12) as i32 * 7).max(2);
+    let resource_width = ((resources.max(0).min(360) as f32 / 360.0) * 38.0) as i32;
+    fill_rect(pixels, x + 22, 15, 98, 4, Rgba::rgba(74, 89, 92, 230));
+    fill_rect(pixels, x + 22, 15, unit_width, 4, color);
+    fill_rect(pixels, x + 22, 24, 98, 4, Rgba::rgba(74, 89, 92, 230));
+    fill_rect(
+        pixels,
+        x + 22,
+        24,
+        structure_width,
+        4,
+        Rgba::rgb(217, 222, 214),
+    );
+    fill_rect(pixels, x + 128, 18, 38, 7, Rgba::rgba(74, 89, 92, 230));
+    fill_rect(
+        pixels,
+        x + 128,
+        18,
+        resource_width,
+        7,
+        Rgba::rgb(94, 219, 204),
     );
 }
 

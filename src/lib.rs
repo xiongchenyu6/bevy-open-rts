@@ -3834,6 +3834,15 @@ pub fn build_capture_match_app() -> App {
 #[derive(Clone, Debug, Default)]
 pub struct CaptureMatchSnapshot {
     pub entities: Vec<CaptureEntitySnapshot>,
+    pub phase: CaptureMatchPhase,
+    pub elapsed_seconds: f32,
+    pub remaining_teams: u32,
+    pub remaining_anchors: u32,
+    pub enemy_units_destroyed: u32,
+    pub enemy_structures_destroyed: u32,
+    pub human: CaptureTeamStats,
+    pub demon: CaptureTeamStats,
+    pub chaos: CaptureTeamStats,
 }
 
 #[derive(Clone, Debug)]
@@ -3861,6 +3870,23 @@ pub enum CaptureEntityKind {
     Resource,
 }
 
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum CaptureMatchPhase {
+    #[default]
+    Running,
+    HumanDefeat,
+    HumanVictory,
+    MatchFinished,
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct CaptureTeamStats {
+    pub units: u32,
+    pub structures: u32,
+    pub ore: i32,
+    pub crystal: i32,
+}
+
 pub fn start_default_match_for_capture(app: &mut App) {
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
@@ -3881,51 +3907,95 @@ pub fn advance_capture_match(app: &mut App, frames: usize) {
 
 pub fn capture_match_snapshot(app: &mut App) -> CaptureMatchSnapshot {
     let world = app.world_mut();
-    let mut query = world.query::<(
-        &Transform,
-        Option<&Team>,
-        Option<&Unit>,
-        Option<&Structure>,
-        Option<&ResourceNode>,
-        Option<&Health>,
-        Option<&VisibilityState>,
-    )>();
     let mut entities = Vec::new();
-    for (transform, team, unit, structure, resource, health, visibility) in query.iter(world) {
-        let kind = if resource.is_some() {
-            CaptureEntityKind::Resource
-        } else if structure.is_some() {
-            CaptureEntityKind::Structure
-        } else if unit.is_some() {
-            CaptureEntityKind::Unit
-        } else {
-            continue;
-        };
-        let health_ratio = health.map_or(1.0, |health| {
-            if health.max <= f32::EPSILON {
-                0.0
+    let mut human = CaptureTeamStats::default();
+    let mut demon = CaptureTeamStats::default();
+    let mut chaos = CaptureTeamStats::default();
+    {
+        let mut query = world.query::<(
+            &Transform,
+            Option<&Team>,
+            Option<&Unit>,
+            Option<&Structure>,
+            Option<&ResourceNode>,
+            Option<&Health>,
+            Option<&VisibilityState>,
+        )>();
+        for (transform, team, unit, structure, resource, health, visibility) in query.iter(world) {
+            let kind = if resource.is_some() {
+                CaptureEntityKind::Resource
+            } else if structure.is_some() {
+                CaptureEntityKind::Structure
+            } else if unit.is_some() {
+                CaptureEntityKind::Unit
             } else {
-                (health.current / health.max).clamp(0.0, 1.0)
+                continue;
+            };
+            let health_ratio = health.map_or(1.0, |health| {
+                if health.max <= f32::EPSILON {
+                    0.0
+                } else {
+                    (health.current / health.max).clamp(0.0, 1.0)
+                }
+            });
+            if health_ratio <= 0.0 || resource.is_some_and(|resource| resource.amount <= 0) {
+                continue;
             }
-        });
-        if health_ratio <= 0.0 || resource.is_some_and(|resource| resource.amount <= 0) {
-            continue;
+            if let Some(team) = team {
+                let stats = match team {
+                    Team::Human => Some(&mut human),
+                    Team::Demon => Some(&mut demon),
+                    Team::Chaos => Some(&mut chaos),
+                    Team::Neutral => None,
+                };
+                if let Some(stats) = stats {
+                    match kind {
+                        CaptureEntityKind::Unit => stats.units += 1,
+                        CaptureEntityKind::Structure => stats.structures += 1,
+                        CaptureEntityKind::Resource => {}
+                    }
+                }
+            }
+            entities.push(CaptureEntitySnapshot {
+                x: transform.translation.x,
+                z: transform.translation.z,
+                team: team.map_or(CaptureTeam::Neutral, |team| match team {
+                    Team::Human => CaptureTeam::Human,
+                    Team::Demon => CaptureTeam::Demon,
+                    Team::Chaos => CaptureTeam::Chaos,
+                    Team::Neutral => CaptureTeam::Neutral,
+                }),
+                kind,
+                visible: visibility.is_none_or(|visibility| visibility.visible),
+                health_ratio,
+            });
         }
-        entities.push(CaptureEntitySnapshot {
-            x: transform.translation.x,
-            z: transform.translation.z,
-            team: team.map_or(CaptureTeam::Neutral, |team| match team {
-                Team::Human => CaptureTeam::Human,
-                Team::Demon => CaptureTeam::Demon,
-                Team::Chaos => CaptureTeam::Chaos,
-                Team::Neutral => CaptureTeam::Neutral,
-            }),
-            kind,
-            visible: visibility.is_none_or(|visibility| visibility.visible),
-            health_ratio,
-        });
     }
-    CaptureMatchSnapshot { entities }
+    let economies = world.resource::<Economies>();
+    human.ore = economies.get(Team::Human).ore;
+    human.crystal = economies.get(Team::Human).crystal;
+    demon.ore = economies.get(Team::Demon).ore;
+    demon.crystal = economies.get(Team::Demon).crystal;
+    chaos.ore = economies.get(Team::Chaos).ore;
+    chaos.crystal = economies.get(Team::Chaos).crystal;
+    let match_state = world.resource::<MatchState>();
+    CaptureMatchSnapshot {
+        entities,
+        phase: match match_state.phase {
+            MatchPhase::Running => CaptureMatchPhase::Running,
+            MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
+            MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
+            MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
+        },
+        elapsed_seconds: match_state.start_time_sec,
+        remaining_teams: match_state.remaining_teams,
+        remaining_anchors: match_state.remaining_anchors,
+        enemy_units_destroyed: match_state.enemy_units_destroyed,
+        enemy_structures_destroyed: match_state.enemy_structures_destroyed,
+        human,
+        demon,
+        chaos,
+    }
 }
 
 fn cleanup_match_scoped_entities(
@@ -30042,6 +30112,39 @@ mod tests {
                 .iter()
                 .any(|entity| entity.kind == CaptureEntityKind::Resource),
             "capture should expose the shared map resource nodes"
+        );
+    }
+
+    #[test]
+    fn capture_snapshot_tracks_live_match_progress_stats() {
+        let mut app = build_capture_match_app();
+        let initial = capture_match_snapshot(&mut app);
+
+        assert_eq!(initial.phase, CaptureMatchPhase::Running);
+        assert!(initial.human.structures > 0);
+        assert!(initial.demon.structures > 0);
+        assert!(initial.human.units > 0);
+        assert!(initial.remaining_teams >= 2);
+        assert!(initial.remaining_anchors >= 2);
+
+        advance_capture_match(&mut app, 90);
+        let advanced = capture_match_snapshot(&mut app);
+
+        assert!(
+            advanced.elapsed_seconds > initial.elapsed_seconds,
+            "capture stats should advance with the shared match app"
+        );
+        assert_eq!(advanced.phase, CaptureMatchPhase::Running);
+        assert_eq!(
+            advanced.human.structures, initial.human.structures,
+            "opening capture should keep the player's base alive"
+        );
+        assert!(
+            advanced.human.ore != initial.human.ore
+                || advanced.human.crystal != initial.human.crystal
+                || advanced.human.units != initial.human.units
+                || advanced.demon.units != initial.demon.units,
+            "capture stats should reflect live economy or unit simulation changes"
         );
     }
 
