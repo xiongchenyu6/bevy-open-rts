@@ -39086,6 +39086,123 @@ mod tests {
     }
 
     #[test]
+    fn default_menu_command_center_resource_rally_sends_new_workers_to_harvest() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+        for _ in 0..3 {
+            app.update();
+        }
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let (command_center, _, command_center_position, constructed) =
+            structure_snapshots_by_id(&mut app, "CommandCenter")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .expect(
+                    "default playable skirmish should spawn a constructed player CommandCenter",
+                );
+        assert!(constructed);
+        let (resource, _, resource_amount_before, resource_position, resource_visible) =
+            runtime_resource_node_snapshots(&mut app)
+                .into_iter()
+                .filter(|(_, kind, amount, _, visible)| {
+                    *kind == ResourceKind::Ore && *amount > 0 && *visible
+                })
+                .min_by(|(_, _, _, lhs, _), (_, _, _, rhs, _)| {
+                    xz_distance(*lhs, command_center_position)
+                        .partial_cmp(&xz_distance(*rhs, command_center_position))
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
+                .expect("default player start should reveal at least one nearby ore node");
+        assert!(
+            resource_visible,
+            "default player start should reveal the resource rally target"
+        );
+
+        select_only_entities(&mut app, &[command_center]);
+        app.update();
+        let (rally_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::SetRallyPoint);
+        click_command_button(&mut app, rally_button);
+        assert!(
+            app.world().resource::<CommandMode>().rally_point,
+            "clicking the CommandCenter rally command should arm rally targeting"
+        );
+
+        attach_test_window_to_main_camera(&mut app, resource_position);
+        right_click_order_at_world(&mut app, resource_position);
+        let rally_point = *app
+            .world()
+            .entity(command_center)
+            .get::<RallyPoint>()
+            .expect("CommandCenter should carry RallyPoint");
+        assert_eq!(
+            rally_point.target_unit,
+            Some(resource),
+            "right-clicking a visible ore node in rally mode should track that resource"
+        );
+        assert!(
+            rally_point
+                .target
+                .is_some_and(|target| xz_distance(target, resource_position) < 0.05),
+            "tracked resource rally target should store the current resource position"
+        );
+
+        let workers_before = unit_entities_by_id(&mut app, Team::Human, "Worker");
+        let (worker_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Worker"));
+        click_command_button(&mut app, worker_button);
+        for _ in 0..120 {
+            app.update();
+            if unit_entities_by_id(&mut app, Team::Human, "Worker").len() > workers_before.len() {
+                break;
+            }
+        }
+        let produced_worker = unit_entities_by_id(&mut app, Team::Human, "Worker")
+            .into_iter()
+            .find(|entity| !workers_before.contains(entity))
+            .expect("default CommandCenter should produce a new Worker from its command button");
+        assert!(
+            app.world()
+                .entity(produced_worker)
+                .get::<HarvestOrder>()
+                .is_some_and(|order| order.resource == Some(resource)),
+            "a Worker produced after setting a resource rally point should harvest that resource"
+        );
+
+        let ore_after_spawn = app.world().resource::<Economies>().get(Team::Human).ore;
+        for _ in 0..160 {
+            app.update();
+            let ore_now = app.world().resource::<Economies>().get(Team::Human).ore;
+            let resource_now = app
+                .world()
+                .get::<ResourceNode>(resource)
+                .map_or(0, |resource| resource.amount);
+            if ore_now > ore_after_spawn && resource_now < resource_amount_before {
+                break;
+            }
+        }
+        let ore_after_harvest = app.world().resource::<Economies>().get(Team::Human).ore;
+        let resource_after_harvest = app
+            .world()
+            .get::<ResourceNode>(resource)
+            .map_or(0, |resource| resource.amount);
+        assert!(
+            resource_after_harvest < resource_amount_before,
+            "resource-rallied Worker should mine the target ore node"
+        );
+        assert!(
+            ore_after_harvest > ore_after_spawn,
+            "resource-rallied Worker should deliver mined ore back to the player economy"
+        );
+    }
+
+    #[test]
     fn default_menu_tank_attack_move_acquires_visible_enemy() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
