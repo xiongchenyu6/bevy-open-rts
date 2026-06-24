@@ -10,6 +10,7 @@ use bevy_open_rts::{
     advance_capture_match, advance_capture_match_proof_frame, build_capture_match_app,
     build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
     capture_proof_unit_count, run_capture_match_proof_for_faction,
+    run_real_menu_match_proof_for_faction,
 };
 
 const WIDTH: u32 = 1280;
@@ -161,6 +162,36 @@ fn run() -> Result<(), String> {
                 ));
             }
         }
+        Some("real-match-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("7200")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let faction = parse_optional_faction(args.next())?;
+            let proof = run_real_menu_match_proof_for_faction(faction, max_frames);
+            println!(
+                "[capture] real-match-proof faction={} label={} product={} phase={:?} frames={} elapsed={}s produced_units={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
+                proof.faction.key(),
+                proof.faction.label(),
+                proof.product_id,
+                proof.phase,
+                proof.frames,
+                proof.elapsed_seconds,
+                proof.produced_units,
+                proof.player_units,
+                proof.enemy_units_destroyed,
+                proof.enemy_structures_destroyed,
+                proof.remaining_teams,
+                proof.remaining_anchors
+            );
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real menu match proof did not reach player victory within {max_frames} frames"
+                ));
+            }
+        }
         Some("help" | "-h" | "--help") => {
             print_help();
         }
@@ -182,6 +213,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- match-proof 7200 human");
     println!("  cargo run --bin capture -- match-proof 7200 demon");
     println!("  cargo run --bin capture -- match-proof 7200 chaos");
+    println!("  cargo run --bin capture -- real-match-proof 7200 human");
 }
 
 fn parse_optional_faction(value: Option<String>) -> Result<CaptureProofFaction, String> {

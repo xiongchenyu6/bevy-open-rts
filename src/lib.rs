@@ -4082,11 +4082,31 @@ pub fn build_capture_match_app_for_faction(faction: CaptureProofFaction) -> App 
     build_capture_match_app_with_settings(capture_match_setup_for_faction(faction))
 }
 
+pub fn build_real_menu_match_app_for_faction(faction: CaptureProofFaction) -> App {
+    let mut app = build_game_app(GameAppMode::Headless);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
+    ));
+    app.update();
+
+    drive_main_menu_action(&mut app, MainMenuAction::SelectFaction(faction.team()), 1);
+    drive_main_menu_action(&mut app, MainMenuAction::StartMatch, 3);
+    app
+}
+
 pub fn run_capture_match_proof_for_faction(
     faction: CaptureProofFaction,
     max_frames: usize,
 ) -> CaptureMatchProof {
     let mut app = build_capture_match_app_for_faction(faction);
+    run_capture_match_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_match_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureMatchProof {
+    let mut app = build_real_menu_match_app_for_faction(faction);
     run_capture_match_proof(&mut app, faction, max_frames)
 }
 
@@ -4176,6 +4196,36 @@ pub fn capture_match_proof_status(
 
 pub fn capture_proof_unit_count(app: &mut App, faction: CaptureProofFaction) -> u32 {
     capture_unit_count_by_id(app.world_mut(), faction.team(), faction.proof_vehicle()) as u32
+}
+
+fn drive_main_menu_action(app: &mut App, action: MainMenuAction, followup_updates: usize) {
+    let button_entity = {
+        let world = app.world_mut();
+        let mut buttons = world.query::<(Entity, &MainMenuButton)>();
+        buttons
+            .iter(world)
+            .find_map(|(entity, button)| (button.action == action).then_some(entity))
+            .expect("main menu button should exist")
+    };
+    app.world_mut()
+        .entity_mut(button_entity)
+        .insert(Interaction::Pressed);
+    {
+        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+        mouse.press(MouseButton::Left);
+    }
+    app.update();
+    {
+        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+        mouse.release(MouseButton::Left);
+        mouse.clear();
+    }
+    app.world_mut()
+        .entity_mut(button_entity)
+        .insert(Interaction::None);
+    for _ in 0..followup_updates {
+        app.update();
+    }
 }
 
 fn capture_match_setup_for_faction(faction: CaptureProofFaction) -> MatchSetupSettings {
@@ -31061,14 +31111,7 @@ mod tests {
     }
 
     fn headless_menu_match_proof_app(faction: CaptureProofFaction) -> App {
-        let mut app = build_game_app(GameAppMode::Headless);
-        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-            Duration::from_secs_f32(1.0 / 30.0),
-        ));
-        app.update();
-
-        press_main_menu_button(&mut app, MainMenuAction::SelectFaction(faction.team()), 1);
-        press_main_menu_button(&mut app, MainMenuAction::StartMatch, 3);
+        let app = build_real_menu_match_app_for_faction(faction);
 
         assert_eq!(
             app_screen(&app),
