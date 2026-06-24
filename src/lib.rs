@@ -41587,6 +41587,137 @@ mod tests {
     }
 
     #[test]
+    fn default_menu_tank_patrol_engages_visible_enemy_and_resumes() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let (factory, _, factory_position, constructed) =
+            structure_snapshots_by_id(&mut app, "VehicleFactory")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .expect(
+                    "default playable skirmish should spawn a constructed player VehicleFactory",
+                );
+        assert!(constructed);
+
+        attach_test_window_to_main_camera(&mut app, factory_position);
+        click_selection_at_world(&mut app, factory_position, false);
+        assert!(
+            app.world().entity(factory).get::<Selected>().is_some(),
+            "left-clicking the visible VehicleFactory should select it before training a patrol Tank"
+        );
+        app.update();
+
+        let tanks_before = unit_entities_by_id(&mut app, Team::Human, "Tank");
+        let (tank_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Tank"));
+        click_command_button(&mut app, tank_button);
+        for _ in 0..120 {
+            app.update();
+            if unit_entities_by_id(&mut app, Team::Human, "Tank").len() > tanks_before.len() {
+                break;
+            }
+        }
+        let tank = unit_entities_by_id(&mut app, Team::Human, "Tank")
+            .into_iter()
+            .find(|entity| !tanks_before.contains(entity))
+            .expect("default VehicleFactory should produce a new Tank from its command button");
+        let tank_position = unit_position(&app, tank);
+
+        attach_test_window_to_main_camera(&mut app, tank_position);
+        click_selection_at_world(&mut app, tank_position, false);
+        assert!(
+            app.world().entity(tank).get::<Selected>().is_some(),
+            "left-clicking the produced Tank should select it before patrol"
+        );
+        app.update();
+        let (patrol_button, _, _) = enabled_command_slot_for_action(&mut app, BuildAction::Patrol);
+        click_command_button(&mut app, patrol_button);
+        assert!(
+            app.world().resource::<CommandMode>().patrol,
+            "clicking the Tank patrol command should arm terrain targeting"
+        );
+
+        let destination = tank_position + Vec3::new(10.0, 0.0, -2.0);
+        attach_test_window_to_main_camera(&mut app, destination);
+        right_click_order_at_world(&mut app, destination);
+        assert!(
+            app.world()
+                .entity(tank)
+                .get::<PatrolOrder>()
+                .is_some_and(|order| {
+                    xz_distance(order.origin, tank_position) < 0.05
+                        && xz_distance(order.destination, destination) < 0.05
+                        && order.moving_to_destination
+                }),
+            "right-clicking terrain in patrol mode should assign a PatrolOrder"
+        );
+        assert!(
+            !app.world().resource::<CommandMode>().patrol,
+            "issuing the terrain patrol command should leave targeting mode"
+        );
+
+        let enemy_position = tank_position + Vec3::new(3.0, 0.0, 0.0);
+        let enemy = spawn_test_unit(&mut app, "Worker", Team::Demon, enemy_position);
+        app.world_mut().entity_mut(enemy).insert((
+            Health::new(1.0),
+            VisibilityState { visible: true },
+            Visibility::Visible,
+        ));
+
+        for _ in 0..8 {
+            app.update();
+            if app
+                .world()
+                .entity(tank)
+                .get::<AttackOrder>()
+                .is_some_and(|order| order.target == enemy)
+            {
+                break;
+            }
+        }
+        assert!(
+            app.world()
+                .entity(tank)
+                .get::<AttackOrder>()
+                .is_some_and(|order| order.target == enemy),
+            "a Tank on patrol should acquire a newly visible enemy inside sight"
+        );
+
+        for _ in 0..16 {
+            app.update();
+            if app.world().get_entity(enemy).is_err()
+                && app.world().entity(tank).get::<AttackOrder>().is_none()
+                && app.world().entity(tank).get::<MoveOrder>().is_some()
+            {
+                break;
+            }
+        }
+
+        assert!(
+            app.world().get_entity(enemy).is_err(),
+            "patrol engagement should destroy the visible enemy"
+        );
+        assert!(
+            app.world().entity(tank).get::<PatrolOrder>().is_some(),
+            "patrol should continue after clearing the enemy"
+        );
+        assert!(
+            app.world()
+                .entity(tank)
+                .get::<MoveOrder>()
+                .is_some_and(|order| xz_distance(order.target, destination) < 0.05),
+            "after clearing the enemy, patrol should resume toward the active patrol point"
+        );
+    }
+
+    #[test]
     fn default_menu_player_can_click_select_factory_train_tank_and_order_attack() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
