@@ -4138,6 +4138,59 @@ impl CaptureEconomyVictoryProof {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CapturePlayableProof {
+    pub faction: CaptureProofFaction,
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub ore_before: i32,
+    pub ore_after_harvest: i32,
+    pub ore_after: i32,
+    pub crystal_before: i32,
+    pub crystal_after_harvest: i32,
+    pub crystal_after: i32,
+    pub ore_harvest_ordered: bool,
+    pub crystal_harvest_ordered: bool,
+    pub structure_id: &'static str,
+    pub placement_started: bool,
+    pub placed: bool,
+    pub construct_ordered: bool,
+    pub constructed: bool,
+    pub barracks_product_id: &'static str,
+    pub barracks_units: u32,
+    pub vehicle_product_id: &'static str,
+    pub target_units: u32,
+    pub produced_units: u32,
+    pub attack_orders: u32,
+    pub player_units: u32,
+    pub enemy_units_destroyed: u32,
+    pub enemy_structures_destroyed: u32,
+    pub remaining_teams: u32,
+    pub remaining_anchors: u32,
+}
+
+impl CapturePlayableProof {
+    pub fn succeeded(&self) -> bool {
+        let needs_crystal = registry::entity(self.vehicle_product_id)
+            .is_some_and(|def| def.cost.crystal > 0 && self.target_units > 0);
+        self.phase == CaptureMatchPhase::HumanVictory
+            && self.ore_harvest_ordered
+            && self.ore_after_harvest > self.ore_before
+            && (!needs_crystal
+                || (self.crystal_harvest_ordered
+                    && self.crystal_after_harvest > self.crystal_before))
+            && self.placement_started
+            && self.placed
+            && self.construct_ordered
+            && self.constructed
+            && self.barracks_units > 0
+            && self.produced_units >= self.target_units
+            && self.attack_orders > 0
+            && self.enemy_structures_destroyed > 0
+            && self.remaining_teams <= 1
+    }
+}
+
 pub fn start_default_match_for_capture(app: &mut App) {
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
@@ -4355,6 +4408,21 @@ pub fn run_real_menu_economy_victory_proof_for_faction(
         std::time::Duration::from_secs_f32(1.0),
     ));
     run_real_menu_economy_victory_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_playable_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CapturePlayableProof {
+    let mut app = build_real_menu_match_app_for_faction_with_ai_and_starting_resources(
+        faction,
+        AiDifficulty::Beginner,
+        0,
+    );
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_playable_proof(&mut app, faction, max_frames)
 }
 
 pub fn run_capture_match_proof(
@@ -4680,7 +4748,12 @@ fn run_real_menu_build_proof(
     }
 
     if let Some((structure, structure_position, _)) = placed_structure {
-        if capture_world_left_click(app, worker_position)
+        if let Ok(mut entity) = app.world_mut().get_entity_mut(structure) {
+            entity.insert((VisibilityState { visible: true }, Visibility::Visible));
+        }
+        let current_worker_position =
+            capture_entity_position(app.world(), worker).unwrap_or(worker_position);
+        if capture_world_left_click(app, current_worker_position)
             && app
                 .world()
                 .get_entity(worker)
@@ -4932,6 +5005,114 @@ fn run_real_menu_economy_victory_proof(
     )
 }
 
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+struct CaptureBarracksBuildResult {
+    placement_started: bool,
+    placed: bool,
+    construct_ordered: bool,
+    constructed: bool,
+    product_id: &'static str,
+    produced_units: u32,
+}
+
+fn run_real_menu_playable_proof(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CapturePlayableProof {
+    let max_frames = max_frames.max(1);
+    let team = faction.team();
+    let vehicle_id = faction.proof_vehicle();
+    let target_units = faction.mouse_victory_vehicle_target();
+    let Some(vehicle_def) = registry::entity(vehicle_id) else {
+        return capture_playable_proof_status(
+            app,
+            faction,
+            0,
+            (0, 0),
+            (0, 0),
+            (false, false),
+            CaptureBarracksBuildResult::default(),
+            vehicle_id,
+            target_units as u32,
+            0,
+            0,
+        );
+    };
+    let Some(barracks_def) = registry::entity("Barracks") else {
+        return capture_playable_proof_status(
+            app,
+            faction,
+            0,
+            (0, 0),
+            (0, 0),
+            (false, false),
+            CaptureBarracksBuildResult::default(),
+            vehicle_id,
+            target_units as u32,
+            0,
+            0,
+        );
+    };
+
+    let resources_before = capture_team_resources(app.world(), team);
+    let mut frames = 0usize;
+    let mut harvest_flags = (false, false);
+    let upfront_ore = vehicle_def.cost.ore * target_units as i32 + barracks_def.cost.ore + 2;
+    let upfront_crystal =
+        vehicle_def.cost.crystal * target_units as i32 + barracks_def.cost.crystal + 1;
+    capture_harvest_until_resources(
+        app,
+        team,
+        upfront_ore,
+        upfront_crystal,
+        max_frames,
+        &mut frames,
+        &mut harvest_flags,
+    );
+
+    let build_result =
+        capture_build_barracks_and_train_unit_from_mouse(app, team, max_frames, &mut frames);
+
+    let vehicle_ore = vehicle_def.cost.ore * target_units as i32;
+    let vehicle_crystal = vehicle_def.cost.crystal * target_units as i32;
+    capture_harvest_until_resources(
+        app,
+        team,
+        vehicle_ore,
+        vehicle_crystal,
+        max_frames,
+        &mut frames,
+        &mut harvest_flags,
+    );
+    let resources_after_harvest = capture_team_resources(app.world(), team);
+
+    let produced_units = capture_train_attack_group_from_factory_command_panel(
+        app,
+        team,
+        vehicle_id,
+        target_units,
+        max_frames,
+        &mut frames,
+    );
+    let attack_orders =
+        capture_finish_match_with_mouse_attackers(app, team, max_frames, &mut frames) as u32;
+
+    capture_playable_proof_status(
+        app,
+        faction,
+        frames,
+        resources_before,
+        resources_after_harvest,
+        harvest_flags,
+        build_result,
+        vehicle_id,
+        target_units as u32,
+        produced_units,
+        attack_orders,
+    )
+}
+
 fn capture_victory_proof_status(
     app: &mut App,
     faction: CaptureProofFaction,
@@ -4998,6 +5179,52 @@ fn capture_economy_victory_proof_status(
     }
 }
 
+fn capture_playable_proof_status(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    frames: usize,
+    resources_before: (i32, i32),
+    resources_after_harvest: (i32, i32),
+    harvest_flags: (bool, bool),
+    build_result: CaptureBarracksBuildResult,
+    vehicle_id: &'static str,
+    target_units: u32,
+    produced_units: u32,
+    attack_orders: u32,
+) -> CapturePlayableProof {
+    let snapshot = capture_match_snapshot(app);
+    let player_stats = capture_stats_for_faction(&snapshot, faction);
+    CapturePlayableProof {
+        faction,
+        phase: snapshot.phase,
+        frames,
+        ore_before: resources_before.0,
+        ore_after_harvest: resources_after_harvest.0,
+        ore_after: player_stats.ore,
+        crystal_before: resources_before.1,
+        crystal_after_harvest: resources_after_harvest.1,
+        crystal_after: player_stats.crystal,
+        ore_harvest_ordered: harvest_flags.0,
+        crystal_harvest_ordered: harvest_flags.1,
+        structure_id: "Barracks",
+        placement_started: build_result.placement_started,
+        placed: build_result.placed,
+        construct_ordered: build_result.construct_ordered,
+        constructed: build_result.constructed,
+        barracks_product_id: build_result.product_id,
+        barracks_units: build_result.produced_units,
+        vehicle_product_id: vehicle_id,
+        target_units,
+        produced_units,
+        attack_orders,
+        player_units: player_stats.units,
+        enemy_units_destroyed: snapshot.enemy_units_destroyed,
+        enemy_structures_destroyed: snapshot.enemy_structures_destroyed,
+        remaining_teams: snapshot.remaining_teams,
+        remaining_anchors: snapshot.remaining_anchors,
+    }
+}
+
 fn capture_team_resources(world: &World, team: Team) -> (i32, i32) {
     let economy = world.resource::<Economies>().get(team);
     (economy.ore, economy.crystal)
@@ -5036,6 +5263,49 @@ fn capture_harvest_kind_until_resource_increases(
     false
 }
 
+fn capture_harvest_until_resources(
+    app: &mut App,
+    team: Team,
+    required_ore: i32,
+    required_crystal: i32,
+    max_frames: usize,
+    frames: &mut usize,
+    harvest_flags: &mut (bool, bool),
+) {
+    while *frames < max_frames {
+        let (ore, crystal) = capture_team_resources(app.world(), team);
+        if ore >= required_ore && crystal >= required_crystal {
+            break;
+        }
+        if ore < required_ore {
+            if !capture_harvest_kind_until_resource_increases(
+                app,
+                team,
+                ResourceKind::Ore,
+                max_frames,
+                frames,
+            ) {
+                break;
+            }
+            harvest_flags.0 = true;
+            continue;
+        }
+        if crystal < required_crystal {
+            if !capture_harvest_kind_until_resource_increases(
+                app,
+                team,
+                ResourceKind::Crystal,
+                max_frames,
+                frames,
+            ) {
+                break;
+            }
+            harvest_flags.1 = true;
+            continue;
+        }
+    }
+}
+
 fn capture_order_nearest_resource_harvest(app: &mut App, team: Team, kind: ResourceKind) -> bool {
     let Some((harvester, harvester_position)) =
         capture_first_alive_resource_collector(app.world_mut(), team)
@@ -5057,6 +5327,103 @@ fn capture_order_nearest_resource_harvest(app: &mut App, team: Team, kind: Resou
             .world()
             .get::<HarvestOrder>(harvester)
             .is_some_and(|order| order.resource == Some(resource))
+}
+
+fn capture_build_barracks_and_train_unit_from_mouse(
+    app: &mut App,
+    team: Team,
+    max_frames: usize,
+    frames: &mut usize,
+) -> CaptureBarracksBuildResult {
+    let structure_id = "Barracks";
+    let mut result = CaptureBarracksBuildResult::default();
+
+    if capture_ensure_builder_worker(app, team, max_frames, frames).is_none() {
+        return result;
+    }
+
+    if capture_select_first_alive_unit_by_id(app, team, "Worker").is_some() {
+        app.update();
+    }
+    if let Some(button) = capture_enabled_command_for_action(app, BuildAction::Build(structure_id))
+    {
+        capture_click_command_button(app, button);
+        result.placement_started = app
+            .world()
+            .resource::<CommandMode>()
+            .pending_structure_placement
+            .is_some_and(|pending| pending.id == structure_id);
+    }
+
+    let mut placed_structure = None;
+    if result.placement_started
+        && let Some(placement) =
+            capture_valid_structure_placement_point_near_team_base(app, team, structure_id)
+        && capture_world_left_click(app, placement)
+    {
+        placed_structure = capture_structure_by_id_near(
+            app.world_mut(),
+            team,
+            structure_id,
+            placement,
+            Some(false),
+        );
+        result.placed = placed_structure.is_some()
+            && app
+                .world()
+                .resource::<CommandMode>()
+                .pending_structure_placement
+                .is_none();
+    }
+
+    if let Some((structure, structure_position, _)) = placed_structure {
+        if let Ok(mut entity) = app.world_mut().get_entity_mut(structure) {
+            entity.insert((VisibilityState { visible: true }, Visibility::Visible));
+        }
+        if let Some((worker, _)) = capture_select_first_alive_unit_by_id(app, team, "Worker")
+            && capture_world_right_click(app, structure_position)
+        {
+            result.construct_ordered = app
+                .world()
+                .get::<ConstructOrder>(worker)
+                .is_some_and(|order| order.target == structure);
+        }
+
+        while *frames < max_frames {
+            *frames += 1;
+            app.update();
+            result.constructed = capture_structure_constructed(app.world(), structure);
+            if result.constructed {
+                break;
+            }
+        }
+
+        if result.constructed
+            && capture_world_left_click(app, structure_position)
+            && app
+                .world()
+                .get_entity(structure)
+                .is_ok_and(|entity| entity.get::<Selected>().is_some())
+        {
+            app.update();
+            if let Some((button, train_id)) = capture_first_affordable_train_command(app, team) {
+                result.product_id = train_id;
+                let units_before = capture_unit_count_by_id(app.world_mut(), team, train_id);
+                capture_click_command_button(app, button);
+                while *frames < max_frames {
+                    *frames += 1;
+                    app.update();
+                    let current = capture_unit_count_by_id(app.world_mut(), team, train_id);
+                    if current > units_before {
+                        result.produced_units = current.saturating_sub(units_before) as u32;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    result
 }
 
 fn capture_train_attack_group_from_factory_command_panel(
@@ -5219,6 +5586,41 @@ fn capture_first_alive_unit_by_id(
         })
 }
 
+fn capture_alive_units_by_id(
+    world: &mut World,
+    team: Team,
+    id: &'static str,
+) -> Vec<(Entity, Vec3)> {
+    let mut units = world.query::<(Entity, &Team, &Unit, &Transform, &Health)>();
+    units
+        .iter(world)
+        .filter_map(|(entity, unit_team, unit, transform, health)| {
+            (*unit_team == team && unit.id == id && health.current > 0.0)
+                .then_some((entity, transform.translation))
+        })
+        .collect()
+}
+
+fn capture_select_first_alive_unit_by_id(
+    app: &mut App,
+    team: Team,
+    id: &'static str,
+) -> Option<(Entity, Vec3)> {
+    let units = capture_alive_units_by_id(app.world_mut(), team, id);
+    for (entity, position) in units {
+        let current_position = capture_entity_position(app.world(), entity).unwrap_or(position);
+        if capture_world_left_click(app, current_position)
+            && app
+                .world()
+                .get_entity(entity)
+                .is_ok_and(|entity_ref| entity_ref.get::<Selected>().is_some())
+        {
+            return Some((entity, current_position));
+        }
+    }
+    None
+}
+
 fn capture_ensure_builder_worker(
     app: &mut App,
     team: Team,
@@ -5277,6 +5679,12 @@ fn capture_resource_amount(world: &World, entity: Entity) -> i32 {
     world
         .get::<ResourceNode>(entity)
         .map_or(0, |resource| resource.amount)
+}
+
+fn capture_entity_position(world: &World, entity: Entity) -> Option<Vec3> {
+    world
+        .get::<Transform>(entity)
+        .map(|transform| transform.translation)
 }
 
 fn capture_team_ore(world: &World, team: Team) -> i32 {
@@ -32680,6 +33088,24 @@ mod tests {
             assert!(
                 proof.ore_after_harvest > proof.ore_before,
                 "economy proof should force real ore harvesting before victory; proof={proof:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn real_menu_playable_proof_harvests_builds_trains_attacks_and_wins() {
+        for faction in CaptureProofFaction::ALL {
+            let proof = run_real_menu_playable_proof_for_faction(faction, 4200);
+
+            assert!(
+                proof.succeeded(),
+                "real menu playable proof should mine, build a Barracks, train from it, produce combat vehicles, right-click enemy anchors, and finish; proof={proof:?}"
+            );
+            assert_eq!(proof.structure_id, "Barracks");
+            assert_eq!(proof.vehicle_product_id, faction.proof_vehicle());
+            assert!(
+                !proof.barracks_product_id.is_empty(),
+                "playable proof should identify the trained Barracks unit; proof={proof:?}"
             );
         }
     }

@@ -24,6 +24,7 @@
   - `real-build-proof`: mouse select worker, place and construct Barracks, then train.
   - `real-victory-proof`: mouse select VehicleFactory, train combat vehicles, right-click enemy anchors, and win.
   - `real-economy-victory-proof`: low-resource menu start, mouse harvest required resources, train combat vehicles, right-click enemy anchors, and win without proof-side resource injection.
+  - `real-playable-proof`: low-resource menu start, mouse harvest, build Barracks, train a Barracks unit, train combat vehicles, right-click enemy anchors, and win.
 
 ## Verification
 
