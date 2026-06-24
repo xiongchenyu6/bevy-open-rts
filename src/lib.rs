@@ -21952,6 +21952,7 @@ fn update_construct_orders(
             &Selectable,
             &Unit,
             &ConstructOrder,
+            Option<&MoveOrder>,
             Option<&EmpDisabled>,
             &Health,
         ),
@@ -21975,6 +21976,7 @@ fn update_construct_orders(
         constructor_selectable,
         constructor_unit,
         order,
+        move_order,
         emp,
         constructor_health,
     ) in &constructors
@@ -22030,14 +22032,21 @@ fn update_construct_orders(
                     .try_remove::<MoveOrder>();
                 continue;
             }
-            commands.entity(constructor_entity).try_insert(MoveOrder {
-                target: unit_contact_move_target_position(
-                    constructor_transform.translation,
-                    constructor_selectable.radius,
-                    target_transform.translation,
-                    target_selectable.radius,
-                ),
-            });
+            if !move_order_targets_contact(
+                move_order,
+                target_transform.translation,
+                constructor_selectable.radius,
+                target_selectable.radius,
+            ) {
+                commands.entity(constructor_entity).try_insert(MoveOrder {
+                    target: unit_contact_move_target_position(
+                        constructor_transform.translation,
+                        constructor_selectable.radius,
+                        target_transform.translation,
+                        target_selectable.radius,
+                    ),
+                });
+            }
             continue;
         }
 
@@ -37374,6 +37383,81 @@ mod tests {
     }
 
     #[test]
+    fn construct_orders_preserve_existing_contact_move_target() {
+        let mut app = construct_order_test_app();
+        let target_position = Vec3::ZERO;
+        let target = spawn_test_structure(&mut app, "RadarUplink", Team::Human, target_position);
+        app.world_mut()
+            .entity_mut(target)
+            .insert(UnderConstruction {
+                remaining: 1.0,
+                total: 1.0,
+                cost: registry::Cost { ore: 4, crystal: 3 },
+                free_harvester_origin: None,
+            });
+        set_health_current(&mut app, target, 1.0);
+        let worker_position = Vec3::new(-3.0, 0.0, -1.5);
+        let worker = spawn_test_unit(&mut app, "Worker", Team::Human, worker_position);
+        let worker_radius = app
+            .world()
+            .entity(worker)
+            .get::<Selectable>()
+            .expect("worker should be selectable")
+            .radius;
+        let target_radius = app
+            .world()
+            .entity(target)
+            .get::<Selectable>()
+            .expect("target should be selectable")
+            .radius;
+        let existing_contact_target = unit_contact_move_target_position(
+            Vec3::new(-5.0, 0.0, 0.0),
+            worker_radius,
+            target_position,
+            target_radius,
+        );
+        let existing_move = MoveOrder {
+            target: existing_contact_target,
+        };
+        assert!(
+            move_order_targets_contact(
+                Some(&existing_move),
+                target_position,
+                worker_radius,
+                target_radius
+            ),
+            "test setup should use an existing contact move target"
+        );
+        assert!(
+            xz_distance(worker_position, target_position)
+                > contact_action_entry_range(
+                    worker_radius,
+                    target_radius,
+                    CONSTRUCTION_ENTRY_MARGIN_M
+                ),
+            "worker should still be outside construction range"
+        );
+        app.world_mut()
+            .entity_mut(worker)
+            .insert((ConstructOrder { target }, existing_move));
+
+        app.update();
+
+        let worker_ref = app.world().entity(worker);
+        assert!(
+            worker_ref.get::<ConstructOrder>().is_some(),
+            "out-of-range construction should keep approaching the target"
+        );
+        let move_order = worker_ref
+            .get::<MoveOrder>()
+            .expect("out-of-range construction should keep a move sub-order");
+        assert!(
+            xz_distance(move_order.target, existing_contact_target) < 0.001,
+            "construction should not rewrite an existing contact move target every tick"
+        );
+    }
+
+    #[test]
     fn immobile_constructors_can_still_build_when_already_in_range_like_godot() {
         let mut app = construct_order_test_app();
         let target = spawn_test_structure(
@@ -40063,6 +40147,78 @@ mod tests {
             Team::Chaos,
             "FieldMedic",
             "LightRifleInfantry",
+        );
+    }
+
+    #[test]
+    fn default_menu_player_can_click_select_mcv_and_deploy_command_center() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let (_, _, command_center_position, constructed) =
+            structure_snapshots_by_id(&mut app, "CommandCenter")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .expect(
+                    "default playable skirmish should spawn a constructed player CommandCenter",
+                );
+        assert!(constructed);
+
+        let mcv_position = command_center_position + Vec3::new(4.0, 0.0, 2.0);
+        let mcv = spawn_test_unit(
+            &mut app,
+            "MobileConstructionVehicle",
+            Team::Human,
+            mcv_position,
+        );
+        app.world_mut().entity_mut(mcv).insert((
+            HoldPosition { enabled: false },
+            VisibilityState { visible: true },
+            Visibility::Visible,
+        ));
+        let command_centers_before = structure_snapshots_by_id(&mut app, "CommandCenter")
+            .into_iter()
+            .filter(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+            .count();
+
+        attach_test_window_to_main_camera(&mut app, mcv_position);
+        click_selection_at_world(&mut app, mcv_position, false);
+        assert!(
+            app.world().entity(mcv).get::<Selected>().is_some(),
+            "left-clicking the player MCV in the default match should select it"
+        );
+        app.update();
+
+        let (deploy_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::DeployMcv);
+        click_command_button(&mut app, deploy_button);
+        for _ in 0..4 {
+            app.update();
+        }
+
+        assert!(
+            app.world().get_entity(mcv).is_err(),
+            "deploying from the default command panel should consume the selected MCV"
+        );
+        let command_centers = structure_snapshots_by_id(&mut app, "CommandCenter")
+            .into_iter()
+            .filter(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+            .collect::<Vec<_>>();
+        assert!(
+            command_centers.len() > command_centers_before,
+            "deploying the default MCV should add a constructed player CommandCenter"
+        );
+        assert!(
+            command_centers
+                .iter()
+                .any(|(_, _, position, _)| xz_distance(*position, mcv_position) < 0.05),
+            "deployed CommandCenter should unpack at the MCV position"
         );
     }
 
