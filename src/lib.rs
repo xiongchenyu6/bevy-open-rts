@@ -30917,6 +30917,68 @@ mod tests {
         }
     }
 
+    fn headless_menu_match_proof_app(faction: CaptureProofFaction) -> App {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0 / 30.0),
+        ));
+        app.update();
+
+        press_main_menu_button(&mut app, MainMenuAction::SelectFaction(faction.team()), 1);
+        press_main_menu_button(&mut app, MainMenuAction::StartMatch, 3);
+
+        assert_eq!(
+            app_screen(&app),
+            AppScreen::InMatch,
+            "real headless app should enter a match from the setup menu before proof"
+        );
+        assert_eq!(
+            app.world().resource::<VisiblePlayer>().team,
+            faction.team(),
+            "menu-selected proof faction should become the controlled player slot"
+        );
+        assert_eq!(
+            app.world()
+                .resource::<PlayerFactions>()
+                .slot_faction(faction.team()),
+            faction.skirmish_faction(),
+            "menu-selected proof faction should use its faction roster"
+        );
+        assert_eq!(
+            skirmish_mode_from_match_setup(*app.world().resource::<MatchSetupSettings>()),
+            SkirmishMatchMode::OneVsOne,
+            "real menu proof should exercise the default playable skirmish mode"
+        );
+        app
+    }
+
+    #[test]
+    fn headless_game_app_menu_started_match_proof_finishes_each_playable_faction() {
+        for faction in CaptureProofFaction::ALL {
+            let mut app = headless_menu_match_proof_app(faction);
+            let proof = run_capture_match_proof(&mut app, faction, 7200);
+
+            assert!(
+                proof.succeeded(),
+                "real app menu-started proof should finish a playable {:?} match; proof={proof:?}",
+                faction
+            );
+            assert_eq!(
+                proof.product_id,
+                faction.proof_vehicle(),
+                "real app menu proof should use the faction's combat production path; proof={proof:?}",
+            );
+            assert!(
+                proof.produced_units >= 6,
+                "real app menu proof should exercise production before victory; proof={proof:?}"
+            );
+            assert!(
+                proof.enemy_structures_destroyed > 0,
+                "real app menu proof should destroy enemy anchors through combat; proof={proof:?}"
+            );
+        }
+    }
+
     #[test]
     fn headless_game_app_uses_shared_setup_menu_and_match_scene() {
         let mut app = build_game_app(GameAppMode::Headless);
