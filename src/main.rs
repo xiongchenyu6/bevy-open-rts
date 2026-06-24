@@ -28602,6 +28602,142 @@ mod tests {
         mouse.clear();
     }
 
+    fn left_click_world_at(app: &mut App, position: Vec3) {
+        let cursor = screen_position_for_world(app, position);
+        set_selection_cursor(app, cursor);
+        {
+            let world = app.world_mut();
+            let mut window_q = world.query_filtered::<&Window, With<PrimaryWindow>>();
+            let window = window_q
+                .single(world)
+                .expect("world click test should have one primary window");
+            assert!(
+                !cursor_is_over_hud(window),
+                "world click test cursor {cursor:?} should be outside HUD"
+            );
+        }
+        let ground_position = ground_position_for_selection_cursor(app);
+        assert!(
+            xz_distance(ground_position, position) < 0.05,
+            "world click test cursor projected to {ground_position:?}, expected {position:?}"
+        );
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.press(MouseButton::Left);
+        }
+        app.update();
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.clear();
+            mouse.release(MouseButton::Left);
+        }
+        app.update();
+        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+        mouse.clear();
+    }
+
+    fn click_command_button(app: &mut App, button: Entity) {
+        app.world_mut()
+            .entity_mut(button)
+            .insert(Interaction::Pressed);
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .press(MouseButton::Left);
+        app.update();
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.release(MouseButton::Left);
+            mouse.clear();
+        }
+        app.world_mut().entity_mut(button).insert(Interaction::None);
+        app.update();
+    }
+
+    fn valid_structure_placement_point_near_team_base(
+        app: &mut App,
+        team: Team,
+        id: &'static str,
+    ) -> Vec3 {
+        let def = registry::entity(id).expect("test structure should exist in registry");
+        let bounds = *app.world().resource::<MapBounds>();
+        let anchors = {
+            let world = app.world_mut();
+            let mut structures =
+                world.query::<(&Structure, &Team, &Transform, Option<&UnderConstruction>)>();
+            structures
+                .iter(world)
+                .filter_map(
+                    |(structure, structure_team, transform, under_construction)| {
+                        if *structure_team != team || !structure_is_constructed(under_construction)
+                        {
+                            return None;
+                        }
+                        let structure_def = registry::entity(structure.id)?;
+                        Some((transform.translation, structure_def.radius))
+                    },
+                )
+                .collect::<Vec<_>>()
+        };
+        assert!(
+            !anchors.is_empty(),
+            "placement search should have at least one constructed team anchor"
+        );
+        let occupiers = {
+            let world = app.world_mut();
+            let mut occupiers = world.query_filtered::<(
+                &Transform,
+                &Selectable,
+                Option<&Health>,
+                Option<&ResourceNode>,
+            ), Or<(With<Unit>, With<Structure>, With<ResourceNode>)>>(
+            );
+            occupiers
+                .iter(world)
+                .filter_map(|(transform, selectable, health, resource_node)| {
+                    if health.is_some_and(|health| health.current <= 0.0)
+                        || resource_node.is_some_and(|resource| resource.amount <= 0)
+                    {
+                        return None;
+                    }
+                    Some((transform.translation, selectable.radius))
+                })
+                .collect::<Vec<_>>()
+        };
+
+        let sample_count = 24;
+        for (anchor, anchor_radius) in anchors.iter().copied() {
+            for ring in 0..20 {
+                let radius = anchor_radius + def.radius + 1.0 + ring as f32 * 0.75;
+                for sample in 0..sample_count {
+                    let angle = (sample as f32 / sample_count as f32) * std::f32::consts::TAU
+                        + ring as f32 * 0.23;
+                    let candidate = bounds.clamp_ground_point(
+                        anchor + Vec3::new(angle.cos() * radius, 0.0, angle.sin() * radius),
+                        def.radius,
+                    );
+                    if !map_contains_ground_point_in_bounds(candidate, bounds) {
+                        continue;
+                    }
+                    let in_base_radius = anchors.iter().any(|(base, base_radius)| {
+                        xz_distance(*base, candidate)
+                            <= *base_radius + def.radius + BASE_CONSTRUCTION_RADIUS_M
+                    });
+                    if !in_base_radius {
+                        continue;
+                    }
+                    let collides = occupiers.iter().any(|(position, radius)| {
+                        xz_distance(*position, candidate) <= *radius + def.radius
+                    });
+                    if !collides {
+                        return candidate;
+                    }
+                }
+            }
+        }
+
+        panic!("could not find a valid placement point for {id} near {team:?} base");
+    }
+
     fn selected_unit_debug(app: &mut App) -> Vec<String> {
         let world = app.world_mut();
         let mut selected_q = world.query_filtered::<(Entity, Option<&Unit>), With<Selected>>();
@@ -38512,6 +38648,108 @@ mod tests {
                 .get::<ResourceNode>()
                 .is_some_and(|resource| resource.amount < 8),
             "resource node should lose ore during the loop"
+        );
+    }
+
+    #[test]
+    fn default_menu_worker_can_build_barracks_and_train_infantry() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let worker = first_unit_by_id(&mut app, Team::Human, "Worker")
+            .expect("default playable skirmish should spawn a player Worker");
+        select_only_entities(&mut app, &[worker]);
+        app.update();
+
+        let (build_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Build("Barracks"));
+        click_command_button(&mut app, build_button);
+        assert_eq!(
+            app.world()
+                .resource::<CommandMode>()
+                .pending_structure_placement,
+            Some(PendingStructurePlacement::new("Barracks")),
+            "clicking the Worker Barracks command should enter placement mode"
+        );
+
+        let placement =
+            valid_structure_placement_point_near_team_base(&mut app, Team::Human, "Barracks");
+        attach_test_window_to_main_camera(&mut app, placement);
+        left_click_world_at(&mut app, placement);
+        assert!(
+            app.world()
+                .resource::<CommandMode>()
+                .pending_structure_placement
+                .is_none(),
+            "placing a valid Barracks blueprint should leave placement mode"
+        );
+        let (new_barracks, _, barracks_position, constructed) =
+            structure_snapshots_by_id(&mut app, "Barracks")
+                .into_iter()
+                .find(|(_, team, position, constructed)| {
+                    *team == Team::Human
+                        && !*constructed
+                        && xz_distance(*position, placement) < 0.05
+                })
+                .expect("left-clicking a valid placement should spawn an unfinished Barracks");
+        assert!(!constructed);
+        assert!(xz_distance(barracks_position, placement) < 0.05);
+
+        select_only_entities(&mut app, &[worker]);
+        app.world_mut()
+            .entity_mut(new_barracks)
+            .insert((VisibilityState { visible: true }, Visibility::Visible));
+        attach_test_window_to_main_camera(&mut app, barracks_position);
+        right_click_order_at_world(&mut app, barracks_position);
+        assert!(
+            app.world()
+                .entity(worker)
+                .get::<ConstructOrder>()
+                .is_some_and(|order| order.target == new_barracks),
+            "right-clicking the unfinished Barracks with a selected Worker should issue ConstructOrder"
+        );
+
+        for _ in 0..120 {
+            app.update();
+            if structure_snapshots_by_id(&mut app, "Barracks")
+                .into_iter()
+                .any(|(entity, team, _, constructed)| {
+                    entity == new_barracks && team == Team::Human && constructed
+                })
+            {
+                break;
+            }
+        }
+        assert!(
+            structure_snapshots_by_id(&mut app, "Barracks")
+                .into_iter()
+                .any(|(entity, team, _, constructed)| {
+                    entity == new_barracks && team == Team::Human && constructed
+                }),
+            "Worker construction should complete the placed Barracks"
+        );
+
+        let infantry_before = unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry");
+        select_only_entities(&mut app, &[new_barracks]);
+        app.update();
+        let (infantry_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("LightRifleInfantry"));
+        click_command_button(&mut app, infantry_button);
+        for _ in 0..120 {
+            app.update();
+            if unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry") > infantry_before {
+                break;
+            }
+        }
+        assert!(
+            unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry") > infantry_before,
+            "the newly constructed Barracks should train at least one LightRifleInfantry"
         );
     }
 
