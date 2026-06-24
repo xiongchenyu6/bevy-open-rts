@@ -48590,6 +48590,82 @@ mod tests {
     }
 
     #[test]
+    fn blocked_production_stays_queued_notifies_once_then_finishes_like_godot() {
+        let mut app = production_queue_test_app();
+        let origin = Vec3::ZERO;
+        let barracks = spawn_test_structure(&mut app, "Barracks", Team::Human, origin);
+        app.insert_resource(MapBounds::from_size((0.4, 0.4)));
+        app.world_mut()
+            .resource_mut::<BuildQueue>()
+            .0
+            .push(BuildJob {
+                team: Team::Human,
+                action: BuildAction::Train("LightRifleInfantry"),
+                producer_entity: barracks,
+                producer_id: "Barracks",
+                timer: 0.25,
+                origin,
+            });
+
+        app.update();
+
+        assert_eq!(
+            app.world().resource::<BuildQueue>().0.len(),
+            1,
+            "blocked Godot production should stay queued instead of being dropped"
+        );
+        assert_eq!(
+            unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry"),
+            0,
+            "no unit should spawn while every production exit is blocked"
+        );
+        assert_eq!(
+            app.world().resource::<AudioFeedback>().pending_sound,
+            Some(SoundEffectKind::Error)
+        );
+        assert_eq!(
+            app.world().resource::<BattleLog>().entries.len(),
+            1,
+            "blocked production should notify exactly once when the ready job first becomes blocked"
+        );
+        assert_eq!(
+            app.world().resource::<BattleLog>().entries[0].message,
+            "生产受阻: 出厂口被堵塞"
+        );
+
+        app.update();
+
+        assert_eq!(
+            app.world().resource::<BuildQueue>().0.len(),
+            1,
+            "still-blocked production should remain queued on later frames"
+        );
+        assert_eq!(
+            app.world().resource::<BattleLog>().entries.len(),
+            1,
+            "still-blocked production should not spam additional blocked notifications"
+        );
+
+        app.insert_resource(MapBounds::default());
+        app.update();
+
+        assert!(
+            app.world().resource::<BuildQueue>().0.is_empty(),
+            "clearing the production exit should let the queued job finish"
+        );
+        assert_eq!(
+            unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry"),
+            1,
+            "the originally blocked infantry job should spawn after the exit opens"
+        );
+        assert_eq!(
+            app.world().resource::<AudioFeedback>().pending_sound,
+            Some(SoundEffectKind::ProductionReady),
+            "finishing after an unblocked exit should play the normal production-ready feedback"
+        );
+    }
+
+    #[test]
     fn siege_artillery_splash_damage_matches_godot_projectile_rules() {
         let mut app = combat_test_app();
         let artillery_def = registry::entity("SiegeArtilleryVehicle")
