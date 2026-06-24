@@ -1,0 +1,445 @@
+use std::{
+    env,
+    fs::{self, File},
+    io::BufWriter,
+    path::{Path, PathBuf},
+};
+
+use bevy_open_rts::{
+    CaptureEntityKind, CaptureMatchSnapshot, CaptureTeam, advance_capture_match,
+    build_capture_match_app, capture_match_snapshot,
+};
+
+const WIDTH: u32 = 1280;
+const HEIGHT: u32 = 720;
+const FPS: f32 = 30.0;
+
+#[derive(Clone, Copy)]
+struct Rgba {
+    r: u8,
+    g: u8,
+    b: u8,
+    a: u8,
+}
+
+impl Rgba {
+    const fn rgb(r: u8, g: u8, b: u8) -> Self {
+        Self { r, g, b, a: 255 }
+    }
+
+    const fn rgba(r: u8, g: u8, b: u8, a: u8) -> Self {
+        Self { r, g, b, a }
+    }
+}
+
+#[derive(Clone, Copy)]
+struct Vec2 {
+    x: f32,
+    y: f32,
+}
+
+impl Vec2 {
+    const fn new(x: f32, y: f32) -> Self {
+        Self { x, y }
+    }
+
+    fn lerp(self, other: Self, t: f32) -> Self {
+        Self {
+            x: self.x + (other.x - self.x) * t,
+            y: self.y + (other.y - self.y) * t,
+        }
+    }
+}
+
+fn main() {
+    if let Err(error) = run() {
+        eprintln!("[capture] error: {error}");
+        std::process::exit(1);
+    }
+}
+
+fn run() -> Result<(), String> {
+    let mut args = env::args().skip(1);
+    match args.next().as_deref() {
+        None => {
+            let path = PathBuf::from("screenshots/capture/still.png");
+            render_still(&path, 0)?;
+            println!("[capture] wrote {}", path.display());
+        }
+        Some("screenshot") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/capture/still.png"));
+            render_still(&path, 0)?;
+            println!("[capture] wrote {}", path.display());
+        }
+        Some("frames") => {
+            let directory = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/capture"));
+            let count = args
+                .next()
+                .as_deref()
+                .unwrap_or("120")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid frame count: {error}"))?;
+            render_frames(&directory, count)?;
+            println!("[capture] wrote {count} frames to {}", directory.display());
+        }
+        Some("help" | "-h" | "--help") => {
+            print_help();
+        }
+        Some(other) => {
+            return Err(format!(
+                "unknown command '{other}'. Use: capture [screenshot <path>|frames <dir> <count>]"
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn print_help() {
+    println!("Usage:");
+    println!("  cargo run --bin capture");
+    println!("  cargo run --bin capture -- screenshot screenshots/capture/still.png");
+    println!("  cargo run --bin capture -- frames screenshots/result/1 450");
+}
+
+fn render_still(path: &Path, frame: usize) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)
+            .map_err(|error| format!("could not create {}: {error}", parent.display()))?;
+    }
+    let mut app = build_capture_match_app();
+    advance_capture_match(&mut app, frame);
+    let snapshot = capture_match_snapshot(&mut app);
+    let pixels = render_frame(frame, 90, &snapshot);
+    write_png(path, WIDTH, HEIGHT, &pixels)
+}
+
+fn render_frames(directory: &Path, count: usize) -> Result<(), String> {
+    fs::create_dir_all(directory)
+        .map_err(|error| format!("could not create {}: {error}", directory.display()))?;
+    let mut app = build_capture_match_app();
+    for frame in 0..count {
+        if frame > 0 {
+            advance_capture_match(&mut app, 1);
+        }
+        let path = directory.join(format!("frame{frame:05}.png"));
+        let snapshot = capture_match_snapshot(&mut app);
+        let pixels = render_frame(frame, count.max(1), &snapshot);
+        write_png(&path, WIDTH, HEIGHT, &pixels)?;
+    }
+    Ok(())
+}
+
+fn write_png(path: &Path, width: u32, height: u32, pixels: &[u8]) -> Result<(), String> {
+    let file = File::create(path)
+        .map_err(|error| format!("could not create {}: {error}", path.display()))?;
+    let writer = BufWriter::new(file);
+    let mut encoder = png::Encoder::new(writer, width, height);
+    encoder.set_color(png::ColorType::Rgba);
+    encoder.set_depth(png::BitDepth::Eight);
+    let mut png_writer = encoder
+        .write_header()
+        .map_err(|error| format!("could not write PNG header for {}: {error}", path.display()))?;
+    png_writer
+        .write_image_data(pixels)
+        .map_err(|error| format!("could not write PNG data for {}: {error}", path.display()))
+}
+
+fn render_frame(frame: usize, total_frames: usize, snapshot: &CaptureMatchSnapshot) -> Vec<u8> {
+    let mut pixels = vec![0; (WIDTH * HEIGHT * 4) as usize];
+    clear(&mut pixels, Rgba::rgb(20, 31, 35));
+
+    let seconds = frame as f32 / FPS;
+
+    draw_ground(&mut pixels);
+    draw_snapshot(&mut pixels, snapshot, seconds);
+    draw_ui(&mut pixels, frame, total_frames);
+    pixels
+}
+
+fn clear(pixels: &mut [u8], color: Rgba) {
+    for chunk in pixels.chunks_exact_mut(4) {
+        chunk[0] = color.r;
+        chunk[1] = color.g;
+        chunk[2] = color.b;
+        chunk[3] = color.a;
+    }
+}
+
+fn draw_ground(pixels: &mut [u8]) {
+    let horizon = 80;
+    fill_rect(
+        pixels,
+        0,
+        horizon,
+        WIDTH as i32,
+        HEIGHT as i32,
+        Rgba::rgb(104, 122, 112),
+    );
+    fill_rect(pixels, 0, 0, WIDTH as i32, horizon, Rgba::rgb(9, 12, 14));
+
+    for i in -22..=22 {
+        let a = world_to_screen(Vec2::new(i as f32, -16.0));
+        let b = world_to_screen(Vec2::new(i as f32, 16.0));
+        draw_line(pixels, a, b, Rgba::rgba(134, 152, 142, 54), 1.0);
+        let c = world_to_screen(Vec2::new(-16.0, i as f32));
+        let d = world_to_screen(Vec2::new(16.0, i as f32));
+        draw_line(pixels, c, d, Rgba::rgba(134, 152, 142, 54), 1.0);
+    }
+}
+
+fn draw_base(pixels: &mut [u8], center: Vec2, color: Rgba, ring: Rgba) {
+    let screen = world_to_screen(center);
+    fill_iso_diamond(pixels, screen, 70.0, 34.0, Rgba::rgba(28, 35, 35, 180));
+    fill_iso_diamond(pixels, screen, 55.0, 27.0, color);
+    fill_iso_diamond(
+        pixels,
+        Vec2::new(screen.x, screen.y - 18.0),
+        31.0,
+        17.0,
+        Rgba::rgb(231, 236, 237),
+    );
+    fill_rect(
+        pixels,
+        (screen.x - 10.0) as i32,
+        (screen.y - 45.0) as i32,
+        20,
+        34,
+        Rgba::rgb(178, 190, 194),
+    );
+    draw_ring(pixels, screen, 66.0, ring);
+}
+
+fn draw_snapshot(pixels: &mut [u8], snapshot: &CaptureMatchSnapshot, seconds: f32) {
+    for entity in snapshot
+        .entities
+        .iter()
+        .filter(|entity| entity.kind == CaptureEntityKind::Resource)
+    {
+        let screen = world_to_screen(Vec2::new(entity.x, entity.z));
+        let pulse = ((seconds * 3.0 + entity.x * 0.31 + entity.z * 0.17).sin() + 1.0) * 0.5;
+        fill_circle(
+            pixels,
+            screen,
+            8.0 + pulse * 3.0,
+            Rgba::rgba(83, 196, 221, 210),
+        );
+        fill_circle(pixels, screen, 4.0, Rgba::rgb(210, 241, 244));
+    }
+
+    for entity in snapshot
+        .entities
+        .iter()
+        .filter(|entity| entity.kind == CaptureEntityKind::Structure)
+    {
+        let (body, ring) = team_colors(entity.team, entity.visible);
+        draw_base(pixels, Vec2::new(entity.x, entity.z), body, ring);
+    }
+
+    for entity in snapshot
+        .entities
+        .iter()
+        .filter(|entity| entity.kind == CaptureEntityKind::Unit)
+    {
+        let (body, ring) = team_colors(entity.team, entity.visible);
+        draw_unit(pixels, Vec2::new(entity.x, entity.z), body, ring);
+    }
+
+    if let Some(target) = snapshot.entities.iter().find(|entity| {
+        entity.team == CaptureTeam::Demon && entity.kind == CaptureEntityKind::Structure
+    }) {
+        let impact = world_to_screen(Vec2::new(target.x, target.z));
+        let pulse = ((seconds * 2.0) % 1.0) * 26.0;
+        draw_ring(pixels, impact, 22.0 + pulse, Rgba::rgba(255, 88, 64, 150));
+    }
+}
+
+fn team_colors(team: CaptureTeam, visible: bool) -> (Rgba, Rgba) {
+    let alpha = if visible { 230 } else { 95 };
+    match team {
+        CaptureTeam::Human => (
+            Rgba::rgba(216, 226, 229, alpha),
+            Rgba::rgba(85, 155, 245, alpha),
+        ),
+        CaptureTeam::Demon => (
+            Rgba::rgba(184, 93, 89, alpha),
+            Rgba::rgba(242, 63, 58, alpha),
+        ),
+        CaptureTeam::Chaos => (
+            Rgba::rgba(159, 113, 221, alpha),
+            Rgba::rgba(174, 93, 245, alpha),
+        ),
+        CaptureTeam::Neutral => (
+            Rgba::rgba(216, 202, 137, alpha),
+            Rgba::rgba(222, 210, 132, alpha),
+        ),
+    }
+}
+
+fn draw_unit(pixels: &mut [u8], world: Vec2, body: Rgba, ring: Rgba) {
+    let screen = world_to_screen(world);
+    draw_ring(pixels, screen, 19.0, ring);
+    fill_iso_diamond(
+        pixels,
+        Vec2::new(screen.x + 5.0, screen.y + 10.0),
+        23.0,
+        9.0,
+        Rgba::rgba(20, 28, 28, 120),
+    );
+    fill_rect(
+        pixels,
+        (screen.x - 9.0) as i32,
+        (screen.y - 9.0) as i32,
+        18,
+        18,
+        body,
+    );
+    fill_rect(
+        pixels,
+        (screen.x + 5.0) as i32,
+        (screen.y - 3.0) as i32,
+        18,
+        5,
+        Rgba::rgb(42, 48, 49),
+    );
+}
+
+fn draw_ui(pixels: &mut [u8], frame: usize, total_frames: usize) {
+    fill_rect(pixels, 0, 0, WIDTH as i32, 43, Rgba::rgba(14, 20, 23, 218));
+    fill_rect(
+        pixels,
+        0,
+        HEIGHT as i32 - 86,
+        WIDTH as i32,
+        86,
+        Rgba::rgba(17, 27, 30, 220),
+    );
+    for index in 0..16 {
+        fill_rect(
+            pixels,
+            16 + index * 76,
+            HEIGHT as i32 - 70,
+            68,
+            46,
+            Rgba::rgba(58, 73, 74, 235),
+        );
+    }
+    fill_rect(
+        pixels,
+        WIDTH as i32 - 210,
+        HEIGHT as i32 - 210,
+        178,
+        178,
+        Rgba::rgba(9, 20, 21, 230),
+    );
+    let marker_x =
+        WIDTH as i32 - 185 + ((frame as f32 / total_frames.max(1) as f32) * 112.0) as i32;
+    fill_rect(
+        pixels,
+        marker_x,
+        HEIGHT as i32 - 112,
+        12,
+        12,
+        Rgba::rgb(101, 168, 245),
+    );
+}
+
+fn world_to_screen(world: Vec2) -> Vec2 {
+    Vec2::new(
+        WIDTH as f32 * 0.5 + (world.x - world.y) * 28.0,
+        110.0 + (world.x + world.y) * 15.0,
+    )
+}
+
+fn fill_rect(pixels: &mut [u8], x: i32, y: i32, width: i32, height: i32, color: Rgba) {
+    for yy in y.max(0)..(y + height).min(HEIGHT as i32) {
+        for xx in x.max(0)..(x + width).min(WIDTH as i32) {
+            blend_pixel(pixels, xx, yy, color);
+        }
+    }
+}
+
+fn fill_circle(pixels: &mut [u8], center: Vec2, radius: f32, color: Rgba) {
+    let min_x = (center.x - radius).floor() as i32;
+    let max_x = (center.x + radius).ceil() as i32;
+    let min_y = (center.y - radius).floor() as i32;
+    let max_y = (center.y + radius).ceil() as i32;
+    let radius_squared = radius * radius;
+    for y in min_y..=max_y {
+        for x in min_x..=max_x {
+            let dx = x as f32 - center.x;
+            let dy = y as f32 - center.y;
+            if dx * dx + dy * dy <= radius_squared {
+                blend_pixel(pixels, x, y, color);
+            }
+        }
+    }
+}
+
+fn fill_iso_diamond(
+    pixels: &mut [u8],
+    center: Vec2,
+    half_width: f32,
+    half_height: f32,
+    color: Rgba,
+) {
+    let min_x = (center.x - half_width).floor() as i32;
+    let max_x = (center.x + half_width).ceil() as i32;
+    let min_y = (center.y - half_height).floor() as i32;
+    let max_y = (center.y + half_height).ceil() as i32;
+    for y in min_y..=max_y {
+        for x in min_x..=max_x {
+            let dx = (x as f32 - center.x).abs() / half_width;
+            let dy = (y as f32 - center.y).abs() / half_height;
+            if dx + dy <= 1.0 {
+                blend_pixel(pixels, x, y, color);
+            }
+        }
+    }
+}
+
+fn draw_ring(pixels: &mut [u8], center: Vec2, radius: f32, color: Rgba) {
+    let min_x = (center.x - radius - 2.0).floor() as i32;
+    let max_x = (center.x + radius + 2.0).ceil() as i32;
+    let min_y = (center.y - radius - 2.0).floor() as i32;
+    let max_y = (center.y + radius + 2.0).ceil() as i32;
+    for y in min_y..=max_y {
+        for x in min_x..=max_x {
+            let dx = x as f32 - center.x;
+            let dy = y as f32 - center.y;
+            let distance = (dx * dx + dy * dy).sqrt();
+            if (distance - radius).abs() <= 1.4 {
+                blend_pixel(pixels, x, y, color);
+            }
+        }
+    }
+}
+
+fn draw_line(pixels: &mut [u8], start: Vec2, end: Vec2, color: Rgba, thickness: f32) {
+    let dx = end.x - start.x;
+    let dy = end.y - start.y;
+    let steps = dx.abs().max(dy.abs()).ceil().max(1.0) as i32;
+    for step in 0..=steps {
+        let t = step as f32 / steps as f32;
+        let point = start.lerp(end, t);
+        fill_circle(pixels, point, thickness, color);
+    }
+}
+
+fn blend_pixel(pixels: &mut [u8], x: i32, y: i32, color: Rgba) {
+    if x < 0 || y < 0 || x >= WIDTH as i32 || y >= HEIGHT as i32 {
+        return;
+    }
+    let index = ((y as u32 * WIDTH + x as u32) * 4) as usize;
+    let alpha = color.a as f32 / 255.0;
+    let inv_alpha = 1.0 - alpha;
+    pixels[index] = (color.r as f32 * alpha + pixels[index] as f32 * inv_alpha) as u8;
+    pixels[index + 1] = (color.g as f32 * alpha + pixels[index + 1] as f32 * inv_alpha) as u8;
+    pixels[index + 2] = (color.b as f32 * alpha + pixels[index + 2] as f32 * inv_alpha) as u8;
+    pixels[index + 3] = 255;
+}

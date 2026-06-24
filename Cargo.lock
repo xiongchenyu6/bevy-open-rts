@@ -343,6 +343,7 @@ dependencies = [
  "bevy_asset_loader",
  "bevy_common_assets",
  "icu_provider",
+ "png",
  "serde",
 ]
 
