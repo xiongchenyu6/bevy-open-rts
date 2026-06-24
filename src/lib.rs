@@ -26632,6 +26632,19 @@ mod tests {
             .expect("selected command panel should expose the requested enabled command")
     }
 
+    fn enabled_command_panel_actions(app: &mut App) -> Vec<BuildAction> {
+        let world = app.world_mut();
+        let mut slots = world.query::<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>();
+        let mut actions = slots
+            .iter(world)
+            .filter_map(|(slot, action, availability)| {
+                availability.enabled.then_some((slot.0, *action))
+            })
+            .collect::<Vec<_>>();
+        actions.sort_by_key(|(slot, _)| *slot);
+        actions.into_iter().map(|(_, action)| action).collect()
+    }
+
     fn issue_orders_click_test_app(visible_player: VisiblePlayer) -> App {
         let mut app = App::new();
         let mut window = Window {
@@ -39490,15 +39503,19 @@ mod tests {
         );
     }
 
-    #[test]
-    fn chaos_menu_worker_can_build_barracks_and_train_faction_infantry() {
+    fn selected_race_worker_can_build_barracks_and_train_faction_infantry(
+        player_team: Team,
+        product_id: &'static str,
+        absent_product_id: &'static str,
+    ) {
         let selection = skirmish_menu_selection(
             0,
-            Team::Chaos,
+            player_team,
             DEFAULT_STARTING_RESOURCE_INDEX,
             SkirmishMatchMode::OneVsOne,
             AiDifficulty::Beginner,
         );
+        let expected_faction = SkirmishFaction::from_team(player_team);
         let mut app = stateful_match_flow_test_app(selection.match_setup());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
             Duration::from_secs_f32(1.0),
@@ -39508,15 +39525,15 @@ mod tests {
         press_key(&mut app, KeyCode::Enter, 3);
 
         assert_eq!(app_screen(&app), AppScreen::InMatch);
-        assert_eq!(app.world().resource::<VisiblePlayer>().team, Team::Chaos);
+        assert_eq!(app.world().resource::<VisiblePlayer>().team, player_team);
         assert_eq!(
             app.world()
                 .resource::<PlayerFactions>()
-                .slot_faction(Team::Chaos),
-            SkirmishFaction::Chaos
+                .slot_faction(player_team),
+            expected_faction
         );
-        let worker = first_unit_by_id(&mut app, Team::Chaos, "Worker")
-            .expect("Chaos skirmish should spawn a player Worker");
+        let worker = first_unit_by_id(&mut app, player_team, "Worker")
+            .expect("selected race skirmish should spawn a player Worker");
         select_only_entities(&mut app, &[worker]);
         app.update();
 
@@ -39528,22 +39545,22 @@ mod tests {
                 .resource::<CommandMode>()
                 .pending_structure_placement,
             Some(PendingStructurePlacement::new("Barracks")),
-            "clicking the Chaos Worker Barracks command should enter placement mode"
+            "clicking the selected race Worker Barracks command should enter placement mode"
         );
 
         let placement =
-            valid_structure_placement_point_near_team_base(&mut app, Team::Chaos, "Barracks");
+            valid_structure_placement_point_near_team_base(&mut app, player_team, "Barracks");
         attach_test_window_to_main_camera(&mut app, placement);
         left_click_world_at(&mut app, placement);
         let (new_barracks, _, barracks_position, constructed) =
             structure_snapshots_by_id(&mut app, "Barracks")
                 .into_iter()
                 .find(|(_, team, position, constructed)| {
-                    *team == Team::Chaos
+                    *team == player_team
                         && !*constructed
                         && xz_distance(*position, placement) < 0.05
                 })
-                .expect("Chaos placement should spawn an unfinished Barracks");
+                .expect("selected race placement should spawn an unfinished Barracks");
         assert!(!constructed);
 
         select_only_entities(&mut app, &[worker]);
@@ -39551,16 +39568,16 @@ mod tests {
             .entity_mut(new_barracks)
             .insert((VisibilityState { visible: true }, Visibility::Visible));
         assert_eq!(
-            construct_target_at(&mut app, Team::Chaos, barracks_position),
+            construct_target_at(&mut app, player_team, barracks_position),
             Some(new_barracks),
-            "unfinished Chaos Barracks should be a direct construct target before right-click"
+            "unfinished selected race Barracks should be a direct construct target before right-click"
         );
         assert!(
             app.world()
                 .resource::<CommandMode>()
                 .pending_structure_placement
                 .is_none(),
-            "successful Chaos Barracks placement should leave placement mode before construction orders"
+            "successful Barracks placement should leave placement mode before construction orders"
         );
         attach_test_window_to_main_camera(&mut app, barracks_position);
         right_click_order_at_world(&mut app, barracks_position);
@@ -39580,7 +39597,7 @@ mod tests {
             .map_or(0.0, |selectable| selectable.radius);
         assert!(
             worker_construct_target == Some(new_barracks),
-            "right-clicking the unfinished Chaos Barracks should issue ConstructOrder; construct_target={worker_construct_target:?} move_target={worker_move_target:?} target_team={target_team:?} visible={target_visible} under_construction={target_under_construction} distance={} radius={target_radius}",
+            "right-clicking the unfinished selected race Barracks should issue ConstructOrder; construct_target={worker_construct_target:?} move_target={worker_move_target:?} target_team={target_team:?} visible={target_visible} under_construction={target_under_construction} distance={} radius={target_radius}",
             xz_distance(barracks_position, placement)
         );
 
@@ -39589,7 +39606,7 @@ mod tests {
             if structure_snapshots_by_id(&mut app, "Barracks")
                 .into_iter()
                 .any(|(entity, team, _, constructed)| {
-                    entity == new_barracks && team == Team::Chaos && constructed
+                    entity == new_barracks && team == player_team && constructed
                 })
             {
                 break;
@@ -39599,32 +39616,60 @@ mod tests {
             structure_snapshots_by_id(&mut app, "Barracks")
                 .into_iter()
                 .any(|(entity, team, _, constructed)| {
-                    entity == new_barracks && team == Team::Chaos && constructed
+                    entity == new_barracks && team == player_team && constructed
                 }),
-            "Chaos Worker construction should complete the placed Barracks"
+            "selected race Worker construction should complete the placed Barracks"
         );
 
-        let medics_before = unit_count_by_id(&mut app, Team::Chaos, "FieldMedic");
+        let produced_before = unit_count_by_id(&mut app, player_team, product_id);
         select_only_entities(&mut app, &[new_barracks]);
         app.update();
-        let (medic_button, _, _) =
-            enabled_command_slot_for_action(&mut app, BuildAction::Train("FieldMedic"));
+        let actions = enabled_command_panel_actions(&mut app);
         assert!(
-            faction_def(SkirmishFaction::Chaos)
+            faction_def(expected_faction)
                 .and_then(|faction| faction.production_for("Barracks"))
-                .is_some_and(|products| !products.contains(&"LightRifleInfantry")),
-            "Chaos Barracks should not fall back to the Alliance infantry roster"
+                .is_some_and(|products| products.contains(&product_id)
+                    && !products.contains(&absent_product_id)),
+            "{expected_faction:?} registry Barracks roster should include {product_id} and exclude {absent_product_id}"
         );
-        click_command_button(&mut app, medic_button);
+        assert!(
+            actions.contains(&BuildAction::Train(product_id)),
+            "{expected_faction:?} constructed Barracks command panel should expose {product_id}"
+        );
+        assert!(
+            !actions.contains(&BuildAction::Train(absent_product_id)),
+            "{expected_faction:?} constructed Barracks command panel should not expose {absent_product_id}"
+        );
+        let (train_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train(product_id));
+        click_command_button(&mut app, train_button);
         for _ in 0..120 {
             app.update();
-            if unit_count_by_id(&mut app, Team::Chaos, "FieldMedic") > medics_before {
+            if unit_count_by_id(&mut app, player_team, product_id) > produced_before {
                 break;
             }
         }
         assert!(
-            unit_count_by_id(&mut app, Team::Chaos, "FieldMedic") > medics_before,
-            "the newly constructed Chaos Barracks should train at least one FieldMedic"
+            unit_count_by_id(&mut app, player_team, product_id) > produced_before,
+            "the newly constructed {expected_faction:?} Barracks should train at least one {product_id}"
+        );
+    }
+
+    #[test]
+    fn demon_menu_worker_can_build_barracks_and_train_faction_infantry() {
+        selected_race_worker_can_build_barracks_and_train_faction_infantry(
+            Team::Demon,
+            "HeavyMachinegunTrooper",
+            "FieldMedic",
+        );
+    }
+
+    #[test]
+    fn chaos_menu_worker_can_build_barracks_and_train_faction_infantry() {
+        selected_race_worker_can_build_barracks_and_train_faction_infantry(
+            Team::Chaos,
+            "FieldMedic",
+            "LightRifleInfantry",
         );
     }
 
