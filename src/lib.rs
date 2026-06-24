@@ -42552,12 +42552,30 @@ mod tests {
         product_id: &'static str,
         produced_count: usize,
     ) {
+        selected_race_vehicle_skirmish_can_train_and_win_in_mode(
+            player_team,
+            product_id,
+            produced_count,
+            SkirmishMatchMode::OneVsOne,
+        );
+    }
+
+    fn selected_race_vehicle_skirmish_can_train_and_win_in_mode(
+        player_team: Team,
+        product_id: &'static str,
+        produced_count: usize,
+        match_mode: SkirmishMatchMode,
+    ) {
         let selection = skirmish_menu_selection(
             0,
             player_team,
             DEFAULT_STARTING_RESOURCE_INDEX,
-            SkirmishMatchMode::OneVsOne,
+            match_mode,
             AiDifficulty::Beginner,
+        );
+        assert!(
+            selection.can_start(),
+            "{match_mode:?} selected race skirmish should be startable"
         );
         let expected_faction = SkirmishFaction::from_team(player_team);
         let mut app = stateful_match_flow_test_app(selection.match_setup());
@@ -42573,6 +42591,11 @@ mod tests {
             app.world().resource::<VisiblePlayer>().team,
             player_team,
             "menu-selected race should become the controlled player slot"
+        );
+        assert_eq!(
+            skirmish_mode_from_match_setup(*app.world().resource::<MatchSetupSettings>()),
+            match_mode,
+            "started match should preserve the selected skirmish mode"
         );
         assert_eq!(
             app.world()
@@ -42637,6 +42660,10 @@ mod tests {
                     .are_enemies(player_team, *team)
             })
             .collect::<Vec<_>>();
+        assert!(
+            !enemy_teams.is_empty(),
+            "{match_mode:?} selected race skirmish should include enemy teams"
+        );
         for enemy_team in enemy_teams {
             for _ in 0..32 {
                 if app.world().resource::<MatchState>().phase != MatchPhase::Running {
@@ -42717,6 +42744,16 @@ mod tests {
     #[test]
     fn chaos_menu_skirmish_can_train_rovers_and_finish_match() {
         selected_race_vehicle_skirmish_can_train_and_win(Team::Chaos, "ScoutRover", 8);
+    }
+
+    #[test]
+    fn three_faction_human_menu_skirmish_can_train_tanks_and_finish_match() {
+        selected_race_vehicle_skirmish_can_train_and_win_in_mode(
+            Team::Human,
+            "Tank",
+            10,
+            SkirmishMatchMode::ThreeFaction,
+        );
     }
 
     #[test]
