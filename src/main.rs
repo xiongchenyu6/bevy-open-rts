@@ -1379,6 +1379,7 @@ impl SkirmishFaction {
 }
 
 const GODOT_STANDARD_STARTING_RESOURCE_INDEX: usize = 1;
+const DEFAULT_STARTING_RESOURCE_INDEX: usize = 3;
 const SKIRMISH_TEAM_OPTION_COUNT: u8 = 3;
 const BEVY_PLAYTEST_STARTING_RESOURCES: StartingResources = StartingResources::new(260, 80);
 const DEFAULT_ACTIVE_TEAMS: [bool; 3] = [true, true, false];
@@ -1389,7 +1390,7 @@ const DEFAULT_PLAYER_FACTIONS: [SkirmishFaction; 3] = [
 ];
 const DEFAULT_PLAYER_CONTROLLERS: [SkirmishPlayerController; 3] = [
     SkirmishPlayerController::Human,
-    SkirmishPlayerController::Ai(AiDifficulty::Normal),
+    SkirmishPlayerController::Ai(AiDifficulty::Beginner),
     SkirmishPlayerController::None,
 ];
 const GODOT_STARTING_RESOURCE_OPTIONS: &[StartingResourceOption] = &[
@@ -1429,11 +1430,11 @@ impl Default for MatchSetupSettings {
     fn default() -> Self {
         Self {
             map_path: SKIRMISH_MAPS[0].godot_path,
-            starting_resources: StartingResources::godot_standard(),
+            starting_resources: StartingResources::new(32, 16),
             visible_player: VisiblePlayer::default(),
-            ai_difficulties: AiDifficultySettings::default(),
+            ai_difficulties: skirmish_ai_difficulties_from_controllers(DEFAULT_PLAYER_CONTROLLERS),
             team_relations: TeamRelations::default(),
-            startup_loadout: StartupLoadoutMode::GodotSkirmish,
+            startup_loadout: StartupLoadoutMode::PlaytestExpanded,
             active_teams: DEFAULT_ACTIVE_TEAMS,
             player_factions: DEFAULT_PLAYER_FACTIONS,
             player_color_slots: DEFAULT_PLAYER_COLOR_SLOTS,
@@ -1668,9 +1669,9 @@ impl Default for SkirmishMenuSelection {
         Self {
             map_index: 0,
             faction: Team::Human,
-            starting_resource_index: GODOT_STANDARD_STARTING_RESOURCE_INDEX,
+            starting_resource_index: DEFAULT_STARTING_RESOURCE_INDEX,
             match_mode: SkirmishMatchMode::OneVsOne,
-            ai_difficulty: AiDifficulty::Normal,
+            ai_difficulty: AiDifficulty::Beginner,
             team_ids: skirmish_default_team_ids(Team::Human, SkirmishMatchMode::OneVsOne),
             player_factions: DEFAULT_PLAYER_FACTIONS,
             player_color_slots: DEFAULT_PLAYER_COLOR_SLOTS,
@@ -2638,6 +2639,10 @@ const HUMAN_STARTUP: TeamStartup = TeamStartup {
             offset: (-3.0, 2.7),
         },
         SpawnSpec {
+            id: "PowerReactor",
+            offset: (-6.2, 0.3),
+        },
+        SpawnSpec {
             id: "Refinery",
             offset: (3.0, -2.6),
         },
@@ -2679,6 +2684,10 @@ const DEMON_STARTUP: TeamStartup = TeamStartup {
         SpawnSpec {
             id: "PowerReactor",
             offset: (-3.0, 2.7),
+        },
+        SpawnSpec {
+            id: "PowerReactor",
+            offset: (-6.2, 0.3),
         },
         SpawnSpec {
             id: "Refinery",
@@ -2726,6 +2735,10 @@ const CHAOS_STARTUP: TeamStartup = TeamStartup {
         SpawnSpec {
             id: "PowerReactor",
             offset: (-3.0, 2.7),
+        },
+        SpawnSpec {
+            id: "PowerReactor",
+            offset: (-6.2, 0.3),
         },
         SpawnSpec {
             id: "Refinery",
@@ -3573,9 +3586,9 @@ const CHAOS_AI_PROFILE: TeamAiProfile = TeamAiProfile {
     defense_limit_bonus: 0,
 };
 
-const BEGINNER_AI_PRODUCTION_PRIORITY: &[&str] = &["Worker", "OreHarvester"];
-const BEGINNER_AI_DEFENSE_PRIORITY: &[&str] = &["AntiGroundTurret"];
-const BEGINNER_AI_DEFENSE_LIMITS: &[(&str, usize)] = &[("AntiGroundTurret", 1)];
+const BEGINNER_AI_PRODUCTION_PRIORITY: &[&str] = &[];
+const BEGINNER_AI_DEFENSE_PRIORITY: &[&str] = &[];
+const BEGINNER_AI_DEFENSE_LIMITS: &[(&str, usize)] = &[];
 
 fn main() {
     let mut app = App::new();
@@ -6746,9 +6759,9 @@ fn faction_ai_profile_for_difficulty(
             profile.defense_priority = BEGINNER_AI_DEFENSE_PRIORITY;
             profile.defense_limits = BEGINNER_AI_DEFENSE_LIMITS;
             profile.expected_command_centers = 1;
-            profile.expected_workers = 2;
+            profile.expected_workers = 1;
             profile.expected_refineries = 1;
-            profile.expected_ore_harvesters = 1;
+            profile.expected_ore_harvesters = 0;
             profile.expected_battlegroups = 0;
             profile.expected_units_in_battlegroup = 0;
             profile.active_offense_enabled = false;
@@ -24433,14 +24446,11 @@ mod tests {
         assert_eq!(settings.visible_player.team, Team::Human);
         assert_eq!(
             selection.starting_resources(),
-            StartingResources::godot_standard()
+            StartingResources::new(32, 16)
         );
-        assert_eq!(
-            settings.starting_resources,
-            StartingResources::godot_standard()
-        );
+        assert_eq!(settings.starting_resources, StartingResources::new(32, 16));
         assert_eq!(selection.match_mode, SkirmishMatchMode::OneVsOne);
-        assert_eq!(selection.ai_difficulty, AiDifficulty::Normal);
+        assert_eq!(selection.ai_difficulty, AiDifficulty::Beginner);
         assert_eq!(selection.active_teams(), [true, true, false]);
         assert_eq!(settings.active_teams, [true, true, false]);
         assert_eq!(settings.player_factions, DEFAULT_PLAYER_FACTIONS);
@@ -24448,7 +24458,7 @@ mod tests {
         assert_eq!(settings.player_controllers, DEFAULT_PLAYER_CONTROLLERS);
         assert_eq!(
             settings.ai_difficulties.difficulty(Team::Demon),
-            AiDifficulty::Normal
+            AiDifficulty::Beginner
         );
     }
 
@@ -24719,7 +24729,7 @@ mod tests {
         );
         assert_eq!(
             selection.player_controller(Team::Human),
-            Some(SkirmishPlayerController::Ai(AiDifficulty::Normal)),
+            Some(SkirmishPlayerController::Ai(AiDifficulty::Beginner)),
             "turning one slot human should demote the previous human slot to AI like Godot"
         );
         assert_eq!(selection.human_team(), Some(Team::Demon));
@@ -24748,7 +24758,7 @@ mod tests {
         );
         assert_eq!(
             settings.ai_difficulties.difficulty(Team::Demon),
-            AiDifficulty::Normal
+            AiDifficulty::Beginner
         );
     }
 
@@ -27607,6 +27617,64 @@ mod tests {
         })
     }
 
+    fn alive_weapon_units_by_team(app: &mut App, team: Team) -> Vec<Entity> {
+        let world = app.world_mut();
+        let mut units =
+            world.query_filtered::<(Entity, &Team, &Health, Option<&Weapon>), With<Unit>>();
+        units
+            .iter(world)
+            .filter_map(|(entity, unit_team, health, weapon)| {
+                (*unit_team == team && health.current > 0.0 && weapon.is_some()).then_some(entity)
+            })
+            .collect()
+    }
+
+    fn anchor_targets_by_team(app: &mut App, team: Team) -> Vec<(Entity, Vec3)> {
+        let mut targets = Vec::new();
+        {
+            let world = app.world_mut();
+            let mut structures =
+                world.query_filtered::<(Entity, &Team, &Transform, &Health), With<Structure>>();
+            targets.extend(structures.iter(world).filter_map(
+                |(entity, structure_team, transform, health)| {
+                    (*structure_team == team && health.current > 0.0)
+                        .then_some((entity, transform.translation))
+                },
+            ));
+        }
+        {
+            let world = app.world_mut();
+            let mut units = world.query::<(Entity, &Unit, &Team, &Transform, &Health)>();
+            targets.extend(units.iter(world).filter_map(
+                |(entity, unit, unit_team, transform, health)| {
+                    (*unit_team == team
+                        && health.current > 0.0
+                        && is_worker_elimination_anchor(unit))
+                    .then_some((entity, transform.translation))
+                },
+            ));
+        }
+        targets
+    }
+
+    fn select_only_entities(app: &mut App, entities: &[Entity]) {
+        let selected = {
+            let world = app.world_mut();
+            let mut selected_q = world.query_filtered::<Entity, With<Selected>>();
+            selected_q.iter(world).collect::<Vec<_>>()
+        };
+        for entity in selected {
+            if let Ok(mut entity_mut) = app.world_mut().get_entity_mut(entity) {
+                entity_mut.remove::<Selected>();
+            }
+        }
+        for entity in entities {
+            if let Ok(mut entity_mut) = app.world_mut().get_entity_mut(*entity) {
+                entity_mut.insert(Selected);
+            }
+        }
+    }
+
     fn battle_unit_count(app: &mut App, team: Team) -> usize {
         let world = app.world_mut();
         let mut units = world.query::<(&Team, &Unit)>();
@@ -27995,6 +28063,61 @@ mod tests {
         for _ in 0..followup_updates {
             app.update();
         }
+    }
+
+    fn attach_test_window_to_main_camera(app: &mut App, focus: Vec3) {
+        let window_entity = {
+            let world = app.world_mut();
+            let mut window_q = world.query_filtered::<Entity, With<PrimaryWindow>>();
+            window_q.iter(world).next()
+        };
+        if let Some(window_entity) = window_entity {
+            app.world_mut()
+                .entity_mut(window_entity)
+                .get_mut::<Window>()
+                .expect("primary window entity should carry Window")
+                .set_cursor_position(Some(Vec2::new(640.0, 360.0)));
+        } else {
+            let mut window = Window {
+                resolution: WindowResolution::new(1280, 720),
+                ..default()
+            };
+            window.set_cursor_position(Some(Vec2::new(640.0, 360.0)));
+            app.world_mut().spawn((window, PrimaryWindow));
+        }
+
+        let camera_state = RtsCamera::focused_on(focus);
+        let camera_transform = camera_transform_from_state(&camera_state);
+        let mut projection = camera_projection_from_state(&camera_state);
+        projection.update(1280.0, 720.0);
+
+        {
+            let mut state = app.world_mut().resource_mut::<RtsCamera>();
+            *state = camera_state;
+        }
+
+        let world = app.world_mut();
+        let mut camera_q = world.query_filtered::<(
+            &mut Camera,
+            &mut Transform,
+            &mut GlobalTransform,
+            &mut Projection,
+        ), With<MainCamera>>();
+        let (mut camera, mut transform, mut global_transform, mut current_projection) = camera_q
+            .single_mut(world)
+            .expect("stateful match test should have one main camera");
+        camera.viewport = Some(Viewport {
+            physical_size: UVec2::new(1280, 720),
+            ..default()
+        });
+        camera.computed.target_info = Some(RenderTargetInfo {
+            physical_size: UVec2::new(1280, 720),
+            scale_factor: 1.0,
+        });
+        camera.computed.clip_from_view = projection.get_clip_from_view();
+        *transform = camera_transform;
+        *global_transform = GlobalTransform::from(camera_transform);
+        *current_projection = projection;
     }
 
     fn current_main_menu_button_label(app: &mut App, action: MainMenuAction) -> String {
@@ -29166,18 +29289,18 @@ mod tests {
     }
 
     #[test]
-    fn match_setup_defaults_to_godot_menu_baseline() {
+    fn match_setup_defaults_to_playable_menu_baseline() {
         let settings = MatchSetupSettings::default();
 
+        assert_eq!(settings.starting_resources, StartingResources::new(32, 16));
         assert_eq!(
-            settings.starting_resources,
-            StartingResources::godot_standard()
+            settings.startup_loadout,
+            StartupLoadoutMode::PlaytestExpanded
         );
-        assert_eq!(settings.startup_loadout, StartupLoadoutMode::GodotSkirmish);
         assert_eq!(settings.active_teams, DEFAULT_ACTIVE_TEAMS);
         assert_eq!(
             settings.player_controllers, DEFAULT_PLAYER_CONTROLLERS,
-            "default cargo run setup should be Human vs Normal AI until the menu changes it"
+            "default cargo run setup should be Human vs Beginner AI until the menu changes it"
         );
     }
 
@@ -29386,6 +29509,8 @@ mod tests {
         let mut app = stateful_match_flow_test_app(SkirmishMenuSelection::default().match_setup());
         app.update();
 
+        press_key(&mut app, KeyCode::KeyW, 0);
+        press_key(&mut app, KeyCode::KeyW, 0);
         press_key(&mut app, KeyCode::KeyW, 0);
         press_key(&mut app, KeyCode::KeyW, 1);
         {
@@ -30373,7 +30498,7 @@ mod tests {
     }
 
     #[test]
-    fn runtime_setup_from_menu_uses_godot_default_two_player_skirmish() {
+    fn runtime_setup_from_menu_uses_default_playable_two_player_skirmish() {
         let settings = SkirmishMenuSelection::default().match_setup();
         let mut app = runtime_setup_test_app_with_settings(settings);
 
@@ -30383,11 +30508,29 @@ mod tests {
             *app.world().resource::<ActiveTeams>(),
             ActiveTeams([true, true, false])
         );
-        assert!(!runtime_structure_counts_by_team(&mut app, Team::Human).is_empty());
-        assert!(!runtime_structure_counts_by_team(&mut app, Team::Demon).is_empty());
+        assert!(
+            runtime_structure_counts_by_team(&mut app, Team::Human).contains_key("VehicleFactory"),
+            "default cargo run skirmish should start with player vehicle production"
+        );
+        assert!(
+            runtime_structure_counts_by_team(&mut app, Team::Human).contains_key("Barracks"),
+            "default cargo run skirmish should start with player infantry production"
+        );
+        assert!(
+            runtime_structure_counts_by_team(&mut app, Team::Demon).contains_key("VehicleFactory"),
+            "default cargo run skirmish should start with AI vehicle production"
+        );
+        assert!(
+            !runtime_unit_counts_by_team(&mut app, Team::Human).is_empty(),
+            "default cargo run skirmish should start with playable player units"
+        );
+        assert!(
+            !runtime_unit_counts_by_team(&mut app, Team::Demon).is_empty(),
+            "default cargo run skirmish should start with playable AI units"
+        );
         assert!(
             runtime_structure_counts_by_team(&mut app, Team::Chaos).is_empty(),
-            "Godot default skirmish starts with one AI opponent, not every registered faction"
+            "default skirmish starts with one AI opponent, not every registered faction"
         );
         assert!(runtime_unit_counts_by_team(&mut app, Team::Chaos).is_empty());
     }
@@ -33691,7 +33834,7 @@ mod tests {
         );
         assert_eq!(
             team_ai_profile_for_difficulty(Team::Demon, AiDifficulty::Beginner).expected_workers,
-            2
+            1
         );
         assert_eq!(
             team_ai_profile_for_difficulty(Team::Demon, AiDifficulty::Beginner).expected_refineries,
@@ -33700,7 +33843,7 @@ mod tests {
         assert_eq!(
             team_ai_profile_for_difficulty(Team::Demon, AiDifficulty::Beginner)
                 .expected_ore_harvesters,
-            1
+            0
         );
         assert_eq!(
             team_ai_profile_for_difficulty(Team::Demon, AiDifficulty::Beginner)
@@ -38369,6 +38512,186 @@ mod tests {
                 .get::<ResourceNode>()
                 .is_some_and(|resource| resource.amount < 8),
             "resource node should lose ore during the loop"
+        );
+    }
+
+    #[test]
+    fn default_menu_skirmish_can_produce_tank_and_finish_visible_enemy_match() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        assert_eq!(
+            app.world().resource::<MatchSetupSettings>().startup_loadout,
+            StartupLoadoutMode::PlaytestExpanded,
+            "default cargo run match should start in the playable production loadout"
+        );
+        let (factory, _, _, _) = structure_snapshots_by_id(&mut app, "VehicleFactory")
+            .into_iter()
+            .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+            .expect("default playable skirmish should spawn a constructed player VehicleFactory");
+        assert!(
+            structure_snapshots_by_id(&mut app, "CommandCenter")
+                .into_iter()
+                .any(|(_, team, _, constructed)| team == Team::Demon && constructed),
+            "default playable skirmish should spawn a constructed enemy anchor"
+        );
+
+        app.world_mut().entity_mut(factory).insert(Selected);
+        app.update();
+
+        let target_tank_count = PRODUCTION_QUEUE_LIMIT * 2;
+        let (tank_button, tank_slot_index, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Tank"));
+        for batch in 0..2 {
+            for expected_tank_jobs in 1..=PRODUCTION_QUEUE_LIMIT {
+                app.world_mut()
+                    .entity_mut(tank_button)
+                    .insert(Interaction::Pressed);
+                app.world_mut()
+                    .resource_mut::<ButtonInput<MouseButton>>()
+                    .press(MouseButton::Left);
+                app.update();
+                {
+                    let queue = app.world().resource::<BuildQueue>();
+                    let human_tank_jobs = queue
+                        .0
+                        .iter()
+                        .filter(|job| {
+                            job.team == Team::Human
+                                && job.producer_entity == factory
+                                && matches!(job.action, BuildAction::Train("Tank"))
+                        })
+                        .count();
+                    assert_eq!(
+                        human_tank_jobs, expected_tank_jobs,
+                        "clicking the default VehicleFactory Tank button should enqueue Tank job {expected_tank_jobs}"
+                    );
+                }
+                {
+                    let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+                    mouse.release(MouseButton::Left);
+                    mouse.clear();
+                }
+                app.world_mut()
+                    .entity_mut(tank_button)
+                    .insert(Interaction::None);
+                app.update();
+            }
+            let expected_total = PRODUCTION_QUEUE_LIMIT * (batch + 1);
+            for _ in 0..220 {
+                app.update();
+                if unit_count_by_id(&mut app, Team::Human, "Tank") >= expected_total {
+                    break;
+                }
+            }
+        }
+
+        let human_tanks = unit_count_by_id(&mut app, Team::Human, "Tank");
+        let queue_status = {
+            let queue = app.world().resource::<BuildQueue>();
+            queue
+                .0
+                .iter()
+                .map(|job| {
+                    format!(
+                        "{:?}:{:.2}:{}",
+                        job.team,
+                        job.timer,
+                        build_target_product(job.action)
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join(",")
+        };
+        let (human_power_used, human_power_capacity, human_ore, human_crystal) = {
+            let human_economy = app.world().resource::<Economies>().get(Team::Human);
+            (
+                human_economy.power_used,
+                human_economy.power_capacity,
+                human_economy.ore,
+                human_economy.crystal,
+            )
+        };
+        let match_phase = app.world().resource::<MatchState>().phase;
+        let human_anchors = anchor_targets_by_team(&mut app, Team::Human).len();
+        let demon_anchors = anchor_targets_by_team(&mut app, Team::Demon).len();
+        assert!(
+            human_tanks >= target_tank_count,
+            "default menu skirmish should produce {target_tank_count} Tanks from command slot {tank_slot_index}; got {human_tanks}; phase={match_phase:?}; anchors human={human_anchors} demon={demon_anchors}; queue=[{queue_status}] power={}/{} ore={} crystal={}",
+            human_power_used,
+            human_power_capacity,
+            human_ore,
+            human_crystal
+        );
+        for _ in 0..24 {
+            if app.world().resource::<MatchState>().phase != MatchPhase::Running {
+                break;
+            }
+            let Some((target, target_position)) = anchor_targets_by_team(&mut app, Team::Demon)
+                .into_iter()
+                .next()
+            else {
+                break;
+            };
+            let attackers = alive_weapon_units_by_team(&mut app, Team::Human);
+            assert!(
+                !attackers.is_empty(),
+                "default skirmish should keep at least one player attack unit alive"
+            );
+            select_only_entities(&mut app, &attackers);
+            app.world_mut()
+                .entity_mut(target)
+                .insert((VisibilityState { visible: true }, Visibility::Visible));
+            attach_test_window_to_main_camera(&mut app, target_position);
+
+            right_click_order_at_world(&mut app, target_position);
+
+            let ordered_attackers = attackers
+                .iter()
+                .filter(|entity| {
+                    app.world().get_entity(**entity).is_ok_and(|entity_ref| {
+                        entity_ref
+                            .get::<AttackOrder>()
+                            .is_some_and(|order| order.target == target)
+                    })
+                })
+                .count();
+            if app.world().get_entity(target).is_ok() {
+                assert!(
+                    ordered_attackers > 0,
+                    "right-clicking a visible enemy anchor in the default match should issue AttackOrder"
+                );
+            }
+            for _ in 0..220 {
+                app.update();
+                if app.world().get_entity(target).is_err()
+                    || app.world().resource::<MatchState>().phase != MatchPhase::Running
+                {
+                    break;
+                }
+            }
+        }
+        for _ in 0..8 {
+            app.update();
+            if app.world().resource::<MatchState>().phase == MatchPhase::HumanVictory {
+                break;
+            }
+        }
+
+        assert!(
+            anchor_targets_by_team(&mut app, Team::Demon).is_empty(),
+            "produced Tank group should be able to destroy all default enemy anchors"
+        );
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::HumanVictory,
+            "destroying the default enemy anchor should finish the match as player victory"
         );
     }
 
