@@ -27291,6 +27291,20 @@ mod tests {
         actions.into_iter().map(|(_, action)| action).collect()
     }
 
+    fn command_panel_train_products(app: &mut App) -> Vec<&'static str> {
+        let world = app.world_mut();
+        let mut slots = world.query::<(&CommandSlot, &BuildAction)>();
+        let mut products = slots
+            .iter(world)
+            .filter_map(|(slot, action)| match action {
+                BuildAction::Train(product) => Some((slot.0, *product)),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        products.sort_by_key(|(slot, _)| *slot);
+        products.into_iter().map(|(_, product)| product).collect()
+    }
+
     fn issue_orders_click_test_app(visible_player: VisiblePlayer) -> App {
         let mut app = App::new();
         let mut window = Window {
@@ -31044,6 +31058,122 @@ mod tests {
                 .into_iter()
                 .any(|(_, team, _, constructed)| team == Team::Demon && constructed),
             "the real app builder should spawn the default AI opponent from the shared match setup"
+        );
+    }
+
+    fn real_menu_structure_train_products(
+        app: &mut App,
+        team: Team,
+        producer_id: &'static str,
+    ) -> Vec<&'static str> {
+        let (producer, _, _, constructed) = structure_snapshots_by_id(app, producer_id)
+            .into_iter()
+            .find(|(_, structure_team, _, constructed)| *structure_team == team && *constructed)
+            .unwrap_or_else(|| panic!("{team:?} should spawn a constructed {producer_id}"));
+        assert!(constructed);
+        mouse_select_entities(
+            app,
+            &[producer],
+            "mouse-selecting a real menu-started production structure should drive the command panel",
+        );
+        app.update();
+        command_panel_train_products(app)
+    }
+
+    #[test]
+    fn headless_game_app_menu_selected_factions_drive_real_command_panels() {
+        let cases = [
+            (Team::Human, SkirmishFaction::Alliance),
+            (Team::Demon, SkirmishFaction::Demon),
+            (Team::Chaos, SkirmishFaction::Chaos),
+        ];
+        let mut rosters = Vec::new();
+
+        for (player_team, expected_faction) in cases {
+            let mut app = build_game_app(GameAppMode::Headless);
+            app.update();
+
+            let faction_button = current_main_menu_button_label(
+                &mut app,
+                MainMenuAction::SelectFaction(player_team),
+            );
+            assert!(
+                faction_button.contains(expected_faction.label()),
+                "real setup menu should show the Chinese faction label for {expected_faction:?}: {faction_button}"
+            );
+            assert!(
+                !faction_button.contains("Human"),
+                "real setup menu should use 人族 instead of the old Human label: {faction_button}"
+            );
+
+            press_main_menu_button(&mut app, MainMenuAction::SelectFaction(player_team), 1);
+            press_main_menu_button(&mut app, MainMenuAction::StartMatch, 3);
+
+            assert_eq!(
+                app_screen(&app),
+                AppScreen::InMatch,
+                "{expected_faction:?} selected from the real menu should enter the shared match scene"
+            );
+            assert_eq!(
+                app.world().resource::<VisiblePlayer>().team,
+                player_team,
+                "real menu-selected faction should become the controlled player slot"
+            );
+            assert_eq!(
+                app.world()
+                    .resource::<PlayerFactions>()
+                    .slot_faction(player_team),
+                expected_faction,
+                "real menu-selected player slot should use its faction roster"
+            );
+
+            let faction =
+                faction_def(expected_faction).expect("selected faction should exist in registry");
+            let expected_barracks = faction
+                .production_for("Barracks")
+                .expect("selected faction should have Barracks production")
+                .to_vec();
+            let expected_vehicles = faction
+                .production_for("VehicleFactory")
+                .expect("selected faction should have VehicleFactory production")
+                .to_vec();
+
+            let barracks_products =
+                real_menu_structure_train_products(&mut app, player_team, "Barracks");
+            assert_eq!(
+                barracks_products, expected_barracks,
+                "{expected_faction:?} real Barracks command panel should mirror the selected faction roster"
+            );
+
+            let vehicle_products =
+                real_menu_structure_train_products(&mut app, player_team, "VehicleFactory");
+            assert_eq!(
+                vehicle_products, expected_vehicles,
+                "{expected_faction:?} real VehicleFactory command panel should mirror the selected faction roster"
+            );
+
+            rosters.push((expected_faction, barracks_products, vehicle_products));
+        }
+
+        assert_ne!(
+            rosters[0].1, rosters[1].1,
+            "人族 and 魔族 Barracks panels should expose different rosters"
+        );
+        assert_ne!(
+            rosters[0].1, rosters[2].1,
+            "人族 and 混沌族 Barracks panels should expose different rosters"
+        );
+        assert_ne!(
+            rosters[1].2, rosters[2].2,
+            "魔族 and 混沌族 VehicleFactory panels should expose different rosters"
+        );
+        assert!(
+            rosters[2].2.contains(&"JammerVehicle"),
+            "混沌族 VehicleFactory should expose its control vehicle"
+        );
+        assert!(
+            !rosters[2].2.contains(&"Tank"),
+            "混沌族 VehicleFactory should not fall back to the default Tank roster"
         );
     }
 
