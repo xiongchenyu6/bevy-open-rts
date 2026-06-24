@@ -40982,14 +40982,19 @@ mod tests {
             "default player start should reveal the resource rally target"
         );
 
-        select_only_entities(&mut app, &[command_center]);
-        app.update();
-        let (rally_button, _, _) =
-            enabled_command_slot_for_action(&mut app, BuildAction::SetRallyPoint);
-        click_command_button(&mut app, rally_button);
+        attach_test_window_to_main_camera(&mut app, command_center_position);
+        click_selection_at_world(&mut app, command_center_position, false);
         assert!(
-            app.world().resource::<CommandMode>().rally_point,
-            "clicking the CommandCenter rally command should arm rally targeting"
+            app.world()
+                .entity(command_center)
+                .get::<Selected>()
+                .is_some(),
+            "left-clicking the visible CommandCenter should select it before setting a resource rally point"
+        );
+        app.update();
+        assert!(
+            !app.world().resource::<CommandMode>().rally_point,
+            "plain right-click resource rally should not require arming explicit rally mode"
         );
 
         attach_test_window_to_main_camera(&mut app, resource_position);
@@ -41002,7 +41007,7 @@ mod tests {
         assert_eq!(
             rally_point.target_unit,
             Some(resource),
-            "right-clicking a visible ore node in rally mode should track that resource"
+            "plain right-clicking a visible ore node with a selected CommandCenter should track that resource"
         );
         assert!(
             rally_point
