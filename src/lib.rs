@@ -38616,6 +38616,66 @@ mod tests {
     }
 
     #[test]
+    fn ai_construction_assignment_system_orders_nearest_worker_like_godot() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins)
+            .insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+                Duration::from_secs_f32(1.0),
+            ))
+            .insert_resource(VisiblePlayer::per_player(Team::Human))
+            .insert_resource(ActiveTeams([true, true, false]))
+            .init_resource::<AiDirector>()
+            .add_systems(
+                Update,
+                (advance_test_time, auto_assign_ai_construction_workers).chain(),
+            );
+        let near_worker =
+            spawn_test_unit(&mut app, "Worker", Team::Demon, Vec3::new(12.0, 0.0, 10.0));
+        let far_worker =
+            spawn_test_unit(&mut app, "Worker", Team::Demon, Vec3::new(38.0, 0.0, 10.0));
+        let near_reactor = spawn_test_structure(
+            &mut app,
+            "PowerReactor",
+            Team::Demon,
+            Vec3::new(14.5, 0.0, 10.0),
+        );
+        let far_reactor = spawn_test_structure(
+            &mut app,
+            "PowerReactor",
+            Team::Demon,
+            Vec3::new(40.5, 0.0, 10.0),
+        );
+        for reactor in [near_reactor, far_reactor] {
+            app.world_mut()
+                .entity_mut(reactor)
+                .insert(UnderConstruction {
+                    remaining: 4.0,
+                    total: 8.0,
+                    cost: registry::Cost { ore: 5, crystal: 3 },
+                    free_harvester_origin: None,
+                });
+        }
+
+        app.update();
+
+        assert_eq!(
+            app.world()
+                .entity(near_worker)
+                .get::<ConstructOrder>()
+                .map(|order| order.target),
+            Some(near_reactor),
+            "Godot construction refresh should assign the nearest idle AI worker to the nearest unfinished structure"
+        );
+        assert!(
+            app.world()
+                .entity(far_worker)
+                .get::<ConstructOrder>()
+                .is_none(),
+            "a second idle worker should remain idle while the closest worker can handle the current construction task"
+        );
+    }
+
+    #[test]
     fn construction_cancel_refunds_full_cost_like_godot() {
         let cost = registry::Cost { ore: 7, crystal: 5 };
 
