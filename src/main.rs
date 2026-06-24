@@ -26145,6 +26145,53 @@ mod tests {
         app
     }
 
+    fn playable_production_shortcut_test_app() -> App {
+        let mut app = App::new();
+        app.add_plugins((
+            MinimalPlugins,
+            AssetPlugin {
+                meta_check: AssetMetaCheck::Never,
+                ..default()
+            },
+            bevy::world_serialization::WorldSerializationPlugin,
+        ))
+        .insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ))
+        .init_asset::<WorldAsset>()
+        .insert_resource(VisiblePlayer::per_player(Team::Human))
+        .init_resource::<ButtonInput<KeyCode>>()
+        .init_resource::<BuildQueue>()
+        .init_resource::<CommandMode>()
+        .init_resource::<Economies>()
+        .init_resource::<NextSpawnId>()
+        .init_resource::<PlayerFactions>()
+        .init_resource::<MapBounds>()
+        .init_resource::<BattleLog>()
+        .init_resource::<AudioFeedback>()
+        .add_systems(
+            Update,
+            (
+                refresh_command_panel,
+                command_shortcuts,
+                advance_test_time,
+                process_build_queue,
+            )
+                .chain(),
+        );
+        for index in 0..COMMAND_SLOT_COUNT {
+            app.world_mut().spawn((
+                CommandSlot(index),
+                BuildAction::None,
+                CommandSlotAvailability::default(),
+                Interaction::None,
+                BackgroundColor(Color::srgba(0.035, 0.045, 0.055, 0.78)),
+                BorderColor::all(Color::srgb(0.28, 0.34, 0.39)),
+            ));
+        }
+        app
+    }
+
     fn issue_orders_click_test_app(visible_player: VisiblePlayer) -> App {
         let mut app = App::new();
         let mut window = Window {
@@ -38157,6 +38204,73 @@ mod tests {
                 .get::<ResourceNode>()
                 .is_some_and(|resource| resource.amount < 8),
             "resource node should lose ore during the loop"
+        );
+    }
+
+    #[test]
+    fn selected_vehicle_factory_hotkey_queues_and_spawns_tank_through_panel() {
+        let mut app = playable_production_shortcut_test_app();
+        let tank_def = registry::entity("Tank").expect("registry should include Tank");
+        let factory_origin = Vec3::new(0.0, 0.0, 0.0);
+        let factory = spawn_test_structure(&mut app, "VehicleFactory", Team::Human, factory_origin);
+        app.world_mut().entity_mut(factory).insert(Selected);
+
+        app.update();
+
+        let (tank_slot_index, tank_hotkey) = {
+            let world = app.world_mut();
+            let mut slots = world.query::<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>();
+            slots
+                .iter(world)
+                .find_map(|(slot, action, availability)| {
+                    (*action == BuildAction::Train("Tank") && availability.enabled).then(|| {
+                        (
+                            slot.0,
+                            command_action_hotkey(slot.0, *action)
+                                .expect("enabled command slot should have a hotkey"),
+                        )
+                    })
+                })
+                .expect("selected VehicleFactory should expose an enabled Tank command")
+        };
+        let before = app.world().resource::<Economies>().get(Team::Human).clone();
+
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .press(tank_hotkey.key_code);
+        app.update();
+
+        {
+            let queue = app.world().resource::<BuildQueue>();
+            assert_eq!(queue.0.len(), 1);
+            assert_eq!(queue.0[0].team, Team::Human);
+            assert!(matches!(queue.0[0].action, BuildAction::Train("Tank")));
+            assert_eq!(queue.0[0].producer_entity, factory);
+        }
+        let after_reservation = app.world().resource::<Economies>().get(Team::Human);
+        assert_eq!(after_reservation.ore, before.ore - tank_def.cost.ore);
+        assert_eq!(
+            after_reservation.crystal,
+            before.crystal - tank_def.cost.crystal
+        );
+
+        {
+            let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
+            keyboard.release(tank_hotkey.key_code);
+            keyboard.clear();
+        }
+        for _ in 0..(tank_def.build_seconds.ceil() as usize + 2) {
+            app.update();
+        }
+
+        assert!(
+            app.world().resource::<BuildQueue>().0.is_empty(),
+            "queued Tank from slot {tank_slot_index} should complete production"
+        );
+        assert_eq!(
+            unit_count_by_id(&mut app, Team::Human, "Tank"),
+            1,
+            "player-facing VehicleFactory command should spawn a playable Tank"
         );
     }
 
