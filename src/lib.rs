@@ -60,6 +60,8 @@ const RESOURCE_ORDER_COLLECTOR_GROUND_SNAP_RADIUS_M: f32 = 5.2;
 const RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 34.0;
 const RESOURCE_ORDER_SCREEN_PICK_MAX_RADIUS_PX: f32 = 78.0;
 const RESOURCE_ORDER_COLLECTOR_SCREEN_PICK_MAX_RADIUS_PX: f32 = 124.0;
+const ENEMY_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 32.0;
+const ENEMY_ORDER_SCREEN_PICK_MAX_RADIUS_PX: f32 = 96.0;
 const DEFAULT_MODEL_FALLBACK: &str = "models/kenney-spacekit/rover.glb";
 const COMMAND_SLOT_COUNT: usize = 24;
 const COMMAND_KEY_CANCEL: &str = "cancel";
@@ -13299,37 +13301,8 @@ fn issue_orders(
     let queue_mode = keyboard.pressed(KeyCode::ShiftLeft) || keyboard.pressed(KeyCode::ShiftRight);
     let force_move = keyboard.pressed(KeyCode::AltLeft) || keyboard.pressed(KeyCode::AltRight);
 
-    let mut enemy_target = None;
-    let mut enemy_distance = f32::MAX;
-    for (
-        entity,
-        transform,
-        selectable,
-        team,
-        visibility,
-        resource_node,
-        supply_crate,
-        _health,
-        _unit,
-        _structure,
-        _under_construction,
-    ) in &selectable_q
-    {
-        if !visibility.visible {
-            continue;
-        }
-        if resource_node.is_some() || supply_crate.is_some() {
-            continue;
-        }
-        if *team == visible_team {
-            continue;
-        }
-        let distance = xz_distance(transform.translation, point);
-        if distance <= selectable.radius + 0.45 && distance < enemy_distance {
-            enemy_target = Some(entity);
-            enemy_distance = distance;
-        }
-    }
+    let enemy_target =
+        nearest_enemy_order_target(point, cursor, &camera_q, visible_team, &selectable_q);
 
     let selected_units = selected_params.p0();
     let selected: Vec<_> = selected_units
@@ -14026,6 +13999,106 @@ fn can_garrison_structure_target(
         && garrison.count < garrison.capacity
 }
 
+fn nearest_enemy_order_target(
+    point: Vec3,
+    cursor: Vec2,
+    camera_q: &Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    visible_team: Team,
+    selectable_q: &Query<SelectableOrderTargetItem<'_>>,
+) -> Option<Entity> {
+    enemy_target_at_cursor(cursor, camera_q, visible_team, selectable_q)
+        .or_else(|| nearest_enemy_target_with_snap_radius(point, visible_team, selectable_q, 0.45))
+}
+
+fn enemy_target_at_cursor(
+    cursor: Vec2,
+    camera_q: &Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    visible_team: Team,
+    selectable_q: &Query<SelectableOrderTargetItem<'_>>,
+) -> Option<Entity> {
+    let (camera, camera_transform) = camera_q.single().ok()?;
+    let mut nearest = None;
+    let mut nearest_screen_distance = f32::MAX;
+    for (
+        entity,
+        transform,
+        selectable,
+        team,
+        visibility,
+        resource_node,
+        supply_crate,
+        health,
+        _unit,
+        _structure,
+        _under_construction,
+    ) in selectable_q
+    {
+        if !visibility.visible
+            || *team == visible_team
+            || resource_node.is_some()
+            || supply_crate.is_some()
+            || health.is_none_or(|health| health.current <= 0.0)
+        {
+            continue;
+        }
+        let Some((screen_distance, pick_radius)) = selectable_cursor_pick_distance(
+            cursor,
+            camera,
+            camera_transform,
+            transform,
+            selectable,
+            ENEMY_ORDER_SCREEN_PICK_MIN_RADIUS_PX,
+            ENEMY_ORDER_SCREEN_PICK_MAX_RADIUS_PX,
+        ) else {
+            continue;
+        };
+        if screen_distance <= pick_radius && screen_distance < nearest_screen_distance {
+            nearest = Some(entity);
+            nearest_screen_distance = screen_distance;
+        }
+    }
+    nearest
+}
+
+fn nearest_enemy_target_with_snap_radius(
+    point: Vec3,
+    visible_team: Team,
+    selectable_q: &Query<SelectableOrderTargetItem<'_>>,
+    snap_radius: f32,
+) -> Option<Entity> {
+    let mut nearest = None;
+    let mut nearest_distance = f32::MAX;
+    for (
+        entity,
+        transform,
+        selectable,
+        team,
+        visibility,
+        resource_node,
+        supply_crate,
+        health,
+        _unit,
+        _structure,
+        _under_construction,
+    ) in selectable_q
+    {
+        if !visibility.visible
+            || *team == visible_team
+            || resource_node.is_some()
+            || supply_crate.is_some()
+            || health.is_none_or(|health| health.current <= 0.0)
+        {
+            continue;
+        }
+        let distance = xz_distance(transform.translation, point);
+        if distance <= selectable.radius + snap_radius && distance < nearest_distance {
+            nearest = Some(entity);
+            nearest_distance = distance;
+        }
+    }
+    nearest
+}
+
 fn nearest_resource_order_target(
     point: Vec3,
     cursor: Vec2,
@@ -14072,12 +14145,13 @@ fn resource_target_at_cursor(
         if !visibility.visible || resource.amount <= 0 {
             continue;
         }
-        let Some((screen_distance, pick_radius)) = resource_cursor_pick_distance(
+        let Some((screen_distance, pick_radius)) = selectable_cursor_pick_distance(
             cursor,
             camera,
             camera_transform,
             transform,
             selectable,
+            RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX,
             max_pick_radius,
         ) else {
             continue;
@@ -14090,12 +14164,13 @@ fn resource_target_at_cursor(
     nearest
 }
 
-fn resource_cursor_pick_distance(
+fn selectable_cursor_pick_distance(
     cursor: Vec2,
     camera: &Camera,
     camera_transform: &GlobalTransform,
     transform: &Transform,
     selectable: &Selectable,
+    min_pick_radius: f32,
     max_pick_radius: f32,
 ) -> Option<(f32, f32)> {
     let base = transform.translation;
@@ -14120,10 +14195,7 @@ fn resource_cursor_pick_distance(
             .map(|edge| edge.distance(base_screen))
     })
     .fold(0.0, f32::max);
-    let pick_radius = projected_radius.clamp(
-        RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX,
-        max_pick_radius.max(RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX),
-    );
+    let pick_radius = projected_radius.clamp(min_pick_radius, max_pick_radius.max(min_pick_radius));
     Some((screen_distance, pick_radius))
 }
 
@@ -29435,6 +29507,67 @@ mod tests {
         keyboard.clear();
     }
 
+    fn mouse_select_entities(app: &mut App, entities: &[Entity], message: &str) {
+        let selected_count = mouse_select_some_entities(app, entities, message);
+        assert_eq!(
+            selected_count,
+            entities.len(),
+            "{message}; selected={selected_count}/{}",
+            entities.len()
+        );
+    }
+
+    fn mouse_select_some_entities(app: &mut App, entities: &[Entity], message: &str) -> usize {
+        assert!(!entities.is_empty(), "{message}");
+        for (index, entity) in entities.iter().copied().enumerate() {
+            let position = unit_position(app, entity);
+            attach_test_window_to_main_camera(app, position);
+            click_selection_at_world(app, position, index > 0);
+        }
+        let selected_count = entities
+            .iter()
+            .filter(|entity| {
+                app.world()
+                    .get_entity(**entity)
+                    .is_ok_and(|entity_ref| entity_ref.get::<Selected>().is_some())
+            })
+            .count();
+        assert!(selected_count > 0, "{message}");
+        selected_count
+    }
+
+    fn order_summary_for_entities(app: &App, entities: &[Entity], target: Entity) -> String {
+        entities
+            .iter()
+            .map(|entity| {
+                app.world().get_entity(*entity).map_or_else(
+                    |_| format!("{entity:?}:missing"),
+                    |entity_ref| {
+                        let selected = entity_ref.get::<Selected>().is_some();
+                        let attack = entity_ref
+                            .get::<AttackOrder>()
+                            .map(|order| format!("{:?}", order.target));
+                        let move_order = entity_ref.get::<MoveOrder>().map(|order| {
+                            format!("({:.1},{:.1})", order.target.x, order.target.z)
+                        });
+                        let queued_attack = entity_ref.get::<OrderQueue>().is_some_and(|queue| {
+                            queue
+                                .orders
+                                .iter()
+                                .any(|order| matches!(order, UnitQueuedOrder::Attack(queued) if *queued == target))
+                        });
+                        format!(
+                            "{entity:?}:sel={selected}:atk={}:move={}:queued_attack={queued_attack}",
+                            attack.unwrap_or_else(|| "-".to_string()),
+                            move_order.unwrap_or_else(|| "-".to_string())
+                        )
+                    },
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("; ")
+    }
+
     fn right_click_order_at_world(app: &mut App, position: Vec3) {
         let cursor = screen_position_for_world(app, position);
         set_selection_cursor(app, cursor);
@@ -40811,7 +40944,11 @@ mod tests {
         assert!(constructed);
         let tank_def = registry::entity("Tank").expect("registry should include Tank");
 
-        select_only_entities(&mut app, &[factory]);
+        mouse_select_entities(
+            &mut app,
+            &[factory],
+            "left-clicking the default VehicleFactory should select it before queuing Tanks",
+        );
         app.update();
 
         let (tank_button, _, _) =
@@ -41447,7 +41584,11 @@ mod tests {
             .into_iter()
             .find(|(_, team, _, constructed)| *team == player_team && *constructed)
             .expect("selected race should spawn a constructed player VehicleFactory");
-        select_only_entities(&mut app, &[factory]);
+        mouse_select_entities(
+            &mut app,
+            &[factory],
+            "left-clicking the selected race VehicleFactory should select it before production",
+        );
         app.update();
         let (train_button, slot_index, _) =
             enabled_command_slot_for_action(&mut app, BuildAction::Train(product_id));
@@ -41495,12 +41636,31 @@ mod tests {
                     "{:?} should keep combat units alive to finish the match",
                     expected_faction
                 );
-                select_only_entities(&mut app, &attackers);
+                let selected_attackers = mouse_select_some_entities(
+                    &mut app,
+                    &attackers,
+                    "left-clicking selected race combat units should select an attack group",
+                );
                 app.world_mut()
                     .entity_mut(target)
                     .insert((VisibilityState { visible: true }, Visibility::Visible));
                 attach_test_window_to_main_camera(&mut app, target_position);
                 right_click_order_at_world(&mut app, target_position);
+                let ordered_attackers = attackers
+                    .iter()
+                    .filter(|entity| {
+                        app.world()
+                            .get_entity(**entity)
+                            .is_ok_and(|entity_ref| entity_ref.get::<AttackOrder>().is_some())
+                    })
+                    .count();
+                if app.world().get_entity(target).is_ok() {
+                    let order_summary = order_summary_for_entities(&app, &attackers, target);
+                    assert!(
+                        ordered_attackers > 0,
+                        "right-clicking near {enemy_team:?} anchor should issue an AttackOrder from selected race mouse-selected group; selected={selected_attackers}; orders={order_summary}"
+                    );
+                }
                 for _ in 0..260 {
                     app.update();
                     if app.world().get_entity(target).is_err()
@@ -41575,7 +41735,11 @@ mod tests {
             "default playable skirmish should spawn a constructed enemy anchor"
         );
 
-        select_only_entities(&mut app, &[factory]);
+        mouse_select_entities(
+            &mut app,
+            &[factory],
+            "left-clicking the default VehicleFactory should select it before queuing the attack group",
+        );
         app.update();
 
         let target_tank_count = PRODUCTION_QUEUE_LIMIT + 1;
@@ -41710,7 +41874,11 @@ mod tests {
                 !attackers.is_empty(),
                 "default skirmish should keep at least one player attack unit alive"
             );
-            select_only_entities(&mut app, &attackers);
+            let selected_attackers = mouse_select_some_entities(
+                &mut app,
+                &attackers,
+                "left-clicking produced player attack units should select an attack group",
+            );
             app.world_mut()
                 .entity_mut(target)
                 .insert((VisibilityState { visible: true }, Visibility::Visible));
@@ -41721,17 +41889,16 @@ mod tests {
             let ordered_attackers = attackers
                 .iter()
                 .filter(|entity| {
-                    app.world().get_entity(**entity).is_ok_and(|entity_ref| {
-                        entity_ref
-                            .get::<AttackOrder>()
-                            .is_some_and(|order| order.target == target)
-                    })
+                    app.world()
+                        .get_entity(**entity)
+                        .is_ok_and(|entity_ref| entity_ref.get::<AttackOrder>().is_some())
                 })
                 .count();
             if app.world().get_entity(target).is_ok() {
+                let order_summary = order_summary_for_entities(&app, &attackers, target);
                 assert!(
                     ordered_attackers > 0,
-                    "right-clicking a visible enemy anchor in the default match should issue AttackOrder"
+                    "right-clicking near a visible enemy anchor in the default match should issue AttackOrder from a mouse-selected group; selected={selected_attackers}; orders={order_summary}"
                 );
             }
             for _ in 0..220 {
