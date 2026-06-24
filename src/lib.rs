@@ -6845,7 +6845,10 @@ fn update_skirmish_map_preview(
     for entity in &elements {
         commands.entity(entity).try_despawn();
     }
-    commands.entity(root).with_children(|parent| {
+    let Ok(mut root_commands) = commands.get_entity(root) else {
+        return;
+    };
+    root_commands.with_children(|parent| {
         spawn_skirmish_map_preview_elements(parent, *selection);
     });
 }
@@ -10940,7 +10943,10 @@ fn update_battle_log(
             .enumerate()
             .rev()
             .collect::<Vec<_>>();
-        commands.entity(root).with_children(|parent| {
+        let Ok(mut root_commands) = commands.get_entity(root) else {
+            return;
+        };
+        root_commands.with_children(|parent| {
             for (index, entry) in visible_entries {
                 spawn_battle_log_entry(parent, root_data.font.clone(), index, entry);
             }
@@ -11106,7 +11112,10 @@ fn update_minimap(
         return;
     }
 
-    commands.entity(content).with_children(|parent| {
+    let Ok(mut content_commands) = commands.get_entity(content) else {
+        return;
+    };
+    content_commands.with_children(|parent| {
         for (transform, team, _selectable, visibility, unit, structure, health, resource, supply) in
             &world_q
         {
