@@ -28426,83 +28426,10 @@ mod tests {
         .init_asset::<bevy::mesh::skinning::SkinnedMeshInverseBindposes>()
         .init_asset::<WorldAsset>()
         .init_asset::<Font>()
-        .init_asset::<bevy::audio::AudioSource>()
-        .init_resource::<Economies>()
-        .init_resource::<TeamRelations>()
-        .init_resource::<BuildQueue>()
-        .init_resource::<NextSpawnId>()
-        .init_resource::<AiDirector>()
-        .init_resource::<AiDifficultySettings>()
-        .init_resource::<ActiveTeams>()
-        .init_resource::<PlayerFactions>()
-        .init_resource::<PlayerColorSlots>()
-        .init_resource::<VisiblePlayer>()
-        .init_resource::<SelectedSkirmishMap>()
-        .init_resource::<SkirmishMenuSelection>()
-        .init_resource::<RandomMapCursor>()
-        .insert_resource(settings)
-        .init_resource::<MapBounds>()
-        .init_resource::<CommandMode>()
-        .init_resource::<StructurePlacementFeedback>()
-        .init_resource::<MatchMenuState>()
-        .init_resource::<MatchSpeed>()
-        .init_resource::<MatchBriefingState>()
-        .init_resource::<SelectionDragState>()
-        .init_resource::<UnitGroups>()
-        .init_resource::<CameraBookmarks>()
-        .init_resource::<CameraMouseRotation>()
-        .init_resource::<DoubleClickState>()
-        .init_resource::<ButtonInput<KeyCode>>()
-        .init_resource::<ButtonInput<MouseButton>>()
-        .init_resource::<LatestBattleEvent>()
-        .init_resource::<MatchFlow>()
-        .init_resource::<MatchState>()
-        .init_resource::<SupportCooldowns>()
-        .init_resource::<KillCredits>()
-        .init_resource::<BattleLog>()
-        .init_resource::<AudioFeedback>()
-        .init_resource::<ObjectiveTrackerState>()
-        .insert_resource(RtsCamera::default())
-        .add_systems(
-            OnEnter(AppScreen::MainMenu),
-            (
-                restore_main_menu_selection_from_match_setup,
-                setup_main_menu,
-            )
-                .chain(),
-        )
-        .add_systems(
-            Update,
-            (
-                main_menu_scroll,
-                main_menu_buttons,
-                update_main_menu_summary,
-                update_skirmish_map_preview,
-            )
-                .chain()
-                .run_if(in_state(AppScreen::MainMenu)),
-        )
-        .add_systems(
-            OnEnter(AppScreen::InMatch),
-            (
-                apply_match_setup_settings,
-                begin_match_from_setup,
-                setup_support_cooldowns,
-                setup,
-            )
-                .chain(),
-        )
-        .add_systems(OnEnter(AppScreen::RestartingMatch), advance_match_restart)
-        .add_systems(
-            OnExit(AppScreen::InMatch),
-            (
-                stop_match_flow_on_exit,
-                reset_match_speed_on_exit,
-                cleanup_match_scoped_entities,
-            )
-                .chain(),
-        );
-        add_runtime_systems(&mut app);
+        .init_asset::<bevy::audio::AudioSource>();
+        add_shared_match_scene(&mut app);
+        add_main_menu_scene(&mut app);
+        app.insert_resource(settings);
         app
     }
 
@@ -39628,6 +39555,83 @@ mod tests {
         assert!(
             ore_after > ore_before,
             "default resource collectors should deliver mined ore back to the player economy; ore {ore_before}->{ore_after}, resource {resource_amount_before}->{resource_after}; {collector_summary}"
+        );
+    }
+
+    #[test]
+    fn default_menu_player_can_click_select_harvester_and_order_visible_ore() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(0.25),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+        for _ in 0..3 {
+            app.update();
+        }
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let ore_harvester = first_unit_by_id(&mut app, Team::Human, "OreHarvester")
+            .expect("default playable skirmish should spawn a player OreHarvester");
+        let harvester_position = unit_position(&app, ore_harvester);
+        let (resource, _, resource_amount_before, resource_position, resource_visible) =
+            runtime_resource_node_snapshots(&mut app)
+                .into_iter()
+                .filter(|(_, kind, amount, _, visible)| {
+                    *kind == ResourceKind::Ore && *amount > 0 && *visible
+                })
+                .min_by(|(_, _, _, lhs, _), (_, _, _, rhs, _)| {
+                    xz_distance(*lhs, harvester_position)
+                        .partial_cmp(&xz_distance(*rhs, harvester_position))
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
+                .expect("default player start should reveal at least one nearby ore node");
+        assert!(
+            resource_visible,
+            "default player start should reveal the clicked ore node"
+        );
+
+        attach_test_window_to_main_camera(&mut app, harvester_position);
+        click_selection_at_world(&mut app, harvester_position, false);
+        assert!(
+            app.world()
+                .entity(ore_harvester)
+                .get::<Selected>()
+                .is_some(),
+            "left-clicking the visible OreHarvester should select it before issuing orders"
+        );
+
+        attach_test_window_to_main_camera(&mut app, resource_position);
+        right_click_order_at_world(&mut app, resource_position);
+        assert!(
+            app.world()
+                .entity(ore_harvester)
+                .get::<HarvestOrder>()
+                .is_some_and(|order| order.resource == Some(resource)),
+            "right-clicking the visible ore after mouse-selecting the OreHarvester should issue HarvestOrder"
+        );
+
+        let ore_before = app.world().resource::<Economies>().get(Team::Human).ore;
+        for _ in 0..180 {
+            app.update();
+            if app.world().resource::<Economies>().get(Team::Human).ore > ore_before {
+                break;
+            }
+        }
+        let ore_after = app.world().resource::<Economies>().get(Team::Human).ore;
+        let resource_after = app
+            .world()
+            .get::<ResourceNode>(resource)
+            .map_or(0, |resource| resource.amount);
+
+        assert!(
+            resource_after < resource_amount_before,
+            "mouse-selected OreHarvester should mine the clicked ore node"
+        );
+        assert!(
+            ore_after > ore_before,
+            "mouse-selected OreHarvester should deliver ore back to the player economy"
         );
     }
 
