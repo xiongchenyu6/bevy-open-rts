@@ -28578,6 +28578,107 @@ mod tests {
             .collect()
     }
 
+    fn ai_attack_wave_orders_against_team(
+        app: &mut App,
+        attacker_team: Team,
+        target_team: Team,
+    ) -> usize {
+        let target_entities = {
+            let world = app.world_mut();
+            let mut targets = world.query::<(Entity, &Team)>();
+            targets
+                .iter(world)
+                .filter_map(|(entity, team)| (*team == target_team).then_some(entity))
+                .collect::<Vec<_>>()
+        };
+        let world = app.world_mut();
+        let mut units = world.query::<(
+            &Team,
+            &Unit,
+            Option<&AttackOrder>,
+            Option<&FollowOrder>,
+            Option<&AiAttackWaveMember>,
+        )>();
+        units
+            .iter(world)
+            .filter(|(team, unit, attack, follow, wave_member)| {
+                **team == attacker_team
+                    && ai_battle_unit_id(unit.id)
+                    && wave_member.is_some()
+                    && attack
+                        .map(|order| order.target)
+                        .or_else(|| follow.map(|order| order.target))
+                        .is_some_and(|target| target_entities.contains(&target))
+            })
+            .count()
+    }
+
+    fn ai_battle_order_debug(app: &mut App, team: Team) -> String {
+        let world = app.world_mut();
+        let mut units = world.query::<(
+            &Team,
+            &Unit,
+            Option<&MoveOrder>,
+            Option<&FollowOrder>,
+            Option<&AttackOrder>,
+            Option<&HarvestOrder>,
+            Option<&ConstructOrder>,
+            Option<&OrderQueue>,
+            Option<&AiAttackWaveMember>,
+        )>();
+        let mut battle = 0usize;
+        let mut idle = 0usize;
+        let mut moving = 0usize;
+        let mut following = 0usize;
+        let mut attacking = 0usize;
+        let mut harvesting = 0usize;
+        let mut constructing = 0usize;
+        let mut queued = 0usize;
+        let mut wave = 0usize;
+        let mut ids = BTreeMap::new();
+        for (
+            unit_team,
+            unit,
+            move_order,
+            follow_order,
+            attack_order,
+            harvest_order,
+            construct_order,
+            queue,
+            wave_member,
+        ) in units.iter(world)
+        {
+            if *unit_team != team || !ai_battle_unit_id(unit.id) {
+                continue;
+            }
+            battle += 1;
+            *ids.entry(unit.id).or_insert(0usize) += 1;
+            if move_order.is_none()
+                && follow_order.is_none()
+                && attack_order.is_none()
+                && harvest_order.is_none()
+                && construct_order.is_none()
+                && queue.is_none_or(|queue| queue.orders.is_empty())
+            {
+                idle += 1;
+            }
+            moving += usize::from(move_order.is_some());
+            following += usize::from(follow_order.is_some());
+            attacking += usize::from(attack_order.is_some());
+            harvesting += usize::from(harvest_order.is_some());
+            constructing += usize::from(construct_order.is_some());
+            queued += usize::from(queue.is_some_and(|queue| !queue.orders.is_empty()));
+            wave += usize::from(wave_member.is_some());
+        }
+        let attack_timer = world.resource::<AiDirector>().attack_timer[team.index()];
+        let match_time = world.resource::<MatchState>().start_time_sec;
+        let match_active = world.resource::<MatchFlow>().active;
+        let difficulty = world.resource::<AiDifficultySettings>().difficulty(team);
+        format!(
+            "difficulty={difficulty:?} match_active={match_active} match_time={match_time:.1} attack_timer={attack_timer:.1} battle={battle} idle={idle} move={moving} follow={following} attack={attacking} harvest={harvesting} construct={constructing} queue={queued} wave={wave} ids={ids:?}"
+        )
+    }
+
     fn queued_train_jobs_for_producer(
         app: &App,
         team: Team,
@@ -31820,6 +31921,62 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn headless_game_app_normal_ai_launches_attack_wave_after_opening_grace() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_main_menu_button(
+            &mut app,
+            MainMenuAction::SelectAiDifficulty(AiDifficulty::Normal),
+            1,
+        );
+        press_main_menu_button(&mut app, MainMenuAction::StartMatch, 3);
+
+        assert_eq!(
+            app_screen(&app),
+            AppScreen::InMatch,
+            "real headless app should enter a match before AI pressure starts"
+        );
+        assert_eq!(
+            app.world()
+                .resource::<AiDifficultySettings>()
+                .difficulty(Team::Demon),
+            AiDifficulty::Normal,
+            "real menu should carry Normal AI difficulty to the active opponent"
+        );
+        assert!(
+            !alive_weapon_units_by_team(&mut app, Team::Demon).is_empty(),
+            "Normal AI should start with battle-capable units in the playable loadout"
+        );
+        assert!(
+            anchor_targets_by_team(&mut app, Team::Human)
+                .into_iter()
+                .next()
+                .is_some(),
+            "player should have an anchor for the AI to attack"
+        );
+
+        let max_updates = 240;
+        for _ in 0..max_updates {
+            app.update();
+            if ai_attack_wave_orders_against_team(&mut app, Team::Demon, Team::Human) > 0 {
+                break;
+            }
+        }
+
+        let attack_wave_orders =
+            ai_attack_wave_orders_against_team(&mut app, Team::Demon, Team::Human);
+        let ai_debug = ai_battle_order_debug(&mut app, Team::Demon);
+        assert!(
+            attack_wave_orders > 0,
+            "Normal AI should issue real attack-wave orders against the player after the opening grace; {ai_debug}"
+        );
     }
 
     #[test]
