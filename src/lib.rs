@@ -31048,6 +31048,114 @@ mod tests {
     }
 
     #[test]
+    fn headless_game_app_harvest_click_income_can_fund_real_barracks_training() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(0.25),
+        ));
+        app.update();
+        press_main_menu_button(&mut app, MainMenuAction::StartMatch, 3);
+
+        assert_eq!(
+            app_screen(&app),
+            AppScreen::InMatch,
+            "real headless app should enter the shared match scene before harvesting"
+        );
+        {
+            let mut economies = app.world_mut().resource_mut::<Economies>();
+            let human = economies.get_mut(Team::Human);
+            human.ore = 0;
+            human.crystal = 0;
+        }
+        let ore_harvester = first_unit_by_id(&mut app, Team::Human, "OreHarvester")
+            .expect("default real match should spawn a player OreHarvester");
+        let harvester_position = unit_position(&app, ore_harvester);
+        let (resource, _, resource_amount_before, resource_position, resource_visible) =
+            runtime_resource_node_snapshots(&mut app)
+                .into_iter()
+                .filter(|(_, kind, amount, _, visible)| {
+                    *kind == ResourceKind::Ore && *amount > 0 && *visible
+                })
+                .min_by(|(_, _, _, lhs, _), (_, _, _, rhs, _)| {
+                    xz_distance(*lhs, harvester_position)
+                        .partial_cmp(&xz_distance(*rhs, harvester_position))
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
+                .expect("real match should reveal an ore node near the player harvester");
+        assert!(resource_visible);
+
+        attach_test_window_to_main_camera(&mut app, harvester_position);
+        click_selection_at_world(&mut app, harvester_position, false);
+        assert!(
+            app.world()
+                .entity(ore_harvester)
+                .get::<Selected>()
+                .is_some(),
+            "mouse-clicking the real match OreHarvester should select it"
+        );
+        attach_test_window_to_main_camera(&mut app, resource_position);
+        right_click_order_at_world(&mut app, resource_position);
+        assert!(
+            app.world()
+                .entity(ore_harvester)
+                .get::<HarvestOrder>()
+                .is_some_and(|order| order.resource == Some(resource)),
+            "right-clicking visible ore in the real app should issue HarvestOrder"
+        );
+
+        let ore_before = app.world().resource::<Economies>().get(Team::Human).ore;
+        for _ in 0..220 {
+            app.update();
+            if app.world().resource::<Economies>().get(Team::Human).ore > ore_before {
+                break;
+            }
+        }
+        let ore_after_harvest = app.world().resource::<Economies>().get(Team::Human).ore;
+        let resource_after_harvest = app
+            .world()
+            .get::<ResourceNode>(resource)
+            .map_or(0, |resource| resource.amount);
+        assert!(
+            resource_after_harvest < resource_amount_before,
+            "real app harvester should mine the clicked ore node"
+        );
+        assert!(
+            ore_after_harvest > ore_before,
+            "real app harvester should deliver mined ore back to the player economy"
+        );
+
+        let (barracks, _, barracks_position, constructed) =
+            structure_snapshots_by_id(&mut app, "Barracks")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .expect("default real match should spawn a constructed player Barracks");
+        assert!(constructed);
+        let infantry_before = unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry");
+        attach_test_window_to_main_camera(&mut app, barracks_position);
+        click_selection_at_world(&mut app, barracks_position, false);
+        assert!(
+            app.world().entity(barracks).get::<Selected>().is_some(),
+            "mouse-clicking the real match Barracks should select it before training"
+        );
+        app.update();
+        let (infantry_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("LightRifleInfantry"));
+        click_command_button(&mut app, infantry_button);
+
+        for _ in 0..80 {
+            app.update();
+            if unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry") > infantry_before {
+                break;
+            }
+        }
+
+        assert!(
+            unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry") > infantry_before,
+            "harvested ore should fund real Barracks infantry production in the cargo-run app path"
+        );
+    }
+
+    #[test]
     fn headless_game_app_menu_selection_enters_shared_match_with_chosen_setup() {
         let mut app = build_game_app(GameAppMode::Headless);
         app.update();
