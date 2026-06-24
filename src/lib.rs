@@ -3691,7 +3691,8 @@ fn add_main_menu_scene(app: &mut App) -> &mut App {
     )
 }
 
-fn add_shared_match_scene(app: &mut App) -> &mut App {
+/// Registers the live match scene shared by `cargo run`, capture, and gameplay tests.
+pub fn add_shared_match_scene(app: &mut App) -> &mut App {
     add_shared_match_resources(app)
         .add_systems(
             OnEnter(AppScreen::InMatch),
@@ -3715,6 +3716,16 @@ fn add_shared_match_scene(app: &mut App) -> &mut App {
         );
     add_runtime_systems(app);
     app
+}
+
+/// Advances an app with [`add_shared_match_scene`] registered into the live match scene.
+pub fn enter_shared_match_scene(app: &mut App) {
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::InMatch);
+    for _ in 0..8 {
+        app.update();
+    }
 }
 
 pub fn build_game_app(mode: GameAppMode) -> App {
@@ -3944,12 +3955,7 @@ pub fn start_default_match_for_capture(app: &mut App) {
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
     ));
-    app.world_mut()
-        .resource_mut::<NextState<AppScreen>>()
-        .set(AppScreen::InMatch);
-    for _ in 0..8 {
-        app.update();
-    }
+    enter_shared_match_scene(app);
 }
 
 pub fn advance_capture_match(app: &mut App, frames: usize) {
@@ -40359,17 +40365,23 @@ mod tests {
         assert_eq!(app_screen(&app), AppScreen::InMatch);
         let worker = first_unit_by_id(&mut app, Team::Human, "Worker")
             .expect("default playable skirmish should spawn a player Worker");
-        select_only_entities(&mut app, &[worker]);
+        let worker_position = unit_position(&app, worker);
+        attach_test_window_to_main_camera(&mut app, worker_position);
+        click_selection_at_world(&mut app, worker_position, false);
+        assert!(
+            app.world().entity(worker).get::<Selected>().is_some(),
+            "left-clicking the visible Worker should select it before opening the build menu"
+        );
         app.update();
 
         let (build_button, _, _) =
             enabled_command_slot_for_action(&mut app, BuildAction::Build("Barracks"));
         click_command_button(&mut app, build_button);
-        assert_eq!(
+        assert!(
             app.world()
                 .resource::<CommandMode>()
-                .pending_structure_placement,
-            Some(PendingStructurePlacement::new("Barracks")),
+                .pending_structure_placement
+                .is_some_and(|pending| pending.id == "Barracks"),
             "clicking the Worker Barracks command should enter placement mode"
         );
 
@@ -40396,10 +40408,16 @@ mod tests {
         assert!(!constructed);
         assert!(xz_distance(barracks_position, placement) < 0.05);
 
-        select_only_entities(&mut app, &[worker]);
         app.world_mut()
             .entity_mut(new_barracks)
             .insert((VisibilityState { visible: true }, Visibility::Visible));
+        let worker_position = unit_position(&app, worker);
+        attach_test_window_to_main_camera(&mut app, worker_position);
+        click_selection_at_world(&mut app, worker_position, false);
+        assert!(
+            app.world().entity(worker).get::<Selected>().is_some(),
+            "left-clicking the Worker after placement should select it for the construction order"
+        );
         attach_test_window_to_main_camera(&mut app, barracks_position);
         right_click_order_at_world(&mut app, barracks_position);
         assert!(
@@ -40431,7 +40449,12 @@ mod tests {
         );
 
         let infantry_before = unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry");
-        select_only_entities(&mut app, &[new_barracks]);
+        attach_test_window_to_main_camera(&mut app, barracks_position);
+        click_selection_at_world(&mut app, barracks_position, false);
+        assert!(
+            app.world().entity(new_barracks).get::<Selected>().is_some(),
+            "left-clicking the constructed Barracks should select it before training infantry"
+        );
         app.update();
         let (infantry_button, _, _) =
             enabled_command_slot_for_action(&mut app, BuildAction::Train("LightRifleInfantry"));
