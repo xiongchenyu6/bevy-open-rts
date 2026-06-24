@@ -3991,6 +3991,30 @@ impl CaptureHarvestProof {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CaptureBuildProof {
+    pub faction: CaptureProofFaction,
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub structure_id: &'static str,
+    pub placement_started: bool,
+    pub placed: bool,
+    pub construct_ordered: bool,
+    pub constructed: bool,
+    pub product_id: &'static str,
+    pub produced_units: u32,
+}
+
+impl CaptureBuildProof {
+    pub fn succeeded(&self) -> bool {
+        self.placement_started
+            && self.placed
+            && self.construct_ordered
+            && self.constructed
+            && self.produced_units > 0
+    }
+}
+
 pub fn start_default_match_for_capture(app: &mut App) {
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
@@ -4154,6 +4178,17 @@ pub fn run_real_menu_harvest_proof_for_faction(
         std::time::Duration::from_secs_f32(0.25),
     ));
     run_real_menu_harvest_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_build_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureBuildProof {
+    let mut app = build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Beginner);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_build_proof(&mut app, faction, max_frames)
 }
 
 pub fn run_capture_match_proof(
@@ -4398,6 +4433,192 @@ fn capture_harvest_proof_status(
     }
 }
 
+fn run_real_menu_build_proof(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureBuildProof {
+    let max_frames = max_frames.max(1);
+    let team = faction.team();
+    let structure_id = "Barracks";
+    let mut frames = 0usize;
+    let mut placement_started = false;
+    let mut placed = false;
+    let mut construct_ordered = false;
+    let mut constructed = false;
+    let mut product_id = "";
+    let mut produced_units = 0u32;
+
+    {
+        let mut economies = app.world_mut().resource_mut::<Economies>();
+        let economy = economies.get_mut(team);
+        economy.ore = economy.ore.max(200);
+        economy.crystal = economy.crystal.max(200);
+    }
+
+    let Some((worker, worker_position)) =
+        capture_ensure_builder_worker(app, team, max_frames, &mut frames)
+    else {
+        return capture_build_proof_status(
+            app,
+            faction,
+            frames,
+            structure_id,
+            placement_started,
+            placed,
+            construct_ordered,
+            constructed,
+            product_id,
+            produced_units,
+        );
+    };
+
+    if capture_world_left_click(app, worker_position)
+        && app
+            .world()
+            .get_entity(worker)
+            .is_ok_and(|entity| entity.get::<Selected>().is_some())
+    {
+        app.update();
+        if let Some(button) =
+            capture_enabled_command_for_action(app, BuildAction::Build(structure_id))
+        {
+            capture_click_command_button(app, button);
+            placement_started = app
+                .world()
+                .resource::<CommandMode>()
+                .pending_structure_placement
+                .is_some_and(|pending| pending.id == structure_id);
+        }
+    }
+
+    let mut placed_structure = None;
+    if placement_started
+        && let Some(placement) =
+            capture_valid_structure_placement_point_near_team_base(app, team, structure_id)
+        && capture_world_left_click(app, placement)
+    {
+        placed_structure = capture_structure_by_id_near(
+            app.world_mut(),
+            team,
+            structure_id,
+            placement,
+            Some(false),
+        );
+        placed = placed_structure.is_some()
+            && app
+                .world()
+                .resource::<CommandMode>()
+                .pending_structure_placement
+                .is_none();
+    }
+
+    if let Some((structure, structure_position, _)) = placed_structure {
+        if capture_world_left_click(app, worker_position)
+            && app
+                .world()
+                .get_entity(worker)
+                .is_ok_and(|entity| entity.get::<Selected>().is_some())
+            && capture_world_right_click(app, structure_position)
+        {
+            construct_ordered = app
+                .world()
+                .get::<ConstructOrder>(worker)
+                .is_some_and(|order| order.target == structure);
+        }
+
+        while frames < max_frames {
+            frames += 1;
+            app.update();
+            constructed = capture_structure_constructed(app.world(), structure);
+            if constructed {
+                break;
+            }
+        }
+
+        if constructed
+            && capture_world_left_click(app, structure_position)
+            && app
+                .world()
+                .get_entity(structure)
+                .is_ok_and(|entity| entity.get::<Selected>().is_some())
+        {
+            app.update();
+            let Some((button, train_id)) = capture_first_affordable_train_command(app, team) else {
+                return capture_build_proof_status(
+                    app,
+                    faction,
+                    frames,
+                    structure_id,
+                    placement_started,
+                    placed,
+                    construct_ordered,
+                    constructed,
+                    product_id,
+                    produced_units,
+                );
+            };
+            product_id = train_id;
+            let units_before = capture_unit_count_by_id(app.world_mut(), team, train_id);
+            capture_click_command_button(app, button);
+            while frames < max_frames {
+                frames += 1;
+                app.update();
+                let current = capture_unit_count_by_id(app.world_mut(), team, train_id);
+                if current > units_before {
+                    produced_units = current.saturating_sub(units_before) as u32;
+                    break;
+                }
+            }
+        }
+    }
+
+    capture_build_proof_status(
+        app,
+        faction,
+        frames,
+        structure_id,
+        placement_started,
+        placed,
+        construct_ordered,
+        constructed,
+        product_id,
+        produced_units,
+    )
+}
+
+fn capture_build_proof_status(
+    app: &App,
+    faction: CaptureProofFaction,
+    frames: usize,
+    structure_id: &'static str,
+    placement_started: bool,
+    placed: bool,
+    construct_ordered: bool,
+    constructed: bool,
+    product_id: &'static str,
+    produced_units: u32,
+) -> CaptureBuildProof {
+    let phase = match app.world().resource::<MatchState>().phase {
+        MatchPhase::Running => CaptureMatchPhase::Running,
+        MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
+        MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
+        MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
+    };
+    CaptureBuildProof {
+        faction,
+        phase,
+        frames,
+        structure_id,
+        placement_started,
+        placed,
+        construct_ordered,
+        constructed,
+        product_id,
+        produced_units,
+    }
+}
+
 fn drive_main_menu_action(app: &mut App, action: MainMenuAction, followup_updates: usize) {
     let button_entity = {
         let world = app.world_mut();
@@ -4452,6 +4673,52 @@ fn capture_first_alive_resource_collector(world: &mut World, team: Team) -> Opti
             _ => 2,
         })
         .map(|(entity, position, _)| (entity, position))
+}
+
+fn capture_first_alive_unit_by_id(
+    world: &mut World,
+    team: Team,
+    id: &'static str,
+) -> Option<(Entity, Vec3)> {
+    let mut units = world.query::<(Entity, &Team, &Unit, &Transform, &Health)>();
+    units
+        .iter(world)
+        .find_map(|(entity, unit_team, unit, transform, health)| {
+            (*unit_team == team && unit.id == id && health.current > 0.0)
+                .then_some((entity, transform.translation))
+        })
+}
+
+fn capture_ensure_builder_worker(
+    app: &mut App,
+    team: Team,
+    max_frames: usize,
+    frames: &mut usize,
+) -> Option<(Entity, Vec3)> {
+    if let Some(worker) = capture_first_alive_unit_by_id(app.world_mut(), team, "Worker") {
+        return Some(worker);
+    }
+    let (command_center, _, command_center_position) =
+        capture_constructed_producer(app.world_mut(), team, "CommandCenter")?;
+    if !capture_world_left_click(app, command_center_position)
+        || !app
+            .world()
+            .get_entity(command_center)
+            .is_ok_and(|entity| entity.get::<Selected>().is_some())
+    {
+        return None;
+    }
+    app.update();
+    let button = capture_enabled_command_for_action(app, BuildAction::Train("Worker"))?;
+    capture_click_command_button(app, button);
+    while *frames < max_frames {
+        *frames += 1;
+        app.update();
+        if let Some(worker) = capture_first_alive_unit_by_id(app.world_mut(), team, "Worker") {
+            return Some(worker);
+        }
+    }
+    None
 }
 
 fn capture_nearest_visible_resource(
@@ -4517,6 +4784,16 @@ fn capture_first_affordable_train_command(
         .map(|(_, entity, product_id)| (entity, product_id))
 }
 
+fn capture_enabled_command_for_action(app: &mut App, target: BuildAction) -> Option<Entity> {
+    let world = app.world_mut();
+    let mut slots = world.query::<(Entity, &BuildAction, &CommandSlotAvailability)>();
+    slots
+        .iter(world)
+        .find_map(|(entity, action, availability)| {
+            (*action == target && availability.enabled).then_some(entity)
+        })
+}
+
 fn capture_affordable_train_command_from_producer(
     app: &mut App,
     team: Team,
@@ -4532,7 +4809,126 @@ fn capture_affordable_train_command_from_producer(
     {
         return None;
     }
+    app.update();
     capture_first_affordable_train_command(app, team)
+}
+
+fn capture_valid_structure_placement_point_near_team_base(
+    app: &mut App,
+    team: Team,
+    id: &'static str,
+) -> Option<Vec3> {
+    let def = registry::entity(id)?;
+    let bounds = *app.world().resource::<MapBounds>();
+    let anchors = {
+        let world = app.world_mut();
+        let mut structures =
+            world.query::<(&Structure, &Team, &Transform, Option<&UnderConstruction>)>();
+        structures
+            .iter(world)
+            .filter_map(
+                |(structure, structure_team, transform, under_construction)| {
+                    if *structure_team != team || !structure_is_constructed(under_construction) {
+                        return None;
+                    }
+                    let structure_def = registry::entity(structure.id)?;
+                    Some((transform.translation, structure_def.radius))
+                },
+            )
+            .collect::<Vec<_>>()
+    };
+    if anchors.is_empty() {
+        return None;
+    }
+    let occupiers = {
+        let world = app.world_mut();
+        let mut occupiers = world.query_filtered::<(
+            &Transform,
+            &Selectable,
+            Option<&Health>,
+            Option<&ResourceNode>,
+        ), Or<(With<Unit>, With<Structure>, With<ResourceNode>)>>(
+        );
+        occupiers
+            .iter(world)
+            .filter_map(|(transform, selectable, health, resource_node)| {
+                if health.is_some_and(|health| health.current <= 0.0)
+                    || resource_node.is_some_and(|resource| resource.amount <= 0)
+                {
+                    return None;
+                }
+                Some((transform.translation, selectable.radius))
+            })
+            .collect::<Vec<_>>()
+    };
+
+    let sample_count = 24;
+    for (anchor, anchor_radius) in anchors.iter().copied() {
+        for ring in 0..20 {
+            let radius = anchor_radius + def.radius + 1.0 + ring as f32 * 0.75;
+            for sample in 0..sample_count {
+                let angle = (sample as f32 / sample_count as f32) * std::f32::consts::TAU
+                    + ring as f32 * 0.23;
+                let candidate = bounds.clamp_ground_point(
+                    anchor + Vec3::new(angle.cos() * radius, 0.0, angle.sin() * radius),
+                    def.radius,
+                );
+                if !map_contains_ground_point_in_bounds(candidate, bounds) {
+                    continue;
+                }
+                let in_base_radius = anchors.iter().any(|(base, base_radius)| {
+                    xz_distance(*base, candidate)
+                        <= *base_radius + def.radius + BASE_CONSTRUCTION_RADIUS_M
+                });
+                if !in_base_radius {
+                    continue;
+                }
+                let collides = occupiers.iter().any(|(position, radius)| {
+                    xz_distance(*position, candidate) <= *radius + def.radius
+                });
+                if !collides {
+                    return Some(candidate);
+                }
+            }
+        }
+    }
+    None
+}
+
+fn capture_structure_by_id_near(
+    world: &mut World,
+    team: Team,
+    id: &'static str,
+    position: Vec3,
+    constructed: Option<bool>,
+) -> Option<(Entity, Vec3, bool)> {
+    let mut structures = world.query::<(
+        Entity,
+        &Structure,
+        &Team,
+        &Transform,
+        Option<&UnderConstruction>,
+    )>();
+    structures.iter(world).find_map(
+        |(entity, structure, structure_team, transform, under_construction)| {
+            let is_constructed = structure_is_constructed(under_construction);
+            (structure.id == id
+                && *structure_team == team
+                && xz_distance(transform.translation, position) < 0.05
+                && constructed.is_none_or(|expected| expected == is_constructed))
+            .then_some((entity, transform.translation, is_constructed))
+        },
+    )
+}
+
+fn capture_structure_constructed(world: &World, entity: Entity) -> bool {
+    world.get_entity(entity).is_ok_and(|entity_ref| {
+        entity_ref
+            .get::<Health>()
+            .is_some_and(|health| health.current > 0.0)
+            && entity_ref.get::<Structure>().is_some()
+            && entity_ref.get::<UnderConstruction>().is_none()
+    })
 }
 
 fn capture_click_command_button(app: &mut App, button: Entity) {
@@ -31649,6 +32045,23 @@ mod tests {
             assert!(
                 !proof.product_id.is_empty(),
                 "harvest proof should identify the trained Barracks unit; proof={proof:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn real_menu_build_proof_places_constructs_and_trains_from_mouse_orders() {
+        for faction in CaptureProofFaction::ALL {
+            let proof = run_real_menu_build_proof_for_faction(faction, 900);
+
+            assert!(
+                proof.succeeded(),
+                "real menu build proof should select a Worker, place a Barracks, right-click it for construction, finish it, and train from it; proof={proof:?}"
+            );
+            assert_eq!(proof.structure_id, "Barracks");
+            assert!(
+                !proof.product_id.is_empty(),
+                "build proof should identify the trained Barracks unit; proof={proof:?}"
             );
         }
     }
