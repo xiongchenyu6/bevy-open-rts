@@ -41080,13 +41080,21 @@ mod tests {
         press_key(&mut app, KeyCode::Enter, 3);
 
         assert_eq!(app_screen(&app), AppScreen::InMatch);
-        let (factory, _, _, constructed) = structure_snapshots_by_id(&mut app, "VehicleFactory")
-            .into_iter()
-            .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
-            .expect("default playable skirmish should spawn a constructed player VehicleFactory");
+        let (factory, _, factory_position, constructed) =
+            structure_snapshots_by_id(&mut app, "VehicleFactory")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .expect(
+                    "default playable skirmish should spawn a constructed player VehicleFactory",
+                );
         assert!(constructed);
 
-        select_only_entities(&mut app, &[factory]);
+        attach_test_window_to_main_camera(&mut app, factory_position);
+        click_selection_at_world(&mut app, factory_position, false);
+        assert!(
+            app.world().entity(factory).get::<Selected>().is_some(),
+            "left-clicking the visible VehicleFactory should select it before training an attack-move Tank"
+        );
         app.update();
 
         let tanks_before = unit_entities_by_id(&mut app, Team::Human, "Tank");
@@ -41105,7 +41113,12 @@ mod tests {
             .expect("default VehicleFactory should produce a new Tank from its command button");
         let tank_position = unit_position(&app, tank);
 
-        select_only_entities(&mut app, &[tank]);
+        attach_test_window_to_main_camera(&mut app, tank_position);
+        click_selection_at_world(&mut app, tank_position, false);
+        assert!(
+            app.world().entity(tank).get::<Selected>().is_some(),
+            "left-clicking the produced Tank should select it before attack-move"
+        );
         app.update();
         let (attack_move_button, _, _) =
             enabled_command_slot_for_action(&mut app, BuildAction::AttackMove);
