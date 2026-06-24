@@ -31321,6 +31321,181 @@ mod tests {
         );
     }
 
+    fn headless_game_app_selected_faction_mouse_produce_vehicle_and_win(
+        player_team: Team,
+        product_id: &'static str,
+        target_vehicle_count: usize,
+    ) {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+        press_main_menu_button(&mut app, MainMenuAction::SelectFaction(player_team), 1);
+        press_main_menu_button(
+            &mut app,
+            MainMenuAction::SelectAiDifficulty(AiDifficulty::Beginner),
+            1,
+        );
+        press_main_menu_button(&mut app, MainMenuAction::StartMatch, 3);
+
+        assert_eq!(
+            app_screen(&app),
+            AppScreen::InMatch,
+            "real headless app should enter a selected-faction match before combat"
+        );
+        assert_eq!(
+            app.world().resource::<VisiblePlayer>().team,
+            player_team,
+            "menu-selected faction should become the controlled player slot"
+        );
+        let expected_faction = SkirmishFaction::from_team(player_team);
+        assert_eq!(
+            app.world()
+                .resource::<PlayerFactions>()
+                .slot_faction(player_team),
+            expected_faction,
+            "controlled player slot should use the selected faction roster"
+        );
+        assert!(
+            faction_def(expected_faction)
+                .and_then(|faction| faction.production_for("VehicleFactory"))
+                .is_some_and(|products| products.contains(&product_id)),
+            "{expected_faction:?} VehicleFactory should expose {product_id}"
+        );
+        if product_id != "Tank" {
+            assert!(
+                !faction_def(expected_faction)
+                    .and_then(|faction| faction.production_for("VehicleFactory"))
+                    .is_some_and(|products| products.contains(&"Tank")),
+                "{expected_faction:?} should not silently fall back to the human Tank roster"
+            );
+        }
+
+        let (factory, _, _, constructed) = structure_snapshots_by_id(&mut app, "VehicleFactory")
+            .into_iter()
+            .find(|(_, team, _, constructed)| *team == player_team && *constructed)
+            .expect("selected faction should spawn a constructed player VehicleFactory");
+        assert!(constructed);
+        mouse_select_entities(
+            &mut app,
+            &[factory],
+            "mouse-selecting the selected-faction VehicleFactory should select it before queuing vehicles",
+        );
+        app.update();
+        let (vehicle_button, slot_index, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train(product_id));
+        for _ in 0..720 {
+            let produced = unit_count_by_id(&mut app, player_team, product_id);
+            if produced >= target_vehicle_count {
+                break;
+            }
+            let started =
+                produced + queued_train_jobs_for_producer(&app, player_team, factory, product_id);
+            if started < target_vehicle_count {
+                click_command_button(&mut app, vehicle_button);
+            }
+            app.update();
+        }
+        assert!(
+            unit_count_by_id(&mut app, player_team, product_id) >= target_vehicle_count,
+            "{expected_faction:?} should produce {target_vehicle_count} {product_id} units through real app command slot {slot_index}"
+        );
+
+        let enemy_teams = Team::all()
+            .into_iter()
+            .filter(|team| {
+                app.world()
+                    .resource::<TeamRelations>()
+                    .are_enemies(player_team, *team)
+            })
+            .collect::<Vec<_>>();
+        assert!(
+            !enemy_teams.is_empty(),
+            "selected-faction match should include at least one enemy team"
+        );
+        for enemy_team in enemy_teams {
+            for _ in 0..32 {
+                if app.world().resource::<MatchState>().phase != MatchPhase::Running {
+                    break;
+                }
+                let Some((target, target_position)) = anchor_targets_by_team(&mut app, enemy_team)
+                    .into_iter()
+                    .next()
+                else {
+                    break;
+                };
+                let attackers = alive_weapon_units_by_team(&mut app, player_team);
+                assert!(
+                    !attackers.is_empty(),
+                    "{expected_faction:?} should keep produced combat units alive to finish the match"
+                );
+                let selected_attackers = drag_select_some_entities(
+                    &mut app,
+                    &attackers,
+                    "drag-selecting selected-faction combat units should select an attack group",
+                );
+                app.world_mut()
+                    .entity_mut(target)
+                    .insert((VisibilityState { visible: true }, Visibility::Visible));
+                attach_test_window_to_main_camera(&mut app, target_position);
+                right_click_order_at_world(&mut app, target_position);
+                let ordered_attackers = attackers
+                    .iter()
+                    .filter(|entity| {
+                        app.world()
+                            .get_entity(**entity)
+                            .is_ok_and(|entity_ref| entity_ref.get::<AttackOrder>().is_some())
+                    })
+                    .count();
+                if app.world().get_entity(target).is_ok() {
+                    let order_summary = order_summary_for_entities(&app, &attackers, target);
+                    assert!(
+                        ordered_attackers > 0,
+                        "right-clicking a visible {enemy_team:?} anchor should issue AttackOrder from mouse-selected {expected_faction:?} units; selected={selected_attackers}; orders={order_summary}"
+                    );
+                }
+                for _ in 0..260 {
+                    app.update();
+                    if app.world().get_entity(target).is_err()
+                        || app.world().resource::<MatchState>().phase != MatchPhase::Running
+                    {
+                        break;
+                    }
+                }
+            }
+            assert!(
+                anchor_targets_by_team(&mut app, enemy_team).is_empty(),
+                "{expected_faction:?} player should destroy {enemy_team:?} anchors with mouse-produced {product_id} units"
+            );
+        }
+        for _ in 0..8 {
+            app.update();
+            if app.world().resource::<MatchState>().phase == MatchPhase::HumanVictory {
+                break;
+            }
+        }
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::HumanVictory,
+            "{expected_faction:?} selected from the real app menu should finish a mouse-driven skirmish"
+        );
+    }
+
+    #[test]
+    fn headless_game_app_demon_mouse_produces_tanks_and_wins() {
+        headless_game_app_selected_faction_mouse_produce_vehicle_and_win(Team::Demon, "Tank", 5);
+    }
+
+    #[test]
+    fn headless_game_app_chaos_mouse_produces_rovers_and_wins() {
+        headless_game_app_selected_faction_mouse_produce_vehicle_and_win(
+            Team::Chaos,
+            "ScoutRover",
+            8,
+        );
+    }
+
     #[test]
     fn headless_game_app_menu_selection_enters_shared_match_with_chosen_setup() {
         let mut app = build_game_app(GameAppMode::Headless);
