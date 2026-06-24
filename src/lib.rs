@@ -5601,7 +5601,7 @@ fn setup_main_menu(
         ))
         .with_children(|root| {
             root.spawn((
-                Text::new("Bevy Open RTS"),
+                Text::new("Bevy Open RTS - 作战设置"),
                 TextFont {
                     font: font.clone().into(),
                     font_size: FontSize::Px(30.0),
@@ -5678,7 +5678,10 @@ fn setup_main_menu(
                             });
 
                             grid.spawn(menu_section_node()).with_children(|section| {
-                                section.spawn(menu_section_title("玩家槽位  H/D/C", font.clone()));
+                                section.spawn(menu_section_title(
+                                    "我方/观战槽位  H/D/C",
+                                    font.clone(),
+                                ));
                                 section.spawn(menu_button_row_node()).with_children(|row| {
                                     for team in [Team::Human, Team::Demon, Team::Chaos] {
                                         let action = MainMenuAction::SelectFaction(team);
@@ -5697,7 +5700,7 @@ fn setup_main_menu(
                             });
 
                             grid.spawn(menu_section_node()).with_children(|section| {
-                                section.spawn(menu_section_title("种族  Z/X/V", font.clone()));
+                                section.spawn(menu_section_title("各槽种族  Z/X/V", font.clone()));
                                 section.spawn(menu_button_row_node()).with_children(|row| {
                                     for team in [Team::Human, Team::Demon, Team::Chaos] {
                                         let action = MainMenuAction::CyclePlayerFaction(team);
@@ -5837,7 +5840,7 @@ fn setup_main_menu(
                         });
                 });
 
-            root.spawn(menu_button(MainMenuAction::StartMatch, 240.0))
+            root.spawn(menu_button(MainMenuAction::StartMatch, 280.0))
                 .with_children(|button| {
                     button.spawn(menu_action_button_label(
                         MainMenuAction::StartMatch,
@@ -5882,7 +5885,7 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
             .map(|map| format!("{} {}", index + 1, map.name))
             .unwrap_or_else(|| "地图".to_string()),
         MainMenuAction::SelectFaction(team) => {
-            format!("{} {}槽", skirmish_slot_key(team), team.label())
+            format!("{} 我方: {}", skirmish_slot_key(team), team.label())
         }
         MainMenuAction::SelectStartingResources(index) => GODOT_STARTING_RESOURCE_OPTIONS
             .get(index)
@@ -5926,7 +5929,7 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
                 .unwrap_or(SkirmishPlayerController::None)
                 .short_label()
         ),
-        MainMenuAction::StartMatch => "开始对战".to_string(),
+        MainMenuAction::StartMatch => "开始对战  Enter".to_string(),
     }
 }
 
@@ -6655,10 +6658,10 @@ fn main_menu_summary_text(selection: SkirmishMenuSelection) -> String {
     let focus_label = if selection.human_team().is_none() {
         "观战焦点"
     } else {
-        "玩家槽位"
+        "我方出生槽"
     };
     format!(
-        "地图: {}  |  模式: {}  |  {}: {}  |  控制: {}  |  队伍: {}  |  种族: {}  |  颜色: {}  |  AI: {}  |  参战玩家: {}/3  |  需要出生点: {}  |  地图出生点: {}  |  资源: {}/{}  |  {}",
+        "地图: {}  |  模式: {}  |  {}: {}  |  控制: {}  |  队伍: {}  |  种族: {}  |  颜色: {}  |  AI: {}  |  参战玩家: {}/3  |  需要出生点: {}  |  地图出生点: {}  |  资源: {}/{}  |  {}  |  开始: Enter/点击开始对战",
         selection.map_label(),
         selection.match_mode.label(),
         focus_label,
@@ -25184,7 +25187,7 @@ mod tests {
 
         let summary = main_menu_summary_text(selection);
 
-        assert!(summary.contains("玩家槽位: 魔族"));
+        assert!(summary.contains("我方出生槽: 魔族"));
         assert!(summary.contains("模式: 1v1"));
         assert!(summary.contains("队伍: 人族=T1/魔族=T2"));
         assert!(summary.contains("种族: 人族=人族/魔族=魔族"));
@@ -29713,6 +29716,41 @@ mod tests {
     }
 
     #[test]
+    fn capture_app_uses_shared_default_match_scene() {
+        let mut app = build_capture_match_app();
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let snapshot = capture_match_snapshot(&mut app);
+
+        assert!(
+            snapshot.entities.iter().any(|entity| {
+                entity.team == CaptureTeam::Human && entity.kind == CaptureEntityKind::Structure
+            }),
+            "capture should render the same default player base as the real match scene"
+        );
+        assert!(
+            snapshot.entities.iter().any(|entity| {
+                entity.team == CaptureTeam::Demon && entity.kind == CaptureEntityKind::Structure
+            }),
+            "capture should render the same default enemy anchor as the real match scene"
+        );
+        assert!(
+            snapshot
+                .entities
+                .iter()
+                .any(|entity| entity.kind == CaptureEntityKind::Unit),
+            "capture should expose live match units, not a disconnected static mock"
+        );
+        assert!(
+            snapshot
+                .entities
+                .iter()
+                .any(|entity| entity.kind == CaptureEntityKind::Resource),
+            "capture should expose the shared map resource nodes"
+        );
+    }
+
+    #[test]
     fn app_defaults_to_skirmish_setup_menu_with_map_and_faction_buttons() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
 
@@ -29766,6 +29804,25 @@ mod tests {
             assert!(actions.contains(&MainMenuAction::SelectAiDifficulty(difficulty)));
         }
         assert!(actions.contains(&MainMenuAction::StartMatch));
+        assert_eq!(
+            current_main_menu_button_label(&mut app, MainMenuAction::SelectFaction(Team::Human)),
+            "H 我方: 人族"
+        );
+        assert_eq!(
+            current_main_menu_button_label(
+                &mut app,
+                MainMenuAction::CyclePlayerFaction(Team::Human)
+            ),
+            "Z 人族: 人族+"
+        );
+        assert_eq!(
+            current_main_menu_button_label(&mut app, MainMenuAction::StartMatch),
+            "开始对战  Enter"
+        );
+        let summary = main_menu_summary_text(*app.world().resource::<SkirmishMenuSelection>());
+        assert!(summary.contains("我方出生槽: 人族"));
+        assert!(summary.contains("种族: 人族=人族/魔族=魔族"));
+        assert!(summary.contains("开始: Enter/点击开始对战"));
         assert_eq!(
             count_entities_with::<MatchScopedEntity>(&mut app),
             0,
