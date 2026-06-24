@@ -30768,6 +30768,44 @@ mod tests {
     }
 
     #[test]
+    fn game_scenes_default_menu_enters_shared_match_scene() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.update();
+
+        assert_eq!(app_screen(&app), AppScreen::MainMenu);
+        assert!(
+            !app.world().resource::<MatchFlow>().active,
+            "real game scene should wait in the setup menu before starting the match"
+        );
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        assert!(
+            app.world().resource::<MatchFlow>().active,
+            "main menu Enter should enter the shared live match scene"
+        );
+        assert!(
+            structure_snapshots_by_id(&mut app, "CommandCenter")
+                .into_iter()
+                .any(|(_, team, _, constructed)| team == Team::Human && constructed),
+            "shared match scene should spawn the default player base"
+        );
+        assert!(
+            structure_snapshots_by_id(&mut app, "CommandCenter")
+                .into_iter()
+                .any(|(_, team, _, constructed)| team == Team::Demon && constructed),
+            "shared match scene should spawn the default enemy anchor"
+        );
+        assert!(
+            runtime_resource_node_snapshots(&mut app)
+                .into_iter()
+                .any(|(_, _, amount, _, _)| amount > 0),
+            "shared match scene should spawn mineable resource nodes"
+        );
+    }
+
+    #[test]
     fn capture_app_uses_shared_default_match_scene() {
         let mut app = build_capture_match_app();
 
