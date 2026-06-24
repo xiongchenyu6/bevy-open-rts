@@ -31714,6 +31714,115 @@ mod tests {
     }
 
     #[test]
+    fn headless_game_app_all_menu_maps_start_playable_matches_for_each_faction_slot() {
+        for (map_index, map) in SKIRMISH_MAPS.iter().enumerate() {
+            for player_team in Team::all() {
+                let expected_faction = SkirmishFaction::from_team(player_team);
+                let mut app = build_game_app(GameAppMode::Headless);
+                app.update();
+
+                press_main_menu_button(&mut app, MainMenuAction::SelectMap(map_index), 1);
+                press_main_menu_button(&mut app, MainMenuAction::SelectFaction(player_team), 1);
+                press_main_menu_button(&mut app, MainMenuAction::StartMatch, 3);
+
+                assert_eq!(
+                    app_screen(&app),
+                    AppScreen::InMatch,
+                    "{} as {expected_faction:?} should enter the shared playable match",
+                    map.id
+                );
+                assert_eq!(
+                    app.world().resource::<SelectedSkirmishMap>().godot_path,
+                    map.godot_path,
+                    "real menu should carry the selected map into match setup"
+                );
+                assert_eq!(
+                    app.world().resource::<VisiblePlayer>().team,
+                    player_team,
+                    "real menu should carry the selected player slot into match setup"
+                );
+                assert_eq!(
+                    app.world()
+                        .resource::<PlayerFactions>()
+                        .slot_faction(player_team),
+                    expected_faction,
+                    "real menu-selected player slot should keep its faction"
+                );
+
+                assert_runtime_resources_match_map(&mut app, map);
+                assert_runtime_command_centers_match_map(&mut app, map);
+
+                let player_structures = runtime_structure_counts_by_team(&mut app, player_team);
+                for id in ["CommandCenter", "Barracks", "VehicleFactory"] {
+                    assert!(
+                        player_structures.contains_key(id),
+                        "{} {expected_faction:?} should start with a playable {id}",
+                        map.id
+                    );
+                }
+                assert!(
+                    first_unit_by_id(&mut app, player_team, "Worker").is_some(),
+                    "{} {expected_faction:?} should start with a selectable worker",
+                    map.id
+                );
+                assert!(
+                    runtime_resource_node_snapshots(&mut app)
+                        .into_iter()
+                        .any(|(_, _, amount, _, visible)| amount > 0 && visible),
+                    "{} {expected_faction:?} should reveal mineable resources at match start",
+                    map.id
+                );
+
+                let expected_focus = team_start_camera_focus_for_faction(
+                    map,
+                    player_team,
+                    expected_faction,
+                    app.world().resource::<MatchSetupSettings>().startup_loadout,
+                );
+                let camera_state = app.world().resource::<RtsCamera>();
+                assert!(
+                    xz_distance(camera_state.focus, expected_focus) < 0.01,
+                    "{} {expected_faction:?} should open the camera over the selected base work area",
+                    map.id
+                );
+                assert_eq!(
+                    camera_state.distance, CAMERA_DEFAULT_DISTANCE,
+                    "{} {expected_faction:?} should use the playable default zoom",
+                    map.id
+                );
+
+                let enemy_teams = {
+                    let relations = app.world().resource::<TeamRelations>();
+                    Team::all()
+                        .into_iter()
+                        .filter(|team| relations.are_enemies(player_team, *team))
+                        .collect::<Vec<_>>()
+                };
+                assert!(
+                    !enemy_teams.is_empty(),
+                    "{} {expected_faction:?} should start with at least one enemy",
+                    map.id
+                );
+                assert!(
+                    enemy_teams
+                        .iter()
+                        .any(|team| !anchor_targets_by_team(&mut app, *team).is_empty()),
+                    "{} {expected_faction:?} should have an enemy anchor to attack",
+                    map.id
+                );
+
+                let vehicle_products =
+                    real_menu_structure_train_products(&mut app, player_team, "VehicleFactory");
+                assert!(
+                    !vehicle_products.is_empty(),
+                    "{} {expected_faction:?} VehicleFactory should expose playable production",
+                    map.id
+                );
+            }
+        }
+    }
+
+    #[test]
     fn app_defaults_to_skirmish_setup_menu_with_map_and_faction_buttons() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
 
