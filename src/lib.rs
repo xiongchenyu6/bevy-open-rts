@@ -54,8 +54,10 @@ const HUMAN_BASE: Vec3 = Vec3::new(-12.0, 0.0, -9.0);
 const DEMON_BASE: Vec3 = Vec3::new(12.0, 0.0, 9.0);
 const CHAOS_BASE: Vec3 = Vec3::new(10.0, 0.0, -11.0);
 const RESOURCE_ORDER_GROUND_SNAP_RADIUS_M: f32 = 2.2;
+const RESOURCE_ORDER_COLLECTOR_GROUND_SNAP_RADIUS_M: f32 = 5.2;
 const RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 34.0;
 const RESOURCE_ORDER_SCREEN_PICK_MAX_RADIUS_PX: f32 = 78.0;
+const RESOURCE_ORDER_COLLECTOR_SCREEN_PICK_MAX_RADIUS_PX: f32 = 124.0;
 const DEFAULT_MODEL_FALLBACK: &str = "models/kenney-spacekit/rover.glb";
 const COMMAND_SLOT_COUNT: usize = 24;
 const COMMAND_KEY_CANCEL: &str = "cancel";
@@ -12850,6 +12852,9 @@ fn issue_orders(
         .filter(|(_, _, _, team, ..)| **team == visible_team)
         .collect();
     let has_owned_voice_unit = selected.iter().any(|selection| is_voice_unit(selection.2));
+    let has_selected_resource_collector = selected
+        .iter()
+        .any(|(_, _, unit, ..)| can_unit_collect_resources(unit));
 
     let garrison_target = nearest_garrison_target(
         point,
@@ -12857,8 +12862,13 @@ fn issue_orders(
         &order_resources.relations,
         &garrison_targets,
     );
-    let resource_target =
-        nearest_resource_order_target(point, cursor, &camera_q, &resource_targets);
+    let resource_target = nearest_resource_order_target(
+        point,
+        cursor,
+        &camera_q,
+        &resource_targets,
+        has_selected_resource_collector,
+    );
     let resource_dropoff_target =
         nearest_resource_dropoff_order_target(point, visible_team, &selectable_q);
     let supply_crate_target = nearest_supply_crate_target(point, &supply_crate_targets);
@@ -13531,19 +13541,6 @@ fn can_garrison_structure_target(
         && garrison.count < garrison.capacity
 }
 
-fn nearest_resource_target(
-    point: Vec3,
-    resources: &Query<(
-        Entity,
-        &Transform,
-        &Selectable,
-        &VisibilityState,
-        &ResourceNode,
-    )>,
-) -> Option<Entity> {
-    nearest_resource_target_with_snap_radius(point, resources, RESOURCE_ORDER_GROUND_SNAP_RADIUS_M)
-}
-
 fn nearest_resource_order_target(
     point: Vec3,
     cursor: Vec2,
@@ -13555,9 +13552,20 @@ fn nearest_resource_order_target(
         &VisibilityState,
         &ResourceNode,
     )>,
+    favor_resource_collectors: bool,
 ) -> Option<Entity> {
-    resource_target_at_cursor(cursor, camera_q, resources)
-        .or_else(|| nearest_resource_target(point, resources))
+    let ground_snap_radius = if favor_resource_collectors {
+        RESOURCE_ORDER_COLLECTOR_GROUND_SNAP_RADIUS_M
+    } else {
+        RESOURCE_ORDER_GROUND_SNAP_RADIUS_M
+    };
+    let screen_pick_max_radius = if favor_resource_collectors {
+        RESOURCE_ORDER_COLLECTOR_SCREEN_PICK_MAX_RADIUS_PX
+    } else {
+        RESOURCE_ORDER_SCREEN_PICK_MAX_RADIUS_PX
+    };
+    resource_target_at_cursor(cursor, camera_q, resources, screen_pick_max_radius)
+        .or_else(|| nearest_resource_target_with_snap_radius(point, resources, ground_snap_radius))
 }
 
 fn resource_target_at_cursor(
@@ -13570,6 +13578,7 @@ fn resource_target_at_cursor(
         &VisibilityState,
         &ResourceNode,
     )>,
+    max_pick_radius: f32,
 ) -> Option<Entity> {
     let (camera, camera_transform) = camera_q.single().ok()?;
     let mut nearest = None;
@@ -13578,9 +13587,14 @@ fn resource_target_at_cursor(
         if !visibility.visible || resource.amount <= 0 {
             continue;
         }
-        let Some((screen_distance, pick_radius)) =
-            resource_cursor_pick_distance(cursor, camera, camera_transform, transform, selectable)
-        else {
+        let Some((screen_distance, pick_radius)) = resource_cursor_pick_distance(
+            cursor,
+            camera,
+            camera_transform,
+            transform,
+            selectable,
+            max_pick_radius,
+        ) else {
             continue;
         };
         if screen_distance <= pick_radius && screen_distance < nearest_screen_distance {
@@ -13597,6 +13611,7 @@ fn resource_cursor_pick_distance(
     camera_transform: &GlobalTransform,
     transform: &Transform,
     selectable: &Selectable,
+    max_pick_radius: f32,
 ) -> Option<(f32, f32)> {
     let base = transform.translation;
     let top = base + Vec3::Y * selectable.radius * 1.35;
@@ -13622,7 +13637,7 @@ fn resource_cursor_pick_distance(
     .fold(0.0, f32::max);
     let pick_radius = projected_radius.clamp(
         RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX,
-        RESOURCE_ORDER_SCREEN_PICK_MAX_RADIUS_PX,
+        max_pick_radius.max(RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX),
     );
     Some((screen_distance, pick_radius))
 }
@@ -38853,6 +38868,65 @@ mod tests {
     }
 
     #[test]
+    fn selected_collectors_can_click_loose_near_visible_resource_like_playable_models() {
+        let mut app = issue_orders_click_test_app(VisiblePlayer::per_player(Team::Human));
+        let worker = spawn_test_unit(&mut app, "Worker", Team::Human, Vec3::ZERO);
+        insert_test_resource_cargo(&mut app, worker, "Worker");
+        app.world_mut().entity_mut(worker).insert(Selected);
+        let resource =
+            spawn_test_resource_node(&mut app, ResourceKind::Ore, 12, Vec3::new(5.0, 0.0, 0.0));
+        app.world_mut()
+            .entity_mut(resource)
+            .insert(VisibilityState { visible: true });
+
+        right_click_order_at_world(&mut app, Vec3::new(1.0, 0.0, 0.0));
+
+        let worker_ref = app.world().entity(worker);
+        assert!(
+            matches!(
+                worker_ref.get::<HarvestOrder>(),
+                Some(HarvestOrder {
+                    resource: Some(target),
+                    state: HarvestState::MovingToResource,
+                    ..
+                }) if *target == resource
+            ),
+            "selected collectors should harvest when the player clicks near the visible ore model, not only its exact ground origin"
+        );
+        assert!(
+            worker_ref.get::<MoveOrder>().is_none(),
+            "loose resource clicks by collectors should not become plain movement"
+        );
+    }
+
+    #[test]
+    fn non_collectors_still_move_when_clicking_loose_near_visible_resource() {
+        let mut app = issue_orders_click_test_app(VisiblePlayer::per_player(Team::Human));
+        let tank = spawn_test_unit(&mut app, "Tank", Team::Human, Vec3::ZERO);
+        app.world_mut().entity_mut(tank).insert(Selected);
+        let resource =
+            spawn_test_resource_node(&mut app, ResourceKind::Ore, 12, Vec3::new(5.0, 0.0, 0.0));
+        app.world_mut()
+            .entity_mut(resource)
+            .insert(VisibilityState { visible: true });
+
+        let clicked_ground = Vec3::new(1.0, 0.0, 0.0);
+        right_click_order_at_world(&mut app, clicked_ground);
+
+        let tank_ref = app.world().entity(tank);
+        assert!(
+            tank_ref.get::<HarvestOrder>().is_none(),
+            "non-collectors should not receive harvest orders from the collector-only loose resource snap"
+        );
+        assert!(
+            tank_ref
+                .get::<MoveOrder>()
+                .is_some_and(|order| xz_distance(order.target, clicked_ground) < 0.05),
+            "non-collectors should still move to the clicked ground near a resource"
+        );
+    }
+
+    #[test]
     fn selected_worker_right_click_resource_completes_harvest_loop() {
         let mut app = playable_harvest_click_test_app(VisiblePlayer::per_player(Team::Human));
         {
@@ -39019,6 +39093,60 @@ mod tests {
             ore_after > ore_before,
             "default resource collectors should deliver mined ore back to the player economy; ore {ore_before}->{ore_after}, resource {resource_amount_before}->{resource_after}; {collector_summary}"
         );
+    }
+
+    #[test]
+    fn default_menu_collectors_can_click_loose_near_visible_ore() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+        for _ in 0..3 {
+            app.update();
+        }
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let worker = first_unit_by_id(&mut app, Team::Human, "Worker")
+            .expect("default playable skirmish should spawn a player Worker");
+        let ore_harvester = first_unit_by_id(&mut app, Team::Human, "OreHarvester")
+            .expect("default playable skirmish should spawn a player OreHarvester");
+        let harvester_position = unit_position(&app, ore_harvester);
+        let (resource, _, _, resource_position, _) = runtime_resource_node_snapshots(&mut app)
+            .into_iter()
+            .filter(|(_, kind, amount, _, visible)| {
+                *kind == ResourceKind::Ore && *amount > 0 && *visible
+            })
+            .min_by(|(_, _, _, lhs, _), (_, _, _, rhs, _)| {
+                xz_distance(*lhs, harvester_position)
+                    .partial_cmp(&xz_distance(*rhs, harvester_position))
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
+            .expect("default player start should reveal at least one nearby ore node");
+
+        let toward_collectors = harvester_position - resource_position;
+        let toward_collectors = if toward_collectors.length_squared() > 0.001 {
+            toward_collectors.normalize()
+        } else {
+            Vec3::X
+        };
+        let loose_click = resource_position + toward_collectors * 4.0;
+        attach_test_window_to_main_camera(&mut app, loose_click);
+
+        select_only_entities(&mut app, &[worker, ore_harvester]);
+        right_click_order_at_world(&mut app, loose_click);
+
+        for entity in [worker, ore_harvester] {
+            assert!(
+                app.world()
+                    .entity(entity)
+                    .get::<HarvestOrder>()
+                    .is_some_and(|order| order.resource == Some(resource)),
+                "default match loose ore click should order selected collectors to harvest"
+            );
+        }
     }
 
     #[test]
