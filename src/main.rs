@@ -26266,6 +26266,48 @@ mod tests {
         app
     }
 
+    fn playable_battle_loop_test_app() -> App {
+        let mut app = App::new();
+        app.add_plugins((
+            MinimalPlugins,
+            AssetPlugin {
+                meta_check: AssetMetaCheck::Never,
+                ..default()
+            },
+            bevy::world_serialization::WorldSerializationPlugin,
+        ))
+        .insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ))
+        .init_asset::<WorldAsset>()
+        .insert_resource(VisiblePlayer::per_player(Team::Human))
+        .insert_resource(MatchFlow { active: true })
+        .init_resource::<Economies>()
+        .init_resource::<BuildQueue>()
+        .init_resource::<NextSpawnId>()
+        .init_resource::<PlayerFactions>()
+        .init_resource::<MapBounds>()
+        .init_resource::<TeamRelations>()
+        .init_resource::<MatchState>()
+        .init_resource::<LatestBattleEvent>()
+        .init_resource::<KillCredits>()
+        .init_resource::<BattleLog>()
+        .init_resource::<AudioFeedback>()
+        .add_systems(
+            Update,
+            (
+                advance_test_time,
+                process_build_queue,
+                combat,
+                cleanup_dead_entities,
+                apply_kill_credits,
+                evaluate_match_end,
+            )
+                .chain(),
+        );
+        app
+    }
+
     fn manual_repair_test_app() -> App {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins)
@@ -27343,6 +27385,14 @@ mod tests {
             .iter(world)
             .filter(|(unit_team, unit)| **unit_team == team && unit.id == id)
             .count()
+    }
+
+    fn first_unit_by_id(app: &mut App, team: Team, id: &'static str) -> Option<Entity> {
+        let world = app.world_mut();
+        let mut units = world.query::<(Entity, &Team, &Unit)>();
+        units.iter(world).find_map(|(entity, unit_team, unit)| {
+            (*unit_team == team && unit.id == id).then_some(entity)
+        })
     }
 
     fn battle_unit_count(app: &mut App, team: Team) -> usize {
@@ -38107,6 +38157,77 @@ mod tests {
                 .get::<ResourceNode>()
                 .is_some_and(|resource| resource.amount < 8),
             "resource node should lose ore during the loop"
+        );
+    }
+
+    #[test]
+    fn production_combat_and_match_victory_loop_is_playable() {
+        let mut app = playable_battle_loop_test_app();
+        let factory_origin = Vec3::new(0.0, 0.0, 0.0);
+        let factory = spawn_test_structure(&mut app, "VehicleFactory", Team::Human, factory_origin);
+        app.world_mut().entity_mut(factory).insert(RallyPoint {
+            target: None,
+            target_unit: None,
+        });
+        spawn_test_structure(
+            &mut app,
+            "CommandCenter",
+            Team::Human,
+            Vec3::new(-5.0, 0.0, 0.0),
+        );
+        let enemy_command_center = spawn_test_structure(
+            &mut app,
+            "CommandCenter",
+            Team::Demon,
+            Vec3::new(4.0, 0.0, 0.0),
+        );
+        app.world_mut()
+            .resource_mut::<BuildQueue>()
+            .0
+            .push(BuildJob {
+                team: Team::Human,
+                action: BuildAction::Train("Tank"),
+                producer_entity: factory,
+                producer_id: "VehicleFactory",
+                timer: 0.25,
+                origin: factory_origin,
+            });
+
+        app.update();
+
+        assert!(
+            app.world().resource::<BuildQueue>().0.is_empty(),
+            "queued tank should finish production"
+        );
+        let tank = first_unit_by_id(&mut app, Team::Human, "Tank")
+            .expect("vehicle factory should spawn a playable tank");
+        app.world_mut().entity_mut(tank).insert((
+            Transform::from_translation(Vec3::new(1.0, 0.0, 0.0)),
+            AttackOrder {
+                target: enemy_command_center,
+            },
+        ));
+
+        for _ in 0..16 {
+            app.update();
+            if app.world().resource::<MatchState>().phase == MatchPhase::HumanVictory {
+                break;
+            }
+        }
+
+        assert!(
+            app.world().get_entity(enemy_command_center).is_err(),
+            "tank attack should destroy the enemy command center"
+        );
+        let match_state = app.world().resource::<MatchState>();
+        assert_eq!(
+            match_state.phase,
+            MatchPhase::HumanVictory,
+            "destroying all enemy anchors should complete the skirmish"
+        );
+        assert!(
+            match_state.enemy_structures_destroyed >= 1,
+            "destroyed enemy structures should be counted"
         );
     }
 

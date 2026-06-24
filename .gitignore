@@ -1,0 +1,7 @@
+.direnv
+__pycache__
+*.pyc
+result
+target
+web/pkg
+web/assets
