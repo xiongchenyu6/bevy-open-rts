@@ -29952,6 +29952,48 @@ mod tests {
     }
 
     #[test]
+    fn generated_registry_asset_paths_exist_under_assets() {
+        let asset_root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("assets");
+        let mut missing = Vec::new();
+
+        for entity in registry::ENTITY_DEFS {
+            for model in entity.model_assets {
+                if !asset_root.join(model).is_file() {
+                    missing.push(format!("{} model asset {model}", entity.id));
+                }
+            }
+            for part in entity.render_parts {
+                if !entity.model_assets.contains(&part.model) {
+                    missing.push(format!(
+                        "{} render part {} is not listed in model_assets",
+                        entity.id, part.model
+                    ));
+                }
+                if !asset_root.join(part.model).is_file() {
+                    missing.push(format!("{} render part model {}", entity.id, part.model));
+                }
+            }
+            if let Some(icon) = entity.icon
+                && !asset_root.join(icon).is_file()
+            {
+                missing.push(format!("{} icon {icon}", entity.id));
+            }
+        }
+
+        for faction in registry::FACTION_DEFS {
+            if !asset_root.join(faction.emblem).is_file() {
+                missing.push(format!("{} emblem {}", faction.id, faction.emblem));
+            }
+        }
+
+        assert!(
+            missing.is_empty(),
+            "generated registry should only reference shipped assets:\n{}",
+            missing.join("\n")
+        );
+    }
+
+    #[test]
     fn ai_director_defaults_to_playable_opening_attack_grace() {
         let director = AiDirector::default();
 
