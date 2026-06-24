@@ -42080,6 +42080,102 @@ mod tests {
     }
 
     #[test]
+    fn default_menu_scatter_hotkey_spreads_selected_tank_group() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let (factory, _, factory_position, constructed) =
+            structure_snapshots_by_id(&mut app, "VehicleFactory")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .expect(
+                    "default playable skirmish should spawn a constructed player VehicleFactory",
+                );
+        assert!(constructed);
+        attach_test_window_to_main_camera(&mut app, factory_position);
+        click_selection_at_world(&mut app, factory_position, false);
+        assert!(
+            app.world().entity(factory).get::<Selected>().is_some(),
+            "left-clicking the visible VehicleFactory should select it before producing scatter Tanks"
+        );
+        app.update();
+
+        let tanks_before = unit_entities_by_id(&mut app, Team::Human, "Tank");
+        let (tank_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Tank"));
+        for _ in 0..180 {
+            let produced = unit_entities_by_id(&mut app, Team::Human, "Tank")
+                .into_iter()
+                .filter(|entity| !tanks_before.contains(entity))
+                .count();
+            let queued = queued_train_jobs_for_producer(&app, Team::Human, factory, "Tank");
+            if produced >= 2 {
+                break;
+            }
+            if produced + queued < 2 {
+                click_command_button(&mut app, tank_button);
+            }
+            app.update();
+        }
+        let produced_tanks = unit_entities_by_id(&mut app, Team::Human, "Tank")
+            .into_iter()
+            .filter(|entity| !tanks_before.contains(entity))
+            .take(2)
+            .collect::<Vec<_>>();
+        assert_eq!(
+            produced_tanks.len(),
+            2,
+            "default VehicleFactory should produce two Tanks before scatter"
+        );
+        let first_position = unit_position(&app, produced_tanks[0]);
+        let second_position = unit_position(&app, produced_tanks[1]);
+        let initial_distance = xz_distance(first_position, second_position);
+        assert!(
+            initial_distance > 0.05,
+            "test setup should spawn the two produced Tanks at distinct positions"
+        );
+
+        mouse_select_entities(
+            &mut app,
+            &produced_tanks,
+            "left-click plus Shift-left-click should select both produced Tanks before scatter",
+        );
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(0.05),
+        ));
+        press_key(&mut app, KeyCode::KeyX, 0);
+
+        let first_target = app
+            .world()
+            .entity(produced_tanks[0])
+            .get::<MoveOrder>()
+            .map(|order| order.target)
+            .expect("scatter should assign a MoveOrder to the first selected Tank");
+        let second_target = app
+            .world()
+            .entity(produced_tanks[1])
+            .get::<MoveOrder>()
+            .map(|order| order.target)
+            .expect("scatter should assign a MoveOrder to the second selected Tank");
+        assert!(
+            xz_distance(first_target, second_target) > initial_distance,
+            "scatter should spread the selected Tank group apart"
+        );
+        let pivot = (first_position + second_position) * 0.5;
+        assert!(
+            xz_distance(first_target, pivot) > xz_distance(first_position, pivot)
+                && xz_distance(second_target, pivot) > xz_distance(second_position, pivot),
+            "scatter targets should move both selected Tanks away from their group pivot"
+        );
+    }
+
+    #[test]
     fn default_menu_player_can_train_helicopter_and_strike_enemy_anchor() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
