@@ -1,7 +1,7 @@
 use bevy::{
     asset::{AssetMetaCheck, AssetPlugin},
     audio::Volume,
-    camera::ScalingMode,
+    camera::{RenderTargetInfo, ScalingMode, Viewport},
     ecs::query::Or,
     ecs::system::SystemParam,
     input::mouse::{MouseMotion, MouseScrollUnit, MouseWheel},
@@ -3968,6 +3968,29 @@ impl CaptureMatchProof {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CaptureHarvestProof {
+    pub faction: CaptureProofFaction,
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub harvest_ordered: bool,
+    pub ore_before: i32,
+    pub ore_after: i32,
+    pub resource_before: i32,
+    pub resource_after: i32,
+    pub product_id: &'static str,
+    pub produced_units: u32,
+}
+
+impl CaptureHarvestProof {
+    pub fn succeeded(&self) -> bool {
+        self.harvest_ordered
+            && self.ore_after > self.ore_before
+            && self.resource_after < self.resource_before
+            && self.produced_units > 0
+    }
+}
+
 pub fn start_default_match_for_capture(app: &mut App) {
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
@@ -4083,6 +4106,13 @@ pub fn build_capture_match_app_for_faction(faction: CaptureProofFaction) -> App 
 }
 
 pub fn build_real_menu_match_app_for_faction(faction: CaptureProofFaction) -> App {
+    build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Easy)
+}
+
+fn build_real_menu_match_app_for_faction_with_ai(
+    faction: CaptureProofFaction,
+    ai_difficulty: AiDifficulty,
+) -> App {
     let mut app = build_game_app(GameAppMode::Headless);
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
@@ -4090,6 +4120,11 @@ pub fn build_real_menu_match_app_for_faction(faction: CaptureProofFaction) -> Ap
     app.update();
 
     drive_main_menu_action(&mut app, MainMenuAction::SelectFaction(faction.team()), 1);
+    drive_main_menu_action(
+        &mut app,
+        MainMenuAction::SelectAiDifficulty(ai_difficulty),
+        1,
+    );
     drive_main_menu_action(&mut app, MainMenuAction::StartMatch, 3);
     app
 }
@@ -4108,6 +4143,17 @@ pub fn run_real_menu_match_proof_for_faction(
 ) -> CaptureMatchProof {
     let mut app = build_real_menu_match_app_for_faction(faction);
     run_capture_match_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_harvest_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureHarvestProof {
+    let mut app = build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Beginner);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(0.25),
+    ));
+    run_real_menu_harvest_proof(&mut app, faction, max_frames)
 }
 
 pub fn run_capture_match_proof(
@@ -4198,6 +4244,160 @@ pub fn capture_proof_unit_count(app: &mut App, faction: CaptureProofFaction) -> 
     capture_unit_count_by_id(app.world_mut(), faction.team(), faction.proof_vehicle()) as u32
 }
 
+fn run_real_menu_harvest_proof(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureHarvestProof {
+    let max_frames = max_frames.max(1);
+    let team = faction.team();
+    let mut frames = 0usize;
+    let mut harvest_ordered = false;
+    let mut product_id = "";
+    let mut produced_units = 0u32;
+
+    {
+        let mut economies = app.world_mut().resource_mut::<Economies>();
+        let economy = economies.get_mut(team);
+        economy.ore = 0;
+        economy.crystal = 0;
+    }
+
+    let Some((harvester, harvester_position)) =
+        capture_first_alive_resource_collector(app.world_mut(), team)
+    else {
+        return capture_harvest_proof_status(
+            app,
+            faction,
+            frames,
+            false,
+            0,
+            0,
+            0,
+            product_id,
+            produced_units,
+        );
+    };
+    let Some((resource, resource_before, resource_position)) =
+        capture_nearest_visible_resource(app.world_mut(), ResourceKind::Ore, harvester_position)
+    else {
+        return capture_harvest_proof_status(
+            app,
+            faction,
+            frames,
+            false,
+            0,
+            0,
+            0,
+            product_id,
+            produced_units,
+        );
+    };
+    let ore_before = capture_team_ore(app.world(), team);
+
+    if capture_world_left_click(app, harvester_position)
+        && app
+            .world()
+            .get_entity(harvester)
+            .is_ok_and(|entity| entity.get::<Selected>().is_some())
+        && capture_world_right_click(app, resource_position)
+    {
+        harvest_ordered = app
+            .world()
+            .get::<HarvestOrder>(harvester)
+            .is_some_and(|order| order.resource == Some(resource));
+    }
+
+    for _ in 0..max_frames {
+        frames += 1;
+        app.update();
+        if capture_team_ore(app.world(), team) > ore_before {
+            break;
+        }
+    }
+
+    let resource_after_harvest = capture_resource_amount(app.world(), resource);
+    if harvest_ordered
+        && capture_team_ore(app.world(), team) > ore_before
+        && resource_after_harvest < resource_before
+    {
+        let mut train_button = None;
+        while train_button.is_none() && frames < max_frames {
+            for producer_id in ["Barracks", "CommandCenter"] {
+                if let Some(command) =
+                    capture_affordable_train_command_from_producer(app, team, producer_id)
+                {
+                    train_button = Some(command);
+                    break;
+                }
+            }
+            if train_button.is_none() {
+                frames += 1;
+                app.update();
+            }
+        }
+
+        if let Some((button, train_id)) = train_button {
+            product_id = train_id;
+            let units_before = capture_unit_count_by_id(app.world_mut(), team, train_id);
+            capture_click_command_button(app, button);
+            while frames < max_frames {
+                frames += 1;
+                app.update();
+                let current = capture_unit_count_by_id(app.world_mut(), team, train_id);
+                if current > units_before {
+                    produced_units = current.saturating_sub(units_before) as u32;
+                    break;
+                }
+            }
+        }
+    }
+
+    let resource_after = capture_resource_amount(app.world(), resource);
+    capture_harvest_proof_status(
+        app,
+        faction,
+        frames,
+        harvest_ordered,
+        ore_before,
+        resource_before,
+        resource_after,
+        product_id,
+        produced_units,
+    )
+}
+
+fn capture_harvest_proof_status(
+    app: &App,
+    faction: CaptureProofFaction,
+    frames: usize,
+    harvest_ordered: bool,
+    ore_before: i32,
+    resource_before: i32,
+    resource_after: i32,
+    product_id: &'static str,
+    produced_units: u32,
+) -> CaptureHarvestProof {
+    let snapshot_phase = match app.world().resource::<MatchState>().phase {
+        MatchPhase::Running => CaptureMatchPhase::Running,
+        MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
+        MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
+        MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
+    };
+    CaptureHarvestProof {
+        faction,
+        phase: snapshot_phase,
+        frames,
+        harvest_ordered,
+        ore_before,
+        ore_after: capture_team_ore(app.world(), faction.team()),
+        resource_before,
+        resource_after,
+        product_id,
+        produced_units,
+    }
+}
+
 fn drive_main_menu_action(app: &mut App, action: MainMenuAction, followup_updates: usize) {
     let button_entity = {
         let world = app.world_mut();
@@ -4226,6 +4426,278 @@ fn drive_main_menu_action(app: &mut App, action: MainMenuAction, followup_update
     for _ in 0..followup_updates {
         app.update();
     }
+}
+
+fn capture_first_alive_resource_collector(world: &mut World, team: Team) -> Option<(Entity, Vec3)> {
+    let mut units = world.query::<(
+        Entity,
+        &Team,
+        &Unit,
+        &Transform,
+        &Health,
+        Option<&ResourceCargo>,
+    )>();
+    units
+        .iter(world)
+        .filter_map(|(entity, unit_team, unit, transform, health, cargo)| {
+            (*unit_team == team
+                && health.current > 0.0
+                && cargo.is_some_and(|cargo| cargo.capacity > 0)
+                && can_unit_collect_resources(unit))
+            .then_some((entity, transform.translation, unit.id))
+        })
+        .min_by_key(|(_, _, id)| match *id {
+            "OreHarvester" => 0,
+            "Worker" => 1,
+            _ => 2,
+        })
+        .map(|(entity, position, _)| (entity, position))
+}
+
+fn capture_nearest_visible_resource(
+    world: &mut World,
+    kind: ResourceKind,
+    origin: Vec3,
+) -> Option<(Entity, i32, Vec3)> {
+    let mut resources = world.query::<(Entity, &ResourceNode, &Transform, &VisibilityState)>();
+    resources
+        .iter(world)
+        .filter_map(|(entity, resource, transform, visibility)| {
+            (resource.kind == kind && resource.amount > 0 && visibility.visible).then_some((
+                entity,
+                resource.amount,
+                transform.translation,
+            ))
+        })
+        .min_by(|(_, _, lhs), (_, _, rhs)| {
+            xz_distance(*lhs, origin)
+                .partial_cmp(&xz_distance(*rhs, origin))
+                .unwrap_or(std::cmp::Ordering::Equal)
+        })
+}
+
+fn capture_resource_amount(world: &World, entity: Entity) -> i32 {
+    world
+        .get::<ResourceNode>(entity)
+        .map_or(0, |resource| resource.amount)
+}
+
+fn capture_team_ore(world: &World, team: Team) -> i32 {
+    world.resource::<Economies>().get(team).ore
+}
+
+fn capture_first_affordable_train_command(
+    app: &mut App,
+    team: Team,
+) -> Option<(Entity, &'static str)> {
+    let world = app.world_mut();
+    let (ore, crystal) = {
+        let economy = world.resource::<Economies>().get(team);
+        (economy.ore, economy.crystal)
+    };
+    let mut slots = world.query::<(Entity, &CommandSlot, &BuildAction, &CommandSlotAvailability)>();
+    let mut candidates = slots
+        .iter(world)
+        .filter_map(|(entity, slot, action, availability)| match action {
+            BuildAction::Train(product_id) if availability.enabled => {
+                let def = registry::entity(product_id)?;
+                (ore >= def.cost.ore && crystal >= def.cost.crystal).then_some((
+                    slot.0,
+                    entity,
+                    *product_id,
+                ))
+            }
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+    candidates.sort_by_key(|(slot, _, _)| *slot);
+    candidates
+        .into_iter()
+        .next()
+        .map(|(_, entity, product_id)| (entity, product_id))
+}
+
+fn capture_affordable_train_command_from_producer(
+    app: &mut App,
+    team: Team,
+    producer_id: &'static str,
+) -> Option<(Entity, &'static str)> {
+    let (producer, _, producer_position) =
+        capture_constructed_producer(app.world_mut(), team, producer_id)?;
+    if !capture_world_left_click(app, producer_position)
+        || !app
+            .world()
+            .get_entity(producer)
+            .is_ok_and(|entity| entity.get::<Selected>().is_some())
+    {
+        return None;
+    }
+    capture_first_affordable_train_command(app, team)
+}
+
+fn capture_click_command_button(app: &mut App, button: Entity) {
+    app.world_mut()
+        .entity_mut(button)
+        .insert(Interaction::Pressed);
+    app.world_mut()
+        .resource_mut::<ButtonInput<MouseButton>>()
+        .press(MouseButton::Left);
+    app.update();
+    {
+        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+        mouse.release(MouseButton::Left);
+        mouse.clear();
+    }
+    app.world_mut().entity_mut(button).insert(Interaction::None);
+    app.update();
+}
+
+fn capture_world_left_click(app: &mut App, position: Vec3) -> bool {
+    capture_world_mouse_click(app, position, MouseButton::Left)
+}
+
+fn capture_world_right_click(app: &mut App, position: Vec3) -> bool {
+    capture_world_mouse_click(app, position, MouseButton::Right)
+}
+
+fn capture_world_mouse_click(app: &mut App, position: Vec3, button: MouseButton) -> bool {
+    if !capture_attach_window_to_main_camera(app, position) {
+        return false;
+    }
+    let Some(cursor) = capture_screen_position_for_world(app, position) else {
+        return false;
+    };
+    if !capture_set_cursor(app, cursor) {
+        return false;
+    }
+    let cursor_blocked = {
+        let world = app.world_mut();
+        let mut window_q = world.query_filtered::<&Window, With<PrimaryWindow>>();
+        let Ok(window) = window_q.single(world) else {
+            return false;
+        };
+        match button {
+            MouseButton::Left => cursor_is_over_hud(window),
+            MouseButton::Right => cursor_blocks_world_order_controls(window, cursor),
+            _ => false,
+        }
+    };
+    if cursor_blocked {
+        return false;
+    }
+    let Some(ground_position) = capture_ground_position_for_cursor(app) else {
+        return false;
+    };
+    if xz_distance(ground_position, position) > 0.05 {
+        return false;
+    }
+    {
+        let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
+        keyboard.release(KeyCode::ShiftLeft);
+        keyboard.release(KeyCode::ShiftRight);
+        keyboard.clear();
+    }
+    {
+        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+        mouse.press(button);
+    }
+    app.update();
+    {
+        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+        mouse.clear();
+        mouse.release(button);
+    }
+    app.update();
+    app.world_mut()
+        .resource_mut::<ButtonInput<MouseButton>>()
+        .clear();
+    true
+}
+
+fn capture_attach_window_to_main_camera(app: &mut App, focus: Vec3) -> bool {
+    let window_entity = {
+        let world = app.world_mut();
+        let mut window_q = world.query_filtered::<Entity, With<PrimaryWindow>>();
+        window_q.iter(world).next()
+    };
+    if let Some(window_entity) = window_entity {
+        if let Some(mut window) = app
+            .world_mut()
+            .entity_mut(window_entity)
+            .get_mut::<Window>()
+        {
+            window.set_cursor_position(Some(Vec2::new(640.0, 360.0)));
+        }
+    } else {
+        let mut window = Window {
+            resolution: WindowResolution::new(1280, 720),
+            ..default()
+        };
+        window.set_cursor_position(Some(Vec2::new(640.0, 360.0)));
+        app.world_mut().spawn((window, PrimaryWindow));
+    }
+
+    let camera_state = RtsCamera::focused_on(focus);
+    let camera_transform = camera_transform_from_state(&camera_state);
+    let mut projection = camera_projection_from_state(&camera_state);
+    projection.update(1280.0, 720.0);
+    *app.world_mut().resource_mut::<RtsCamera>() = camera_state;
+
+    let world = app.world_mut();
+    let mut camera_q = world.query_filtered::<(
+        &mut Camera,
+        &mut Transform,
+        &mut GlobalTransform,
+        &mut Projection,
+    ), With<MainCamera>>();
+    let Ok((mut camera, mut transform, mut global_transform, mut current_projection)) =
+        camera_q.single_mut(world)
+    else {
+        return false;
+    };
+    camera.viewport = Some(Viewport {
+        physical_size: UVec2::new(1280, 720),
+        ..default()
+    });
+    camera.computed.target_info = Some(RenderTargetInfo {
+        physical_size: UVec2::new(1280, 720),
+        scale_factor: 1.0,
+    });
+    camera.computed.clip_from_view = projection.get_clip_from_view();
+    *transform = camera_transform;
+    *global_transform = GlobalTransform::from(camera_transform);
+    *current_projection = projection;
+    true
+}
+
+fn capture_set_cursor(app: &mut App, cursor: Vec2) -> bool {
+    let world = app.world_mut();
+    let mut window_q = world.query_filtered::<&mut Window, With<PrimaryWindow>>();
+    let Ok(mut window) = window_q.single_mut(world) else {
+        return false;
+    };
+    window.set_cursor_position(Some(cursor));
+    true
+}
+
+fn capture_screen_position_for_world(app: &mut App, position: Vec3) -> Option<Vec2> {
+    let world = app.world_mut();
+    let mut camera_q = world.query_filtered::<(&Camera, &GlobalTransform), With<MainCamera>>();
+    let (camera, camera_transform) = camera_q.single(world).ok()?;
+    camera.world_to_viewport(camera_transform, position).ok()
+}
+
+fn capture_ground_position_for_cursor(app: &mut App) -> Option<Vec3> {
+    let cursor = {
+        let world = app.world_mut();
+        let mut window_q = world.query_filtered::<&Window, With<PrimaryWindow>>();
+        window_q.single(world).ok()?.cursor_position()?
+    };
+    let world = app.world_mut();
+    let mut camera_q = world.query_filtered::<(&Camera, &GlobalTransform), With<MainCamera>>();
+    let (camera, camera_transform) = camera_q.single(world).ok()?;
+    let ray = camera.viewport_to_world(camera_transform, cursor).ok()?;
+    ray.plane_intersection_point(Vec3::ZERO, InfinitePlane3d::new(Vec3::Y))
 }
 
 fn capture_match_setup_for_faction(faction: CaptureProofFaction) -> MatchSetupSettings {
@@ -31161,6 +31633,22 @@ mod tests {
             assert!(
                 proof.enemy_structures_destroyed > 0,
                 "real app menu proof should destroy enemy anchors through combat; proof={proof:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn real_menu_harvest_proof_mines_and_trains_from_mouse_orders() {
+        for faction in CaptureProofFaction::ALL {
+            let proof = run_real_menu_harvest_proof_for_faction(faction, 900);
+
+            assert!(
+                proof.succeeded(),
+                "real menu harvest proof should select a collector, right-click visible ore, deliver income, and train from Barracks; proof={proof:?}"
+            );
+            assert!(
+                !proof.product_id.is_empty(),
+                "harvest proof should identify the trained Barracks unit; proof={proof:?}"
             );
         }
     }
