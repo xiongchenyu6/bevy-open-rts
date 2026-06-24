@@ -27611,6 +27611,17 @@ mod tests {
             .count()
     }
 
+    fn unit_entities_by_id(app: &mut App, team: Team, id: &'static str) -> Vec<Entity> {
+        let world = app.world_mut();
+        let mut units = world.query::<(Entity, &Team, &Unit)>();
+        units
+            .iter(world)
+            .filter_map(|(entity, unit_team, unit)| {
+                (*unit_team == team && unit.id == id).then_some(entity)
+            })
+            .collect()
+    }
+
     fn first_unit_by_id(app: &mut App, team: Team, id: &'static str) -> Option<Entity> {
         let world = app.world_mut();
         let mut units = world.query::<(Entity, &Team, &Unit)>();
@@ -38965,6 +38976,98 @@ mod tests {
         assert!(
             !rallying_tanks.is_empty(),
             "a Tank produced after setting a factory rally point should receive MoveOrder toward the rally target"
+        );
+    }
+
+    #[test]
+    fn default_menu_tank_attack_move_acquires_visible_enemy() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let (factory, _, _, constructed) = structure_snapshots_by_id(&mut app, "VehicleFactory")
+            .into_iter()
+            .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+            .expect("default playable skirmish should spawn a constructed player VehicleFactory");
+        assert!(constructed);
+
+        select_only_entities(&mut app, &[factory]);
+        app.update();
+
+        let tanks_before = unit_entities_by_id(&mut app, Team::Human, "Tank");
+        let (tank_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Tank"));
+        click_command_button(&mut app, tank_button);
+        for _ in 0..120 {
+            app.update();
+            if unit_entities_by_id(&mut app, Team::Human, "Tank").len() > tanks_before.len() {
+                break;
+            }
+        }
+        let tank = unit_entities_by_id(&mut app, Team::Human, "Tank")
+            .into_iter()
+            .find(|entity| !tanks_before.contains(entity))
+            .expect("default VehicleFactory should produce a new Tank from its command button");
+        let tank_position = unit_position(&app, tank);
+
+        select_only_entities(&mut app, &[tank]);
+        app.update();
+        let (attack_move_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::AttackMove);
+        click_command_button(&mut app, attack_move_button);
+        assert!(
+            app.world().resource::<CommandMode>().attack_move,
+            "clicking the Tank attack-move command should arm terrain targeting"
+        );
+
+        let destination = tank_position + Vec3::new(12.0, 0.0, -3.0);
+        attach_test_window_to_main_camera(&mut app, destination);
+        right_click_order_at_world(&mut app, destination);
+        assert!(
+            app.world()
+                .entity(tank)
+                .get::<AttackMoveOrder>()
+                .is_some_and(|order| xz_distance(order.destination, destination) < 0.05),
+            "right-clicking terrain in attack-move mode should assign an AttackMoveOrder"
+        );
+        assert!(
+            !app.world().resource::<CommandMode>().attack_move,
+            "issuing the terrain attack-move command should leave targeting mode"
+        );
+
+        let enemy_position = tank_position + Vec3::new(4.0, 0.0, 0.0);
+        let enemy = spawn_test_unit(&mut app, "Tank", Team::Demon, enemy_position);
+        app.world_mut()
+            .entity_mut(enemy)
+            .insert((VisibilityState { visible: true }, Visibility::Visible));
+
+        for _ in 0..8 {
+            app.update();
+            if app
+                .world()
+                .entity(tank)
+                .get::<AttackOrder>()
+                .is_some_and(|order| order.target == enemy)
+            {
+                break;
+            }
+        }
+
+        assert!(
+            app.world()
+                .entity(tank)
+                .get::<AttackOrder>()
+                .is_some_and(|order| order.target == enemy),
+            "a Tank on attack-move should acquire a newly visible enemy inside sight"
+        );
+        assert!(
+            app.world().entity(tank).get::<MoveOrder>().is_none(),
+            "movement should pause while the attack-move target is being engaged"
         );
     }
 
