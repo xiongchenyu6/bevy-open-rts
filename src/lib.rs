@@ -42176,6 +42176,98 @@ mod tests {
     }
 
     #[test]
+    fn default_menu_production_structure_hotkeys_focus_and_keep_command_context() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let hotkeys = [
+            ("CommandCenter", KeyCode::KeyC),
+            ("VehicleFactory", KeyCode::KeyV),
+            ("AircraftFactory", KeyCode::KeyF),
+            ("Barracks", KeyCode::KeyB),
+        ];
+        let mut production_structures = Vec::new();
+        for (id, key) in hotkeys {
+            let (entity, _, position, constructed) = structure_snapshots_by_id(&mut app, id)
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .unwrap_or_else(|| {
+                    panic!("default playable skirmish should spawn a constructed player {id}")
+                });
+            assert!(constructed);
+            production_structures.push((id, key, entity, position));
+        }
+
+        for (id, key, entity, position) in production_structures.iter().copied() {
+            app.world_mut().resource_mut::<RtsCamera>().focus = Vec3::new(30.0, 0.0, 30.0);
+            press_selection_keys(&mut app, &[KeyCode::AltLeft, key]);
+            app.update();
+            assert!(
+                app.world().entity(entity).get::<Selected>().is_some(),
+                "Alt+{} should select the default player {id}",
+                keycode_display_for_production_hotkey(key)
+            );
+            for (other_id, _, other_entity, _) in production_structures.iter().copied() {
+                if other_entity == entity {
+                    continue;
+                }
+                assert!(
+                    app.world().entity(other_entity).get::<Selected>().is_none(),
+                    "Alt+{} should select only {id}, not leave {other_id} selected",
+                    keycode_display_for_production_hotkey(key)
+                );
+            }
+            assert!(
+                xz_distance(app.world().resource::<RtsCamera>().focus, position) < 0.01,
+                "Alt+{} should focus the camera on the selected {id}",
+                keycode_display_for_production_hotkey(key)
+            );
+        }
+
+        let (barracks, _, barracks_position, _) = structure_snapshots_by_id(&mut app, "Barracks")
+            .into_iter()
+            .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+            .expect("default player Barracks should still exist for hotkey production");
+        assert!(app.world().entity(barracks).get::<Selected>().is_some());
+        assert!(
+            xz_distance(app.world().resource::<RtsCamera>().focus, barracks_position) < 0.01,
+            "the last Alt+B should keep the Barracks command context focused"
+        );
+
+        let infantry_before = unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry");
+        let (infantry_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("LightRifleInfantry"));
+        click_command_button(&mut app, infantry_button);
+        for _ in 0..120 {
+            app.update();
+            if unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry") > infantry_before {
+                break;
+            }
+        }
+
+        assert!(
+            unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry") > infantry_before,
+            "Alt+B selected Barracks should keep its command panel active and train infantry"
+        );
+    }
+
+    fn keycode_display_for_production_hotkey(key: KeyCode) -> &'static str {
+        match key {
+            KeyCode::KeyC => "C",
+            KeyCode::KeyB => "B",
+            KeyCode::KeyV => "V",
+            KeyCode::KeyF => "F",
+            _ => "?",
+        }
+    }
+
+    #[test]
     fn default_menu_player_can_train_helicopter_and_strike_enemy_anchor() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
