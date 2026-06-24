@@ -79,6 +79,8 @@ const SELECTION_DRAG_INTERRUPT_MARGIN_PX: f32 = 1.0;
 const CAMERA_ROTATE_SPEED: f32 = 2.0;
 const DOUBLE_CLICK_MIN_SECONDS: f32 = 0.05;
 const DOUBLE_CLICK_MAX_SECONDS: f32 = 0.6;
+const SINGLE_CLICK_SELECTION_SCREEN_RADIUS_PX: f32 = 38.0;
+const SINGLE_CLICK_SELECTION_SCREEN_RADIUS_PER_METER_PX: f32 = 18.0;
 const FOG_REVEAL_RADIUS: f32 = 11.5;
 const FOG_COMPENSATION: f32 = 2.0;
 const MATCH_END_TITLE_COLOR: Color = Color::srgb(0.98, 0.96, 0.42);
@@ -5441,7 +5443,7 @@ type IdleUnitOrderFilter = (
     Without<PatrolOrder>,
 );
 
-#[derive(Component, Clone, Copy, PartialEq, Eq)]
+#[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 enum MovementDomain {
     Terrain,
     Air,
@@ -12942,6 +12944,11 @@ fn select_entities(
         drag_state.dragging = false;
         return;
     };
+    let Ok((camera, camera_transform)) = camera_q.single() else {
+        drag_state.active = false;
+        drag_state.dragging = false;
+        return;
+    };
 
     if !additive {
         for (entity, _, _, _, _, _, _) in &selectable_q {
@@ -12958,8 +12965,17 @@ fn select_entities(
         if *team != visible_team {
             continue;
         }
-        let distance = xz_distance(transform.translation, point);
-        if distance <= selectable.radius + 0.35 && distance < nearest_distance {
+        let ground_distance = xz_distance(transform.translation, point);
+        let screen_distance = camera
+            .world_to_viewport(camera_transform, transform.translation)
+            .ok()
+            .map(|screen_position| screen_position.distance(cursor));
+        let ground_pick = ground_distance <= selectable.radius + 0.35;
+        let screen_pick = screen_distance.is_some_and(|distance| {
+            distance <= single_click_selection_screen_radius(selectable.radius)
+        });
+        let distance = screen_distance.unwrap_or(ground_distance * 64.0);
+        if (ground_pick || screen_pick) && distance < nearest_distance {
             nearest = Some((
                 entity,
                 unit.map(|unit| unit.id),
@@ -13041,6 +13057,12 @@ fn select_entities(
 
     drag_state.active = false;
     drag_state.dragging = false;
+}
+
+fn single_click_selection_screen_radius(selectable_radius: f32) -> f32 {
+    (SINGLE_CLICK_SELECTION_SCREEN_RADIUS_PX
+        + selectable_radius.max(0.0) * SINGLE_CLICK_SELECTION_SCREEN_RADIUS_PER_METER_PX)
+        .clamp(24.0, 72.0)
 }
 
 fn cancel_selection_drag(drag_state: &mut SelectionDragState) {
@@ -28754,46 +28776,11 @@ mod tests {
         .init_asset::<bevy::mesh::skinning::SkinnedMeshInverseBindposes>()
         .init_asset::<WorldAsset>()
         .init_asset::<Font>()
-        .init_asset::<bevy::audio::AudioSource>()
-        .init_resource::<Economies>()
-        .init_resource::<TeamRelations>()
-        .init_resource::<BuildQueue>()
-        .init_resource::<NextSpawnId>()
-        .init_resource::<AiDirector>()
-        .init_resource::<AiDifficultySettings>()
-        .init_resource::<ActiveTeams>()
-        .init_resource::<PlayerFactions>()
-        .init_resource::<PlayerColorSlots>()
-        .init_resource::<VisiblePlayer>()
-        .init_resource::<SelectedSkirmishMap>()
-        .init_resource::<MatchSetupSettings>()
-        .init_resource::<MapBounds>()
-        .init_resource::<CommandMode>()
-        .init_resource::<StructurePlacementFeedback>()
-        .init_resource::<MatchMenuState>()
-        .init_resource::<MatchSpeed>()
-        .init_resource::<MatchBriefingState>()
-        .init_resource::<SelectionDragState>()
-        .init_resource::<UnitGroups>()
-        .init_resource::<CameraBookmarks>()
-        .init_resource::<CameraMouseRotation>()
-        .init_resource::<DoubleClickState>()
-        .init_resource::<ButtonInput<KeyCode>>()
-        .init_resource::<ButtonInput<MouseButton>>()
-        .init_resource::<LatestBattleEvent>()
-        .init_resource::<MatchFlow>()
-        .init_resource::<MatchState>()
-        .init_resource::<SupportCooldowns>()
-        .init_resource::<KillCredits>()
-        .init_resource::<BattleLog>()
-        .init_resource::<AudioFeedback>()
-        .init_resource::<ObjectiveTrackerState>()
-        .insert_resource(RtsCamera::default())
-        .add_systems(
-            Startup,
-            (apply_match_setup_settings, setup_support_cooldowns, setup).chain(),
-        );
-        add_runtime_systems(&mut app);
+        .init_asset::<bevy::audio::AudioSource>();
+        add_shared_match_scene(&mut app);
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::InMatch);
         app
     }
 
@@ -29370,6 +29357,49 @@ mod tests {
             xz_distance(ground_position, position) < 0.05,
             "selection click test cursor projected to {ground_position:?}, expected {position:?}"
         );
+        {
+            let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
+            if shift {
+                keyboard.press(KeyCode::ShiftLeft);
+            } else {
+                keyboard.release(KeyCode::ShiftLeft);
+            }
+            keyboard.clear();
+        }
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.press(MouseButton::Left);
+        }
+        app.update();
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.clear();
+            mouse.release(MouseButton::Left);
+        }
+        app.update();
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.clear();
+        }
+        let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
+        keyboard.release(KeyCode::ShiftLeft);
+        keyboard.clear();
+    }
+
+    fn click_selection_at_projected_world(app: &mut App, position: Vec3, shift: bool) {
+        let cursor = screen_position_for_world(app, position);
+        set_selection_cursor(app, cursor);
+        {
+            let world = app.world_mut();
+            let mut window_q = world.query_filtered::<&Window, With<PrimaryWindow>>();
+            let window = window_q
+                .single(world)
+                .expect("selection click test should have one primary window");
+            assert!(
+                !cursor_is_over_hud(window),
+                "selection click test cursor {cursor:?} should be outside HUD"
+            );
+        }
         {
             let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
             if shift {
@@ -41187,6 +41217,108 @@ mod tests {
                 .get::<AttackOrder>()
                 .is_some_and(|order| order.target == enemy_anchor),
             "right-clicking the visible enemy anchor with the mouse-selected Tank should issue AttackOrder"
+        );
+    }
+
+    #[test]
+    fn default_menu_player_can_train_helicopter_and_strike_enemy_anchor() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let (aircraft_factory, _, factory_position, constructed) =
+            structure_snapshots_by_id(&mut app, "AircraftFactory")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .expect(
+                    "default playable skirmish should spawn a constructed player AircraftFactory",
+                );
+        assert!(constructed);
+        attach_test_window_to_main_camera(&mut app, factory_position);
+        click_selection_at_world(&mut app, factory_position, false);
+        assert!(
+            app.world()
+                .entity(aircraft_factory)
+                .get::<Selected>()
+                .is_some(),
+            "left-clicking the visible AircraftFactory should select it for air production"
+        );
+        app.update();
+
+        let helicopters_before = unit_entities_by_id(&mut app, Team::Human, "Helicopter");
+        let (helicopter_button, slot_index, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Helicopter"));
+        click_command_button(&mut app, helicopter_button);
+        for _ in 0..120 {
+            app.update();
+            if unit_entities_by_id(&mut app, Team::Human, "Helicopter").len()
+                > helicopters_before.len()
+            {
+                break;
+            }
+        }
+        let helicopter = unit_entities_by_id(&mut app, Team::Human, "Helicopter")
+            .into_iter()
+            .find(|entity| !helicopters_before.contains(entity))
+            .unwrap_or_else(|| {
+                panic!(
+                    "clicking AircraftFactory command slot {slot_index} should produce a Helicopter"
+                )
+            });
+        assert_eq!(
+            app.world()
+                .entity(helicopter)
+                .get::<MovementDomain>()
+                .copied(),
+            Some(MovementDomain::Air),
+            "produced Helicopter should use the air movement domain"
+        );
+
+        let helicopter_position = unit_position(&app, helicopter);
+        attach_test_window_to_main_camera(&mut app, helicopter_position);
+        click_selection_at_projected_world(&mut app, helicopter_position, false);
+        assert!(
+            app.world().entity(helicopter).get::<Selected>().is_some(),
+            "left-clicking the produced Helicopter should select it for player orders"
+        );
+
+        let (enemy_anchor, enemy_anchor_position) = anchor_targets_by_team(&mut app, Team::Demon)
+            .into_iter()
+            .next()
+            .expect("default skirmish should spawn a Demon enemy anchor");
+        app.world_mut()
+            .entity_mut(enemy_anchor)
+            .insert((VisibilityState { visible: true }, Visibility::Visible));
+        let enemy_health_before = current_health(&app, enemy_anchor);
+        attach_test_window_to_main_camera(&mut app, enemy_anchor_position);
+        right_click_order_at_world(&mut app, enemy_anchor_position);
+
+        assert!(
+            app.world()
+                .entity(helicopter)
+                .get::<AttackOrder>()
+                .is_some_and(|order| order.target == enemy_anchor),
+            "right-clicking a visible enemy anchor with the mouse-selected Helicopter should issue AttackOrder"
+        );
+
+        for _ in 0..120 {
+            app.update();
+            if app.world().get_entity(enemy_anchor).is_err()
+                || current_health(&app, enemy_anchor) < enemy_health_before
+            {
+                break;
+            }
+        }
+
+        assert!(
+            app.world().get_entity(enemy_anchor).is_err()
+                || current_health(&app, enemy_anchor) < enemy_health_before,
+            "the produced Helicopter should be able to strike a ground enemy anchor"
         );
     }
 
