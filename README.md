@@ -41,6 +41,18 @@ includes the wasm target tools. `scripts/build_web.sh` stamps `web/index.html`
 with a content hash of the generated JS/WASM artifacts so browsers do not reuse
 stale game code after a rebuild.
 
+## Capture And Match Proof
+
+```sh
+cargo run --bin capture -- screenshot screenshots/capture/still.png
+cargo run --bin capture -- frames screenshots/result/1 450
+cargo run --bin capture -- match-proof 7200
+```
+
+`match-proof` runs the shared default skirmish scene, accelerates player tank
+production through the real build queue, orders the attack group onto enemy
+anchors, and exits non-zero if the match does not reach player victory.
+
 ## Regenerate Migration Data
 
 ```sh

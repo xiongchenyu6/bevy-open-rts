@@ -3845,6 +3845,25 @@ pub struct CaptureTeamStats {
     pub crystal: i32,
 }
 
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct CaptureMatchProof {
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub elapsed_seconds: u32,
+    pub produced_tanks: u32,
+    pub human_units: u32,
+    pub enemy_units_destroyed: u32,
+    pub enemy_structures_destroyed: u32,
+    pub remaining_teams: u32,
+    pub remaining_anchors: u32,
+}
+
+impl CaptureMatchProof {
+    pub fn succeeded(self) -> bool {
+        self.phase == CaptureMatchPhase::HumanVictory && self.remaining_teams <= 1
+    }
+}
+
 pub fn start_default_match_for_capture(app: &mut App) {
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
@@ -3954,6 +3973,210 @@ pub fn capture_match_snapshot(app: &mut App) -> CaptureMatchSnapshot {
         demon,
         chaos,
     }
+}
+
+pub fn run_capture_default_match_proof(max_frames: usize) -> CaptureMatchProof {
+    let mut app = build_capture_match_app();
+    run_capture_match_proof(&mut app, max_frames)
+}
+
+pub fn run_capture_match_proof(app: &mut App, max_frames: usize) -> CaptureMatchProof {
+    const TARGET_TANKS: usize = 12;
+    let max_frames = max_frames.max(1);
+    let tanks_before = capture_unit_count_by_id(app.world_mut(), Team::Human, "Tank");
+    let mut produced_tanks = 0usize;
+
+    for frame in 0..max_frames {
+        capture_queue_human_tanks(app, TARGET_TANKS);
+        produced_tanks = produced_tanks.max(capture_unit_count_by_id(
+            app.world_mut(),
+            Team::Human,
+            "Tank",
+        ));
+        if frame % 30 == 0 {
+            capture_order_human_attackers(app);
+        }
+        if app.world().resource::<MatchState>().phase != MatchPhase::Running {
+            return capture_match_proof_from_app(app, frame + 1, produced_tanks, tanks_before);
+        }
+        app.update();
+    }
+
+    capture_match_proof_from_app(app, max_frames, produced_tanks, tanks_before)
+}
+
+fn capture_match_proof_from_app(
+    app: &mut App,
+    frames: usize,
+    produced_tanks: usize,
+    tanks_before: usize,
+) -> CaptureMatchProof {
+    let snapshot = capture_match_snapshot(app);
+    CaptureMatchProof {
+        phase: snapshot.phase,
+        frames,
+        elapsed_seconds: snapshot.elapsed_seconds.round() as u32,
+        produced_tanks: produced_tanks.saturating_sub(tanks_before) as u32,
+        human_units: snapshot.human.units,
+        enemy_units_destroyed: snapshot.enemy_units_destroyed,
+        enemy_structures_destroyed: snapshot.enemy_structures_destroyed,
+        remaining_teams: snapshot.remaining_teams,
+        remaining_anchors: snapshot.remaining_anchors,
+    }
+}
+
+fn capture_queue_human_tanks(app: &mut App, target_tanks: usize) -> usize {
+    let world = app.world_mut();
+    let produced = capture_unit_count_by_id(world, Team::Human, "Tank");
+    let queued = capture_queued_train_jobs(world, Team::Human, "Tank");
+    let Some((factory, producer_id, origin)) =
+        capture_constructed_producer(world, Team::Human, "VehicleFactory")
+    else {
+        return 0;
+    };
+    let queue_len = {
+        let build_queue = world.resource::<BuildQueue>();
+        producer_build_queue_len(build_queue, factory)
+    };
+    let capacity = PRODUCTION_QUEUE_LIMIT.saturating_sub(queue_len);
+    let needed = target_tanks.saturating_sub(produced + queued).min(capacity);
+    if needed == 0 {
+        return 0;
+    }
+
+    let Some(def) = registry::entity("Tank") else {
+        return 0;
+    };
+    {
+        let mut economies = world.resource_mut::<Economies>();
+        let economy = economies.get_mut(Team::Human);
+        economy.ore = economy.ore.max(def.cost.ore * needed as i32 + 120);
+        economy.crystal = economy.crystal.max(def.cost.crystal * needed as i32 + 120);
+    }
+    {
+        let mut build_queue = world.resource_mut::<BuildQueue>();
+        for _ in 0..needed {
+            build_queue.0.push(BuildJob {
+                team: Team::Human,
+                action: BuildAction::Train("Tank"),
+                producer_entity: factory,
+                producer_id,
+                timer: 0.25,
+                origin,
+            });
+        }
+    }
+    needed
+}
+
+fn capture_constructed_producer(
+    world: &mut World,
+    team: Team,
+    id: &'static str,
+) -> Option<(Entity, &'static str, Vec3)> {
+    let mut query = world.query::<(
+        Entity,
+        &Structure,
+        &Team,
+        &Transform,
+        Option<&UnderConstruction>,
+    )>();
+    query.iter(world).find_map(
+        |(entity, structure, structure_team, transform, under_construction)| {
+            (*structure_team == team
+                && structure.id == id
+                && structure_is_constructed(under_construction))
+            .then_some((entity, structure.id, transform.translation))
+        },
+    )
+}
+
+fn capture_unit_count_by_id(world: &mut World, team: Team, id: &'static str) -> usize {
+    let mut query = world.query::<(&Team, &Unit, &Health)>();
+    query
+        .iter(world)
+        .filter(|(unit_team, unit, health)| {
+            **unit_team == team && unit.id == id && health.current > 0.0
+        })
+        .count()
+}
+
+fn capture_queued_train_jobs(world: &World, team: Team, product_id: &'static str) -> usize {
+    world
+        .resource::<BuildQueue>()
+        .0
+        .iter()
+        .filter(|job| {
+            job.team == team && matches!(job.action, BuildAction::Train(id) if id == product_id)
+        })
+        .count()
+}
+
+fn capture_order_human_attackers(app: &mut App) -> usize {
+    let Some((target, _)) = capture_first_enemy_anchor(app.world_mut(), Team::Human) else {
+        return 0;
+    };
+    if let Ok(mut entity) = app.world_mut().get_entity_mut(target) {
+        entity.insert((VisibilityState { visible: true }, Visibility::Visible));
+    }
+    let attackers = capture_alive_attackers(app.world_mut(), Team::Human);
+    for attacker in &attackers {
+        if let Ok(mut entity) = app.world_mut().get_entity_mut(*attacker) {
+            entity.remove::<(
+                MoveOrder,
+                FollowOrder,
+                CaptureOrder,
+                GarrisonOrder,
+                HarvestOrder,
+                RepairOrder,
+                ConstructOrder,
+                AttackMoveOrder,
+                PatrolOrder,
+                OrderQueue,
+            )>();
+            entity.insert(AttackOrder { target });
+        }
+    }
+    attackers.len()
+}
+
+fn capture_alive_attackers(world: &mut World, team: Team) -> Vec<Entity> {
+    let mut query = world.query::<(Entity, &Team, &Health, &Weapon)>();
+    query
+        .iter(world)
+        .filter_map(|(entity, unit_team, health, _)| {
+            (*unit_team == team && health.current > 0.0).then_some(entity)
+        })
+        .collect()
+}
+
+fn capture_first_enemy_anchor(world: &mut World, player_team: Team) -> Option<(Entity, Vec3)> {
+    let relations = *world.resource::<TeamRelations>();
+    let mut best = None;
+    {
+        let mut structures = world.query::<(Entity, &Structure, &Team, &Transform, &Health)>();
+        for (entity, structure, team, transform, health) in structures.iter(world) {
+            if health.current > 0.0
+                && relations.are_enemies(player_team, *team)
+                && is_structure_elimination_anchor(structure)
+            {
+                best = Some((entity, transform.translation));
+                break;
+            }
+        }
+    }
+    if best.is_some() {
+        return best;
+    }
+    let mut units = world.query::<(Entity, &Unit, &Team, &Transform, &Health)>();
+    units
+        .iter(world)
+        .find_map(|(entity, unit, team, transform, health)| {
+            (health.current > 0.0
+                && relations.are_enemies(player_team, *team)
+                && is_worker_elimination_anchor(unit))
+            .then_some((entity, transform.translation))
+        })
 }
 
 fn cleanup_match_scoped_entities(
@@ -30039,6 +30262,24 @@ mod tests {
                 || advanced.human.units != initial.human.units
                 || advanced.demon.units != initial.demon.units,
             "capture stats should reflect live economy or unit simulation changes"
+        );
+    }
+
+    #[test]
+    fn capture_match_proof_finishes_default_playable_match() {
+        let proof = run_capture_default_match_proof(7200);
+
+        assert!(
+            proof.succeeded(),
+            "capture match proof should finish the default playable match; proof={proof:?}"
+        );
+        assert!(
+            proof.produced_tanks >= 6,
+            "capture proof should exercise production before victory; proof={proof:?}"
+        );
+        assert!(
+            proof.enemy_structures_destroyed > 0,
+            "capture proof should destroy enemy anchors through combat; proof={proof:?}"
         );
     }
 

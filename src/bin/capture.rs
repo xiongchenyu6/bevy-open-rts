@@ -7,7 +7,7 @@ use std::{
 
 use bevy_open_rts::{
     CaptureEntityKind, CaptureMatchPhase, CaptureMatchSnapshot, CaptureTeam, advance_capture_match,
-    build_capture_match_app, capture_match_snapshot,
+    build_capture_match_app, capture_match_snapshot, run_capture_default_match_proof,
 };
 
 const WIDTH: u32 = 1280;
@@ -88,6 +88,32 @@ fn run() -> Result<(), String> {
             render_frames(&directory, count)?;
             println!("[capture] wrote {count} frames to {}", directory.display());
         }
+        Some("match-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("7200")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let proof = run_capture_default_match_proof(max_frames);
+            println!(
+                "[capture] match-proof phase={:?} frames={} elapsed={}s produced_tanks={} human_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
+                proof.phase,
+                proof.frames,
+                proof.elapsed_seconds,
+                proof.produced_tanks,
+                proof.human_units,
+                proof.enemy_units_destroyed,
+                proof.enemy_structures_destroyed,
+                proof.remaining_teams,
+                proof.remaining_anchors
+            );
+            if !proof.succeeded() {
+                return Err(format!(
+                    "match proof did not reach player victory within {max_frames} frames"
+                ));
+            }
+        }
         Some("help" | "-h" | "--help") => {
             print_help();
         }
@@ -105,6 +131,7 @@ fn print_help() {
     println!("  cargo run --bin capture");
     println!("  cargo run --bin capture -- screenshot screenshots/capture/still.png");
     println!("  cargo run --bin capture -- frames screenshots/result/1 450");
+    println!("  cargo run --bin capture -- match-proof 7200");
 }
 
 fn render_still(path: &Path, frame: usize) -> Result<(), String> {
