@@ -40848,7 +40848,7 @@ mod tests {
         press_key(&mut app, KeyCode::Enter, 3);
 
         assert_eq!(app_screen(&app), AppScreen::InMatch);
-        let (command_center, _, _, constructed) =
+        let (command_center, _, command_center_position, constructed) =
             structure_snapshots_by_id(&mut app, "CommandCenter")
                 .into_iter()
                 .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
@@ -40863,15 +40863,19 @@ mod tests {
             .entity_mut(rally_target)
             .insert((VisibilityState { visible: true }, Visibility::Visible));
 
-        select_only_entities(&mut app, &[command_center]);
-        app.update();
-
-        let (rally_button, _, _) =
-            enabled_command_slot_for_action(&mut app, BuildAction::SetRallyPoint);
-        click_command_button(&mut app, rally_button);
+        attach_test_window_to_main_camera(&mut app, command_center_position);
+        click_selection_at_world(&mut app, command_center_position, false);
         assert!(
-            app.world().resource::<CommandMode>().rally_point,
-            "clicking the CommandCenter rally command should arm rally targeting"
+            app.world()
+                .entity(command_center)
+                .get::<Selected>()
+                .is_some(),
+            "left-clicking the visible CommandCenter should select it before setting a friendly-unit rally point"
+        );
+        app.update();
+        assert!(
+            !app.world().resource::<CommandMode>().rally_point,
+            "plain right-click friendly-unit rally should not require arming explicit rally mode"
         );
 
         attach_test_window_to_main_camera(&mut app, rally_target_position);
@@ -40884,7 +40888,7 @@ mod tests {
         assert_eq!(
             rally_point.target_unit,
             Some(rally_target),
-            "right-clicking a friendly unit in rally mode should track that unit"
+            "plain right-clicking a friendly unit with a selected CommandCenter should track that unit"
         );
         assert!(
             rally_point
