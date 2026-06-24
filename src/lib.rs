@@ -42342,6 +42342,72 @@ mod tests {
     }
 
     #[test]
+    fn default_menu_control_group_hotkeys_recall_and_focus_mouse_selected_units() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let scout = first_unit_by_id(&mut app, Team::Human, "ScoutRover")
+            .expect("default playable skirmish should spawn a player ScoutRover");
+        let worker = first_unit_by_id(&mut app, Team::Human, "Worker")
+            .expect("default playable skirmish should spawn a player Worker");
+        let group_entities = [scout, worker];
+        mouse_select_entities(
+            &mut app,
+            &group_entities,
+            "left-click plus Shift-left-click should select the default control group members",
+        );
+
+        press_selection_keys(&mut app, &[KeyCode::ControlLeft, KeyCode::Digit1]);
+        app.update();
+        assert_eq!(
+            app.world().resource::<UnitGroups>().slots[0],
+            group_entities,
+            "Ctrl+1 should store the mouse-selected default units in control group 1"
+        );
+
+        let expected_focus = (unit_position(&app, scout) + unit_position(&app, worker)) * 0.5;
+        let bounds = *app.world().resource::<MapBounds>();
+        let away_focus = safe_camera_focus(
+            Vec3::new(bounds.half_width - 1.0, 0.0, bounds.half_depth - 1.0),
+            bounds,
+        );
+        assert!(
+            xz_distance(away_focus, expected_focus) > 1.0,
+            "default control group focus fixture should start away from the stored group"
+        );
+        for entity in group_entities {
+            app.world_mut().entity_mut(entity).remove::<Selected>();
+        }
+        app.world_mut().resource_mut::<RtsCamera>().focus = away_focus;
+
+        press_selection_keys(&mut app, &[KeyCode::Digit1]);
+        app.update();
+        for entity in group_entities {
+            assert!(
+                app.world().entity(entity).get::<Selected>().is_some(),
+                "pressing 1 should recall the stored default control group"
+            );
+        }
+        assert!(
+            xz_distance(app.world().resource::<RtsCamera>().focus, away_focus) < 0.01,
+            "first control group recall should preserve the current camera focus"
+        );
+
+        press_selection_keys(&mut app, &[KeyCode::Digit1]);
+        app.update();
+        assert!(
+            xz_distance(app.world().resource::<RtsCamera>().focus, expected_focus) < 0.01,
+            "second control group recall should focus the camera on the stored default group"
+        );
+    }
+
+    #[test]
     fn default_menu_player_can_train_helicopter_and_strike_enemy_anchor() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
