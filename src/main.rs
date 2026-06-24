@@ -26287,6 +26287,54 @@ mod tests {
         app
     }
 
+    fn ai_pressure_match_test_app() -> App {
+        let mut app = App::new();
+        app.add_plugins((
+            MinimalPlugins,
+            AssetPlugin {
+                meta_check: AssetMetaCheck::Never,
+                ..default()
+            },
+            bevy::world_serialization::WorldSerializationPlugin,
+        ))
+        .insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ))
+        .init_asset::<WorldAsset>()
+        .insert_resource(VisiblePlayer::per_player(Team::Human))
+        .insert_resource(MatchFlow { active: true })
+        .insert_resource(ActiveTeams([true, true, false]))
+        .init_resource::<Economies>()
+        .init_resource::<NextSpawnId>()
+        .init_resource::<AiDirector>()
+        .init_resource::<AiDifficultySettings>()
+        .init_resource::<PlayerFactions>()
+        .init_resource::<MapBounds>()
+        .init_resource::<TeamRelations>()
+        .init_resource::<SupportCooldowns>()
+        .init_resource::<BattleLog>()
+        .init_resource::<AudioFeedback>()
+        .init_resource::<KillCredits>()
+        .init_resource::<MatchState>()
+        .init_resource::<LatestBattleEvent>()
+        .add_systems(
+            Update,
+            (
+                advance_test_time,
+                ai_director,
+                restore_ai_attack_wave_orders,
+                chase_attack_targets,
+                move_units,
+                combat,
+                cleanup_dead_entities,
+                apply_kill_credits,
+                evaluate_match_end,
+            )
+                .chain(),
+        );
+        app
+    }
+
     fn enabled_command_slot_for_action(
         app: &mut App,
         target: BuildAction,
@@ -38505,6 +38553,82 @@ mod tests {
             match_state.phase,
             MatchPhase::HumanVictory,
             "destroying the enemy anchor through player orders should finish the match"
+        );
+    }
+
+    #[test]
+    fn ai_opponent_produces_attack_wave_and_can_destroy_player_base() {
+        let mut app = ai_pressure_match_test_app();
+        let human_command_center =
+            spawn_test_structure(&mut app, "CommandCenter", Team::Human, Vec3::ZERO);
+        spawn_test_structure(
+            &mut app,
+            "CommandCenter",
+            Team::Demon,
+            Vec3::new(9.0, 0.0, 0.0),
+        );
+        spawn_test_structure(
+            &mut app,
+            "VehicleFactory",
+            Team::Demon,
+            Vec3::new(7.0, 0.0, 0.0),
+        );
+        let profile = team_ai_profile_for_difficulty(Team::Demon, AiDifficulty::Normal);
+        for index in 0..profile.expected_workers {
+            spawn_test_unit(
+                &mut app,
+                "Worker",
+                Team::Demon,
+                Vec3::new(8.0 + index as f32 * 0.4, 0.0, 1.2),
+            );
+        }
+        for index in 0..profile.expected_ore_harvesters {
+            spawn_test_unit(
+                &mut app,
+                "OreHarvester",
+                Team::Demon,
+                Vec3::new(8.0 + index as f32 * 0.5, 0.0, -1.2),
+            );
+        }
+        {
+            let mut economies = app.world_mut().resource_mut::<Economies>();
+            let demon = economies.get_mut(Team::Demon);
+            demon.ore = 10_000;
+            demon.crystal = 10_000;
+        }
+
+        set_ai_director_production_refresh_only(&mut app, Team::Demon);
+        app.update();
+
+        let ai_tank = first_unit_by_id(&mut app, Team::Demon, "Tank")
+            .expect("AI production refresh should train a Demon tank from its VehicleFactory");
+        set_ai_director_attack_refresh_only(&mut app, Team::Demon);
+        app.update();
+
+        assert_eq!(
+            app.world()
+                .entity(ai_tank)
+                .get::<AttackOrder>()
+                .map(|order| order.target),
+            Some(human_command_center),
+            "AI attack refresh should assign produced combat units to attack the player anchor"
+        );
+
+        for _ in 0..32 {
+            app.update();
+            if app.world().resource::<MatchState>().phase == MatchPhase::HumanDefeat {
+                break;
+            }
+        }
+
+        assert!(
+            app.world().get_entity(human_command_center).is_err(),
+            "AI-produced attack wave should destroy the player's command center"
+        );
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::HumanDefeat,
+            "losing the player anchor to AI pressure should finish the match as defeat"
         );
     }
 
