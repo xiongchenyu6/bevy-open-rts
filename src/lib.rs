@@ -40745,6 +40745,228 @@ mod tests {
         );
     }
 
+    fn build_structure_from_worker_via_menu(
+        app: &mut App,
+        worker: Entity,
+        team: Team,
+        id: &'static str,
+    ) -> (Entity, Vec3) {
+        let worker_position = unit_position(app, worker);
+        attach_test_window_to_main_camera(app, worker_position);
+        click_selection_at_world(app, worker_position, false);
+        assert!(
+            app.world().entity(worker).get::<Selected>().is_some(),
+            "left-clicking the Worker should select it before opening the {id} build command"
+        );
+        app.update();
+
+        let (build_button, _, _) = enabled_command_slot_for_action(app, BuildAction::Build(id));
+        click_command_button(app, build_button);
+        assert!(
+            app.world()
+                .resource::<CommandMode>()
+                .pending_structure_placement
+                .is_some_and(|pending| pending.id == id),
+            "clicking the Worker {id} command should enter placement mode"
+        );
+
+        let placement = valid_structure_placement_point_near_team_base(app, team, id);
+        attach_test_window_to_main_camera(app, placement);
+        left_click_world_at(app, placement);
+        assert!(
+            app.world()
+                .resource::<CommandMode>()
+                .pending_structure_placement
+                .is_none(),
+            "placing a valid {id} blueprint should leave placement mode"
+        );
+        let (structure, _, structure_position, constructed) = structure_snapshots_by_id(app, id)
+            .into_iter()
+            .find(|(_, structure_team, position, constructed)| {
+                *structure_team == team && !*constructed && xz_distance(*position, placement) < 0.05
+            })
+            .unwrap_or_else(|| {
+                panic!("left-clicking a valid placement should spawn an unfinished {id}")
+            });
+        assert!(!constructed);
+
+        app.world_mut()
+            .entity_mut(structure)
+            .insert((VisibilityState { visible: true }, Visibility::Visible));
+        let worker_position = unit_position(app, worker);
+        attach_test_window_to_main_camera(app, worker_position);
+        click_selection_at_world(app, worker_position, false);
+        assert!(
+            app.world().entity(worker).get::<Selected>().is_some(),
+            "left-clicking the Worker after {id} placement should select it for construction"
+        );
+        attach_test_window_to_main_camera(app, structure_position);
+        right_click_order_at_world(app, structure_position);
+        assert!(
+            app.world()
+                .entity(worker)
+                .get::<ConstructOrder>()
+                .is_some_and(|order| order.target == structure),
+            "right-clicking the unfinished {id} with a selected Worker should issue ConstructOrder"
+        );
+
+        for _ in 0..120 {
+            app.update();
+            if structure_snapshots_by_id(app, id).into_iter().any(
+                |(entity, structure_team, _, constructed)| {
+                    entity == structure && structure_team == team && constructed
+                },
+            ) {
+                break;
+            }
+        }
+        assert!(
+            structure_snapshots_by_id(app, id).into_iter().any(
+                |(entity, structure_team, _, constructed)| {
+                    entity == structure && structure_team == team && constructed
+                }
+            ),
+            "Worker construction should complete the placed {id}"
+        );
+
+        (structure, structure_position)
+    }
+
+    #[test]
+    fn four_corners_menu_human_can_unlock_engineer_and_capture_tech_oil() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Digit2, 1);
+        press_key(&mut app, KeyCode::Enter, 3);
+        for _ in 0..3 {
+            app.update();
+        }
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        assert_eq!(
+            app.world().resource::<SelectedSkirmishMap>().godot_path,
+            SKIRMISH_MAPS[1].godot_path,
+            "Digit2 should start the FourCorners runtime map with neutral tech"
+        );
+        let worker = first_unit_by_id(&mut app, Team::Human, "Worker")
+            .expect("FourCorners playable skirmish should spawn a player Worker");
+        let (command_center, _, command_center_position, constructed) =
+            structure_snapshots_by_id(&mut app, "CommandCenter")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .expect("FourCorners should spawn a constructed player CommandCenter");
+        assert!(constructed);
+
+        let (_radar, _) =
+            build_structure_from_worker_via_menu(&mut app, worker, Team::Human, "RadarUplink");
+        let (_robotics, _) =
+            build_structure_from_worker_via_menu(&mut app, worker, Team::Human, "RoboticsBay");
+
+        let engineers_before = unit_entities_by_id(&mut app, Team::Human, "EngineerDrone");
+        attach_test_window_to_main_camera(&mut app, command_center_position);
+        click_selection_at_world(&mut app, command_center_position, false);
+        assert!(
+            app.world()
+                .entity(command_center)
+                .get::<Selected>()
+                .is_some(),
+            "left-clicking the CommandCenter should select it before training EngineerDrone"
+        );
+        app.update();
+        let (engineer_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("EngineerDrone"));
+        click_command_button(&mut app, engineer_button);
+        for _ in 0..180 {
+            app.update();
+            if unit_entities_by_id(&mut app, Team::Human, "EngineerDrone").len()
+                > engineers_before.len()
+            {
+                break;
+            }
+        }
+        let engineer = unit_entities_by_id(&mut app, Team::Human, "EngineerDrone")
+            .into_iter()
+            .find(|entity| !engineers_before.contains(entity))
+            .expect("CommandCenter should produce an EngineerDrone after RadarUplink and RoboticsBay are built");
+
+        let (oil, _, oil_position, constructed) =
+            structure_snapshots_by_id(&mut app, "TechOilDerrick")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Neutral && *constructed)
+                .expect("FourCorners should spawn a neutral TechOilDerrick");
+        assert!(constructed);
+
+        let engineer_position = unit_position(&app, engineer);
+        attach_test_window_to_main_camera(&mut app, engineer_position);
+        click_selection_at_projected_world(&mut app, engineer_position, false);
+        assert!(
+            app.world().entity(engineer).get::<Selected>().is_some(),
+            "left-clicking the EngineerDrone should select it before the capture order"
+        );
+
+        let oil_def = registry::entity("TechOilDerrick").expect("tech oil definition should exist");
+        let ore_before = app.world().resource::<Economies>().get(Team::Human).ore;
+        app.world_mut()
+            .entity_mut(oil)
+            .insert((VisibilityState { visible: true }, Visibility::Visible));
+        attach_test_window_to_main_camera(&mut app, oil_position);
+        right_click_order_at_world(&mut app, Vec3::new(oil_position.x, 0.0, oil_position.z));
+
+        let engineer_order_debug = {
+            let engineer_ref = app.world().entity(engineer);
+            let selected = engineer_ref.get::<Selected>().is_some();
+            let capture = engineer_ref.get::<CaptureOrder>().map(|order| order.target);
+            let attack = engineer_ref.get::<AttackOrder>().map(|order| order.target);
+            let movement = engineer_ref.get::<MoveOrder>().map(|order| order.target);
+            format!("selected={selected} capture={capture:?} attack={attack:?} move={movement:?}")
+        };
+        let oil_debug = {
+            let oil_ref = app.world().entity(oil);
+            let team = oil_ref
+                .get::<Team>()
+                .copied()
+                .expect("TechOilDerrick should keep team");
+            let visible = oil_ref
+                .get::<VisibilityState>()
+                .is_some_and(|visibility| visibility.visible);
+            let health = oil_ref.get::<Health>().map_or(0.0, |health| health.current);
+            format!("team={team:?} visible={visible} health={health}")
+        };
+        assert!(
+            app.world()
+                .entity(engineer)
+                .get::<CaptureOrder>()
+                .is_some_and(|order| order.target == oil),
+            "right-clicking a visible neutral TechOilDerrick should issue CaptureOrder; engineer={engineer_order_debug}; oil={oil_debug}"
+        );
+
+        for _ in 0..240 {
+            app.update();
+            if structure_team(&app, oil) == Team::Human {
+                break;
+            }
+        }
+
+        assert_eq!(
+            structure_team(&app, oil),
+            Team::Human,
+            "EngineerDrone should capture the ordered FourCorners TechOilDerrick"
+        );
+        assert!(
+            app.world().get_entity(engineer).is_err(),
+            "EngineerDrone should be consumed after capturing neutral tech"
+        );
+        assert!(
+            app.world().resource::<Economies>().get(Team::Human).ore
+                >= ore_before + oil_def.capture_bonus_ore,
+            "capturing TechOilDerrick should grant its ore capture bonus"
+        );
+    }
+
     fn selected_race_worker_right_click_visible_ore_and_deliver(player_team: Team) {
         let selection = skirmish_menu_selection(
             0,
