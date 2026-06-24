@@ -28702,6 +28702,16 @@ mod tests {
             .count()
     }
 
+    fn minimap_status_text(app: &mut App) -> String {
+        let world = app.world_mut();
+        let mut query = world.query_filtered::<&Text, With<MinimapStatusText>>();
+        query
+            .single(world)
+            .expect("minimap render test should have one status text")
+            .0
+            .clone()
+    }
+
     fn structure_destruction_vfx_kinds(app: &mut App) -> Vec<StructureDestructionVfxKind> {
         let world = app.world_mut();
         let mut query = world.query::<&StructureDestructionVfx>();
@@ -47012,6 +47022,61 @@ mod tests {
         );
         assert_eq!(minimap_radar_state(true, true), MinimapRadarState::LowPower);
         assert_eq!(minimap_radar_state(true, false), MinimapRadarState::Online);
+    }
+
+    #[test]
+    fn minimap_radar_status_follows_runtime_visible_player_like_godot() {
+        let mut app = minimap_render_test_app();
+
+        app.update();
+        assert_eq!(
+            minimap_status_text(&mut app),
+            "",
+            "default human minimap should start online with the test radar"
+        );
+
+        app.insert_resource(VisiblePlayer::per_player(Team::Demon));
+        app.update();
+        assert_eq!(
+            minimap_status_text(&mut app),
+            MinimapRadarState::MissingRadar.status_text(),
+            "runtime perspective switching should make minimap radar state follow the new visible player"
+        );
+
+        let demon_radar = spawn_test_structure(
+            &mut app,
+            "RadarUplink",
+            Team::Demon,
+            Vec3::new(3.0, 0.0, 0.0),
+        );
+        app.world_mut()
+            .entity_mut(demon_radar)
+            .insert(VisibilityState { visible: true });
+        {
+            let mut economies = app.world_mut().resource_mut::<Economies>();
+            let demon = economies.get_mut(Team::Demon);
+            demon.power_capacity = 0;
+            demon.power_used = 3;
+        }
+        app.update();
+        assert_eq!(
+            minimap_status_text(&mut app),
+            MinimapRadarState::LowPower.status_text(),
+            "minimap should read the focused player's low-power state, not the previous player's radar"
+        );
+
+        {
+            let mut economies = app.world_mut().resource_mut::<Economies>();
+            let demon = economies.get_mut(Team::Demon);
+            demon.power_capacity = 4;
+            demon.power_used = 3;
+        }
+        app.update();
+        assert_eq!(
+            minimap_status_text(&mut app),
+            "",
+            "restored power on the current visible player should bring that player's minimap back online"
+        );
     }
 
     #[test]
