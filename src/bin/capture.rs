@@ -53,6 +53,12 @@ impl Vec2 {
     }
 }
 
+#[derive(Clone, Copy)]
+struct CaptureView {
+    center: Vec2,
+    scale: f32,
+}
+
 fn main() {
     if let Err(error) = run() {
         eprintln!("[capture] error: {error}");
@@ -202,7 +208,7 @@ fn render_still(path: &Path, frame: usize) -> Result<(), String> {
     let mut app = build_capture_match_app();
     advance_capture_match(&mut app, frame);
     let snapshot = capture_match_snapshot(&mut app);
-    let pixels = render_frame(frame, 90, &snapshot);
+    let pixels = render_frame(frame, 90, &snapshot, Some(CaptureTeam::Human));
     write_png(path, WIDTH, HEIGHT, &pixels)
 }
 
@@ -216,7 +222,7 @@ fn render_frames(directory: &Path, count: usize) -> Result<(), String> {
         }
         let path = directory.join(format!("frame{frame:05}.png"));
         let snapshot = capture_match_snapshot(&mut app);
-        let pixels = render_frame(frame, count.max(1), &snapshot);
+        let pixels = render_frame(frame, count.max(1), &snapshot, Some(CaptureTeam::Human));
         write_png(&path, WIDTH, HEIGHT, &pixels)?;
     }
     Ok(())
@@ -237,7 +243,12 @@ fn render_proof_frames(
         unit_peak = unit_peak.max(capture_proof_unit_count(&mut app, faction));
         let path = directory.join(format!("frame{frame:05}.png"));
         let snapshot = capture_match_snapshot(&mut app);
-        let pixels = render_frame(frame, count.max(1), &snapshot);
+        let pixels = render_frame(
+            frame,
+            count.max(1),
+            &snapshot,
+            Some(capture_team_for_faction(faction)),
+        );
         write_png(&path, WIDTH, HEIGHT, &pixels)?;
     }
     Ok(capture_match_proof_status(
@@ -246,6 +257,14 @@ fn render_proof_frames(
         count,
         unit_peak.saturating_sub(units_before),
     ))
+}
+
+fn capture_team_for_faction(faction: CaptureProofFaction) -> CaptureTeam {
+    match faction {
+        CaptureProofFaction::Human => CaptureTeam::Human,
+        CaptureProofFaction::Demon => CaptureTeam::Demon,
+        CaptureProofFaction::Chaos => CaptureTeam::Chaos,
+    }
 }
 
 fn write_png(path: &Path, width: u32, height: u32, pixels: &[u8]) -> Result<(), String> {
@@ -263,14 +282,20 @@ fn write_png(path: &Path, width: u32, height: u32, pixels: &[u8]) -> Result<(), 
         .map_err(|error| format!("could not write PNG data for {}: {error}", path.display()))
 }
 
-fn render_frame(frame: usize, total_frames: usize, snapshot: &CaptureMatchSnapshot) -> Vec<u8> {
+fn render_frame(
+    frame: usize,
+    total_frames: usize,
+    snapshot: &CaptureMatchSnapshot,
+    focus_team: Option<CaptureTeam>,
+) -> Vec<u8> {
     let mut pixels = vec![0; (WIDTH * HEIGHT * 4) as usize];
     clear(&mut pixels, Rgba::rgb(20, 31, 35));
 
     let seconds = frame as f32 / FPS;
+    let view = capture_view(snapshot, focus_team);
 
-    draw_ground(&mut pixels);
-    draw_snapshot(&mut pixels, snapshot, seconds);
+    draw_ground(&mut pixels, view);
+    draw_snapshot(&mut pixels, snapshot, seconds, view, focus_team);
     draw_ui(&mut pixels, frame, total_frames, snapshot);
     pixels
 }
@@ -284,7 +309,7 @@ fn clear(pixels: &mut [u8], color: Rgba) {
     }
 }
 
-fn draw_ground(pixels: &mut [u8]) {
+fn draw_ground(pixels: &mut [u8], view: CaptureView) {
     let horizon = 80;
     fill_rect(
         pixels,
@@ -296,18 +321,19 @@ fn draw_ground(pixels: &mut [u8]) {
     );
     fill_rect(pixels, 0, 0, WIDTH as i32, horizon, Rgba::rgb(9, 12, 14));
 
-    for i in -22..=22 {
-        let a = world_to_screen(Vec2::new(i as f32, -16.0));
-        let b = world_to_screen(Vec2::new(i as f32, 16.0));
+    let grid_extent = 44;
+    for i in -grid_extent..=grid_extent {
+        let a = world_to_screen(Vec2::new(i as f32, -grid_extent as f32), view);
+        let b = world_to_screen(Vec2::new(i as f32, grid_extent as f32), view);
         draw_line(pixels, a, b, Rgba::rgba(134, 152, 142, 54), 1.0);
-        let c = world_to_screen(Vec2::new(-16.0, i as f32));
-        let d = world_to_screen(Vec2::new(16.0, i as f32));
+        let c = world_to_screen(Vec2::new(-grid_extent as f32, i as f32), view);
+        let d = world_to_screen(Vec2::new(grid_extent as f32, i as f32), view);
         draw_line(pixels, c, d, Rgba::rgba(134, 152, 142, 54), 1.0);
     }
 }
 
-fn draw_base(pixels: &mut [u8], center: Vec2, color: Rgba, ring: Rgba) {
-    let screen = world_to_screen(center);
+fn draw_base(pixels: &mut [u8], center: Vec2, color: Rgba, ring: Rgba, view: CaptureView) {
+    let screen = world_to_screen(center, view);
     fill_iso_diamond(pixels, screen, 70.0, 34.0, Rgba::rgba(28, 35, 35, 180));
     fill_iso_diamond(pixels, screen, 55.0, 27.0, color);
     fill_iso_diamond(
@@ -328,13 +354,19 @@ fn draw_base(pixels: &mut [u8], center: Vec2, color: Rgba, ring: Rgba) {
     draw_ring(pixels, screen, 66.0, ring);
 }
 
-fn draw_snapshot(pixels: &mut [u8], snapshot: &CaptureMatchSnapshot, seconds: f32) {
+fn draw_snapshot(
+    pixels: &mut [u8],
+    snapshot: &CaptureMatchSnapshot,
+    seconds: f32,
+    view: CaptureView,
+    focus_team: Option<CaptureTeam>,
+) {
     for entity in snapshot
         .entities
         .iter()
         .filter(|entity| entity.kind == CaptureEntityKind::Resource)
     {
-        let screen = world_to_screen(Vec2::new(entity.x, entity.z));
+        let screen = world_to_screen(Vec2::new(entity.x, entity.z), view);
         let pulse = ((seconds * 3.0 + entity.x * 0.31 + entity.z * 0.17).sin() + 1.0) * 0.5;
         fill_circle(
             pixels,
@@ -351,7 +383,7 @@ fn draw_snapshot(pixels: &mut [u8], snapshot: &CaptureMatchSnapshot, seconds: f3
         .filter(|entity| entity.kind == CaptureEntityKind::Structure)
     {
         let (body, ring) = team_colors(entity.team, entity.visible);
-        draw_base(pixels, Vec2::new(entity.x, entity.z), body, ring);
+        draw_base(pixels, Vec2::new(entity.x, entity.z), body, ring, view);
     }
 
     for entity in snapshot
@@ -360,13 +392,14 @@ fn draw_snapshot(pixels: &mut [u8], snapshot: &CaptureMatchSnapshot, seconds: f3
         .filter(|entity| entity.kind == CaptureEntityKind::Unit)
     {
         let (body, ring) = team_colors(entity.team, entity.visible);
-        draw_unit(pixels, Vec2::new(entity.x, entity.z), body, ring);
+        draw_unit(pixels, Vec2::new(entity.x, entity.z), body, ring, view);
     }
 
     if let Some(target) = snapshot.entities.iter().find(|entity| {
-        entity.team == CaptureTeam::Demon && entity.kind == CaptureEntityKind::Structure
+        focus_team.is_some_and(|focus_team| is_enemy_capture_team(focus_team, entity.team))
+            && entity.kind == CaptureEntityKind::Structure
     }) {
-        let impact = world_to_screen(Vec2::new(target.x, target.z));
+        let impact = world_to_screen(Vec2::new(target.x, target.z), view);
         let pulse = ((seconds * 2.0) % 1.0) * 26.0;
         draw_ring(pixels, impact, 22.0 + pulse, Rgba::rgba(255, 88, 64, 150));
     }
@@ -394,8 +427,8 @@ fn team_colors(team: CaptureTeam, visible: bool) -> (Rgba, Rgba) {
     }
 }
 
-fn draw_unit(pixels: &mut [u8], world: Vec2, body: Rgba, ring: Rgba) {
-    let screen = world_to_screen(world);
+fn draw_unit(pixels: &mut [u8], world: Vec2, body: Rgba, ring: Rgba, view: CaptureView) {
+    let screen = world_to_screen(world, view);
     draw_ring(pixels, screen, 19.0, ring);
     fill_iso_diamond(
         pixels,
@@ -551,10 +584,106 @@ fn draw_team_status_row(
     );
 }
 
-fn world_to_screen(world: Vec2) -> Vec2 {
+fn capture_view(snapshot: &CaptureMatchSnapshot, focus_team: Option<CaptureTeam>) -> CaptureView {
+    let Some(focus_team) = focus_team else {
+        return CaptureView {
+            center: Vec2::new(0.0, 0.0),
+            scale: 28.0,
+        };
+    };
+    let focus_points = snapshot
+        .entities
+        .iter()
+        .filter(|entity| {
+            entity.team == focus_team
+                && matches!(
+                    entity.kind,
+                    CaptureEntityKind::Unit | CaptureEntityKind::Structure
+                )
+        })
+        .map(entity_position)
+        .collect::<Vec<_>>();
+    let mut center = average_point(&focus_points).unwrap_or(Vec2::new(0.0, 0.0));
+    if let Some(enemy) = nearest_enemy_point(snapshot, focus_team, center) {
+        center = center.lerp(enemy, 0.28);
+    }
+    let mut frame_points = focus_points
+        .iter()
+        .copied()
+        .filter(|point| world_distance(*point, center) <= 20.0)
+        .collect::<Vec<_>>();
+    if let Some(enemy) = nearest_enemy_point(snapshot, focus_team, center) {
+        frame_points.push(enemy);
+    }
+    if frame_points.is_empty() {
+        frame_points.push(center);
+    }
+    let radius = frame_points
+        .iter()
+        .map(|point| world_distance(*point, center))
+        .fold(6.0_f32, f32::max);
+    let scale = (220.0 / radius).clamp(24.0, 42.0);
+    CaptureView { center, scale }
+}
+
+fn entity_position(entity: &bevy_open_rts::CaptureEntitySnapshot) -> Vec2 {
+    Vec2::new(entity.x, entity.z)
+}
+
+fn average_point(points: &[Vec2]) -> Option<Vec2> {
+    if points.is_empty() {
+        return None;
+    }
+    let mut sum = Vec2::new(0.0, 0.0);
+    for point in points {
+        sum.x += point.x;
+        sum.y += point.y;
+    }
+    Some(Vec2::new(
+        sum.x / points.len() as f32,
+        sum.y / points.len() as f32,
+    ))
+}
+
+fn nearest_enemy_point(
+    snapshot: &CaptureMatchSnapshot,
+    focus_team: CaptureTeam,
+    from: Vec2,
+) -> Option<Vec2> {
+    snapshot
+        .entities
+        .iter()
+        .filter(|entity| {
+            is_enemy_capture_team(focus_team, entity.team)
+                && matches!(
+                    entity.kind,
+                    CaptureEntityKind::Structure | CaptureEntityKind::Unit
+                )
+        })
+        .map(entity_position)
+        .min_by(|lhs, rhs| {
+            world_distance(*lhs, from)
+                .partial_cmp(&world_distance(*rhs, from))
+                .unwrap_or(std::cmp::Ordering::Equal)
+        })
+}
+
+fn is_enemy_capture_team(focus_team: CaptureTeam, team: CaptureTeam) -> bool {
+    !matches!(team, CaptureTeam::Neutral) && team != focus_team
+}
+
+fn world_distance(a: Vec2, b: Vec2) -> f32 {
+    let dx = a.x - b.x;
+    let dy = a.y - b.y;
+    (dx * dx + dy * dy).sqrt()
+}
+
+fn world_to_screen(world: Vec2, view: CaptureView) -> Vec2 {
+    let local_x = world.x - view.center.x;
+    let local_y = world.y - view.center.y;
     Vec2::new(
-        WIDTH as f32 * 0.5 + (world.x - world.y) * 28.0,
-        110.0 + (world.x + world.y) * 15.0,
+        WIDTH as f32 * 0.5 + (local_x - local_y) * view.scale,
+        330.0 + (local_x + local_y) * view.scale * 0.54,
     )
 }
 

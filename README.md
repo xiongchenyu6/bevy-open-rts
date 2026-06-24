@@ -50,6 +50,7 @@ cargo run --bin capture -- proof-frames screenshots/result/2 900 human
 cargo run --bin capture -- match-proof 7200 human
 cargo run --bin capture -- match-proof 7200 demon
 cargo run --bin capture -- match-proof 7200 chaos
+scripts/capture_proof_bundle.sh human
 ```
 
 `match-proof` runs the same shared skirmish scene used by the real runtime,
@@ -57,7 +58,10 @@ accelerates faction-specific combat production through the real build queue,
 orders the attack group onto enemy anchors, and exits non-zero if the match does
 not reach player victory. `proof-frames` records that same proof flow as a PNG
 sequence for video encoding. The optional proof faction is `human`, `demon`, or
-`chaos`; it defaults to `human`.
+`chaos`; it defaults to `human`. `scripts/capture_proof_bundle.sh` writes the
+next `screenshots/result/N/` directory with the raw proof frames and a 30 fps
+`video.mp4`; pass an optional faction and frame count, for example
+`scripts/capture_proof_bundle.sh chaos 900`.
 
 ## Regenerate Migration Data
 
