@@ -13139,22 +13139,6 @@ fn desired_order_for_selected_unit(
     if let Some(target_position) = choices.supply_crate_position {
         return (unit.speed > 0.0).then_some(UnitQueuedOrder::Move(target_position));
     }
-    if let Some(target) = choices.resource_target
-        && can_unit_collect_resources(unit)
-    {
-        return (unit.speed > 0.0).then_some(UnitQueuedOrder::Harvest {
-            target,
-            state: HarvestState::MovingToResource,
-        });
-    }
-    if let Some(target) = choices.resource_dropoff_target
-        && can_unit_collect_resources(unit)
-    {
-        return Some(UnitQueuedOrder::Harvest {
-            target,
-            state: HarvestState::MovingToDropoff,
-        });
-    }
     if let Some(target) = choices.enemy_target {
         if context.enemy_target_capturable && can_unit_capture(unit) {
             return Some(UnitQueuedOrder::Capture(target));
@@ -13170,6 +13154,22 @@ fn desired_order_for_selected_unit(
         && can_unit_construct_structures(unit)
     {
         return Some(UnitQueuedOrder::Construct(target));
+    }
+    if let Some(target) = choices.resource_target
+        && can_unit_collect_resources(unit)
+    {
+        return (unit.speed > 0.0).then_some(UnitQueuedOrder::Harvest {
+            target,
+            state: HarvestState::MovingToResource,
+        });
+    }
+    if let Some(target) = choices.resource_dropoff_target
+        && can_unit_collect_resources(unit)
+    {
+        return Some(UnitQueuedOrder::Harvest {
+            target,
+            state: HarvestState::MovingToDropoff,
+        });
     }
     if let Some(target) = choices.garrison_target
         && can_unit_garrison(unit)
@@ -27953,6 +27953,44 @@ mod tests {
         targets
     }
 
+    fn construct_target_at(app: &mut App, team: Team, point: Vec3) -> Option<Entity> {
+        let world = app.world_mut();
+        let mut selectable_q = world.query::<SelectableOrderTargetItem<'_>>();
+        let mut best = None;
+        let mut best_distance = f32::MAX;
+        for (
+            entity,
+            transform,
+            selectable,
+            target_team,
+            visibility,
+            resource_node,
+            supply_crate,
+            health,
+            _unit,
+            structure,
+            under_construction,
+        ) in selectable_q.iter(world)
+        {
+            if !visibility.visible
+                || *target_team != team
+                || resource_node.is_some()
+                || supply_crate.is_some()
+                || health.is_none_or(|health| health.current <= 0.0)
+                || structure.is_none()
+                || under_construction.is_none()
+            {
+                continue;
+            }
+            let distance = xz_distance(transform.translation, point);
+            if distance <= selectable.radius + 0.45 && distance < best_distance {
+                best = Some(entity);
+                best_distance = distance;
+            }
+        }
+        best
+    }
+
     fn select_only_entities(app: &mut App, entities: &[Entity]) {
         let selected = {
             let world = app.world_mut();
@@ -28883,6 +28921,11 @@ mod tests {
                 "order click test cursor {cursor:?} should not hit command controls"
             );
         }
+        let ground_position = ground_position_for_selection_cursor(app);
+        assert!(
+            xz_distance(ground_position, position) < 0.05,
+            "order click test cursor projected to {ground_position:?}, expected {position:?}"
+        );
         {
             let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
             mouse.press(MouseButton::Right);
@@ -38990,6 +39033,48 @@ mod tests {
     }
 
     #[test]
+    fn worker_construct_target_beats_nearby_resource_snap() {
+        let resource = test_entity(93);
+        let construct = test_entity(94);
+        let destination = Vec3::new(4.0, 0.0, -2.0);
+        let choices = OrderTargetChoices {
+            supply_crate_position: None,
+            resource_target: Some(resource),
+            resource_dropoff_target: None,
+            enemy_target: None,
+            repair_target: None,
+            construct_target: Some(construct),
+            garrison_target: None,
+            follow_target: None,
+        };
+        let context = UnitOrderContext {
+            force_move: false,
+            enemy_target_capturable: false,
+            attack_move: false,
+            patrol: false,
+            origin: Vec3::ZERO,
+            point: destination,
+            offset: Vec3::ZERO,
+        };
+
+        let worker_order = desired_order_for_selected_unit(&test_unit("Worker"), choices, context);
+        assert!(
+            matches!(worker_order, Some(UnitQueuedOrder::Construct(target)) if target == construct),
+            "workers should build the clicked unfinished structure instead of being stolen by loose resource snapping"
+        );
+
+        let harvester_order =
+            desired_order_for_selected_unit(&test_unit("OreHarvester"), choices, context);
+        assert!(
+            matches!(harvester_order, Some(UnitQueuedOrder::Harvest {
+                target,
+                state: HarvestState::MovingToResource
+            }) if target == resource),
+            "dedicated harvesters should still harvest when they cannot construct the clicked building"
+        );
+    }
+
+    #[test]
     fn right_click_near_resource_orders_selected_workers_to_harvest() {
         let mut app = issue_orders_click_test_app(VisiblePlayer::per_player(Team::Human));
         let worker = spawn_test_unit(&mut app, "Worker", Team::Human, Vec3::ZERO);
@@ -39402,6 +39487,144 @@ mod tests {
         assert!(
             unit_count_by_id(&mut app, Team::Human, "LightRifleInfantry") > infantry_before,
             "the newly constructed Barracks should train at least one LightRifleInfantry"
+        );
+    }
+
+    #[test]
+    fn chaos_menu_worker_can_build_barracks_and_train_faction_infantry() {
+        let selection = skirmish_menu_selection(
+            0,
+            Team::Chaos,
+            DEFAULT_STARTING_RESOURCE_INDEX,
+            SkirmishMatchMode::OneVsOne,
+            AiDifficulty::Beginner,
+        );
+        let mut app = stateful_match_flow_test_app(selection.match_setup());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        assert_eq!(app.world().resource::<VisiblePlayer>().team, Team::Chaos);
+        assert_eq!(
+            app.world()
+                .resource::<PlayerFactions>()
+                .slot_faction(Team::Chaos),
+            SkirmishFaction::Chaos
+        );
+        let worker = first_unit_by_id(&mut app, Team::Chaos, "Worker")
+            .expect("Chaos skirmish should spawn a player Worker");
+        select_only_entities(&mut app, &[worker]);
+        app.update();
+
+        let (build_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Build("Barracks"));
+        click_command_button(&mut app, build_button);
+        assert_eq!(
+            app.world()
+                .resource::<CommandMode>()
+                .pending_structure_placement,
+            Some(PendingStructurePlacement::new("Barracks")),
+            "clicking the Chaos Worker Barracks command should enter placement mode"
+        );
+
+        let placement =
+            valid_structure_placement_point_near_team_base(&mut app, Team::Chaos, "Barracks");
+        attach_test_window_to_main_camera(&mut app, placement);
+        left_click_world_at(&mut app, placement);
+        let (new_barracks, _, barracks_position, constructed) =
+            structure_snapshots_by_id(&mut app, "Barracks")
+                .into_iter()
+                .find(|(_, team, position, constructed)| {
+                    *team == Team::Chaos
+                        && !*constructed
+                        && xz_distance(*position, placement) < 0.05
+                })
+                .expect("Chaos placement should spawn an unfinished Barracks");
+        assert!(!constructed);
+
+        select_only_entities(&mut app, &[worker]);
+        app.world_mut()
+            .entity_mut(new_barracks)
+            .insert((VisibilityState { visible: true }, Visibility::Visible));
+        assert_eq!(
+            construct_target_at(&mut app, Team::Chaos, barracks_position),
+            Some(new_barracks),
+            "unfinished Chaos Barracks should be a direct construct target before right-click"
+        );
+        assert!(
+            app.world()
+                .resource::<CommandMode>()
+                .pending_structure_placement
+                .is_none(),
+            "successful Chaos Barracks placement should leave placement mode before construction orders"
+        );
+        attach_test_window_to_main_camera(&mut app, barracks_position);
+        right_click_order_at_world(&mut app, barracks_position);
+        let worker_ref = app.world().entity(worker);
+        let worker_construct_target = worker_ref.get::<ConstructOrder>().map(|order| order.target);
+        let worker_move_target = worker_ref.get::<MoveOrder>().map(|order| order.target);
+        let target_ref = app.world().entity(new_barracks);
+        let target_team = *target_ref
+            .get::<Team>()
+            .expect("unfinished Barracks should have a team");
+        let target_visible = target_ref
+            .get::<VisibilityState>()
+            .is_some_and(|visibility| visibility.visible);
+        let target_under_construction = target_ref.get::<UnderConstruction>().is_some();
+        let target_radius = target_ref
+            .get::<Selectable>()
+            .map_or(0.0, |selectable| selectable.radius);
+        assert!(
+            worker_construct_target == Some(new_barracks),
+            "right-clicking the unfinished Chaos Barracks should issue ConstructOrder; construct_target={worker_construct_target:?} move_target={worker_move_target:?} target_team={target_team:?} visible={target_visible} under_construction={target_under_construction} distance={} radius={target_radius}",
+            xz_distance(barracks_position, placement)
+        );
+
+        for _ in 0..120 {
+            app.update();
+            if structure_snapshots_by_id(&mut app, "Barracks")
+                .into_iter()
+                .any(|(entity, team, _, constructed)| {
+                    entity == new_barracks && team == Team::Chaos && constructed
+                })
+            {
+                break;
+            }
+        }
+        assert!(
+            structure_snapshots_by_id(&mut app, "Barracks")
+                .into_iter()
+                .any(|(entity, team, _, constructed)| {
+                    entity == new_barracks && team == Team::Chaos && constructed
+                }),
+            "Chaos Worker construction should complete the placed Barracks"
+        );
+
+        let medics_before = unit_count_by_id(&mut app, Team::Chaos, "FieldMedic");
+        select_only_entities(&mut app, &[new_barracks]);
+        app.update();
+        let (medic_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("FieldMedic"));
+        assert!(
+            faction_def(SkirmishFaction::Chaos)
+                .and_then(|faction| faction.production_for("Barracks"))
+                .is_some_and(|products| !products.contains(&"LightRifleInfantry")),
+            "Chaos Barracks should not fall back to the Alliance infantry roster"
+        );
+        click_command_button(&mut app, medic_button);
+        for _ in 0..120 {
+            app.update();
+            if unit_count_by_id(&mut app, Team::Chaos, "FieldMedic") > medics_before {
+                break;
+            }
+        }
+        assert!(
+            unit_count_by_id(&mut app, Team::Chaos, "FieldMedic") > medics_before,
+            "the newly constructed Chaos Barracks should train at least one FieldMedic"
         );
     }
 
