@@ -3739,43 +3739,56 @@ pub fn enter_shared_match_scene(app: &mut App) {
 
 pub fn build_game_app(mode: GameAppMode) -> App {
     let mut app = App::new();
-    let primary_window = match mode {
-        GameAppMode::Interactive => Some(Window {
-            title: "Bevy Open RTS".to_string(),
-            resolution: WindowResolution::new(1280, 720),
-            canvas: Some("#bevy-canvas".to_string()),
-            fit_canvas_to_parent: true,
-            prevent_default_event_handling: true,
-            ..default()
-        }),
-        GameAppMode::Headless => None,
-    };
-    let plugin_group = DefaultPlugins
-        .set(WindowPlugin {
-            primary_window,
-            exit_condition: match mode {
-                GameAppMode::Interactive => bevy::window::ExitCondition::OnPrimaryClosed,
-                GameAppMode::Headless => bevy::window::ExitCondition::DontExit,
-            },
-            ..default()
-        })
-        .set(AssetPlugin {
-            meta_check: AssetMetaCheck::Never,
-            ..default()
-        })
-        .set(bevy::log::LogPlugin {
-            filter: format!(
-                "{},bevy_ecs::world::command_queue=error,icu_provider=error,icu_segmenter=error,parley=error",
-                bevy::log::DEFAULT_FILTER
-            ),
-            ..default()
-        });
-    let plugin_group = match mode {
-        GameAppMode::Interactive => plugin_group,
-        GameAppMode::Headless => plugin_group.disable::<bevy::winit::WinitPlugin>(),
+    match mode {
+        GameAppMode::Interactive => {
+            app.add_plugins(
+                DefaultPlugins
+                    .set(WindowPlugin {
+                        primary_window: Some(Window {
+                            title: "Bevy Open RTS".to_string(),
+                            resolution: WindowResolution::new(1280, 720),
+                            canvas: Some("#bevy-canvas".to_string()),
+                            fit_canvas_to_parent: true,
+                            prevent_default_event_handling: true,
+                            ..default()
+                        }),
+                        exit_condition: bevy::window::ExitCondition::OnPrimaryClosed,
+                        ..default()
+                    })
+                    .set(AssetPlugin {
+                        meta_check: AssetMetaCheck::Never,
+                        ..default()
+                    })
+                    .set(bevy::log::LogPlugin {
+                        filter: format!(
+                            "{},bevy_ecs::world::command_queue=error,icu_provider=error,icu_segmenter=error,parley=error",
+                            bevy::log::DEFAULT_FILTER
+                        ),
+                        ..default()
+                    }),
+            );
+        }
+        GameAppMode::Headless => {
+            app.add_plugins((
+                MinimalPlugins,
+                bevy::state::app::StatesPlugin,
+                AssetPlugin {
+                    meta_check: AssetMetaCheck::Never,
+                    ..default()
+                },
+                bevy::gizmos::GizmoPlugin,
+            ))
+            .add_message::<MouseMotion>()
+            .add_message::<MouseWheel>()
+            .init_resource::<Assets<Mesh>>()
+            .init_resource::<Assets<StandardMaterial>>()
+            .init_asset::<bevy::mesh::skinning::SkinnedMeshInverseBindposes>()
+            .init_asset::<WorldAsset>()
+            .init_asset::<Font>()
+            .init_asset::<bevy::audio::AudioSource>();
+        }
     };
     app.insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
-        .add_plugins(plugin_group)
         .add_plugins((
             JsonAssetPlugin::<RtsDataManifest>::new(&["rts.json"]),
             RonAssetPlugin::<RtsDataManifest>::new(&["rts.ron"]),
@@ -30915,6 +30928,46 @@ mod tests {
                 "capture proof should destroy enemy anchors through combat; proof={proof:?}"
             );
         }
+    }
+
+    #[test]
+    fn headless_game_app_uses_shared_setup_menu_and_match_scene() {
+        let mut app = build_game_app(GameAppMode::Headless);
+
+        assert_eq!(
+            app_screen(&app),
+            AppScreen::MainMenu,
+            "the real cargo-run app builder should start on the skirmish setup menu"
+        );
+        app.update();
+        assert_eq!(app_screen(&app), AppScreen::MainMenu);
+        assert!(
+            count_entities_with::<MainMenuButton>(&mut app) > 0,
+            "the real app builder should register the shared skirmish setup UI"
+        );
+
+        press_key(&mut app, KeyCode::Enter, 3);
+        assert_eq!(
+            app_screen(&app),
+            AppScreen::InMatch,
+            "pressing Enter in the real app builder should enter the shared match scene"
+        );
+        assert!(
+            app.world().resource::<MatchFlow>().active,
+            "the shared match scene should activate match flow in the real app builder"
+        );
+        assert!(
+            structure_snapshots_by_id(&mut app, "CommandCenter")
+                .into_iter()
+                .any(|(_, team, _, constructed)| team == Team::Human && constructed),
+            "the real app builder should spawn the player's shared match base"
+        );
+        assert!(
+            structure_snapshots_by_id(&mut app, "CommandCenter")
+                .into_iter()
+                .any(|(_, team, _, constructed)| team == Team::Demon && constructed),
+            "the real app builder should spawn the default AI opponent from the shared match setup"
+        );
     }
 
     #[test]
