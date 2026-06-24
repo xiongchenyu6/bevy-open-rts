@@ -30353,6 +30353,24 @@ mod tests {
             .collect()
     }
 
+    fn runtime_supply_crate_snapshots(
+        app: &mut App,
+    ) -> Vec<(Entity, SupplyCrateEffect, Vec3, bool)> {
+        let world = app.world_mut();
+        let mut query = world.query::<(Entity, &SupplyCrate, &Transform, &VisibilityState)>();
+        query
+            .iter(world)
+            .map(|(entity, crate_spec, transform, visibility)| {
+                (
+                    entity,
+                    crate_spec.effect,
+                    transform.translation,
+                    visibility.visible,
+                )
+            })
+            .collect()
+    }
+
     fn runtime_structure_positions(
         app: &mut App,
         team: Team,
@@ -40648,6 +40666,83 @@ mod tests {
                 "default match loose ore click should order selected collectors to harvest"
             );
         }
+    }
+
+    #[test]
+    fn four_corners_menu_scout_right_clicks_visible_supply_crate_and_collects_it() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(0.25),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Digit2, 1);
+        press_key(&mut app, KeyCode::Enter, 3);
+        for _ in 0..3 {
+            app.update();
+        }
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        assert_eq!(
+            app.world().resource::<SelectedSkirmishMap>().godot_path,
+            SKIRMISH_MAPS[1].godot_path,
+            "Digit2 should start the FourCorners runtime map with supply crates"
+        );
+        let scout = first_unit_by_id(&mut app, Team::Human, "ScoutRover")
+            .expect("FourCorners playable skirmish should spawn a player ScoutRover");
+        let scout_position = unit_position(&app, scout);
+        let (crate_entity, _, crate_position, _) = runtime_supply_crate_snapshots(&mut app)
+            .into_iter()
+            .filter(|(_, effect, _, _)| *effect == SupplyCrateEffect::Resources)
+            .min_by(|(_, _, lhs, _), (_, _, rhs, _)| {
+                xz_distance(*lhs, scout_position)
+                    .partial_cmp(&xz_distance(*rhs, scout_position))
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
+            .expect("FourCorners should spawn at least one resource supply crate");
+        app.world_mut()
+            .entity_mut(crate_entity)
+            .insert((VisibilityState { visible: true }, Visibility::Visible));
+
+        attach_test_window_to_main_camera(&mut app, scout_position);
+        click_selection_at_world(&mut app, scout_position, false);
+        assert!(
+            app.world().entity(scout).get::<Selected>().is_some(),
+            "left-clicking the ScoutRover should select it before the crate order"
+        );
+
+        let (ore_before, crystal_before) = {
+            let economy = app.world().resource::<Economies>().get(Team::Human);
+            (economy.ore, economy.crystal)
+        };
+        attach_test_window_to_main_camera(&mut app, crate_position);
+        right_click_order_at_world(&mut app, Vec3::new(crate_position.x, 0.0, crate_position.z));
+
+        assert!(
+            app.world()
+                .entity(scout)
+                .get::<MoveOrder>()
+                .is_some_and(|order| xz_distance(order.target, crate_position) < 0.05),
+            "right-clicking a visible supply crate should move the selected scout to collect it"
+        );
+
+        for _ in 0..240 {
+            app.update();
+            if app.world().get_entity(crate_entity).is_err() {
+                break;
+            }
+        }
+
+        assert!(
+            app.world().get_entity(crate_entity).is_err(),
+            "ScoutRover should collect and consume the ordered FourCorners resource crate"
+        );
+        let economy = app.world().resource::<Economies>().get(Team::Human);
+        assert_eq!(economy.ore, ore_before + SUPPLY_CRATE_RESOURCE_ORE);
+        assert_eq!(
+            economy.crystal,
+            crystal_before + SUPPLY_CRATE_RESOURCE_CRYSTAL
+        );
     }
 
     fn selected_race_worker_right_click_visible_ore_and_deliver(player_team: Team) {
