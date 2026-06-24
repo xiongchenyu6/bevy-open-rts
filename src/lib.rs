@@ -4097,6 +4097,47 @@ impl CaptureVictoryProof {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CaptureEconomyVictoryProof {
+    pub faction: CaptureProofFaction,
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub ore_before: i32,
+    pub ore_after_harvest: i32,
+    pub ore_after: i32,
+    pub crystal_before: i32,
+    pub crystal_after_harvest: i32,
+    pub crystal_after: i32,
+    pub ore_harvest_ordered: bool,
+    pub crystal_harvest_ordered: bool,
+    pub product_id: &'static str,
+    pub target_units: u32,
+    pub produced_units: u32,
+    pub attack_orders: u32,
+    pub player_units: u32,
+    pub enemy_units_destroyed: u32,
+    pub enemy_structures_destroyed: u32,
+    pub remaining_teams: u32,
+    pub remaining_anchors: u32,
+}
+
+impl CaptureEconomyVictoryProof {
+    pub fn succeeded(&self) -> bool {
+        let needs_crystal = registry::entity(self.product_id)
+            .is_some_and(|def| def.cost.crystal > 0 && self.target_units > 0);
+        self.phase == CaptureMatchPhase::HumanVictory
+            && self.ore_harvest_ordered
+            && self.ore_after_harvest > self.ore_before
+            && (!needs_crystal
+                || (self.crystal_harvest_ordered
+                    && self.crystal_after_harvest > self.crystal_before))
+            && self.produced_units >= self.target_units
+            && self.attack_orders > 0
+            && self.enemy_structures_destroyed > 0
+            && self.remaining_teams <= 1
+    }
+}
+
 pub fn start_default_match_for_capture(app: &mut App) {
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
@@ -4219,6 +4260,18 @@ fn build_real_menu_match_app_for_faction_with_ai(
     faction: CaptureProofFaction,
     ai_difficulty: AiDifficulty,
 ) -> App {
+    build_real_menu_match_app_for_faction_with_ai_and_starting_resources(
+        faction,
+        ai_difficulty,
+        DEFAULT_STARTING_RESOURCE_INDEX,
+    )
+}
+
+fn build_real_menu_match_app_for_faction_with_ai_and_starting_resources(
+    faction: CaptureProofFaction,
+    ai_difficulty: AiDifficulty,
+    starting_resource_index: usize,
+) -> App {
     let mut app = build_game_app(GameAppMode::Headless);
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
@@ -4226,6 +4279,11 @@ fn build_real_menu_match_app_for_faction_with_ai(
     app.update();
 
     drive_main_menu_action(&mut app, MainMenuAction::SelectFaction(faction.team()), 1);
+    drive_main_menu_action(
+        &mut app,
+        MainMenuAction::SelectStartingResources(starting_resource_index),
+        1,
+    );
     drive_main_menu_action(
         &mut app,
         MainMenuAction::SelectAiDifficulty(ai_difficulty),
@@ -4282,6 +4340,21 @@ pub fn run_real_menu_victory_proof_for_faction(
         std::time::Duration::from_secs_f32(1.0),
     ));
     run_real_menu_victory_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_economy_victory_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureEconomyVictoryProof {
+    let mut app = build_real_menu_match_app_for_faction_with_ai_and_starting_resources(
+        faction,
+        AiDifficulty::Beginner,
+        0,
+    );
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_economy_victory_proof(&mut app, faction, max_frames)
 }
 
 pub fn run_capture_match_proof(
@@ -4746,89 +4819,112 @@ fn run_real_menu_victory_proof(
             .max(product_def.cost.crystal * target_units as i32 + 320);
     }
 
-    let Some((factory, _, factory_position)) =
-        capture_constructed_producer(app.world_mut(), team, "VehicleFactory")
-    else {
-        return capture_victory_proof_status(
-            app,
-            faction,
-            frames,
-            product_id,
-            target_units as u32,
-            0,
-            attack_orders,
-        );
-    };
-    let units_before = capture_unit_count_by_id(app.world_mut(), team, product_id);
-    let mut produced_units = 0u32;
-
-    if capture_world_left_click(app, factory_position)
-        && app
-            .world()
-            .get_entity(factory)
-            .is_ok_and(|entity| entity.get::<Selected>().is_some())
-    {
-        app.update();
-        while frames < max_frames {
-            let produced = capture_unit_count_by_id(app.world_mut(), team, product_id);
-            produced_units = produced.saturating_sub(units_before) as u32;
-            if produced >= units_before + target_units {
-                break;
-            }
-            let started = produced + capture_queued_train_jobs(app.world(), team, product_id);
-            if started < units_before + target_units
-                && let Some(button) =
-                    capture_enabled_command_for_action(app, BuildAction::Train(product_id))
-            {
-                capture_click_command_button(app, button);
-            }
-            frames += 1;
-            app.update();
-        }
-    }
-
-    while frames < max_frames && app.world().resource::<MatchState>().phase == MatchPhase::Running {
-        let Some((target, target_position)) = capture_first_enemy_anchor(app.world_mut(), team)
-        else {
-            break;
-        };
-        if let Ok(mut entity) = app.world_mut().get_entity_mut(target) {
-            entity.insert((VisibilityState { visible: true }, Visibility::Visible));
-        }
-        let attackers = capture_alive_attackers(app.world_mut(), team);
-        if attackers.is_empty() {
-            break;
-        }
-        attack_orders +=
-            capture_mouse_order_attackers_to_target(app, &attackers, target, target_position)
-                as u32;
-
-        for _ in 0..260 {
-            if frames >= max_frames
-                || app.world().get_entity(target).is_err()
-                || app.world().resource::<MatchState>().phase != MatchPhase::Running
-            {
-                break;
-            }
-            frames += 1;
-            app.update();
-        }
-    }
-
-    for _ in 0..8 {
-        if frames >= max_frames
-            || app.world().resource::<MatchState>().phase == MatchPhase::HumanVictory
-        {
-            break;
-        }
-        frames += 1;
-        app.update();
-    }
+    let produced_units = capture_train_attack_group_from_factory_command_panel(
+        app,
+        team,
+        product_id,
+        target_units,
+        max_frames,
+        &mut frames,
+    );
+    attack_orders +=
+        capture_finish_match_with_mouse_attackers(app, team, max_frames, &mut frames) as u32;
 
     capture_victory_proof_status(
         app,
         faction,
         frames,
+        product_id,
+        target_units as u32,
+        produced_units,
+        attack_orders,
+    )
+}
+
+fn run_real_menu_economy_victory_proof(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureEconomyVictoryProof {
+    let max_frames = max_frames.max(1);
+    let team = faction.team();
+    let product_id = faction.proof_vehicle();
+    let target_units = faction.mouse_victory_vehicle_target();
+    let Some(product_def) = registry::entity(product_id) else {
+        return capture_economy_victory_proof_status(
+            app,
+            faction,
+            0,
+            (0, 0),
+            (0, 0),
+            false,
+            false,
+            product_id,
+            target_units as u32,
+            0,
+            0,
+        );
+    };
+    let required_ore = product_def.cost.ore * target_units as i32;
+    let required_crystal = product_def.cost.crystal * target_units as i32;
+    let resources_before = capture_team_resources(app.world(), team);
+    let mut frames = 0usize;
+    let mut ore_harvest_ordered = false;
+    let mut crystal_harvest_ordered = false;
+
+    while frames < max_frames {
+        let (ore, crystal) = capture_team_resources(app.world(), team);
+        if ore >= required_ore && crystal >= required_crystal {
+            break;
+        }
+        if ore < required_ore {
+            if !capture_harvest_kind_until_resource_increases(
+                app,
+                team,
+                ResourceKind::Ore,
+                max_frames,
+                &mut frames,
+            ) {
+                break;
+            }
+            ore_harvest_ordered = true;
+            continue;
+        }
+        if crystal < required_crystal {
+            if !capture_harvest_kind_until_resource_increases(
+                app,
+                team,
+                ResourceKind::Crystal,
+                max_frames,
+                &mut frames,
+            ) {
+                break;
+            }
+            crystal_harvest_ordered = true;
+            continue;
+        }
+    }
+
+    let resources_after_harvest = capture_team_resources(app.world(), team);
+    let produced_units = capture_train_attack_group_from_factory_command_panel(
+        app,
+        team,
+        product_id,
+        target_units,
+        max_frames,
+        &mut frames,
+    );
+    let attack_orders =
+        capture_finish_match_with_mouse_attackers(app, team, max_frames, &mut frames) as u32;
+
+    capture_economy_victory_proof_status(
+        app,
+        faction,
+        frames,
+        resources_before,
+        resources_after_harvest,
+        ore_harvest_ordered,
+        crystal_harvest_ordered,
         product_id,
         target_units as u32,
         produced_units,
@@ -4861,6 +4957,196 @@ fn capture_victory_proof_status(
         remaining_teams: snapshot.remaining_teams,
         remaining_anchors: snapshot.remaining_anchors,
     }
+}
+
+fn capture_economy_victory_proof_status(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    frames: usize,
+    resources_before: (i32, i32),
+    resources_after_harvest: (i32, i32),
+    ore_harvest_ordered: bool,
+    crystal_harvest_ordered: bool,
+    product_id: &'static str,
+    target_units: u32,
+    produced_units: u32,
+    attack_orders: u32,
+) -> CaptureEconomyVictoryProof {
+    let snapshot = capture_match_snapshot(app);
+    let player_stats = capture_stats_for_faction(&snapshot, faction);
+    CaptureEconomyVictoryProof {
+        faction,
+        phase: snapshot.phase,
+        frames,
+        ore_before: resources_before.0,
+        ore_after_harvest: resources_after_harvest.0,
+        ore_after: player_stats.ore,
+        crystal_before: resources_before.1,
+        crystal_after_harvest: resources_after_harvest.1,
+        crystal_after: player_stats.crystal,
+        ore_harvest_ordered,
+        crystal_harvest_ordered,
+        product_id,
+        target_units,
+        produced_units,
+        attack_orders,
+        player_units: player_stats.units,
+        enemy_units_destroyed: snapshot.enemy_units_destroyed,
+        enemy_structures_destroyed: snapshot.enemy_structures_destroyed,
+        remaining_teams: snapshot.remaining_teams,
+        remaining_anchors: snapshot.remaining_anchors,
+    }
+}
+
+fn capture_team_resources(world: &World, team: Team) -> (i32, i32) {
+    let economy = world.resource::<Economies>().get(team);
+    (economy.ore, economy.crystal)
+}
+
+fn capture_resource_value(resources: (i32, i32), kind: ResourceKind) -> i32 {
+    match kind {
+        ResourceKind::Ore => resources.0,
+        ResourceKind::Crystal => resources.1,
+    }
+}
+
+fn capture_harvest_kind_until_resource_increases(
+    app: &mut App,
+    team: Team,
+    kind: ResourceKind,
+    max_frames: usize,
+    frames: &mut usize,
+) -> bool {
+    let before = capture_team_resources(app.world(), team);
+    if !capture_order_nearest_resource_harvest(app, team, kind) {
+        return false;
+    }
+    let before_value = capture_resource_value(before, kind);
+    while *frames < max_frames {
+        *frames += 1;
+        app.update();
+        let current = capture_resource_value(capture_team_resources(app.world(), team), kind);
+        if current > before_value {
+            return true;
+        }
+        if app.world().resource::<MatchState>().phase != MatchPhase::Running {
+            break;
+        }
+    }
+    false
+}
+
+fn capture_order_nearest_resource_harvest(app: &mut App, team: Team, kind: ResourceKind) -> bool {
+    let Some((harvester, harvester_position)) =
+        capture_first_alive_resource_collector(app.world_mut(), team)
+    else {
+        return false;
+    };
+    let Some((resource, _, resource_position)) =
+        capture_nearest_visible_resource(app.world_mut(), kind, harvester_position)
+    else {
+        return false;
+    };
+    capture_world_left_click(app, harvester_position)
+        && app
+            .world()
+            .get_entity(harvester)
+            .is_ok_and(|entity| entity.get::<Selected>().is_some())
+        && capture_world_right_click(app, resource_position)
+        && app
+            .world()
+            .get::<HarvestOrder>(harvester)
+            .is_some_and(|order| order.resource == Some(resource))
+}
+
+fn capture_train_attack_group_from_factory_command_panel(
+    app: &mut App,
+    team: Team,
+    product_id: &'static str,
+    target_units: usize,
+    max_frames: usize,
+    frames: &mut usize,
+) -> u32 {
+    let Some((factory, _, factory_position)) =
+        capture_constructed_producer(app.world_mut(), team, "VehicleFactory")
+    else {
+        return 0;
+    };
+    let units_before = capture_unit_count_by_id(app.world_mut(), team, product_id);
+    let mut produced_units = 0u32;
+
+    if capture_world_left_click(app, factory_position)
+        && app
+            .world()
+            .get_entity(factory)
+            .is_ok_and(|entity| entity.get::<Selected>().is_some())
+    {
+        app.update();
+        while *frames < max_frames {
+            let produced = capture_unit_count_by_id(app.world_mut(), team, product_id);
+            produced_units = produced.saturating_sub(units_before) as u32;
+            if produced >= units_before + target_units {
+                break;
+            }
+            let started = produced + capture_queued_train_jobs(app.world(), team, product_id);
+            if started < units_before + target_units
+                && let Some(button) =
+                    capture_enabled_command_for_action(app, BuildAction::Train(product_id))
+            {
+                capture_click_command_button(app, button);
+            }
+            *frames += 1;
+            app.update();
+        }
+    }
+    produced_units
+}
+
+fn capture_finish_match_with_mouse_attackers(
+    app: &mut App,
+    team: Team,
+    max_frames: usize,
+    frames: &mut usize,
+) -> usize {
+    let mut attack_orders = 0usize;
+    while *frames < max_frames && app.world().resource::<MatchState>().phase == MatchPhase::Running
+    {
+        let Some((target, target_position)) = capture_first_enemy_anchor(app.world_mut(), team)
+        else {
+            break;
+        };
+        if let Ok(mut entity) = app.world_mut().get_entity_mut(target) {
+            entity.insert((VisibilityState { visible: true }, Visibility::Visible));
+        }
+        let attackers = capture_alive_attackers(app.world_mut(), team);
+        if attackers.is_empty() {
+            break;
+        }
+        attack_orders +=
+            capture_mouse_order_attackers_to_target(app, &attackers, target, target_position);
+
+        for _ in 0..260 {
+            if *frames >= max_frames
+                || app.world().get_entity(target).is_err()
+                || app.world().resource::<MatchState>().phase != MatchPhase::Running
+            {
+                break;
+            }
+            *frames += 1;
+            app.update();
+        }
+    }
+
+    for _ in 0..8 {
+        if *frames >= max_frames
+            || app.world().resource::<MatchState>().phase == MatchPhase::HumanVictory
+        {
+            break;
+        }
+        *frames += 1;
+        app.update();
+    }
+    attack_orders
 }
 
 fn drive_main_menu_action(app: &mut App, action: MainMenuAction, followup_updates: usize) {
@@ -32377,6 +32663,23 @@ mod tests {
             assert!(
                 proof.produced_units >= faction.mouse_victory_vehicle_target() as u32,
                 "victory proof should produce the faction's target attack group; proof={proof:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn real_menu_economy_victory_proof_harvests_trains_attacks_and_wins() {
+        for faction in CaptureProofFaction::ALL {
+            let proof = run_real_menu_economy_victory_proof_for_faction(faction, 3600);
+
+            assert!(
+                proof.succeeded(),
+                "low-resource real menu proof should mine required resources, train combat vehicles through command buttons, right-click enemy anchors, and finish; proof={proof:?}"
+            );
+            assert_eq!(proof.product_id, faction.proof_vehicle());
+            assert!(
+                proof.ore_after_harvest > proof.ore_before,
+                "economy proof should force real ore harvesting before victory; proof={proof:?}"
             );
         }
     }

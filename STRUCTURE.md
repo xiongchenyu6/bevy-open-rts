@@ -23,6 +23,7 @@
   - `real-harvest-proof`: mouse select collector, right-click ore, harvest, then train.
   - `real-build-proof`: mouse select worker, place and construct Barracks, then train.
   - `real-victory-proof`: mouse select VehicleFactory, train combat vehicles, right-click enemy anchors, and win.
+  - `real-economy-victory-proof`: low-resource menu start, mouse harvest required resources, train combat vehicles, right-click enemy anchors, and win without proof-side resource injection.
 
 ## Verification
 
