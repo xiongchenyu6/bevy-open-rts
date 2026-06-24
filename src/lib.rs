@@ -3720,6 +3720,13 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
     app
 }
 
+/// Registers the real game scene flow used by `cargo run`: setup menu plus shared match runtime.
+pub fn add_game_scenes(app: &mut App) -> &mut App {
+    add_shared_match_scene(app);
+    add_main_menu_scene(app);
+    app
+}
+
 /// Advances an app with [`add_shared_match_scene`] registered into the live match scene.
 pub fn enter_shared_match_scene(app: &mut App) {
     app.world_mut()
@@ -3774,8 +3781,7 @@ pub fn build_game_app(mode: GameAppMode) -> App {
             RonAssetPlugin::<RtsDataManifest>::new(&["rts.ron"]),
         ))
         .insert_resource(RenderErrorHandler(handle_render_error));
-    add_shared_match_scene(&mut app);
-    add_main_menu_scene(&mut app);
+    add_game_scenes(&mut app);
     app
 }
 
@@ -28893,8 +28899,7 @@ mod tests {
         .init_asset::<WorldAsset>()
         .init_asset::<Font>()
         .init_asset::<bevy::audio::AudioSource>();
-        add_shared_match_scene(&mut app);
-        add_main_menu_scene(&mut app);
+        add_game_scenes(&mut app);
         app.insert_resource(settings);
         app
     }
@@ -29384,14 +29389,17 @@ mod tests {
     }
 
     fn screen_position_for_world(app: &mut App, position: Vec3) -> Vec2 {
+        try_screen_position_for_world(app, position)
+            .expect("test world position should project into viewport space")
+    }
+
+    fn try_screen_position_for_world(app: &mut App, position: Vec3) -> Option<Vec2> {
         let world = app.world_mut();
         let mut camera_q = world.query_filtered::<(&Camera, &GlobalTransform), With<MainCamera>>();
         let (camera, camera_transform) = camera_q
             .single(world)
             .expect("selection click test should have one main camera");
-        camera
-            .world_to_viewport(camera_transform, position)
-            .expect("test world position should project into viewport space")
+        camera.world_to_viewport(camera_transform, position).ok()
     }
 
     fn ground_position_for_selection_cursor(app: &mut App) -> Vec3 {
@@ -29534,6 +29542,230 @@ mod tests {
             .count();
         assert!(selected_count > 0, "{message}");
         selected_count
+    }
+
+    fn drag_select_some_entities(app: &mut App, entities: &[Entity], message: &str) -> usize {
+        assert!(!entities.is_empty(), "{message}");
+        let positions = entities
+            .iter()
+            .filter_map(|entity| {
+                app.world()
+                    .get_entity(*entity)
+                    .ok()
+                    .and_then(|entity_ref| {
+                        entity_ref
+                            .get::<VisibilityState>()
+                            .is_none_or(|visibility| visibility.visible)
+                            .then_some(entity_ref)
+                    })
+                    .and_then(|entity_ref| {
+                        entity_ref
+                            .get::<Transform>()
+                            .map(|transform| (*entity, transform.translation))
+                    })
+            })
+            .collect::<Vec<_>>();
+        assert!(!positions.is_empty(), "{message}");
+
+        let mut last_rect = None;
+        let mut selected_before = 0;
+        for pass in 0..positions.len() {
+            let remaining = positions
+                .iter()
+                .copied()
+                .filter(|(entity, _)| {
+                    app.world()
+                        .get_entity(*entity)
+                        .is_ok_and(|entity_ref| entity_ref.get::<Selected>().is_none())
+                })
+                .collect::<Vec<_>>();
+            if remaining.is_empty() {
+                break;
+            }
+
+            let mut best_focus = remaining[0].1;
+            let mut best_visible = Vec::new();
+            for (_, focus) in &remaining {
+                attach_test_window_to_main_camera(app, *focus);
+                let visible = remaining
+                    .iter()
+                    .filter_map(|(entity, position)| {
+                        let screen = try_screen_position_for_world(app, *position)?;
+                        drag_select_screen_point_is_safe(screen).then_some((*entity, screen))
+                    })
+                    .collect::<Vec<_>>();
+                if visible.len() > best_visible.len() {
+                    best_focus = *focus;
+                    best_visible = visible;
+                }
+            }
+            assert!(
+                !best_visible.is_empty(),
+                "{message}; no candidate unit projected into the drag-select safe screen area"
+            );
+
+            attach_test_window_to_main_camera(app, best_focus);
+            let screen_positions = best_visible
+                .iter()
+                .filter_map(|(entity, _)| {
+                    let (_, position) = positions
+                        .iter()
+                        .find(|(candidate, _)| candidate == entity)
+                        .expect("best visible entity should still have a world position");
+                    try_screen_position_for_world(app, *position)
+                })
+                .collect::<Vec<_>>();
+            assert!(
+                !screen_positions.is_empty(),
+                "{message}; best drag-select candidates no longer project after refocus"
+            );
+            let (mut min, mut max) = (screen_positions[0], screen_positions[0]);
+            for screen_position in &screen_positions[1..] {
+                min = min.min(*screen_position);
+                max = max.max(*screen_position);
+            }
+            let center = (min + max) * 0.5;
+            let half = ((max - min) * 0.5 + Vec2::splat(58.0)).max(Vec2::splat(48.0));
+            let (start, end) = clamped_drag_rect(center, half);
+            drag_select_screen_rect(app, start, end, pass > 0);
+            last_rect = Some((start, end));
+
+            let selected_after = entities
+                .iter()
+                .filter(|entity| {
+                    app.world()
+                        .get_entity(**entity)
+                        .is_ok_and(|entity_ref| entity_ref.get::<Selected>().is_some())
+                })
+                .count();
+            if selected_after <= selected_before {
+                break;
+            }
+            selected_before = selected_after;
+        }
+
+        let selected_count = entities
+            .iter()
+            .filter(|entity| {
+                app.world()
+                    .get_entity(**entity)
+                    .is_ok_and(|entity_ref| entity_ref.get::<Selected>().is_some())
+            })
+            .count();
+        let drag_state_debug = format!("{:?}", app.world().resource::<SelectionDragState>());
+        let debug_data = entities
+            .iter()
+            .map(|entity| {
+                app.world().get_entity(*entity).map_or(
+                    (*entity, None, false, false, None),
+                    |entity_ref| {
+                        let position = entity_ref
+                            .get::<Transform>()
+                            .map(|transform| transform.translation);
+                        let visible = entity_ref
+                            .get::<VisibilityState>()
+                            .is_none_or(|visibility| visibility.visible);
+                        let selected = entity_ref.get::<Selected>().is_some();
+                        let team = entity_ref.get::<Team>().copied();
+                        (*entity, position, visible, selected, team)
+                    },
+                )
+            })
+            .collect::<Vec<_>>();
+        let debug_summary = debug_data
+            .into_iter()
+            .map(|(entity, position, visible, selected, team)| {
+                let screen =
+                    position.and_then(|position| try_screen_position_for_world(app, position));
+                match screen {
+                    Some(screen) => format!(
+                        "{entity:?}:team={team:?}:visible={visible}:selected={selected}:screen=({:.1},{:.1})",
+                        screen.x, screen.y
+                    ),
+                    None => format!("{entity:?}:missing"),
+                }
+            })
+            .collect::<Vec<_>>()
+            .join("; ");
+        assert!(
+            selected_count > 0,
+            "{message}; last_rect={last_rect:?}; drag={drag_state_debug}; entities={debug_summary}"
+        );
+        selected_count
+    }
+
+    fn clamped_drag_rect(center: Vec2, half: Vec2) -> (Vec2, Vec2) {
+        let (safe_min, safe_max) = drag_select_safe_bounds();
+        let mut start = center - half;
+        let mut end = center + half;
+        if start.x < safe_min.x {
+            let delta = safe_min.x - start.x;
+            start.x += delta;
+            end.x += delta;
+        }
+        if start.y < safe_min.y {
+            let delta = safe_min.y - start.y;
+            start.y += delta;
+            end.y += delta;
+        }
+        if end.x > safe_max.x {
+            let delta = end.x - safe_max.x;
+            start.x -= delta;
+            end.x -= delta;
+        }
+        if end.y > safe_max.y {
+            let delta = end.y - safe_max.y;
+            start.y -= delta;
+            end.y -= delta;
+        }
+        (
+            start.clamp(safe_min, safe_max - Vec2::splat(12.0)),
+            end.clamp(safe_min + Vec2::splat(12.0), safe_max),
+        )
+    }
+
+    fn drag_select_safe_bounds() -> (Vec2, Vec2) {
+        (Vec2::new(74.0, 92.0), Vec2::new(1200.0, 650.0))
+    }
+
+    fn drag_select_screen_point_is_safe(point: Vec2) -> bool {
+        let (safe_min, safe_max) = drag_select_safe_bounds();
+        point.cmpge(safe_min).all() && point.cmple(safe_max).all()
+    }
+
+    fn drag_select_screen_rect(app: &mut App, start: Vec2, end: Vec2, additive: bool) {
+        {
+            let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
+            if additive {
+                keyboard.press(KeyCode::ShiftLeft);
+            } else {
+                keyboard.release(KeyCode::ShiftLeft);
+            }
+            keyboard.release(KeyCode::ShiftRight);
+            keyboard.clear();
+        }
+        set_selection_cursor(app, start);
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.press(MouseButton::Left);
+        }
+        app.update();
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.clear();
+        }
+        set_selection_cursor(app, end);
+        app.update();
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.release(MouseButton::Left);
+        }
+        app.update();
+        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+        mouse.clear();
+        let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
+        keyboard.release(KeyCode::ShiftLeft);
+        keyboard.clear();
     }
 
     fn order_summary_for_entities(app: &App, entities: &[Entity], target: Entity) -> String {
@@ -41874,10 +42106,10 @@ mod tests {
                 !attackers.is_empty(),
                 "default skirmish should keep at least one player attack unit alive"
             );
-            let selected_attackers = mouse_select_some_entities(
+            let selected_attackers = drag_select_some_entities(
                 &mut app,
                 &attackers,
-                "left-clicking produced player attack units should select an attack group",
+                "drag-selecting produced player attack units should select an attack group",
             );
             app.world_mut()
                 .entity_mut(target)
