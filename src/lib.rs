@@ -41718,6 +41718,124 @@ mod tests {
     }
 
     #[test]
+    fn default_menu_tank_hold_position_waits_and_guard_area_resumes() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let (factory, _, factory_position, constructed) =
+            structure_snapshots_by_id(&mut app, "VehicleFactory")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .expect(
+                    "default playable skirmish should spawn a constructed player VehicleFactory",
+                );
+        assert!(constructed);
+
+        attach_test_window_to_main_camera(&mut app, factory_position);
+        click_selection_at_world(&mut app, factory_position, false);
+        assert!(
+            app.world().entity(factory).get::<Selected>().is_some(),
+            "left-clicking the visible VehicleFactory should select it before training a hold-position Tank"
+        );
+        app.update();
+
+        let tanks_before = unit_entities_by_id(&mut app, Team::Human, "Tank");
+        let (tank_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Tank"));
+        click_command_button(&mut app, tank_button);
+        for _ in 0..120 {
+            app.update();
+            if unit_entities_by_id(&mut app, Team::Human, "Tank").len() > tanks_before.len() {
+                break;
+            }
+        }
+        let tank = unit_entities_by_id(&mut app, Team::Human, "Tank")
+            .into_iter()
+            .find(|entity| !tanks_before.contains(entity))
+            .expect("default VehicleFactory should produce a new Tank from its command button");
+        let tank_position = unit_position(&app, tank);
+
+        attach_test_window_to_main_camera(&mut app, tank_position);
+        click_selection_at_world(&mut app, tank_position, false);
+        assert!(
+            app.world().entity(tank).get::<Selected>().is_some(),
+            "left-clicking the produced Tank should select it before hold-position"
+        );
+        app.update();
+        let (hold_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::HoldPosition);
+        let (guard_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::GuardArea);
+
+        click_command_button(&mut app, hold_button);
+        assert!(
+            app.world()
+                .entity(tank)
+                .get::<HoldPosition>()
+                .is_some_and(|hold| hold.enabled),
+            "clicking the Tank hold-position command should enable the hold stance"
+        );
+
+        let enemy_position = tank_position + Vec3::new(3.0, 0.0, 0.0);
+        let enemy = spawn_test_unit(&mut app, "Worker", Team::Demon, enemy_position);
+        app.world_mut().entity_mut(enemy).insert((
+            Health::new(1.0),
+            VisibilityState { visible: true },
+            Visibility::Visible,
+        ));
+        let enemy_before = current_health(&app, enemy);
+
+        for _ in 0..4 {
+            app.update();
+        }
+
+        assert_eq!(
+            current_health(&app, enemy),
+            enemy_before,
+            "hold-position Tank should not damage a visible nearby enemy automatically"
+        );
+        assert!(
+            app.world().entity(tank).get::<AttackOrder>().is_none(),
+            "hold-position Tank should keep waiting instead of auto-acquiring the visible enemy"
+        );
+
+        click_command_button(&mut app, guard_button);
+        assert!(
+            !app.world()
+                .entity(tank)
+                .get::<HoldPosition>()
+                .expect("selected Tank should keep hold-position state")
+                .enabled,
+            "clicking guard-area should clear hold-position stance"
+        );
+
+        for _ in 0..8 {
+            app.update();
+            let enemy_damaged_or_destroyed = app.world().get_entity(enemy).is_err()
+                || current_health(&app, enemy) < enemy_before;
+            if enemy_damaged_or_destroyed {
+                break;
+            }
+        }
+
+        assert!(
+            app.world().get_entity(enemy).is_err() || current_health(&app, enemy) < enemy_before,
+            "guard-area should restore automatic target acquisition against the visible enemy"
+        );
+        assert!(
+            app.world().entity(tank).get::<AttackOrder>().is_some()
+                || app.world().get_entity(enemy).is_err(),
+            "guarding Tank should acquire the nearby enemy after hold is cleared"
+        );
+    }
+
+    #[test]
     fn default_menu_player_can_click_select_factory_train_tank_and_order_attack() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
