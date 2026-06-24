@@ -40543,6 +40543,79 @@ mod tests {
         );
     }
 
+    #[test]
+    fn default_menu_player_can_click_select_factory_train_tank_and_order_attack() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let (factory, _, factory_position, constructed) =
+            structure_snapshots_by_id(&mut app, "VehicleFactory")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .expect(
+                    "default playable skirmish should spawn a constructed player VehicleFactory",
+                );
+        assert!(constructed);
+        attach_test_window_to_main_camera(&mut app, factory_position);
+        click_selection_at_world(&mut app, factory_position, false);
+        assert!(
+            app.world().entity(factory).get::<Selected>().is_some(),
+            "left-clicking the visible VehicleFactory should select it for production"
+        );
+        app.update();
+
+        let tanks_before = unit_entities_by_id(&mut app, Team::Human, "Tank");
+        let (tank_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Tank"));
+        click_command_button(&mut app, tank_button);
+        for _ in 0..120 {
+            app.update();
+            if unit_entities_by_id(&mut app, Team::Human, "Tank").len() > tanks_before.len() {
+                break;
+            }
+        }
+        let produced_tank = unit_entities_by_id(&mut app, Team::Human, "Tank")
+            .into_iter()
+            .find(|entity| !tanks_before.contains(entity))
+            .expect("clicking the selected VehicleFactory Tank button should produce a Tank");
+        let tank_position = unit_position(&app, produced_tank);
+
+        attach_test_window_to_main_camera(&mut app, tank_position);
+        click_selection_at_world(&mut app, tank_position, false);
+        assert!(
+            app.world()
+                .entity(produced_tank)
+                .get::<Selected>()
+                .is_some(),
+            "left-clicking the produced Tank should select it for player orders"
+        );
+        app.update();
+
+        let (enemy_anchor, enemy_anchor_position) = anchor_targets_by_team(&mut app, Team::Demon)
+            .into_iter()
+            .next()
+            .expect("default skirmish should spawn a Demon enemy anchor");
+        app.world_mut()
+            .entity_mut(enemy_anchor)
+            .insert((VisibilityState { visible: true }, Visibility::Visible));
+        attach_test_window_to_main_camera(&mut app, enemy_anchor_position);
+        right_click_order_at_world(&mut app, enemy_anchor_position);
+
+        assert!(
+            app.world()
+                .entity(produced_tank)
+                .get::<AttackOrder>()
+                .is_some_and(|order| order.target == enemy_anchor),
+            "right-clicking the visible enemy anchor with the mouse-selected Tank should issue AttackOrder"
+        );
+    }
+
     fn selected_race_vehicle_skirmish_can_train_and_win(
         player_team: Team,
         product_id: &'static str,
