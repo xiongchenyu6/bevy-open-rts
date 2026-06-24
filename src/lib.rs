@@ -28569,6 +28569,36 @@ mod tests {
             .expect("main menu action label should exist")
     }
 
+    fn press_main_menu_button(app: &mut App, action: MainMenuAction, followup_updates: usize) {
+        let button_entity = {
+            let world = app.world_mut();
+            let mut buttons = world.query::<(Entity, &MainMenuButton)>();
+            buttons
+                .iter(world)
+                .find_map(|(entity, button)| (button.action == action).then_some(entity))
+                .expect("main menu button should exist")
+        };
+        app.world_mut()
+            .entity_mut(button_entity)
+            .insert(Interaction::Pressed);
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.press(MouseButton::Left);
+        }
+        app.update();
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.release(MouseButton::Left);
+            mouse.clear();
+        }
+        app.world_mut()
+            .entity_mut(button_entity)
+            .insert(Interaction::None);
+        for _ in 0..followup_updates {
+            app.update();
+        }
+    }
+
     fn open_match_menu(app: &mut App) {
         press_key(app, KeyCode::Escape, 0);
         assert!(
@@ -30119,6 +30149,64 @@ mod tests {
                 .resource::<AiDifficultySettings>()
                 .difficulty(Team::Human),
             AiDifficulty::Hard
+        );
+    }
+
+    #[test]
+    fn skirmish_setup_mouse_buttons_start_match_with_selected_map_and_race() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.update();
+
+        press_main_menu_button(&mut app, MainMenuAction::SelectMap(1), 1);
+        press_main_menu_button(&mut app, MainMenuAction::SelectFaction(Team::Chaos), 1);
+        press_main_menu_button(&mut app, MainMenuAction::SelectStartingResources(2), 1);
+        press_main_menu_button(
+            &mut app,
+            MainMenuAction::SelectAiDifficulty(AiDifficulty::Hard),
+            1,
+        );
+
+        {
+            let selection = *app.world().resource::<SkirmishMenuSelection>();
+            assert_eq!(selection.map_index, 1);
+            assert_eq!(selection.faction, Team::Chaos);
+            assert_eq!(selection.starting_resource_index, 2);
+            assert_eq!(selection.ai_difficulty, AiDifficulty::Hard);
+            assert!(selection.can_start());
+            assert!(main_menu_summary_text(selection).contains("我方出生槽: 混沌族"));
+            assert!(main_menu_summary_text(selection).contains("资源: 16/8"));
+            assert_eq!(
+                current_main_menu_button_label(
+                    &mut app,
+                    MainMenuAction::SelectFaction(Team::Chaos)
+                ),
+                "C 我方: 混沌族"
+            );
+        }
+
+        press_main_menu_button(&mut app, MainMenuAction::StartMatch, 2);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        assert_eq!(
+            app.world().resource::<SelectedSkirmishMap>().godot_path,
+            SKIRMISH_MAPS[1].godot_path
+        );
+        assert_eq!(app.world().resource::<VisiblePlayer>().team, Team::Chaos);
+        let economy = app.world().resource::<Economies>().get(Team::Chaos);
+        assert_eq!(
+            economy.ore,
+            GODOT_STARTING_RESOURCE_OPTIONS[2].resources.ore
+        );
+        assert_eq!(
+            economy.crystal,
+            GODOT_STARTING_RESOURCE_OPTIONS[2].resources.crystal
+        );
+        assert_eq!(
+            app.world()
+                .resource::<AiDifficultySettings>()
+                .difficulty(Team::Human),
+            AiDifficulty::Hard,
+            "mouse-selected Chaos skirmish should start against the chosen Human AI difficulty"
         );
     }
 
