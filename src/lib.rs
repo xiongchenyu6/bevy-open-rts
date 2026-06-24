@@ -42268,6 +42268,80 @@ mod tests {
     }
 
     #[test]
+    fn default_menu_army_and_idle_economy_hotkeys_select_expected_units() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let scout = first_unit_by_id(&mut app, Team::Human, "ScoutRover")
+            .expect("default playable skirmish should spawn a player ScoutRover army unit");
+        let worker = first_unit_by_id(&mut app, Team::Human, "Worker")
+            .expect("default playable skirmish should spawn a player Worker");
+        let harvester = first_unit_by_id(&mut app, Team::Human, "OreHarvester")
+            .expect("default playable skirmish should spawn a player OreHarvester");
+        let command_center = structure_snapshots_by_id(&mut app, "CommandCenter")
+            .into_iter()
+            .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+            .map(|(entity, ..)| entity)
+            .expect("default playable skirmish should spawn a constructed player CommandCenter");
+
+        press_selection_keys(
+            &mut app,
+            &[KeyCode::AltLeft, KeyCode::ControlLeft, KeyCode::KeyA],
+        );
+        app.update();
+
+        assert!(
+            app.world().entity(scout).get::<Selected>().is_some(),
+            "Ctrl+Alt+A should select the default player army unit"
+        );
+        assert!(
+            app.world().entity(worker).get::<Selected>().is_none()
+                && app.world().entity(harvester).get::<Selected>().is_none()
+                && app
+                    .world()
+                    .entity(command_center)
+                    .get::<Selected>()
+                    .is_none(),
+            "Ctrl+Alt+A should not select workers, harvesters, or structures"
+        );
+
+        press_selection_keys(&mut app, &[KeyCode::AltLeft, KeyCode::KeyI]);
+        app.update();
+
+        assert!(
+            app.world().entity(worker).get::<Selected>().is_some(),
+            "Alt+I should select the idle construction Worker"
+        );
+        assert!(
+            app.world().entity(scout).get::<Selected>().is_none()
+                && app.world().entity(harvester).get::<Selected>().is_none(),
+            "Alt+I should not keep army units or harvesters selected"
+        );
+
+        press_selection_keys(
+            &mut app,
+            &[KeyCode::AltLeft, KeyCode::ControlLeft, KeyCode::KeyI],
+        );
+        app.update();
+
+        assert!(
+            app.world().entity(harvester).get::<Selected>().is_some(),
+            "Ctrl+Alt+I should select the idle OreHarvester"
+        );
+        assert!(
+            app.world().entity(worker).get::<Selected>().is_none()
+                && app.world().entity(scout).get::<Selected>().is_none(),
+            "Ctrl+Alt+I should not keep construction workers or army units selected"
+        );
+    }
+
+    #[test]
     fn default_menu_player_can_train_helicopter_and_strike_enemy_anchor() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
