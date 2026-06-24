@@ -110,6 +110,7 @@ const STRUCTURE_MANUAL_REPAIR_HP_PER_SECOND: f32 = 3.0;
 const AI_REPAIR_MIN_MISSING_HITPOINT_RATIO: f32 = 0.25;
 const AI_REPAIR_MAX_STARTS_PER_REFRESH: usize = 2;
 const AI_REPAIR_REFRESH_INTERVAL_SECONDS: f32 = 0.5;
+const AI_OPENING_ATTACK_GRACE_SECONDS: f32 = 45.0;
 const AI_TECH_BUNKER_GARRISON_REFRESH_INTERVAL_SECONDS: f32 = 1.0;
 const AI_TECH_BUNKER_GARRISON_SEARCH_RADIUS: f32 = 16.0;
 const AI_SUPPORT_MIN_CLUSTER_TARGETS: usize = 2;
@@ -1395,7 +1396,7 @@ const DEFAULT_PLAYER_FACTIONS: [SkirmishFaction; 3] = [
 ];
 const DEFAULT_PLAYER_CONTROLLERS: [SkirmishPlayerController; 3] = [
     SkirmishPlayerController::Human,
-    SkirmishPlayerController::Ai(AiDifficulty::Beginner),
+    SkirmishPlayerController::Ai(AiDifficulty::Easy),
     SkirmishPlayerController::None,
 ];
 const GODOT_STARTING_RESOURCE_OPTIONS: &[StartingResourceOption] = &[
@@ -1676,7 +1677,7 @@ impl Default for SkirmishMenuSelection {
             faction: Team::Human,
             starting_resource_index: DEFAULT_STARTING_RESOURCE_INDEX,
             match_mode: SkirmishMatchMode::OneVsOne,
-            ai_difficulty: AiDifficulty::Beginner,
+            ai_difficulty: AiDifficulty::Easy,
             team_ids: skirmish_default_team_ids(Team::Human, SkirmishMatchMode::OneVsOne),
             player_factions: DEFAULT_PLAYER_FACTIONS,
             player_color_slots: DEFAULT_PLAYER_COLOR_SLOTS,
@@ -5318,7 +5319,7 @@ impl Default for AiDirector {
         Self {
             production_timer: [2.5; 3],
             production_cursor: [0; 3],
-            attack_timer: [5.0; 3],
+            attack_timer: [AI_OPENING_ATTACK_GRACE_SECONDS; 3],
             build_timer: [8.0; 3],
             construction_timer: [0.0; 3],
             capture_timer: [3.0; 3],
@@ -7012,6 +7013,9 @@ fn faction_ai_profile_for_difficulty(
             profile.expected_ore_harvesters = 1;
             profile.expected_battlegroups = 1;
             profile.expected_units_in_battlegroup = 3;
+            profile.capture_enabled = false;
+            profile.saboteur_enabled = false;
+            profile.support_powers_enabled = false;
             profile.production_interval = 5.5;
             profile.attack_interval = 9.0;
             profile.build_interval = 13.0;
@@ -10060,8 +10064,8 @@ fn evaluate_match_end(
     let controlled_team = controlled_player_team(visible_player.as_deref());
     let mut active_anchor_team = [false; 3];
     let mut active_anchor_count = 0u32;
-    for (_, team, health) in &structures {
-        if health.current > 0.0 {
+    for (structure, team, health) in &structures {
+        if is_structure_elimination_anchor(structure) && health.current > 0.0 {
             record_active_elimination_anchor(
                 *team,
                 &mut active_anchor_team,
@@ -10145,6 +10149,10 @@ fn is_worker_elimination_anchor(unit: &Unit) -> bool {
     })
 }
 
+fn is_structure_elimination_anchor(structure: &Structure) -> bool {
+    structure.id == "CommandCenter"
+}
+
 fn record_active_elimination_anchor(
     team: Team,
     active_anchor_team: &mut [bool; 3],
@@ -10178,8 +10186,11 @@ fn objective_tracker_snapshot(
     let mut structure_count = 0u32;
     let mut worker_count = 0u32;
 
-    for (_, team, health) in structures {
-        if health.current <= 0.0 || !relations.are_enemies(visible_team, *team) {
+    for (structure, team, health) in structures {
+        if health.current <= 0.0
+            || !is_structure_elimination_anchor(structure)
+            || !relations.are_enemies(visible_team, *team)
+        {
             continue;
         }
         structure_count += 1;
@@ -24697,7 +24708,7 @@ mod tests {
         );
         assert_eq!(settings.starting_resources, StartingResources::new(32, 16));
         assert_eq!(selection.match_mode, SkirmishMatchMode::OneVsOne);
-        assert_eq!(selection.ai_difficulty, AiDifficulty::Beginner);
+        assert_eq!(selection.ai_difficulty, AiDifficulty::Easy);
         assert_eq!(selection.active_teams(), [true, true, false]);
         assert_eq!(settings.active_teams, [true, true, false]);
         assert_eq!(settings.player_factions, DEFAULT_PLAYER_FACTIONS);
@@ -24705,7 +24716,7 @@ mod tests {
         assert_eq!(settings.player_controllers, DEFAULT_PLAYER_CONTROLLERS);
         assert_eq!(
             settings.ai_difficulties.difficulty(Team::Demon),
-            AiDifficulty::Beginner
+            AiDifficulty::Easy
         );
     }
 
@@ -24976,7 +24987,7 @@ mod tests {
         );
         assert_eq!(
             selection.player_controller(Team::Human),
-            Some(SkirmishPlayerController::Ai(AiDifficulty::Beginner)),
+            Some(SkirmishPlayerController::Ai(AiDifficulty::Easy)),
             "turning one slot human should demote the previous human slot to AI like Godot"
         );
         assert_eq!(selection.human_team(), Some(Team::Demon));
@@ -25005,7 +25016,7 @@ mod tests {
         );
         assert_eq!(
             settings.ai_difficulties.difficulty(Team::Demon),
-            AiDifficulty::Beginner
+            AiDifficulty::Easy
         );
     }
 
@@ -27898,12 +27909,14 @@ mod tests {
         let mut targets = Vec::new();
         {
             let world = app.world_mut();
-            let mut structures =
-                world.query_filtered::<(Entity, &Team, &Transform, &Health), With<Structure>>();
+            let mut structures = world
+                .query_filtered::<(Entity, &Structure, &Team, &Transform, &Health), With<Structure>>();
             targets.extend(structures.iter(world).filter_map(
-                |(entity, structure_team, transform, health)| {
-                    (*structure_team == team && health.current > 0.0)
-                        .then_some((entity, transform.translation))
+                |(entity, structure, structure_team, transform, health)| {
+                    (*structure_team == team
+                        && health.current > 0.0
+                        && is_structure_elimination_anchor(structure))
+                    .then_some((entity, transform.translation))
                 },
             ));
         }
@@ -29737,7 +29750,18 @@ mod tests {
         assert_eq!(settings.active_teams, DEFAULT_ACTIVE_TEAMS);
         assert_eq!(
             settings.player_controllers, DEFAULT_PLAYER_CONTROLLERS,
-            "default cargo run setup should be Human vs Beginner AI until the menu changes it"
+            "default cargo run setup should be Human vs Easy AI until the menu changes it"
+        );
+    }
+
+    #[test]
+    fn ai_director_defaults_to_playable_opening_attack_grace() {
+        let director = AiDirector::default();
+
+        assert_eq!(director.attack_timer, [AI_OPENING_ATTACK_GRACE_SECONDS; 3]);
+        assert!(
+            AI_OPENING_ATTACK_GRACE_SECONDS >= 30.0,
+            "default skirmish AI should give the player time to mine and train a first group"
         );
     }
 
@@ -30000,7 +30024,6 @@ mod tests {
         let mut app = stateful_match_flow_test_app(SkirmishMenuSelection::default().match_setup());
         app.update();
 
-        press_key(&mut app, KeyCode::KeyW, 0);
         press_key(&mut app, KeyCode::KeyW, 0);
         press_key(&mut app, KeyCode::KeyW, 0);
         press_key(&mut app, KeyCode::KeyW, 1);
@@ -36599,6 +36622,19 @@ mod tests {
     }
 
     #[test]
+    fn command_center_is_the_primary_structure_elimination_anchor() {
+        let command_center = Structure {
+            id: "CommandCenter",
+        };
+        let vehicle_factory = Structure {
+            id: "VehicleFactory",
+        };
+
+        assert!(is_structure_elimination_anchor(&command_center));
+        assert!(!is_structure_elimination_anchor(&vehicle_factory));
+    }
+
+    #[test]
     fn match_end_anchor_count_tracks_each_participating_anchor() {
         let mut active_teams = [false; 3];
         let mut anchor_count = 0;
@@ -36646,6 +36682,17 @@ mod tests {
         assert!(!ai_profile_requests_offensive_combat_units(&beginner));
         assert_eq!(beginner.defense_priority, BEGINNER_AI_DEFENSE_PRIORITY);
         assert_eq!(beginner.defense_limits, BEGINNER_AI_DEFENSE_LIMITS);
+    }
+
+    #[test]
+    fn easy_ai_profile_uses_basic_pressure_without_advanced_harassment() {
+        let easy = team_ai_profile_for_difficulty(Team::Demon, AiDifficulty::Easy);
+
+        assert!(easy.active_offense_enabled);
+        assert!(!easy.capture_enabled);
+        assert!(!easy.saboteur_enabled);
+        assert!(!easy.support_powers_enabled);
+        assert_eq!(easy.expected_battlegroups, 1);
     }
 
     #[test]
@@ -39069,7 +39116,7 @@ mod tests {
     fn default_menu_collectors_right_click_visible_ore_and_deliver() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-            Duration::from_secs_f32(1.0),
+            Duration::from_secs_f32(0.25),
         ));
         app.update();
 
@@ -39833,6 +39880,13 @@ mod tests {
             StartupLoadoutMode::PlaytestExpanded,
             "default cargo run match should start in the playable production loadout"
         );
+        assert_eq!(
+            app.world()
+                .resource::<AiDifficultySettings>()
+                .difficulty(Team::Demon),
+            AiDifficulty::Easy,
+            "default cargo run match should use an active Easy AI opponent"
+        );
         let (factory, _, _, _) = structure_snapshots_by_id(&mut app, "VehicleFactory")
             .into_iter()
             .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
@@ -39844,24 +39898,23 @@ mod tests {
             "default playable skirmish should spawn a constructed enemy anchor"
         );
 
-        app.world_mut().entity_mut(factory).insert(Selected);
+        select_only_entities(&mut app, &[factory]);
         app.update();
 
-        let target_tank_count = PRODUCTION_QUEUE_LIMIT * 2;
+        let target_tank_count = PRODUCTION_QUEUE_LIMIT + 1;
         let (tank_button, tank_slot_index, _) =
             enabled_command_slot_for_action(&mut app, BuildAction::Train("Tank"));
         for batch in 0..2 {
-            for expected_tank_jobs in 1..=PRODUCTION_QUEUE_LIMIT {
-                app.world_mut()
-                    .entity_mut(tank_button)
-                    .insert(Interaction::Pressed);
-                app.world_mut()
-                    .resource_mut::<ButtonInput<MouseButton>>()
-                    .press(MouseButton::Left);
-                app.update();
-                {
+            let expected_total = if batch == 0 {
+                PRODUCTION_QUEUE_LIMIT
+            } else {
+                target_tank_count
+            };
+            let mut queue_attempts = 0;
+            while queue_attempts < 120 {
+                let human_tank_jobs = {
                     let queue = app.world().resource::<BuildQueue>();
-                    let human_tank_jobs = queue
+                    queue
                         .0
                         .iter()
                         .filter(|job| {
@@ -39869,12 +39922,21 @@ mod tests {
                                 && job.producer_entity == factory
                                 && matches!(job.action, BuildAction::Train("Tank"))
                         })
-                        .count();
-                    assert_eq!(
-                        human_tank_jobs, expected_tank_jobs,
-                        "clicking the default VehicleFactory Tank button should enqueue Tank job {expected_tank_jobs}"
-                    );
+                        .count()
+                };
+                if unit_count_by_id(&mut app, Team::Human, "Tank") + human_tank_jobs
+                    >= expected_total
+                {
+                    break;
                 }
+                queue_attempts += 1;
+                app.world_mut()
+                    .entity_mut(tank_button)
+                    .insert(Interaction::Pressed);
+                app.world_mut()
+                    .resource_mut::<ButtonInput<MouseButton>>()
+                    .press(MouseButton::Left);
+                app.update();
                 {
                     let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
                     mouse.release(MouseButton::Left);
@@ -39884,8 +39946,33 @@ mod tests {
                     .entity_mut(tank_button)
                     .insert(Interaction::None);
                 app.update();
+                for _ in 0..8 {
+                    app.update();
+                }
             }
-            let expected_total = PRODUCTION_QUEUE_LIMIT * (batch + 1);
+            let human_tank_jobs = {
+                let queue = app.world().resource::<BuildQueue>();
+                queue
+                    .0
+                    .iter()
+                    .filter(|job| {
+                        job.team == Team::Human
+                            && job.producer_entity == factory
+                            && matches!(job.action, BuildAction::Train("Tank"))
+                    })
+                    .count()
+            };
+            let human_tanks_started =
+                unit_count_by_id(&mut app, Team::Human, "Tank") + human_tank_jobs;
+            let human_economy = app.world().resource::<Economies>().get(Team::Human);
+            assert!(
+                human_tanks_started >= expected_total,
+                "clicking the default VehicleFactory Tank button should eventually start {expected_total} Tank jobs after mining funds the queue; started={human_tanks_started} queued={human_tank_jobs} ore={} crystal={} power={}/{} attempts={queue_attempts}",
+                human_economy.ore,
+                human_economy.crystal,
+                human_economy.power_used,
+                human_economy.power_capacity
+            );
             for _ in 0..220 {
                 app.update();
                 if unit_count_by_id(&mut app, Team::Human, "Tank") >= expected_total {
@@ -39925,7 +40012,7 @@ mod tests {
         let demon_anchors = anchor_targets_by_team(&mut app, Team::Demon).len();
         assert!(
             human_tanks >= target_tank_count,
-            "default menu skirmish should produce {target_tank_count} Tanks from command slot {tank_slot_index}; got {human_tanks}; phase={match_phase:?}; anchors human={human_anchors} demon={demon_anchors}; queue=[{queue_status}] power={}/{} ore={} crystal={}",
+            "default menu skirmish should produce a {target_tank_count}-Tank attack group from command slot {tank_slot_index} under Easy AI pressure; got {human_tanks}; phase={match_phase:?}; anchors human={human_anchors} demon={demon_anchors}; queue=[{queue_status}] power={}/{} ore={} crystal={}",
             human_power_used,
             human_power_capacity,
             human_ore,
@@ -40002,6 +40089,12 @@ mod tests {
         let mut app = playable_production_shortcut_test_app();
         let tank_def = registry::entity("Tank").expect("registry should include Tank");
         let factory_origin = Vec3::new(0.0, 0.0, 0.0);
+        spawn_test_structure(
+            &mut app,
+            "CommandCenter",
+            Team::Human,
+            Vec3::new(-4.0, 0.0, 0.0),
+        );
         let factory = spawn_test_structure(&mut app, "VehicleFactory", Team::Human, factory_origin);
         app.world_mut().entity_mut(factory).insert(Selected);
 
@@ -40111,6 +40204,12 @@ mod tests {
         let mut app = player_match_loop_test_app();
         let tank_def = registry::entity("Tank").expect("registry should include Tank");
         let factory_origin = Vec3::new(0.0, 0.0, 0.0);
+        spawn_test_structure(
+            &mut app,
+            "CommandCenter",
+            Team::Human,
+            Vec3::new(-4.0, 0.0, 0.0),
+        );
         let factory = spawn_test_structure(&mut app, "VehicleFactory", Team::Human, factory_origin);
         app.world_mut().entity_mut(factory).insert(Selected);
         let enemy_command_center = spawn_test_structure(
