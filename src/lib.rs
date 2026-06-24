@@ -4096,6 +4096,7 @@ impl CaptureBuildProof {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CaptureVictoryProof {
     pub faction: CaptureProofFaction,
+    pub map_id: &'static str,
     pub phase: CaptureMatchPhase,
     pub frames: usize,
     pub product_id: &'static str,
@@ -4333,6 +4334,7 @@ pub fn build_real_menu_match_app_for_faction(faction: CaptureProofFaction) -> Ap
 
 #[derive(Clone, Copy, Debug)]
 struct RealMenuMatchStart {
+    map_index: usize,
     faction: CaptureProofFaction,
     ai_difficulty: AiDifficulty,
     starting_resource_index: usize,
@@ -4342,11 +4344,17 @@ struct RealMenuMatchStart {
 impl RealMenuMatchStart {
     fn new(faction: CaptureProofFaction) -> Self {
         Self {
+            map_index: 0,
             faction,
             ai_difficulty: AiDifficulty::Easy,
             starting_resource_index: DEFAULT_STARTING_RESOURCE_INDEX,
             match_mode: SkirmishMatchMode::OneVsOne,
         }
+    }
+
+    fn with_map_index(mut self, map_index: usize) -> Self {
+        self.map_index = map_index;
+        self
     }
 
     fn with_ai_difficulty(mut self, ai_difficulty: AiDifficulty) -> Self {
@@ -4395,6 +4403,11 @@ fn build_real_menu_match_app(match_start: RealMenuMatchStart) -> App {
     ));
     app.update();
 
+    drive_main_menu_action(
+        &mut app,
+        MainMenuAction::SelectMap(match_start.map_index),
+        1,
+    );
     drive_main_menu_action(
         &mut app,
         MainMenuAction::SelectFaction(match_start.faction.team()),
@@ -4532,6 +4545,27 @@ pub fn run_real_menu_selected_faction_victory_proof_for_faction(
         faction,
         max_frames,
         faction.mouse_victory_vehicle_target(),
+        false,
+    )
+}
+
+pub fn run_real_menu_selected_map_victory_proof(
+    map_index: usize,
+    max_frames: usize,
+) -> CaptureVictoryProof {
+    let mut app = build_real_menu_match_app(
+        RealMenuMatchStart::new(CaptureProofFaction::Human)
+            .with_map_index(map_index)
+            .with_ai_difficulty(AiDifficulty::Beginner),
+    );
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_victory_proof_with_target_units(
+        &mut app,
+        CaptureProofFaction::Human,
+        max_frames,
+        PRODUCTION_QUEUE_LIMIT + 1,
         false,
     )
 }
@@ -5451,8 +5485,14 @@ fn capture_victory_proof_status(
 ) -> CaptureVictoryProof {
     let snapshot = capture_match_snapshot(app);
     let player_stats = capture_stats_for_faction(&snapshot, faction);
+    let map_id = app
+        .world()
+        .get_resource::<SelectedSkirmishMap>()
+        .map(|map| map.definition().id)
+        .unwrap_or("unknown");
     CaptureVictoryProof {
         faction,
+        map_id,
         phase: snapshot.phase,
         frames,
         product_id,
@@ -33599,6 +33639,29 @@ mod tests {
             assert!(
                 proof.produced_units >= proof.target_units,
                 "selected-faction proof should produce the full faction-specific attack group; proof={proof:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn real_menu_selected_map_victory_proof_wins_on_each_menu_map() {
+        for (map_index, map) in SKIRMISH_MAPS.iter().enumerate() {
+            let proof = run_real_menu_selected_map_victory_proof(map_index, 7200);
+
+            assert!(
+                proof.succeeded(),
+                "selected-map real menu proof should pick map {} in the setup UI, train combat vehicles through command buttons without proof-side resource grants, right-click enemy anchors, and win; proof={proof:?}",
+                map.id
+            );
+            assert_eq!(
+                proof.map_id, map.id,
+                "selected-map proof should report the map actually loaded into the shared match scene; proof={proof:?}"
+            );
+            assert_eq!(proof.product_id, CaptureProofFaction::Human.proof_vehicle());
+            assert!(
+                proof.produced_units >= proof.target_units,
+                "selected-map proof should produce its full attack group on {}; proof={proof:?}",
+                map.id
             );
         }
     }

@@ -28,6 +28,7 @@
   - `real-victory-proof`: mouse select VehicleFactory, train combat vehicles, right-click enemy anchors, and win.
   - `real-default-victory-proof`: default `cargo run` menu start, no setup changes or proof-side resource grant, train combat vehicles from the real command panel, right-click enemy anchors, and win.
   - `real-selected-faction-victory-proof`: real menu faction selection, default resources, no proof-side resource grant, train that faction's vehicle roster from the real command panel, right-click enemy anchors, and win.
+  - `real-selected-map-victory-proof`: real menu map selection, default resources, no proof-side resource grant, train combat vehicles from the real command panel, right-click enemy anchors, and win while reporting the loaded map id.
   - `real-economy-victory-proof`: low-resource menu start, mouse harvest required resources, train combat vehicles, right-click enemy anchors, and win without proof-side resource injection.
   - `real-playable-proof`: low-resource menu start, mouse harvest, build Barracks, train a Barracks unit, train combat vehicles, right-click enemy anchors, and win.
   - `real-three-faction-playable-proof`: low-resource real menu start, select three-faction skirmish mode, use the same playable proof flow with a larger attack group, and finish all enemy anchors.

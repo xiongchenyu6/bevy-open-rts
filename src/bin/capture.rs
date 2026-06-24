@@ -16,6 +16,7 @@ use bevy_open_rts::{
     run_real_menu_economy_victory_proof_for_faction, run_real_menu_harvest_proof_for_faction,
     run_real_menu_match_proof_for_faction, run_real_menu_playable_proof_for_faction,
     run_real_menu_selected_faction_victory_proof_for_faction,
+    run_real_menu_selected_map_victory_proof,
     run_real_menu_three_faction_playable_proof_for_faction,
     run_real_menu_victory_proof_for_faction,
 };
@@ -361,6 +362,27 @@ fn run() -> Result<(), String> {
                 ));
             }
         }
+        Some("real-selected-map-victory-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("7200")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let map_index = args
+                .next()
+                .as_deref()
+                .unwrap_or("1")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid map index: {error}"))?;
+            let proof = run_real_menu_selected_map_victory_proof(map_index, max_frames);
+            print_victory_proof("real-selected-map-victory-proof", &proof);
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real selected-map victory proof did not train, attack, and win within {max_frames} frames"
+                ));
+            }
+        }
         Some("real-economy-victory-proof") => {
             let max_frames = args
                 .next()
@@ -481,10 +503,11 @@ fn print_playable_proof(command: &str, proof: &CapturePlayableProof) {
 
 fn print_victory_proof(command: &str, proof: &CaptureVictoryProof) {
     println!(
-        "[capture] {} faction={} label={} phase={:?} frames={} product={} target_units={} produced_units={} attack_orders={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
+        "[capture] {} faction={} label={} map={} phase={:?} frames={} product={} target_units={} produced_units={} attack_orders={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
         command,
         proof.faction.key(),
         proof.faction.label(),
+        proof.map_id,
         proof.phase,
         proof.frames,
         proof.product_id,
@@ -516,6 +539,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-default-victory-proof 3600");
     println!("  cargo run --bin capture -- real-selected-faction-victory-proof 3600 chaos");
+    println!("  cargo run --bin capture -- real-selected-map-victory-proof 7200 1");
     println!("  cargo run --bin capture -- real-economy-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-playable-proof 4200 human");
     println!("  cargo run --bin capture -- real-three-faction-playable-proof 7200 human");
