@@ -69,6 +69,8 @@ const COMMAND_KEY_HOLD_POSITION: &str = "hold_position";
 const COMMAND_KEY_MINIMAP_MOVE: &str = "minimap_move";
 const COMMAND_KEY_DEPLOY_MCV: &str = "deploy_mcv";
 const COMMAND_KEY_TOGGLE_DEPLOY: &str = "toggle_deploy";
+const MOVE_ORDER_REACHED_DISTANCE_M: f32 = 0.22;
+const CONTACT_ACTION_REACHED_TOLERANCE_M: f32 = MOVE_ORDER_REACHED_DISTANCE_M;
 const ATTACK_MOVE_REACHED_DISTANCE: f32 = 2.0;
 const PATROL_TURN_DISTANCE: f32 = 2.0;
 const SCATTER_DISTANCE: f32 = 4.0;
@@ -20792,8 +20794,11 @@ fn update_capture_orders(
             continue;
         }
 
-        let entry_range =
-            capturer_selectable.radius + target_selectable.radius + CAPTURE_ENTRY_MARGIN_M;
+        let entry_range = contact_action_entry_range(
+            capturer_selectable.radius,
+            target_selectable.radius,
+            CAPTURE_ENTRY_MARGIN_M,
+        );
         if xz_distance(capturer_transform.translation, target_transform.translation) > entry_range {
             if unit.speed <= 0.0 {
                 commands
@@ -20934,8 +20939,11 @@ fn update_garrison_orders(
             continue;
         }
 
-        let entry_range =
-            unit_selectable.radius + bunker_selectable.radius + CAPTURE_ENTRY_MARGIN_M;
+        let entry_range = contact_action_entry_range(
+            unit_selectable.radius,
+            bunker_selectable.radius,
+            CAPTURE_ENTRY_MARGIN_M,
+        );
         if xz_distance(unit_transform.translation, bunker_transform.translation) > entry_range {
             if unit.speed <= 0.0 {
                 commands
@@ -20974,6 +20982,7 @@ fn update_harvest_orders(
             &Health,
             &mut ResourceCargo,
             &mut HarvestOrder,
+            Option<&MoveOrder>,
             Option<&EmpDisabled>,
         ),
         (With<Unit>, Without<Structure>, Without<ResourceNode>),
@@ -20995,8 +21004,18 @@ fn update_harvest_orders(
         (With<Structure>, Without<Unit>),
     >,
 ) {
-    for (unit_entity, team, transform, selectable, unit, health, mut cargo, mut order, emp) in
-        &mut harvesters
+    for (
+        unit_entity,
+        team,
+        transform,
+        selectable,
+        unit,
+        health,
+        mut cargo,
+        mut order,
+        move_order,
+        emp,
+    ) in &mut harvesters
     {
         if cargo.capacity <= 0
             || health.current <= 0.0
@@ -21048,8 +21067,11 @@ fn update_harvest_orders(
                         order.resource = None;
                         continue;
                     }
-                    let entry_range =
-                        selectable.radius + resource_selectable.radius + RESOURCE_ENTRY_MARGIN_M;
+                    let entry_range = contact_action_entry_range(
+                        selectable.radius,
+                        resource_selectable.radius,
+                        RESOURCE_ENTRY_MARGIN_M,
+                    );
                     xz_distance(transform.translation, resource_transform.translation)
                         <= entry_range
                 };
@@ -21066,14 +21088,21 @@ fn update_harvest_orders(
                     if let Ok((_, resource_transform, resource_selectable, _)) =
                         resources.get(target)
                     {
-                        commands.entity(unit_entity).try_insert(MoveOrder {
-                            target: unit_contact_move_target_position(
-                                transform.translation,
-                                selectable.radius,
-                                resource_transform.translation,
-                                resource_selectable.radius,
-                            ),
-                        });
+                        if !move_order_targets_contact(
+                            move_order,
+                            resource_transform.translation,
+                            selectable.radius,
+                            resource_selectable.radius,
+                        ) {
+                            commands.entity(unit_entity).try_insert(MoveOrder {
+                                target: unit_contact_move_target_position(
+                                    transform.translation,
+                                    selectable.radius,
+                                    resource_transform.translation,
+                                    resource_selectable.radius,
+                                ),
+                            });
+                        }
                     }
                     continue;
                 }
@@ -21104,8 +21133,11 @@ fn update_harvest_orders(
                         order.state = HarvestState::MovingToResource;
                         continue;
                     };
-                    let entry_range =
-                        selectable.radius + resource_selectable.radius + RESOURCE_ENTRY_MARGIN_M;
+                    let entry_range = contact_action_entry_range(
+                        selectable.radius,
+                        resource_selectable.radius,
+                        RESOURCE_ENTRY_MARGIN_M,
+                    );
                     if resource.amount <= 0
                         || xz_distance(transform.translation, resource_transform.translation)
                             > entry_range
@@ -21166,8 +21198,11 @@ fn update_harvest_orders(
                     continue;
                 };
 
-                let entry_range =
-                    selectable.radius + dropoff_radius + RESOURCE_DROPOFF_ENTRY_MARGIN_M;
+                let entry_range = contact_action_entry_range(
+                    selectable.radius,
+                    dropoff_radius,
+                    RESOURCE_DROPOFF_ENTRY_MARGIN_M,
+                );
                 if xz_distance(transform.translation, dropoff_position) > entry_range {
                     if unit.speed <= 0.0 {
                         commands
@@ -21176,14 +21211,21 @@ fn update_harvest_orders(
                             .try_remove::<MoveOrder>();
                         continue;
                     }
-                    commands.entity(unit_entity).try_insert(MoveOrder {
-                        target: unit_contact_move_target_position(
-                            transform.translation,
-                            selectable.radius,
-                            dropoff_position,
-                            dropoff_radius,
-                        ),
-                    });
+                    if !move_order_targets_contact(
+                        move_order,
+                        dropoff_position,
+                        selectable.radius,
+                        dropoff_radius,
+                    ) {
+                        commands.entity(unit_entity).try_insert(MoveOrder {
+                            target: unit_contact_move_target_position(
+                                transform.translation,
+                                selectable.radius,
+                                dropoff_position,
+                                dropoff_radius,
+                            ),
+                        });
+                    }
                     continue;
                 }
 
@@ -21698,6 +21740,24 @@ fn unit_contact_move_target_position(
         + direction_from_target * (source_radius + target_radius + UNIT_ADHERENCE_MARGIN_M)
 }
 
+fn contact_action_entry_range(source_radius: f32, target_radius: f32, margin: f32) -> f32 {
+    source_radius + target_radius + margin + CONTACT_ACTION_REACHED_TOLERANCE_M
+}
+
+fn move_order_targets_contact(
+    move_order: Option<&MoveOrder>,
+    target_position: Vec3,
+    source_radius: f32,
+    target_radius: f32,
+) -> bool {
+    let Some(move_order) = move_order else {
+        return false;
+    };
+    let expected_contact_distance = source_radius + target_radius + UNIT_ADHERENCE_MARGIN_M;
+    (xz_distance(move_order.target, target_position) - expected_contact_distance).abs()
+        <= CONTACT_ACTION_REACHED_TOLERANCE_M * 2.0
+}
+
 fn follow_order_desired_distance(
     source_radius: f32,
     target_radius: f32,
@@ -21824,7 +21884,7 @@ fn update_repair_orders(
             repairer.capability,
             repairer.radius,
             target_selectable.radius,
-        );
+        ) + CONTACT_ACTION_REACHED_TOLERANCE_M;
         if xz_distance(repairer.position, target_transform.translation) > range {
             if !repairer.can_move {
                 commands
@@ -21925,8 +21985,11 @@ fn update_construct_orders(
             continue;
         }
 
-        let range =
-            constructor_selectable.radius + target_selectable.radius + CONSTRUCTION_ENTRY_MARGIN_M;
+        let range = contact_action_entry_range(
+            constructor_selectable.radius,
+            target_selectable.radius,
+            CONSTRUCTION_ENTRY_MARGIN_M,
+        );
         if xz_distance(
             constructor_transform.translation,
             target_transform.translation,
@@ -22617,7 +22680,7 @@ fn move_units(
             target.y = transform.translation.y;
             let delta = target - transform.translation;
             let distance = delta.length();
-            if distance < 0.22 {
+            if distance < MOVE_ORDER_REACHED_DISTANCE_M {
                 commands.entity(entity).try_remove::<MoveOrder>();
                 continue;
             }
@@ -22751,7 +22814,7 @@ fn movement_direction_around_static_obstacles(
         let clearance = mover_radius + obstacle.radius + MOVEMENT_OBSTACLE_CLEARANCE_M;
         let to_center = center - start;
         let projection = to_center.dot(desired_xz);
-        if projection < -clearance || projection > lookahead + clearance {
+        if projection < -clearance || projection > lookahead {
             continue;
         }
         let segment_distance = distance_point_to_xz_segment(
@@ -26007,6 +26070,36 @@ mod tests {
                 steered_direction * MOVEMENT_OBSTACLE_LOOKAHEAD_M,
             ) > 0.9,
             "steered lookahead should move away from the obstacle center"
+        );
+    }
+
+    #[test]
+    fn movement_direction_keeps_contact_target_obstacle_reachable() {
+        let source = Vec3::ZERO;
+        let source_radius = 0.4;
+        let obstacle = MovementObstacleSnapshot {
+            position: Vec3::new(2.0, 0.0, 0.0),
+            radius: 0.9,
+        };
+        let contact_target = unit_contact_move_target_position(
+            source,
+            source_radius,
+            obstacle.position,
+            obstacle.radius,
+        );
+        let desired = (contact_target - source).normalize();
+
+        let direction = movement_direction_around_static_obstacles(
+            source,
+            contact_target,
+            desired,
+            source_radius,
+            &[obstacle],
+        );
+
+        assert_eq!(
+            direction, desired,
+            "the target resource/building sits behind its contact point and should not repel the mover"
         );
     }
 
@@ -39399,6 +39492,111 @@ mod tests {
                 "default match loose ore click should order selected collectors to harvest"
             );
         }
+    }
+
+    fn selected_race_worker_right_click_visible_ore_and_deliver(player_team: Team) {
+        let selection = skirmish_menu_selection(
+            0,
+            player_team,
+            DEFAULT_STARTING_RESOURCE_INDEX,
+            SkirmishMatchMode::OneVsOne,
+            AiDifficulty::Beginner,
+        );
+        let mut app = stateful_match_flow_test_app(selection.match_setup());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(0.25),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+        for _ in 0..3 {
+            app.update();
+        }
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        assert_eq!(app.world().resource::<VisiblePlayer>().team, player_team);
+        let worker = first_unit_by_id(&mut app, player_team, "Worker")
+            .expect("selected race skirmish should spawn a player Worker");
+        let worker_position = unit_position(&app, worker);
+        let (resource, _, resource_amount_before, resource_position, resource_visible) =
+            runtime_resource_node_snapshots(&mut app)
+                .into_iter()
+                .filter(|(_, kind, amount, _, visible)| {
+                    *kind == ResourceKind::Ore && *amount > 0 && *visible
+                })
+                .min_by(|(_, _, _, lhs, _), (_, _, _, rhs, _)| {
+                    xz_distance(*lhs, worker_position)
+                        .partial_cmp(&xz_distance(*rhs, worker_position))
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
+                .expect("selected race player start should reveal at least one nearby ore node");
+        assert!(
+            resource_visible,
+            "selected race player start should reveal the clicked ore node"
+        );
+
+        select_only_entities(&mut app, &[worker]);
+        attach_test_window_to_main_camera(&mut app, resource_position);
+        right_click_order_at_world(&mut app, resource_position);
+        assert!(
+            app.world()
+                .entity(worker)
+                .get::<HarvestOrder>()
+                .is_some_and(|order| order.resource == Some(resource)),
+            "right-clicking visible ore should order the selected race Worker to harvest"
+        );
+
+        let ore_before = app.world().resource::<Economies>().get(player_team).ore;
+        for _ in 0..160 {
+            app.update();
+            if app.world().resource::<Economies>().get(player_team).ore > ore_before {
+                break;
+            }
+        }
+        let ore_after = app.world().resource::<Economies>().get(player_team).ore;
+        let resource_after = app
+            .world()
+            .get::<ResourceNode>(resource)
+            .map_or(0, |resource| resource.amount);
+        let worker_ref = app.world().entity(worker);
+        let worker_position_after = worker_ref
+            .get::<Transform>()
+            .expect("Worker should keep transform")
+            .translation;
+        let cargo_after = worker_ref
+            .get::<ResourceCargo>()
+            .expect("Worker should keep resource cargo")
+            .total();
+        let harvest_after = worker_ref
+            .get::<HarvestOrder>()
+            .map(|harvest| harvest.state);
+        let move_after = worker_ref.get::<MoveOrder>().map(|order| order.target);
+        assert!(
+            resource_after < resource_amount_before,
+            "selected race Worker should mine the clicked ore node before delivery; team={player_team:?} ore={ore_before}->{ore_after} resource={resource_amount_before}->{resource_after} worker=({:.1},{:.1}) resource=({:.1},{:.1}) cargo={cargo_after} harvest={harvest_after:?} move={move_after:?}",
+            worker_position_after.x,
+            worker_position_after.z,
+            resource_position.x,
+            resource_position.z
+        );
+        assert!(
+            ore_after > ore_before,
+            "{player_team:?} Worker should deliver mined ore back to its own economy"
+        );
+        assert_eq!(
+            cargo_after, 0,
+            "delivered Worker cargo should be cleared after dropoff"
+        );
+    }
+
+    #[test]
+    fn demon_menu_worker_right_click_visible_ore_and_deliver() {
+        selected_race_worker_right_click_visible_ore_and_deliver(Team::Demon);
+    }
+
+    #[test]
+    fn chaos_menu_worker_right_click_visible_ore_and_deliver() {
+        selected_race_worker_right_click_visible_ore_and_deliver(Team::Chaos);
     }
 
     #[test]
