@@ -30971,6 +30971,93 @@ mod tests {
     }
 
     #[test]
+    fn headless_game_app_menu_selection_enters_shared_match_with_chosen_setup() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.update();
+
+        press_main_menu_button(&mut app, MainMenuAction::SelectMap(1), 1);
+        press_main_menu_button(&mut app, MainMenuAction::SelectFaction(Team::Chaos), 1);
+        press_main_menu_button(&mut app, MainMenuAction::SelectStartingResources(2), 1);
+        press_main_menu_button(
+            &mut app,
+            MainMenuAction::SelectAiDifficulty(AiDifficulty::Hard),
+            1,
+        );
+
+        {
+            let selection = *app.world().resource::<SkirmishMenuSelection>();
+            assert_eq!(selection.map_index, 1);
+            assert_eq!(selection.faction, Team::Chaos);
+            assert_eq!(selection.starting_resource_index, 2);
+            assert_eq!(selection.ai_difficulty, AiDifficulty::Hard);
+            assert!(selection.can_start());
+        }
+
+        press_main_menu_button(&mut app, MainMenuAction::StartMatch, 3);
+
+        assert_eq!(
+            app_screen(&app),
+            AppScreen::InMatch,
+            "the real app builder should carry menu selections into the shared match scene"
+        );
+        assert_eq!(
+            app.world().resource::<SelectedSkirmishMap>().godot_path,
+            SKIRMISH_MAPS[1].godot_path
+        );
+        assert_eq!(app.world().resource::<VisiblePlayer>().team, Team::Chaos);
+        assert_eq!(
+            app.world()
+                .resource::<PlayerFactions>()
+                .slot_faction(Team::Chaos),
+            SkirmishFaction::Chaos
+        );
+        let chaos_economy = app.world().resource::<Economies>().get(Team::Chaos);
+        assert_eq!(
+            chaos_economy.ore,
+            GODOT_STARTING_RESOURCE_OPTIONS[2].resources.ore
+        );
+        assert_eq!(
+            chaos_economy.crystal,
+            GODOT_STARTING_RESOURCE_OPTIONS[2].resources.crystal
+        );
+        assert_eq!(
+            app.world()
+                .resource::<AiDifficultySettings>()
+                .difficulty(Team::Human),
+            AiDifficulty::Hard
+        );
+        let expected_focus = team_start_camera_focus_for_faction(
+            &SKIRMISH_MAPS[1],
+            Team::Chaos,
+            SkirmishFaction::Chaos,
+            app.world().resource::<MatchSetupSettings>().startup_loadout,
+        );
+        {
+            let camera_state = app.world().resource::<RtsCamera>();
+            assert!(
+                xz_distance(camera_state.focus, expected_focus) < 0.01,
+                "selected Chaos match should open the camera over the selected base work area"
+            );
+            assert_eq!(
+                camera_state.distance, CAMERA_DEFAULT_DISTANCE,
+                "real app match start should use the playable default zoom"
+            );
+        }
+        assert!(
+            structure_snapshots_by_id(&mut app, "CommandCenter")
+                .into_iter()
+                .any(|(_, team, _, constructed)| team == Team::Chaos && constructed),
+            "the selected Chaos slot should receive a constructed shared match base"
+        );
+        assert!(
+            runtime_resource_node_snapshots(&mut app)
+                .into_iter()
+                .any(|(_, _, amount, _, visible)| amount > 0 && visible),
+            "chosen shared match map should reveal mineable resources after start"
+        );
+    }
+
+    #[test]
     fn app_defaults_to_skirmish_setup_menu_with_map_and_faction_buttons() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
 
