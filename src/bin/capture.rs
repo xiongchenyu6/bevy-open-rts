@@ -10,9 +10,10 @@ use bevy_open_rts::{
     advance_capture_match, advance_capture_match_proof_frame, build_capture_match_app,
     build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
     capture_proof_unit_count, run_capture_match_proof_for_faction,
-    run_real_menu_build_proof_for_faction, run_real_menu_economy_victory_proof_for_faction,
-    run_real_menu_harvest_proof_for_faction, run_real_menu_match_proof_for_faction,
-    run_real_menu_playable_proof_for_faction, run_real_menu_victory_proof_for_faction,
+    run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
+    run_real_menu_economy_victory_proof_for_faction, run_real_menu_harvest_proof_for_faction,
+    run_real_menu_match_proof_for_faction, run_real_menu_playable_proof_for_faction,
+    run_real_menu_victory_proof_for_faction,
 };
 
 const WIDTH: u32 = 1280;
@@ -223,6 +224,34 @@ fn run() -> Result<(), String> {
                 ));
             }
         }
+        Some("real-dual-harvest-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("1800")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let faction = parse_optional_faction(args.next())?;
+            let proof = run_real_menu_dual_harvest_proof_for_faction(faction, max_frames);
+            println!(
+                "[capture] real-dual-harvest-proof faction={} label={} phase={:?} frames={} ore={}->{} crystal={}->{} harvest_ore={} harvest_crystal={}",
+                proof.faction.key(),
+                proof.faction.label(),
+                proof.phase,
+                proof.frames,
+                proof.ore_before,
+                proof.ore_after,
+                proof.crystal_before,
+                proof.crystal_after,
+                proof.ore_harvest_ordered,
+                proof.crystal_harvest_ordered,
+            );
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real menu dual harvest proof did not mine both Ore and Crystal within {max_frames} frames"
+                ));
+            }
+        }
         Some("real-build-proof") => {
             let max_frames = args
                 .next()
@@ -391,6 +420,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- match-proof 7200 chaos");
     println!("  cargo run --bin capture -- real-match-proof 7200 human");
     println!("  cargo run --bin capture -- real-harvest-proof 900 human");
+    println!("  cargo run --bin capture -- real-dual-harvest-proof 1800 human");
     println!("  cargo run --bin capture -- real-build-proof 900 human");
     println!("  cargo run --bin capture -- real-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-economy-victory-proof 3600 human");

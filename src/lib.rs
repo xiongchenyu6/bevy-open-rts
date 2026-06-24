@@ -4027,6 +4027,28 @@ impl CaptureHarvestProof {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CaptureDualHarvestProof {
+    pub faction: CaptureProofFaction,
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub ore_before: i32,
+    pub ore_after: i32,
+    pub crystal_before: i32,
+    pub crystal_after: i32,
+    pub ore_harvest_ordered: bool,
+    pub crystal_harvest_ordered: bool,
+}
+
+impl CaptureDualHarvestProof {
+    pub fn succeeded(&self) -> bool {
+        self.ore_harvest_ordered
+            && self.crystal_harvest_ordered
+            && self.ore_after > self.ore_before
+            && self.crystal_after > self.crystal_before
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CaptureBuildProof {
     pub faction: CaptureProofFaction,
     pub phase: CaptureMatchPhase,
@@ -4352,6 +4374,21 @@ pub fn run_real_menu_harvest_proof_for_faction(
     run_real_menu_harvest_proof(&mut app, faction, max_frames)
 }
 
+pub fn run_real_menu_dual_harvest_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureDualHarvestProof {
+    let mut app = build_real_menu_match_app_for_faction_with_ai_and_starting_resources(
+        faction,
+        AiDifficulty::Beginner,
+        0,
+    );
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_dual_harvest_proof(&mut app, faction, max_frames)
+}
+
 pub fn run_real_menu_build_proof_for_faction(
     faction: CaptureProofFaction,
     max_frames: usize,
@@ -4643,6 +4680,67 @@ fn capture_harvest_proof_status(
         resource_after,
         product_id,
         produced_units,
+    }
+}
+
+fn run_real_menu_dual_harvest_proof(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureDualHarvestProof {
+    let max_frames = max_frames.max(1);
+    let team = faction.team();
+    let resources_before = capture_team_resources(app.world(), team);
+    let mut frames = 0usize;
+    let ore_harvest_ordered = capture_harvest_kind_until_resource_increases(
+        app,
+        team,
+        ResourceKind::Ore,
+        max_frames,
+        &mut frames,
+    );
+    let crystal_harvest_ordered = if frames < max_frames {
+        capture_harvest_kind_until_resource_increases(
+            app,
+            team,
+            ResourceKind::Crystal,
+            max_frames,
+            &mut frames,
+        )
+    } else {
+        false
+    };
+
+    capture_dual_harvest_proof_status(
+        app,
+        faction,
+        frames,
+        resources_before,
+        ore_harvest_ordered,
+        crystal_harvest_ordered,
+    )
+}
+
+fn capture_dual_harvest_proof_status(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    frames: usize,
+    resources_before: (i32, i32),
+    ore_harvest_ordered: bool,
+    crystal_harvest_ordered: bool,
+) -> CaptureDualHarvestProof {
+    let snapshot = capture_match_snapshot(app);
+    let player_stats = capture_stats_for_faction(&snapshot, faction);
+    CaptureDualHarvestProof {
+        faction,
+        phase: snapshot.phase,
+        frames,
+        ore_before: resources_before.0,
+        ore_after: player_stats.ore,
+        crystal_before: resources_before.1,
+        crystal_after: player_stats.crystal,
+        ore_harvest_ordered,
+        crystal_harvest_ordered,
     }
 }
 
@@ -33030,6 +33128,27 @@ mod tests {
             assert!(
                 !proof.product_id.is_empty(),
                 "harvest proof should identify the trained Barracks unit; proof={proof:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn real_menu_dual_harvest_proof_mines_ore_and_crystal_from_mouse_orders() {
+        for faction in CaptureProofFaction::ALL {
+            let proof = run_real_menu_dual_harvest_proof_for_faction(faction, 1800);
+
+            assert!(
+                proof.succeeded(),
+                "real menu dual harvest proof should mouse-order both Ore and Crystal gathering for {:?}; proof={proof:?}",
+                faction
+            );
+            assert!(
+                proof.ore_after > proof.ore_before,
+                "dual harvest proof should increase ore through a real harvest order; proof={proof:?}"
+            );
+            assert!(
+                proof.crystal_after > proof.crystal_before,
+                "dual harvest proof should increase crystal through a real harvest order; proof={proof:?}"
             );
         }
     }
