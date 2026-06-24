@@ -1651,6 +1651,15 @@ impl SkirmishMatchMode {
         Self::AlliedTwoVsOne,
     ];
 
+    fn id(self) -> &'static str {
+        match self {
+            Self::OneVsOne => "one_vs_one",
+            Self::ThreeFaction => "three_faction",
+            Self::AiVsAi => "ai_vs_ai",
+            Self::AlliedTwoVsOne => "allied_two_vs_one",
+        }
+    }
+
     fn label(self) -> &'static str {
         match self {
             Self::OneVsOne => "1v1",
@@ -4097,6 +4106,7 @@ impl CaptureBuildProof {
 pub struct CaptureVictoryProof {
     pub faction: CaptureProofFaction,
     pub map_id: &'static str,
+    pub match_mode_id: &'static str,
     pub phase: CaptureMatchPhase,
     pub frames: usize,
     pub product_id: &'static str,
@@ -4112,11 +4122,16 @@ pub struct CaptureVictoryProof {
 
 impl CaptureVictoryProof {
     pub fn succeeded(&self) -> bool {
+        let max_remaining_teams = if self.match_mode_id == "allied_two_vs_one" {
+            2
+        } else {
+            1
+        };
         self.phase == CaptureMatchPhase::HumanVictory
             && self.produced_units > 0
             && self.attack_orders > 0
             && self.enemy_structures_destroyed > 0
-            && self.remaining_teams <= 1
+            && self.remaining_teams <= max_remaining_teams
     }
 }
 
@@ -4566,6 +4581,27 @@ pub fn run_real_menu_selected_map_victory_proof(
         CaptureProofFaction::Human,
         max_frames,
         PRODUCTION_QUEUE_LIMIT + 1,
+        false,
+    )
+}
+
+pub fn run_real_menu_allied_victory_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureVictoryProof {
+    let mut app = build_real_menu_match_app(
+        RealMenuMatchStart::new(faction)
+            .with_match_mode(SkirmishMatchMode::AlliedTwoVsOne)
+            .with_ai_difficulty(AiDifficulty::Beginner),
+    );
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_victory_proof_with_target_units(
+        &mut app,
+        faction,
+        max_frames,
+        faction.mouse_victory_vehicle_target() + 3,
         false,
     )
 }
@@ -5490,9 +5526,15 @@ fn capture_victory_proof_status(
         .get_resource::<SelectedSkirmishMap>()
         .map(|map| map.definition().id)
         .unwrap_or("unknown");
+    let match_mode_id = app
+        .world()
+        .get_resource::<MatchSetupSettings>()
+        .map(|settings| skirmish_mode_from_match_setup(*settings).id())
+        .unwrap_or("unknown");
     CaptureVictoryProof {
         faction,
         map_id,
+        match_mode_id,
         phase: snapshot.phase,
         frames,
         product_id,
@@ -33664,6 +33706,27 @@ mod tests {
                 map.id
             );
         }
+    }
+
+    #[test]
+    fn real_menu_allied_two_vs_one_victory_proof_wins() {
+        let proof =
+            run_real_menu_allied_victory_proof_for_faction(CaptureProofFaction::Demon, 7200);
+
+        assert!(
+            proof.succeeded(),
+            "allied 2v1 real menu proof should select the allied match mode, train combat vehicles through command buttons without proof-side resource grants, right-click enemy anchors, and win; proof={proof:?}"
+        );
+        assert_eq!(proof.faction, CaptureProofFaction::Demon);
+        assert_eq!(
+            proof.match_mode_id, "allied_two_vs_one",
+            "allied proof should report the selected shared match mode; proof={proof:?}"
+        );
+        assert_eq!(proof.product_id, CaptureProofFaction::Demon.proof_vehicle());
+        assert!(
+            proof.produced_units >= proof.target_units,
+            "allied proof should produce its full attack group; proof={proof:?}"
+        );
     }
 
     #[test]

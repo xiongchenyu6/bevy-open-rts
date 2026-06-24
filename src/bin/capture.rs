@@ -12,9 +12,10 @@ use bevy_open_rts::{
     build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
     capture_proof_unit_count, run_capture_match_proof_for_faction,
     run_real_default_menu_victory_proof, run_real_menu_ai_pressure_proof_for_faction,
-    run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
-    run_real_menu_economy_victory_proof_for_faction, run_real_menu_harvest_proof_for_faction,
-    run_real_menu_match_proof_for_faction, run_real_menu_playable_proof_for_faction,
+    run_real_menu_allied_victory_proof_for_faction, run_real_menu_build_proof_for_faction,
+    run_real_menu_dual_harvest_proof_for_faction, run_real_menu_economy_victory_proof_for_faction,
+    run_real_menu_harvest_proof_for_faction, run_real_menu_match_proof_for_faction,
+    run_real_menu_playable_proof_for_faction,
     run_real_menu_selected_faction_victory_proof_for_faction,
     run_real_menu_selected_map_victory_proof,
     run_real_menu_three_faction_playable_proof_for_faction,
@@ -383,6 +384,22 @@ fn run() -> Result<(), String> {
                 ));
             }
         }
+        Some("real-allied-victory-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("7200")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let faction = parse_optional_faction(args.next())?;
+            let proof = run_real_menu_allied_victory_proof_for_faction(faction, max_frames);
+            print_victory_proof("real-allied-victory-proof", &proof);
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real allied 2v1 victory proof did not train, attack, and win within {max_frames} frames"
+                ));
+            }
+        }
         Some("real-economy-victory-proof") => {
             let max_frames = args
                 .next()
@@ -503,11 +520,12 @@ fn print_playable_proof(command: &str, proof: &CapturePlayableProof) {
 
 fn print_victory_proof(command: &str, proof: &CaptureVictoryProof) {
     println!(
-        "[capture] {} faction={} label={} map={} phase={:?} frames={} product={} target_units={} produced_units={} attack_orders={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
+        "[capture] {} faction={} label={} map={} mode={} phase={:?} frames={} product={} target_units={} produced_units={} attack_orders={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
         command,
         proof.faction.key(),
         proof.faction.label(),
         proof.map_id,
+        proof.match_mode_id,
         proof.phase,
         proof.frames,
         proof.product_id,
@@ -540,6 +558,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-default-victory-proof 3600");
     println!("  cargo run --bin capture -- real-selected-faction-victory-proof 3600 chaos");
     println!("  cargo run --bin capture -- real-selected-map-victory-proof 7200 1");
+    println!("  cargo run --bin capture -- real-allied-victory-proof 7200 demon");
     println!("  cargo run --bin capture -- real-economy-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-playable-proof 4200 human");
     println!("  cargo run --bin capture -- real-three-faction-playable-proof 7200 human");
