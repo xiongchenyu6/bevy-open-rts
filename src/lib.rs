@@ -40007,7 +40007,17 @@ mod tests {
             "default player start should reveal the clicked ore node"
         );
 
-        select_only_entities(&mut app, &[worker, ore_harvester]);
+        let worker_position = unit_position(&app, worker);
+        attach_test_window_to_main_camera(&mut app, worker_position);
+        click_selection_at_world(&mut app, worker_position, false);
+        attach_test_window_to_main_camera(&mut app, harvester_position);
+        click_selection_at_world(&mut app, harvester_position, true);
+        for entity in [worker, ore_harvester] {
+            assert!(
+                app.world().entity(entity).get::<Selected>().is_some(),
+                "left-click plus Shift-left-click should select both default collectors before a harvest order"
+            );
+        }
         attach_test_window_to_main_camera(&mut app, resource_position);
         right_click_order_at_world(&mut app, resource_position);
 
@@ -40205,9 +40215,19 @@ mod tests {
             Vec3::X
         };
         let loose_click = resource_position + toward_collectors * 4.0;
-        attach_test_window_to_main_camera(&mut app, loose_click);
 
-        select_only_entities(&mut app, &[worker, ore_harvester]);
+        let worker_position = unit_position(&app, worker);
+        attach_test_window_to_main_camera(&mut app, worker_position);
+        click_selection_at_world(&mut app, worker_position, false);
+        attach_test_window_to_main_camera(&mut app, harvester_position);
+        click_selection_at_world(&mut app, harvester_position, true);
+        for entity in [worker, ore_harvester] {
+            assert!(
+                app.world().entity(entity).get::<Selected>().is_some(),
+                "left-click plus Shift-left-click should select both collectors before a loose ore click"
+            );
+        }
+        attach_test_window_to_main_camera(&mut app, loose_click);
         right_click_order_at_world(&mut app, loose_click);
 
         for entity in [worker, ore_harvester] {
