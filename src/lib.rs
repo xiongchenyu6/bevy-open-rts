@@ -3627,6 +3627,15 @@ pub enum GameAppMode {
     Headless,
 }
 
+#[derive(Default)]
+pub struct SharedMatchScenePlugin;
+
+impl Plugin for SharedMatchScenePlugin {
+    fn build(&self, app: &mut App) {
+        add_shared_match_scene(app);
+    }
+}
+
 pub fn run_game_app() {
     build_game_app(GameAppMode::Interactive).run();
 }
@@ -3722,7 +3731,7 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
 
 /// Registers the real game scene flow used by `cargo run`: setup menu plus shared match runtime.
 pub fn add_game_scenes(app: &mut App) -> &mut App {
-    add_shared_match_scene(app);
+    app.add_plugins(SharedMatchScenePlugin);
     add_main_menu_scene(app);
     app
 }
@@ -3810,7 +3819,7 @@ fn build_capture_match_app_with_settings(settings: MatchSetupSettings) -> App {
     let mut app = App::new();
     add_headless_game_plugins(&mut app);
     app.insert_resource(settings);
-    add_shared_match_scene(&mut app);
+    app.add_plugins(SharedMatchScenePlugin);
     start_default_match_for_capture(&mut app);
     app
 }
@@ -28870,7 +28879,7 @@ mod tests {
         .init_asset::<WorldAsset>()
         .init_asset::<Font>()
         .init_asset::<bevy::audio::AudioSource>();
-        add_shared_match_scene(&mut app);
+        app.add_plugins(SharedMatchScenePlugin);
         app.world_mut()
             .resource_mut::<NextState<AppScreen>>()
             .set(AppScreen::InMatch);
