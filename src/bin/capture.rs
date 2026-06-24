@@ -7,7 +7,8 @@ use std::{
 
 use bevy_open_rts::{
     CaptureEntityKind, CaptureMatchPhase, CaptureMatchSnapshot, CaptureTeam, advance_capture_match,
-    build_capture_match_app, capture_match_snapshot, run_capture_default_match_proof,
+    advance_capture_match_proof_frame, build_capture_match_app, capture_human_tank_count,
+    capture_match_proof_status, capture_match_snapshot, run_capture_default_match_proof,
 };
 
 const WIDTH: u32 = 1280;
@@ -88,6 +89,37 @@ fn run() -> Result<(), String> {
             render_frames(&directory, count)?;
             println!("[capture] wrote {count} frames to {}", directory.display());
         }
+        Some("proof-frames") => {
+            let directory = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/capture-proof"));
+            let count = args
+                .next()
+                .as_deref()
+                .unwrap_or("600")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid frame count: {error}"))?;
+            let proof = render_proof_frames(&directory, count)?;
+            println!(
+                "[capture] proof-frames phase={:?} frames={} elapsed={}s produced_tanks={} human_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={} dir={}",
+                proof.phase,
+                proof.frames,
+                proof.elapsed_seconds,
+                proof.produced_tanks,
+                proof.human_units,
+                proof.enemy_units_destroyed,
+                proof.enemy_structures_destroyed,
+                proof.remaining_teams,
+                proof.remaining_anchors,
+                directory.display()
+            );
+            if !proof.succeeded() {
+                return Err(format!(
+                    "proof frames did not reach player victory within {count} frames"
+                ));
+            }
+        }
         Some("match-proof") => {
             let max_frames = args
                 .next()
@@ -131,6 +163,7 @@ fn print_help() {
     println!("  cargo run --bin capture");
     println!("  cargo run --bin capture -- screenshot screenshots/capture/still.png");
     println!("  cargo run --bin capture -- frames screenshots/result/1 450");
+    println!("  cargo run --bin capture -- proof-frames screenshots/result/2 600");
     println!("  cargo run --bin capture -- match-proof 7200");
 }
 
@@ -160,6 +193,30 @@ fn render_frames(directory: &Path, count: usize) -> Result<(), String> {
         write_png(&path, WIDTH, HEIGHT, &pixels)?;
     }
     Ok(())
+}
+
+fn render_proof_frames(
+    directory: &Path,
+    count: usize,
+) -> Result<bevy_open_rts::CaptureMatchProof, String> {
+    fs::create_dir_all(directory)
+        .map_err(|error| format!("could not create {}: {error}", directory.display()))?;
+    let mut app = build_capture_match_app();
+    let tanks_before = capture_human_tank_count(&mut app);
+    let mut tank_peak = tanks_before;
+    for frame in 0..count {
+        advance_capture_match_proof_frame(&mut app, frame);
+        tank_peak = tank_peak.max(capture_human_tank_count(&mut app));
+        let path = directory.join(format!("frame{frame:05}.png"));
+        let snapshot = capture_match_snapshot(&mut app);
+        let pixels = render_frame(frame, count.max(1), &snapshot);
+        write_png(&path, WIDTH, HEIGHT, &pixels)?;
+    }
+    Ok(capture_match_proof_status(
+        &mut app,
+        count,
+        tank_peak.saturating_sub(tanks_before),
+    ))
 }
 
 fn write_png(path: &Path, width: u32, height: u32, pixels: &[u8]) -> Result<(), String> {

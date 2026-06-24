@@ -46,12 +46,15 @@ stale game code after a rebuild.
 ```sh
 cargo run --bin capture -- screenshot screenshots/capture/still.png
 cargo run --bin capture -- frames screenshots/result/1 450
+cargo run --bin capture -- proof-frames screenshots/result/2 600
 cargo run --bin capture -- match-proof 7200
 ```
 
 `match-proof` runs the shared default skirmish scene, accelerates player tank
 production through the real build queue, orders the attack group onto enemy
 anchors, and exits non-zero if the match does not reach player victory.
+`proof-frames` records that same proof flow as a PNG sequence for video
+encoding.
 
 ## Regenerate Migration Data
 

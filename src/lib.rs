@@ -3858,6 +3858,8 @@ pub struct CaptureMatchProof {
     pub remaining_anchors: u32,
 }
 
+const CAPTURE_PROOF_TARGET_TANKS: usize = 12;
+
 impl CaptureMatchProof {
     pub fn succeeded(self) -> bool {
         self.phase == CaptureMatchPhase::HumanVictory && self.remaining_teams <= 1
@@ -3981,28 +3983,34 @@ pub fn run_capture_default_match_proof(max_frames: usize) -> CaptureMatchProof {
 }
 
 pub fn run_capture_match_proof(app: &mut App, max_frames: usize) -> CaptureMatchProof {
-    const TARGET_TANKS: usize = 12;
     let max_frames = max_frames.max(1);
     let tanks_before = capture_unit_count_by_id(app.world_mut(), Team::Human, "Tank");
     let mut produced_tanks = 0usize;
 
     for frame in 0..max_frames {
-        capture_queue_human_tanks(app, TARGET_TANKS);
+        if app.world().resource::<MatchState>().phase != MatchPhase::Running {
+            return capture_match_proof_from_app(app, frame, produced_tanks, tanks_before);
+        }
+        advance_capture_match_proof_frame(app, frame);
         produced_tanks = produced_tanks.max(capture_unit_count_by_id(
             app.world_mut(),
             Team::Human,
             "Tank",
         ));
-        if frame % 30 == 0 {
-            capture_order_human_attackers(app);
-        }
-        if app.world().resource::<MatchState>().phase != MatchPhase::Running {
-            return capture_match_proof_from_app(app, frame + 1, produced_tanks, tanks_before);
-        }
-        app.update();
     }
 
     capture_match_proof_from_app(app, max_frames, produced_tanks, tanks_before)
+}
+
+pub fn advance_capture_match_proof_frame(app: &mut App, frame: usize) {
+    if app.world().resource::<MatchState>().phase != MatchPhase::Running {
+        return;
+    }
+    capture_queue_human_tanks(app, CAPTURE_PROOF_TARGET_TANKS);
+    if frame % 30 == 0 {
+        capture_order_human_attackers(app);
+    }
+    app.update();
 }
 
 fn capture_match_proof_from_app(
@@ -4011,18 +4019,34 @@ fn capture_match_proof_from_app(
     produced_tanks: usize,
     tanks_before: usize,
 ) -> CaptureMatchProof {
+    capture_match_proof_status(
+        app,
+        frames,
+        produced_tanks.saturating_sub(tanks_before) as u32,
+    )
+}
+
+pub fn capture_match_proof_status(
+    app: &mut App,
+    frames: usize,
+    produced_tanks: u32,
+) -> CaptureMatchProof {
     let snapshot = capture_match_snapshot(app);
     CaptureMatchProof {
         phase: snapshot.phase,
         frames,
         elapsed_seconds: snapshot.elapsed_seconds.round() as u32,
-        produced_tanks: produced_tanks.saturating_sub(tanks_before) as u32,
+        produced_tanks,
         human_units: snapshot.human.units,
         enemy_units_destroyed: snapshot.enemy_units_destroyed,
         enemy_structures_destroyed: snapshot.enemy_structures_destroyed,
         remaining_teams: snapshot.remaining_teams,
         remaining_anchors: snapshot.remaining_anchors,
     }
+}
+
+pub fn capture_human_tank_count(app: &mut App) -> u32 {
+    capture_unit_count_by_id(app.world_mut(), Team::Human, "Tank") as u32
 }
 
 fn capture_queue_human_tanks(app: &mut App, target_tanks: usize) -> usize {
