@@ -42757,6 +42757,16 @@ mod tests {
     }
 
     #[test]
+    fn allied_demon_menu_skirmish_can_train_tanks_and_finish_match() {
+        selected_race_vehicle_skirmish_can_train_and_win_in_mode(
+            Team::Demon,
+            "Tank",
+            8,
+            SkirmishMatchMode::AlliedTwoVsOne,
+        );
+    }
+
+    #[test]
     fn default_menu_skirmish_can_produce_tank_and_finish_visible_enemy_match() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
