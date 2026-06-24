@@ -1946,6 +1946,43 @@ impl SkirmishMenuSelection {
     }
 }
 
+fn match_setup_from_menu_selection(
+    selection: SkirmishMenuSelection,
+    random_map_cursor: &mut RandomMapCursor,
+) -> Option<MatchSetupSettings> {
+    if !selection.can_start() {
+        return None;
+    }
+    let seed = if selection.map_choice_is_random() {
+        random_map_cursor.next_seed()
+    } else {
+        0
+    };
+    Some(selection.match_setup_with_map_seed(seed))
+}
+
+fn request_shared_match_scene_start(
+    setup_settings: &mut MatchSetupSettings,
+    next_state: &mut NextState<AppScreen>,
+    settings: MatchSetupSettings,
+) {
+    *setup_settings = settings;
+    next_state.set(AppScreen::InMatch);
+}
+
+fn start_shared_match_from_menu_selection(
+    selection: SkirmishMenuSelection,
+    setup_settings: &mut MatchSetupSettings,
+    random_map_cursor: &mut RandomMapCursor,
+    next_state: &mut NextState<AppScreen>,
+) -> bool {
+    let Some(settings) = match_setup_from_menu_selection(selection, random_map_cursor) else {
+        return false;
+    };
+    request_shared_match_scene_start(setup_settings, next_state, settings);
+    true
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum SkirmishStartStatus {
     Ready,
@@ -3738,12 +3775,22 @@ pub fn add_game_scenes(app: &mut App) -> &mut App {
 
 /// Advances an app with [`add_shared_match_scene`] registered into the live match scene.
 pub fn enter_shared_match_scene(app: &mut App) {
+    start_shared_match_scene_with_current_setup(app);
+}
+
+/// Starts the shared live match scene with the app's current [`MatchSetupSettings`].
+pub fn start_shared_match_scene_with_current_setup(app: &mut App) {
     app.world_mut()
         .resource_mut::<NextState<AppScreen>>()
         .set(AppScreen::InMatch);
     for _ in 0..8 {
         app.update();
     }
+}
+
+fn start_shared_match_scene_with_settings(app: &mut App, settings: MatchSetupSettings) {
+    app.insert_resource(settings);
+    start_shared_match_scene_with_current_setup(app);
 }
 
 fn add_headless_game_plugins(app: &mut App) -> &mut App {
@@ -3818,9 +3865,11 @@ pub fn build_capture_match_app() -> App {
 fn build_capture_match_app_with_settings(settings: MatchSetupSettings) -> App {
     let mut app = App::new();
     add_headless_game_plugins(&mut app);
-    app.insert_resource(settings);
     app.add_plugins(SharedMatchScenePlugin);
-    start_default_match_for_capture(&mut app);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
+    ));
+    start_shared_match_scene_with_settings(&mut app, settings);
     app
 }
 
@@ -3945,6 +3994,13 @@ impl CaptureProofFaction {
             Self::Chaos => 18,
         }
     }
+
+    fn mouse_victory_vehicle_target(self) -> usize {
+        match self {
+            Self::Human | Self::Demon => 5,
+            Self::Chaos => 8,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -4012,6 +4068,32 @@ impl CaptureBuildProof {
             && self.construct_ordered
             && self.constructed
             && self.produced_units > 0
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CaptureVictoryProof {
+    pub faction: CaptureProofFaction,
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub product_id: &'static str,
+    pub target_units: u32,
+    pub produced_units: u32,
+    pub attack_orders: u32,
+    pub player_units: u32,
+    pub enemy_units_destroyed: u32,
+    pub enemy_structures_destroyed: u32,
+    pub remaining_teams: u32,
+    pub remaining_anchors: u32,
+}
+
+impl CaptureVictoryProof {
+    pub fn succeeded(&self) -> bool {
+        self.phase == CaptureMatchPhase::HumanVictory
+            && self.produced_units > 0
+            && self.attack_orders > 0
+            && self.enemy_structures_destroyed > 0
+            && self.remaining_teams <= 1
     }
 }
 
@@ -4189,6 +4271,17 @@ pub fn run_real_menu_build_proof_for_faction(
         std::time::Duration::from_secs_f32(1.0),
     ));
     run_real_menu_build_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_victory_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureVictoryProof {
+    let mut app = build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Beginner);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_victory_proof(&mut app, faction, max_frames)
 }
 
 pub fn run_capture_match_proof(
@@ -4616,6 +4709,157 @@ fn capture_build_proof_status(
         constructed,
         product_id,
         produced_units,
+    }
+}
+
+fn run_real_menu_victory_proof(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureVictoryProof {
+    let max_frames = max_frames.max(1);
+    let team = faction.team();
+    let product_id = faction.proof_vehicle();
+    let target_units = faction.mouse_victory_vehicle_target();
+    let mut frames = 0usize;
+    let mut attack_orders = 0u32;
+
+    let Some(product_def) = registry::entity(product_id) else {
+        return capture_victory_proof_status(
+            app,
+            faction,
+            frames,
+            product_id,
+            target_units as u32,
+            0,
+            attack_orders,
+        );
+    };
+    {
+        let mut economies = app.world_mut().resource_mut::<Economies>();
+        let economy = economies.get_mut(team);
+        economy.ore = economy
+            .ore
+            .max(product_def.cost.ore * target_units as i32 + 320);
+        economy.crystal = economy
+            .crystal
+            .max(product_def.cost.crystal * target_units as i32 + 320);
+    }
+
+    let Some((factory, _, factory_position)) =
+        capture_constructed_producer(app.world_mut(), team, "VehicleFactory")
+    else {
+        return capture_victory_proof_status(
+            app,
+            faction,
+            frames,
+            product_id,
+            target_units as u32,
+            0,
+            attack_orders,
+        );
+    };
+    let units_before = capture_unit_count_by_id(app.world_mut(), team, product_id);
+    let mut produced_units = 0u32;
+
+    if capture_world_left_click(app, factory_position)
+        && app
+            .world()
+            .get_entity(factory)
+            .is_ok_and(|entity| entity.get::<Selected>().is_some())
+    {
+        app.update();
+        while frames < max_frames {
+            let produced = capture_unit_count_by_id(app.world_mut(), team, product_id);
+            produced_units = produced.saturating_sub(units_before) as u32;
+            if produced >= units_before + target_units {
+                break;
+            }
+            let started = produced + capture_queued_train_jobs(app.world(), team, product_id);
+            if started < units_before + target_units
+                && let Some(button) =
+                    capture_enabled_command_for_action(app, BuildAction::Train(product_id))
+            {
+                capture_click_command_button(app, button);
+            }
+            frames += 1;
+            app.update();
+        }
+    }
+
+    while frames < max_frames && app.world().resource::<MatchState>().phase == MatchPhase::Running {
+        let Some((target, target_position)) = capture_first_enemy_anchor(app.world_mut(), team)
+        else {
+            break;
+        };
+        if let Ok(mut entity) = app.world_mut().get_entity_mut(target) {
+            entity.insert((VisibilityState { visible: true }, Visibility::Visible));
+        }
+        let attackers = capture_alive_attackers(app.world_mut(), team);
+        if attackers.is_empty() {
+            break;
+        }
+        attack_orders +=
+            capture_mouse_order_attackers_to_target(app, &attackers, target, target_position)
+                as u32;
+
+        for _ in 0..260 {
+            if frames >= max_frames
+                || app.world().get_entity(target).is_err()
+                || app.world().resource::<MatchState>().phase != MatchPhase::Running
+            {
+                break;
+            }
+            frames += 1;
+            app.update();
+        }
+    }
+
+    for _ in 0..8 {
+        if frames >= max_frames
+            || app.world().resource::<MatchState>().phase == MatchPhase::HumanVictory
+        {
+            break;
+        }
+        frames += 1;
+        app.update();
+    }
+
+    capture_victory_proof_status(
+        app,
+        faction,
+        frames,
+        product_id,
+        target_units as u32,
+        produced_units,
+        attack_orders,
+    )
+}
+
+fn capture_victory_proof_status(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    frames: usize,
+    product_id: &'static str,
+    target_units: u32,
+    produced_units: u32,
+    attack_orders: u32,
+) -> CaptureVictoryProof {
+    let snapshot = capture_match_snapshot(app);
+    let player_stats = capture_stats_for_faction(&snapshot, faction);
+    CaptureVictoryProof {
+        faction,
+        phase: snapshot.phase,
+        frames,
+        product_id,
+        target_units,
+        produced_units,
+        attack_orders,
+        player_units: player_stats.units,
+        enemy_units_destroyed: snapshot.enemy_units_destroyed,
+        enemy_structures_destroyed: snapshot.enemy_structures_destroyed,
+        remaining_teams: snapshot.remaining_teams,
+        remaining_anchors: snapshot.remaining_anchors,
     }
 }
 
@@ -5260,6 +5504,61 @@ fn capture_alive_attackers(world: &mut World, team: Team) -> Vec<Entity> {
             (*unit_team == team && health.current > 0.0).then_some(entity)
         })
         .collect()
+}
+
+fn capture_mouse_order_attackers_to_target(
+    app: &mut App,
+    attackers: &[Entity],
+    target: Entity,
+    target_position: Vec3,
+) -> usize {
+    let positions = attackers
+        .iter()
+        .filter_map(|entity| {
+            app.world().get_entity(*entity).ok().and_then(|entity_ref| {
+                let health = entity_ref.get::<Health>()?;
+                let transform = entity_ref.get::<Transform>()?;
+                (health.current > 0.0).then_some((*entity, transform.translation))
+            })
+        })
+        .collect::<Vec<_>>();
+
+    let mut ordered = 0usize;
+    for (attacker, position) in positions {
+        let target_health_before = app
+            .world()
+            .get::<Health>(target)
+            .map(|health| health.current);
+        let selected = capture_world_left_click(app, position)
+            && app
+                .world()
+                .get_entity(attacker)
+                .is_ok_and(|entity| entity.get::<Selected>().is_some());
+        let clicked = selected && capture_world_right_click(app, target_position);
+        if !clicked {
+            continue;
+        }
+        let target_health_after = app
+            .world()
+            .get::<Health>(target)
+            .map(|health| health.current);
+        let target_destroyed = app.world().get_entity(target).is_err();
+        let attacker_has_attack_or_chase = app.world().get_entity(attacker).is_ok_and(|entity| {
+            entity
+                .get::<AttackOrder>()
+                .is_some_and(|order| order.target == target)
+                || entity
+                    .get::<MoveOrder>()
+                    .is_some_and(|order| xz_distance(order.target, target_position) <= 8.0)
+        });
+        let target_damaged = target_health_before
+            .zip(target_health_after)
+            .is_some_and(|(before, after)| after < before);
+        if target_destroyed || attacker_has_attack_or_chase || target_damaged {
+            ordered += 1;
+        }
+    }
+    ordered
 }
 
 fn capture_first_enemy_anchor(world: &mut World, player_team: Team) -> Option<(Entity, Vec3)> {
@@ -7939,14 +8238,13 @@ fn main_menu_buttons(
         *border = BorderColor::all(border_color);
     }
 
-    if start_requested && selection.can_start() {
-        let seed = if selection.map_choice_is_random() {
-            random_map_cursor.next_seed()
-        } else {
-            0
-        };
-        *setup_settings = selection.match_setup_with_map_seed(seed);
-        next_state.set(AppScreen::InMatch);
+    if start_requested {
+        start_shared_match_from_menu_selection(
+            *selection,
+            &mut setup_settings,
+            &mut random_map_cursor,
+            &mut next_state,
+        );
     }
 }
 
@@ -32062,6 +32360,23 @@ mod tests {
             assert!(
                 !proof.product_id.is_empty(),
                 "build proof should identify the trained Barracks unit; proof={proof:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn real_menu_victory_proof_trains_attacks_and_wins_from_mouse_orders() {
+        for faction in CaptureProofFaction::ALL {
+            let proof = run_real_menu_victory_proof_for_faction(faction, 3600);
+
+            assert!(
+                proof.succeeded(),
+                "real menu victory proof should train combat vehicles from the real command panel, right-click enemy anchors, and finish a match; proof={proof:?}"
+            );
+            assert_eq!(proof.product_id, faction.proof_vehicle());
+            assert!(
+                proof.produced_units >= faction.mouse_victory_vehicle_target() as u32,
+                "victory proof should produce the faction's target attack group; proof={proof:?}"
             );
         }
     }
