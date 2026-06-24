@@ -1,0 +1,46 @@
+[package]
+name = "bevy-open-rts"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95.0"
+license = "MIT OR Apache-2.0"
+description = "A Bevy 0.19/WebGPU porting foundation for godot-open-rts."
+
+[features]
+default = []
+webgpu = ["bevy/webgpu"]
+
+[dependencies]
+bevy = { version = "0.19.0", default-features = false, features = [
+  "default_app",
+  "bevy_winit",
+  "x11",
+  "3d_bevy_render",
+  "ui_bevy_render",
+  "scene",
+  "picking",
+  "keyboard",
+  "mouse",
+  "bevy_audio",
+  "wav",
+  "vorbis",
+  "png",
+] }
+bevy_asset_loader = { version = "0.27.0", default-features = false }
+bevy_common_assets = { version = "0.17.0", default-features = false, features = [
+  "json",
+  "ron",
+] }
+# Bevy's text stack reaches ICU4X through Parley. In debug builds, icu_provider
+# writes missing complex-segmentation warnings directly to stderr unless its
+# logging feature is enabled; enabling it lets Bevy's LogPlugin filter them.
+icu_provider = { version = "2.2.0", default-features = false, features = ["logging"] }
+serde = { version = "1.0", features = ["derive"] }
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+opt-level = "z"
+
+[profile.dev.package."*"]
+opt-level = 2
