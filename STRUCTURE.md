@@ -18,7 +18,7 @@
 
 - `src/bin/capture.rs` exposes proof commands for live match simulation.
 - `build_capture_match_app_for_faction()` uses `SharedMatchScenePlugin` plus `start_shared_match_scene_with_settings()`.
-- Real menu proofs use `build_real_menu_match_app_for_faction_with_ai()`, which drives the actual setup menu buttons before running proof logic.
+- Real menu proofs use `RealMenuMatchStart` plus the actual setup menu buttons before running proof logic. The same path can select faction, match mode, starting resources, and AI difficulty before entering the shared live scene.
 - Current proof surfaces:
   - `real-match-proof`: direct production/order proof from a menu-started match.
   - `real-harvest-proof`: mouse select collector, right-click ore, harvest, then train.
@@ -28,6 +28,7 @@
   - `real-victory-proof`: mouse select VehicleFactory, train combat vehicles, right-click enemy anchors, and win.
   - `real-economy-victory-proof`: low-resource menu start, mouse harvest required resources, train combat vehicles, right-click enemy anchors, and win without proof-side resource injection.
   - `real-playable-proof`: low-resource menu start, mouse harvest, build Barracks, train a Barracks unit, train combat vehicles, right-click enemy anchors, and win.
+  - `real-three-faction-playable-proof`: low-resource real menu start, select three-faction skirmish mode, use the same playable proof flow with a larger attack group, and finish all enemy anchors.
 
 ## Verification
 

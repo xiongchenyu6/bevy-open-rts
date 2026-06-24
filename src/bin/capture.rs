@@ -6,14 +6,16 @@ use std::{
 };
 
 use bevy_open_rts::{
-    CaptureEntityKind, CaptureMatchPhase, CaptureMatchSnapshot, CaptureProofFaction, CaptureTeam,
-    advance_capture_match, advance_capture_match_proof_frame, build_capture_match_app,
-    build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
-    capture_proof_unit_count, run_capture_match_proof_for_faction,
+    CaptureEntityKind, CaptureMatchPhase, CaptureMatchSnapshot, CapturePlayableProof,
+    CaptureProofFaction, CaptureTeam, advance_capture_match, advance_capture_match_proof_frame,
+    build_capture_match_app, build_capture_match_app_for_faction, capture_match_proof_status,
+    capture_match_snapshot, capture_proof_unit_count, run_capture_match_proof_for_faction,
     run_real_menu_ai_pressure_proof_for_faction, run_real_menu_build_proof_for_faction,
     run_real_menu_dual_harvest_proof_for_faction, run_real_menu_economy_victory_proof_for_faction,
     run_real_menu_harvest_proof_for_faction, run_real_menu_match_proof_for_faction,
-    run_real_menu_playable_proof_for_faction, run_real_menu_victory_proof_for_faction,
+    run_real_menu_playable_proof_for_faction,
+    run_real_menu_three_faction_playable_proof_for_faction,
+    run_real_menu_victory_proof_for_faction,
 };
 
 const WIDTH: u32 = 1280;
@@ -388,40 +390,26 @@ fn run() -> Result<(), String> {
                 .map_err(|error| format!("invalid max frame count: {error}"))?;
             let faction = parse_optional_faction(args.next())?;
             let proof = run_real_menu_playable_proof_for_faction(faction, max_frames);
-            println!(
-                "[capture] real-playable-proof faction={} label={} phase={:?} frames={} ore={}=>{}=>{} crystal={}=>{}=>{} harvest_ore={} harvest_crystal={} structure={} placement_started={} placed={} construct_ordered={} constructed={} barracks_product={} barracks_units={} vehicle={} target_units={} produced_units={} attack_orders={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
-                proof.faction.key(),
-                proof.faction.label(),
-                proof.phase,
-                proof.frames,
-                proof.ore_before,
-                proof.ore_after_harvest,
-                proof.ore_after,
-                proof.crystal_before,
-                proof.crystal_after_harvest,
-                proof.crystal_after,
-                proof.ore_harvest_ordered,
-                proof.crystal_harvest_ordered,
-                proof.structure_id,
-                proof.placement_started,
-                proof.placed,
-                proof.construct_ordered,
-                proof.constructed,
-                proof.barracks_product_id,
-                proof.barracks_units,
-                proof.vehicle_product_id,
-                proof.target_units,
-                proof.produced_units,
-                proof.attack_orders,
-                proof.player_units,
-                proof.enemy_units_destroyed,
-                proof.enemy_structures_destroyed,
-                proof.remaining_teams,
-                proof.remaining_anchors
-            );
+            print_playable_proof("real-playable-proof", &proof);
             if !proof.succeeded() {
                 return Err(format!(
                     "real menu playable proof did not harvest, build, train, attack, and win within {max_frames} frames"
+                ));
+            }
+        }
+        Some("real-three-faction-playable-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("7200")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let faction = parse_optional_faction(args.next())?;
+            let proof = run_real_menu_three_faction_playable_proof_for_faction(faction, max_frames);
+            print_playable_proof("real-three-faction-playable-proof", &proof);
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real menu three-faction playable proof did not harvest, build, train, attack, and win within {max_frames} frames"
                 ));
             }
         }
@@ -435,6 +423,41 @@ fn run() -> Result<(), String> {
         }
     }
     Ok(())
+}
+
+fn print_playable_proof(command: &str, proof: &CapturePlayableProof) {
+    println!(
+        "[capture] {} faction={} label={} phase={:?} frames={} ore={}=>{}=>{} crystal={}=>{}=>{} harvest_ore={} harvest_crystal={} structure={} placement_started={} placed={} construct_ordered={} constructed={} barracks_product={} barracks_units={} vehicle={} target_units={} produced_units={} attack_orders={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
+        command,
+        proof.faction.key(),
+        proof.faction.label(),
+        proof.phase,
+        proof.frames,
+        proof.ore_before,
+        proof.ore_after_harvest,
+        proof.ore_after,
+        proof.crystal_before,
+        proof.crystal_after_harvest,
+        proof.crystal_after,
+        proof.ore_harvest_ordered,
+        proof.crystal_harvest_ordered,
+        proof.structure_id,
+        proof.placement_started,
+        proof.placed,
+        proof.construct_ordered,
+        proof.constructed,
+        proof.barracks_product_id,
+        proof.barracks_units,
+        proof.vehicle_product_id,
+        proof.target_units,
+        proof.produced_units,
+        proof.attack_orders,
+        proof.player_units,
+        proof.enemy_units_destroyed,
+        proof.enemy_structures_destroyed,
+        proof.remaining_teams,
+        proof.remaining_anchors
+    );
 }
 
 fn print_help() {
@@ -454,6 +477,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-economy-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-playable-proof 4200 human");
+    println!("  cargo run --bin capture -- real-three-faction-playable-proof 7200 human");
 }
 
 fn parse_optional_faction(value: Option<String>) -> Result<CaptureProofFaction, String> {

@@ -4331,6 +4331,40 @@ pub fn build_real_menu_match_app_for_faction(faction: CaptureProofFaction) -> Ap
     build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Easy)
 }
 
+#[derive(Clone, Copy, Debug)]
+struct RealMenuMatchStart {
+    faction: CaptureProofFaction,
+    ai_difficulty: AiDifficulty,
+    starting_resource_index: usize,
+    match_mode: SkirmishMatchMode,
+}
+
+impl RealMenuMatchStart {
+    fn new(faction: CaptureProofFaction) -> Self {
+        Self {
+            faction,
+            ai_difficulty: AiDifficulty::Easy,
+            starting_resource_index: DEFAULT_STARTING_RESOURCE_INDEX,
+            match_mode: SkirmishMatchMode::OneVsOne,
+        }
+    }
+
+    fn with_ai_difficulty(mut self, ai_difficulty: AiDifficulty) -> Self {
+        self.ai_difficulty = ai_difficulty;
+        self
+    }
+
+    fn with_starting_resource_index(mut self, starting_resource_index: usize) -> Self {
+        self.starting_resource_index = starting_resource_index;
+        self
+    }
+
+    fn with_match_mode(mut self, match_mode: SkirmishMatchMode) -> Self {
+        self.match_mode = match_mode;
+        self
+    }
+}
+
 fn build_real_menu_match_app_for_faction_with_ai(
     faction: CaptureProofFaction,
     ai_difficulty: AiDifficulty,
@@ -4347,21 +4381,38 @@ fn build_real_menu_match_app_for_faction_with_ai_and_starting_resources(
     ai_difficulty: AiDifficulty,
     starting_resource_index: usize,
 ) -> App {
+    build_real_menu_match_app(
+        RealMenuMatchStart::new(faction)
+            .with_ai_difficulty(ai_difficulty)
+            .with_starting_resource_index(starting_resource_index),
+    )
+}
+
+fn build_real_menu_match_app(match_start: RealMenuMatchStart) -> App {
     let mut app = build_game_app(GameAppMode::Headless);
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
     ));
     app.update();
 
-    drive_main_menu_action(&mut app, MainMenuAction::SelectFaction(faction.team()), 1);
     drive_main_menu_action(
         &mut app,
-        MainMenuAction::SelectStartingResources(starting_resource_index),
+        MainMenuAction::SelectFaction(match_start.faction.team()),
         1,
     );
     drive_main_menu_action(
         &mut app,
-        MainMenuAction::SelectAiDifficulty(ai_difficulty),
+        MainMenuAction::SelectMatchMode(match_start.match_mode),
+        1,
+    );
+    drive_main_menu_action(
+        &mut app,
+        MainMenuAction::SelectStartingResources(match_start.starting_resource_index),
+        1,
+    );
+    drive_main_menu_action(
+        &mut app,
+        MainMenuAction::SelectAiDifficulty(match_start.ai_difficulty),
         1,
     );
     drive_main_menu_action(&mut app, MainMenuAction::StartMatch, 3);
@@ -4471,6 +4522,27 @@ pub fn run_real_menu_playable_proof_for_faction(
         std::time::Duration::from_secs_f32(1.0),
     ));
     run_real_menu_playable_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_three_faction_playable_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CapturePlayableProof {
+    let mut app = build_real_menu_match_app(
+        RealMenuMatchStart::new(faction)
+            .with_ai_difficulty(AiDifficulty::Beginner)
+            .with_starting_resource_index(0)
+            .with_match_mode(SkirmishMatchMode::ThreeFaction),
+    );
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_playable_proof_with_target_units(
+        &mut app,
+        faction,
+        max_frames,
+        faction.mouse_victory_vehicle_target() * 2,
+    )
 }
 
 pub fn run_capture_match_proof(
@@ -5205,10 +5277,23 @@ fn run_real_menu_playable_proof(
     faction: CaptureProofFaction,
     max_frames: usize,
 ) -> CapturePlayableProof {
+    run_real_menu_playable_proof_with_target_units(
+        app,
+        faction,
+        max_frames,
+        faction.mouse_victory_vehicle_target(),
+    )
+}
+
+fn run_real_menu_playable_proof_with_target_units(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+    target_units: usize,
+) -> CapturePlayableProof {
     let max_frames = max_frames.max(1);
     let team = faction.team();
     let vehicle_id = faction.proof_vehicle();
-    let target_units = faction.mouse_victory_vehicle_target();
     let Some(vehicle_def) = registry::entity(vehicle_id) else {
         return capture_playable_proof_status(
             app,
@@ -33408,6 +33493,29 @@ mod tests {
             assert!(
                 !proof.barracks_product_id.is_empty(),
                 "playable proof should identify the trained Barracks unit; proof={proof:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn real_menu_three_faction_playable_proof_uses_shared_scene_and_wins() {
+        for faction in CaptureProofFaction::ALL {
+            let proof = run_real_menu_three_faction_playable_proof_for_faction(faction, 7200);
+
+            assert!(
+                proof.succeeded(),
+                "real menu three-faction proof should select the shared menu match mode, mine, build, train, right-click enemy anchors, and finish; proof={proof:?}"
+            );
+            assert_eq!(proof.structure_id, "Barracks");
+            assert_eq!(proof.vehicle_product_id, faction.proof_vehicle());
+            assert_eq!(
+                proof.target_units,
+                (faction.mouse_victory_vehicle_target() * 2) as u32,
+                "three-faction proof should bring a larger attack group than the 1v1 proof; proof={proof:?}"
+            );
+            assert!(
+                proof.enemy_structures_destroyed >= 2,
+                "three-faction proof should destroy anchors across multiple enemy teams; proof={proof:?}"
             );
         }
     }
