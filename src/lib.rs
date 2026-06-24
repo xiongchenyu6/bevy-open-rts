@@ -40689,7 +40689,12 @@ mod tests {
                     "default playable skirmish should spawn a constructed player VehicleFactory",
                 );
         assert!(constructed);
-        select_only_entities(&mut app, &[factory]);
+        attach_test_window_to_main_camera(&mut app, factory_position);
+        click_selection_at_world(&mut app, factory_position, false);
+        assert!(
+            app.world().entity(factory).get::<Selected>().is_some(),
+            "left-clicking the visible VehicleFactory should select it before setting a rally point"
+        );
         app.update();
 
         let (rally_button, _, _) =
