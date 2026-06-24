@@ -46,15 +46,18 @@ stale game code after a rebuild.
 ```sh
 cargo run --bin capture -- screenshot screenshots/capture/still.png
 cargo run --bin capture -- frames screenshots/result/1 450
-cargo run --bin capture -- proof-frames screenshots/result/2 600
-cargo run --bin capture -- match-proof 7200
+cargo run --bin capture -- proof-frames screenshots/result/2 900 human
+cargo run --bin capture -- match-proof 7200 human
+cargo run --bin capture -- match-proof 7200 demon
+cargo run --bin capture -- match-proof 7200 chaos
 ```
 
-`match-proof` runs the shared default skirmish scene, accelerates player tank
-production through the real build queue, orders the attack group onto enemy
-anchors, and exits non-zero if the match does not reach player victory.
-`proof-frames` records that same proof flow as a PNG sequence for video
-encoding.
+`match-proof` runs the same shared skirmish scene used by the real runtime,
+accelerates faction-specific combat production through the real build queue,
+orders the attack group onto enemy anchors, and exits non-zero if the match does
+not reach player victory. `proof-frames` records that same proof flow as a PNG
+sequence for video encoding. The optional proof faction is `human`, `demon`, or
+`chaos`; it defaults to `human`.
 
 ## Regenerate Migration Data
 

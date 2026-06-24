@@ -6,9 +6,10 @@ use std::{
 };
 
 use bevy_open_rts::{
-    CaptureEntityKind, CaptureMatchPhase, CaptureMatchSnapshot, CaptureTeam, advance_capture_match,
-    advance_capture_match_proof_frame, build_capture_match_app, capture_human_tank_count,
-    capture_match_proof_status, capture_match_snapshot, run_capture_default_match_proof,
+    CaptureEntityKind, CaptureMatchPhase, CaptureMatchSnapshot, CaptureProofFaction, CaptureTeam,
+    advance_capture_match, advance_capture_match_proof_frame, build_capture_match_app,
+    build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
+    capture_proof_unit_count, run_capture_match_proof_for_faction,
 };
 
 const WIDTH: u32 = 1280;
@@ -97,17 +98,21 @@ fn run() -> Result<(), String> {
             let count = args
                 .next()
                 .as_deref()
-                .unwrap_or("600")
+                .unwrap_or("900")
                 .parse::<usize>()
                 .map_err(|error| format!("invalid frame count: {error}"))?;
-            let proof = render_proof_frames(&directory, count)?;
+            let faction = parse_optional_faction(args.next())?;
+            let proof = render_proof_frames(&directory, count, faction)?;
             println!(
-                "[capture] proof-frames phase={:?} frames={} elapsed={}s produced_tanks={} human_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={} dir={}",
+                "[capture] proof-frames faction={} label={} product={} phase={:?} frames={} elapsed={}s produced_units={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={} dir={}",
+                proof.faction.key(),
+                proof.faction.label(),
+                proof.product_id,
                 proof.phase,
                 proof.frames,
                 proof.elapsed_seconds,
-                proof.produced_tanks,
-                proof.human_units,
+                proof.produced_units,
+                proof.player_units,
                 proof.enemy_units_destroyed,
                 proof.enemy_structures_destroyed,
                 proof.remaining_teams,
@@ -127,14 +132,18 @@ fn run() -> Result<(), String> {
                 .unwrap_or("7200")
                 .parse::<usize>()
                 .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let proof = run_capture_default_match_proof(max_frames);
+            let faction = parse_optional_faction(args.next())?;
+            let proof = run_capture_match_proof_for_faction(faction, max_frames);
             println!(
-                "[capture] match-proof phase={:?} frames={} elapsed={}s produced_tanks={} human_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
+                "[capture] match-proof faction={} label={} product={} phase={:?} frames={} elapsed={}s produced_units={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
+                proof.faction.key(),
+                proof.faction.label(),
+                proof.product_id,
                 proof.phase,
                 proof.frames,
                 proof.elapsed_seconds,
-                proof.produced_tanks,
-                proof.human_units,
+                proof.produced_units,
+                proof.player_units,
                 proof.enemy_units_destroyed,
                 proof.enemy_structures_destroyed,
                 proof.remaining_teams,
@@ -163,8 +172,26 @@ fn print_help() {
     println!("  cargo run --bin capture");
     println!("  cargo run --bin capture -- screenshot screenshots/capture/still.png");
     println!("  cargo run --bin capture -- frames screenshots/result/1 450");
-    println!("  cargo run --bin capture -- proof-frames screenshots/result/2 600");
-    println!("  cargo run --bin capture -- match-proof 7200");
+    println!("  cargo run --bin capture -- proof-frames screenshots/result/2 900 human");
+    println!("  cargo run --bin capture -- match-proof 7200 human");
+    println!("  cargo run --bin capture -- match-proof 7200 demon");
+    println!("  cargo run --bin capture -- match-proof 7200 chaos");
+}
+
+fn parse_optional_faction(value: Option<String>) -> Result<CaptureProofFaction, String> {
+    let Some(value) = value else {
+        return Ok(CaptureProofFaction::Human);
+    };
+    CaptureProofFaction::parse(&value).ok_or_else(|| {
+        format!(
+            "invalid faction '{value}'. Expected one of: {}",
+            CaptureProofFaction::ALL
+                .iter()
+                .map(|faction| faction.key())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    })
 }
 
 fn render_still(path: &Path, frame: usize) -> Result<(), String> {
@@ -198,15 +225,16 @@ fn render_frames(directory: &Path, count: usize) -> Result<(), String> {
 fn render_proof_frames(
     directory: &Path,
     count: usize,
+    faction: CaptureProofFaction,
 ) -> Result<bevy_open_rts::CaptureMatchProof, String> {
     fs::create_dir_all(directory)
         .map_err(|error| format!("could not create {}: {error}", directory.display()))?;
-    let mut app = build_capture_match_app();
-    let tanks_before = capture_human_tank_count(&mut app);
-    let mut tank_peak = tanks_before;
+    let mut app = build_capture_match_app_for_faction(faction);
+    let units_before = capture_proof_unit_count(&mut app, faction);
+    let mut unit_peak = units_before;
     for frame in 0..count {
-        advance_capture_match_proof_frame(&mut app, frame);
-        tank_peak = tank_peak.max(capture_human_tank_count(&mut app));
+        advance_capture_match_proof_frame(&mut app, faction, frame);
+        unit_peak = unit_peak.max(capture_proof_unit_count(&mut app, faction));
         let path = directory.join(format!("frame{frame:05}.png"));
         let snapshot = capture_match_snapshot(&mut app);
         let pixels = render_frame(frame, count.max(1), &snapshot);
@@ -214,8 +242,9 @@ fn render_proof_frames(
     }
     Ok(capture_match_proof_status(
         &mut app,
+        faction,
         count,
-        tank_peak.saturating_sub(tanks_before),
+        unit_peak.saturating_sub(units_before),
     ))
 }
 

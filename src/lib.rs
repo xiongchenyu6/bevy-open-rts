@@ -3765,6 +3765,10 @@ pub fn build_game_app(mode: GameAppMode) -> App {
 }
 
 pub fn build_capture_match_app() -> App {
+    build_capture_match_app_with_settings(MatchSetupSettings::default())
+}
+
+fn build_capture_match_app_with_settings(settings: MatchSetupSettings) -> App {
     let mut app = App::new();
     app.add_plugins((
         MinimalPlugins,
@@ -3784,6 +3788,7 @@ pub fn build_capture_match_app() -> App {
     .init_asset::<WorldAsset>()
     .init_asset::<Font>()
     .init_asset::<bevy::audio::AudioSource>();
+    app.insert_resource(settings);
     add_shared_match_scene(&mut app);
     start_default_match_for_capture(&mut app);
     app
@@ -3846,19 +3851,86 @@ pub struct CaptureTeamStats {
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum CaptureProofFaction {
+    #[default]
+    Human,
+    Demon,
+    Chaos,
+}
+
+impl CaptureProofFaction {
+    pub const ALL: [Self; 3] = [Self::Human, Self::Demon, Self::Chaos];
+
+    pub fn key(self) -> &'static str {
+        match self {
+            Self::Human => "human",
+            Self::Demon => "demon",
+            Self::Chaos => "chaos",
+        }
+    }
+
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Human => "人族",
+            Self::Demon => "魔族",
+            Self::Chaos => "混沌族",
+        }
+    }
+
+    pub fn parse(value: &str) -> Option<Self> {
+        match value.trim().to_ascii_lowercase().as_str() {
+            "human" | "alliance" | "ren" | "人族" => Some(Self::Human),
+            "demon" | "mo" | "魔族" => Some(Self::Demon),
+            "chaos" | "hun" | "混沌族" => Some(Self::Chaos),
+            _ => None,
+        }
+    }
+
+    fn team(self) -> Team {
+        match self {
+            Self::Human => Team::Human,
+            Self::Demon => Team::Demon,
+            Self::Chaos => Team::Chaos,
+        }
+    }
+
+    fn skirmish_faction(self) -> SkirmishFaction {
+        match self {
+            Self::Human => SkirmishFaction::Alliance,
+            Self::Demon => SkirmishFaction::Demon,
+            Self::Chaos => SkirmishFaction::Chaos,
+        }
+    }
+
+    fn proof_vehicle(self) -> &'static str {
+        match self {
+            Self::Human | Self::Demon => "Tank",
+            Self::Chaos => "ScoutRover",
+        }
+    }
+
+    fn proof_vehicle_target(self) -> usize {
+        match self {
+            Self::Human | Self::Demon => 12,
+            Self::Chaos => 18,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct CaptureMatchProof {
+    pub faction: CaptureProofFaction,
+    pub product_id: &'static str,
     pub phase: CaptureMatchPhase,
     pub frames: usize,
     pub elapsed_seconds: u32,
-    pub produced_tanks: u32,
-    pub human_units: u32,
+    pub produced_units: u32,
+    pub player_units: u32,
     pub enemy_units_destroyed: u32,
     pub enemy_structures_destroyed: u32,
     pub remaining_teams: u32,
     pub remaining_anchors: u32,
 }
-
-const CAPTURE_PROOF_TARGET_TANKS: usize = 12;
 
 impl CaptureMatchProof {
     pub fn succeeded(self) -> bool {
@@ -3978,66 +4050,98 @@ pub fn capture_match_snapshot(app: &mut App) -> CaptureMatchSnapshot {
 }
 
 pub fn run_capture_default_match_proof(max_frames: usize) -> CaptureMatchProof {
-    let mut app = build_capture_match_app();
-    run_capture_match_proof(&mut app, max_frames)
+    run_capture_match_proof_for_faction(CaptureProofFaction::Human, max_frames)
 }
 
-pub fn run_capture_match_proof(app: &mut App, max_frames: usize) -> CaptureMatchProof {
+pub fn build_capture_match_app_for_faction(faction: CaptureProofFaction) -> App {
+    build_capture_match_app_with_settings(capture_match_setup_for_faction(faction))
+}
+
+pub fn run_capture_match_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureMatchProof {
+    let mut app = build_capture_match_app_for_faction(faction);
+    run_capture_match_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_capture_match_proof(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureMatchProof {
     let max_frames = max_frames.max(1);
-    let tanks_before = capture_unit_count_by_id(app.world_mut(), Team::Human, "Tank");
-    let mut produced_tanks = 0usize;
+    let player_team = faction.team();
+    let product_id = faction.proof_vehicle();
+    let units_before = capture_unit_count_by_id(app.world_mut(), player_team, product_id);
+    let mut produced_units = 0usize;
 
     for frame in 0..max_frames {
         if app.world().resource::<MatchState>().phase != MatchPhase::Running {
-            return capture_match_proof_from_app(app, frame, produced_tanks, tanks_before);
+            return capture_match_proof_from_app(app, faction, frame, produced_units, units_before);
         }
-        advance_capture_match_proof_frame(app, frame);
-        produced_tanks = produced_tanks.max(capture_unit_count_by_id(
+        advance_capture_match_proof_frame(app, faction, frame);
+        produced_units = produced_units.max(capture_unit_count_by_id(
             app.world_mut(),
-            Team::Human,
-            "Tank",
+            player_team,
+            product_id,
         ));
     }
 
-    capture_match_proof_from_app(app, max_frames, produced_tanks, tanks_before)
+    capture_match_proof_from_app(app, faction, max_frames, produced_units, units_before)
 }
 
-pub fn advance_capture_match_proof_frame(app: &mut App, frame: usize) {
+pub fn advance_capture_match_proof_frame(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    frame: usize,
+) {
     if app.world().resource::<MatchState>().phase != MatchPhase::Running {
         return;
     }
-    capture_queue_human_tanks(app, CAPTURE_PROOF_TARGET_TANKS);
+    capture_queue_player_units(
+        app,
+        faction.team(),
+        faction.proof_vehicle(),
+        faction.proof_vehicle_target(),
+    );
     if frame % 30 == 0 {
-        capture_order_human_attackers(app);
+        capture_order_player_attackers(app, faction.team());
     }
     app.update();
 }
 
 fn capture_match_proof_from_app(
     app: &mut App,
+    faction: CaptureProofFaction,
     frames: usize,
-    produced_tanks: usize,
-    tanks_before: usize,
+    produced_units: usize,
+    units_before: usize,
 ) -> CaptureMatchProof {
     capture_match_proof_status(
         app,
+        faction,
         frames,
-        produced_tanks.saturating_sub(tanks_before) as u32,
+        produced_units.saturating_sub(units_before) as u32,
     )
 }
 
 pub fn capture_match_proof_status(
     app: &mut App,
+    faction: CaptureProofFaction,
     frames: usize,
-    produced_tanks: u32,
+    produced_units: u32,
 ) -> CaptureMatchProof {
     let snapshot = capture_match_snapshot(app);
+    let player_stats = capture_stats_for_faction(&snapshot, faction);
     CaptureMatchProof {
+        faction,
+        product_id: faction.proof_vehicle(),
         phase: snapshot.phase,
         frames,
         elapsed_seconds: snapshot.elapsed_seconds.round() as u32,
-        produced_tanks,
-        human_units: snapshot.human.units,
+        produced_units,
+        player_units: player_stats.units,
         enemy_units_destroyed: snapshot.enemy_units_destroyed,
         enemy_structures_destroyed: snapshot.enemy_structures_destroyed,
         remaining_teams: snapshot.remaining_teams,
@@ -4045,16 +4149,57 @@ pub fn capture_match_proof_status(
     }
 }
 
-pub fn capture_human_tank_count(app: &mut App) -> u32 {
-    capture_unit_count_by_id(app.world_mut(), Team::Human, "Tank") as u32
+pub fn capture_proof_unit_count(app: &mut App, faction: CaptureProofFaction) -> u32 {
+    capture_unit_count_by_id(app.world_mut(), faction.team(), faction.proof_vehicle()) as u32
 }
 
-fn capture_queue_human_tanks(app: &mut App, target_tanks: usize) -> usize {
+fn capture_match_setup_for_faction(faction: CaptureProofFaction) -> MatchSetupSettings {
+    let player_team = faction.team();
+    let mut player_factions = DEFAULT_PLAYER_FACTIONS;
+    if let Some(index) = player_team.economy_index() {
+        player_factions[index] = faction.skirmish_faction();
+    }
+    let controllers = skirmish_default_player_controllers(
+        player_team,
+        SkirmishMatchMode::OneVsOne,
+        AiDifficulty::Easy,
+    );
+    let selection = SkirmishMenuSelection {
+        map_index: 0,
+        faction: player_team,
+        starting_resource_index: DEFAULT_STARTING_RESOURCE_INDEX,
+        match_mode: SkirmishMatchMode::OneVsOne,
+        ai_difficulty: AiDifficulty::Easy,
+        team_ids: skirmish_default_team_ids(player_team, SkirmishMatchMode::OneVsOne),
+        player_factions,
+        player_color_slots: DEFAULT_PLAYER_COLOR_SLOTS,
+        player_controllers: controllers,
+    };
+    selection.match_setup_with_map_seed(0)
+}
+
+fn capture_stats_for_faction(
+    snapshot: &CaptureMatchSnapshot,
+    faction: CaptureProofFaction,
+) -> CaptureTeamStats {
+    match faction {
+        CaptureProofFaction::Human => snapshot.human,
+        CaptureProofFaction::Demon => snapshot.demon,
+        CaptureProofFaction::Chaos => snapshot.chaos,
+    }
+}
+
+fn capture_queue_player_units(
+    app: &mut App,
+    team: Team,
+    product_id: &'static str,
+    target_units: usize,
+) -> usize {
     let world = app.world_mut();
-    let produced = capture_unit_count_by_id(world, Team::Human, "Tank");
-    let queued = capture_queued_train_jobs(world, Team::Human, "Tank");
+    let produced = capture_unit_count_by_id(world, team, product_id);
+    let queued = capture_queued_train_jobs(world, team, product_id);
     let Some((factory, producer_id, origin)) =
-        capture_constructed_producer(world, Team::Human, "VehicleFactory")
+        capture_constructed_producer(world, team, "VehicleFactory")
     else {
         return 0;
     };
@@ -4063,17 +4208,17 @@ fn capture_queue_human_tanks(app: &mut App, target_tanks: usize) -> usize {
         producer_build_queue_len(build_queue, factory)
     };
     let capacity = PRODUCTION_QUEUE_LIMIT.saturating_sub(queue_len);
-    let needed = target_tanks.saturating_sub(produced + queued).min(capacity);
+    let needed = target_units.saturating_sub(produced + queued).min(capacity);
     if needed == 0 {
         return 0;
     }
 
-    let Some(def) = registry::entity("Tank") else {
+    let Some(def) = registry::entity(product_id) else {
         return 0;
     };
     {
         let mut economies = world.resource_mut::<Economies>();
-        let economy = economies.get_mut(Team::Human);
+        let economy = economies.get_mut(team);
         economy.ore = economy.ore.max(def.cost.ore * needed as i32 + 120);
         economy.crystal = economy.crystal.max(def.cost.crystal * needed as i32 + 120);
     }
@@ -4081,8 +4226,8 @@ fn capture_queue_human_tanks(app: &mut App, target_tanks: usize) -> usize {
         let mut build_queue = world.resource_mut::<BuildQueue>();
         for _ in 0..needed {
             build_queue.0.push(BuildJob {
-                team: Team::Human,
-                action: BuildAction::Train("Tank"),
+                team,
+                action: BuildAction::Train(product_id),
                 producer_entity: factory,
                 producer_id,
                 timer: 0.25,
@@ -4136,14 +4281,14 @@ fn capture_queued_train_jobs(world: &World, team: Team, product_id: &'static str
         .count()
 }
 
-fn capture_order_human_attackers(app: &mut App) -> usize {
-    let Some((target, _)) = capture_first_enemy_anchor(app.world_mut(), Team::Human) else {
+fn capture_order_player_attackers(app: &mut App, player_team: Team) -> usize {
+    let Some((target, _)) = capture_first_enemy_anchor(app.world_mut(), player_team) else {
         return 0;
     };
     if let Ok(mut entity) = app.world_mut().get_entity_mut(target) {
         entity.insert((VisibilityState { visible: true }, Visibility::Visible));
     }
-    let attackers = capture_alive_attackers(app.world_mut(), Team::Human);
+    let attackers = capture_alive_attackers(app.world_mut(), player_team);
     for attacker in &attackers {
         if let Ok(mut entity) = app.world_mut().get_entity_mut(*attacker) {
             entity.remove::<(
@@ -30290,21 +30435,29 @@ mod tests {
     }
 
     #[test]
-    fn capture_match_proof_finishes_default_playable_match() {
-        let proof = run_capture_default_match_proof(7200);
+    fn capture_match_proof_finishes_each_playable_faction() {
+        for faction in CaptureProofFaction::ALL {
+            let proof = run_capture_match_proof_for_faction(faction, 7200);
 
-        assert!(
-            proof.succeeded(),
-            "capture match proof should finish the default playable match; proof={proof:?}"
-        );
-        assert!(
-            proof.produced_tanks >= 6,
-            "capture proof should exercise production before victory; proof={proof:?}"
-        );
-        assert!(
-            proof.enemy_structures_destroyed > 0,
-            "capture proof should destroy enemy anchors through combat; proof={proof:?}"
-        );
+            assert!(
+                proof.succeeded(),
+                "capture match proof should finish a playable {:?} match; proof={proof:?}",
+                faction
+            );
+            assert_eq!(
+                proof.product_id,
+                faction.proof_vehicle(),
+                "capture proof should use the faction's combat production path; proof={proof:?}",
+            );
+            assert!(
+                proof.produced_units >= 6,
+                "capture proof should exercise production before victory; proof={proof:?}"
+            );
+            assert!(
+                proof.enemy_structures_destroyed > 0,
+                "capture proof should destroy enemy anchors through combat; proof={proof:?}"
+            );
+        }
     }
 
     #[test]
