@@ -26195,6 +26195,77 @@ mod tests {
         app
     }
 
+    fn playable_harvest_click_test_app(visible_player: VisiblePlayer) -> App {
+        let mut app = App::new();
+        let mut window = Window {
+            resolution: WindowResolution::new(1280, 720),
+            ..default()
+        };
+        window.set_cursor_position(Some(Vec2::new(640.0, 360.0)));
+
+        let camera_state = RtsCamera::focused_on(Vec3::new(3.0, 0.0, 0.0));
+        let mut projection = camera_projection_from_state(&camera_state);
+        let mut camera = Camera {
+            viewport: Some(Viewport {
+                physical_size: UVec2::new(1280, 720),
+                ..default()
+            }),
+            ..default()
+        };
+        camera.computed.target_info = Some(RenderTargetInfo {
+            physical_size: UVec2::new(1280, 720),
+            scale_factor: 1.0,
+        });
+        projection.update(1280.0, 720.0);
+        camera.computed.clip_from_view = projection.get_clip_from_view();
+
+        app.add_plugins((
+            MinimalPlugins,
+            AssetPlugin {
+                meta_check: AssetMetaCheck::Never,
+                ..default()
+            },
+        ))
+        .insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ))
+        .insert_resource(visible_player)
+        .init_resource::<ButtonInput<KeyCode>>()
+        .init_resource::<ButtonInput<MouseButton>>()
+        .init_resource::<Economies>()
+        .init_resource::<TeamRelations>()
+        .init_resource::<CommandMode>()
+        .init_resource::<SupportCooldowns>()
+        .init_resource::<BattleLog>()
+        .init_resource::<AudioFeedback>()
+        .init_resource::<MapBounds>()
+        .init_resource::<KillCredits>()
+        .init_resource::<MatchState>()
+        .init_resource::<LatestBattleEvent>()
+        .add_systems(
+            Update,
+            (
+                advance_test_time,
+                issue_orders,
+                update_harvest_orders,
+                move_units,
+            )
+                .chain(),
+        );
+        app.world_mut().spawn((window, PrimaryWindow));
+        let camera_transform = camera_transform_from_state(&camera_state);
+        app.world_mut().spawn((
+            Camera3d::default(),
+            camera,
+            camera_transform,
+            GlobalTransform::from(camera_transform),
+            projection,
+            MainCamera,
+        ));
+        app.update();
+        app
+    }
+
     fn manual_repair_test_app() -> App {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins)
@@ -37986,6 +38057,56 @@ mod tests {
         assert!(
             worker_ref.get::<MoveOrder>().is_none(),
             "resource clicks should not be downgraded to plain movement"
+        );
+    }
+
+    #[test]
+    fn selected_worker_right_click_resource_completes_harvest_loop() {
+        let mut app = playable_harvest_click_test_app(VisiblePlayer::per_player(Team::Human));
+        {
+            let mut economies = app.world_mut().resource_mut::<Economies>();
+            economies.get_mut(Team::Human).ore = 0;
+            economies.get_mut(Team::Human).crystal = 0;
+        }
+        spawn_test_structure(&mut app, "Refinery", Team::Human, Vec3::new(0.0, 0.0, 0.0));
+        let worker = spawn_test_unit(&mut app, "Worker", Team::Human, Vec3::new(2.6, 0.0, 0.0));
+        insert_test_resource_cargo(&mut app, worker, "Worker");
+        app.world_mut().entity_mut(worker).insert(Selected);
+        let resource =
+            spawn_test_resource_node(&mut app, ResourceKind::Ore, 8, Vec3::new(5.0, 0.0, 0.0));
+        app.world_mut()
+            .entity_mut(resource)
+            .insert(VisibilityState { visible: true });
+
+        right_click_order_at_world(&mut app, Vec3::new(4.1, 0.0, 0.0));
+        for _ in 0..12 {
+            app.update();
+        }
+
+        let human = app.world().resource::<Economies>().get(Team::Human);
+        assert!(
+            human.ore >= 2,
+            "selected worker should mine and deliver at least one full worker load after a resource click"
+        );
+        let worker_ref = app.world().entity(worker);
+        assert_eq!(
+            worker_ref
+                .get::<ResourceCargo>()
+                .expect("worker should keep cargo")
+                .total(),
+            0,
+            "delivered cargo should be cleared after dropoff"
+        );
+        assert!(
+            worker_ref.get::<HarvestOrder>().is_some(),
+            "harvester should continue cycling after the first delivery"
+        );
+        assert!(
+            app.world()
+                .entity(resource)
+                .get::<ResourceNode>()
+                .is_some_and(|resource| resource.amount < 8),
+            "resource node should lose ore during the loop"
         );
     }
 
