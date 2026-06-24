@@ -38980,6 +38980,112 @@ mod tests {
     }
 
     #[test]
+    fn default_menu_command_center_rally_to_friendly_unit_sends_new_workers_to_follow() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let (command_center, _, _, constructed) =
+            structure_snapshots_by_id(&mut app, "CommandCenter")
+                .into_iter()
+                .find(|(_, team, _, constructed)| *team == Team::Human && *constructed)
+                .expect(
+                    "default playable skirmish should spawn a constructed player CommandCenter",
+                );
+        assert!(constructed);
+        let rally_target = first_unit_by_id(&mut app, Team::Human, "Worker")
+            .expect("default playable skirmish should spawn a player Worker");
+        let rally_target_position = unit_position(&app, rally_target);
+        app.world_mut()
+            .entity_mut(rally_target)
+            .insert((VisibilityState { visible: true }, Visibility::Visible));
+
+        select_only_entities(&mut app, &[command_center]);
+        app.update();
+
+        let (rally_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::SetRallyPoint);
+        click_command_button(&mut app, rally_button);
+        assert!(
+            app.world().resource::<CommandMode>().rally_point,
+            "clicking the CommandCenter rally command should arm rally targeting"
+        );
+
+        attach_test_window_to_main_camera(&mut app, rally_target_position);
+        right_click_order_at_world(&mut app, rally_target_position);
+        let rally_point = *app
+            .world()
+            .entity(command_center)
+            .get::<RallyPoint>()
+            .expect("CommandCenter should carry RallyPoint");
+        assert_eq!(
+            rally_point.target_unit,
+            Some(rally_target),
+            "right-clicking a friendly unit in rally mode should track that unit"
+        );
+        assert!(
+            rally_point
+                .target
+                .is_some_and(|target| xz_distance(target, rally_target_position) < 0.05),
+            "tracked friendly rally target should store the current target position"
+        );
+
+        let workers_before = unit_entities_by_id(&mut app, Team::Human, "Worker");
+        let (worker_button, _, _) =
+            enabled_command_slot_for_action(&mut app, BuildAction::Train("Worker"));
+        click_command_button(&mut app, worker_button);
+        for _ in 0..120 {
+            app.update();
+            if unit_entities_by_id(&mut app, Team::Human, "Worker").len() > workers_before.len() {
+                break;
+            }
+        }
+        let produced_worker = unit_entities_by_id(&mut app, Team::Human, "Worker")
+            .into_iter()
+            .find(|entity| !workers_before.contains(entity))
+            .expect("default CommandCenter should produce a new Worker from its command button");
+
+        assert!(
+            app.world()
+                .entity(produced_worker)
+                .get::<FollowOrder>()
+                .is_some_and(|order| order.target == rally_target && !order.allow_enemy),
+            "a Worker produced after setting a friendly-unit rally point should follow that unit"
+        );
+        let produced_worker_position = unit_position(&app, produced_worker);
+        let rally_target_position = unit_position(&app, rally_target);
+        let produced_worker_radius = app
+            .world()
+            .entity(produced_worker)
+            .get::<Selectable>()
+            .expect("produced Worker should be selectable")
+            .radius;
+        let rally_target_radius = app
+            .world()
+            .entity(rally_target)
+            .get::<Selectable>()
+            .expect("friendly rally target should be selectable")
+            .radius;
+        if let Some(move_order) = app.world().entity(produced_worker).get::<MoveOrder>() {
+            let expected_follow_move = unit_contact_move_target_position(
+                produced_worker_position,
+                produced_worker_radius,
+                rally_target_position,
+                rally_target_radius,
+            );
+            assert!(
+                xz_distance(move_order.target, expected_follow_move) < 0.05,
+                "friendly-unit rally MoveOrder should be the follow contact point, not a stale terrain target"
+            );
+        }
+    }
+
+    #[test]
     fn default_menu_tank_attack_move_acquires_visible_enemy() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
