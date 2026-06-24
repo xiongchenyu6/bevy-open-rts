@@ -26194,6 +26194,99 @@ mod tests {
         app
     }
 
+    fn player_match_loop_test_app() -> App {
+        let mut app = App::new();
+        let mut window = Window {
+            resolution: WindowResolution::new(1280, 720),
+            ..default()
+        };
+        window.set_cursor_position(Some(Vec2::new(640.0, 360.0)));
+
+        let camera_state = RtsCamera::focused_on(Vec3::new(2.0, 0.0, 0.0));
+        let mut projection = camera_projection_from_state(&camera_state);
+        let mut camera = Camera {
+            viewport: Some(Viewport {
+                physical_size: UVec2::new(1280, 720),
+                ..default()
+            }),
+            ..default()
+        };
+        camera.computed.target_info = Some(RenderTargetInfo {
+            physical_size: UVec2::new(1280, 720),
+            scale_factor: 1.0,
+        });
+        projection.update(1280.0, 720.0);
+        camera.computed.clip_from_view = projection.get_clip_from_view();
+
+        app.add_plugins((
+            MinimalPlugins,
+            AssetPlugin {
+                meta_check: AssetMetaCheck::Never,
+                ..default()
+            },
+            bevy::world_serialization::WorldSerializationPlugin,
+        ))
+        .insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(1.0),
+        ))
+        .init_asset::<WorldAsset>()
+        .insert_resource(VisiblePlayer::per_player(Team::Human))
+        .insert_resource(MatchFlow { active: true })
+        .init_resource::<ButtonInput<KeyCode>>()
+        .init_resource::<ButtonInput<MouseButton>>()
+        .init_resource::<Economies>()
+        .init_resource::<BuildQueue>()
+        .init_resource::<CommandMode>()
+        .init_resource::<NextSpawnId>()
+        .init_resource::<PlayerFactions>()
+        .init_resource::<MapBounds>()
+        .init_resource::<TeamRelations>()
+        .init_resource::<SupportCooldowns>()
+        .init_resource::<BattleLog>()
+        .init_resource::<AudioFeedback>()
+        .init_resource::<KillCredits>()
+        .init_resource::<MatchState>()
+        .init_resource::<LatestBattleEvent>()
+        .add_systems(
+            Update,
+            (
+                refresh_command_panel,
+                command_buttons,
+                issue_orders,
+                advance_test_time,
+                process_build_queue,
+                chase_attack_targets,
+                move_units,
+                combat,
+                cleanup_dead_entities,
+                apply_kill_credits,
+                evaluate_match_end,
+            )
+                .chain(),
+        );
+        app.world_mut().spawn((window, PrimaryWindow));
+        let camera_transform = camera_transform_from_state(&camera_state);
+        app.world_mut().spawn((
+            Camera3d::default(),
+            camera,
+            camera_transform,
+            GlobalTransform::from(camera_transform),
+            projection,
+            MainCamera,
+        ));
+        for index in 0..COMMAND_SLOT_COUNT {
+            app.world_mut().spawn((
+                CommandSlot(index),
+                BuildAction::None,
+                CommandSlotAvailability::default(),
+                Interaction::None,
+                BackgroundColor(Color::srgba(0.035, 0.045, 0.055, 0.78)),
+                BorderColor::all(Color::srgb(0.28, 0.34, 0.39)),
+            ));
+        }
+        app
+    }
+
     fn enabled_command_slot_for_action(
         app: &mut App,
         target: BuildAction,
@@ -38337,6 +38430,81 @@ mod tests {
             unit_count_by_id(&mut app, Team::Human, "Tank"),
             1,
             "left-clicking the VehicleFactory command button should spawn a playable Tank"
+        );
+    }
+
+    #[test]
+    fn player_can_click_produce_tank_then_right_click_enemy_base_to_win() {
+        let mut app = player_match_loop_test_app();
+        let tank_def = registry::entity("Tank").expect("registry should include Tank");
+        let factory_origin = Vec3::new(0.0, 0.0, 0.0);
+        let factory = spawn_test_structure(&mut app, "VehicleFactory", Team::Human, factory_origin);
+        app.world_mut().entity_mut(factory).insert(Selected);
+        let enemy_command_center = spawn_test_structure(
+            &mut app,
+            "CommandCenter",
+            Team::Demon,
+            Vec3::new(4.0, 0.0, 0.0),
+        );
+        app.world_mut()
+            .entity_mut(enemy_command_center)
+            .insert(VisibilityState { visible: true });
+
+        app.update();
+
+        let (button, _, _) = enabled_command_slot_for_action(&mut app, BuildAction::Train("Tank"));
+        app.world_mut()
+            .entity_mut(button)
+            .insert(Interaction::Pressed);
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .press(MouseButton::Left);
+        app.update();
+        {
+            let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+            mouse.release(MouseButton::Left);
+            mouse.clear();
+        }
+
+        for _ in 0..(tank_def.build_seconds.ceil() as usize + 2) {
+            app.update();
+        }
+        assert_eq!(
+            unit_count_by_id(&mut app, Team::Human, "Tank"),
+            1,
+            "player button production should create the attacking tank"
+        );
+
+        app.world_mut().entity_mut(factory).remove::<Selected>();
+        let tank = first_unit_by_id(&mut app, Team::Human, "Tank")
+            .expect("produced tank should be selectable for player orders");
+        app.world_mut().entity_mut(tank).insert(Selected);
+        right_click_order_at_world(&mut app, Vec3::new(4.0, 0.0, 0.0));
+        assert_eq!(
+            app.world()
+                .entity(tank)
+                .get::<AttackOrder>()
+                .map(|order| order.target),
+            Some(enemy_command_center),
+            "right-clicking a visible enemy base should issue a real AttackOrder"
+        );
+
+        for _ in 0..32 {
+            app.update();
+            if app.world().resource::<MatchState>().phase == MatchPhase::HumanVictory {
+                break;
+            }
+        }
+
+        assert!(
+            app.world().get_entity(enemy_command_center).is_err(),
+            "right-click attack should destroy the enemy command center"
+        );
+        let match_state = app.world().resource::<MatchState>();
+        assert_eq!(
+            match_state.phase,
+            MatchPhase::HumanVictory,
+            "destroying the enemy anchor through player orders should finish the match"
         );
     }
 
