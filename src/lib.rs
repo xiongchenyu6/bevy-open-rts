@@ -1836,10 +1836,10 @@ impl SkirmishMenuSelection {
             .collect()
     }
 
-    fn runtime_team_ids(self) -> Vec<u8> {
+    fn runtime_team_ids(self) -> Vec<usize> {
         self.active_lobby_slots()
             .into_iter()
-            .map(|slot| self.lobby_team_ids[slot] % SKIRMISH_TEAM_OPTION_COUNT)
+            .map(|slot| (self.lobby_team_ids[slot] % SKIRMISH_TEAM_OPTION_COUNT) as usize)
             .collect()
     }
 
@@ -1979,9 +1979,9 @@ impl SkirmishMenuSelection {
             (self.lobby_color_slots[slot] + 1) % PLAYER_COLOR_PALETTE.len();
     }
 
-    fn team_id(self, team: Team) -> Option<u8> {
+    fn team_id(self, team: Team) -> Option<usize> {
         self.runtime_slot_for_team(team)
-            .map(|slot| self.lobby_team_ids[slot] % SKIRMISH_TEAM_OPTION_COUNT)
+            .map(|slot| (self.lobby_team_ids[slot] % SKIRMISH_TEAM_OPTION_COUNT) as usize)
     }
 
     fn player_faction(self, team: Team) -> Option<SkirmishFaction> {
@@ -2377,7 +2377,7 @@ fn lobby_team_ids_from_match_setup(
             .copied()
             .unwrap_or(runtime_index);
         if slot < MAX_SKIRMISH_LOBBY_SLOTS {
-            team_ids[slot] = team_id % SKIRMISH_TEAM_OPTION_COUNT;
+            team_ids[slot] = (team_id % SKIRMISH_TEAM_OPTION_COUNT as usize) as u8;
         }
     }
     team_ids
@@ -2423,7 +2423,10 @@ fn skirmish_mode_from_match_setup(settings: &MatchSetupSettings) -> SkirmishMatc
     }
 }
 
-fn skirmish_team_relations_from_team_ids(active_teams: &[bool], team_ids: &[u8]) -> TeamRelations {
+fn skirmish_team_relations_from_team_ids(
+    active_teams: &[bool],
+    team_ids: &[usize],
+) -> TeamRelations {
     let mut relations = TeamRelations::default();
     relations.ensure_player_count(active_teams.len());
     for left_index in 0..active_teams.len() {
@@ -2447,19 +2450,20 @@ fn skirmish_team_relations_from_team_ids(active_teams: &[bool], team_ids: &[u8])
     relations
 }
 
-fn skirmish_team_ids_from_relations(active_teams: &[bool], relations: &TeamRelations) -> Vec<u8> {
-    let mut team_ids = (0..active_teams.len())
-        .map(|index| (index % SKIRMISH_TEAM_OPTION_COUNT as usize) as u8)
-        .collect::<Vec<_>>();
+fn skirmish_team_ids_from_relations(
+    active_teams: &[bool],
+    relations: &TeamRelations,
+) -> Vec<usize> {
+    let mut team_ids = (0..active_teams.len()).collect::<Vec<_>>();
     let mut assigned = vec![false; active_teams.len()];
-    let mut next_team_id = 0u8;
+    let mut next_team_id = 0usize;
     for leader_index in 0..active_teams.len() {
         let leader = Team::Player(leader_index);
         if !active_teams[leader_index] || assigned[leader_index] {
             continue;
         }
-        let team_id = next_team_id.min(SKIRMISH_TEAM_OPTION_COUNT.saturating_sub(1));
-        next_team_id = next_team_id.saturating_add(1);
+        let team_id = next_team_id;
+        next_team_id += 1;
         for member_index in 0..active_teams.len() {
             let member = Team::Player(member_index);
             if active_teams[member_index] && relations.are_allied(leader, member) {
@@ -29209,6 +29213,27 @@ mod current_tests {
             capture_team_from_team(Team::Player(7)),
             CaptureTeam::Player(7)
         );
+    }
+
+    #[test]
+    fn runtime_team_ids_from_relations_do_not_clamp_after_lobby_slot_count() {
+        let active = vec![true; 12];
+        let mut relations = TeamRelations::default();
+        relations.ensure_player_count(active.len());
+
+        let team_ids = skirmish_team_ids_from_relations(&active, &relations);
+
+        assert_eq!(team_ids, (0..12).collect::<Vec<_>>());
+
+        let relation_ids = (0..12).collect::<Vec<_>>();
+        let relations = skirmish_team_relations_from_team_ids(&active, &relation_ids);
+        assert!(relations.are_enemies(Team::Player(0), Team::Player(8)));
+        assert!(relations.are_enemies(Team::Player(8), Team::Player(11)));
+
+        let mut allied_ids = (0..12).collect::<Vec<_>>();
+        allied_ids[11] = 8;
+        let allied_relations = skirmish_team_relations_from_team_ids(&active, &allied_ids);
+        assert!(allied_relations.are_allied(Team::Player(8), Team::Player(11)));
     }
 
     #[test]

@@ -17,8 +17,8 @@
 - World overlays keep selected rings, resource/supply rings, active command markers, and the current placement footprint. Unselected structures and construction-range anchors no longer draw permanent rings.
 - Runtime player state is data-driven from `ActiveTeams` / `MatchSetupSettings`: economies, team relations, AI timers, support cooldowns, HUD counts, and match-end checks grow by player index instead of assuming three hard-coded teams.
 - `Team` is runtime identity only (`Player(index)` / `Neutral`). Playable faction identity comes from `PlayerFactions`, so 人族/魔族/混沌族 rules follow the configured player slot instead of being tied to Player0/1/2.
-- Lobby team ids default to one independent team per spawn slot and cycle across the full lobby slot count, so 4/8-player maps are not folded into three activity teams.
-- AI/runtime fallback helpers are not capped to the lobby slot count: active AI iteration, opponent helpers, late-slot resources, cooldowns, and fallback home positions are verified beyond eight players.
+- Lobby team buttons remain an 8-row setup UI concern, but runtime team IDs are stored and derived as unbounded `usize` values. The battle core no longer clamps alliances to three teams or to the current lobby button count.
+- AI/runtime fallback helpers are not capped to the lobby slot count: active AI iteration, opponent helpers, late-slot resources, cooldowns, fallback home positions, and runtime team relation IDs are verified beyond eight players.
 
 ## Capture And Proofs
 
