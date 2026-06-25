@@ -27451,7 +27451,6 @@ fn draw_structure_placement_preview(
         team, faction, pending.id, point, bounds, economies, structures, occupiers,
     );
     let color = structure_placement_preview_color(validity);
-    draw_base_construction_preview_ranges(gizmos, team, def.radius, structures);
     draw_structure_placement_footprint(
         gizmos,
         point,
@@ -27461,28 +27460,6 @@ fn draw_structure_placement_preview(
     );
     if validity != StructurePlacementValidity::Valid {
         draw_ring(gizmos, point, def.radius + 0.28, color);
-    }
-}
-
-fn draw_base_construction_preview_ranges(
-    gizmos: &mut Gizmos,
-    team: Team,
-    pending_radius: f32,
-    structures: &Query<StructurePrereqItem<'_>>,
-) {
-    for (structure, structure_team, transform, under_construction) in structures {
-        if *structure_team != team || !structure_is_constructed(under_construction) {
-            continue;
-        }
-        let Some(def) = registry::entity(structure.id) else {
-            continue;
-        };
-        draw_ring(
-            gizmos,
-            transform.translation,
-            def.radius + pending_radius + BASE_CONSTRUCTION_RADIUS_M,
-            Color::srgba(0.35, 0.72, 1.0, 0.2),
-        );
     }
 }
 
