@@ -4539,6 +4539,46 @@ impl CaptureRuntimePlayersProof {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CaptureLobbyRowsMapProof {
+    pub map_id: &'static str,
+    pub map_players: usize,
+    pub row_count: usize,
+    pub fully_configurable_rows: usize,
+    pub unexpected_slot_buttons: usize,
+    pub last_slot_index: usize,
+    pub last_slot_selects: bool,
+    pub last_slot_controller_cycles: bool,
+    pub last_slot_faction_cycles: bool,
+    pub last_slot_team_cycles: bool,
+    pub last_slot_color_cycles: bool,
+}
+
+impl CaptureLobbyRowsMapProof {
+    pub fn succeeded(&self) -> bool {
+        self.row_count == self.map_players
+            && self.fully_configurable_rows == self.map_players
+            && self.unexpected_slot_buttons == 0
+            && self.last_slot_selects
+            && self.last_slot_controller_cycles
+            && self.last_slot_faction_cycles
+            && self.last_slot_team_cycles
+            && self.last_slot_color_cycles
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CaptureLobbyRowsProof {
+    pub maps: Vec<CaptureLobbyRowsMapProof>,
+}
+
+impl CaptureLobbyRowsProof {
+    pub fn succeeded(&self) -> bool {
+        self.maps.len() == SKIRMISH_MAPS.len()
+            && self.maps.iter().all(CaptureLobbyRowsMapProof::succeeded)
+    }
+}
+
 pub fn start_default_match_for_capture(app: &mut App) {
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
@@ -4815,6 +4855,13 @@ pub fn run_real_menu_lobby_slots_proof(max_frames: usize) -> CaptureLobbySlotsPr
     capture_lobby_slots_proof(&mut app, max_frames)
 }
 
+pub fn run_real_menu_lobby_rows_proof() -> CaptureLobbyRowsProof {
+    let maps = (0..SKIRMISH_MAPS.len())
+        .map(run_real_menu_lobby_rows_map_proof)
+        .collect();
+    CaptureLobbyRowsProof { maps }
+}
+
 pub fn run_capture_runtime_players_proof(
     player_count: usize,
     max_frames: usize,
@@ -4827,6 +4874,154 @@ pub fn run_capture_runtime_players_proof(
         app.update();
     }
     capture_runtime_players_proof(&mut app, expected_players, max_frames)
+}
+
+fn run_real_menu_lobby_rows_map_proof(map_index: usize) -> CaptureLobbyRowsMapProof {
+    let mut app = build_game_app(GameAppMode::Headless);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
+    ));
+    app.update();
+    drive_main_menu_action(&mut app, MainMenuAction::SelectMap(map_index), 2);
+
+    let (map_id, map_players, row_count, fully_configurable_rows, unexpected_slot_buttons) =
+        capture_current_lobby_row_counts(&mut app);
+    let last_slot_index = map_players.saturating_sub(1);
+
+    let last_slot_selects = try_drive_main_menu_action(
+        &mut app,
+        MainMenuAction::SelectLobbySlot(last_slot_index),
+        1,
+    ) && app
+        .world()
+        .resource::<SkirmishMenuSelection>()
+        .human_lobby_slot()
+        == Some(last_slot_index);
+
+    let controller_before = app
+        .world()
+        .resource::<SkirmishMenuSelection>()
+        .lobby_controllers[last_slot_index];
+    let last_slot_controller_cycles = try_drive_main_menu_action(
+        &mut app,
+        MainMenuAction::CycleLobbySlotController(last_slot_index),
+        1,
+    ) && app
+        .world()
+        .resource::<SkirmishMenuSelection>()
+        .lobby_controllers[last_slot_index]
+        != controller_before;
+
+    let faction_before = app
+        .world()
+        .resource::<SkirmishMenuSelection>()
+        .lobby_factions[last_slot_index];
+    let last_slot_faction_cycles = try_drive_main_menu_action(
+        &mut app,
+        MainMenuAction::CycleLobbySlotFaction(last_slot_index),
+        1,
+    ) && app
+        .world()
+        .resource::<SkirmishMenuSelection>()
+        .lobby_factions[last_slot_index]
+        != faction_before;
+
+    let team_before = app
+        .world()
+        .resource::<SkirmishMenuSelection>()
+        .lobby_team_ids[last_slot_index];
+    let last_slot_team_cycles = try_drive_main_menu_action(
+        &mut app,
+        MainMenuAction::CycleLobbySlotTeamId(last_slot_index),
+        1,
+    ) && app
+        .world()
+        .resource::<SkirmishMenuSelection>()
+        .lobby_team_ids[last_slot_index]
+        != team_before;
+
+    let color_before = app
+        .world()
+        .resource::<SkirmishMenuSelection>()
+        .lobby_color_slots[last_slot_index];
+    let last_slot_color_cycles = try_drive_main_menu_action(
+        &mut app,
+        MainMenuAction::CycleLobbySlotColor(last_slot_index),
+        1,
+    ) && app
+        .world()
+        .resource::<SkirmishMenuSelection>()
+        .lobby_color_slots[last_slot_index]
+        != color_before;
+
+    CaptureLobbyRowsMapProof {
+        map_id,
+        map_players,
+        row_count,
+        fully_configurable_rows,
+        unexpected_slot_buttons,
+        last_slot_index,
+        last_slot_selects,
+        last_slot_controller_cycles,
+        last_slot_faction_cycles,
+        last_slot_team_cycles,
+        last_slot_color_cycles,
+    }
+}
+
+fn capture_current_lobby_row_counts(app: &mut App) -> (&'static str, usize, usize, usize, usize) {
+    const REQUIRED_LOBBY_ROW_ACTIONS: u8 = 0b1_1111;
+    let world = app.world_mut();
+    let selection = *world.resource::<SkirmishMenuSelection>();
+    let map = selection.map();
+    let map_players = map.players;
+    let row_count = {
+        let mut rows = world.query_filtered::<Entity, With<MainMenuLobbySlotRow>>();
+        rows.iter(world).count()
+    };
+    let mut slot_action_masks = vec![0u8; map_players.max(MAX_SKIRMISH_LOBBY_SLOTS)];
+    let mut unexpected_slot_buttons = 0usize;
+    {
+        let mut buttons = world.query::<&MainMenuButton>();
+        for button in buttons.iter(world) {
+            let Some((slot, mask)) = lobby_slot_action_mask(button.action) else {
+                continue;
+            };
+            if slot >= map_players {
+                unexpected_slot_buttons += 1;
+                continue;
+            }
+            if slot_action_masks.len() <= slot {
+                slot_action_masks.resize(slot + 1, 0);
+            }
+            slot_action_masks[slot] |= mask;
+        }
+    }
+    let fully_configurable_rows = (0..map_players)
+        .filter(|slot| slot_action_masks[*slot] == REQUIRED_LOBBY_ROW_ACTIONS)
+        .count();
+    (
+        map.id,
+        map_players,
+        row_count,
+        fully_configurable_rows,
+        unexpected_slot_buttons,
+    )
+}
+
+fn lobby_slot_action_mask(action: MainMenuAction) -> Option<(usize, u8)> {
+    match action {
+        MainMenuAction::SelectLobbySlot(slot) => Some((slot, 0b0_0001)),
+        MainMenuAction::CycleLobbySlotController(slot) => Some((slot, 0b0_0010)),
+        MainMenuAction::CycleLobbySlotFaction(slot) => Some((slot, 0b0_0100)),
+        MainMenuAction::CycleLobbySlotTeamId(slot) => Some((slot, 0b0_1000)),
+        MainMenuAction::CycleLobbySlotColor(slot) => Some((slot, 0b1_0000)),
+        MainMenuAction::SelectMap(_)
+        | MainMenuAction::SelectStartingResources(_)
+        | MainMenuAction::SelectMatchMode(_)
+        | MainMenuAction::SelectAiDifficulty(_)
+        | MainMenuAction::StartMatch => None,
+    }
 }
 
 fn capture_lobby_slots_proof(app: &mut App, frames: usize) -> CaptureLobbySlotsProof {
@@ -7128,13 +7323,24 @@ fn capture_finish_match_with_mouse_attackers(
 }
 
 fn drive_main_menu_action(app: &mut App, action: MainMenuAction, followup_updates: usize) {
-    let button_entity = {
+    try_drive_main_menu_action(app, action, followup_updates)
+        .then_some(())
+        .expect("main menu button should exist");
+}
+
+fn try_drive_main_menu_action(
+    app: &mut App,
+    action: MainMenuAction,
+    followup_updates: usize,
+) -> bool {
+    let Some(button_entity) = ({
         let world = app.world_mut();
         let mut buttons = world.query::<(Entity, &MainMenuButton)>();
         buttons
             .iter(world)
             .find_map(|(entity, button)| (button.action == action).then_some(entity))
-            .expect("main menu button should exist")
+    }) else {
+        return false;
     };
     app.world_mut()
         .entity_mut(button_entity)
@@ -7155,6 +7361,7 @@ fn drive_main_menu_action(app: &mut App, action: MainMenuAction, followup_update
     for _ in 0..followup_updates {
         app.update();
     }
+    true
 }
 
 fn capture_first_alive_resource_collector(world: &mut World, team: Team) -> Option<(Entity, Vec3)> {

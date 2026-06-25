@@ -49,9 +49,10 @@
   - `real-economy-victory-proof`: low-resource menu start, mouse harvest required resources, train combat vehicles, right-click enemy anchors, and win without proof-side resource injection.
   - `real-playable-proof`: low-resource menu start, mouse harvest both Ore and Crystal, build Barracks, train a Barracks unit, train combat vehicles, right-click enemy anchors, and win.
   - `real-free-for-all-playable-proof`: low-resource real menu start, select free-for-all skirmish mode, use the same playable proof flow with a larger attack group, and finish all enemy anchors.
+  - `real-lobby-rows-proof`: real menu proof that every authored skirmish map renders one configurable player row per map spawn slot, including the 8-row Big Arena lobby.
   - `real-lobby-slots-proof`: real menu Big Arena setup that enables every map spawn slot and verifies all eight active player rows reach the live scene with economies, units, structures, command centers, and spawn anchors.
   - `runtime-players-proof`: direct shared-scene proof that starts more runtime players than the authored map spawn count and verifies economies, units, structures, command centers, and virtual fallback spawns.
-  - `real-playability-suite-proof`: top-level CLI regression gate that runs the real menu dual-harvest, supply-crate, tech-oil, playable, free-for-all, all-map, Allied 2v1, AI pressure, AI-vs-AI, and runtime-player-count proof surfaces.
+  - `real-playability-suite-proof`: top-level CLI regression gate that runs the real menu lobby-row, dual-harvest, supply-crate, tech-oil, playable, free-for-all, all-map, Allied 2v1, AI pressure, AI-vs-AI, and runtime-player-count proof surfaces.
 
 ## Verification
 

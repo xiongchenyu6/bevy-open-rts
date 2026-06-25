@@ -7,11 +7,12 @@ use std::{
 
 use bevy_open_rts::{
     CaptureAiPressureProof, CaptureAiVsAiProof, CaptureDualHarvestProof, CaptureEntityKind,
-    CaptureMatchPhase, CaptureMatchSnapshot, CapturePlayableProof, CaptureProofFaction,
-    CaptureRuntimePlayersProof, CaptureSupplyCrateProof, CaptureTeam, CaptureTechOilProof,
-    CaptureVictoryProof, advance_capture_match, advance_capture_match_proof_frame,
-    build_capture_match_app, build_capture_match_app_for_faction, capture_match_proof_status,
-    capture_match_snapshot, capture_proof_unit_count, run_capture_match_proof_for_faction,
+    CaptureLobbyRowsMapProof, CaptureLobbyRowsProof, CaptureMatchPhase, CaptureMatchSnapshot,
+    CapturePlayableProof, CaptureProofFaction, CaptureRuntimePlayersProof, CaptureSupplyCrateProof,
+    CaptureTeam, CaptureTechOilProof, CaptureVictoryProof, advance_capture_match,
+    advance_capture_match_proof_frame, build_capture_match_app,
+    build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
+    capture_proof_unit_count, run_capture_match_proof_for_faction,
     run_capture_runtime_players_proof, run_real_default_menu_victory_proof,
     run_real_menu_ai_pressure_proof_for_faction, run_real_menu_ai_pressure_proofs,
     run_real_menu_ai_vs_ai_proof_for_faction, run_real_menu_ai_vs_ai_proofs,
@@ -19,8 +20,8 @@ use bevy_open_rts::{
     run_real_menu_allied_victory_proofs, run_real_menu_build_proof_for_faction,
     run_real_menu_dual_harvest_proof_for_faction, run_real_menu_economy_victory_proof_for_faction,
     run_real_menu_free_for_all_playable_proof_for_faction, run_real_menu_harvest_proof_for_faction,
-    run_real_menu_lobby_slots_proof, run_real_menu_match_proof_for_faction,
-    run_real_menu_playable_proof_for_faction,
+    run_real_menu_lobby_rows_proof, run_real_menu_lobby_slots_proof,
+    run_real_menu_match_proof_for_faction, run_real_menu_playable_proof_for_faction,
     run_real_menu_selected_faction_victory_proof_for_faction,
     run_real_menu_selected_map_victory_proof, run_real_menu_supply_crate_proof_for_faction,
     run_real_menu_tech_oil_proof_for_faction, run_real_menu_tech_oil_proofs,
@@ -236,6 +237,13 @@ fn run() -> Result<(), String> {
                 return Err(format!(
                     "real menu lobby slots proof did not preserve all active map slots within {max_frames} frames"
                 ));
+            }
+        }
+        Some("real-lobby-rows-proof") => {
+            let proof = run_real_menu_lobby_rows_proof();
+            print_lobby_rows_proof("real-lobby-rows-proof", &proof);
+            if !proof.succeeded() {
+                return Err("real menu lobby rows proof did not preserve map slot rows".to_string());
             }
         }
         Some("real-harvest-proof") => {
@@ -680,6 +688,13 @@ fn run_real_playability_suite() -> Result<(), String> {
     let mut failures = Vec::new();
     let mut checks = 0usize;
 
+    let lobby_rows_proof = run_real_menu_lobby_rows_proof();
+    print_lobby_rows_proof("real-playability-suite-proof:lobby-rows", &lobby_rows_proof);
+    checks += lobby_rows_proof.maps.len();
+    if !lobby_rows_proof.succeeded() {
+        failures.push("lobby-rows".to_string());
+    }
+
     for faction in CaptureProofFaction::ALL {
         let proof = run_real_menu_dual_harvest_proof_for_faction(faction, DUAL_HARVEST_FRAMES);
         print_dual_harvest_proof("real-playability-suite-proof:dual-harvest", &proof);
@@ -806,6 +821,30 @@ fn print_dual_harvest_proof(command: &str, proof: &CaptureDualHarvestProof) {
         proof.crystal_after,
         proof.ore_harvest_ordered,
         proof.crystal_harvest_ordered,
+    );
+}
+
+fn print_lobby_rows_proof(command: &str, proof: &CaptureLobbyRowsProof) {
+    for map in &proof.maps {
+        print_lobby_rows_map_proof(command, map);
+    }
+}
+
+fn print_lobby_rows_map_proof(command: &str, proof: &CaptureLobbyRowsMapProof) {
+    println!(
+        "[capture] {} map={} map_players={} row_count={} configurable_rows={} unexpected_slot_buttons={} last_slot={} select={} controller={} faction={} team={} color={}",
+        command,
+        proof.map_id,
+        proof.map_players,
+        proof.row_count,
+        proof.fully_configurable_rows,
+        proof.unexpected_slot_buttons,
+        proof.last_slot_index + 1,
+        proof.last_slot_selects,
+        proof.last_slot_controller_cycles,
+        proof.last_slot_faction_cycles,
+        proof.last_slot_team_cycles,
+        proof.last_slot_color_cycles,
     );
 }
 
@@ -984,6 +1023,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- match-proof 7200 demon");
     println!("  cargo run --bin capture -- match-proof 7200 chaos");
     println!("  cargo run --bin capture -- real-match-proof 7200 human");
+    println!("  cargo run --bin capture -- real-lobby-rows-proof");
     println!("  cargo run --bin capture -- real-harvest-proof 900 human");
     println!("  cargo run --bin capture -- real-dual-harvest-proof 1800 human");
     println!("  cargo run --bin capture -- real-supply-crate-proof 900 human");
