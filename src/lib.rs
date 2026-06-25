@@ -2487,13 +2487,13 @@ fn skirmish_has_opposing_active_teams(active_teams: &[bool], relations: &TeamRel
     false
 }
 
-fn allied_skirmish_ally(player_team: Team) -> Option<Team> {
-    default_skirmish_opponent(player_team)
+fn allied_skirmish_ally(player_team: Team, active_team_count: usize) -> Option<Team> {
+    default_skirmish_opponent(player_team, active_team_count)
 }
 
-fn allied_skirmish_enemy(player_team: Team) -> Option<Team> {
-    let ally = allied_skirmish_ally(player_team)?;
-    player_teams(MAX_SKIRMISH_LOBBY_SLOTS).find(|team| *team != player_team && *team != ally)
+fn allied_skirmish_enemy(player_team: Team, active_team_count: usize) -> Option<Team> {
+    let ally = allied_skirmish_ally(player_team, active_team_count)?;
+    player_teams(active_team_count).find(|team| *team != player_team && *team != ally)
 }
 
 fn skirmish_has_cross_team_alliance(relations: &TeamRelations, active_teams: &[bool]) -> bool {
@@ -2515,8 +2515,8 @@ fn skirmish_has_cross_team_alliance(relations: &TeamRelations, active_teams: &[b
     false
 }
 
-fn default_skirmish_opponent(player_team: Team) -> Option<Team> {
-    player_teams(MAX_SKIRMISH_LOBBY_SLOTS).find(|team| *team != player_team)
+fn default_skirmish_opponent(player_team: Team, active_team_count: usize) -> Option<Team> {
+    player_teams(active_team_count).find(|team| *team != player_team)
 }
 
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
@@ -8581,7 +8581,7 @@ impl Team {
     fn index(self) -> usize {
         match self {
             Team::Player(index) => index,
-            Team::Neutral => MAX_SKIRMISH_LOBBY_SLOTS,
+            Team::Neutral => usize::MAX,
         }
     }
 
@@ -11107,8 +11107,8 @@ fn skirmish_opponents_text(selection: SkirmishMenuSelection) -> String {
             .collect::<Vec<_>>()
             .join("/"),
         SkirmishMatchMode::AlliedTwoVsOne => match (
-            allied_skirmish_ally(focus_team),
-            allied_skirmish_enemy(focus_team),
+            allied_skirmish_ally(focus_team, active_teams.len()),
+            allied_skirmish_enemy(focus_team, active_teams.len()),
         ) {
             (Some(ally), Some(enemy)) => {
                 format!("{}（盟友: {}）", enemy.label(), ally.label())
@@ -25060,8 +25060,10 @@ fn ai_structure_under_limit(
 fn team_home(team: Team) -> Vec3 {
     match team {
         Team::Player(index) => {
-            let angle = index as f32 * std::f32::consts::TAU / MAX_SKIRMISH_LOBBY_SLOTS as f32;
-            Vec3::new(angle.cos() * 14.0, 0.0, angle.sin() * 14.0)
+            const GOLDEN_ANGLE: f32 = 2.399_963_1;
+            let angle = index as f32 * GOLDEN_ANGLE;
+            let radius = 14.0 + (index / MAX_SKIRMISH_LOBBY_SLOTS) as f32 * 5.0;
+            Vec3::new(angle.cos() * radius, 0.0, angle.sin() * radius)
         }
         Team::Neutral => Vec3::ZERO,
     }
@@ -29232,5 +29234,29 @@ mod current_tests {
             support_cooldowns.remaining_for(late_team, SupportPowerKind::Paradrop),
             9.0
         );
+    }
+
+    #[test]
+    fn runtime_team_helpers_do_not_wrap_after_lobby_slot_count() {
+        let active = ActiveTeams(vec![true; 16]);
+        let teams = active_ai_teams(Some(Team::Player(0)), Some(&active)).collect::<Vec<_>>();
+        assert_eq!(teams.len(), 15);
+        assert!(teams.contains(&Team::Player(15)));
+
+        assert_eq!(
+            default_skirmish_opponent(Team::Player(12), 16),
+            Some(Team::Player(0))
+        );
+        assert_eq!(
+            allied_skirmish_ally(Team::Player(12), 16),
+            Some(Team::Player(0))
+        );
+        assert_eq!(
+            allied_skirmish_enemy(Team::Player(12), 16),
+            Some(Team::Player(1))
+        );
+        assert_eq!(Team::Neutral.index(), usize::MAX);
+        assert!(xz_distance(team_home(Team::Player(0)), team_home(Team::Player(8))) > 1.0);
+        assert!(xz_distance(team_home(Team::Player(8)), team_home(Team::Player(16))) > 1.0);
     }
 }
