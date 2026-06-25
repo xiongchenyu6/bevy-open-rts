@@ -6,9 +6,9 @@ use std::{
 };
 
 use bevy_open_rts::{
-    CaptureAiPressureProof, CaptureAiVsAiProof, CaptureEntityKind, CaptureMatchPhase,
-    CaptureMatchSnapshot, CapturePlayableProof, CaptureProofFaction, CaptureTeam,
-    CaptureVictoryProof, advance_capture_match, advance_capture_match_proof_frame,
+    CaptureAiPressureProof, CaptureAiVsAiProof, CaptureDualHarvestProof, CaptureEntityKind,
+    CaptureMatchPhase, CaptureMatchSnapshot, CapturePlayableProof, CaptureProofFaction,
+    CaptureTeam, CaptureVictoryProof, advance_capture_match, advance_capture_match_proof_frame,
     build_capture_match_app, build_capture_match_app_for_faction, capture_match_proof_status,
     capture_match_snapshot, capture_proof_unit_count, run_capture_match_proof_for_faction,
     run_real_default_menu_victory_proof, run_real_menu_ai_pressure_proof_for_faction,
@@ -241,19 +241,7 @@ fn run() -> Result<(), String> {
                 .map_err(|error| format!("invalid max frame count: {error}"))?;
             let faction = parse_optional_faction(args.next())?;
             let proof = run_real_menu_dual_harvest_proof_for_faction(faction, max_frames);
-            println!(
-                "[capture] real-dual-harvest-proof faction={} label={} phase={:?} frames={} ore={}->{} crystal={}->{} harvest_ore={} harvest_crystal={}",
-                proof.faction.key(),
-                proof.faction.label(),
-                proof.phase,
-                proof.frames,
-                proof.ore_before,
-                proof.ore_after,
-                proof.crystal_before,
-                proof.crystal_after,
-                proof.ore_harvest_ordered,
-                proof.crystal_harvest_ordered,
-            );
+            print_dual_harvest_proof("real-dual-harvest-proof", &proof);
             if !proof.succeeded() {
                 return Err(format!(
                     "real menu dual harvest proof did not mine both Ore and Crystal within {max_frames} frames"
@@ -550,6 +538,9 @@ fn run() -> Result<(), String> {
                 ));
             }
         }
+        Some("real-playability-suite-proof") => {
+            run_real_playability_suite()?;
+        }
         Some("help" | "-h" | "--help") => {
             print_help();
         }
@@ -560,6 +551,111 @@ fn run() -> Result<(), String> {
         }
     }
     Ok(())
+}
+
+fn run_real_playability_suite() -> Result<(), String> {
+    const DUAL_HARVEST_FRAMES: usize = 1800;
+    const PLAYABLE_FRAMES: usize = 4200;
+    const THREE_FACTION_FRAMES: usize = 7200;
+    const ALL_MAPS_FRAMES: usize = 7200;
+    const ALLIED_FRAMES: usize = 7200;
+    const AI_PRESSURE_FRAMES: usize = 1200;
+    const AI_VS_AI_FRAMES: usize = 2400;
+
+    let mut failures = Vec::new();
+    let mut checks = 0usize;
+
+    for faction in CaptureProofFaction::ALL {
+        let proof = run_real_menu_dual_harvest_proof_for_faction(faction, DUAL_HARVEST_FRAMES);
+        print_dual_harvest_proof("real-playability-suite-proof:dual-harvest", &proof);
+        checks += 1;
+        if !proof.succeeded() {
+            failures.push(format!("dual-harvest:{}", faction.key()));
+        }
+    }
+
+    for faction in CaptureProofFaction::ALL {
+        let proof = run_real_menu_playable_proof_for_faction(faction, PLAYABLE_FRAMES);
+        print_playable_proof("real-playability-suite-proof:playable", &proof);
+        checks += 1;
+        if !proof.succeeded() {
+            failures.push(format!("playable:{}", faction.key()));
+        }
+    }
+
+    for faction in CaptureProofFaction::ALL {
+        let proof =
+            run_real_menu_three_faction_playable_proof_for_faction(faction, THREE_FACTION_FRAMES);
+        print_playable_proof("real-playability-suite-proof:three-faction", &proof);
+        checks += 1;
+        if !proof.succeeded() {
+            failures.push(format!("three-faction:{}", faction.key()));
+        }
+    }
+
+    let all_map_proofs = run_real_menu_all_maps_victory_proofs(ALL_MAPS_FRAMES);
+    for proof in &all_map_proofs {
+        print_victory_proof("real-playability-suite-proof:all-maps", proof);
+        checks += 1;
+        if !proof.succeeded() {
+            failures.push(format!("all-maps:{}:{}", proof.faction.key(), proof.map_id));
+        }
+    }
+
+    let allied_proofs = run_real_menu_allied_victory_proofs(ALLIED_FRAMES);
+    for proof in &allied_proofs {
+        print_victory_proof("real-playability-suite-proof:allied", proof);
+        checks += 1;
+        if !proof.succeeded() {
+            failures.push(format!("allied:{}", proof.faction.key()));
+        }
+    }
+
+    let ai_pressure_proofs = run_real_menu_ai_pressure_proofs(AI_PRESSURE_FRAMES);
+    for proof in &ai_pressure_proofs {
+        print_ai_pressure_proof("real-playability-suite-proof:ai-pressure", proof);
+        checks += 1;
+        if !proof.succeeded() {
+            failures.push(format!("ai-pressure:{}", proof.faction.key()));
+        }
+    }
+
+    let ai_vs_ai_proofs = run_real_menu_ai_vs_ai_proofs(AI_VS_AI_FRAMES);
+    for proof in &ai_vs_ai_proofs {
+        print_ai_vs_ai_proof("real-playability-suite-proof:ai-vs-ai", proof);
+        checks += 1;
+        if !proof.succeeded() {
+            failures.push(format!("ai-vs-ai:{}", proof.focus_faction.key()));
+        }
+    }
+
+    if failures.is_empty() {
+        println!("[capture] real-playability-suite-proof passed checks={checks}");
+        Ok(())
+    } else {
+        Err(format!(
+            "real playability suite failed checks={}: {}",
+            failures.len(),
+            failures.join(", ")
+        ))
+    }
+}
+
+fn print_dual_harvest_proof(command: &str, proof: &CaptureDualHarvestProof) {
+    println!(
+        "[capture] {} faction={} label={} phase={:?} frames={} ore={}->{} crystal={}->{} harvest_ore={} harvest_crystal={}",
+        command,
+        proof.faction.key(),
+        proof.faction.label(),
+        proof.phase,
+        proof.frames,
+        proof.ore_before,
+        proof.ore_after,
+        proof.crystal_before,
+        proof.crystal_after,
+        proof.ore_harvest_ordered,
+        proof.crystal_harvest_ordered,
+    );
 }
 
 fn print_playable_proof(command: &str, proof: &CapturePlayableProof) {
@@ -690,6 +786,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-economy-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-playable-proof 4200 human");
     println!("  cargo run --bin capture -- real-three-faction-playable-proof 7200 human");
+    println!("  cargo run --bin capture -- real-playability-suite-proof");
 }
 
 fn parse_optional_faction(value: Option<String>) -> Result<CaptureProofFaction, String> {
