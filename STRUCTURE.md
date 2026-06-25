@@ -13,6 +13,8 @@
 - `start_shared_match_scene_with_settings()` is the internal helper for capture/test apps that need to inject a specific `MatchSetupSettings` before entering the same live scene.
 - The main menu uses `start_shared_match_from_menu_selection()` so `cargo run` and capture/test proofs enter through the same setup contract.
 - Match start camera focus is derived from the selected player's actual base anchor: first the `MobileConstructionVehicle` spawn when present, then the `CommandCenter`. It no longer blends toward nearby resources, so `cargo run` opens over the player's base instead of a zoomed-out map work area.
+- Resource nodes are left-click selectable for target confirmation, and selected harvesters use a wider resource-specific right-click snap so clicking the visible ore/crystal model edge still issues `HarvestOrder`.
+- World overlays keep selected rings, resource/supply rings, and active command markers, but unselected structures no longer draw permanent team-color rings.
 
 ## Capture And Proofs
 

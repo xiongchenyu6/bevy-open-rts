@@ -54,10 +54,10 @@ const HUMAN_BASE: Vec3 = Vec3::new(-12.0, 0.0, -9.0);
 const DEMON_BASE: Vec3 = Vec3::new(12.0, 0.0, 9.0);
 const CHAOS_BASE: Vec3 = Vec3::new(10.0, 0.0, -11.0);
 const RESOURCE_ORDER_GROUND_SNAP_RADIUS_M: f32 = 2.2;
-const RESOURCE_ORDER_COLLECTOR_GROUND_SNAP_RADIUS_M: f32 = 5.2;
+const RESOURCE_ORDER_COLLECTOR_GROUND_SNAP_RADIUS_M: f32 = 7.0;
 const RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 34.0;
 const RESOURCE_ORDER_SCREEN_PICK_MAX_RADIUS_PX: f32 = 78.0;
-const RESOURCE_ORDER_COLLECTOR_SCREEN_PICK_MAX_RADIUS_PX: f32 = 124.0;
+const RESOURCE_ORDER_COLLECTOR_SCREEN_PICK_MAX_RADIUS_PX: f32 = 148.0;
 const ENEMY_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 32.0;
 const ENEMY_ORDER_SCREEN_PICK_MAX_RADIUS_PX: f32 = 96.0;
 const DEFAULT_MODEL_FALLBACK: &str = "models/kenney-spacekit/rover.glb";
@@ -15511,6 +15511,7 @@ fn select_entities(
         &Team,
         &VisibilityState,
         Option<&Unit>,
+        Option<&ResourceNode>,
         Option<&Selected>,
     )>,
 ) {
@@ -15518,7 +15519,7 @@ fn select_entities(
         return;
     }
     let Some(visible_team) = controlled_player_team(Some(&*visible_player)) else {
-        for (entity, _, _, _, _, _, _) in &selectable_q {
+        for (entity, _, _, _, _, _, _, _) in &selectable_q {
             commands.entity(entity).try_remove::<Selected>();
         }
         drag_state.active = false;
@@ -15575,7 +15576,7 @@ fn select_entities(
     if drag_state.dragging {
         let Some(screen_polygon) = screen_polygon_for_drag(drag_state.start, cursor) else {
             if !additive {
-                for (entity, _, _, _, _, _, _) in &selectable_q {
+                for (entity, _, _, _, _, _, _, _) in &selectable_q {
                     commands.entity(entity).try_remove::<Selected>();
                 }
             }
@@ -15589,17 +15590,17 @@ fn select_entities(
             return;
         };
         if !additive {
-            for (entity, _, _, _, _, _, _) in &selectable_q {
+            for (entity, _, _, _, _, _, _, _) in &selectable_q {
                 commands.entity(entity).try_remove::<Selected>();
             }
         }
         let mut selected_owned = false;
         let mut selected_owned_voice_unit = false;
-        for (entity, transform, _, team, visibility, unit, _) in &selectable_q {
+        for (entity, transform, _, team, visibility, unit, resource_node, _) in &selectable_q {
             if !visibility.visible {
                 continue;
             }
-            if *team != visible_team {
+            if *team != visible_team || resource_node.is_some() {
                 continue;
             }
             let Ok(screen_position) =
@@ -15637,18 +15638,23 @@ fn select_entities(
     };
 
     if !additive {
-        for (entity, _, _, _, _, _, _) in &selectable_q {
+        for (entity, _, _, _, _, _, _, _) in &selectable_q {
             commands.entity(entity).try_remove::<Selected>();
         }
     }
 
     let mut nearest = None;
     let mut nearest_distance = f32::MAX;
-    for (entity, transform, selectable, team, visibility, unit, selected) in &selectable_q {
+    for (entity, transform, selectable, team, visibility, unit, resource_node, selected) in
+        &selectable_q
+    {
         if !visibility.visible {
             continue;
         }
-        if *team != visible_team {
+        if *team != visible_team && resource_node.is_none() {
+            continue;
+        }
+        if resource_node.is_some_and(|resource| resource.amount <= 0) {
             continue;
         }
         let ground_distance = xz_distance(transform.translation, point);
@@ -15680,7 +15686,7 @@ fn select_entities(
             && (current_time - double_click_state.last_click_time) <= DOUBLE_CLICK_MAX_SECONDS
             && let Some(target_id) = target_unit
         {
-            for (entity, _, _, _, _, _, _) in &selectable_q {
+            for (entity, _, _, _, _, _, _, _) in &selectable_q {
                 commands.entity(entity).try_remove::<Selected>();
             }
             let Ok((camera, camera_transform)) = camera_q.single() else {
@@ -15690,11 +15696,13 @@ fn select_entities(
             };
             let mut selected_owned = false;
             let mut selected_owned_voice_unit = false;
-            for (entity, transform, _, team, visibility, same_unit, _) in &selectable_q {
+            for (entity, transform, _, team, visibility, same_unit, resource_node, _) in
+                &selectable_q
+            {
                 if !visibility.visible {
                     continue;
                 }
-                if *team != visible_team {
+                if *team != visible_team || resource_node.is_some() {
                     continue;
                 }
                 if let Some(candidate_unit) = same_unit {
@@ -27122,10 +27130,22 @@ fn draw_world_overlays(
             Option<&AttackMoveOrder>,
             Option<&PatrolOrder>,
             Option<&OrderQueue>,
+            Option<&Unit>,
+            Option<&Structure>,
         ),
         With<Selected>,
     >,
-    all: Query<(&Transform, &Selectable, &Team, &Health), Without<Selected>>,
+    all: Query<
+        (
+            &Transform,
+            &Selectable,
+            &Team,
+            &Health,
+            Option<&Unit>,
+            Option<&Structure>,
+        ),
+        Without<Selected>,
+    >,
     pulses: Query<&ShotPulse>,
     warnings: Query<(&Transform, &SupportWarning)>,
     reveals: Query<(&Transform, &TemporarySupportReveal)>,
@@ -27150,6 +27170,8 @@ fn draw_world_overlays(
         attack_move_order,
         patrol_order,
         order_queue,
+        unit,
+        structure,
     ) in &selected
     {
         draw_ring(
@@ -27182,22 +27204,26 @@ fn draw_world_overlays(
             );
             draw_terrain_order_path(&mut gizmos, transform.translation, &path_points);
         }
-        draw_team_marker(
-            &mut gizmos,
-            transform.translation,
-            selectable.radius,
-            *team,
-            &player_colors,
-        );
+        if should_draw_team_marker_for_entity(unit, structure) && *team != visible_team {
+            draw_team_marker(
+                &mut gizmos,
+                transform.translation,
+                selectable.radius,
+                *team,
+                &player_colors,
+            );
+        }
     }
-    for (transform, selectable, team, health) in &all {
-        draw_team_marker(
-            &mut gizmos,
-            transform.translation,
-            selectable.radius,
-            *team,
-            &player_colors,
-        );
+    for (transform, selectable, team, health, unit, structure) in &all {
+        if should_draw_team_marker_for_entity(unit, structure) {
+            draw_team_marker(
+                &mut gizmos,
+                transform.translation,
+                selectable.radius,
+                *team,
+                &player_colors,
+            );
+        }
         if health.current < health.max {
             draw_health_bar(
                 &mut gizmos,
@@ -27309,6 +27335,10 @@ fn draw_world_overlays(
             &placement_preview.occupiers,
         );
     }
+}
+
+fn should_draw_team_marker_for_entity(unit: Option<&Unit>, structure: Option<&Structure>) -> bool {
+    unit.is_some() && structure.is_none()
 }
 
 fn draw_structure_placement_preview(
@@ -44689,6 +44719,131 @@ mod tests {
     }
 
     #[test]
+    fn default_menu_player_can_click_select_visible_ore_resource() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(0.25),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+        for _ in 0..3 {
+            app.update();
+        }
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let harvester = first_unit_by_id(&mut app, Team::Human, "OreHarvester")
+            .expect("default playable skirmish should spawn a player OreHarvester");
+        let harvester_position = unit_position(&app, harvester);
+        let (resource, _, _, resource_position, visible) =
+            runtime_resource_node_snapshots(&mut app)
+                .into_iter()
+                .filter(|(_, kind, amount, _, visible)| {
+                    *kind == ResourceKind::Ore && *amount > 0 && *visible
+                })
+                .min_by(|(_, _, _, lhs, _), (_, _, _, rhs, _)| {
+                    xz_distance(*lhs, harvester_position)
+                        .partial_cmp(&xz_distance(*rhs, harvester_position))
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
+                .expect("default player start should reveal at least one nearby ore node");
+        assert!(visible);
+
+        attach_test_window_to_main_camera(&mut app, resource_position);
+        click_selection_at_world(&mut app, resource_position, false);
+
+        assert!(
+            app.world().entity(resource).get::<Selected>().is_some(),
+            "left-clicking visible ore should select the resource node for target confirmation"
+        );
+    }
+
+    #[test]
+    fn default_menu_mixed_harvester_group_right_clicks_ore_edge_to_harvest() {
+        let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            Duration::from_secs_f32(0.25),
+        ));
+        app.update();
+
+        press_key(&mut app, KeyCode::Enter, 3);
+        for _ in 0..3 {
+            app.update();
+        }
+
+        assert_eq!(app_screen(&app), AppScreen::InMatch);
+        let ore_harvester = first_unit_by_id(&mut app, Team::Human, "OreHarvester")
+            .expect("default playable skirmish should spawn a player OreHarvester");
+        let scout = first_unit_by_id(&mut app, Team::Human, "ScoutRover")
+            .expect("default playable skirmish should spawn a player ScoutRover");
+        let harvester_position = unit_position(&app, ore_harvester);
+        let scout_position = unit_position(&app, scout);
+        let (resource, _, resource_amount_before, resource_position, _) =
+            runtime_resource_node_snapshots(&mut app)
+                .into_iter()
+                .filter(|(_, kind, amount, _, visible)| {
+                    *kind == ResourceKind::Ore && *amount > 0 && *visible
+                })
+                .min_by(|(_, _, _, lhs, _), (_, _, _, rhs, _)| {
+                    xz_distance(*lhs, harvester_position)
+                        .partial_cmp(&xz_distance(*rhs, harvester_position))
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
+                .expect("default player start should reveal at least one nearby ore node");
+
+        attach_test_window_to_main_camera(&mut app, harvester_position);
+        click_selection_at_world(&mut app, harvester_position, false);
+        attach_test_window_to_main_camera(&mut app, scout_position);
+        click_selection_at_world(&mut app, scout_position, true);
+        for entity in [ore_harvester, scout] {
+            assert!(
+                app.world().entity(entity).get::<Selected>().is_some(),
+                "left-click plus Shift-left-click should select the mixed harvester group"
+            );
+        }
+
+        let toward_group = (harvester_position + scout_position) * 0.5 - resource_position;
+        let toward_group = if toward_group.length_squared() > 0.001 {
+            toward_group.normalize()
+        } else {
+            Vec3::X
+        };
+        let edge_click = resource_position + toward_group * 6.0;
+        attach_test_window_to_main_camera(&mut app, edge_click);
+        right_click_order_at_world(&mut app, edge_click);
+
+        assert!(
+            app.world()
+                .entity(ore_harvester)
+                .get::<HarvestOrder>()
+                .is_some_and(|order| order.resource == Some(resource)),
+            "right-clicking the visible ore edge with a mixed ScoutRover/OreHarvester group should order the harvester to mine"
+        );
+        let ore_before = app.world().resource::<Economies>().get(Team::Human).ore;
+        for _ in 0..180 {
+            app.update();
+            let ore_now = app.world().resource::<Economies>().get(Team::Human).ore;
+            let resource_now = app
+                .world()
+                .get::<ResourceNode>(resource)
+                .map_or(0, |resource| resource.amount);
+            if ore_now > ore_before && resource_now < resource_amount_before {
+                break;
+            }
+        }
+        assert!(
+            app.world()
+                .get::<ResourceNode>(resource)
+                .is_some_and(|resource| resource.amount < resource_amount_before),
+            "mixed-group edge click should result in the target ore being mined"
+        );
+        assert!(
+            app.world().resource::<Economies>().get(Team::Human).ore > ore_before,
+            "mixed-group edge click should deliver harvested ore"
+        );
+    }
+
+    #[test]
     fn default_menu_collectors_can_click_loose_near_visible_ore() {
         let mut app = stateful_match_flow_test_app(MatchSetupSettings::default());
         app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
@@ -52285,6 +52440,21 @@ mod tests {
     fn air_to_terrain_marker_only_draws_for_air_units() {
         assert!(should_draw_air_to_terrain_marker(MovementDomain::Air));
         assert!(!should_draw_air_to_terrain_marker(MovementDomain::Terrain));
+    }
+
+    #[test]
+    fn team_markers_do_not_draw_for_structures() {
+        let unit = test_unit("Worker");
+        let structure = Structure {
+            id: "CommandCenter",
+        };
+
+        assert!(should_draw_team_marker_for_entity(Some(&unit), None));
+        assert!(!should_draw_team_marker_for_entity(None, Some(&structure)));
+        assert!(!should_draw_team_marker_for_entity(
+            Some(&unit),
+            Some(&structure)
+        ));
     }
 
     #[test]
