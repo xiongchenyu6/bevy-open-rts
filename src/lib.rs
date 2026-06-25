@@ -4683,6 +4683,13 @@ pub fn run_real_menu_allied_victory_proof_for_faction(
     )
 }
 
+pub fn run_real_menu_allied_victory_proofs(max_frames: usize) -> Vec<CaptureVictoryProof> {
+    CaptureProofFaction::ALL
+        .into_iter()
+        .map(|faction| run_real_menu_allied_victory_proof_for_faction(faction, max_frames))
+        .collect()
+}
+
 pub fn run_real_menu_economy_victory_proof_for_faction(
     faction: CaptureProofFaction,
     max_frames: usize,
@@ -34088,23 +34095,31 @@ mod tests {
 
     #[test]
     fn real_menu_allied_two_vs_one_victory_proof_wins() {
-        let proof =
-            run_real_menu_allied_victory_proof_for_faction(CaptureProofFaction::Demon, 7200);
+        let proofs = run_real_menu_allied_victory_proofs(7200);
 
-        assert!(
-            proof.succeeded(),
-            "allied 2v1 real menu proof should select the allied match mode, train combat vehicles through command buttons without proof-side resource grants, right-click enemy anchors, and win; proof={proof:?}"
-        );
-        assert_eq!(proof.faction, CaptureProofFaction::Demon);
         assert_eq!(
-            proof.match_mode_id, "allied_two_vs_one",
-            "allied proof should report the selected shared match mode; proof={proof:?}"
+            proofs.len(),
+            CaptureProofFaction::ALL.len(),
+            "allied proof should cover every playable faction"
         );
-        assert_eq!(proof.product_id, CaptureProofFaction::Demon.proof_vehicle());
-        assert!(
-            proof.produced_units >= proof.target_units,
-            "allied proof should produce its full attack group; proof={proof:?}"
-        );
+        for (proof, faction) in proofs.iter().zip(CaptureProofFaction::ALL) {
+            assert!(
+                proof.succeeded(),
+                "allied 2v1 real menu proof should select faction {:?}, select the allied match mode, train combat vehicles through command buttons without proof-side resource grants, right-click enemy anchors, and win; proof={proof:?}",
+                faction
+            );
+            assert_eq!(proof.faction, faction);
+            assert_eq!(
+                proof.match_mode_id, "allied_two_vs_one",
+                "allied proof should report the selected shared match mode; proof={proof:?}"
+            );
+            assert_eq!(proof.product_id, faction.proof_vehicle());
+            assert!(
+                proof.produced_units >= proof.target_units,
+                "allied proof should produce its full {:?} attack group; proof={proof:?}",
+                faction
+            );
+        }
     }
 
     #[test]

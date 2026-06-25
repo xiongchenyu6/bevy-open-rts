@@ -13,10 +13,10 @@ use bevy_open_rts::{
     capture_proof_unit_count, run_capture_match_proof_for_faction,
     run_real_default_menu_victory_proof, run_real_menu_ai_pressure_proof_for_faction,
     run_real_menu_ai_vs_ai_proof_for_faction, run_real_menu_all_maps_victory_proofs,
-    run_real_menu_allied_victory_proof_for_faction, run_real_menu_build_proof_for_faction,
-    run_real_menu_dual_harvest_proof_for_faction, run_real_menu_economy_victory_proof_for_faction,
-    run_real_menu_harvest_proof_for_faction, run_real_menu_match_proof_for_faction,
-    run_real_menu_playable_proof_for_faction,
+    run_real_menu_allied_victory_proof_for_faction, run_real_menu_allied_victory_proofs,
+    run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
+    run_real_menu_economy_victory_proof_for_faction, run_real_menu_harvest_proof_for_faction,
+    run_real_menu_match_proof_for_faction, run_real_menu_playable_proof_for_faction,
     run_real_menu_selected_faction_victory_proof_for_faction,
     run_real_menu_selected_map_victory_proof,
     run_real_menu_three_faction_playable_proof_for_faction,
@@ -436,6 +436,24 @@ fn run() -> Result<(), String> {
                 ));
             }
         }
+        Some("real-allied-all-factions-victory-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("7200")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let proofs = run_real_menu_allied_victory_proofs(max_frames);
+            for proof in &proofs {
+                print_victory_proof("real-allied-all-factions-victory-proof", proof);
+            }
+            if let Some(proof) = proofs.iter().find(|proof| !proof.succeeded()) {
+                return Err(format!(
+                    "real allied all-factions victory proof failed for faction={} within {max_frames} frames",
+                    proof.faction.key()
+                ));
+            }
+        }
         Some("real-economy-victory-proof") => {
             let max_frames = args
                 .next()
@@ -624,6 +642,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-selected-map-victory-proof 7200 1");
     println!("  cargo run --bin capture -- real-all-maps-victory-proof 7200");
     println!("  cargo run --bin capture -- real-allied-victory-proof 7200 demon");
+    println!("  cargo run --bin capture -- real-allied-all-factions-victory-proof 7200");
     println!("  cargo run --bin capture -- real-economy-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-playable-proof 4200 human");
     println!("  cargo run --bin capture -- real-three-faction-playable-proof 7200 human");
