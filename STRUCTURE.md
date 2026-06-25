@@ -18,7 +18,8 @@
 - Runtime player state is data-driven from `ActiveTeams` / `MatchSetupSettings`: economies, team relations, AI timers, support cooldowns, HUD counts, and match-end checks grow by player index instead of assuming three hard-coded teams.
 - `Team` is runtime identity only (`Player(index)` / `Neutral`). Playable faction identity comes from `PlayerFactions`, so 人族/魔族/混沌族 rules follow the configured player slot instead of being tied to Player0/1/2.
 - Lobby team buttons remain an 8-row setup UI concern, but runtime team IDs are stored and derived as unbounded `usize` values. The battle core no longer clamps alliances to three teams or to the current lobby button count.
-- AI/runtime fallback helpers are not capped to the lobby slot count: active AI iteration, opponent helpers, late-slot resources, cooldowns, fallback home positions, and runtime team relation IDs are verified beyond eight players.
+- Runtime spawning is not capped to the map's authored spawn-point count. Players beyond the map rows receive clamped virtual fallback base positions instead of being skipped.
+- AI/runtime fallback helpers are not capped to the lobby slot count: active AI iteration, opponent helpers, late-slot resources, cooldowns, fallback home positions, virtual spawn positions, and runtime team relation IDs are verified beyond eight players.
 
 ## Capture And Proofs
 
@@ -49,7 +50,8 @@
   - `real-playable-proof`: low-resource menu start, mouse harvest both Ore and Crystal, build Barracks, train a Barracks unit, train combat vehicles, right-click enemy anchors, and win.
   - `real-free-for-all-playable-proof`: low-resource real menu start, select free-for-all skirmish mode, use the same playable proof flow with a larger attack group, and finish all enemy anchors.
   - `real-lobby-slots-proof`: real menu Big Arena setup that enables every map spawn slot and verifies all eight active player rows reach the live scene with economies, units, structures, command centers, and spawn anchors.
-  - `real-playability-suite-proof`: top-level CLI regression gate that runs the real menu dual-harvest, supply-crate, tech-oil, playable, free-for-all, all-map, Allied 2v1, AI pressure, and AI-vs-AI proof surfaces across all playable factions.
+  - `runtime-players-proof`: direct shared-scene proof that starts more runtime players than the authored map spawn count and verifies economies, units, structures, command centers, and virtual fallback spawns.
+  - `real-playability-suite-proof`: top-level CLI regression gate that runs the real menu dual-harvest, supply-crate, tech-oil, playable, free-for-all, all-map, Allied 2v1, AI pressure, AI-vs-AI, and runtime-player-count proof surfaces.
 
 ## Verification
 

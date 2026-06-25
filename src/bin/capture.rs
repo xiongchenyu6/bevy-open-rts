@@ -8,16 +8,16 @@ use std::{
 use bevy_open_rts::{
     CaptureAiPressureProof, CaptureAiVsAiProof, CaptureDualHarvestProof, CaptureEntityKind,
     CaptureMatchPhase, CaptureMatchSnapshot, CapturePlayableProof, CaptureProofFaction,
-    CaptureSupplyCrateProof, CaptureTeam, CaptureTechOilProof, CaptureVictoryProof,
-    advance_capture_match, advance_capture_match_proof_frame, build_capture_match_app,
-    build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
-    capture_proof_unit_count, run_capture_match_proof_for_faction,
-    run_real_default_menu_victory_proof, run_real_menu_ai_pressure_proof_for_faction,
-    run_real_menu_ai_pressure_proofs, run_real_menu_ai_vs_ai_proof_for_faction,
-    run_real_menu_ai_vs_ai_proofs, run_real_menu_all_maps_victory_proofs,
-    run_real_menu_allied_victory_proof_for_faction, run_real_menu_allied_victory_proofs,
-    run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
-    run_real_menu_economy_victory_proof_for_faction,
+    CaptureRuntimePlayersProof, CaptureSupplyCrateProof, CaptureTeam, CaptureTechOilProof,
+    CaptureVictoryProof, advance_capture_match, advance_capture_match_proof_frame,
+    build_capture_match_app, build_capture_match_app_for_faction, capture_match_proof_status,
+    capture_match_snapshot, capture_proof_unit_count, run_capture_match_proof_for_faction,
+    run_capture_runtime_players_proof, run_real_default_menu_victory_proof,
+    run_real_menu_ai_pressure_proof_for_faction, run_real_menu_ai_pressure_proofs,
+    run_real_menu_ai_vs_ai_proof_for_faction, run_real_menu_ai_vs_ai_proofs,
+    run_real_menu_all_maps_victory_proofs, run_real_menu_allied_victory_proof_for_faction,
+    run_real_menu_allied_victory_proofs, run_real_menu_build_proof_for_faction,
+    run_real_menu_dual_harvest_proof_for_faction, run_real_menu_economy_victory_proof_for_faction,
     run_real_menu_free_for_all_playable_proof_for_faction, run_real_menu_harvest_proof_for_faction,
     run_real_menu_lobby_slots_proof, run_real_menu_match_proof_for_faction,
     run_real_menu_playable_proof_for_faction,
@@ -627,6 +627,28 @@ fn run() -> Result<(), String> {
                 ));
             }
         }
+        Some("runtime-players-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("120")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let player_count = args
+                .next()
+                .as_deref()
+                .unwrap_or("12")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid player count: {error}"))?;
+            let proof = run_capture_runtime_players_proof(player_count, max_frames);
+            print_runtime_players_proof("runtime-players-proof", &proof);
+            if !proof.succeeded() {
+                return Err(format!(
+                    "runtime players proof did not preserve {} active players within {max_frames} frames",
+                    proof.expected_players
+                ));
+            }
+        }
         Some("real-playability-suite-proof") => {
             run_real_playability_suite()?;
         }
@@ -652,6 +674,8 @@ fn run_real_playability_suite() -> Result<(), String> {
     const ALLIED_FRAMES: usize = 7200;
     const AI_PRESSURE_FRAMES: usize = 1200;
     const AI_VS_AI_FRAMES: usize = 2400;
+    const RUNTIME_PLAYERS_FRAMES: usize = 120;
+    const RUNTIME_PLAYERS: usize = 12;
 
     let mut failures = Vec::new();
     let mut checks = 0usize;
@@ -740,6 +764,20 @@ fn run_real_playability_suite() -> Result<(), String> {
         if !proof.succeeded() {
             failures.push(format!("ai-vs-ai:{}", proof.focus_faction.key()));
         }
+    }
+
+    let runtime_players_proof =
+        run_capture_runtime_players_proof(RUNTIME_PLAYERS, RUNTIME_PLAYERS_FRAMES);
+    print_runtime_players_proof(
+        "real-playability-suite-proof:runtime-players",
+        &runtime_players_proof,
+    );
+    checks += 1;
+    if !runtime_players_proof.succeeded() {
+        failures.push(format!(
+            "runtime-players:{}",
+            runtime_players_proof.expected_players
+        ));
     }
 
     if failures.is_empty() {
@@ -914,6 +952,28 @@ fn print_victory_proof(command: &str, proof: &CaptureVictoryProof) {
     );
 }
 
+fn print_runtime_players_proof(command: &str, proof: &CaptureRuntimePlayersProof) {
+    println!(
+        "[capture] {} map={} map_players={} expected_players={} runtime_players={} active_players={} economy_rows={} unit_teams={} structure_teams={} command_center_teams={} fallback_spawn_matches={} visible_player={:?} phase={:?} frames={} remaining_teams={} remaining_anchors={}",
+        command,
+        proof.map_id,
+        proof.map_players,
+        proof.expected_players,
+        proof.runtime_players,
+        proof.active_players,
+        proof.economy_rows,
+        proof.unit_teams,
+        proof.structure_teams,
+        proof.command_center_teams,
+        proof.fallback_spawn_matches,
+        proof.visible_player_index,
+        proof.phase,
+        proof.frames,
+        proof.remaining_teams,
+        proof.remaining_anchors,
+    );
+}
+
 fn print_help() {
     println!("Usage:");
     println!("  cargo run --bin capture");
@@ -944,6 +1004,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-economy-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-playable-proof 4200 human");
     println!("  cargo run --bin capture -- real-free-for-all-playable-proof 7200 human");
+    println!("  cargo run --bin capture -- runtime-players-proof 120 12");
     println!("  cargo run --bin capture -- real-playability-suite-proof");
 }
 

@@ -3479,13 +3479,24 @@ fn team_start_position(map: &SkirmishMapDef, team: Team) -> Vec3 {
 }
 
 fn team_start_position_for_spawn_slot(map: &SkirmishMapDef, spawn_index: usize) -> Vec3 {
-    let spawn_point = map
-        .spawn_points
+    map.spawn_points
         .get(spawn_index)
         .copied()
-        .or_else(|| map.spawn_points.first().copied())
-        .unwrap_or((map.size.0 * 0.5, map.size.1 * 0.5));
-    map_local_to_world(map, spawn_point)
+        .map(|spawn_point| map_local_to_world(map, spawn_point))
+        .unwrap_or_else(|| fallback_team_start_position_for_spawn_slot(map, spawn_index))
+}
+
+fn fallback_team_start_position_for_spawn_slot(map: &SkirmishMapDef, spawn_index: usize) -> Vec3 {
+    const GOLDEN_ANGLE: f32 = 2.399_963_1;
+    let bounds = MapBounds::from_map(map);
+    let spawn_ring = spawn_index / map.spawn_points.len().max(1);
+    let radius =
+        (bounds.half_width.min(bounds.half_depth) * 0.58 - spawn_ring as f32 * 6.0).max(10.0);
+    let angle = spawn_index as f32 * GOLDEN_ANGLE;
+    bounds.clamp_ground_point(
+        Vec3::new(angle.cos() * radius, 0.0, angle.sin() * radius),
+        10.0,
+    )
 }
 
 #[allow(dead_code)]
@@ -4492,6 +4503,42 @@ impl CaptureLobbySlotsProof {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CaptureRuntimePlayersProof {
+    pub map_id: &'static str,
+    pub map_players: usize,
+    pub expected_players: usize,
+    pub runtime_players: usize,
+    pub active_players: usize,
+    pub economy_rows: usize,
+    pub unit_teams: usize,
+    pub structure_teams: usize,
+    pub command_center_teams: usize,
+    pub fallback_spawn_matches: usize,
+    pub visible_player_index: Option<usize>,
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub remaining_teams: u32,
+    pub remaining_anchors: u32,
+}
+
+impl CaptureRuntimePlayersProof {
+    pub fn succeeded(&self) -> bool {
+        self.expected_players > MAX_SKIRMISH_LOBBY_SLOTS
+            && self.runtime_players == self.expected_players
+            && self.active_players == self.expected_players
+            && self.economy_rows >= self.expected_players
+            && self.unit_teams == self.expected_players
+            && self.structure_teams == self.expected_players
+            && self.command_center_teams == self.expected_players
+            && self.fallback_spawn_matches == self.expected_players.saturating_sub(self.map_players)
+            && self.visible_player_index == Some(0)
+            && self.phase == CaptureMatchPhase::Running
+            && self.remaining_teams == self.expected_players as u32
+            && self.remaining_anchors >= self.expected_players as u32
+    }
+}
+
 pub fn start_default_match_for_capture(app: &mut App) {
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
@@ -4768,6 +4815,20 @@ pub fn run_real_menu_lobby_slots_proof(max_frames: usize) -> CaptureLobbySlotsPr
     capture_lobby_slots_proof(&mut app, max_frames)
 }
 
+pub fn run_capture_runtime_players_proof(
+    player_count: usize,
+    max_frames: usize,
+) -> CaptureRuntimePlayersProof {
+    let expected_players = player_count.max(MAX_SKIRMISH_LOBBY_SLOTS + 1);
+    let mut app = build_capture_match_app_with_settings(capture_runtime_players_match_setup(
+        expected_players,
+    ));
+    for _ in 0..max_frames {
+        app.update();
+    }
+    capture_runtime_players_proof(&mut app, expected_players, max_frames)
+}
+
 fn capture_lobby_slots_proof(app: &mut App, frames: usize) -> CaptureLobbySlotsProof {
     let world = app.world_mut();
     let settings = world.resource::<MatchSetupSettings>().clone();
@@ -4835,6 +4896,114 @@ fn capture_lobby_slots_proof(app: &mut App, frames: usize) -> CaptureLobbySlotsP
         structure_teams: player_flag_count(&structure_teams),
         command_center_teams: player_flag_count(&command_center_teams),
         spawn_anchor_matches: player_flag_count(&spawn_anchor_matches),
+        visible_player_index: settings.visible_player.team.economy_index(),
+        phase,
+        frames,
+        remaining_teams: match_state.remaining_teams,
+        remaining_anchors: match_state.remaining_anchors,
+    }
+}
+
+fn capture_runtime_players_match_setup(player_count: usize) -> MatchSetupSettings {
+    let active_teams = vec![true; player_count];
+    let player_controllers = (0..player_count)
+        .map(|index| {
+            if index == 0 {
+                SkirmishPlayerController::Human
+            } else {
+                SkirmishPlayerController::Ai(AiDifficulty::Beginner)
+            }
+        })
+        .collect::<Vec<_>>();
+    let mut team_relations = TeamRelations::default();
+    team_relations.ensure_player_count(player_count);
+    MatchSetupSettings {
+        map_path: largest_skirmish_map().godot_path,
+        starting_resources: StartingResources::godot_standard(),
+        visible_player: VisiblePlayer::per_player(Team::Player(0)),
+        ai_difficulties: skirmish_ai_difficulties_from_controllers(&player_controllers),
+        team_relations,
+        startup_loadout: StartupLoadoutMode::GodotSkirmish,
+        active_teams,
+        player_factions: (0..player_count)
+            .map(|index| SkirmishFaction::ALL[index % SkirmishFaction::ALL.len()])
+            .collect(),
+        player_color_slots: (0..player_count).collect(),
+        player_controllers,
+        player_spawn_slots: (0..player_count).collect(),
+    }
+}
+
+fn capture_runtime_players_proof(
+    app: &mut App,
+    expected_players: usize,
+    frames: usize,
+) -> CaptureRuntimePlayersProof {
+    let world = app.world_mut();
+    let settings = world.resource::<MatchSetupSettings>().clone();
+    let map = skirmish_map_by_path(settings.map_path).unwrap_or_else(|| largest_skirmish_map());
+    let mut unit_teams = Vec::new();
+    let mut structure_teams = Vec::new();
+    let mut command_center_teams = Vec::new();
+    let mut fallback_spawn_matches = Vec::new();
+
+    {
+        let mut query = world.query::<(
+            &Team,
+            Option<&Unit>,
+            Option<&Structure>,
+            &Transform,
+            Option<&Health>,
+        )>();
+        for (team, unit, structure, transform, health) in query.iter(world) {
+            if health.is_some_and(|health| health.current <= 0.0) {
+                continue;
+            }
+            if unit.is_some() {
+                mark_player_flag(&mut unit_teams, *team);
+            }
+            if let Some(structure) = structure {
+                mark_player_flag(&mut structure_teams, *team);
+                if structure.id == "CommandCenter" {
+                    if let Some(index) = mark_player_flag(&mut command_center_teams, *team) {
+                        let spawn_slot = settings.player_spawn_slot(*team);
+                        if spawn_slot >= map.players {
+                            let expected = team_start_position_for_spawn_slot(map, spawn_slot);
+                            if settings.active_teams.get(index).copied().unwrap_or(false)
+                                && xz_distance(transform.translation, expected) <= 2.0
+                            {
+                                mark_player_flag(&mut fallback_spawn_matches, *team);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    let match_state = world.resource::<MatchState>();
+    let phase = match match_state.phase {
+        MatchPhase::Running => CaptureMatchPhase::Running,
+        MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
+        MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
+        MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
+    };
+
+    CaptureRuntimePlayersProof {
+        map_id: map.id,
+        map_players: map.players,
+        expected_players,
+        runtime_players: settings.active_teams.len(),
+        active_players: settings
+            .active_teams
+            .iter()
+            .filter(|active| **active)
+            .count(),
+        economy_rows: world.resource::<Economies>().players.len(),
+        unit_teams: player_flag_count(&unit_teams),
+        structure_teams: player_flag_count(&structure_teams),
+        command_center_teams: player_flag_count(&command_center_teams),
+        fallback_spawn_matches: player_flag_count(&fallback_spawn_matches),
         visible_player_index: settings.visible_player.team.economy_index(),
         phase,
         frames,
@@ -11220,9 +11389,6 @@ fn setup(
         .filter(|team| setup_settings.team_active(*team))
     {
         let spawn_slot = setup_settings.player_spawn_slot(team);
-        let Some(spawn_point) = skirmish_map.spawn_points.get(spawn_slot).copied() else {
-            continue;
-        };
         let visible_team = setup_settings.visible_player.team;
         setup_team(
             &mut commands,
@@ -11231,7 +11397,7 @@ fn setup(
             team,
             setup_settings.player_faction(team),
             visible_team,
-            map_local_to_world(skirmish_map, spawn_point),
+            team_start_position_for_spawn_slot(skirmish_map, spawn_slot),
             setup_settings.startup_loadout,
         );
     }
@@ -29283,5 +29449,18 @@ mod current_tests {
         assert_eq!(Team::Neutral.index(), usize::MAX);
         assert!(xz_distance(team_home(Team::Player(0)), team_home(Team::Player(8))) > 1.0);
         assert!(xz_distance(team_home(Team::Player(8)), team_home(Team::Player(16))) > 1.0);
+    }
+
+    #[test]
+    fn virtual_spawn_positions_exist_after_map_spawn_slots() {
+        let map = largest_skirmish_map();
+        let bounds = MapBounds::from_map(map);
+        let first_extra = team_start_position_for_spawn_slot(map, map.players);
+        let second_extra = team_start_position_for_spawn_slot(map, map.players + 1);
+
+        assert!(bounds.contains_ground_point(first_extra));
+        assert!(bounds.contains_ground_point(second_extra));
+        assert!(xz_distance(first_extra, second_extra) > 1.0);
+        assert!(xz_distance(first_extra, team_start_position_for_spawn_slot(map, 0)) > 1.0);
     }
 }
