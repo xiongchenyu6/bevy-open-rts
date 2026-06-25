@@ -17,13 +17,13 @@ use bevy_open_rts::{
     run_real_menu_ai_vs_ai_proofs, run_real_menu_all_maps_victory_proofs,
     run_real_menu_allied_victory_proof_for_faction, run_real_menu_allied_victory_proofs,
     run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
-    run_real_menu_economy_victory_proof_for_faction, run_real_menu_harvest_proof_for_faction,
+    run_real_menu_economy_victory_proof_for_faction,
+    run_real_menu_free_for_all_playable_proof_for_faction, run_real_menu_harvest_proof_for_faction,
     run_real_menu_lobby_slots_proof, run_real_menu_match_proof_for_faction,
     run_real_menu_playable_proof_for_faction,
     run_real_menu_selected_faction_victory_proof_for_faction,
     run_real_menu_selected_map_victory_proof, run_real_menu_supply_crate_proof_for_faction,
     run_real_menu_tech_oil_proof_for_faction, run_real_menu_tech_oil_proofs,
-    run_real_menu_three_faction_playable_proof_for_faction,
     run_real_menu_victory_proof_for_faction,
 };
 
@@ -611,7 +611,7 @@ fn run() -> Result<(), String> {
                 ));
             }
         }
-        Some("real-three-faction-playable-proof") => {
+        Some("real-free-for-all-playable-proof") => {
             let max_frames = args
                 .next()
                 .as_deref()
@@ -619,11 +619,11 @@ fn run() -> Result<(), String> {
                 .parse::<usize>()
                 .map_err(|error| format!("invalid max frame count: {error}"))?;
             let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_three_faction_playable_proof_for_faction(faction, max_frames);
-            print_playable_proof("real-three-faction-playable-proof", &proof);
+            let proof = run_real_menu_free_for_all_playable_proof_for_faction(faction, max_frames);
+            print_playable_proof("real-free-for-all-playable-proof", &proof);
             if !proof.succeeded() {
                 return Err(format!(
-                    "real menu three-faction playable proof did not harvest, build, train, attack, and win within {max_frames} frames"
+                    "real menu free-for-all playable proof did not harvest, build, train, attack, and win within {max_frames} frames"
                 ));
             }
         }
@@ -647,7 +647,7 @@ fn run_real_playability_suite() -> Result<(), String> {
     const SUPPLY_CRATE_FRAMES: usize = 900;
     const TECH_OIL_FRAMES: usize = 1800;
     const PLAYABLE_FRAMES: usize = 4200;
-    const THREE_FACTION_FRAMES: usize = 7200;
+    const FREE_FOR_ALL_FRAMES: usize = 7200;
     const ALL_MAPS_FRAMES: usize = 7200;
     const ALLIED_FRAMES: usize = 7200;
     const AI_PRESSURE_FRAMES: usize = 1200;
@@ -698,11 +698,11 @@ fn run_real_playability_suite() -> Result<(), String> {
 
     for faction in CaptureProofFaction::ALL {
         let proof =
-            run_real_menu_three_faction_playable_proof_for_faction(faction, THREE_FACTION_FRAMES);
-        print_playable_proof("real-playability-suite-proof:three-faction", &proof);
+            run_real_menu_free_for_all_playable_proof_for_faction(faction, FREE_FOR_ALL_FRAMES);
+        print_playable_proof("real-playability-suite-proof:free-for-all", &proof);
         checks += 1;
         if !proof.succeeded() {
-            failures.push(format!("three-faction:{}", faction.key()));
+            failures.push(format!("free-for-all:{}", faction.key()));
         }
     }
 
@@ -943,7 +943,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-allied-all-factions-victory-proof 7200");
     println!("  cargo run --bin capture -- real-economy-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-playable-proof 4200 human");
-    println!("  cargo run --bin capture -- real-three-faction-playable-proof 7200 human");
+    println!("  cargo run --bin capture -- real-free-for-all-playable-proof 7200 human");
     println!("  cargo run --bin capture -- real-playability-suite-proof");
 }
 

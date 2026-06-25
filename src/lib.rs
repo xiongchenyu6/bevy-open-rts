@@ -1673,7 +1673,7 @@ impl SkirmishPlayerController {
 enum SkirmishMatchMode {
     #[default]
     OneVsOne,
-    ThreeFaction,
+    FreeForAll,
     AiVsAi,
     AlliedTwoVsOne,
 }
@@ -1681,7 +1681,7 @@ enum SkirmishMatchMode {
 impl SkirmishMatchMode {
     const ALL: [Self; 4] = [
         Self::OneVsOne,
-        Self::ThreeFaction,
+        Self::FreeForAll,
         Self::AiVsAi,
         Self::AlliedTwoVsOne,
     ];
@@ -1689,7 +1689,7 @@ impl SkirmishMatchMode {
     fn id(self) -> &'static str {
         match self {
             Self::OneVsOne => "one_vs_one",
-            Self::ThreeFaction => "three_faction",
+            Self::FreeForAll => "free_for_all",
             Self::AiVsAi => "ai_vs_ai",
             Self::AlliedTwoVsOne => "allied_two_vs_one",
         }
@@ -1698,7 +1698,7 @@ impl SkirmishMatchMode {
     fn label(self) -> &'static str {
         match self {
             Self::OneVsOne => "1v1",
-            Self::ThreeFaction => "三族混战",
+            Self::FreeForAll => "自由混战",
             Self::AiVsAi => "AI对战",
             Self::AlliedTwoVsOne => "盟军2v1",
         }
@@ -2402,7 +2402,7 @@ fn lobby_color_slots_from_match_setup(
 
 fn skirmish_mode_from_active_teams(active_teams: &[bool]) -> SkirmishMatchMode {
     if active_teams.iter().filter(|active| **active).count() >= 3 {
-        SkirmishMatchMode::ThreeFaction
+        SkirmishMatchMode::FreeForAll
     } else {
         SkirmishMatchMode::OneVsOne
     }
@@ -5128,7 +5128,7 @@ pub fn run_real_menu_playable_proof_for_faction(
     run_real_menu_playable_proof(&mut app, faction, max_frames)
 }
 
-pub fn run_real_menu_three_faction_playable_proof_for_faction(
+pub fn run_real_menu_free_for_all_playable_proof_for_faction(
     faction: CaptureProofFaction,
     max_frames: usize,
 ) -> CapturePlayableProof {
@@ -5136,7 +5136,7 @@ pub fn run_real_menu_three_faction_playable_proof_for_faction(
         RealMenuMatchStart::new(faction)
             .with_ai_difficulty(AiDifficulty::Beginner)
             .with_starting_resource_index(0)
-            .with_match_mode(SkirmishMatchMode::ThreeFaction),
+            .with_match_mode(SkirmishMatchMode::FreeForAll),
     );
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0),
@@ -9783,7 +9783,7 @@ fn setup_main_menu(
                                                 for mode in SkirmishMatchMode::ALL {
                                                     let width = match mode {
                                                         SkirmishMatchMode::OneVsOne => 112.0,
-                                                        SkirmishMatchMode::ThreeFaction => 140.0,
+                                                        SkirmishMatchMode::FreeForAll => 140.0,
                                                         SkirmishMatchMode::AiVsAi => 132.0,
                                                         SkirmishMatchMode::AlliedTwoVsOne => 132.0,
                                                     };
@@ -10044,7 +10044,7 @@ fn skirmish_lobby_slot_color_key(slot: usize) -> &'static str {
 fn skirmish_match_mode_key(mode: SkirmishMatchMode) -> &'static str {
     match mode {
         SkirmishMatchMode::OneVsOne => "9",
-        SkirmishMatchMode::ThreeFaction => "0",
+        SkirmishMatchMode::FreeForAll => "0",
         SkirmishMatchMode::AiVsAi => "A",
         SkirmishMatchMode::AlliedTwoVsOne => "M",
     }
@@ -10771,7 +10771,7 @@ fn main_menu_buttons(
     }
     for (mode, key) in [
         (SkirmishMatchMode::OneVsOne, KeyCode::Digit9),
-        (SkirmishMatchMode::ThreeFaction, KeyCode::Digit0),
+        (SkirmishMatchMode::FreeForAll, KeyCode::Digit0),
         (SkirmishMatchMode::AiVsAi, KeyCode::KeyA),
         (SkirmishMatchMode::AlliedTwoVsOne, KeyCode::KeyM),
     ] {
@@ -11101,7 +11101,7 @@ fn skirmish_opponents_text(selection: SkirmishMenuSelection) -> String {
             .find(|team| *team != focus_team && relations.are_enemies(focus_team, *team))
             .map(|team| team.label().to_string())
             .unwrap_or_else(|| "无".to_string()),
-        SkirmishMatchMode::ThreeFaction => player_teams(active_teams.len())
+        SkirmishMatchMode::FreeForAll => player_teams(active_teams.len())
             .filter(|team| *team != focus_team && relations.are_enemies(focus_team, *team))
             .map(Team::label)
             .collect::<Vec<_>>()
