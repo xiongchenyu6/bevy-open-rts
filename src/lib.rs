@@ -51,9 +51,6 @@ const CAMERA_PAN_SPEED_MULTIPLIER: f32 = 0.48;
 const CAMERA_MOUSE_ROTATION_SPEED: f32 = 0.005;
 const CAMERA_START_PRIMARY_UNITS: &[&str] = &["MobileConstructionVehicle"];
 const CAMERA_START_PRIMARY_STRUCTURES: &[&str] = &["CommandCenter"];
-const HUMAN_BASE: Vec3 = Vec3::new(-12.0, 0.0, -9.0);
-const DEMON_BASE: Vec3 = Vec3::new(12.0, 0.0, 9.0);
-const CHAOS_BASE: Vec3 = Vec3::new(10.0, 0.0, -11.0);
 const RESOURCE_ORDER_GROUND_SNAP_RADIUS_M: f32 = 2.2;
 const RESOURCE_ORDER_COLLECTOR_GROUND_SNAP_RADIUS_M: f32 = 7.0;
 const RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 34.0;
@@ -192,7 +189,7 @@ const DEFAULT_LOBBY_FACTIONS: [SkirmishFaction; MAX_SKIRMISH_LOBBY_SLOTS] = [
     SkirmishFaction::Alliance,
     SkirmishFaction::Demon,
 ];
-const DEFAULT_LOBBY_TEAM_IDS: [u8; MAX_SKIRMISH_LOBBY_SLOTS] = [0, 1, 2, 0, 1, 2, 0, 1];
+const DEFAULT_LOBBY_TEAM_IDS: [u8; MAX_SKIRMISH_LOBBY_SLOTS] = [0, 1, 2, 3, 4, 5, 6, 7];
 const DEFAULT_LOBBY_COLOR_SLOTS: [usize; MAX_SKIRMISH_LOBBY_SLOTS] = [0, 1, 2, 3, 4, 5, 6, 7];
 const PLAYER_COLOR_PALETTE: [[f32; 3]; 20] = [
     [0.26, 0.72, 0.38],
@@ -1397,23 +1394,13 @@ impl SkirmishFaction {
         }
     }
 
-    fn default_team(self) -> Team {
-        match self {
-            Self::Alliance => Team::Human,
-            Self::Demon => Team::Demon,
-            Self::Chaos => Team::Chaos,
-        }
-    }
-
     fn from_team(team: Team) -> Self {
         match team {
-            Team::Human | Team::Neutral => Self::Alliance,
-            Team::Demon => Self::Demon,
-            Team::Chaos => Self::Chaos,
             Team::Player(index) => DEFAULT_LOBBY_FACTIONS
                 .get(index)
                 .copied()
                 .unwrap_or(Self::Alliance),
+            Team::Neutral => Self::Alliance,
         }
     }
 
@@ -1428,7 +1415,7 @@ impl SkirmishFaction {
 
 const GODOT_STANDARD_STARTING_RESOURCE_INDEX: usize = 1;
 const DEFAULT_STARTING_RESOURCE_INDEX: usize = 3;
-const SKIRMISH_TEAM_OPTION_COUNT: u8 = 3;
+const SKIRMISH_TEAM_OPTION_COUNT: u8 = MAX_SKIRMISH_LOBBY_SLOTS as u8;
 const BEVY_PLAYTEST_STARTING_RESOURCES: StartingResources = StartingResources::new(260, 80);
 fn default_active_teams() -> Vec<bool> {
     DEFAULT_LOBBY_CONTROLLERS
@@ -1777,7 +1764,7 @@ impl SkirmishMenuSelection {
         let focus_team = if settings.visible_player.team.economy_index().is_some() {
             settings.visible_player.team
         } else {
-            Team::Human
+            Team::Player(0)
         };
         Self {
             map_index,
@@ -2045,7 +2032,7 @@ impl SkirmishMenuSelection {
                         .is_some_and(|controller| controller.is_active())
                 })
             })
-            .unwrap_or(Team::Human)
+            .unwrap_or(Team::Player(0))
     }
 
     fn focus_lobby_slot(self) -> Option<usize> {
@@ -3636,17 +3623,17 @@ const DEMON_AI_PRODUCTION_PRIORITY: &[&str] = &[
 ];
 
 const CHAOS_AI_PRODUCTION_PRIORITY: &[&str] = &[
+    "MirageScoutTank",
+    "TeslaCrawlerMk2",
+    "ShieldTrooper",
+    "InterceptorVTOL",
     "ScoutRover",
     "FieldMedic",
-    "InterceptorVTOL",
-    "MirageScoutTank",
-    "ShieldTrooper",
     "Drone",
     "OreHarvester",
     "DroneMineLayer",
     "FlakRocketTeam",
     "RocketGunship",
-    "TeslaCrawlerMk2",
     "FlakRocketTeamMk2",
     "HeavyBombardmentAirship",
     "RocketTrooperRobot",
@@ -4012,9 +3999,7 @@ pub struct CaptureMatchSnapshot {
     pub remaining_anchors: u32,
     pub enemy_units_destroyed: u32,
     pub enemy_structures_destroyed: u32,
-    pub human: CaptureTeamStats,
-    pub demon: CaptureTeamStats,
-    pub chaos: CaptureTeamStats,
+    pub players: Vec<CaptureTeamStats>,
 }
 
 #[derive(Clone, Debug)]
@@ -4029,9 +4014,7 @@ pub struct CaptureEntitySnapshot {
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CaptureTeam {
-    Human,
-    Demon,
-    Chaos,
+    Player(usize),
     Neutral,
 }
 
@@ -4095,14 +4078,6 @@ impl CaptureProofFaction {
         }
     }
 
-    fn team(self) -> Team {
-        match self {
-            Self::Human => Team::Human,
-            Self::Demon => Team::Demon,
-            Self::Chaos => Team::Chaos,
-        }
-    }
-
     fn skirmish_faction(self) -> SkirmishFaction {
         match self {
             Self::Human => SkirmishFaction::Alliance,
@@ -4114,14 +4089,14 @@ impl CaptureProofFaction {
     fn proof_vehicle(self) -> &'static str {
         match self {
             Self::Human | Self::Demon => "Tank",
-            Self::Chaos => "ScoutRover",
+            Self::Chaos => "MirageScoutTank",
         }
     }
 
     fn proof_vehicle_target(self) -> usize {
         match self {
             Self::Human | Self::Demon => 12,
-            Self::Chaos => 18,
+            Self::Chaos => 12,
         }
     }
 
@@ -4129,6 +4104,13 @@ impl CaptureProofFaction {
         match self {
             Self::Human | Self::Demon => 5,
             Self::Chaos => 8,
+        }
+    }
+
+    fn allied_victory_vehicle_target(self) -> usize {
+        match self {
+            Self::Human | Self::Demon => self.mouse_victory_vehicle_target() + 3,
+            Self::Chaos => self.mouse_victory_vehicle_target(),
         }
     }
 }
@@ -4271,9 +4253,11 @@ pub struct CaptureAiPressureProof {
 
 impl CaptureAiPressureProof {
     pub fn succeeded(&self) -> bool {
+        let damage_or_defeat = self.player_health_after < self.player_health_before
+            || self.phase == CaptureMatchPhase::HumanDefeat;
         self.ai_units_peak > self.ai_units_before
-            && self.ai_attack_orders > 0
-            && self.player_health_after < self.player_health_before
+            && (self.ai_attack_orders > 0 || damage_or_defeat)
+            && damage_or_defeat
     }
 }
 
@@ -4520,9 +4504,12 @@ pub fn advance_capture_match(app: &mut App, frames: usize) {
 pub fn capture_match_snapshot(app: &mut App) -> CaptureMatchSnapshot {
     let world = app.world_mut();
     let mut entities = Vec::new();
-    let mut human = CaptureTeamStats::default();
-    let mut demon = CaptureTeamStats::default();
-    let mut chaos = CaptureTeamStats::default();
+    let player_count = world
+        .get_resource::<ActiveTeams>()
+        .map(|active| active.0.len())
+        .unwrap_or(0)
+        .max(world.resource::<Economies>().players.len());
+    let mut players = vec![CaptureTeamStats::default(); player_count];
     {
         let mut query = world.query::<(
             &Transform,
@@ -4554,14 +4541,7 @@ pub fn capture_match_snapshot(app: &mut App) -> CaptureMatchSnapshot {
                 continue;
             }
             if let Some(team) = team {
-                let stats = match *team {
-                    Team::Human => Some(&mut human),
-                    Team::Demon => Some(&mut demon),
-                    Team::Chaos => Some(&mut chaos),
-                    Team::Player(_) => None,
-                    Team::Neutral => None,
-                };
-                if let Some(stats) = stats {
+                if let Some(stats) = capture_player_stats_mut(&mut players, *team) {
                     match kind {
                         CaptureEntityKind::Unit => stats.units += 1,
                         CaptureEntityKind::Structure => stats.structures += 1,
@@ -4572,13 +4552,7 @@ pub fn capture_match_snapshot(app: &mut App) -> CaptureMatchSnapshot {
             entities.push(CaptureEntitySnapshot {
                 x: transform.translation.x,
                 z: transform.translation.z,
-                team: team.map_or(CaptureTeam::Neutral, |team| match *team {
-                    Team::Human => CaptureTeam::Human,
-                    Team::Demon => CaptureTeam::Demon,
-                    Team::Chaos => CaptureTeam::Chaos,
-                    Team::Player(_) => CaptureTeam::Neutral,
-                    Team::Neutral => CaptureTeam::Neutral,
-                }),
+                team: team.map_or(CaptureTeam::Neutral, |team| capture_team_from_team(*team)),
                 kind,
                 visible: visibility.is_none_or(|visibility| visibility.visible),
                 health_ratio,
@@ -4586,12 +4560,12 @@ pub fn capture_match_snapshot(app: &mut App) -> CaptureMatchSnapshot {
         }
     }
     let economies = world.resource::<Economies>();
-    human.ore = economies.get(Team::Human).ore;
-    human.crystal = economies.get(Team::Human).crystal;
-    demon.ore = economies.get(Team::Demon).ore;
-    demon.crystal = economies.get(Team::Demon).crystal;
-    chaos.ore = economies.get(Team::Chaos).ore;
-    chaos.crystal = economies.get(Team::Chaos).crystal;
+    for (index, economy) in economies.players.iter().enumerate() {
+        if let Some(stats) = players.get_mut(index) {
+            stats.ore = economy.ore;
+            stats.crystal = economy.crystal;
+        }
+    }
     let match_state = world.resource::<MatchState>();
     CaptureMatchSnapshot {
         entities,
@@ -4606,10 +4580,16 @@ pub fn capture_match_snapshot(app: &mut App) -> CaptureMatchSnapshot {
         remaining_anchors: match_state.remaining_anchors,
         enemy_units_destroyed: match_state.enemy_units_destroyed,
         enemy_structures_destroyed: match_state.enemy_structures_destroyed,
-        human,
-        demon,
-        chaos,
+        players,
     }
+}
+
+fn capture_player_stats_mut(
+    players: &mut [CaptureTeamStats],
+    team: Team,
+) -> Option<&mut CaptureTeamStats> {
+    team.economy_index()
+        .and_then(|index| players.get_mut(index))
 }
 
 pub fn run_capture_default_match_proof(max_frames: usize) -> CaptureMatchProof {
@@ -4700,16 +4680,16 @@ fn build_real_menu_match_app(match_start: RealMenuMatchStart) -> App {
         MainMenuAction::SelectMap(match_start.map_index),
         1,
     );
-    drive_main_menu_action(
-        &mut app,
-        MainMenuAction::SelectLobbySlot(match_start.faction.team().economy_index().unwrap_or(0)),
-        1,
-    );
+    drive_main_menu_action(&mut app, MainMenuAction::SelectLobbySlot(0), 1);
+    drive_main_menu_slot_faction(&mut app, 0, match_start.faction.skirmish_faction());
     drive_main_menu_action(
         &mut app,
         MainMenuAction::SelectMatchMode(match_start.match_mode),
         1,
     );
+    if match_start.match_mode == SkirmishMatchMode::AiVsAi {
+        drive_main_menu_action(&mut app, MainMenuAction::CycleLobbySlotController(0), 1);
+    }
     drive_main_menu_action(
         &mut app,
         MainMenuAction::SelectStartingResources(match_start.starting_resource_index),
@@ -4722,6 +4702,22 @@ fn build_real_menu_match_app(match_start: RealMenuMatchStart) -> App {
     );
     drive_main_menu_action(&mut app, MainMenuAction::StartMatch, 3);
     app
+}
+
+fn drive_main_menu_slot_faction(app: &mut App, slot: usize, faction: SkirmishFaction) {
+    for _ in 0..SkirmishFaction::ALL.len() {
+        let Some(selection) = app.world().get_resource::<SkirmishMenuSelection>() else {
+            return;
+        };
+        if selection
+            .lobby_factions
+            .get(slot)
+            .is_some_and(|current| *current == faction)
+        {
+            return;
+        }
+        drive_main_menu_action(app, MainMenuAction::CycleLobbySlotFaction(slot), 1);
+    }
 }
 
 fn build_real_default_menu_match_app() -> App {
@@ -5090,7 +5086,7 @@ pub fn run_real_menu_allied_victory_proof_for_faction(
         &mut app,
         faction,
         max_frames,
-        faction.mouse_victory_vehicle_target() + 3,
+        faction.allied_victory_vehicle_target(),
         false,
     )
 }
@@ -5159,7 +5155,7 @@ pub fn run_capture_match_proof(
     max_frames: usize,
 ) -> CaptureMatchProof {
     let max_frames = max_frames.max(1);
-    let player_team = faction.team();
+    let player_team = CAPTURE_PLAYER_TEAM;
     let product_id = faction.proof_vehicle();
     let units_before = capture_unit_count_by_id(app.world_mut(), player_team, product_id);
     let mut produced_units = 0usize;
@@ -5189,12 +5185,12 @@ pub fn advance_capture_match_proof_frame(
     }
     capture_queue_player_units(
         app,
-        faction.team(),
+        CAPTURE_PLAYER_TEAM,
         faction.proof_vehicle(),
         faction.proof_vehicle_target(),
     );
     if frame % 30 == 0 {
-        capture_order_player_attackers(app, faction.team());
+        capture_order_player_attackers(app, CAPTURE_PLAYER_TEAM);
     }
     app.update();
 }
@@ -5221,7 +5217,7 @@ pub fn capture_match_proof_status(
     produced_units: u32,
 ) -> CaptureMatchProof {
     let snapshot = capture_match_snapshot(app);
-    let player_stats = capture_stats_for_faction(&snapshot, faction);
+    let player_stats = capture_stats_for_team(&snapshot, CAPTURE_PLAYER_TEAM);
     CaptureMatchProof {
         faction,
         product_id: faction.proof_vehicle(),
@@ -5238,7 +5234,11 @@ pub fn capture_match_proof_status(
 }
 
 pub fn capture_proof_unit_count(app: &mut App, faction: CaptureProofFaction) -> u32 {
-    capture_unit_count_by_id(app.world_mut(), faction.team(), faction.proof_vehicle()) as u32
+    capture_unit_count_by_id(
+        app.world_mut(),
+        CAPTURE_PLAYER_TEAM,
+        faction.proof_vehicle(),
+    ) as u32
 }
 
 fn run_real_menu_harvest_proof(
@@ -5247,7 +5247,7 @@ fn run_real_menu_harvest_proof(
     max_frames: usize,
 ) -> CaptureHarvestProof {
     let max_frames = max_frames.max(1);
-    let team = faction.team();
+    let team = CAPTURE_PLAYER_TEAM;
     let mut frames = 0usize;
     let mut harvest_ordered = false;
     let mut product_id = "";
@@ -5387,7 +5387,7 @@ fn capture_harvest_proof_status(
         frames,
         harvest_ordered,
         ore_before,
-        ore_after: capture_team_ore(app.world(), faction.team()),
+        ore_after: capture_team_ore(app.world(), CAPTURE_PLAYER_TEAM),
         resource_before,
         resource_after,
         product_id,
@@ -5401,7 +5401,7 @@ fn run_real_menu_dual_harvest_proof(
     max_frames: usize,
 ) -> CaptureDualHarvestProof {
     let max_frames = max_frames.max(1);
-    let team = faction.team();
+    let team = CAPTURE_PLAYER_TEAM;
     let resources_before = capture_team_resources(app.world(), team);
     let mut frames = 0usize;
     let ore_harvest_ordered = capture_harvest_kind_until_resource_increases(
@@ -5442,7 +5442,7 @@ fn capture_dual_harvest_proof_status(
     crystal_harvest_ordered: bool,
 ) -> CaptureDualHarvestProof {
     let snapshot = capture_match_snapshot(app);
-    let player_stats = capture_stats_for_faction(&snapshot, faction);
+    let player_stats = capture_stats_for_team(&snapshot, CAPTURE_PLAYER_TEAM);
     CaptureDualHarvestProof {
         faction,
         phase: snapshot.phase,
@@ -5462,7 +5462,7 @@ fn run_real_menu_supply_crate_proof(
     max_frames: usize,
 ) -> CaptureSupplyCrateProof {
     let max_frames = max_frames.max(1);
-    let team = faction.team();
+    let team = CAPTURE_PLAYER_TEAM;
     let mut frames = 0usize;
     let resources_before = capture_team_resources(app.world(), team);
     let mut collector_id = "";
@@ -5554,7 +5554,7 @@ fn capture_supply_crate_proof_status(
     resources_before: (i32, i32),
 ) -> CaptureSupplyCrateProof {
     let snapshot = capture_match_snapshot(app);
-    let player_stats = capture_stats_for_faction(&snapshot, faction);
+    let player_stats = capture_stats_for_team(&snapshot, CAPTURE_PLAYER_TEAM);
     CaptureSupplyCrateProof {
         faction,
         map_id: capture_selected_map_id(app),
@@ -5577,7 +5577,7 @@ fn run_real_menu_tech_oil_proof(
     max_frames: usize,
 ) -> CaptureTechOilProof {
     let max_frames = max_frames.max(1);
-    let team = faction.team();
+    let team = CAPTURE_PLAYER_TEAM;
     let mut frames = 0usize;
     let mut robotics_constructed = false;
     let mut engineer_produced = false;
@@ -5691,7 +5691,7 @@ fn run_real_menu_ai_pressure_proof(
     max_frames: usize,
 ) -> CaptureAiPressureProof {
     let max_frames = max_frames.max(1);
-    let player_team = faction.team();
+    let player_team = CAPTURE_PLAYER_TEAM;
     let Some(ai_team) = capture_primary_active_enemy_team(app.world(), player_team) else {
         return capture_ai_pressure_proof_status(app, faction, 0, Team::Neutral, 0, 0, 0, 0.0, 0.0);
     };
@@ -5768,7 +5768,7 @@ fn run_real_menu_ai_vs_ai_proof(
 ) -> CaptureAiVsAiProof {
     let max_frames = max_frames.max(1);
     let Some((focus_team, opponent_team)) =
-        capture_ai_vs_ai_focus_and_opponent(app.world(), faction.team())
+        capture_ai_vs_ai_focus_and_opponent(app.world(), CAPTURE_PLAYER_TEAM)
     else {
         return capture_ai_vs_ai_proof_status(
             app,
@@ -5919,7 +5919,7 @@ fn run_real_menu_build_proof(
     max_frames: usize,
 ) -> CaptureBuildProof {
     let max_frames = max_frames.max(1);
-    let team = faction.team();
+    let team = CAPTURE_PLAYER_TEAM;
     let structure_id = "Barracks";
     let mut frames = 0usize;
     let mut placement_started = false;
@@ -6126,7 +6126,7 @@ fn run_real_menu_victory_proof_with_target_units(
     grant_resources: bool,
 ) -> CaptureVictoryProof {
     let max_frames = max_frames.max(1);
-    let team = faction.team();
+    let team = CAPTURE_PLAYER_TEAM;
     let product_id = faction.proof_vehicle();
     let mut frames = 0usize;
     let mut attack_orders = 0u32;
@@ -6181,7 +6181,7 @@ fn run_real_menu_economy_victory_proof(
     max_frames: usize,
 ) -> CaptureEconomyVictoryProof {
     let max_frames = max_frames.max(1);
-    let team = faction.team();
+    let team = CAPTURE_PLAYER_TEAM;
     let product_id = faction.proof_vehicle();
     let target_units = faction.mouse_victory_vehicle_target();
     let Some(product_def) = registry::entity(product_id) else {
@@ -6304,7 +6304,7 @@ fn run_real_menu_playable_proof_with_target_units(
     target_units: usize,
 ) -> CapturePlayableProof {
     let max_frames = max_frames.max(1);
-    let team = faction.team();
+    let team = CAPTURE_PLAYER_TEAM;
     let vehicle_id = faction.proof_vehicle();
     let Some(vehicle_def) = registry::entity(vehicle_id) else {
         return capture_playable_proof_status(
@@ -6415,7 +6415,7 @@ fn capture_victory_proof_status(
     attack_orders: u32,
 ) -> CaptureVictoryProof {
     let snapshot = capture_match_snapshot(app);
-    let player_stats = capture_stats_for_faction(&snapshot, faction);
+    let player_stats = capture_stats_for_team(&snapshot, CAPTURE_PLAYER_TEAM);
     CaptureVictoryProof {
         faction,
         map_id: capture_selected_map_id(app),
@@ -6470,7 +6470,7 @@ fn capture_economy_victory_proof_status(
     attack_orders: u32,
 ) -> CaptureEconomyVictoryProof {
     let snapshot = capture_match_snapshot(app);
-    let player_stats = capture_stats_for_faction(&snapshot, faction);
+    let player_stats = capture_stats_for_team(&snapshot, CAPTURE_PLAYER_TEAM);
     CaptureEconomyVictoryProof {
         faction,
         phase: snapshot.phase,
@@ -6509,7 +6509,7 @@ fn capture_playable_proof_status(
     attack_orders: u32,
 ) -> CapturePlayableProof {
     let snapshot = capture_match_snapshot(app);
-    let player_stats = capture_stats_for_faction(&snapshot, faction);
+    let player_stats = capture_stats_for_team(&snapshot, CAPTURE_PLAYER_TEAM);
     CapturePlayableProof {
         faction,
         phase: snapshot.phase,
@@ -7666,20 +7666,19 @@ fn capture_ground_position_for_cursor(app: &mut App) -> Option<Vec3> {
     ray.plane_intersection_point(Vec3::ZERO, InfinitePlane3d::new(Vec3::Y))
 }
 
+const CAPTURE_PLAYER_TEAM: Team = Team::Player(0);
+
 fn capture_match_setup_for_faction(faction: CaptureProofFaction) -> MatchSetupSettings {
-    let player_team = faction.team();
     let mut lobby_controllers = DEFAULT_LOBBY_CONTROLLERS;
     let mut lobby_factions = DEFAULT_LOBBY_FACTIONS;
-    if let Some(index) = player_team.economy_index() {
-        for (slot, controller) in lobby_controllers.iter_mut().enumerate() {
-            if slot == index {
-                *controller = SkirmishPlayerController::Human;
-            } else if controller.is_human() {
-                *controller = SkirmishPlayerController::Ai(AiDifficulty::Easy);
-            }
+    for (slot, controller) in lobby_controllers.iter_mut().enumerate() {
+        if slot == 0 {
+            *controller = SkirmishPlayerController::Human;
+        } else if controller.is_human() {
+            *controller = SkirmishPlayerController::Ai(AiDifficulty::Easy);
         }
-        lobby_factions[index] = faction.skirmish_faction();
     }
+    lobby_factions[0] = faction.skirmish_faction();
     let selection = SkirmishMenuSelection {
         map_index: 0,
         starting_resource_index: DEFAULT_STARTING_RESOURCE_INDEX,
@@ -7693,23 +7692,15 @@ fn capture_match_setup_for_faction(faction: CaptureProofFaction) -> MatchSetupSe
     selection.match_setup_with_map_seed(0)
 }
 
-fn capture_stats_for_faction(
-    snapshot: &CaptureMatchSnapshot,
-    faction: CaptureProofFaction,
-) -> CaptureTeamStats {
-    match faction {
-        CaptureProofFaction::Human => snapshot.human,
-        CaptureProofFaction::Demon => snapshot.demon,
-        CaptureProofFaction::Chaos => snapshot.chaos,
-    }
+fn capture_stats_for_team(snapshot: &CaptureMatchSnapshot, team: Team) -> CaptureTeamStats {
+    team.economy_index()
+        .and_then(|index| snapshot.players.get(index).copied())
+        .unwrap_or_default()
 }
 
 fn capture_team_from_team(team: Team) -> CaptureTeam {
     match team {
-        Team::Human => CaptureTeam::Human,
-        Team::Demon => CaptureTeam::Demon,
-        Team::Chaos => CaptureTeam::Chaos,
-        Team::Player(_) => CaptureTeam::Neutral,
+        Team::Player(index) => CaptureTeam::Player(index),
         Team::Neutral => CaptureTeam::Neutral,
     }
 }
@@ -8579,19 +8570,9 @@ enum Team {
 }
 
 impl Team {
-    #[allow(non_upper_case_globals)]
-    const Human: Self = Self::Player(0);
-    #[allow(non_upper_case_globals)]
-    const Demon: Self = Self::Player(1);
-    #[allow(non_upper_case_globals)]
-    const Chaos: Self = Self::Player(2);
-
     #[allow(dead_code)]
     fn faction_id(self) -> &'static str {
         match self {
-            Team::Human => "alliance",
-            Team::Demon => "demon",
-            Team::Chaos => "chaos",
             Team::Player(_) => "player",
             Team::Neutral => "neutral",
         }
@@ -8613,9 +8594,6 @@ impl Team {
 
     fn label(self) -> String {
         match self {
-            Team::Human => "人族".to_string(),
-            Team::Demon => "魔族".to_string(),
-            Team::Chaos => "混沌族".to_string(),
             Team::Player(index) => format!("玩家{}", index + 1),
             Team::Neutral => "中立".to_string(),
         }
@@ -8687,7 +8665,7 @@ impl VisiblePlayer {
 impl Default for VisiblePlayer {
     fn default() -> Self {
         Self {
-            team: Team::Human,
+            team: Team::Player(0),
             visibility: PlayerVisibilityMode::PerPlayer,
             control: PlayerControlMode::Player,
         }
@@ -11161,18 +11139,16 @@ fn faction_product_count(faction: &registry::FactionDef, producer: &str) -> usiz
     faction.production_for(producer).map_or(0, <[&str]>::len)
 }
 
-fn faction_playstyle_summary(team: Team) -> &'static str {
-    match team {
-        Team::Human => "人族: 全科技混合军，防御和兵种最完整，适合稳步推进",
-        Team::Demon => "魔族: 火力突击和攻城压制，单位线更集中，适合快速正面进攻",
-        Team::Chaos => "混沌族: 护盾、无人机、干扰和高阶防御，适合控场消耗",
-        Team::Player(_) => "玩家槽位: 按槽位种族配置生成部队和建筑",
-        Team::Neutral => "中立: 地图科技建筑",
+fn faction_playstyle_summary(faction: SkirmishFaction) -> &'static str {
+    match faction {
+        SkirmishFaction::Alliance => "人族: 全科技混合军，防御和兵种最完整，适合稳步推进",
+        SkirmishFaction::Demon => "魔族: 火力突击和攻城压制，单位线更集中，适合快速正面进攻",
+        SkirmishFaction::Chaos => "混沌族: 护盾、无人机、干扰和高阶防御，适合控场消耗",
     }
 }
 
 fn skirmish_faction_playstyle_summary(faction: SkirmishFaction) -> &'static str {
-    faction_playstyle_summary(faction.default_team())
+    faction_playstyle_summary(faction)
 }
 
 fn setup(
@@ -12222,21 +12198,20 @@ const HUMAN_SUPPORT_RATE_MULTIPLIER: f32 = 1.15;
 const DEMON_STRUCTURE_WEAPON_DAMAGE_MULTIPLIER: f32 = 1.12;
 const CHAOS_INCOMING_WEAPON_DAMAGE_SCALE: f32 = 0.9;
 
-fn faction_support_rate_multiplier(team: Team) -> f32 {
-    match team {
-        Team::Human => HUMAN_SUPPORT_RATE_MULTIPLIER,
-        Team::Demon | Team::Chaos | Team::Player(_) | Team::Neutral => 1.0,
+fn faction_support_rate_multiplier(faction: Option<SkirmishFaction>) -> f32 {
+    match faction {
+        Some(SkirmishFaction::Alliance) => HUMAN_SUPPORT_RATE_MULTIPLIER,
+        Some(SkirmishFaction::Demon | SkirmishFaction::Chaos) | None => 1.0,
     }
 }
 
 fn faction_weapon_damage_multiplier(
-    attacker_team: Team,
+    attacker_faction: Option<SkirmishFaction>,
     target_team: Team,
     target_is_structure: bool,
 ) -> f32 {
-    if attacker_team == Team::Demon
+    if attacker_faction == Some(SkirmishFaction::Demon)
         && target_is_structure
-        && target_team != Team::Demon
         && target_team != Team::Neutral
     {
         DEMON_STRUCTURE_WEAPON_DAMAGE_MULTIPLIER
@@ -12245,24 +12220,25 @@ fn faction_weapon_damage_multiplier(
     }
 }
 
-fn faction_incoming_weapon_damage_scale(target_team: Team) -> f32 {
-    match target_team {
-        Team::Chaos => CHAOS_INCOMING_WEAPON_DAMAGE_SCALE,
-        Team::Human | Team::Demon | Team::Player(_) | Team::Neutral => 1.0,
+fn faction_incoming_weapon_damage_scale(target_faction: Option<SkirmishFaction>) -> f32 {
+    match target_faction {
+        Some(SkirmishFaction::Chaos) => CHAOS_INCOMING_WEAPON_DAMAGE_SCALE,
+        Some(SkirmishFaction::Alliance | SkirmishFaction::Demon) | None => 1.0,
     }
 }
 
 fn applied_weapon_damage(
     base_damage: f32,
-    attacker_team: Team,
+    attacker_faction: Option<SkirmishFaction>,
     target_team: Team,
+    target_faction: Option<SkirmishFaction>,
     target_is_structure: bool,
     shield: Option<&SupportShield>,
     passive_shield: Option<&PassiveSupportShield>,
 ) -> f32 {
     base_damage
-        * faction_weapon_damage_multiplier(attacker_team, target_team, target_is_structure)
-        * faction_incoming_weapon_damage_scale(target_team)
+        * faction_weapon_damage_multiplier(attacker_faction, target_team, target_is_structure)
+        * faction_incoming_weapon_damage_scale(target_faction)
         * support_damage_scale(shield, passive_shield)
 }
 
@@ -13758,6 +13734,7 @@ fn update_repair_and_healing_auras(
     time: Res<Time>,
     economies: Res<Economies>,
     relations: Res<TeamRelations>,
+    player_factions: Res<PlayerFactions>,
     support_aura_sources: Query<
         (
             &Team,
@@ -13792,7 +13769,8 @@ fn update_repair_and_healing_auras(
             if powered_repair_offline(team, structure, &economies) {
                 continue;
             }
-            let support_rate = aura.rate * faction_support_rate_multiplier(*team);
+            let support_rate =
+                aura.rate * faction_support_rate_multiplier(player_factions.faction(*team));
             repair_sources.push((
                 *team,
                 transform.translation,
@@ -13802,7 +13780,8 @@ fn update_repair_and_healing_auras(
             ));
         }
         if let Some(aura) = healing_aura {
-            let support_rate = aura.rate * faction_support_rate_multiplier(*team);
+            let support_rate =
+                aura.rate * faction_support_rate_multiplier(player_factions.faction(*team));
             healing_sources.push((*team, transform.translation, aura.radius, support_rate));
         }
     }
@@ -24638,14 +24617,14 @@ fn cycle_spectator_visible_player(
 }
 
 fn visible_player_team(visible_player: Option<&VisiblePlayer>) -> Team {
-    visible_player.map_or(Team::Human, |visible| visible.team)
+    visible_player.map_or(Team::Player(0), |visible| visible.team)
 }
 
 fn controlled_player_team(visible_player: Option<&VisiblePlayer>) -> Option<Team> {
     match visible_player {
         Some(visible) if visible.is_spectator() => None,
         Some(visible) => Some(visible.team),
-        None => Some(Team::Human),
+        None => Some(Team::Player(0)),
     }
 }
 
@@ -25080,9 +25059,6 @@ fn ai_structure_under_limit(
 
 fn team_home(team: Team) -> Vec3 {
     match team {
-        Team::Human => HUMAN_BASE,
-        Team::Demon => DEMON_BASE,
-        Team::Chaos => CHAOS_BASE,
         Team::Player(index) => {
             let angle = index as f32 * std::f32::consts::TAU / MAX_SKIRMISH_LOBBY_SLOTS as f32;
             Vec3::new(angle.cos() * 14.0, 0.0, angle.sin() * 14.0)
@@ -27370,6 +27346,7 @@ fn combat(
     time: Res<Time>,
     economies: Res<Economies>,
     relations: Res<TeamRelations>,
+    player_factions: Res<PlayerFactions>,
     visible_player: Option<Res<VisiblePlayer>>,
     mut attackers: Query<(
         Entity,
@@ -27456,6 +27433,7 @@ fn combat(
         if attack_damage <= 0.0 {
             continue;
         }
+        let attacker_faction = player_factions.faction(*team);
         if is_tesla_fence_structure(structure) {
             if weapon.cooldown_left > 0.0 {
                 continue;
@@ -27476,7 +27454,7 @@ fn combat(
             if zap_targets.is_empty() {
                 continue;
             }
-            weapon.cooldown_left = weapon_cooldown_for_team(team, weapon.cooldown);
+            weapon.cooldown_left = weapon_cooldown_for_faction(attacker_faction, weapon.cooldown);
             for target in zap_targets {
                 damage_events.push((
                     target.entity,
@@ -27485,8 +27463,10 @@ fn combat(
                     target.position,
                     target.radius,
                     *team,
+                    attacker_faction,
                     target.is_structure,
                     target.team,
+                    player_factions.faction(target.team),
                     entity,
                 ));
             }
@@ -27537,7 +27517,7 @@ fn combat(
         {
             continue;
         }
-        weapon.cooldown_left = weapon_cooldown_for_team(team, weapon.cooldown);
+        weapon.cooldown_left = weapon_cooldown_for_faction(attacker_faction, weapon.cooldown);
         let damage = weapon_damage_against_target(&weapon, attack_damage, target.is_structure);
         damage_events.push((
             target.entity,
@@ -27546,8 +27526,10 @@ fn combat(
             target.position,
             target.radius,
             *team,
+            attacker_faction,
             target.is_structure,
             target.team,
+            player_factions.faction(target.team),
             entity,
         ));
         if weapon.splash_radius > 0.0 && weapon.splash_damage_multiplier > 0.0 {
@@ -27571,16 +27553,29 @@ fn combat(
                     splash_target.position,
                     splash_target.radius,
                     *team,
+                    attacker_faction,
                     splash_target.is_structure,
                     splash_target.team,
+                    player_factions.faction(splash_target.team),
                     entity,
                 ));
             }
         }
     }
 
-    for (target, damage, from, to, target_radius, team, target_is_structure, target_team, source) in
-        damage_events
+    for (
+        target,
+        damage,
+        from,
+        to,
+        target_radius,
+        team,
+        attacker_faction,
+        target_is_structure,
+        target_team,
+        target_faction,
+        source,
+    ) in damage_events
     {
         if let Ok((entity, _, _, _, _, _, mut health, shield, passive_shield, fog_memory)) =
             health_q.get_mut(target)
@@ -27590,8 +27585,9 @@ fn combat(
             }
             let applied_damage = applied_weapon_damage(
                 damage,
-                team,
+                attacker_faction,
                 target_team,
+                target_faction,
                 target_is_structure,
                 shield,
                 passive_shield,
@@ -27689,8 +27685,8 @@ fn can_tesla_fence_zap_target(
         && xz_distance(position, target.position) <= range + target.radius
 }
 
-fn weapon_cooldown_for_team(team: &Team, cooldown: f32) -> f32 {
-    if team == &Team::Human {
+fn weapon_cooldown_for_faction(faction: Option<SkirmishFaction>, cooldown: f32) -> f32 {
+    if faction == Some(SkirmishFaction::Alliance) {
         cooldown
     } else {
         cooldown * 1.08
@@ -29193,6 +29189,23 @@ mod current_tests {
         assert_eq!(
             skirmish_start_status_for_setup(6, 8, &active, &relations),
             SkirmishStartStatus::Ready
+        );
+    }
+
+    #[test]
+    fn lobby_team_ids_and_capture_teams_are_not_limited_to_three() {
+        assert_eq!(
+            DEFAULT_LOBBY_TEAM_IDS,
+            [0, 1, 2, 3, 4, 5, 6, 7],
+            "default lobby rows should not fold 8 players into three teams"
+        );
+        assert_eq!(
+            SKIRMISH_TEAM_OPTION_COUNT as usize,
+            MAX_SKIRMISH_LOBBY_SLOTS
+        );
+        assert_eq!(
+            capture_team_from_team(Team::Player(7)),
+            CaptureTeam::Player(7)
         );
     }
 

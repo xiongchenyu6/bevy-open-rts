@@ -16,10 +16,13 @@
 - Resource nodes are left-click selectable for target confirmation, and selected harvesters use a wider resource-specific right-click snap so clicking the visible ore/crystal model edge still issues `HarvestOrder`.
 - World overlays keep selected rings, resource/supply rings, active command markers, and the current placement footprint. Unselected structures and construction-range anchors no longer draw permanent rings.
 - Runtime player state is data-driven from `ActiveTeams` / `MatchSetupSettings`: economies, team relations, AI timers, support cooldowns, HUD counts, and match-end checks grow by player index instead of assuming three hard-coded teams.
+- `Team` is runtime identity only (`Player(index)` / `Neutral`). Playable faction identity comes from `PlayerFactions`, so 人族/魔族/混沌族 rules follow the configured player slot instead of being tied to Player0/1/2.
+- Lobby team ids default to one independent team per spawn slot and cycle across the full lobby slot count, so 4/8-player maps are not folded into three activity teams.
 
 ## Capture And Proofs
 
 - `src/bin/capture.rs` exposes proof commands for live match simulation.
+- Capture snapshots use `CaptureTeam::Player(index)` and `players: Vec<CaptureTeamStats>` rather than fixed human/demon/chaos fields, so proof output can represent every runtime player row.
 - `build_capture_match_app_for_faction()` uses `SharedMatchScenePlugin` plus `start_shared_match_scene_with_settings()`.
 - Real menu proofs use `RealMenuMatchStart` plus the actual setup menu buttons before running proof logic. The same path can select faction, match mode, starting resources, and AI difficulty before entering the shared live scene.
 - Current proof surfaces:

@@ -971,7 +971,7 @@ fn render_still(path: &Path, frame: usize) -> Result<(), String> {
     let mut app = build_capture_match_app();
     advance_capture_match(&mut app, frame);
     let snapshot = capture_match_snapshot(&mut app);
-    let pixels = render_frame(frame, 90, &snapshot, Some(CaptureTeam::Human));
+    let pixels = render_frame(frame, 90, &snapshot, Some(CaptureTeam::Player(0)));
     write_png(path, WIDTH, HEIGHT, &pixels)
 }
 
@@ -985,7 +985,7 @@ fn render_frames(directory: &Path, count: usize) -> Result<(), String> {
         }
         let path = directory.join(format!("frame{frame:05}.png"));
         let snapshot = capture_match_snapshot(&mut app);
-        let pixels = render_frame(frame, count.max(1), &snapshot, Some(CaptureTeam::Human));
+        let pixels = render_frame(frame, count.max(1), &snapshot, Some(CaptureTeam::Player(0)));
         write_png(&path, WIDTH, HEIGHT, &pixels)?;
     }
     Ok(())
@@ -1023,11 +1023,8 @@ fn render_proof_frames(
 }
 
 fn capture_team_for_faction(faction: CaptureProofFaction) -> CaptureTeam {
-    match faction {
-        CaptureProofFaction::Human => CaptureTeam::Human,
-        CaptureProofFaction::Demon => CaptureTeam::Demon,
-        CaptureProofFaction::Chaos => CaptureTeam::Chaos,
-    }
+    let _ = faction;
+    CaptureTeam::Player(0)
 }
 
 fn write_png(path: &Path, width: u32, height: u32, pixels: &[u8]) -> Result<(), String> {
@@ -1171,23 +1168,35 @@ fn draw_snapshot(
 fn team_colors(team: CaptureTeam, visible: bool) -> (Rgba, Rgba) {
     let alpha = if visible { 230 } else { 95 };
     match team {
-        CaptureTeam::Human => (
-            Rgba::rgba(216, 226, 229, alpha),
-            Rgba::rgba(85, 155, 245, alpha),
-        ),
-        CaptureTeam::Demon => (
-            Rgba::rgba(184, 93, 89, alpha),
-            Rgba::rgba(242, 63, 58, alpha),
-        ),
-        CaptureTeam::Chaos => (
-            Rgba::rgba(159, 113, 221, alpha),
-            Rgba::rgba(174, 93, 245, alpha),
-        ),
+        CaptureTeam::Player(index) => indexed_team_colors(index, alpha),
         CaptureTeam::Neutral => (
             Rgba::rgba(216, 202, 137, alpha),
             Rgba::rgba(222, 210, 132, alpha),
         ),
     }
+}
+
+fn indexed_team_colors(index: usize, alpha: u8) -> (Rgba, Rgba) {
+    const COLORS: [(u8, u8, u8); 8] = [
+        (85, 155, 245),
+        (242, 63, 58),
+        (174, 93, 245),
+        (72, 184, 205),
+        (235, 158, 46),
+        (214, 74, 159),
+        (150, 199, 57),
+        (70, 109, 224),
+    ];
+    let (r, g, b) = COLORS[index % COLORS.len()];
+    (
+        Rgba::rgba(
+            ((r as u16 + 216) / 2) as u8,
+            ((g as u16 + 226) / 2) as u8,
+            ((b as u16 + 229) / 2) as u8,
+            alpha,
+        ),
+        Rgba::rgba(r, g, b, alpha),
+    )
 }
 
 fn draw_unit(pixels: &mut [u8], world: Vec2, body: Rgba, ring: Rgba, view: CaptureView) {
@@ -1276,34 +1285,23 @@ fn draw_match_status(pixels: &mut [u8], snapshot: &CaptureMatchSnapshot) {
     fill_rect(pixels, 28, 25, 140, 6, Rgba::rgba(62, 78, 82, 230));
     fill_rect(pixels, 30, 27, anchors_fill, 2, Rgba::rgb(221, 210, 138));
 
-    let teams_fill = (snapshot.remaining_teams.min(3) as i32 * 28).max(2);
+    let team_capacity = snapshot.players.len().max(1) as u32;
+    let teams_fill =
+        (snapshot.remaining_teams.min(team_capacity) as i32 * 86 / team_capacity as i32).max(2);
     fill_rect(pixels, 176, 25, 86, 6, Rgba::rgba(62, 78, 82, 230));
     fill_rect(pixels, 178, 27, teams_fill, 2, Rgba::rgb(156, 227, 181));
 
-    draw_team_status_row(
-        pixels,
-        292,
-        snapshot.human.units,
-        snapshot.human.structures,
-        snapshot.human.ore + snapshot.human.crystal,
-        Rgba::rgb(85, 155, 245),
-    );
-    draw_team_status_row(
-        pixels,
-        508,
-        snapshot.demon.units,
-        snapshot.demon.structures,
-        snapshot.demon.ore + snapshot.demon.crystal,
-        Rgba::rgb(242, 63, 58),
-    );
-    draw_team_status_row(
-        pixels,
-        724,
-        snapshot.chaos.units,
-        snapshot.chaos.structures,
-        snapshot.chaos.ore + snapshot.chaos.crystal,
-        Rgba::rgb(174, 93, 245),
-    );
+    for (index, stats) in snapshot.players.iter().take(6).enumerate() {
+        let (_, ring) = indexed_team_colors(index, 230);
+        draw_team_status_row(
+            pixels,
+            292 + index as i32 * 108,
+            stats.units,
+            stats.structures,
+            stats.ore + stats.crystal,
+            ring,
+        );
+    }
 
     let destroyed_width =
         ((snapshot.enemy_units_destroyed + snapshot.enemy_structures_destroyed).min(24) as i32 * 5)
@@ -1320,26 +1318,26 @@ fn draw_team_status_row(
     resources: i32,
     color: Rgba,
 ) {
-    fill_rect(pixels, x, 11, 176, 22, Rgba::rgba(34, 47, 50, 210));
+    fill_rect(pixels, x, 11, 98, 22, Rgba::rgba(34, 47, 50, 210));
     fill_rect(pixels, x + 7, 16, 8, 8, color);
     let unit_width = (units.min(24) as i32 * 4).max(2);
     let structure_width = (structures.min(12) as i32 * 7).max(2);
-    let resource_width = ((resources.max(0).min(360) as f32 / 360.0) * 38.0) as i32;
-    fill_rect(pixels, x + 22, 15, 98, 4, Rgba::rgba(74, 89, 92, 230));
-    fill_rect(pixels, x + 22, 15, unit_width, 4, color);
-    fill_rect(pixels, x + 22, 24, 98, 4, Rgba::rgba(74, 89, 92, 230));
+    let resource_width = ((resources.max(0).min(360) as f32 / 360.0) * 22.0) as i32;
+    fill_rect(pixels, x + 22, 15, 62, 4, Rgba::rgba(74, 89, 92, 230));
+    fill_rect(pixels, x + 22, 15, unit_width.min(62), 4, color);
+    fill_rect(pixels, x + 22, 24, 62, 4, Rgba::rgba(74, 89, 92, 230));
     fill_rect(
         pixels,
         x + 22,
         24,
-        structure_width,
+        structure_width.min(62),
         4,
         Rgba::rgb(217, 222, 214),
     );
-    fill_rect(pixels, x + 128, 18, 38, 7, Rgba::rgba(74, 89, 92, 230));
+    fill_rect(pixels, x + 66, 18, 22, 7, Rgba::rgba(74, 89, 92, 230));
     fill_rect(
         pixels,
-        x + 128,
+        x + 66,
         18,
         resource_width,
         7,
