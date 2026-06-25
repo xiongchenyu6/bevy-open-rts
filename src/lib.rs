@@ -4642,6 +4642,14 @@ pub fn run_real_menu_selected_map_victory_proof(
     )
 }
 
+pub fn run_real_menu_all_maps_victory_proofs(max_frames: usize) -> Vec<CaptureVictoryProof> {
+    SKIRMISH_MAPS
+        .iter()
+        .enumerate()
+        .map(|(map_index, _)| run_real_menu_selected_map_victory_proof(map_index, max_frames))
+        .collect()
+}
+
 pub fn run_real_menu_allied_victory_proof_for_faction(
     faction: CaptureProofFaction,
     max_frames: usize,
@@ -33946,9 +33954,14 @@ mod tests {
 
     #[test]
     fn real_menu_selected_map_victory_proof_wins_on_each_menu_map() {
-        for (map_index, map) in SKIRMISH_MAPS.iter().enumerate() {
-            let proof = run_real_menu_selected_map_victory_proof(map_index, 7200);
+        let proofs = run_real_menu_all_maps_victory_proofs(7200);
 
+        assert_eq!(
+            proofs.len(),
+            SKIRMISH_MAPS.len(),
+            "all-maps proof should cover every menu map"
+        );
+        for (proof, map) in proofs.iter().zip(SKIRMISH_MAPS.iter()) {
             assert!(
                 proof.succeeded(),
                 "selected-map real menu proof should pick map {} in the setup UI, train combat vehicles through command buttons without proof-side resource grants, right-click enemy anchors, and win; proof={proof:?}",
