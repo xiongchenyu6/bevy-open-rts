@@ -414,7 +414,8 @@ fn run() -> Result<(), String> {
             }
             if let Some(proof) = proofs.iter().find(|proof| !proof.succeeded()) {
                 return Err(format!(
-                    "real all-maps victory proof failed on map={} within {max_frames} frames",
+                    "real all-maps victory proof failed for faction={} on map={} within {max_frames} frames",
+                    proof.faction.key(),
                     proof.map_id
                 ));
             }

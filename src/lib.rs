@@ -4622,8 +4622,20 @@ pub fn run_real_menu_selected_map_victory_proof(
     map_index: usize,
     max_frames: usize,
 ) -> CaptureVictoryProof {
+    run_real_menu_selected_map_victory_proof_for_faction(
+        CaptureProofFaction::Human,
+        map_index,
+        max_frames,
+    )
+}
+
+pub fn run_real_menu_selected_map_victory_proof_for_faction(
+    faction: CaptureProofFaction,
+    map_index: usize,
+    max_frames: usize,
+) -> CaptureVictoryProof {
     let mut app = build_real_menu_match_app(
-        RealMenuMatchStart::new(CaptureProofFaction::Human)
+        RealMenuMatchStart::new(faction)
             .with_map_index(map_index)
             .with_ai_difficulty(AiDifficulty::Beginner),
     );
@@ -4632,7 +4644,7 @@ pub fn run_real_menu_selected_map_victory_proof(
     ));
     run_real_menu_victory_proof_with_target_units(
         &mut app,
-        CaptureProofFaction::Human,
+        faction,
         max_frames,
         PRODUCTION_QUEUE_LIMIT + 1,
         false,
@@ -4640,10 +4652,13 @@ pub fn run_real_menu_selected_map_victory_proof(
 }
 
 pub fn run_real_menu_all_maps_victory_proofs(max_frames: usize) -> Vec<CaptureVictoryProof> {
-    SKIRMISH_MAPS
-        .iter()
-        .enumerate()
-        .map(|(map_index, _)| run_real_menu_selected_map_victory_proof(map_index, max_frames))
+    CaptureProofFaction::ALL
+        .into_iter()
+        .flat_map(|faction| {
+            SKIRMISH_MAPS.iter().enumerate().map(move |(map_index, _)| {
+                run_real_menu_selected_map_victory_proof_for_faction(faction, map_index, max_frames)
+            })
+        })
         .collect()
 }
 
@@ -34041,23 +34056,31 @@ mod tests {
 
         assert_eq!(
             proofs.len(),
-            SKIRMISH_MAPS.len(),
-            "all-maps proof should cover every menu map"
+            CaptureProofFaction::ALL.len() * SKIRMISH_MAPS.len(),
+            "all-maps proof should cover every faction on every menu map"
         );
-        for (proof, map) in proofs.iter().zip(SKIRMISH_MAPS.iter()) {
+        for (proof_index, proof) in proofs.iter().enumerate() {
+            let faction = CaptureProofFaction::ALL[proof_index / SKIRMISH_MAPS.len()];
+            let map = &SKIRMISH_MAPS[proof_index % SKIRMISH_MAPS.len()];
             assert!(
                 proof.succeeded(),
-                "selected-map real menu proof should pick map {} in the setup UI, train combat vehicles through command buttons without proof-side resource grants, right-click enemy anchors, and win; proof={proof:?}",
+                "selected-map real menu proof should pick faction {:?} and map {} in the setup UI, train combat vehicles through command buttons without proof-side resource grants, right-click enemy anchors, and win; proof={proof:?}",
+                faction,
                 map.id
+            );
+            assert_eq!(
+                proof.faction, faction,
+                "selected-map proof should report the faction actually chosen in the setup menu; proof={proof:?}"
             );
             assert_eq!(
                 proof.map_id, map.id,
                 "selected-map proof should report the map actually loaded into the shared match scene; proof={proof:?}"
             );
-            assert_eq!(proof.product_id, CaptureProofFaction::Human.proof_vehicle());
+            assert_eq!(proof.product_id, faction.proof_vehicle());
             assert!(
                 proof.produced_units >= proof.target_units,
-                "selected-map proof should produce its full attack group on {}; proof={proof:?}",
+                "selected-map proof should produce its full {:?} attack group on {}; proof={proof:?}",
+                faction,
                 map.id
             );
         }

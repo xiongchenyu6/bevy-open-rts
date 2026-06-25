@@ -32,7 +32,7 @@
   - `real-default-victory-proof`: default `cargo run` menu start, no setup changes or proof-side resource grant, train combat vehicles from the real command panel, right-click enemy anchors, and win.
   - `real-selected-faction-victory-proof`: real menu faction selection, default resources, no proof-side resource grant, train that faction's vehicle roster from the real command panel, right-click enemy anchors, and win.
   - `real-selected-map-victory-proof`: real menu map selection, default resources, no proof-side resource grant, train combat vehicles from the real command panel, right-click enemy anchors, and win while reporting the loaded map id.
-  - `real-all-maps-victory-proof`: batch CLI wrapper over the selected-map real menu proof for every migrated skirmish map.
+  - `real-all-maps-victory-proof`: batch CLI wrapper over the selected-map real menu proof for every playable faction on every migrated skirmish map.
   - `real-allied-victory-proof`: real menu Allied 2v1 mode selection, default resources, no proof-side resource grant, train combat vehicles from the real command panel, right-click enemy anchors, and win while reporting the loaded match mode id.
   - `real-economy-victory-proof`: low-resource menu start, mouse harvest required resources, train combat vehicles, right-click enemy anchors, and win without proof-side resource injection.
   - `real-playable-proof`: low-resource menu start, mouse harvest both Ore and Crystal, build Barracks, train a Barracks unit, train combat vehicles, right-click enemy anchors, and win.
