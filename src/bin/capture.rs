@@ -6,13 +6,14 @@ use std::{
 };
 
 use bevy_open_rts::{
-    CaptureAiVsAiProof, CaptureEntityKind, CaptureMatchPhase, CaptureMatchSnapshot,
-    CapturePlayableProof, CaptureProofFaction, CaptureTeam, CaptureVictoryProof,
-    advance_capture_match, advance_capture_match_proof_frame, build_capture_match_app,
-    build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
-    capture_proof_unit_count, run_capture_match_proof_for_faction,
+    CaptureAiPressureProof, CaptureAiVsAiProof, CaptureEntityKind, CaptureMatchPhase,
+    CaptureMatchSnapshot, CapturePlayableProof, CaptureProofFaction, CaptureTeam,
+    CaptureVictoryProof, advance_capture_match, advance_capture_match_proof_frame,
+    build_capture_match_app, build_capture_match_app_for_faction, capture_match_proof_status,
+    capture_match_snapshot, capture_proof_unit_count, run_capture_match_proof_for_faction,
     run_real_default_menu_victory_proof, run_real_menu_ai_pressure_proof_for_faction,
-    run_real_menu_ai_vs_ai_proof_for_faction, run_real_menu_all_maps_victory_proofs,
+    run_real_menu_ai_pressure_proofs, run_real_menu_ai_vs_ai_proof_for_faction,
+    run_real_menu_ai_vs_ai_proofs, run_real_menu_all_maps_victory_proofs,
     run_real_menu_allied_victory_proof_for_faction, run_real_menu_allied_victory_proofs,
     run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
     run_real_menu_economy_victory_proof_for_faction, run_real_menu_harvest_proof_for_faction,
@@ -268,22 +269,28 @@ fn run() -> Result<(), String> {
                 .map_err(|error| format!("invalid max frame count: {error}"))?;
             let faction = parse_optional_faction(args.next())?;
             let proof = run_real_menu_ai_pressure_proof_for_faction(faction, max_frames);
-            println!(
-                "[capture] real-ai-pressure-proof faction={} label={} phase={:?} frames={} ai_team={:?} ai_units={}=>{} ai_attack_orders={} player_health={:.1}->{:.1}",
-                proof.faction.key(),
-                proof.faction.label(),
-                proof.phase,
-                proof.frames,
-                proof.ai_team,
-                proof.ai_units_before,
-                proof.ai_units_peak,
-                proof.ai_attack_orders,
-                proof.player_health_before,
-                proof.player_health_after,
-            );
+            print_ai_pressure_proof("real-ai-pressure-proof", &proof);
             if !proof.succeeded() {
                 return Err(format!(
                     "real menu AI pressure proof did not produce, attack, and damage the player within {max_frames} frames"
+                ));
+            }
+        }
+        Some("real-ai-pressure-all-factions-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("1200")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let proofs = run_real_menu_ai_pressure_proofs(max_frames);
+            for proof in &proofs {
+                print_ai_pressure_proof("real-ai-pressure-all-factions-proof", proof);
+            }
+            if let Some(proof) = proofs.iter().find(|proof| !proof.succeeded()) {
+                return Err(format!(
+                    "real menu AI pressure all-factions proof failed for faction={} within {max_frames} frames",
+                    proof.faction.key()
                 ));
             }
         }
@@ -300,6 +307,24 @@ fn run() -> Result<(), String> {
             if !proof.succeeded() {
                 return Err(format!(
                     "real menu AI-vs-AI proof did not produce, attack, and damage either side within {max_frames} frames"
+                ));
+            }
+        }
+        Some("real-ai-vs-ai-all-factions-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("2400")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let proofs = run_real_menu_ai_vs_ai_proofs(max_frames);
+            for proof in &proofs {
+                print_ai_vs_ai_proof("real-ai-vs-ai-all-factions-proof", proof);
+            }
+            if let Some(proof) = proofs.iter().find(|proof| !proof.succeeded()) {
+                return Err(format!(
+                    "real menu AI-vs-AI all-factions proof failed for focus={} within {max_frames} frames",
+                    proof.focus_faction.key()
                 ));
             }
         }
@@ -572,6 +597,23 @@ fn print_playable_proof(command: &str, proof: &CapturePlayableProof) {
     );
 }
 
+fn print_ai_pressure_proof(command: &str, proof: &CaptureAiPressureProof) {
+    println!(
+        "[capture] {} faction={} label={} phase={:?} frames={} ai_team={:?} ai_units={}=>{} ai_attack_orders={} player_health={:.1}->{:.1}",
+        command,
+        proof.faction.key(),
+        proof.faction.label(),
+        proof.phase,
+        proof.frames,
+        proof.ai_team,
+        proof.ai_units_before,
+        proof.ai_units_peak,
+        proof.ai_attack_orders,
+        proof.player_health_before,
+        proof.player_health_after,
+    );
+}
+
 fn print_ai_vs_ai_proof(command: &str, proof: &CaptureAiVsAiProof) {
     println!(
         "[capture] {} focus={} label={} map={} mode={} phase={:?} frames={} focus_team={:?} opponent_team={:?} focus_units={}=>{} opponent_units={}=>{} focus_attack_orders={} opponent_attack_orders={} focus_health={:.1}->{:.1} opponent_health={:.1}->{:.1} remaining_teams={} remaining_anchors={}",
@@ -634,7 +676,9 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-harvest-proof 900 human");
     println!("  cargo run --bin capture -- real-dual-harvest-proof 1800 human");
     println!("  cargo run --bin capture -- real-ai-pressure-proof 1200 human");
+    println!("  cargo run --bin capture -- real-ai-pressure-all-factions-proof 1200");
     println!("  cargo run --bin capture -- real-ai-vs-ai-proof 2400 human");
+    println!("  cargo run --bin capture -- real-ai-vs-ai-all-factions-proof 2400");
     println!("  cargo run --bin capture -- real-build-proof 900 human");
     println!("  cargo run --bin capture -- real-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-default-victory-proof 3600");

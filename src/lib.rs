@@ -4550,6 +4550,13 @@ pub fn run_real_menu_ai_pressure_proof_for_faction(
     run_real_menu_ai_pressure_proof(&mut app, faction, max_frames)
 }
 
+pub fn run_real_menu_ai_pressure_proofs(max_frames: usize) -> Vec<CaptureAiPressureProof> {
+    CaptureProofFaction::ALL
+        .into_iter()
+        .map(|faction| run_real_menu_ai_pressure_proof_for_faction(faction, max_frames))
+        .collect()
+}
+
 pub fn run_real_menu_ai_vs_ai_proof_for_faction(
     faction: CaptureProofFaction,
     max_frames: usize,
@@ -4563,6 +4570,13 @@ pub fn run_real_menu_ai_vs_ai_proof_for_faction(
         std::time::Duration::from_secs_f32(1.0),
     ));
     run_real_menu_ai_vs_ai_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_ai_vs_ai_proofs(max_frames: usize) -> Vec<CaptureAiVsAiProof> {
+    CaptureProofFaction::ALL
+        .into_iter()
+        .map(|faction| run_real_menu_ai_vs_ai_proof_for_faction(faction, max_frames))
+        .collect()
 }
 
 pub fn run_real_menu_build_proof_for_faction(
@@ -33927,9 +33941,14 @@ mod tests {
 
     #[test]
     fn real_menu_ai_pressure_proof_produces_attacks_and_damages_player() {
-        for faction in CaptureProofFaction::ALL {
-            let proof = run_real_menu_ai_pressure_proof_for_faction(faction, 1200);
+        let proofs = run_real_menu_ai_pressure_proofs(1200);
 
+        assert_eq!(
+            proofs.len(),
+            CaptureProofFaction::ALL.len(),
+            "AI pressure proof should cover every playable faction"
+        );
+        for (proof, faction) in proofs.iter().zip(CaptureProofFaction::ALL) {
             assert!(
                 proof.succeeded(),
                 "real menu AI pressure proof should let Hard AI produce units, issue attacks, and damage the selected player for {:?}; proof={proof:?}",
@@ -33952,9 +33971,14 @@ mod tests {
 
     #[test]
     fn real_menu_ai_vs_ai_proof_runs_spectator_ai_match() {
-        for faction in CaptureProofFaction::ALL {
-            let proof = run_real_menu_ai_vs_ai_proof_for_faction(faction, 2400);
+        let proofs = run_real_menu_ai_vs_ai_proofs(2400);
 
+        assert_eq!(
+            proofs.len(),
+            CaptureProofFaction::ALL.len(),
+            "AI-vs-AI proof should cover every playable focus faction"
+        );
+        for (proof, faction) in proofs.iter().zip(CaptureProofFaction::ALL) {
             assert!(
                 proof.succeeded(),
                 "real menu AI-vs-AI proof should start spectator AI mode, let both AI sides produce, issue attacks, and damage a side for {:?}; proof={proof:?}",
