@@ -4078,6 +4078,48 @@ impl CaptureAiPressureProof {
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct CaptureAiVsAiProof {
+    pub focus_faction: CaptureProofFaction,
+    pub map_id: &'static str,
+    pub match_mode_id: &'static str,
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub focus_team: CaptureTeam,
+    pub opponent_team: CaptureTeam,
+    pub focus_units_before: u32,
+    pub focus_units_peak: u32,
+    pub opponent_units_before: u32,
+    pub opponent_units_peak: u32,
+    pub focus_attack_orders: u32,
+    pub opponent_attack_orders: u32,
+    pub focus_health_before: f32,
+    pub focus_health_after: f32,
+    pub opponent_health_before: f32,
+    pub opponent_health_after: f32,
+    pub remaining_teams: u32,
+    pub remaining_anchors: u32,
+}
+
+impl CaptureAiVsAiProof {
+    pub fn succeeded(&self) -> bool {
+        let both_ai_sides_produced = self.focus_units_peak > self.focus_units_before
+            && self.opponent_units_peak > self.opponent_units_before;
+        let any_attack_orders = self.focus_attack_orders + self.opponent_attack_orders > 0;
+        let any_side_damaged = self.focus_health_after < self.focus_health_before
+            || self.opponent_health_after < self.opponent_health_before
+            || (self.phase == CaptureMatchPhase::MatchFinished && self.remaining_teams <= 1);
+        self.match_mode_id == SkirmishMatchMode::AiVsAi.id()
+            && matches!(
+                self.phase,
+                CaptureMatchPhase::Running | CaptureMatchPhase::MatchFinished
+            )
+            && both_ai_sides_produced
+            && any_attack_orders
+            && any_side_damaged
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CaptureBuildProof {
     pub faction: CaptureProofFaction,
@@ -4509,6 +4551,21 @@ pub fn run_real_menu_ai_pressure_proof_for_faction(
         std::time::Duration::from_secs_f32(1.0),
     ));
     run_real_menu_ai_pressure_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_ai_vs_ai_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureAiVsAiProof {
+    let mut app = build_real_menu_match_app(
+        RealMenuMatchStart::new(faction)
+            .with_match_mode(SkirmishMatchMode::AiVsAi)
+            .with_ai_difficulty(AiDifficulty::Hard),
+    );
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_ai_vs_ai_proof(&mut app, faction, max_frames)
 }
 
 pub fn run_real_menu_build_proof_for_faction(
@@ -5036,6 +5093,162 @@ fn capture_ai_pressure_proof_status(
     }
 }
 
+fn run_real_menu_ai_vs_ai_proof(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureAiVsAiProof {
+    let max_frames = max_frames.max(1);
+    let Some((focus_team, opponent_team)) =
+        capture_ai_vs_ai_focus_and_opponent(app.world(), faction.team())
+    else {
+        return capture_ai_vs_ai_proof_status(
+            app,
+            faction,
+            0,
+            Team::Neutral,
+            Team::Neutral,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        );
+    };
+
+    let focus_units_before = capture_alive_unit_count(app.world_mut(), focus_team) as u32;
+    let opponent_units_before = capture_alive_unit_count(app.world_mut(), opponent_team) as u32;
+    let focus_health_before = capture_team_total_health(app.world_mut(), focus_team);
+    let opponent_health_before = capture_team_total_health(app.world_mut(), opponent_team);
+    let mut focus_units_peak = focus_units_before;
+    let mut opponent_units_peak = opponent_units_before;
+    let mut focus_attack_orders_peak = 0u32;
+    let mut opponent_attack_orders_peak = 0u32;
+    let mut focus_health_min = focus_health_before;
+    let mut opponent_health_min = opponent_health_before;
+    let mut frames = 0usize;
+
+    while frames < max_frames && app.world().resource::<MatchState>().phase == MatchPhase::Running {
+        frames += 1;
+        app.update();
+        focus_units_peak =
+            focus_units_peak.max(capture_alive_unit_count(app.world_mut(), focus_team) as u32);
+        opponent_units_peak = opponent_units_peak
+            .max(capture_alive_unit_count(app.world_mut(), opponent_team) as u32);
+        focus_attack_orders_peak = focus_attack_orders_peak.max(
+            capture_attack_orders_against_team(app.world_mut(), focus_team, opponent_team) as u32,
+        );
+        opponent_attack_orders_peak = opponent_attack_orders_peak.max(
+            capture_attack_orders_against_team(app.world_mut(), opponent_team, focus_team) as u32,
+        );
+        focus_health_min =
+            focus_health_min.min(capture_team_total_health(app.world_mut(), focus_team));
+        opponent_health_min =
+            opponent_health_min.min(capture_team_total_health(app.world_mut(), opponent_team));
+        if focus_units_peak > focus_units_before
+            && opponent_units_peak > opponent_units_before
+            && focus_attack_orders_peak + opponent_attack_orders_peak > 0
+            && (focus_health_min < focus_health_before
+                || opponent_health_min < opponent_health_before)
+        {
+            break;
+        }
+    }
+
+    capture_ai_vs_ai_proof_status(
+        app,
+        faction,
+        frames,
+        focus_team,
+        opponent_team,
+        focus_units_before,
+        focus_units_peak,
+        opponent_units_before,
+        opponent_units_peak,
+        focus_attack_orders_peak,
+        opponent_attack_orders_peak,
+        focus_health_before,
+        focus_health_min,
+        opponent_health_before,
+        opponent_health_min,
+    )
+}
+
+fn capture_ai_vs_ai_focus_and_opponent(world: &World, focus_team: Team) -> Option<(Team, Team)> {
+    let active_teams = world.resource::<ActiveTeams>();
+    let relations = world.resource::<TeamRelations>();
+    if team_is_active(focus_team, Some(active_teams))
+        && let Some(opponent) = Team::all().into_iter().find(|team| {
+            *team != focus_team
+                && team_is_active(*team, Some(active_teams))
+                && relations.are_enemies(focus_team, *team)
+        })
+    {
+        return Some((focus_team, opponent));
+    }
+
+    Team::all()
+        .into_iter()
+        .filter(|team| team_is_active(*team, Some(active_teams)))
+        .find_map(|first| {
+            Team::all()
+                .into_iter()
+                .find(|second| {
+                    *second != first
+                        && team_is_active(*second, Some(active_teams))
+                        && relations.are_enemies(first, *second)
+                })
+                .map(|second| (first, second))
+        })
+}
+
+#[allow(clippy::too_many_arguments)]
+fn capture_ai_vs_ai_proof_status(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    frames: usize,
+    focus_team: Team,
+    opponent_team: Team,
+    focus_units_before: u32,
+    focus_units_peak: u32,
+    opponent_units_before: u32,
+    opponent_units_peak: u32,
+    focus_attack_orders: u32,
+    opponent_attack_orders: u32,
+    focus_health_before: f32,
+    focus_health_after: f32,
+    opponent_health_before: f32,
+    opponent_health_after: f32,
+) -> CaptureAiVsAiProof {
+    let snapshot = capture_match_snapshot(app);
+    CaptureAiVsAiProof {
+        focus_faction: faction,
+        map_id: capture_selected_map_id(app),
+        match_mode_id: capture_match_mode_id(app),
+        phase: snapshot.phase,
+        frames,
+        focus_team: capture_team_from_team(focus_team),
+        opponent_team: capture_team_from_team(opponent_team),
+        focus_units_before,
+        focus_units_peak,
+        opponent_units_before,
+        opponent_units_peak,
+        focus_attack_orders,
+        opponent_attack_orders,
+        focus_health_before,
+        focus_health_after,
+        opponent_health_before,
+        opponent_health_after,
+        remaining_teams: snapshot.remaining_teams,
+        remaining_anchors: snapshot.remaining_anchors,
+    }
+}
+
 fn run_real_menu_build_proof(
     app: &mut App,
     faction: CaptureProofFaction,
@@ -5521,20 +5734,10 @@ fn capture_victory_proof_status(
 ) -> CaptureVictoryProof {
     let snapshot = capture_match_snapshot(app);
     let player_stats = capture_stats_for_faction(&snapshot, faction);
-    let map_id = app
-        .world()
-        .get_resource::<SelectedSkirmishMap>()
-        .map(|map| map.definition().id)
-        .unwrap_or("unknown");
-    let match_mode_id = app
-        .world()
-        .get_resource::<MatchSetupSettings>()
-        .map(|settings| skirmish_mode_from_match_setup(*settings).id())
-        .unwrap_or("unknown");
     CaptureVictoryProof {
         faction,
-        map_id,
-        match_mode_id,
+        map_id: capture_selected_map_id(app),
+        match_mode_id: capture_match_mode_id(app),
         phase: snapshot.phase,
         frames,
         product_id,
@@ -5546,6 +5749,28 @@ fn capture_victory_proof_status(
         enemy_structures_destroyed: snapshot.enemy_structures_destroyed,
         remaining_teams: snapshot.remaining_teams,
         remaining_anchors: snapshot.remaining_anchors,
+    }
+}
+
+fn capture_selected_map_id(app: &App) -> &'static str {
+    app.world()
+        .get_resource::<SelectedSkirmishMap>()
+        .map(|map| map.definition().id)
+        .unwrap_or("unknown")
+}
+
+fn capture_match_mode_id(app: &App) -> &'static str {
+    let Some(settings) = app.world().get_resource::<MatchSetupSettings>() else {
+        return "unknown";
+    };
+    if app
+        .world()
+        .get_resource::<VisiblePlayer>()
+        .is_some_and(|visible_player| visible_player.is_spectator())
+    {
+        SkirmishMatchMode::AiVsAi.id()
+    } else {
+        skirmish_mode_from_match_setup(*settings).id()
     }
 }
 
@@ -33608,6 +33833,40 @@ mod tests {
             assert!(
                 proof.player_health_after < proof.player_health_before,
                 "AI pressure proof should prove runtime combat damaged the selected player; proof={proof:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn real_menu_ai_vs_ai_proof_runs_spectator_ai_match() {
+        for faction in CaptureProofFaction::ALL {
+            let proof = run_real_menu_ai_vs_ai_proof_for_faction(faction, 2400);
+
+            assert!(
+                proof.succeeded(),
+                "real menu AI-vs-AI proof should start spectator AI mode, let both AI sides produce, issue attacks, and damage a side for {:?}; proof={proof:?}",
+                faction
+            );
+            assert_eq!(
+                proof.match_mode_id, "ai_vs_ai",
+                "AI-vs-AI proof should report the menu-selected match mode; proof={proof:?}"
+            );
+            assert!(
+                proof.focus_units_peak > proof.focus_units_before,
+                "focused AI side should grow its army; proof={proof:?}"
+            );
+            assert!(
+                proof.opponent_units_peak > proof.opponent_units_before,
+                "opponent AI side should grow its army; proof={proof:?}"
+            );
+            assert!(
+                proof.focus_attack_orders + proof.opponent_attack_orders > 0,
+                "at least one AI side should issue attack orders; proof={proof:?}"
+            );
+            assert!(
+                proof.focus_health_after < proof.focus_health_before
+                    || proof.opponent_health_after < proof.opponent_health_before,
+                "AI-vs-AI combat should damage one active side; proof={proof:?}"
             );
         }
     }

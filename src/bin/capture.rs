@@ -6,16 +6,16 @@ use std::{
 };
 
 use bevy_open_rts::{
-    CaptureEntityKind, CaptureMatchPhase, CaptureMatchSnapshot, CapturePlayableProof,
-    CaptureProofFaction, CaptureTeam, CaptureVictoryProof, advance_capture_match,
-    advance_capture_match_proof_frame, build_capture_match_app,
+    CaptureAiVsAiProof, CaptureEntityKind, CaptureMatchPhase, CaptureMatchSnapshot,
+    CapturePlayableProof, CaptureProofFaction, CaptureTeam, CaptureVictoryProof,
+    advance_capture_match, advance_capture_match_proof_frame, build_capture_match_app,
     build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
     capture_proof_unit_count, run_capture_match_proof_for_faction,
     run_real_default_menu_victory_proof, run_real_menu_ai_pressure_proof_for_faction,
-    run_real_menu_allied_victory_proof_for_faction, run_real_menu_build_proof_for_faction,
-    run_real_menu_dual_harvest_proof_for_faction, run_real_menu_economy_victory_proof_for_faction,
-    run_real_menu_harvest_proof_for_faction, run_real_menu_match_proof_for_faction,
-    run_real_menu_playable_proof_for_faction,
+    run_real_menu_ai_vs_ai_proof_for_faction, run_real_menu_allied_victory_proof_for_faction,
+    run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
+    run_real_menu_economy_victory_proof_for_faction, run_real_menu_harvest_proof_for_faction,
+    run_real_menu_match_proof_for_faction, run_real_menu_playable_proof_for_faction,
     run_real_menu_selected_faction_victory_proof_for_faction,
     run_real_menu_selected_map_victory_proof,
     run_real_menu_three_faction_playable_proof_for_faction,
@@ -286,6 +286,22 @@ fn run() -> Result<(), String> {
                 ));
             }
         }
+        Some("real-ai-vs-ai-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("2400")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let faction = parse_optional_faction(args.next())?;
+            let proof = run_real_menu_ai_vs_ai_proof_for_faction(faction, max_frames);
+            print_ai_vs_ai_proof("real-ai-vs-ai-proof", &proof);
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real menu AI-vs-AI proof did not produce, attack, and damage either side within {max_frames} frames"
+                ));
+            }
+        }
         Some("real-build-proof") => {
             let max_frames = args
                 .next()
@@ -518,6 +534,33 @@ fn print_playable_proof(command: &str, proof: &CapturePlayableProof) {
     );
 }
 
+fn print_ai_vs_ai_proof(command: &str, proof: &CaptureAiVsAiProof) {
+    println!(
+        "[capture] {} focus={} label={} map={} mode={} phase={:?} frames={} focus_team={:?} opponent_team={:?} focus_units={}=>{} opponent_units={}=>{} focus_attack_orders={} opponent_attack_orders={} focus_health={:.1}->{:.1} opponent_health={:.1}->{:.1} remaining_teams={} remaining_anchors={}",
+        command,
+        proof.focus_faction.key(),
+        proof.focus_faction.label(),
+        proof.map_id,
+        proof.match_mode_id,
+        proof.phase,
+        proof.frames,
+        proof.focus_team,
+        proof.opponent_team,
+        proof.focus_units_before,
+        proof.focus_units_peak,
+        proof.opponent_units_before,
+        proof.opponent_units_peak,
+        proof.focus_attack_orders,
+        proof.opponent_attack_orders,
+        proof.focus_health_before,
+        proof.focus_health_after,
+        proof.opponent_health_before,
+        proof.opponent_health_after,
+        proof.remaining_teams,
+        proof.remaining_anchors
+    );
+}
+
 fn print_victory_proof(command: &str, proof: &CaptureVictoryProof) {
     println!(
         "[capture] {} faction={} label={} map={} mode={} phase={:?} frames={} product={} target_units={} produced_units={} attack_orders={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
@@ -553,6 +596,7 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-harvest-proof 900 human");
     println!("  cargo run --bin capture -- real-dual-harvest-proof 1800 human");
     println!("  cargo run --bin capture -- real-ai-pressure-proof 1200 human");
+    println!("  cargo run --bin capture -- real-ai-vs-ai-proof 2400 human");
     println!("  cargo run --bin capture -- real-build-proof 900 human");
     println!("  cargo run --bin capture -- real-victory-proof 3600 human");
     println!("  cargo run --bin capture -- real-default-victory-proof 3600");
