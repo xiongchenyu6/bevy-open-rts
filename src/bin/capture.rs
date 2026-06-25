@@ -7,21 +7,23 @@ use std::{
 
 use bevy_open_rts::{
     CaptureAiPressureProof, CaptureAiVsAiProof, CaptureDualHarvestProof, CaptureEntityKind,
-    CaptureLobbyRowsMapProof, CaptureLobbyRowsProof, CaptureMatchPhase, CaptureMatchSnapshot,
-    CapturePlayableProof, CaptureProofFaction, CaptureRuntimePlayersProof, CaptureSupplyCrateProof,
-    CaptureTeam, CaptureTechOilProof, CaptureVictoryProof, advance_capture_match,
-    advance_capture_match_proof_frame, build_capture_match_app,
+    CaptureFullLobbyAiProof, CaptureLobbyRowsMapProof, CaptureLobbyRowsProof, CaptureMatchPhase,
+    CaptureMatchSnapshot, CapturePlayableProof, CaptureProofFaction, CaptureRuntimePlayersProof,
+    CaptureSupplyCrateProof, CaptureTeam, CaptureTechOilProof, CaptureVictoryProof,
+    advance_capture_match, advance_capture_match_proof_frame, build_capture_match_app,
     build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
     capture_proof_unit_count, run_capture_match_proof_for_faction,
-    run_capture_runtime_players_proof, run_real_default_menu_victory_proof,
-    run_real_menu_ai_pressure_proof_for_faction, run_real_menu_ai_pressure_proofs,
-    run_real_menu_ai_vs_ai_proof_for_faction, run_real_menu_ai_vs_ai_proofs,
-    run_real_menu_all_maps_victory_proofs, run_real_menu_allied_victory_proof_for_faction,
-    run_real_menu_allied_victory_proofs, run_real_menu_build_proof_for_faction,
-    run_real_menu_dual_harvest_proof_for_faction, run_real_menu_economy_victory_proof_for_faction,
-    run_real_menu_free_for_all_playable_proof_for_faction, run_real_menu_harvest_proof_for_faction,
-    run_real_menu_lobby_rows_proof, run_real_menu_lobby_slots_proof,
-    run_real_menu_match_proof_for_faction, run_real_menu_playable_proof_for_faction,
+    run_capture_runtime_ai_scale_proof, run_capture_runtime_players_proof,
+    run_real_default_menu_victory_proof, run_real_menu_ai_pressure_proof_for_faction,
+    run_real_menu_ai_pressure_proofs, run_real_menu_ai_vs_ai_proof_for_faction,
+    run_real_menu_ai_vs_ai_proofs, run_real_menu_all_maps_victory_proofs,
+    run_real_menu_allied_victory_proof_for_faction, run_real_menu_allied_victory_proofs,
+    run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
+    run_real_menu_economy_victory_proof_for_faction,
+    run_real_menu_free_for_all_playable_proof_for_faction, run_real_menu_full_lobby_ai_proof,
+    run_real_menu_harvest_proof_for_faction, run_real_menu_lobby_rows_proof,
+    run_real_menu_lobby_slots_proof, run_real_menu_match_proof_for_faction,
+    run_real_menu_playable_proof_for_faction,
     run_real_menu_selected_faction_victory_proof_for_faction,
     run_real_menu_selected_map_victory_proof, run_real_menu_supply_crate_proof_for_faction,
     run_real_menu_tech_oil_proof_for_faction, run_real_menu_tech_oil_proofs,
@@ -379,6 +381,44 @@ fn run() -> Result<(), String> {
                 ));
             }
         }
+        Some("real-full-lobby-ai-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("1800")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let proof = run_real_menu_full_lobby_ai_proof(max_frames);
+            print_full_lobby_ai_proof("real-full-lobby-ai-proof", &proof);
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real full-lobby AI proof did not make all {} AI players produce and fight within {max_frames} frames",
+                    proof.ai_players
+                ));
+            }
+        }
+        Some("runtime-ai-scale-proof") => {
+            let player_count = args
+                .next()
+                .as_deref()
+                .unwrap_or("12")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid player count: {error}"))?;
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("1800")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let proof = run_capture_runtime_ai_scale_proof(player_count, max_frames);
+            print_full_lobby_ai_proof("runtime-ai-scale-proof", &proof);
+            if !proof.succeeded() {
+                return Err(format!(
+                    "runtime AI scale proof did not make all {} AI players produce and fight within {max_frames} frames",
+                    proof.ai_players
+                ));
+            }
+        }
         Some("real-ai-vs-ai-proof") => {
             let max_frames = args
                 .next()
@@ -681,6 +721,8 @@ fn run_real_playability_suite() -> Result<(), String> {
     const ALL_MAPS_FRAMES: usize = 7200;
     const ALLIED_FRAMES: usize = 7200;
     const AI_PRESSURE_FRAMES: usize = 1200;
+    const FULL_LOBBY_AI_FRAMES: usize = 1800;
+    const RUNTIME_AI_SCALE_FRAMES: usize = 1800;
     const AI_VS_AI_FRAMES: usize = 2400;
     const RUNTIME_PLAYERS_FRAMES: usize = 120;
     const RUNTIME_PLAYERS: usize = 12;
@@ -770,6 +812,30 @@ fn run_real_playability_suite() -> Result<(), String> {
         if !proof.succeeded() {
             failures.push(format!("ai-pressure:{}", proof.faction.key()));
         }
+    }
+
+    let full_lobby_ai_proof = run_real_menu_full_lobby_ai_proof(FULL_LOBBY_AI_FRAMES);
+    print_full_lobby_ai_proof(
+        "real-playability-suite-proof:full-lobby-ai",
+        &full_lobby_ai_proof,
+    );
+    checks += 1;
+    if !full_lobby_ai_proof.succeeded() {
+        failures.push("full-lobby-ai".to_string());
+    }
+
+    let runtime_ai_scale_proof =
+        run_capture_runtime_ai_scale_proof(RUNTIME_PLAYERS, RUNTIME_AI_SCALE_FRAMES);
+    print_full_lobby_ai_proof(
+        "real-playability-suite-proof:runtime-ai-scale",
+        &runtime_ai_scale_proof,
+    );
+    checks += 1;
+    if !runtime_ai_scale_proof.succeeded() {
+        failures.push(format!(
+            "runtime-ai-scale:{}",
+            runtime_ai_scale_proof.expected_players
+        ));
     }
 
     let ai_vs_ai_proofs = run_real_menu_ai_vs_ai_proofs(AI_VS_AI_FRAMES);
@@ -942,6 +1008,27 @@ fn print_ai_pressure_proof(command: &str, proof: &CaptureAiPressureProof) {
     );
 }
 
+fn print_full_lobby_ai_proof(command: &str, proof: &CaptureFullLobbyAiProof) {
+    println!(
+        "[capture] {} map={} map_players={} expected_players={} active_players={} ai_players={} ai_growth={}/{} ai_attackers={} damaged_teams={} total_attack_orders={} phase={:?} frames={} remaining_teams={} remaining_anchors={}",
+        command,
+        proof.map_id,
+        proof.map_players,
+        proof.expected_players,
+        proof.active_players,
+        proof.ai_players,
+        proof.ai_teams_with_growth,
+        proof.ai_players,
+        proof.ai_teams_with_attack_orders,
+        proof.damaged_teams,
+        proof.total_attack_orders,
+        proof.phase,
+        proof.frames,
+        proof.remaining_teams,
+        proof.remaining_anchors,
+    );
+}
+
 fn print_ai_vs_ai_proof(command: &str, proof: &CaptureAiVsAiProof) {
     println!(
         "[capture] {} focus={} label={} map={} mode={} phase={:?} frames={} focus_team={:?} opponent_team={:?} focus_units={}=>{} opponent_units={}=>{} focus_attack_orders={} opponent_attack_orders={} focus_health={:.1}->{:.1} opponent_health={:.1}->{:.1} remaining_teams={} remaining_anchors={}",
@@ -1031,6 +1118,8 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-tech-oil-all-factions-proof 1800");
     println!("  cargo run --bin capture -- real-ai-pressure-proof 1200 human");
     println!("  cargo run --bin capture -- real-ai-pressure-all-factions-proof 1200");
+    println!("  cargo run --bin capture -- real-full-lobby-ai-proof 1800");
+    println!("  cargo run --bin capture -- runtime-ai-scale-proof 12 1800");
     println!("  cargo run --bin capture -- real-ai-vs-ai-proof 2400 human");
     println!("  cargo run --bin capture -- real-ai-vs-ai-all-factions-proof 2400");
     println!("  cargo run --bin capture -- real-build-proof 900 human");

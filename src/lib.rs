@@ -4277,6 +4277,40 @@ impl CaptureAiPressureProof {
 }
 
 #[derive(Clone, Debug, PartialEq)]
+pub struct CaptureFullLobbyAiProof {
+    pub map_id: &'static str,
+    pub map_players: usize,
+    pub expected_players: usize,
+    pub active_players: usize,
+    pub ai_players: usize,
+    pub ai_teams_with_growth: usize,
+    pub ai_teams_with_attack_orders: usize,
+    pub damaged_teams: usize,
+    pub total_attack_orders: u32,
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub remaining_teams: u32,
+    pub remaining_anchors: u32,
+}
+
+impl CaptureFullLobbyAiProof {
+    pub fn succeeded(&self) -> bool {
+        let battle_phase = matches!(
+            self.phase,
+            CaptureMatchPhase::Running | CaptureMatchPhase::HumanDefeat
+        );
+        self.expected_players >= MAX_SKIRMISH_LOBBY_SLOTS
+            && self.active_players == self.expected_players
+            && self.ai_players == self.expected_players.saturating_sub(1)
+            && self.ai_teams_with_growth == self.ai_players
+            && self.ai_teams_with_attack_orders == self.ai_players
+            && self.damaged_teams > 0
+            && self.total_attack_orders > 0
+            && battle_phase
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub struct CaptureAiVsAiProof {
     pub focus_faction: CaptureProofFaction,
     pub map_id: &'static str,
@@ -4823,6 +4857,13 @@ fn build_real_default_menu_match_app() -> App {
 }
 
 fn build_real_menu_full_lobby_match_app(map_index: usize) -> App {
+    build_real_menu_full_lobby_match_app_with_ai(map_index, AiDifficulty::Easy)
+}
+
+fn build_real_menu_full_lobby_match_app_with_ai(
+    map_index: usize,
+    ai_difficulty: AiDifficulty,
+) -> App {
     let mut app = build_game_app(GameAppMode::Headless);
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
@@ -4839,7 +4880,7 @@ fn build_real_menu_full_lobby_match_app(map_index: usize) -> App {
     }
     drive_main_menu_action(
         &mut app,
-        MainMenuAction::SelectAiDifficulty(AiDifficulty::Easy),
+        MainMenuAction::SelectAiDifficulty(ai_difficulty),
         1,
     );
     drive_main_menu_action(&mut app, MainMenuAction::SelectLobbySlot(0), 1);
@@ -4853,6 +4894,19 @@ pub fn run_real_menu_lobby_slots_proof(max_frames: usize) -> CaptureLobbySlotsPr
         app.update();
     }
     capture_lobby_slots_proof(&mut app, max_frames)
+}
+
+pub fn run_real_menu_full_lobby_ai_proof(max_frames: usize) -> CaptureFullLobbyAiProof {
+    let mut app = build_real_menu_full_lobby_match_app_with_ai(3, AiDifficulty::Hard);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    let expected_players = app
+        .world()
+        .resource::<SelectedSkirmishMap>()
+        .definition()
+        .players;
+    run_full_lobby_ai_proof(&mut app, expected_players, max_frames)
 }
 
 pub fn run_real_menu_lobby_rows_proof() -> CaptureLobbyRowsProof {
@@ -4874,6 +4928,23 @@ pub fn run_capture_runtime_players_proof(
         app.update();
     }
     capture_runtime_players_proof(&mut app, expected_players, max_frames)
+}
+
+pub fn run_capture_runtime_ai_scale_proof(
+    player_count: usize,
+    max_frames: usize,
+) -> CaptureFullLobbyAiProof {
+    let expected_players = player_count.max(MAX_SKIRMISH_LOBBY_SLOTS + 4);
+    let mut app = build_capture_match_app_with_settings(capture_runtime_players_match_setup_with(
+        expected_players,
+        AiDifficulty::Hard,
+        BEVY_PLAYTEST_STARTING_RESOURCES,
+        StartupLoadoutMode::PlaytestExpanded,
+    ));
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_full_lobby_ai_proof(&mut app, expected_players, max_frames)
 }
 
 fn run_real_menu_lobby_rows_map_proof(map_index: usize) -> CaptureLobbyRowsMapProof {
@@ -5099,14 +5170,158 @@ fn capture_lobby_slots_proof(app: &mut App, frames: usize) -> CaptureLobbySlotsP
     }
 }
 
+fn run_full_lobby_ai_proof(
+    app: &mut App,
+    expected_players: usize,
+    max_frames: usize,
+) -> CaptureFullLobbyAiProof {
+    let active_teams_resource = app.world().resource::<ActiveTeams>().clone();
+    let active_team_flags = active_teams_resource.0.clone();
+    let active_teams = player_teams(active_team_flags.len())
+        .filter(|team| team_is_active(*team, Some(&active_teams_resource)))
+        .collect::<Vec<_>>();
+    let ai_teams = active_teams
+        .iter()
+        .copied()
+        .filter(|team| *team != CAPTURE_PLAYER_TEAM)
+        .collect::<Vec<_>>();
+    let units_before = ai_teams
+        .iter()
+        .map(|team| capture_alive_unit_count(app.world_mut(), *team))
+        .collect::<Vec<_>>();
+    let mut units_peak = units_before.clone();
+    let health_before = active_teams
+        .iter()
+        .map(|team| capture_team_total_health(app.world_mut(), *team))
+        .collect::<Vec<_>>();
+    let mut health_min = health_before.clone();
+    let mut attack_orders_peak = vec![0usize; ai_teams.len()];
+    let mut frames = 0usize;
+
+    while frames < max_frames && app.world().resource::<MatchState>().phase == MatchPhase::Running {
+        frames += 1;
+        app.update();
+        for (index, team) in ai_teams.iter().copied().enumerate() {
+            units_peak[index] =
+                units_peak[index].max(capture_alive_unit_count(app.world_mut(), team));
+            attack_orders_peak[index] = attack_orders_peak[index].max(
+                capture_attack_orders_against_any_enemy(app.world_mut(), team),
+            );
+        }
+        for (index, team) in active_teams.iter().copied().enumerate() {
+            health_min[index] =
+                health_min[index].min(capture_team_total_health(app.world_mut(), team));
+        }
+
+        let ai_teams_with_growth = units_peak
+            .iter()
+            .zip(units_before.iter())
+            .filter(|(peak, before)| peak > before)
+            .count();
+        let ai_teams_with_attack_orders = attack_orders_peak
+            .iter()
+            .filter(|orders| **orders > 0)
+            .count();
+        let damaged_teams = health_min
+            .iter()
+            .zip(health_before.iter())
+            .filter(|(min, before)| min < before)
+            .count();
+        if ai_teams_with_growth == ai_teams.len()
+            && ai_teams_with_attack_orders == ai_teams.len()
+            && damaged_teams > 0
+        {
+            break;
+        }
+    }
+
+    capture_full_lobby_ai_proof_status(
+        app,
+        frames,
+        expected_players,
+        active_teams.len(),
+        ai_teams.len(),
+        units_before,
+        units_peak,
+        attack_orders_peak,
+        health_before,
+        health_min,
+    )
+}
+
+fn capture_full_lobby_ai_proof_status(
+    app: &mut App,
+    frames: usize,
+    expected_players: usize,
+    active_players: usize,
+    ai_players: usize,
+    units_before: Vec<usize>,
+    units_peak: Vec<usize>,
+    attack_orders_peak: Vec<usize>,
+    health_before: Vec<f32>,
+    health_min: Vec<f32>,
+) -> CaptureFullLobbyAiProof {
+    let map_players = app
+        .world()
+        .resource::<SelectedSkirmishMap>()
+        .definition()
+        .players;
+    let match_state = app.world().resource::<MatchState>();
+    CaptureFullLobbyAiProof {
+        map_id: capture_selected_map_id(app),
+        map_players,
+        expected_players,
+        active_players,
+        ai_players,
+        ai_teams_with_growth: units_peak
+            .iter()
+            .zip(units_before.iter())
+            .filter(|(peak, before)| peak > before)
+            .count(),
+        ai_teams_with_attack_orders: attack_orders_peak
+            .iter()
+            .filter(|orders| **orders > 0)
+            .count(),
+        damaged_teams: health_min
+            .iter()
+            .zip(health_before.iter())
+            .filter(|(min, before)| min < before)
+            .count(),
+        total_attack_orders: attack_orders_peak.iter().sum::<usize>() as u32,
+        phase: match match_state.phase {
+            MatchPhase::Running => CaptureMatchPhase::Running,
+            MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
+            MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
+            MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
+        },
+        frames,
+        remaining_teams: match_state.remaining_teams,
+        remaining_anchors: match_state.remaining_anchors,
+    }
+}
+
 fn capture_runtime_players_match_setup(player_count: usize) -> MatchSetupSettings {
+    capture_runtime_players_match_setup_with(
+        player_count,
+        AiDifficulty::Beginner,
+        StartingResources::godot_standard(),
+        StartupLoadoutMode::GodotSkirmish,
+    )
+}
+
+fn capture_runtime_players_match_setup_with(
+    player_count: usize,
+    ai_difficulty: AiDifficulty,
+    starting_resources: StartingResources,
+    startup_loadout: StartupLoadoutMode,
+) -> MatchSetupSettings {
     let active_teams = vec![true; player_count];
     let player_controllers = (0..player_count)
         .map(|index| {
             if index == 0 {
                 SkirmishPlayerController::Human
             } else {
-                SkirmishPlayerController::Ai(AiDifficulty::Beginner)
+                SkirmishPlayerController::Ai(ai_difficulty)
             }
         })
         .collect::<Vec<_>>();
@@ -5114,11 +5329,11 @@ fn capture_runtime_players_match_setup(player_count: usize) -> MatchSetupSetting
     team_relations.ensure_player_count(player_count);
     MatchSetupSettings {
         map_path: largest_skirmish_map().godot_path,
-        starting_resources: StartingResources::godot_standard(),
+        starting_resources,
         visible_player: VisiblePlayer::per_player(Team::Player(0)),
         ai_difficulties: skirmish_ai_difficulties_from_controllers(&player_controllers),
         team_relations,
-        startup_loadout: StartupLoadoutMode::GodotSkirmish,
+        startup_loadout,
         active_teams,
         player_factions: (0..player_count)
             .map(|index| SkirmishFaction::ALL[index % SkirmishFaction::ALL.len()])
@@ -8129,6 +8344,25 @@ fn capture_attack_orders_against_team(
             world
                 .get::<Team>(*target)
                 .is_some_and(|team| *team == target_team)
+        })
+        .count()
+}
+
+fn capture_attack_orders_against_any_enemy(world: &mut World, attacker_team: Team) -> usize {
+    let relations = world.resource::<TeamRelations>().clone();
+    let mut units = world.query::<(&Team, &Health, &AttackOrder)>();
+    let targets = units
+        .iter(world)
+        .filter_map(|(team, health, attack_order)| {
+            (*team == attacker_team && health.current > 0.0).then_some(attack_order.target)
+        })
+        .collect::<Vec<_>>();
+    targets
+        .into_iter()
+        .filter(|target| {
+            world
+                .get::<Team>(*target)
+                .is_some_and(|target_team| relations.are_enemies(attacker_team, *target_team))
         })
         .count()
 }

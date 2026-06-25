@@ -19,7 +19,7 @@
 - `Team` is runtime identity only (`Player(index)` / `Neutral`). Playable faction identity comes from `PlayerFactions`, so 人族/魔族/混沌族 rules follow the configured player slot instead of being tied to Player0/1/2.
 - Lobby team buttons remain an 8-row setup UI concern, but runtime team IDs are stored and derived as unbounded `usize` values. The battle core no longer clamps alliances to three teams or to the current lobby button count.
 - Runtime spawning is not capped to the map's authored spawn-point count. Players beyond the map rows receive clamped virtual fallback base positions instead of being skipped.
-- AI/runtime fallback helpers are not capped to the lobby slot count: active AI iteration, opponent helpers, late-slot resources, cooldowns, fallback home positions, virtual spawn positions, and runtime team relation IDs are verified beyond eight players.
+- AI/runtime fallback helpers are not capped to the lobby slot count: active AI iteration, opponent helpers, late-slot resources, cooldowns, fallback home positions, virtual spawn positions, runtime team relation IDs, and battle AI participation are verified beyond eight players.
 
 ## Capture And Proofs
 
@@ -36,6 +36,8 @@
   - `real-tech-oil-all-factions-proof`: batch CLI wrapper over the FourCorners tech-oil capture proof for every playable faction.
   - `real-ai-pressure-proof`: menu-started Hard AI match that requires AI production growth, AI attack orders, and real damage to the selected player's army/base.
   - `real-ai-pressure-all-factions-proof`: batch CLI wrapper over the Hard AI pressure proof for every playable faction.
+  - `real-full-lobby-ai-proof`: real menu Big Arena full-lobby start that requires all seven AI players to grow and issue enemy attack orders in the shared battle scene.
+  - `runtime-ai-scale-proof`: direct shared-scene proof that starts twelve active runtime players on an eight-spawn map and requires all eleven AI players to grow and issue enemy attack orders.
   - `real-ai-vs-ai-proof`: real menu AI-vs-AI spectator mode selection that requires both AI sides to grow armies, at least one side to issue attack orders, and live combat damage in the shared match scene while reporting `mode=ai_vs_ai`.
   - `real-ai-vs-ai-all-factions-proof`: batch CLI wrapper over the AI-vs-AI spectator proof for every playable focus faction.
   - `real-build-proof`: mouse select worker, place and construct Barracks, then train.
@@ -52,7 +54,7 @@
   - `real-lobby-rows-proof`: real menu proof that every authored skirmish map renders one configurable player row per map spawn slot, including the 8-row Big Arena lobby.
   - `real-lobby-slots-proof`: real menu Big Arena setup that enables every map spawn slot and verifies all eight active player rows reach the live scene with economies, units, structures, command centers, and spawn anchors.
   - `runtime-players-proof`: direct shared-scene proof that starts more runtime players than the authored map spawn count and verifies economies, units, structures, command centers, and virtual fallback spawns.
-  - `real-playability-suite-proof`: top-level CLI regression gate that runs the real menu lobby-row, dual-harvest, supply-crate, tech-oil, playable, free-for-all, all-map, Allied 2v1, AI pressure, AI-vs-AI, and runtime-player-count proof surfaces.
+  - `real-playability-suite-proof`: top-level CLI regression gate that runs the real menu lobby-row, dual-harvest, supply-crate, tech-oil, playable, free-for-all, all-map, Allied 2v1, AI pressure, full-lobby AI, runtime AI scale, AI-vs-AI, and runtime-player-count proof surfaces.
 
 ## Verification
 
