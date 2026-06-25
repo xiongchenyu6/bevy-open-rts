@@ -15,6 +15,7 @@
 - Match start camera focus is derived from the selected player's actual base anchor: first the `MobileConstructionVehicle` spawn when present, then the `CommandCenter`. It no longer blends toward nearby resources, so `cargo run` opens over the player's base instead of a zoomed-out map work area.
 - Resource nodes are left-click selectable for target confirmation, and selected harvesters use a wider resource-specific right-click snap so clicking the visible ore/crystal model edge still issues `HarvestOrder`.
 - World overlays keep selected rings, resource/supply rings, active command markers, and the current placement footprint. Unselected structures and construction-range anchors no longer draw permanent rings.
+- Runtime player state is data-driven from `ActiveTeams` / `MatchSetupSettings`: economies, team relations, AI timers, support cooldowns, HUD counts, and match-end checks grow by player index instead of assuming three hard-coded teams.
 
 ## Capture And Proofs
 
@@ -43,6 +44,7 @@
   - `real-economy-victory-proof`: low-resource menu start, mouse harvest required resources, train combat vehicles, right-click enemy anchors, and win without proof-side resource injection.
   - `real-playable-proof`: low-resource menu start, mouse harvest both Ore and Crystal, build Barracks, train a Barracks unit, train combat vehicles, right-click enemy anchors, and win.
   - `real-three-faction-playable-proof`: low-resource real menu start, select three-faction skirmish mode, use the same playable proof flow with a larger attack group, and finish all enemy anchors.
+  - `real-lobby-slots-proof`: real menu Big Arena setup that enables every map spawn slot and verifies all eight active player rows reach the live scene with economies, units, structures, command centers, and spawn anchors.
   - `real-playability-suite-proof`: top-level CLI regression gate that runs the real menu dual-harvest, supply-crate, tech-oil, playable, three-faction, all-map, Allied 2v1, AI pressure, and AI-vs-AI proof surfaces across all playable factions.
 
 ## Verification

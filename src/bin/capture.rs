@@ -18,7 +18,8 @@ use bevy_open_rts::{
     run_real_menu_allied_victory_proof_for_faction, run_real_menu_allied_victory_proofs,
     run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
     run_real_menu_economy_victory_proof_for_faction, run_real_menu_harvest_proof_for_faction,
-    run_real_menu_match_proof_for_faction, run_real_menu_playable_proof_for_faction,
+    run_real_menu_lobby_slots_proof, run_real_menu_match_proof_for_faction,
+    run_real_menu_playable_proof_for_faction,
     run_real_menu_selected_faction_victory_proof_for_faction,
     run_real_menu_selected_map_victory_proof, run_real_menu_supply_crate_proof_for_faction,
     run_real_menu_tech_oil_proof_for_faction, run_real_menu_tech_oil_proofs,
@@ -202,6 +203,38 @@ fn run() -> Result<(), String> {
             if !proof.succeeded() {
                 return Err(format!(
                     "real menu match proof did not reach player victory within {max_frames} frames"
+                ));
+            }
+        }
+        Some("real-lobby-slots-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("120")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let proof = run_real_menu_lobby_slots_proof(max_frames);
+            println!(
+                "[capture] real-lobby-slots-proof map={} map_players={} configured_slots={} runtime_players={} active_players={} economy_rows={} unit_teams={} structure_teams={} command_center_teams={} spawn_anchor_matches={} visible_player={:?} phase={:?} frames={} remaining_teams={} remaining_anchors={}",
+                proof.map_id,
+                proof.map_players,
+                proof.configured_slots,
+                proof.runtime_players,
+                proof.active_players,
+                proof.economy_rows,
+                proof.unit_teams,
+                proof.structure_teams,
+                proof.command_center_teams,
+                proof.spawn_anchor_matches,
+                proof.visible_player_index,
+                proof.phase,
+                proof.frames,
+                proof.remaining_teams,
+                proof.remaining_anchors
+            );
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real menu lobby slots proof did not preserve all active map slots within {max_frames} frames"
                 ));
             }
         }
