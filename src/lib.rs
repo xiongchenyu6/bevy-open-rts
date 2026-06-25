@@ -4251,14 +4251,11 @@ pub struct CapturePlayableProof {
 
 impl CapturePlayableProof {
     pub fn succeeded(&self) -> bool {
-        let needs_crystal = registry::entity(self.vehicle_product_id)
-            .is_some_and(|def| def.cost.crystal > 0 && self.target_units > 0);
         self.phase == CaptureMatchPhase::HumanVictory
             && self.ore_harvest_ordered
             && self.ore_after_harvest > self.ore_before
-            && (!needs_crystal
-                || (self.crystal_harvest_ordered
-                    && self.crystal_after_harvest > self.crystal_before))
+            && self.crystal_harvest_ordered
+            && self.crystal_after_harvest > self.crystal_before
             && self.placement_started
             && self.placed
             && self.construct_ordered
@@ -5676,6 +5673,7 @@ fn run_real_menu_playable_proof_with_target_units(
     let resources_before = capture_team_resources(app.world(), team);
     let mut frames = 0usize;
     let mut harvest_flags = (false, false);
+    let mut harvest_peaks = resources_before;
     let upfront_ore = vehicle_def.cost.ore * target_units as i32 + barracks_def.cost.ore + 2;
     let upfront_crystal =
         vehicle_def.cost.crystal * target_units as i32 + barracks_def.cost.crystal + 1;
@@ -5687,6 +5685,15 @@ fn run_real_menu_playable_proof_with_target_units(
         max_frames,
         &mut frames,
         &mut harvest_flags,
+        &mut harvest_peaks,
+    );
+    capture_force_sample_harvests(
+        app,
+        team,
+        max_frames,
+        &mut frames,
+        &mut harvest_flags,
+        &mut harvest_peaks,
     );
 
     let build_result =
@@ -5702,8 +5709,8 @@ fn run_real_menu_playable_proof_with_target_units(
         max_frames,
         &mut frames,
         &mut harvest_flags,
+        &mut harvest_peaks,
     );
-    let resources_after_harvest = capture_team_resources(app.world(), team);
 
     let produced_units = capture_train_attack_group_from_factory_command_panel(
         app,
@@ -5721,7 +5728,7 @@ fn run_real_menu_playable_proof_with_target_units(
         faction,
         frames,
         resources_before,
-        resources_after_harvest,
+        harvest_peaks,
         harvest_flags,
         build_result,
         vehicle_id,
@@ -5913,6 +5920,7 @@ fn capture_harvest_until_resources(
     max_frames: usize,
     frames: &mut usize,
     harvest_flags: &mut (bool, bool),
+    harvest_peaks: &mut (i32, i32),
 ) {
     while *frames < max_frames {
         let (ore, crystal) = capture_team_resources(app.world(), team);
@@ -5930,6 +5938,9 @@ fn capture_harvest_until_resources(
                 break;
             }
             harvest_flags.0 = true;
+            let resources = capture_team_resources(app.world(), team);
+            harvest_peaks.0 = harvest_peaks.0.max(resources.0);
+            harvest_peaks.1 = harvest_peaks.1.max(resources.1);
             continue;
         }
         if crystal < required_crystal {
@@ -5943,8 +5954,50 @@ fn capture_harvest_until_resources(
                 break;
             }
             harvest_flags.1 = true;
+            let resources = capture_team_resources(app.world(), team);
+            harvest_peaks.0 = harvest_peaks.0.max(resources.0);
+            harvest_peaks.1 = harvest_peaks.1.max(resources.1);
             continue;
         }
+    }
+}
+
+fn capture_force_sample_harvests(
+    app: &mut App,
+    team: Team,
+    max_frames: usize,
+    frames: &mut usize,
+    harvest_flags: &mut (bool, bool),
+    harvest_peaks: &mut (i32, i32),
+) {
+    if !harvest_flags.0
+        && capture_harvest_kind_until_resource_increases(
+            app,
+            team,
+            ResourceKind::Ore,
+            max_frames,
+            frames,
+        )
+    {
+        harvest_flags.0 = true;
+        let resources = capture_team_resources(app.world(), team);
+        harvest_peaks.0 = harvest_peaks.0.max(resources.0);
+        harvest_peaks.1 = harvest_peaks.1.max(resources.1);
+    }
+
+    if !harvest_flags.1
+        && capture_harvest_kind_until_resource_increases(
+            app,
+            team,
+            ResourceKind::Crystal,
+            max_frames,
+            frames,
+        )
+    {
+        harvest_flags.1 = true;
+        let resources = capture_team_resources(app.world(), team);
+        harvest_peaks.0 = harvest_peaks.0.max(resources.0);
+        harvest_peaks.1 = harvest_peaks.1.max(resources.1);
     }
 }
 
@@ -34055,10 +34108,18 @@ mod tests {
 
             assert!(
                 proof.succeeded(),
-                "real menu playable proof should mine, build a Barracks, train from it, produce combat vehicles, right-click enemy anchors, and finish; proof={proof:?}"
+                "real menu playable proof should mine ore and crystal, build a Barracks, train from it, produce combat vehicles, right-click enemy anchors, and finish; proof={proof:?}"
             );
             assert_eq!(proof.structure_id, "Barracks");
             assert_eq!(proof.vehicle_product_id, faction.proof_vehicle());
+            assert!(
+                proof.ore_harvest_ordered && proof.ore_after_harvest > proof.ore_before,
+                "playable proof should prove real ore harvesting for every faction; proof={proof:?}"
+            );
+            assert!(
+                proof.crystal_harvest_ordered && proof.crystal_after_harvest > proof.crystal_before,
+                "playable proof should prove real crystal harvesting for every faction, including zero-crystal victory routes; proof={proof:?}"
+            );
             assert!(
                 !proof.barracks_product_id.is_empty(),
                 "playable proof should identify the trained Barracks unit; proof={proof:?}"
