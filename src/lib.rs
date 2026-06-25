@@ -4057,6 +4057,63 @@ impl CaptureDualHarvestProof {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CaptureSupplyCrateProof {
+    pub faction: CaptureProofFaction,
+    pub map_id: &'static str,
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub collector_id: &'static str,
+    pub collector_selected: bool,
+    pub move_ordered: bool,
+    pub crate_consumed: bool,
+    pub ore_before: i32,
+    pub ore_after: i32,
+    pub crystal_before: i32,
+    pub crystal_after: i32,
+}
+
+impl CaptureSupplyCrateProof {
+    pub fn succeeded(&self) -> bool {
+        self.collector_selected
+            && self.move_ordered
+            && self.crate_consumed
+            && self.ore_after > self.ore_before
+            && self.crystal_after > self.crystal_before
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CaptureTechOilProof {
+    pub faction: CaptureProofFaction,
+    pub map_id: &'static str,
+    pub phase: CaptureMatchPhase,
+    pub frames: usize,
+    pub radar_constructed: bool,
+    pub robotics_constructed: bool,
+    pub engineer_produced: bool,
+    pub engineer_selected: bool,
+    pub capture_ordered: bool,
+    pub captured: bool,
+    pub engineer_consumed: bool,
+    pub ore_before: i32,
+    pub ore_after: i32,
+    pub capture_bonus_ore: i32,
+}
+
+impl CaptureTechOilProof {
+    pub fn succeeded(&self) -> bool {
+        self.radar_constructed
+            && self.robotics_constructed
+            && self.engineer_produced
+            && self.engineer_selected
+            && self.capture_ordered
+            && self.captured
+            && self.engineer_consumed
+            && self.ore_after >= self.ore_before + self.capture_bonus_ore
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct CaptureAiPressureProof {
     pub faction: CaptureProofFaction,
@@ -4537,6 +4594,43 @@ pub fn run_real_menu_dual_harvest_proof_for_faction(
         std::time::Duration::from_secs_f32(1.0),
     ));
     run_real_menu_dual_harvest_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_supply_crate_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureSupplyCrateProof {
+    let mut app = build_real_menu_match_app(
+        RealMenuMatchStart::new(faction)
+            .with_map_index(1)
+            .with_ai_difficulty(AiDifficulty::Beginner),
+    );
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(0.25),
+    ));
+    run_real_menu_supply_crate_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_tech_oil_proof_for_faction(
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureTechOilProof {
+    let mut app = build_real_menu_match_app(
+        RealMenuMatchStart::new(faction)
+            .with_map_index(1)
+            .with_ai_difficulty(AiDifficulty::Beginner),
+    );
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0),
+    ));
+    run_real_menu_tech_oil_proof(&mut app, faction, max_frames)
+}
+
+pub fn run_real_menu_tech_oil_proofs(max_frames: usize) -> Vec<CaptureTechOilProof> {
+    CaptureProofFaction::ALL
+        .into_iter()
+        .map(|faction| run_real_menu_tech_oil_proof_for_faction(faction, max_frames))
+        .collect()
 }
 
 pub fn run_real_menu_ai_pressure_proof_for_faction(
@@ -5055,6 +5149,235 @@ fn capture_dual_harvest_proof_status(
         crystal_after: player_stats.crystal,
         ore_harvest_ordered,
         crystal_harvest_ordered,
+    }
+}
+
+fn run_real_menu_supply_crate_proof(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureSupplyCrateProof {
+    let max_frames = max_frames.max(1);
+    let team = faction.team();
+    let mut frames = 0usize;
+    let resources_before = capture_team_resources(app.world(), team);
+    let mut collector_id = "";
+    let mut collector_selected = false;
+    let mut move_ordered = false;
+    let mut crate_consumed = false;
+
+    let Some((collector, collector_position, id)) =
+        capture_first_alive_supply_crate_collector(app.world_mut(), team)
+    else {
+        return capture_supply_crate_proof_status(
+            app,
+            faction,
+            frames,
+            collector_id,
+            collector_selected,
+            move_ordered,
+            crate_consumed,
+            resources_before,
+        );
+    };
+    collector_id = id;
+
+    let Some((crate_entity, crate_position)) = capture_nearest_supply_crate(
+        app.world_mut(),
+        SupplyCrateEffect::Resources,
+        collector_position,
+    ) else {
+        return capture_supply_crate_proof_status(
+            app,
+            faction,
+            frames,
+            collector_id,
+            collector_selected,
+            move_ordered,
+            crate_consumed,
+            resources_before,
+        );
+    };
+    if let Ok(mut entity) = app.world_mut().get_entity_mut(crate_entity) {
+        entity.insert((VisibilityState { visible: true }, Visibility::Visible));
+    }
+
+    collector_selected = capture_world_left_click(app, collector_position)
+        && app
+            .world()
+            .get_entity(collector)
+            .is_ok_and(|entity| entity.get::<Selected>().is_some());
+    let crate_ground = Vec3::new(crate_position.x, 0.0, crate_position.z);
+    if collector_selected && capture_world_right_click(app, crate_ground) {
+        move_ordered = app
+            .world()
+            .get::<MoveOrder>(collector)
+            .is_some_and(|order| xz_distance(order.target, crate_position) < 0.08);
+    }
+
+    while frames < max_frames {
+        frames += 1;
+        app.update();
+        if app.world().get_entity(crate_entity).is_err() {
+            crate_consumed = true;
+            break;
+        }
+        if app.world().resource::<MatchState>().phase != MatchPhase::Running {
+            break;
+        }
+    }
+
+    capture_supply_crate_proof_status(
+        app,
+        faction,
+        frames,
+        collector_id,
+        collector_selected,
+        move_ordered,
+        crate_consumed,
+        resources_before,
+    )
+}
+
+fn capture_supply_crate_proof_status(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    frames: usize,
+    collector_id: &'static str,
+    collector_selected: bool,
+    move_ordered: bool,
+    crate_consumed: bool,
+    resources_before: (i32, i32),
+) -> CaptureSupplyCrateProof {
+    let snapshot = capture_match_snapshot(app);
+    let player_stats = capture_stats_for_faction(&snapshot, faction);
+    CaptureSupplyCrateProof {
+        faction,
+        map_id: capture_selected_map_id(app),
+        phase: snapshot.phase,
+        frames,
+        collector_id,
+        collector_selected,
+        move_ordered,
+        crate_consumed,
+        ore_before: resources_before.0,
+        ore_after: player_stats.ore,
+        crystal_before: resources_before.1,
+        crystal_after: player_stats.crystal,
+    }
+}
+
+fn run_real_menu_tech_oil_proof(
+    app: &mut App,
+    faction: CaptureProofFaction,
+    max_frames: usize,
+) -> CaptureTechOilProof {
+    let max_frames = max_frames.max(1);
+    let team = faction.team();
+    let mut frames = 0usize;
+    let mut robotics_constructed = false;
+    let mut engineer_produced = false;
+    let mut engineer_selected = false;
+    let mut capture_ordered = false;
+    let mut captured = false;
+    let mut engineer_consumed = false;
+    let mut ore_before = capture_team_ore(app.world(), team);
+    let capture_bonus_ore =
+        registry::entity("TechOilDerrick").map_or(0, |def| def.capture_bonus_ore);
+
+    let radar_constructed = capture_ensure_constructed_structure_from_worker(
+        app,
+        team,
+        "RadarUplink",
+        max_frames,
+        &mut frames,
+    )
+    .constructed;
+    if frames < max_frames {
+        robotics_constructed = capture_ensure_constructed_structure_from_worker(
+            app,
+            team,
+            "RoboticsBay",
+            max_frames,
+            &mut frames,
+        )
+        .constructed;
+    }
+
+    let mut engineer_entity = None;
+    if radar_constructed && robotics_constructed && frames < max_frames {
+        engineer_entity = capture_train_unit_from_producer(
+            app,
+            team,
+            "CommandCenter",
+            "EngineerDrone",
+            max_frames,
+            &mut frames,
+        );
+        engineer_produced = engineer_entity.is_some();
+    }
+
+    if let Some(engineer) = engineer_entity {
+        let engineer_position =
+            capture_entity_position(app.world(), engineer).unwrap_or(Vec3::ZERO);
+        if let Some((oil, oil_position, _)) = capture_nearest_structure_by_id_and_team(
+            app.world_mut(),
+            Team::Neutral,
+            "TechOilDerrick",
+            engineer_position,
+            Some(true),
+        ) {
+            ore_before = capture_team_ore(app.world(), team);
+            if let Ok(mut entity) = app.world_mut().get_entity_mut(engineer) {
+                entity.insert((VisibilityState { visible: true }, Visibility::Visible));
+            }
+            engineer_selected = capture_world_left_click_projected(app, engineer_position)
+                && app
+                    .world()
+                    .get_entity(engineer)
+                    .is_ok_and(|entity| entity.get::<Selected>().is_some());
+            if let Ok(mut entity) = app.world_mut().get_entity_mut(oil) {
+                entity.insert((VisibilityState { visible: true }, Visibility::Visible));
+            }
+            if engineer_selected
+                && capture_world_right_click(app, Vec3::new(oil_position.x, 0.0, oil_position.z))
+            {
+                capture_ordered = app
+                    .world()
+                    .get::<CaptureOrder>(engineer)
+                    .is_some_and(|order| order.target == oil);
+            }
+
+            while frames < max_frames {
+                frames += 1;
+                app.update();
+                if capture_entity_team(app.world(), oil) == Some(team) {
+                    captured = true;
+                    break;
+                }
+                if app.world().resource::<MatchState>().phase != MatchPhase::Running {
+                    break;
+                }
+            }
+            engineer_consumed = app.world().get_entity(engineer).is_err();
+        }
+    }
+
+    CaptureTechOilProof {
+        faction,
+        map_id: capture_selected_map_id(app),
+        phase: capture_match_phase(app.world()),
+        frames,
+        radar_constructed,
+        robotics_constructed,
+        engineer_produced,
+        engineer_selected,
+        capture_ordered,
+        captured,
+        engineer_consumed,
+        ore_before,
+        ore_after: capture_team_ore(app.world(), team),
+        capture_bonus_ore,
     }
 }
 
@@ -5653,6 +5976,14 @@ struct CaptureBarracksBuildResult {
     produced_units: u32,
 }
 
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+struct CaptureStructureBuildOnlyResult {
+    placement_started: bool,
+    placed: bool,
+    construct_ordered: bool,
+    constructed: bool,
+}
+
 fn run_real_menu_playable_proof(
     app: &mut App,
     faction: CaptureProofFaction,
@@ -6060,6 +6391,82 @@ fn capture_order_nearest_resource_harvest(app: &mut App, team: Team, kind: Resou
             .is_some_and(|order| order.resource == Some(resource))
 }
 
+fn capture_ensure_constructed_structure_from_worker(
+    app: &mut App,
+    team: Team,
+    structure_id: &'static str,
+    max_frames: usize,
+    frames: &mut usize,
+) -> CaptureStructureBuildOnlyResult {
+    let mut result = CaptureStructureBuildOnlyResult::default();
+    if capture_constructed_producer(app.world_mut(), team, structure_id).is_some() {
+        result.constructed = true;
+        return result;
+    }
+
+    if capture_ensure_builder_worker(app, team, max_frames, frames).is_none() {
+        return result;
+    }
+    if capture_select_first_alive_unit_by_id(app, team, "Worker").is_some() {
+        app.update();
+    }
+    if let Some(button) = capture_enabled_command_for_action(app, BuildAction::Build(structure_id))
+    {
+        capture_click_command_button(app, button);
+        result.placement_started = app
+            .world()
+            .resource::<CommandMode>()
+            .pending_structure_placement
+            .is_some_and(|pending| pending.id == structure_id);
+    }
+
+    let mut placed_structure = None;
+    if result.placement_started
+        && let Some(placement) =
+            capture_valid_structure_placement_point_near_team_base(app, team, structure_id)
+        && capture_world_left_click(app, placement)
+    {
+        placed_structure = capture_structure_by_id_near(
+            app.world_mut(),
+            team,
+            structure_id,
+            placement,
+            Some(false),
+        );
+        result.placed = placed_structure.is_some()
+            && app
+                .world()
+                .resource::<CommandMode>()
+                .pending_structure_placement
+                .is_none();
+    }
+
+    if let Some((structure, structure_position, _)) = placed_structure {
+        if let Ok(mut entity) = app.world_mut().get_entity_mut(structure) {
+            entity.insert((VisibilityState { visible: true }, Visibility::Visible));
+        }
+        if let Some((worker, _)) = capture_select_first_alive_unit_by_id(app, team, "Worker")
+            && capture_world_right_click(app, structure_position)
+        {
+            result.construct_ordered = app
+                .world()
+                .get::<ConstructOrder>(worker)
+                .is_some_and(|order| order.target == structure);
+        }
+
+        while *frames < max_frames {
+            *frames += 1;
+            app.update();
+            result.constructed = capture_structure_constructed(app.world(), structure);
+            if result.constructed {
+                break;
+            }
+        }
+    }
+
+    result
+}
+
 fn capture_build_barracks_and_train_unit_from_mouse(
     app: &mut App,
     team: Team,
@@ -6317,6 +6724,28 @@ fn capture_first_alive_unit_by_id(
         })
 }
 
+fn capture_first_alive_supply_crate_collector(
+    world: &mut World,
+    team: Team,
+) -> Option<(Entity, Vec3, &'static str)> {
+    let mut units = world.query::<(Entity, &Team, &Unit, &MovementDomain, &Transform, &Health)>();
+    units
+        .iter(world)
+        .filter_map(|(entity, unit_team, unit, domain, transform, health)| {
+            (*unit_team == team
+                && health.current > 0.0
+                && unit.speed > 0.0
+                && *domain == MovementDomain::Terrain)
+                .then_some((entity, transform.translation, unit.id))
+        })
+        .min_by_key(|(_, _, id)| match *id {
+            "ScoutRover" => 0,
+            "FlameAssaultBuggy" => 1,
+            "Worker" => 2,
+            _ => 3,
+        })
+}
+
 fn capture_alive_units_by_id(
     world: &mut World,
     team: Team,
@@ -6406,6 +6835,24 @@ fn capture_nearest_visible_resource(
         })
 }
 
+fn capture_nearest_supply_crate(
+    world: &mut World,
+    effect: SupplyCrateEffect,
+    origin: Vec3,
+) -> Option<(Entity, Vec3)> {
+    let mut crates = world.query::<(Entity, &SupplyCrate, &Transform)>();
+    crates
+        .iter(world)
+        .filter_map(|(entity, supply_crate, transform)| {
+            (supply_crate.effect == effect).then_some((entity, transform.translation))
+        })
+        .min_by(|(_, lhs), (_, rhs)| {
+            xz_distance(*lhs, origin)
+                .partial_cmp(&xz_distance(*rhs, origin))
+                .unwrap_or(std::cmp::Ordering::Equal)
+        })
+}
+
 fn capture_resource_amount(world: &World, entity: Entity) -> i32 {
     world
         .get::<ResourceNode>(entity)
@@ -6416,6 +6863,19 @@ fn capture_entity_position(world: &World, entity: Entity) -> Option<Vec3> {
     world
         .get::<Transform>(entity)
         .map(|transform| transform.translation)
+}
+
+fn capture_entity_team(world: &World, entity: Entity) -> Option<Team> {
+    world.get::<Team>(entity).copied()
+}
+
+fn capture_match_phase(world: &World) -> CaptureMatchPhase {
+    match world.resource::<MatchState>().phase {
+        MatchPhase::Running => CaptureMatchPhase::Running,
+        MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
+        MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
+        MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
+    }
 }
 
 fn capture_team_ore(world: &World, team: Team) -> i32 {
@@ -6451,6 +6911,41 @@ fn capture_first_affordable_train_command(
         .into_iter()
         .next()
         .map(|(_, entity, product_id)| (entity, product_id))
+}
+
+fn capture_train_unit_from_producer(
+    app: &mut App,
+    team: Team,
+    producer_id: &'static str,
+    product_id: &'static str,
+    max_frames: usize,
+    frames: &mut usize,
+) -> Option<Entity> {
+    let (producer, _, producer_position) =
+        capture_constructed_producer(app.world_mut(), team, producer_id)?;
+    if !capture_world_left_click(app, producer_position)
+        || !app
+            .world()
+            .get_entity(producer)
+            .is_ok_and(|entity| entity.get::<Selected>().is_some())
+    {
+        return None;
+    }
+    app.update();
+    let button = capture_enabled_command_for_action(app, BuildAction::Train(product_id))?;
+    let units_before = capture_alive_units_by_id(app.world_mut(), team, product_id);
+    capture_click_command_button(app, button);
+    while *frames < max_frames {
+        *frames += 1;
+        app.update();
+        if let Some((entity, _)) = capture_alive_units_by_id(app.world_mut(), team, product_id)
+            .into_iter()
+            .find(|(entity, _)| !units_before.iter().any(|(before, _)| before == entity))
+        {
+            return Some(entity);
+        }
+    }
+    None
 }
 
 fn capture_enabled_command_for_action(app: &mut App, target: BuildAction) -> Option<Entity> {
@@ -6590,6 +7085,38 @@ fn capture_structure_by_id_near(
     )
 }
 
+fn capture_nearest_structure_by_id_and_team(
+    world: &mut World,
+    team: Team,
+    id: &'static str,
+    origin: Vec3,
+    constructed: Option<bool>,
+) -> Option<(Entity, Vec3, bool)> {
+    let mut structures = world.query::<(
+        Entity,
+        &Structure,
+        &Team,
+        &Transform,
+        Option<&UnderConstruction>,
+    )>();
+    structures
+        .iter(world)
+        .filter_map(
+            |(entity, structure, structure_team, transform, under_construction)| {
+                let is_constructed = structure_is_constructed(under_construction);
+                (structure.id == id
+                    && *structure_team == team
+                    && constructed.is_none_or(|expected| expected == is_constructed))
+                .then_some((entity, transform.translation, is_constructed))
+            },
+        )
+        .min_by(|(_, lhs, _), (_, rhs, _)| {
+            xz_distance(*lhs, origin)
+                .partial_cmp(&xz_distance(*rhs, origin))
+                .unwrap_or(std::cmp::Ordering::Equal)
+        })
+}
+
 fn capture_structure_constructed(world: &World, entity: Entity) -> bool {
     world.get_entity(entity).is_ok_and(|entity_ref| {
         entity_ref
@@ -6621,6 +7148,10 @@ fn capture_world_left_click(app: &mut App, position: Vec3) -> bool {
     capture_world_mouse_click(app, position, MouseButton::Left)
 }
 
+fn capture_world_left_click_projected(app: &mut App, position: Vec3) -> bool {
+    capture_world_mouse_click_projected(app, position, MouseButton::Left)
+}
+
 fn capture_world_left_click_additive(app: &mut App, position: Vec3) -> bool {
     capture_world_mouse_click_with_shift(app, position, MouseButton::Left, true)
 }
@@ -6631,6 +7162,54 @@ fn capture_world_right_click(app: &mut App, position: Vec3) -> bool {
 
 fn capture_world_mouse_click(app: &mut App, position: Vec3, button: MouseButton) -> bool {
     capture_world_mouse_click_with_shift(app, position, button, false)
+}
+
+fn capture_world_mouse_click_projected(app: &mut App, position: Vec3, button: MouseButton) -> bool {
+    if !capture_attach_window_to_main_camera(app, position) {
+        return false;
+    }
+    let Some(cursor) = capture_screen_position_for_world(app, position) else {
+        return false;
+    };
+    if !capture_set_cursor(app, cursor) {
+        return false;
+    }
+    let cursor_blocked = {
+        let world = app.world_mut();
+        let mut window_q = world.query_filtered::<&Window, With<PrimaryWindow>>();
+        let Ok(window) = window_q.single(world) else {
+            return false;
+        };
+        match button {
+            MouseButton::Left => cursor_is_over_hud(window),
+            MouseButton::Right => cursor_blocks_world_order_controls(window, cursor),
+            _ => false,
+        }
+    };
+    if cursor_blocked {
+        return false;
+    }
+    {
+        let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
+        keyboard.release(KeyCode::ShiftLeft);
+        keyboard.release(KeyCode::ShiftRight);
+        keyboard.clear();
+    }
+    {
+        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+        mouse.press(button);
+    }
+    app.update();
+    {
+        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
+        mouse.clear();
+        mouse.release(button);
+    }
+    app.update();
+    app.world_mut()
+        .resource_mut::<ButtonInput<MouseButton>>()
+        .clear();
+    true
 }
 
 fn capture_world_mouse_click_with_shift(
@@ -33912,6 +34491,39 @@ mod tests {
             assert!(
                 proof.crystal_after > proof.crystal_before,
                 "dual harvest proof should increase crystal through a real harvest order; proof={proof:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn real_menu_supply_crate_proof_collects_four_corners_crate() {
+        let proof = run_real_menu_supply_crate_proof_for_faction(CaptureProofFaction::Human, 900);
+
+        assert!(
+            proof.succeeded(),
+            "real menu supply crate proof should pick FourCorners, select a moving unit, right-click a resource crate, consume it, and award resources; proof={proof:?}",
+        );
+        assert_eq!(proof.map_id, SKIRMISH_MAPS[1].id);
+        assert!(
+            !proof.collector_id.is_empty(),
+            "supply crate proof should report the collector unit type; proof={proof:?}"
+        );
+    }
+
+    #[test]
+    fn real_menu_tech_oil_proof_unlocks_engineer_and_captures_oil() {
+        for faction in CaptureProofFaction::ALL {
+            let proof = run_real_menu_tech_oil_proof_for_faction(faction, 1800);
+
+            assert!(
+                proof.succeeded(),
+                "real menu tech oil proof should pick FourCorners, satisfy EngineerDrone tech, train it, right-click neutral TechOilDerrick, capture it, and consume the engineer for {:?}; proof={proof:?}",
+                faction
+            );
+            assert_eq!(proof.map_id, SKIRMISH_MAPS[1].id);
+            assert!(
+                proof.ore_after >= proof.ore_before + proof.capture_bonus_ore,
+                "tech oil capture should grant its capture bonus; proof={proof:?}"
             );
         }
     }

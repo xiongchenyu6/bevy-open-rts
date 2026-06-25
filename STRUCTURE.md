@@ -25,6 +25,9 @@
   - `real-match-proof`: direct production/order proof from a menu-started match.
   - `real-harvest-proof`: mouse select collector, right-click ore, harvest, then train.
   - `real-dual-harvest-proof`: low-resource menu start, mouse-order both Ore and Crystal gathering, and require both player resource totals to increase.
+  - `real-supply-crate-proof`: real menu FourCorners Human start, mouse-select a movable unit, right-click a visible resource supply crate, consume it, and require Ore/Crystal rewards.
+  - `real-tech-oil-proof`: real menu FourCorners start, satisfy EngineerDrone tech, train EngineerDrone, right-click a neutral TechOilDerrick, capture it, consume the engineer, and require the capture bonus.
+  - `real-tech-oil-all-factions-proof`: batch CLI wrapper over the FourCorners tech-oil capture proof for every playable faction.
   - `real-ai-pressure-proof`: menu-started Hard AI match that requires AI production growth, AI attack orders, and real damage to the selected player's army/base.
   - `real-ai-pressure-all-factions-proof`: batch CLI wrapper over the Hard AI pressure proof for every playable faction.
   - `real-ai-vs-ai-proof`: real menu AI-vs-AI spectator mode selection that requires both AI sides to grow armies, at least one side to issue attack orders, and live combat damage in the shared match scene while reporting `mode=ai_vs_ai`.
@@ -40,7 +43,7 @@
   - `real-economy-victory-proof`: low-resource menu start, mouse harvest required resources, train combat vehicles, right-click enemy anchors, and win without proof-side resource injection.
   - `real-playable-proof`: low-resource menu start, mouse harvest both Ore and Crystal, build Barracks, train a Barracks unit, train combat vehicles, right-click enemy anchors, and win.
   - `real-three-faction-playable-proof`: low-resource real menu start, select three-faction skirmish mode, use the same playable proof flow with a larger attack group, and finish all enemy anchors.
-  - `real-playability-suite-proof`: top-level CLI regression gate that runs the real menu dual-harvest, playable, three-faction, all-map, Allied 2v1, AI pressure, and AI-vs-AI proof surfaces across all playable factions.
+  - `real-playability-suite-proof`: top-level CLI regression gate that runs the real menu dual-harvest, supply-crate, tech-oil, playable, three-faction, all-map, Allied 2v1, AI pressure, and AI-vs-AI proof surfaces across all playable factions.
 
 ## Verification
 

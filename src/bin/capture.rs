@@ -8,9 +8,10 @@ use std::{
 use bevy_open_rts::{
     CaptureAiPressureProof, CaptureAiVsAiProof, CaptureDualHarvestProof, CaptureEntityKind,
     CaptureMatchPhase, CaptureMatchSnapshot, CapturePlayableProof, CaptureProofFaction,
-    CaptureTeam, CaptureVictoryProof, advance_capture_match, advance_capture_match_proof_frame,
-    build_capture_match_app, build_capture_match_app_for_faction, capture_match_proof_status,
-    capture_match_snapshot, capture_proof_unit_count, run_capture_match_proof_for_faction,
+    CaptureSupplyCrateProof, CaptureTeam, CaptureTechOilProof, CaptureVictoryProof,
+    advance_capture_match, advance_capture_match_proof_frame, build_capture_match_app,
+    build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
+    capture_proof_unit_count, run_capture_match_proof_for_faction,
     run_real_default_menu_victory_proof, run_real_menu_ai_pressure_proof_for_faction,
     run_real_menu_ai_pressure_proofs, run_real_menu_ai_vs_ai_proof_for_faction,
     run_real_menu_ai_vs_ai_proofs, run_real_menu_all_maps_victory_proofs,
@@ -19,7 +20,8 @@ use bevy_open_rts::{
     run_real_menu_economy_victory_proof_for_faction, run_real_menu_harvest_proof_for_faction,
     run_real_menu_match_proof_for_faction, run_real_menu_playable_proof_for_faction,
     run_real_menu_selected_faction_victory_proof_for_faction,
-    run_real_menu_selected_map_victory_proof,
+    run_real_menu_selected_map_victory_proof, run_real_menu_supply_crate_proof_for_faction,
+    run_real_menu_tech_oil_proof_for_faction, run_real_menu_tech_oil_proofs,
     run_real_menu_three_faction_playable_proof_for_faction,
     run_real_menu_victory_proof_for_faction,
 };
@@ -245,6 +247,60 @@ fn run() -> Result<(), String> {
             if !proof.succeeded() {
                 return Err(format!(
                     "real menu dual harvest proof did not mine both Ore and Crystal within {max_frames} frames"
+                ));
+            }
+        }
+        Some("real-supply-crate-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("900")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let faction = parse_optional_faction(args.next())?;
+            let proof = run_real_menu_supply_crate_proof_for_faction(faction, max_frames);
+            print_supply_crate_proof("real-supply-crate-proof", &proof);
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real menu supply crate proof did not collect a FourCorners resource crate within {max_frames} frames"
+                ));
+            }
+        }
+        Some("real-tech-oil-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("1800")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let faction = parse_optional_faction(args.next())?;
+            let proof = run_real_menu_tech_oil_proof_for_faction(faction, max_frames);
+            print_tech_oil_proof("real-tech-oil-proof", &proof);
+            if !proof.succeeded() {
+                return Err(format!(
+                    "real menu tech oil proof did not unlock EngineerDrone and capture TechOilDerrick within {max_frames} frames"
+                ));
+            }
+        }
+        Some("real-tech-oil-all-factions-proof") => {
+            let max_frames = args
+                .next()
+                .as_deref()
+                .unwrap_or("1800")
+                .parse::<usize>()
+                .map_err(|error| format!("invalid max frame count: {error}"))?;
+            let proofs = run_real_menu_tech_oil_proofs(max_frames);
+            let mut failures = Vec::new();
+            for proof in &proofs {
+                print_tech_oil_proof("real-tech-oil-all-factions-proof", proof);
+                if !proof.succeeded() {
+                    failures.push(proof.faction.key());
+                }
+            }
+            if !failures.is_empty() {
+                return Err(format!(
+                    "real menu tech oil all-factions proof failed for {}",
+                    failures.join(", ")
                 ));
             }
         }
@@ -555,6 +611,8 @@ fn run() -> Result<(), String> {
 
 fn run_real_playability_suite() -> Result<(), String> {
     const DUAL_HARVEST_FRAMES: usize = 1800;
+    const SUPPLY_CRATE_FRAMES: usize = 900;
+    const TECH_OIL_FRAMES: usize = 1800;
     const PLAYABLE_FRAMES: usize = 4200;
     const THREE_FACTION_FRAMES: usize = 7200;
     const ALL_MAPS_FRAMES: usize = 7200;
@@ -571,6 +629,28 @@ fn run_real_playability_suite() -> Result<(), String> {
         checks += 1;
         if !proof.succeeded() {
             failures.push(format!("dual-harvest:{}", faction.key()));
+        }
+    }
+
+    let supply_crate_proof = run_real_menu_supply_crate_proof_for_faction(
+        CaptureProofFaction::Human,
+        SUPPLY_CRATE_FRAMES,
+    );
+    print_supply_crate_proof(
+        "real-playability-suite-proof:supply-crate",
+        &supply_crate_proof,
+    );
+    checks += 1;
+    if !supply_crate_proof.succeeded() {
+        failures.push(format!("supply-crate:{}", supply_crate_proof.faction.key()));
+    }
+
+    let tech_oil_proofs = run_real_menu_tech_oil_proofs(TECH_OIL_FRAMES);
+    for proof in &tech_oil_proofs {
+        print_tech_oil_proof("real-playability-suite-proof:tech-oil", proof);
+        checks += 1;
+        if !proof.succeeded() {
+            failures.push(format!("tech-oil:{}", proof.faction.key()));
         }
     }
 
@@ -655,6 +735,48 @@ fn print_dual_harvest_proof(command: &str, proof: &CaptureDualHarvestProof) {
         proof.crystal_after,
         proof.ore_harvest_ordered,
         proof.crystal_harvest_ordered,
+    );
+}
+
+fn print_supply_crate_proof(command: &str, proof: &CaptureSupplyCrateProof) {
+    println!(
+        "[capture] {} faction={} label={} map={} phase={:?} frames={} collector={} selected={} move_ordered={} consumed={} ore={}->{} crystal={}->{}",
+        command,
+        proof.faction.key(),
+        proof.faction.label(),
+        proof.map_id,
+        proof.phase,
+        proof.frames,
+        proof.collector_id,
+        proof.collector_selected,
+        proof.move_ordered,
+        proof.crate_consumed,
+        proof.ore_before,
+        proof.ore_after,
+        proof.crystal_before,
+        proof.crystal_after,
+    );
+}
+
+fn print_tech_oil_proof(command: &str, proof: &CaptureTechOilProof) {
+    println!(
+        "[capture] {} faction={} label={} map={} phase={:?} frames={} radar={} robotics={} engineer={} selected={} capture_ordered={} captured={} engineer_consumed={} ore={}->{} bonus={}",
+        command,
+        proof.faction.key(),
+        proof.faction.label(),
+        proof.map_id,
+        proof.phase,
+        proof.frames,
+        proof.radar_constructed,
+        proof.robotics_constructed,
+        proof.engineer_produced,
+        proof.engineer_selected,
+        proof.capture_ordered,
+        proof.captured,
+        proof.engineer_consumed,
+        proof.ore_before,
+        proof.ore_after,
+        proof.capture_bonus_ore,
     );
 }
 
@@ -771,6 +893,9 @@ fn print_help() {
     println!("  cargo run --bin capture -- real-match-proof 7200 human");
     println!("  cargo run --bin capture -- real-harvest-proof 900 human");
     println!("  cargo run --bin capture -- real-dual-harvest-proof 1800 human");
+    println!("  cargo run --bin capture -- real-supply-crate-proof 900 human");
+    println!("  cargo run --bin capture -- real-tech-oil-proof 1800 human");
+    println!("  cargo run --bin capture -- real-tech-oil-all-factions-proof 1800");
     println!("  cargo run --bin capture -- real-ai-pressure-proof 1200 human");
     println!("  cargo run --bin capture -- real-ai-pressure-all-factions-proof 1200");
     println!("  cargo run --bin capture -- real-ai-vs-ai-proof 2400 human");
