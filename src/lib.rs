@@ -30006,4 +30006,18 @@ mod current_tests {
         assert!(xz_distance(first_extra, second_extra) > 1.0);
         assert!(xz_distance(first_extra, team_start_position_for_spawn_slot(map, 0)) > 1.0);
     }
+
+    #[test]
+    fn real_menu_workers_can_right_click_resources_to_harvest() {
+        let proof = run_real_menu_dual_harvest_proof_for_faction(CaptureProofFaction::Human, 2400);
+
+        assert!(proof.succeeded(), "{proof:?}");
+    }
+
+    #[test]
+    fn real_menu_core_loop_can_build_attack_and_win() {
+        let proof = run_real_menu_playable_proof_for_faction(CaptureProofFaction::Human, 4200);
+
+        assert!(proof.succeeded(), "{proof:?}");
+    }
 }
