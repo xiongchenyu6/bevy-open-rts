@@ -4131,13 +4131,7 @@ pub fn build_capture_app(width: u32, height: u32) -> App {
                 meta_check: AssetMetaCheck::Never,
                 ..default()
             })
-            .set(bevy::log::LogPlugin {
-                filter: format!(
-                    "warn,bevy_ecs::world::command_queue=error,icu_provider=error,icu_segmenter=error,parley=error,{}=info",
-                    env!("CARGO_PKG_NAME").replace('-', "_")
-                ),
-                ..default()
-            })
+            .disable::<bevy::log::LogPlugin>()
             .disable::<bevy::winit::WinitPlugin>(),
     )
     .add_plugins(bevy::app::ScheduleRunnerPlugin::run_loop(
@@ -4374,34 +4368,36 @@ pub fn capture_selected_player_unit_ids(app: &mut App) -> Vec<&'static str> {
         .collect()
 }
 
-/// Returns (a movable armed player unit's world pos, nearest enemy base pos).
-pub fn capture_select_move_demo_points(app: &mut App) -> Option<(Vec3, Vec3)> {
+/// Average world position of the currently selected player units.
+pub fn capture_selected_player_unit_average_position(app: &mut App) -> Option<Vec3> {
     let player = Team::Player(0);
     let world = app.world_mut();
-    let mut player_unit = None;
-    {
-        let mut q = world.query_filtered::<(&Unit, &Team, &Transform), ()>();
-        for (unit, team, transform) in q.iter(world) {
-            let armed = registry::entity(unit.id)
-                .map(|d| d.weapon.is_some())
-                .unwrap_or(false);
-            if *team == player && armed {
-                player_unit = Some(transform.translation);
-                break;
-            }
+    let mut q = world.query_filtered::<(&Team, &Transform), (With<Unit>, With<Selected>)>();
+    let mut sum = Vec3::ZERO;
+    let mut count = 0usize;
+    for (team, transform) in q.iter(world) {
+        if *team != player {
+            continue;
         }
+        sum += transform.translation;
+        count += 1;
     }
+    (count > 0).then_some(sum / count as f32)
+}
+
+/// Nearest enemy structure position for capture/demo movement targets.
+pub fn capture_enemy_structure_position(app: &mut App) -> Option<Vec3> {
+    let player = Team::Player(0);
+    let world = app.world_mut();
     let mut enemy = None;
-    {
-        let mut q = world.query_filtered::<(&Team, &Transform), With<Structure>>();
-        for (team, transform) in q.iter(world) {
-            if *team != player && *team != Team::Neutral {
-                enemy = Some(transform.translation);
-                break;
-            }
+    let mut q = world.query_filtered::<(&Team, &Transform), With<Structure>>();
+    for (team, transform) in q.iter(world) {
+        if *team != player && *team != Team::Neutral {
+            enemy = Some(transform.translation);
+            break;
         }
     }
-    Some((player_unit?, enemy?))
+    enemy
 }
 
 /// Emits a real keyboard message (the same data winit produces) so command
@@ -4430,7 +4426,7 @@ pub fn capture_key(app: &mut App, key: KeyCode, pressed: bool) {
         });
 }
 
-/// World position of a player production structure (Barracks/factory), if any.
+/// World position of a player production structure, if any.
 pub fn capture_player_producer_position(app: &mut App) -> Option<Vec3> {
     let player = Team::Player(0);
     let world = app.world_mut();
@@ -4439,7 +4435,7 @@ pub fn capture_player_producer_position(app: &mut App) -> Option<Vec3> {
         if *team == player
             && matches!(
                 structure.id,
-                "Barracks" | "VehicleFactory" | "AircraftFactory"
+                "CommandCenter" | "Barracks" | "VehicleFactory" | "AircraftFactory"
             )
         {
             return Some(transform.translation);

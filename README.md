@@ -53,10 +53,11 @@ cargo run --bin capture -- factions screenshots/factions
 ```
 
 `capture play` drives the real input systems through select, move, train, and
-build actions. `capture harvest` selects an actual Worker, right-clicks a
-visible resource node, and exits non-zero if no `HarvestOrder` is issued.
-`capture factions` renders every faction's starting base and checks that each
-faction can reach human train/build input through the command panel.
+build actions, and exits non-zero if any step fails. `capture harvest` selects an
+actual Worker, right-clicks a visible resource node, and exits non-zero if no
+`HarvestOrder` is issued. `capture factions` renders every faction's starting
+base and exits non-zero unless each faction can reach human train/build input
+through the command panel.
 
 ## Regenerate Migration Data
 

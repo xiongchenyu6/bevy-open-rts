@@ -22,7 +22,9 @@ saboteur/crates/garrison/support/difficulty).
 - **Worker-only economy**: removed the separate `OreHarvester` playable entity,
   its icon manifest entry, VehicleFactory production access, AI production demand,
   and runtime classification paths. Workers now carry resources and are the only
-  trained collector unit; refineries spawn a free Worker on completion.
+  trained collector unit; refineries spawn a free Worker on completion. Worker
+  visuals/icons now use infantry/engineer art instead of the old rover/miner
+  silhouette.
 - **Shared allied vision** (was MISSING): `update_visibility` now treats any
   `are_allied(visible_team, team)` unit/structure as a fog revealer, and allied
   entities are always visible. Test `allied_vision_is_shared_through_allies`.
@@ -76,12 +78,18 @@ Root cause: Bevy 0.19 `DefaultUiCamera::get()` only falls back to a camera whose
 `RenderTarget` is the primary window; `retarget_capture_camera` had switched the
 capture camera to `RenderTarget::Image`, so no camera qualified and the UI was
 dropped. Fix: insert `bevy::ui::IsDefaultUiCamera` on the retargeted camera. Now
-`capture screenshot/harvest/menu` render the full HUD (command-bar icons,
-selection portrait, resource bar, briefing, minimap) and the setup menu/lobby.
-Also fixed `render_harvest` selecting an offscreen worker via new helper
-`capture_player_onscreen_unit_position`.
+`capture screenshot/harvest/menu/play/factions` render the full HUD
+(command-bar icons, selection portrait, resource bar, briefing, minimap) and the
+setup menu/lobby. `capture harvest` selects a click-safe Worker and exits
+non-zero unless a `HarvestOrder` is issued. `capture play` now hard-checks
+select, movement delta, train queue insertion, and Worker building placement.
+`capture factions` exits non-zero unless all three factions can train and build
+through the human command panel. Capture apps disable `LogPlugin` so multi-app
+capture runs no longer emit duplicate global-logger errors.
 
 ## Verification notes
-- 17/17 lib tests pass; `cargo build --bin capture` clean.
-- Command icons + portrait + lobby dropdowns are now confirmed in capture output
-  (no longer need `cargo run` eyeballing for UI).
+- 20/20 `cargo test current_tests` pass; `cargo build --bins` clean.
+- Command icons + portrait + lobby dropdowns are confirmed in capture output
+  (no longer need `cargo run` eyeballing for UI in this headless environment).
+- `capture play`, `capture harvest`, and `capture factions` are hard
+  self-checking smoke tests for the human input loop.

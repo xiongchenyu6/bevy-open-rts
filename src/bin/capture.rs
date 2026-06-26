@@ -23,16 +23,16 @@ use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 
 use bevy_open_rts::{
     CaptureTarget, build_capture_app, capture_build_options_count,
-    capture_first_enabled_build_hotkey, capture_first_enabled_train_hotkey,
-    capture_focus_camera_on, capture_grant_player_resources, capture_key, capture_mouse_button,
-    capture_nearest_visible_resource_click_position_to, capture_placement_is_valid,
-    capture_player_attack_move_all, capture_player_build_queue_len,
+    capture_enemy_structure_position, capture_first_enabled_build_hotkey,
+    capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_grant_player_resources,
+    capture_key, capture_mouse_button, capture_nearest_visible_resource_click_position_to,
+    capture_placement_is_valid, capture_player_attack_move_all, capture_player_build_queue_len,
     capture_player_harvesting_count, capture_player_in_placement_mode,
-    capture_player_onscreen_worker_position, capture_player_producer_position,
-    capture_player_structure_count, capture_player_worker_position,
-    capture_select_move_demo_points, capture_selected_player_unit_count,
-    capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
-    capture_world_to_screen, start_shared_match_scene_with_current_setup,
+    capture_player_onscreen_unit_position, capture_player_onscreen_worker_position,
+    capture_player_producer_position, capture_player_structure_count,
+    capture_player_worker_position, capture_selected_player_unit_average_position,
+    capture_selected_player_unit_count, capture_selected_player_unit_ids, capture_set_all_factions,
+    capture_set_cursor, capture_world_to_screen, start_shared_match_scene_with_current_setup,
 };
 
 const WIDTH: u32 = 1280;
@@ -160,7 +160,14 @@ fn faction_try_train(app: &mut App) -> bool {
 /// Selects a worker, enters placement via the build hotkey, and places a
 /// structure via real input; returns true if a structure was built.
 fn faction_try_build(app: &mut App) -> bool {
-    let Some(worker_pos) = capture_player_worker_position(app) else {
+    let Some(worker_anchor) = capture_player_worker_position(app) else {
+        return false;
+    };
+    capture_focus_camera_on(app, worker_anchor);
+    for _ in 0..12 {
+        app.update();
+    }
+    let Some(worker_pos) = capture_player_onscreen_worker_position(app) else {
         return false;
     };
     let Some(screen) = capture_world_to_screen(app, worker_pos) else {
@@ -340,6 +347,11 @@ fn render_factions(dir: &Path) -> Result<(), String> {
         println!(
             "[capture] faction {index} ({label}): base ok, human train={trained}, build={built}"
         );
+        if !trained || !built {
+            return Err(format!(
+                "faction {index} ({label}) input smoke failed: train={trained}, build={built}"
+            ));
+        }
     }
     println!("[capture] wrote faction bases to {}", dir.display());
     Ok(())
@@ -353,8 +365,15 @@ fn render_play(dir: &Path) -> Result<(), String> {
     let mut app = start_match_app();
     let handle = capture_handle(&app);
 
-    let (unit_pos, enemy_pos) = capture_select_move_demo_points(&mut app)
-        .ok_or("no armed player unit / enemy base found")?;
+    let unit_anchor = capture_player_onscreen_unit_position(&mut app)
+        .or_else(|| capture_player_worker_position(&mut app))
+        .ok_or("no player unit found for select/move demo")?;
+    capture_focus_camera_on(&mut app, unit_anchor);
+    for _ in 0..12 {
+        app.update();
+    }
+    let unit_pos = capture_player_onscreen_unit_position(&mut app)
+        .ok_or("no click-safe player unit found for select/move demo")?;
     shoot(&mut app, &handle, dir.join("00_start.png"));
 
     // SELECT: left-click on the unit's screen position via real input.
@@ -372,9 +391,20 @@ fn render_play(dir: &Path) -> Result<(), String> {
     let selected = capture_selected_player_unit_count(&mut app);
     println!("[capture] after left-click select: {selected} player unit(s) selected");
     shoot(&mut app, &handle, dir.join("01_selected.png"));
+    if selected == 0 {
+        return Err("left-click select did not select a player unit".into());
+    }
 
     // MOVE: right-click a ground point partway toward the enemy.
-    let move_target = unit_pos.lerp(enemy_pos, 0.4);
+    let direction = capture_enemy_structure_position(&mut app)
+        .map(|enemy| Vec3::new(enemy.x - unit_pos.x, 0.0, enemy.z - unit_pos.z))
+        .and_then(|direction| direction.try_normalize())
+        .unwrap_or(Vec3::X);
+    let move_target = unit_pos + direction * 3.5;
+    capture_focus_camera_on(&mut app, unit_pos.lerp(move_target, 0.5));
+    for _ in 0..4 {
+        app.update();
+    }
     if let Some(move_screen) = capture_world_to_screen(&mut app, move_target) {
         capture_set_cursor(&mut app, move_screen);
         capture_mouse_button(&mut app, MouseButton::Right, true);
@@ -385,10 +415,23 @@ fn render_play(dir: &Path) -> Result<(), String> {
     for _ in 0..90 {
         app.update();
     }
+    let moved = capture_selected_player_unit_average_position(&mut app)
+        .map(|after| {
+            let distance = after.distance(unit_pos);
+            println!("[capture] move delta: {distance:.2}m");
+            distance
+        })
+        .unwrap_or(0.0);
     shoot(&mut app, &handle, dir.join("02_moved.png"));
+    if moved < 0.35 {
+        return Err(format!(
+            "right-click move did not move selected unit ({moved:.2}m)"
+        ));
+    }
 
     // TRAIN: select a production structure, then press the train hotkey via real
     // keyboard input and confirm the command reaches the build queue.
+    let mut trained = false;
     if let Some(producer_pos) = capture_player_producer_position(&mut app)
         && let Some(producer_screen) = capture_world_to_screen(&mut app, producer_pos)
     {
@@ -414,16 +457,27 @@ fn render_play(dir: &Path) -> Result<(), String> {
                 println!(
                     "[capture] train hotkey {key:?}: player build queue {queue_before} -> {queue_after}"
                 );
+                trained = queue_after > queue_before;
             }
             None => println!("[capture] no enabled train hotkey on the command panel"),
         }
     }
     shoot(&mut app, &handle, dir.join("03_trained.png"));
+    if !trained {
+        return Err("train hotkey did not add a player build-queue job".into());
+    }
 
     // BUILD: top up resources so a structure is affordable, then select a
     // worker, enter placement via the build hotkey, and left-click a ground spot.
     capture_grant_player_resources(&mut app, 1000, 500);
-    if let Some(worker_pos) = capture_player_worker_position(&mut app)
+    let mut built = false;
+    if let Some(worker_anchor) = capture_player_worker_position(&mut app) {
+        capture_focus_camera_on(&mut app, worker_anchor);
+        for _ in 0..12 {
+            app.update();
+        }
+    }
+    if let Some(worker_pos) = capture_player_onscreen_worker_position(&mut app)
         && let Some(worker_screen) = capture_world_to_screen(&mut app, worker_pos)
     {
         capture_set_cursor(&mut app, worker_screen);
@@ -487,11 +541,15 @@ fn render_play(dir: &Path) -> Result<(), String> {
                 println!(
                     "[capture] build: player structures {structures_before} -> {structures_after}"
                 );
+                built = structures_after > structures_before;
             }
             None => println!("[capture] no enabled build hotkey on the command panel"),
         }
     }
     shoot(&mut app, &handle, dir.join("04_built.png"));
+    if !built {
+        return Err("build hotkey did not place a player structure".into());
+    }
 
     println!(
         "[capture] wrote select/move/train/build playthrough to {}",
