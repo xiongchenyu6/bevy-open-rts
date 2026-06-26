@@ -10696,7 +10696,7 @@
       "mine_spacing": 0.0,
       "mine_trigger_radius": 0.0,
       "model_assets": [
-        "models/kenney-spacekit/rover.glb"
+        "models/kenney-spacekit/astronautA.glb"
       ],
       "name_key": null,
       "power_delta": 0,
@@ -10704,7 +10704,7 @@
       "radius": 0.6,
       "render_parts": [
         {
-          "model": "models/kenney-spacekit/rover.glb",
+          "model": "models/kenney-spacekit/astronautA.glb",
           "rotation": [
             0.0,
             0.0,
@@ -10712,14 +10712,14 @@
             1.0
           ],
           "scale": [
-            2.0,
-            2.0,
-            2.0
+            0.72,
+            0.72,
+            0.72
           ],
           "translation": [
-            -4.0,
-            -0.02,
-            -3.0
+            0.0,
+            0.0,
+            0.0
           ]
         }
       ],

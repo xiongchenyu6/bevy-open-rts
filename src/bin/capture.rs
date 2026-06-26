@@ -10,6 +10,10 @@
 //! Usage:
 //!   capture screenshot [path]            single still (default screenshots/capture/still.png)
 //!   capture frames <dir> [count]         numbered frameXXXXX.png sequence (default 450)
+//!   capture play <dir>                   real input smoke: select/move/train/build
+//!   capture harvest <dir>                real input smoke: Worker right-clicks ore
+//!   capture menu [path]                  lobby/setup screenshot
+//!   capture factions <dir>               faction base/build smoke screenshots
 
 use std::env;
 use std::path::{Path, PathBuf};
@@ -20,14 +24,15 @@ use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 use bevy_open_rts::{
     CaptureTarget, build_capture_app, capture_build_options_count,
     capture_first_enabled_build_hotkey, capture_first_enabled_train_hotkey,
-    capture_grant_player_resources, capture_key, capture_mouse_button,
-    capture_nearest_visible_resource_position, capture_placement_is_valid,
+    capture_focus_camera_on, capture_grant_player_resources, capture_key, capture_mouse_button,
+    capture_nearest_visible_resource_click_position_to, capture_placement_is_valid,
     capture_player_attack_move_all, capture_player_build_queue_len,
     capture_player_harvesting_count, capture_player_in_placement_mode,
-    capture_player_onscreen_unit_position, capture_player_producer_position,
+    capture_player_onscreen_worker_position, capture_player_producer_position,
     capture_player_structure_count, capture_player_worker_position,
-    capture_select_move_demo_points, capture_selected_player_unit_count, capture_set_all_factions,
-    capture_set_cursor, capture_world_to_screen, start_shared_match_scene_with_current_setup,
+    capture_select_move_demo_points, capture_selected_player_unit_count,
+    capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
+    capture_world_to_screen, start_shared_match_scene_with_current_setup,
 };
 
 const WIDTH: u32 = 1280;
@@ -232,13 +237,26 @@ fn render_harvest(dir: &Path) -> Result<(), String> {
     let handle = capture_handle(&app);
     shoot(&mut app, &handle, dir.join("00_start.png"));
 
-    // Pick a worker that is actually framed on-screen (the first worker by spawn
-    // order can be below the viewport, so a click there would select nothing).
-    let worker = capture_player_onscreen_unit_position(&mut app)
-        .or_else(|| capture_player_worker_position(&mut app))
-        .ok_or("no player worker")?;
-    let ore =
-        capture_nearest_visible_resource_position(&mut app).ok_or("no visible resource node")?;
+    // Pick a real Worker, then center the camera on it so the synthetic click
+    // lands in the world instead of on HUD/briefing chrome.
+    let worker_anchor = capture_player_worker_position(&mut app).ok_or("no player Worker")?;
+    capture_focus_camera_on(&mut app, worker_anchor);
+    for _ in 0..12 {
+        app.update();
+    }
+    let worker = capture_player_onscreen_worker_position(&mut app)
+        .ok_or("no click-safe on-screen player Worker")?;
+    let ore = capture_nearest_visible_resource_click_position_to(&mut app, worker)
+        .ok_or("no visible resource node near Worker")?;
+    let camera_focus = Vec3::new((worker.x + ore.x) * 0.5, 0.0, (worker.z + ore.z) * 0.5);
+    capture_focus_camera_on(&mut app, camera_focus);
+    for _ in 0..12 {
+        app.update();
+    }
+    let worker = capture_player_onscreen_worker_position(&mut app)
+        .ok_or("player Worker moved out of click-safe area after camera focus")?;
+    let ore = capture_nearest_visible_resource_click_position_to(&mut app, worker)
+        .ok_or("resource moved out of click-safe area after camera focus")?;
 
     // Select the worker.
     let worker_screen = capture_world_to_screen(&mut app, worker).ok_or("worker offscreen")?;
@@ -250,10 +268,19 @@ fn render_harvest(dir: &Path) -> Result<(), String> {
     for _ in 0..3 {
         app.update();
     }
+    let selected_ids = capture_selected_player_unit_ids(&mut app);
     println!(
-        "[capture] selected {} player unit(s)",
-        capture_selected_player_unit_count(&mut app)
+        "[capture] selected {} player unit(s): {}",
+        selected_ids.len(),
+        selected_ids.join(", ")
     );
+    if !selected_ids.iter().any(|id| *id == "Worker") {
+        shoot(&mut app, &handle, dir.join("01_selection_failed.png"));
+        return Err(format!(
+            "manual harvest selected {:?}, expected Worker",
+            selected_ids
+        ));
+    }
 
     // Right-click the ore node to harvest.
     let ore_screen = capture_world_to_screen(&mut app, ore).ok_or("ore offscreen")?;
@@ -268,6 +295,9 @@ fn render_harvest(dir: &Path) -> Result<(), String> {
     let harvesting = capture_player_harvesting_count(&mut app);
     println!("[capture] after right-click ore: {harvesting} player unit(s) harvesting");
     shoot(&mut app, &handle, dir.join("01_harvest_order.png"));
+    if harvesting == 0 {
+        return Err("Worker right-clicked ore but no HarvestOrder was issued".into());
+    }
 
     // Let it gather and deposit; watch ore grow.
     for _ in 0..600 {

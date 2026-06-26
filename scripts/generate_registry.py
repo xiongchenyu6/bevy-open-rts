@@ -156,6 +156,20 @@ REMOVED_PRODUCTION_PRODUCTS = {
 
 REMOVED_ENTITY_IDS = {"OreHarvester"}
 
+ENTITY_RENDER_OVERRIDES = {
+    "Worker": {
+        "model_assets": ["models/kenney-spacekit/astronautA.glb"],
+        "render_parts": [
+            {
+                "model": "models/kenney-spacekit/astronautA.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [0.72, 0.72, 0.72],
+            }
+        ],
+    }
+}
+
 
 def read_balanced(text: str, start: int) -> tuple[str, int]:
     pairs = {"{": "}", "[": "]", "(": ")"}
@@ -816,6 +830,8 @@ def build_registry() -> dict[str, object]:
             "speed": 0.0 if role == "structure" else 4.0,
             "domain": "terrain",
         }
+        if entity_id in ENTITY_RENDER_OVERRIDES:
+            scene_data = {**scene_data, **ENTITY_RENDER_OVERRIDES[entity_id]}
         props = dict(default_properties.get(scene_path, {}))
         script_file = scene_file.with_suffix(".gd")
         if script_file.exists():
@@ -1281,10 +1297,15 @@ def write_rust(registry: dict[str, object]) -> None:
 def write_reports(registry: dict[str, object]) -> None:
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSON.write_text(json.dumps(registry, indent=2, sort_keys=True) + "\n")
+    removed_asset_paths = {
+        f"ui/icons/{entity_id}.png" for entity_id in REMOVED_ENTITY_IDS
+    }
     source_assets = sorted(
         str(path.relative_to(GODOT_ROOT / "assets"))
         for path in (GODOT_ROOT / "assets").rglob("*")
-        if path.is_file() and path.suffix != ".import"
+        if path.is_file()
+        and path.suffix != ".import"
+        and str(path.relative_to(GODOT_ROOT / "assets")) not in removed_asset_paths
     )
     asset_categories: dict[str, int] = {}
     for asset in source_assets:

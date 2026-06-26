@@ -4261,6 +4261,15 @@ pub fn capture_world_to_screen(app: &mut App, world_pos: Vec3) -> Option<Vec2> {
     camera.world_to_viewport(transform, world_pos).ok()
 }
 
+/// Moves the RTS camera focus for deterministic capture input. This uses the
+/// same camera resource as the real match; the normal camera system applies it
+/// on the next update.
+pub fn capture_focus_camera_on(app: &mut App, focus: Vec3) {
+    let bounds = *app.world().resource::<MapBounds>();
+    let mut camera = app.world_mut().resource_mut::<RtsCamera>();
+    set_camera_focus_safely(&mut camera, focus, bounds);
+}
+
 /// World position of a player unit that is currently on-screen (projects inside
 /// the viewport, clear of the top/bottom HUD margins) so a synthetic click
 /// actually lands on it. Prefers workers. Returns `None` if none are framed.
@@ -4307,6 +4316,46 @@ pub fn capture_player_onscreen_unit_position(app: &mut App) -> Option<Vec3> {
     fallback
 }
 
+/// World position of a player Worker that is currently in a click-safe area.
+pub fn capture_player_onscreen_worker_position(app: &mut App) -> Option<Vec3> {
+    let player = Team::Player(0);
+    let (width, height) = {
+        let world = app.world_mut();
+        let mut windows = world.query_filtered::<&Window, With<PrimaryWindow>>();
+        let window = windows.iter(world).next()?;
+        (window.width(), window.height())
+    };
+    let world = app.world_mut();
+    let (camera, cam_transform) = {
+        let mut cameras = world.query_filtered::<(&Camera, &GlobalTransform), With<MainCamera>>();
+        let (camera, transform) = cameras.iter(world).next()?;
+        (camera.clone(), *transform)
+    };
+    let screen_center = Vec2::new(width * 0.5, height * 0.5);
+    let mut best: Option<(f32, Vec3)> = None;
+    let mut candidates = world.query_filtered::<(&Unit, &Team, &Transform), ()>();
+    for (unit, team, transform) in candidates.iter(world) {
+        if *team != player || !registry::entity(unit.id).is_some_and(|d| d.is_worker) {
+            continue;
+        }
+        let Ok(screen) = camera.world_to_viewport(&cam_transform, transform.translation) else {
+            continue;
+        };
+        let on_screen = screen.x >= 8.0
+            && screen.x <= width - 8.0
+            && screen.y >= 80.0
+            && screen.y <= height - 152.0;
+        if !on_screen {
+            continue;
+        }
+        let score = screen.distance_squared(screen_center);
+        if best.is_none_or(|(best_score, _)| score < best_score) {
+            best = Some((score, transform.translation));
+        }
+    }
+    best.map(|(_, pos)| pos)
+}
+
 /// Number of currently-selected player units (programmatic check for selection).
 pub fn capture_selected_player_unit_count(app: &mut App) -> usize {
     let world = app.world_mut();
@@ -4314,6 +4363,15 @@ pub fn capture_selected_player_unit_count(app: &mut App) -> usize {
     q.iter(world)
         .filter(|team| **team == Team::Player(0))
         .count()
+}
+
+/// IDs of currently-selected player units, for capture diagnostics.
+pub fn capture_selected_player_unit_ids(app: &mut App) -> Vec<&'static str> {
+    let world = app.world_mut();
+    let mut q = world.query_filtered::<(&Unit, &Team), With<Selected>>();
+    q.iter(world)
+        .filter_map(|(unit, team)| (*team == Team::Player(0)).then_some(unit.id))
+        .collect()
 }
 
 /// Returns (a movable armed player unit's world pos, nearest enemy base pos).
@@ -4529,6 +4587,31 @@ pub fn capture_nearest_visible_resource_position(app: &mut App) -> Option<Vec3> 
         let d = xz_distance(anchor, tf.translation);
         if best.is_none_or(|(bd, _)| d < bd) {
             best = Some((d, tf.translation));
+        }
+    }
+    best.map(|(_, pos)| pos)
+}
+
+/// Click position on the nearest visible resource model to `anchor`.
+///
+/// The returned point is above the resource ground anchor, matching the visible
+/// model body. Projecting/clicking the ground anchor can miss on an angled RTS
+/// camera because the crystal/ore body appears above that point on screen.
+pub fn capture_nearest_visible_resource_click_position_to(
+    app: &mut App,
+    anchor: Vec3,
+) -> Option<Vec3> {
+    let world = app.world_mut();
+    let mut q = world.query::<(&Transform, &VisibilityState, &ResourceNode)>();
+    let mut best: Option<(f32, Vec3)> = None;
+    for (tf, vis, node) in q.iter(world) {
+        if !vis.visible || node.amount <= 0 {
+            continue;
+        }
+        let d = xz_distance(anchor, tf.translation);
+        let click_pos = tf.translation + Vec3::Y * resource_visual_height(node.kind) * 0.55;
+        if best.is_none_or(|(bd, _)| d < bd) {
+            best = Some((d, click_pos));
         }
     }
     best.map(|(_, pos)| pos)

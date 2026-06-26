@@ -2,7 +2,7 @@
 
 - Entities: 74 (49 units, 25 structures)
 - Factions: 3
-- Mirrored Godot asset files: 528
+- Mirrored Godot asset files: 527
 - Referenced GLB models: 61
 - Matched command icons: 71
 - Procedural-only Godot render scenes: 2

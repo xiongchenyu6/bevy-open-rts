@@ -2222,12 +2222,12 @@ const PARTS_WEATHERCONTROLSPIRE: &[RenderPart] = &[
         scale: [0.3772, 0.3772, 0.3772],
     },
 ];
-const MODELS_WORKER: &[&str] = &["models/kenney-spacekit/rover.glb"];
+const MODELS_WORKER: &[&str] = &["models/kenney-spacekit/astronautA.glb"];
 const PARTS_WORKER: &[RenderPart] = &[RenderPart {
-    model: "models/kenney-spacekit/rover.glb",
-    translation: [-4.0, -0.02, -3.0],
+    model: "models/kenney-spacekit/astronautA.glb",
+    translation: [0.0, 0.0, 0.0],
     rotation: [0.0, 0.0, 0.0, 1.0],
-    scale: [2.0, 2.0, 2.0],
+    scale: [0.72, 0.72, 0.72],
 }];
 
 pub const ENTITY_DEFS: &[EntityDef] = &[

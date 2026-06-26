@@ -1,5 +1,5 @@
 {
-  "asset_count": 528,
+  "asset_count": 527,
   "assets": [
     "fonts/wqy-microhei-ui.ttf",
     "logos/LOGO_LICENSES.md",
@@ -536,7 +536,7 @@
     "music": 1,
     "sfx": 19,
     "translations": 8,
-    "ui": 322,
+    "ui": 321,
     "vfx": 6,
     "voice": 14
   },
