@@ -28528,7 +28528,8 @@ fn update_hud(
                 unit_count[idx] += 1;
             }
         }
-        let unit_status = dynamic_unit_status_text(&unit_count, active_teams.as_deref());
+        let unit_status =
+            dynamic_unit_status_text(&unit_count, visible_team, active_teams.as_deref());
         let mode_text = if let Some(pending) = command_mode.pending_structure_placement {
             let label = registry::entity(pending.id).map_or(pending.id, |def| def.label);
             let feedback = placement_feedback
@@ -28553,17 +28554,10 @@ fn update_hud(
         } else {
             String::new()
         };
-        let mut support_status = " 支援CD:".to_string();
-        for power in SupportPowerKind::ALL {
-            let remaining = support_cooldowns.remaining_for(visible_team, power);
-            if remaining > 0.0 {
-                support_status.push_str(&format!(" {} {remaining:.0}", power.label()));
-            } else {
-                support_status.push_str(&format!(" {} 就绪", power.label()));
-            }
-        }
+        let support_status =
+            support_hud_status_text(visible_team, &support_cooldowns, command_mode.support_power);
         **text = format!(
-            "{}  Ore {}  Crystal {}  {}{}{}    Units {}    {}",
+            "{}  Ore {}  Crystal {}  {}{}{}  {}  {}",
             visible_team.label(),
             visible_economy.ore,
             visible_economy.crystal,
@@ -28577,11 +28571,14 @@ fn update_hud(
                 active_teams.as_deref(),
             ),
         );
-        text.push_str(&ai_low_power_status_text(
+        let low_power_ai = ai_low_power_status_text(
             controlled_player_team(Some(&*visible_player)),
             &economies,
             active_teams.as_deref(),
-        ));
+        );
+        if !low_power_ai.is_empty() {
+            text.push_str(&format!("  {low_power_ai}"));
+        }
     }
 
     if let Ok(mut text) = selection_text.single_mut() {
@@ -28758,30 +28755,46 @@ fn exact_control_group_slot(
 fn power_status_text(economy: &TeamEconomy) -> String {
     let base = format!("电力 {}/{}", economy.power_capacity, economy.power_used);
     if economy.low_power() {
-        format!("{base} 低电力: 生产减速/防御停火/雷达离线")
+        format!("{base} 低电")
     } else {
         base
     }
 }
 
-fn dynamic_unit_status_text(unit_count: &[usize], active_teams: Option<&ActiveTeams>) -> String {
+fn dynamic_unit_status_text(
+    unit_count: &[usize],
+    visible_team: Team,
+    active_teams: Option<&ActiveTeams>,
+) -> String {
     let slot_count = active_teams.map_or(unit_count.len(), |active| {
         active.0.len().max(unit_count.len())
     });
-    let mut parts = Vec::new();
-    for index in 0..slot_count {
+    let mut own = 0usize;
+    let mut other_players = 0usize;
+    let mut neutral_or_unknown = 0usize;
+    for team in player_teams(slot_count) {
+        let Some(index) = team.economy_index() else {
+            continue;
+        };
         let count = unit_count.get(index).copied().unwrap_or(0);
         let active = active_teams
             .and_then(|active| active.0.get(index).copied())
             .unwrap_or(false);
-        if active || count > 0 {
-            parts.push(format!("P{}:{}", index + 1, count));
+        if !active && count == 0 {
+            continue;
+        }
+        if team == visible_team {
+            own += count;
+        } else if active {
+            other_players += count;
+        } else {
+            neutral_or_unknown += count;
         }
     }
-    if parts.is_empty() {
-        "0".to_string()
+    if neutral_or_unknown > 0 {
+        format!("Units 我:{own} 其他:{other_players} 中:{neutral_or_unknown}")
     } else {
-        parts.join(" ")
+        format!("Units 我:{own} 其他:{other_players}")
     }
 }
 
@@ -28797,15 +28810,29 @@ fn ai_hud_status_text(
     ai_settings: &AiDifficultySettings,
     active_teams: Option<&ActiveTeams>,
 ) -> String {
-    let mut text = String::from("AI");
+    let mut counts = BTreeMap::<&'static str, usize>::new();
     for team in active_ai_teams(controlled_team, active_teams) {
-        text.push_str(&format!(
-            " {}:{}",
-            team_hud_short_label(team),
-            ai_settings.difficulty(team).label()
-        ));
+        *counts
+            .entry(ai_settings.difficulty(team).label())
+            .or_insert(0) += 1;
     }
-    text
+    if counts.is_empty() {
+        return "AI 无".to_string();
+    }
+    format!(
+        "AI {}",
+        counts
+            .iter()
+            .map(|(difficulty, count)| {
+                if *count == 1 {
+                    (*difficulty).to_string()
+                } else {
+                    format!("{difficulty}x{count}")
+                }
+            })
+            .collect::<Vec<_>>()
+            .join("/")
+    )
 }
 
 fn ai_low_power_status_text(
@@ -28813,13 +28840,48 @@ fn ai_low_power_status_text(
     economies: &Economies,
     active_teams: Option<&ActiveTeams>,
 ) -> String {
-    let mut text = String::new();
+    let mut low_power_teams = Vec::new();
     for team in active_ai_teams(controlled_team, active_teams) {
         if economies.get(team).low_power() {
-            text.push_str(&format!("    {} LOW", team_hud_short_label(team)));
+            low_power_teams.push(team_hud_short_label(team));
         }
     }
-    text
+    if low_power_teams.is_empty() {
+        String::new()
+    } else {
+        format!("AI低电 {}", low_power_teams.join("/"))
+    }
+}
+
+fn support_hud_status_text(
+    team: Team,
+    support_cooldowns: &SupportCooldowns,
+    active_power: Option<SupportPowerKind>,
+) -> String {
+    if let Some(power) = active_power {
+        return format!(" 支援:{}", power.label());
+    }
+    let cooling = SupportPowerKind::ALL
+        .into_iter()
+        .filter_map(|power| {
+            let remaining = support_cooldowns.remaining_for(team, power);
+            (remaining > 0.0).then_some((power.label(), remaining.ceil() as u32))
+        })
+        .collect::<Vec<_>>();
+    if cooling.is_empty() {
+        return String::new();
+    }
+    let preview = cooling
+        .iter()
+        .take(2)
+        .map(|(label, remaining)| format!("{label} {remaining}s"))
+        .collect::<Vec<_>>()
+        .join("/");
+    if cooling.len() > 2 {
+        format!(" 支援CD:{preview}+{}", cooling.len() - 2)
+    } else {
+        format!(" 支援CD:{preview}")
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -29076,12 +29138,22 @@ fn draw_world_overlays(
         structure,
     ) in &selected
     {
-        draw_ring(
-            &mut gizmos,
-            transform.translation,
-            selectable.radius + 0.18,
-            Color::srgb(0.62, 0.95, 0.64),
-        );
+        let selected_color = Color::srgb(0.62, 0.95, 0.64);
+        if structure.is_some() && unit.is_none() {
+            draw_structure_selection_brackets(
+                &mut gizmos,
+                transform.translation,
+                selectable.radius,
+                selected_color,
+            );
+        } else {
+            draw_ring(
+                &mut gizmos,
+                transform.translation,
+                selectable.radius + 0.18,
+                selected_color,
+            );
+        }
         if should_draw_air_to_terrain_marker(*movement_domain) {
             draw_air_to_terrain_marker(
                 &mut gizmos,
@@ -29241,6 +29313,36 @@ fn draw_world_overlays(
 
 fn should_draw_team_marker_for_entity(unit: Option<&Unit>, structure: Option<&Structure>) -> bool {
     unit.is_some() && structure.is_none()
+}
+
+fn draw_structure_selection_brackets(
+    gizmos: &mut Gizmos,
+    position: Vec3,
+    radius: f32,
+    color: Color,
+) {
+    let center = terrain_overlay_point(position);
+    let half_extent = (radius + 0.22).max(0.7);
+    let bracket = (half_extent * 0.28).clamp(0.28, 0.82);
+    for (sx, sz) in [(1.0, 1.0), (1.0, -1.0), (-1.0, 1.0), (-1.0, -1.0)] {
+        let corner = Vec3::new(
+            center.x + sx * half_extent,
+            center.y,
+            center.z + sz * half_extent,
+        );
+        let x_leg = Vec3::new(
+            center.x + sx * (half_extent - bracket),
+            center.y,
+            center.z + sz * half_extent,
+        );
+        let z_leg = Vec3::new(
+            center.x + sx * half_extent,
+            center.y,
+            center.z + sz * (half_extent - bracket),
+        );
+        gizmos.line(corner, x_leg, color);
+        gizmos.line(corner, z_leg, color);
+    }
 }
 
 fn draw_structure_placement_preview(
