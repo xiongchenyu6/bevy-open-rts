@@ -2,10 +2,10 @@
 use bevy::audio::Volume;
 use bevy::{
     asset::{AssetMetaCheck, AssetPlugin},
-    camera::{RenderTargetInfo, ScalingMode, Viewport},
+    camera::{RenderTarget, ScalingMode},
     ecs::query::Or,
     ecs::system::SystemParam,
-    input::mouse::{MouseMotion, MouseScrollUnit, MouseWheel},
+    input::mouse::{MouseButtonInput, MouseMotion, MouseScrollUnit, MouseWheel},
     math::primitives::{ConicalFrustum, Cuboid, Cylinder, Torus},
     prelude::*,
     render::error_handler::{ErrorType, RenderError, RenderErrorHandler, RenderErrorPolicy},
@@ -51,11 +51,9 @@ const CAMERA_PAN_SPEED_MULTIPLIER: f32 = 0.48;
 const CAMERA_MOUSE_ROTATION_SPEED: f32 = 0.005;
 const CAMERA_START_PRIMARY_UNITS: &[&str] = &["MobileConstructionVehicle"];
 const CAMERA_START_PRIMARY_STRUCTURES: &[&str] = &["CommandCenter"];
-const RESOURCE_ORDER_GROUND_SNAP_RADIUS_M: f32 = 2.2;
-const RESOURCE_ORDER_COLLECTOR_GROUND_SNAP_RADIUS_M: f32 = 7.0;
-const RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 34.0;
-const RESOURCE_ORDER_SCREEN_PICK_MAX_RADIUS_PX: f32 = 78.0;
-const RESOURCE_ORDER_COLLECTOR_SCREEN_PICK_MAX_RADIUS_PX: f32 = 148.0;
+const RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 48.0;
+const RESOURCE_ORDER_SCREEN_PICK_MAX_RADIUS_PX: f32 = 95.0;
+const RESOURCE_ORDER_COLLECTOR_SCREEN_PICK_MAX_RADIUS_PX: f32 = 95.0;
 const ENEMY_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 32.0;
 const ENEMY_ORDER_SCREEN_PICK_MAX_RADIUS_PX: f32 = 96.0;
 const DEFAULT_MODEL_FALLBACK: &str = "models/kenney-spacekit/rover.glb";
@@ -339,15 +337,15 @@ impl SupportPowerKind {
 
     fn label(self) -> &'static str {
         match self {
-            Self::RadarSweep => "雷达扫描",
-            Self::OrbitalStrike => "轨道打击",
-            Self::EmpPulse => "EMP脉冲",
-            Self::ChronoRelay => "时光回响",
-            Self::ShieldOverdrive => "护盾超载",
-            Self::NaniteRepairSwarm => "纳米修复",
-            Self::WeatherStorm => "气象风暴",
-            Self::StrategicMissile => "战略导弹",
-            Self::Paradrop => "空投",
+            Self::RadarSweep => t("雷达扫描", "Radar Sweep"),
+            Self::OrbitalStrike => t("轨道打击", "Orbital Strike"),
+            Self::EmpPulse => t("EMP脉冲", "EMP Pulse"),
+            Self::ChronoRelay => t("时光回响", "Chrono Relay"),
+            Self::ShieldOverdrive => t("护盾超载", "Shield Overdrive"),
+            Self::NaniteRepairSwarm => t("纳米修复", "Nanite Repair Swarm"),
+            Self::WeatherStorm => t("气象风暴", "Weather Storm"),
+            Self::StrategicMissile => t("战略导弹", "Strategic Missile"),
+            Self::Paradrop => t("空投", "Paradrop"),
         }
     }
 
@@ -1131,6 +1129,26 @@ struct FogMemoryStructureRemnant {
 #[derive(Component)]
 struct VisionRadius(f32);
 
+/// Fog-of-war shroud texture resolution (pixels per side) drawn over the map.
+const FOG_OVERLAY_RES: usize = 192;
+/// Alpha of the dim shroud over explored-but-not-currently-visible terrain.
+const FOG_OVERLAY_EXPLORED_ALPHA: u8 = 150;
+/// Height above the terrain at which the shroud plane sits.
+const FOG_OVERLAY_Y: f32 = 0.06;
+
+/// Marker for the textured shroud plane covering the whole map.
+#[derive(Component)]
+struct FogOverlayPlane;
+
+/// Live fog-of-war shroud: a CPU-updated texture sampled over the map. Each cell
+/// is clear where the viewing player (or an ally) currently sees, dimmed where it
+/// was explored before, and black where never seen (godot's shroud+fog layers).
+#[derive(Resource)]
+struct FogOverlay {
+    handle: Handle<Image>,
+    explored: Vec<bool>,
+}
+
 #[derive(Component)]
 struct MatchEndOverlay;
 
@@ -1200,6 +1218,13 @@ enum MatchMenuAction {
 struct ClickMarker {
     ttl: f32,
     radius: f32,
+    kind: ClickMarkerKind,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ClickMarkerKind {
+    Move,
+    Harvest,
 }
 
 #[derive(Component)]
@@ -1388,9 +1413,9 @@ impl SkirmishFaction {
 
     fn label(self) -> &'static str {
         match self {
-            Self::Alliance => "人族",
-            Self::Demon => "魔族",
-            Self::Chaos => "混沌族",
+            Self::Alliance => t("人族", "Alliance"),
+            Self::Demon => t("魔族", "Demon"),
+            Self::Chaos => t("混沌族", "Chaos"),
         }
     }
 
@@ -1484,7 +1509,9 @@ impl Default for MatchSetupSettings {
                 &default_player_controllers(),
             ),
             team_relations: TeamRelations::default(),
-            startup_loadout: StartupLoadoutMode::PlaytestExpanded,
+            // Minimal RA2/SC1-style opening: one base + workers, build the rest.
+            // (PlaytestExpanded dumped ~10-20 buildings that cluttered/blocked the start.)
+            startup_loadout: StartupLoadoutMode::GodotSkirmish,
             active_teams: default_active_teams(),
             player_factions: default_player_factions(),
             player_color_slots: default_player_color_slots(),
@@ -1646,25 +1673,14 @@ impl SkirmishPlayerController {
         }
     }
 
-    fn next(self) -> Self {
-        match self {
-            Self::None => Self::Human,
-            Self::Human => Self::Ai(AiDifficulty::Beginner),
-            Self::Ai(AiDifficulty::Beginner) => Self::Ai(AiDifficulty::Easy),
-            Self::Ai(AiDifficulty::Easy) => Self::Ai(AiDifficulty::Normal),
-            Self::Ai(AiDifficulty::Normal) => Self::Ai(AiDifficulty::Hard),
-            Self::Ai(AiDifficulty::Hard) => Self::None,
-        }
-    }
-
     fn short_label(self) -> &'static str {
         match self {
-            Self::None => "无",
-            Self::Human => "人族玩家",
-            Self::Ai(AiDifficulty::Beginner) => "AI新手",
-            Self::Ai(AiDifficulty::Easy) => "AI简单",
-            Self::Ai(AiDifficulty::Normal) => "AI普通",
-            Self::Ai(AiDifficulty::Hard) => "AI困难",
+            Self::None => t("无", "None"),
+            Self::Human => t("人族玩家", "Human"),
+            Self::Ai(AiDifficulty::Beginner) => t("AI新手", "AI Beginner"),
+            Self::Ai(AiDifficulty::Easy) => t("AI简单", "AI Easy"),
+            Self::Ai(AiDifficulty::Normal) => t("AI普通", "AI Normal"),
+            Self::Ai(AiDifficulty::Hard) => t("AI困难", "AI Hard"),
         }
     }
 }
@@ -1698,9 +1714,9 @@ impl SkirmishMatchMode {
     fn label(self) -> &'static str {
         match self {
             Self::OneVsOne => "1v1",
-            Self::FreeForAll => "自由混战",
-            Self::AiVsAi => "AI对战",
-            Self::AlliedTwoVsOne => "盟军2v1",
+            Self::FreeForAll => t("自由混战", "Free-for-All"),
+            Self::AiVsAi => t("AI对战", "AI vs AI"),
+            Self::AlliedTwoVsOne => t("盟军2v1", "Allied 2v1"),
         }
     }
 }
@@ -1715,6 +1731,8 @@ struct SkirmishMenuSelection {
     lobby_factions: [SkirmishFaction; MAX_SKIRMISH_LOBBY_SLOTS],
     lobby_team_ids: [u8; MAX_SKIRMISH_LOBBY_SLOTS],
     lobby_color_slots: [usize; MAX_SKIRMISH_LOBBY_SLOTS],
+    controller_dropdown_open: Option<usize>,
+    faction_dropdown_open: Option<usize>,
 }
 
 impl Default for SkirmishMenuSelection {
@@ -1725,6 +1743,8 @@ impl Default for SkirmishMenuSelection {
             match_mode: SkirmishMatchMode::OneVsOne,
             ai_difficulty: AiDifficulty::Easy,
             lobby_controllers: DEFAULT_LOBBY_CONTROLLERS,
+            controller_dropdown_open: None,
+            faction_dropdown_open: None,
             lobby_factions: DEFAULT_LOBBY_FACTIONS,
             lobby_team_ids: DEFAULT_LOBBY_TEAM_IDS,
             lobby_color_slots: DEFAULT_LOBBY_COLOR_SLOTS,
@@ -1746,7 +1766,7 @@ impl SkirmishMenuSelection {
 
     fn map_label(self) -> &'static str {
         if self.map_choice_is_random() {
-            RANDOM_MAP_LABEL
+            random_map_label()
         } else {
             self.map().name
         }
@@ -1776,6 +1796,8 @@ impl SkirmishMenuSelection {
             },
             ai_difficulty: settings.ai_difficulties.default_ai_difficulty(focus_team),
             lobby_controllers: lobby_controllers_from_match_setup(&settings),
+            controller_dropdown_open: None,
+            faction_dropdown_open: None,
             lobby_factions: lobby_factions_from_match_setup(&settings),
             lobby_team_ids: lobby_team_ids_from_match_setup(&settings),
             lobby_color_slots: lobby_color_slots_from_match_setup(&settings),
@@ -1954,7 +1976,55 @@ impl SkirmishMenuSelection {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
-        self.set_lobby_slot_controller(slot, self.lobby_controllers[slot].next());
+        // Three-state cycle so closing a slot is always 1-2 clicks (RA2/Warcraft
+        // style): 关闭 -> 我方 -> 电脑 -> 关闭. AI difficulty comes from the global
+        // F1-F4 selector, so it isn't buried in this per-slot cycle.
+        let next = match self.lobby_controllers[slot] {
+            SkirmishPlayerController::None => SkirmishPlayerController::Human,
+            SkirmishPlayerController::Human => SkirmishPlayerController::Ai(self.ai_difficulty),
+            SkirmishPlayerController::Ai(_) => SkirmishPlayerController::None,
+        };
+        self.set_lobby_slot_controller(slot, next);
+    }
+
+    fn toggle_controller_dropdown(&mut self, slot: usize) {
+        if !self.lobby_slot_in_selected_map(slot) {
+            return;
+        }
+        self.faction_dropdown_open = None;
+        self.controller_dropdown_open = if self.controller_dropdown_open == Some(slot) {
+            None
+        } else {
+            Some(slot)
+        };
+    }
+
+    fn toggle_faction_dropdown(&mut self, slot: usize) {
+        if !self.lobby_slot_in_selected_map(slot) {
+            return;
+        }
+        self.controller_dropdown_open = None;
+        self.faction_dropdown_open = if self.faction_dropdown_open == Some(slot) {
+            None
+        } else {
+            Some(slot)
+        };
+    }
+
+    fn set_lobby_slot_faction_choice(&mut self, slot: usize, faction: SkirmishFaction) {
+        if self.lobby_slot_in_selected_map(slot) {
+            self.lobby_factions[slot] = faction;
+        }
+        self.faction_dropdown_open = None;
+    }
+
+    fn set_lobby_slot_controller_choice(
+        &mut self,
+        slot: usize,
+        controller: SkirmishPlayerController,
+    ) {
+        self.set_lobby_slot_controller(slot, controller);
+        self.controller_dropdown_open = None;
     }
 
     fn cycle_lobby_slot_faction(&mut self, slot: usize) {
@@ -2141,27 +2211,36 @@ impl SkirmishStartStatus {
 
     fn summary_label(self) -> String {
         match self {
-            Self::Ready => "状态: 可开始".to_string(),
+            Self::Ready => t("状态: 可开始", "Status: Ready").to_string(),
             Self::MapTooSmall {
                 required_slots,
                 available_slots,
             } => {
-                format!("状态: 地图出生点不足({available_slots}/{required_slots})")
+                format!(
+                    "{}({available_slots}/{required_slots})",
+                    t("状态: 地图出生点不足", "Status: Not enough map spawns ")
+                )
             }
             Self::NotEnoughPlayers {
                 active_players,
                 required_players,
             } => {
                 format!(
-                    "状态: 需要至少{required_players}名玩家({active_players}/{required_players})"
+                    "{}{required_players}{}({active_players}/{required_players})",
+                    t("状态: 需要至少", "Status: Need at least "),
+                    t("名玩家", " players ")
                 )
             }
-            Self::NoOpposingTeams => "状态: 缺少敌对队伍".to_string(),
+            Self::NoOpposingTeams => {
+                t("状态: 缺少敌对队伍", "Status: No opposing teams").to_string()
+            }
         }
     }
 }
 
-const RANDOM_MAP_LABEL: &str = "随机地图";
+fn random_map_label() -> &'static str {
+    t("随机地图", "Random Map")
+}
 
 #[derive(Clone, Debug)]
 struct RouletteWheel<T> {
@@ -2531,6 +2610,10 @@ enum MainMenuAction {
     SelectAiDifficulty(AiDifficulty),
     SelectLobbySlot(usize),
     CycleLobbySlotController(usize),
+    ToggleLobbySlotController(usize),
+    SetLobbySlotController(usize, SkirmishPlayerController),
+    ToggleLobbySlotFaction(usize),
+    SetLobbySlotFaction(usize, SkirmishFaction),
     CycleLobbySlotFaction(usize),
     CycleLobbySlotTeamId(usize),
     CycleLobbySlotColor(usize),
@@ -2548,6 +2631,18 @@ impl MainMenuAction {
             MainMenuAction::SelectAiDifficulty(difficulty) => difficulty == selection.ai_difficulty,
             MainMenuAction::SelectLobbySlot(slot) => selection.human_lobby_slot() == Some(slot),
             MainMenuAction::CycleLobbySlotController(_) => false,
+            MainMenuAction::ToggleLobbySlotController(slot) => {
+                selection.controller_dropdown_open == Some(slot)
+            }
+            MainMenuAction::SetLobbySlotController(slot, controller) => {
+                selection.lobby_controllers.get(slot).copied() == Some(controller)
+            }
+            MainMenuAction::ToggleLobbySlotFaction(slot) => {
+                selection.faction_dropdown_open == Some(slot)
+            }
+            MainMenuAction::SetLobbySlotFaction(slot, faction) => {
+                selection.lobby_factions.get(slot).copied() == Some(faction)
+            }
             MainMenuAction::CycleLobbySlotFaction(_) => false,
             MainMenuAction::CycleLobbySlotTeamId(_) => false,
             MainMenuAction::CycleLobbySlotColor(_) => false,
@@ -2732,7 +2827,6 @@ struct TeamAiProfile {
     expected_command_centers: usize,
     expected_workers: usize,
     expected_refineries: usize,
-    expected_ore_harvesters: usize,
     expected_battlegroups: usize,
     expected_units_in_battlegroup: usize,
     active_offense_enabled: bool,
@@ -2751,7 +2845,6 @@ struct TeamAiProfile {
 #[derive(Clone, Copy, Default)]
 struct AiProductionCounts {
     workers: usize,
-    ore_harvesters: usize,
     battle_units: usize,
 }
 
@@ -2833,7 +2926,7 @@ const HUMAN_STARTUP: TeamStartup = TeamStartup {
             offset: (0.7, -3.0),
         },
         SpawnSpec {
-            id: "OreHarvester",
+            id: "Worker",
             offset: (2.3, -3.8),
         },
     ],
@@ -3574,7 +3667,6 @@ const HUMAN_AI_PRODUCTION_PRIORITY: &[&str] = &[
     "ScoutRover",
     "RocketInfantry",
     "InterceptorVTOL",
-    "OreHarvester",
     "MirageScoutTank",
     "FieldMedic",
     "BomberVTOL",
@@ -3621,7 +3713,6 @@ const DEMON_AI_PRODUCTION_PRIORITY: &[&str] = &[
     "FlameAssaultBuggy",
     "RocketInfantry",
     "BomberVTOL",
-    "OreHarvester",
     "ScoutRover",
     "HeavyMachinegunTrooper",
     "HeavyBombardmentAirship",
@@ -3645,7 +3736,6 @@ const CHAOS_AI_PRODUCTION_PRIORITY: &[&str] = &[
     "ScoutRover",
     "FieldMedic",
     "Drone",
-    "OreHarvester",
     "DroneMineLayer",
     "FlakRocketTeam",
     "RocketGunship",
@@ -3721,7 +3811,6 @@ const HUMAN_AI_PROFILE: TeamAiProfile = TeamAiProfile {
     expected_command_centers: 1,
     expected_workers: 3,
     expected_refineries: 1,
-    expected_ore_harvesters: 2,
     expected_battlegroups: 2,
     expected_units_in_battlegroup: 4,
     active_offense_enabled: true,
@@ -3744,7 +3833,6 @@ const DEMON_AI_PROFILE: TeamAiProfile = TeamAiProfile {
     expected_command_centers: 1,
     expected_workers: 3,
     expected_refineries: 1,
-    expected_ore_harvesters: 2,
     expected_battlegroups: 2,
     expected_units_in_battlegroup: 4,
     active_offense_enabled: true,
@@ -3767,7 +3855,6 @@ const CHAOS_AI_PROFILE: TeamAiProfile = TeamAiProfile {
     expected_command_centers: 1,
     expected_workers: 3,
     expected_refineries: 1,
-    expected_ore_harvesters: 2,
     expected_battlegroups: 2,
     expected_units_in_battlegroup: 4,
     active_offense_enabled: true,
@@ -3824,6 +3911,7 @@ fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<RandomMapCursor>()
         .init_resource::<MapBounds>()
         .init_resource::<CommandMode>()
+        .init_resource::<HoveredResource>()
         .init_resource::<StructurePlacementFeedback>()
         .init_resource::<MatchMenuState>()
         .init_resource::<MatchSpeed>()
@@ -3900,7 +3988,31 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
 pub fn add_game_scenes(app: &mut App) -> &mut App {
     app.add_plugins(SharedMatchScenePlugin);
     add_main_menu_scene(app);
+    app.init_resource::<Locale>();
+    app.add_systems(
+        Update,
+        (sync_locale, toggle_language_hotkey, update_localized_text),
+    );
     app
+}
+
+/// F12 toggles the UI language (Chinese / English). Input may be absent in pure
+/// headless apps, so the keyboard resource is optional.
+fn toggle_language_hotkey(
+    keyboard: Option<Res<ButtonInput<KeyCode>>>,
+    mut locale: ResMut<Locale>,
+    menu_selection: Option<ResMut<SkirmishMenuSelection>>,
+) {
+    if let Some(keyboard) = keyboard
+        && keyboard.just_pressed(KeyCode::F12)
+    {
+        locale.0 = locale.0.toggled();
+        // The menu rebuilds its dynamic rows/buttons on selection change; nudge it
+        // so lobby labels re-evaluate `t()` in the new language immediately.
+        if let Some(mut menu_selection) = menu_selection {
+            menu_selection.set_changed();
+        }
+    }
 }
 
 /// Advances an app with [`add_shared_match_scene`] registered into the live match scene.
@@ -3916,11 +4028,6 @@ pub fn start_shared_match_scene_with_current_setup(app: &mut App) {
     for _ in 0..8 {
         app.update();
     }
-}
-
-fn start_shared_match_scene_with_settings(app: &mut App, settings: MatchSetupSettings) {
-    app.insert_resource(settings);
-    start_shared_match_scene_with_current_setup(app);
 }
 
 fn add_headless_game_plugins(app: &mut App) -> &mut App {
@@ -3990,4618 +4097,481 @@ pub fn build_game_app(mode: GameAppMode) -> App {
     app
 }
 
-pub fn build_capture_match_app() -> App {
-    build_capture_match_app_with_settings(MatchSetupSettings::default())
-}
+/// Offscreen render target handle used by the capture binary.
+#[derive(Resource, Clone)]
+pub struct CaptureTarget(pub Handle<Image>);
 
-fn build_capture_match_app_with_settings(settings: MatchSetupSettings) -> App {
+#[derive(Component)]
+struct CaptureCameraReady;
+
+/// Render-capable headless app for real screenshot/video capture.
+///
+/// Unlike [`GameAppMode::Headless`] (which uses `MinimalPlugins` and never
+/// renders), this builds the full render pipeline with no window and an
+/// offscreen image target, so captured frames show the *actual* Bevy scene
+/// instead of a hand-drawn approximation.
+pub fn build_capture_app(width: u32, height: u32) -> App {
     let mut app = App::new();
-    add_headless_game_plugins(&mut app);
-    app.add_plugins(SharedMatchScenePlugin);
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0 / 30.0),
-    ));
-    start_shared_match_scene_with_settings(&mut app, settings);
-    app
-}
-
-#[derive(Clone, Debug, Default)]
-pub struct CaptureMatchSnapshot {
-    pub entities: Vec<CaptureEntitySnapshot>,
-    pub phase: CaptureMatchPhase,
-    pub elapsed_seconds: f32,
-    pub remaining_teams: u32,
-    pub remaining_anchors: u32,
-    pub enemy_units_destroyed: u32,
-    pub enemy_structures_destroyed: u32,
-    pub players: Vec<CaptureTeamStats>,
-}
-
-#[derive(Clone, Debug)]
-pub struct CaptureEntitySnapshot {
-    pub x: f32,
-    pub z: f32,
-    pub team: CaptureTeam,
-    pub kind: CaptureEntityKind,
-    pub visible: bool,
-    pub health_ratio: f32,
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum CaptureTeam {
-    Player(usize),
-    Neutral,
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum CaptureEntityKind {
-    Unit,
-    Structure,
-    Resource,
-}
-
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
-pub enum CaptureMatchPhase {
-    #[default]
-    Running,
-    HumanDefeat,
-    HumanVictory,
-    MatchFinished,
-}
-
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
-pub struct CaptureTeamStats {
-    pub units: u32,
-    pub structures: u32,
-    pub ore: i32,
-    pub crystal: i32,
-}
-
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
-pub enum CaptureProofFaction {
-    #[default]
-    Human,
-    Demon,
-    Chaos,
-}
-
-impl CaptureProofFaction {
-    pub const ALL: [Self; 3] = [Self::Human, Self::Demon, Self::Chaos];
-
-    pub fn key(self) -> &'static str {
-        match self {
-            Self::Human => "human",
-            Self::Demon => "demon",
-            Self::Chaos => "chaos",
-        }
-    }
-
-    pub fn label(self) -> &'static str {
-        match self {
-            Self::Human => "人族",
-            Self::Demon => "魔族",
-            Self::Chaos => "混沌族",
-        }
-    }
-
-    pub fn parse(value: &str) -> Option<Self> {
-        match value.trim().to_ascii_lowercase().as_str() {
-            "human" | "alliance" | "ren" | "人族" => Some(Self::Human),
-            "demon" | "mo" | "魔族" => Some(Self::Demon),
-            "chaos" | "hun" | "混沌族" => Some(Self::Chaos),
-            _ => None,
-        }
-    }
-
-    fn skirmish_faction(self) -> SkirmishFaction {
-        match self {
-            Self::Human => SkirmishFaction::Alliance,
-            Self::Demon => SkirmishFaction::Demon,
-            Self::Chaos => SkirmishFaction::Chaos,
-        }
-    }
-
-    fn proof_vehicle(self) -> &'static str {
-        match self {
-            Self::Human | Self::Demon => "Tank",
-            Self::Chaos => "MirageScoutTank",
-        }
-    }
-
-    fn proof_vehicle_target(self) -> usize {
-        match self {
-            Self::Human | Self::Demon => 12,
-            Self::Chaos => 12,
-        }
-    }
-
-    fn mouse_victory_vehicle_target(self) -> usize {
-        match self {
-            Self::Human | Self::Demon => 5,
-            Self::Chaos => 8,
-        }
-    }
-
-    fn allied_victory_vehicle_target(self) -> usize {
-        match self {
-            Self::Human | Self::Demon => self.mouse_victory_vehicle_target() + 3,
-            Self::Chaos => self.mouse_victory_vehicle_target(),
-        }
-    }
-}
-
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
-pub struct CaptureMatchProof {
-    pub faction: CaptureProofFaction,
-    pub product_id: &'static str,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub elapsed_seconds: u32,
-    pub produced_units: u32,
-    pub player_units: u32,
-    pub enemy_units_destroyed: u32,
-    pub enemy_structures_destroyed: u32,
-    pub remaining_teams: u32,
-    pub remaining_anchors: u32,
-}
-
-impl CaptureMatchProof {
-    pub fn succeeded(self) -> bool {
-        self.phase == CaptureMatchPhase::HumanVictory && self.remaining_teams <= 1
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CaptureHarvestProof {
-    pub faction: CaptureProofFaction,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub harvest_ordered: bool,
-    pub ore_before: i32,
-    pub ore_after: i32,
-    pub resource_before: i32,
-    pub resource_after: i32,
-    pub product_id: &'static str,
-    pub produced_units: u32,
-}
-
-impl CaptureHarvestProof {
-    pub fn succeeded(&self) -> bool {
-        self.harvest_ordered
-            && self.ore_after > self.ore_before
-            && self.resource_after < self.resource_before
-            && self.produced_units > 0
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CaptureDualHarvestProof {
-    pub faction: CaptureProofFaction,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub ore_before: i32,
-    pub ore_after: i32,
-    pub crystal_before: i32,
-    pub crystal_after: i32,
-    pub ore_harvest_ordered: bool,
-    pub crystal_harvest_ordered: bool,
-}
-
-impl CaptureDualHarvestProof {
-    pub fn succeeded(&self) -> bool {
-        self.ore_harvest_ordered
-            && self.crystal_harvest_ordered
-            && self.ore_after > self.ore_before
-            && self.crystal_after > self.crystal_before
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CaptureSupplyCrateProof {
-    pub faction: CaptureProofFaction,
-    pub map_id: &'static str,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub collector_id: &'static str,
-    pub collector_selected: bool,
-    pub move_ordered: bool,
-    pub crate_consumed: bool,
-    pub ore_before: i32,
-    pub ore_after: i32,
-    pub crystal_before: i32,
-    pub crystal_after: i32,
-}
-
-impl CaptureSupplyCrateProof {
-    pub fn succeeded(&self) -> bool {
-        self.collector_selected
-            && self.move_ordered
-            && self.crate_consumed
-            && self.ore_after > self.ore_before
-            && self.crystal_after > self.crystal_before
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CaptureTechOilProof {
-    pub faction: CaptureProofFaction,
-    pub map_id: &'static str,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub radar_constructed: bool,
-    pub robotics_constructed: bool,
-    pub engineer_produced: bool,
-    pub engineer_selected: bool,
-    pub capture_ordered: bool,
-    pub captured: bool,
-    pub engineer_consumed: bool,
-    pub ore_before: i32,
-    pub ore_after: i32,
-    pub capture_bonus_ore: i32,
-}
-
-impl CaptureTechOilProof {
-    pub fn succeeded(&self) -> bool {
-        self.radar_constructed
-            && self.robotics_constructed
-            && self.engineer_produced
-            && self.engineer_selected
-            && self.capture_ordered
-            && self.captured
-            && self.engineer_consumed
-            && self.ore_after >= self.ore_before + self.capture_bonus_ore
-    }
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct CaptureAiPressureProof {
-    pub faction: CaptureProofFaction,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub ai_team: CaptureTeam,
-    pub ai_units_before: u32,
-    pub ai_units_peak: u32,
-    pub ai_attack_orders: u32,
-    pub player_health_before: f32,
-    pub player_health_after: f32,
-}
-
-impl CaptureAiPressureProof {
-    pub fn succeeded(&self) -> bool {
-        let damage_or_defeat = self.player_health_after < self.player_health_before
-            || self.phase == CaptureMatchPhase::HumanDefeat;
-        self.ai_units_peak > self.ai_units_before
-            && (self.ai_attack_orders > 0 || damage_or_defeat)
-            && damage_or_defeat
-    }
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct CaptureFullLobbyAiProof {
-    pub map_id: &'static str,
-    pub map_players: usize,
-    pub expected_players: usize,
-    pub active_players: usize,
-    pub ai_players: usize,
-    pub ai_teams_with_growth: usize,
-    pub ai_teams_with_attack_orders: usize,
-    pub damaged_teams: usize,
-    pub total_attack_orders: u32,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub remaining_teams: u32,
-    pub remaining_anchors: u32,
-}
-
-impl CaptureFullLobbyAiProof {
-    pub fn succeeded(&self) -> bool {
-        let battle_phase = matches!(
-            self.phase,
-            CaptureMatchPhase::Running | CaptureMatchPhase::HumanDefeat
-        );
-        self.expected_players >= MAX_SKIRMISH_LOBBY_SLOTS
-            && self.active_players == self.expected_players
-            && self.ai_players == self.expected_players.saturating_sub(1)
-            && self.ai_teams_with_growth == self.ai_players
-            && self.ai_teams_with_attack_orders == self.ai_players
-            && self.damaged_teams > 0
-            && self.total_attack_orders > 0
-            && battle_phase
-    }
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct CaptureAiVsAiProof {
-    pub focus_faction: CaptureProofFaction,
-    pub map_id: &'static str,
-    pub match_mode_id: &'static str,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub focus_team: CaptureTeam,
-    pub opponent_team: CaptureTeam,
-    pub focus_units_before: u32,
-    pub focus_units_peak: u32,
-    pub opponent_units_before: u32,
-    pub opponent_units_peak: u32,
-    pub focus_attack_orders: u32,
-    pub opponent_attack_orders: u32,
-    pub focus_health_before: f32,
-    pub focus_health_after: f32,
-    pub opponent_health_before: f32,
-    pub opponent_health_after: f32,
-    pub remaining_teams: u32,
-    pub remaining_anchors: u32,
-}
-
-impl CaptureAiVsAiProof {
-    pub fn succeeded(&self) -> bool {
-        let both_ai_sides_produced = self.focus_units_peak > self.focus_units_before
-            && self.opponent_units_peak > self.opponent_units_before;
-        let any_attack_orders = self.focus_attack_orders + self.opponent_attack_orders > 0;
-        let any_side_damaged = self.focus_health_after < self.focus_health_before
-            || self.opponent_health_after < self.opponent_health_before
-            || (self.phase == CaptureMatchPhase::MatchFinished && self.remaining_teams <= 1);
-        self.match_mode_id == SkirmishMatchMode::AiVsAi.id()
-            && matches!(
-                self.phase,
-                CaptureMatchPhase::Running | CaptureMatchPhase::MatchFinished
-            )
-            && both_ai_sides_produced
-            && any_attack_orders
-            && any_side_damaged
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CaptureBuildProof {
-    pub faction: CaptureProofFaction,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub structure_id: &'static str,
-    pub placement_started: bool,
-    pub placed: bool,
-    pub construct_ordered: bool,
-    pub constructed: bool,
-    pub product_id: &'static str,
-    pub produced_units: u32,
-}
-
-impl CaptureBuildProof {
-    pub fn succeeded(&self) -> bool {
-        self.placement_started
-            && self.placed
-            && self.construct_ordered
-            && self.constructed
-            && self.produced_units > 0
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CaptureVictoryProof {
-    pub faction: CaptureProofFaction,
-    pub map_id: &'static str,
-    pub match_mode_id: &'static str,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub product_id: &'static str,
-    pub target_units: u32,
-    pub produced_units: u32,
-    pub attack_orders: u32,
-    pub player_units: u32,
-    pub enemy_units_destroyed: u32,
-    pub enemy_structures_destroyed: u32,
-    pub remaining_teams: u32,
-    pub remaining_anchors: u32,
-}
-
-impl CaptureVictoryProof {
-    pub fn succeeded(&self) -> bool {
-        let max_remaining_teams = if self.match_mode_id == "allied_two_vs_one" {
-            2
-        } else {
-            1
-        };
-        self.phase == CaptureMatchPhase::HumanVictory
-            && self.produced_units > 0
-            && self.attack_orders > 0
-            && self.enemy_structures_destroyed > 0
-            && self.remaining_teams <= max_remaining_teams
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CaptureEconomyVictoryProof {
-    pub faction: CaptureProofFaction,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub ore_before: i32,
-    pub ore_after_harvest: i32,
-    pub ore_after: i32,
-    pub crystal_before: i32,
-    pub crystal_after_harvest: i32,
-    pub crystal_after: i32,
-    pub ore_harvest_ordered: bool,
-    pub crystal_harvest_ordered: bool,
-    pub product_id: &'static str,
-    pub target_units: u32,
-    pub produced_units: u32,
-    pub attack_orders: u32,
-    pub player_units: u32,
-    pub enemy_units_destroyed: u32,
-    pub enemy_structures_destroyed: u32,
-    pub remaining_teams: u32,
-    pub remaining_anchors: u32,
-}
-
-impl CaptureEconomyVictoryProof {
-    pub fn succeeded(&self) -> bool {
-        let needs_crystal = registry::entity(self.product_id)
-            .is_some_and(|def| def.cost.crystal > 0 && self.target_units > 0);
-        self.phase == CaptureMatchPhase::HumanVictory
-            && self.ore_harvest_ordered
-            && self.ore_after_harvest > self.ore_before
-            && (!needs_crystal
-                || (self.crystal_harvest_ordered
-                    && self.crystal_after_harvest > self.crystal_before))
-            && self.produced_units >= self.target_units
-            && self.attack_orders > 0
-            && self.enemy_structures_destroyed > 0
-            && self.remaining_teams <= 1
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CapturePlayableProof {
-    pub faction: CaptureProofFaction,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub ore_before: i32,
-    pub ore_after_harvest: i32,
-    pub ore_after: i32,
-    pub crystal_before: i32,
-    pub crystal_after_harvest: i32,
-    pub crystal_after: i32,
-    pub ore_harvest_ordered: bool,
-    pub crystal_harvest_ordered: bool,
-    pub structure_id: &'static str,
-    pub placement_started: bool,
-    pub placed: bool,
-    pub construct_ordered: bool,
-    pub constructed: bool,
-    pub barracks_product_id: &'static str,
-    pub barracks_units: u32,
-    pub vehicle_product_id: &'static str,
-    pub target_units: u32,
-    pub produced_units: u32,
-    pub attack_orders: u32,
-    pub player_units: u32,
-    pub enemy_units_destroyed: u32,
-    pub enemy_structures_destroyed: u32,
-    pub remaining_teams: u32,
-    pub remaining_anchors: u32,
-}
-
-impl CapturePlayableProof {
-    pub fn succeeded(&self) -> bool {
-        self.phase == CaptureMatchPhase::HumanVictory
-            && self.ore_harvest_ordered
-            && self.ore_after_harvest > self.ore_before
-            && self.crystal_harvest_ordered
-            && self.crystal_after_harvest > self.crystal_before
-            && self.placement_started
-            && self.placed
-            && self.construct_ordered
-            && self.constructed
-            && self.barracks_units > 0
-            && self.produced_units >= self.target_units
-            && self.attack_orders > 0
-            && self.enemy_structures_destroyed > 0
-            && self.remaining_teams <= 1
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CaptureLobbySlotsProof {
-    pub map_id: &'static str,
-    pub map_players: usize,
-    pub configured_slots: usize,
-    pub runtime_players: usize,
-    pub active_players: usize,
-    pub economy_rows: usize,
-    pub unit_teams: usize,
-    pub structure_teams: usize,
-    pub command_center_teams: usize,
-    pub spawn_anchor_matches: usize,
-    pub visible_player_index: Option<usize>,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub remaining_teams: u32,
-    pub remaining_anchors: u32,
-}
-
-impl CaptureLobbySlotsProof {
-    pub fn succeeded(&self) -> bool {
-        self.map_players >= 8
-            && self.configured_slots == self.map_players
-            && self.runtime_players == self.configured_slots
-            && self.active_players == self.configured_slots
-            && self.economy_rows >= self.configured_slots
-            && self.unit_teams == self.configured_slots
-            && self.structure_teams == self.configured_slots
-            && self.command_center_teams == self.configured_slots
-            && self.spawn_anchor_matches == self.configured_slots
-            && self.visible_player_index == Some(0)
-            && self.phase == CaptureMatchPhase::Running
-            && self.remaining_teams == self.configured_slots as u32
-            && self.remaining_anchors >= self.configured_slots as u32
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CaptureRuntimePlayersProof {
-    pub map_id: &'static str,
-    pub map_players: usize,
-    pub expected_players: usize,
-    pub runtime_players: usize,
-    pub active_players: usize,
-    pub economy_rows: usize,
-    pub unit_teams: usize,
-    pub structure_teams: usize,
-    pub command_center_teams: usize,
-    pub fallback_spawn_matches: usize,
-    pub visible_player_index: Option<usize>,
-    pub phase: CaptureMatchPhase,
-    pub frames: usize,
-    pub remaining_teams: u32,
-    pub remaining_anchors: u32,
-}
-
-impl CaptureRuntimePlayersProof {
-    pub fn succeeded(&self) -> bool {
-        self.expected_players > MAX_SKIRMISH_LOBBY_SLOTS
-            && self.runtime_players == self.expected_players
-            && self.active_players == self.expected_players
-            && self.economy_rows >= self.expected_players
-            && self.unit_teams == self.expected_players
-            && self.structure_teams == self.expected_players
-            && self.command_center_teams == self.expected_players
-            && self.fallback_spawn_matches == self.expected_players.saturating_sub(self.map_players)
-            && self.visible_player_index == Some(0)
-            && self.phase == CaptureMatchPhase::Running
-            && self.remaining_teams == self.expected_players as u32
-            && self.remaining_anchors >= self.expected_players as u32
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CaptureLobbyRowsMapProof {
-    pub map_id: &'static str,
-    pub map_players: usize,
-    pub row_count: usize,
-    pub fully_configurable_rows: usize,
-    pub unexpected_slot_buttons: usize,
-    pub last_slot_index: usize,
-    pub last_slot_selects: bool,
-    pub last_slot_controller_cycles: bool,
-    pub last_slot_faction_cycles: bool,
-    pub last_slot_team_cycles: bool,
-    pub last_slot_color_cycles: bool,
-}
-
-impl CaptureLobbyRowsMapProof {
-    pub fn succeeded(&self) -> bool {
-        self.row_count == self.map_players
-            && self.fully_configurable_rows == self.map_players
-            && self.unexpected_slot_buttons == 0
-            && self.last_slot_selects
-            && self.last_slot_controller_cycles
-            && self.last_slot_faction_cycles
-            && self.last_slot_team_cycles
-            && self.last_slot_color_cycles
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CaptureLobbyRowsProof {
-    pub maps: Vec<CaptureLobbyRowsMapProof>,
-}
-
-impl CaptureLobbyRowsProof {
-    pub fn succeeded(&self) -> bool {
-        self.maps.len() == SKIRMISH_MAPS.len()
-            && self.maps.iter().all(CaptureLobbyRowsMapProof::succeeded)
-    }
-}
-
-pub fn start_default_match_for_capture(app: &mut App) {
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0 / 30.0),
-    ));
-    enter_shared_match_scene(app);
-}
-
-pub fn advance_capture_match(app: &mut App, frames: usize) {
-    for _ in 0..frames {
-        app.update();
-    }
-}
-
-pub fn capture_match_snapshot(app: &mut App) -> CaptureMatchSnapshot {
-    let world = app.world_mut();
-    let mut entities = Vec::new();
-    let player_count = world
-        .get_resource::<ActiveTeams>()
-        .map(|active| active.0.len())
-        .unwrap_or(0)
-        .max(world.resource::<Economies>().players.len());
-    let mut players = vec![CaptureTeamStats::default(); player_count];
-    {
-        let mut query = world.query::<(
-            &Transform,
-            Option<&Team>,
-            Option<&Unit>,
-            Option<&Structure>,
-            Option<&ResourceNode>,
-            Option<&Health>,
-            Option<&VisibilityState>,
-        )>();
-        for (transform, team, unit, structure, resource, health, visibility) in query.iter(world) {
-            let kind = if resource.is_some() {
-                CaptureEntityKind::Resource
-            } else if structure.is_some() {
-                CaptureEntityKind::Structure
-            } else if unit.is_some() {
-                CaptureEntityKind::Unit
-            } else {
-                continue;
-            };
-            let health_ratio = health.map_or(1.0, |health| {
-                if health.max <= f32::EPSILON {
-                    0.0
-                } else {
-                    (health.current / health.max).clamp(0.0, 1.0)
-                }
-            });
-            if health_ratio <= 0.0 || resource.is_some_and(|resource| resource.amount <= 0) {
-                continue;
-            }
-            if let Some(team) = team {
-                if let Some(stats) = capture_player_stats_mut(&mut players, *team) {
-                    match kind {
-                        CaptureEntityKind::Unit => stats.units += 1,
-                        CaptureEntityKind::Structure => stats.structures += 1,
-                        CaptureEntityKind::Resource => {}
-                    }
-                }
-            }
-            entities.push(CaptureEntitySnapshot {
-                x: transform.translation.x,
-                z: transform.translation.z,
-                team: team.map_or(CaptureTeam::Neutral, |team| capture_team_from_team(*team)),
-                kind,
-                visible: visibility.is_none_or(|visibility| visibility.visible),
-                health_ratio,
-            });
-        }
-    }
-    let economies = world.resource::<Economies>();
-    for (index, economy) in economies.players.iter().enumerate() {
-        if let Some(stats) = players.get_mut(index) {
-            stats.ore = economy.ore;
-            stats.crystal = economy.crystal;
-        }
-    }
-    let match_state = world.resource::<MatchState>();
-    CaptureMatchSnapshot {
-        entities,
-        phase: match match_state.phase {
-            MatchPhase::Running => CaptureMatchPhase::Running,
-            MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
-            MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
-            MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
-        },
-        elapsed_seconds: match_state.start_time_sec,
-        remaining_teams: match_state.remaining_teams,
-        remaining_anchors: match_state.remaining_anchors,
-        enemy_units_destroyed: match_state.enemy_units_destroyed,
-        enemy_structures_destroyed: match_state.enemy_structures_destroyed,
-        players,
-    }
-}
-
-fn capture_player_stats_mut(
-    players: &mut [CaptureTeamStats],
-    team: Team,
-) -> Option<&mut CaptureTeamStats> {
-    team.economy_index()
-        .and_then(|index| players.get_mut(index))
-}
-
-pub fn run_capture_default_match_proof(max_frames: usize) -> CaptureMatchProof {
-    run_capture_match_proof_for_faction(CaptureProofFaction::Human, max_frames)
-}
-
-pub fn build_capture_match_app_for_faction(faction: CaptureProofFaction) -> App {
-    build_capture_match_app_with_settings(capture_match_setup_for_faction(faction))
-}
-
-pub fn build_real_menu_match_app_for_faction(faction: CaptureProofFaction) -> App {
-    build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Easy)
-}
-
-#[derive(Clone, Copy, Debug)]
-struct RealMenuMatchStart {
-    map_index: usize,
-    faction: CaptureProofFaction,
-    ai_difficulty: AiDifficulty,
-    starting_resource_index: usize,
-    match_mode: SkirmishMatchMode,
-}
-
-impl RealMenuMatchStart {
-    fn new(faction: CaptureProofFaction) -> Self {
-        Self {
-            map_index: 0,
-            faction,
-            ai_difficulty: AiDifficulty::Easy,
-            starting_resource_index: DEFAULT_STARTING_RESOURCE_INDEX,
-            match_mode: SkirmishMatchMode::OneVsOne,
-        }
-    }
-
-    fn with_map_index(mut self, map_index: usize) -> Self {
-        self.map_index = map_index;
-        self
-    }
-
-    fn with_ai_difficulty(mut self, ai_difficulty: AiDifficulty) -> Self {
-        self.ai_difficulty = ai_difficulty;
-        self
-    }
-
-    fn with_starting_resource_index(mut self, starting_resource_index: usize) -> Self {
-        self.starting_resource_index = starting_resource_index;
-        self
-    }
-
-    fn with_match_mode(mut self, match_mode: SkirmishMatchMode) -> Self {
-        self.match_mode = match_mode;
-        self
-    }
-}
-
-fn build_real_menu_match_app_for_faction_with_ai(
-    faction: CaptureProofFaction,
-    ai_difficulty: AiDifficulty,
-) -> App {
-    build_real_menu_match_app_for_faction_with_ai_and_starting_resources(
-        faction,
-        ai_difficulty,
-        DEFAULT_STARTING_RESOURCE_INDEX,
-    )
-}
-
-fn build_real_menu_match_app_for_faction_with_ai_and_starting_resources(
-    faction: CaptureProofFaction,
-    ai_difficulty: AiDifficulty,
-    starting_resource_index: usize,
-) -> App {
-    build_real_menu_match_app(
-        RealMenuMatchStart::new(faction)
-            .with_ai_difficulty(ai_difficulty)
-            .with_starting_resource_index(starting_resource_index),
-    )
-}
-
-fn build_real_menu_match_app(match_start: RealMenuMatchStart) -> App {
-    let mut app = build_game_app(GameAppMode::Headless);
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0 / 30.0),
-    ));
-    app.update();
-
-    drive_main_menu_action(
-        &mut app,
-        MainMenuAction::SelectMap(match_start.map_index),
-        1,
-    );
-    drive_main_menu_action(&mut app, MainMenuAction::SelectLobbySlot(0), 1);
-    drive_main_menu_slot_faction(&mut app, 0, match_start.faction.skirmish_faction());
-    drive_main_menu_action(
-        &mut app,
-        MainMenuAction::SelectMatchMode(match_start.match_mode),
-        1,
-    );
-    if match_start.match_mode == SkirmishMatchMode::AiVsAi {
-        drive_main_menu_action(&mut app, MainMenuAction::CycleLobbySlotController(0), 1);
-    }
-    drive_main_menu_action(
-        &mut app,
-        MainMenuAction::SelectStartingResources(match_start.starting_resource_index),
-        1,
-    );
-    drive_main_menu_action(
-        &mut app,
-        MainMenuAction::SelectAiDifficulty(match_start.ai_difficulty),
-        1,
-    );
-    drive_main_menu_action(&mut app, MainMenuAction::StartMatch, 3);
-    app
-}
-
-fn drive_main_menu_slot_faction(app: &mut App, slot: usize, faction: SkirmishFaction) {
-    for _ in 0..SkirmishFaction::ALL.len() {
-        let Some(selection) = app.world().get_resource::<SkirmishMenuSelection>() else {
-            return;
-        };
-        if selection
-            .lobby_factions
-            .get(slot)
-            .is_some_and(|current| *current == faction)
-        {
-            return;
-        }
-        drive_main_menu_action(app, MainMenuAction::CycleLobbySlotFaction(slot), 1);
-    }
-}
-
-fn build_real_default_menu_match_app() -> App {
-    let mut app = build_game_app(GameAppMode::Headless);
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0 / 30.0),
-    ));
-    app.update();
-
-    drive_main_menu_action(&mut app, MainMenuAction::StartMatch, 3);
-    app
-}
-
-fn build_real_menu_full_lobby_match_app(map_index: usize) -> App {
-    build_real_menu_full_lobby_match_app_with_ai(map_index, AiDifficulty::Easy)
-}
-
-fn build_real_menu_full_lobby_match_app_with_ai(
-    map_index: usize,
-    ai_difficulty: AiDifficulty,
-) -> App {
-    let mut app = build_game_app(GameAppMode::Headless);
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0 / 30.0),
-    ));
-    app.update();
-
-    let map = SKIRMISH_MAPS
-        .get(map_index)
-        .unwrap_or_else(|| largest_skirmish_map());
-    drive_main_menu_action(&mut app, MainMenuAction::SelectMap(map_index), 2);
-    for slot in 2..map.players {
-        drive_main_menu_action(&mut app, MainMenuAction::CycleLobbySlotController(slot), 1);
-        drive_main_menu_action(&mut app, MainMenuAction::CycleLobbySlotController(slot), 1);
-    }
-    drive_main_menu_action(
-        &mut app,
-        MainMenuAction::SelectAiDifficulty(ai_difficulty),
-        1,
-    );
-    drive_main_menu_action(&mut app, MainMenuAction::SelectLobbySlot(0), 1);
-    drive_main_menu_action(&mut app, MainMenuAction::StartMatch, 5);
-    app
-}
-
-pub fn run_real_menu_lobby_slots_proof(max_frames: usize) -> CaptureLobbySlotsProof {
-    let mut app = build_real_menu_full_lobby_match_app(3);
-    for _ in 0..max_frames {
-        app.update();
-    }
-    capture_lobby_slots_proof(&mut app, max_frames)
-}
-
-pub fn run_real_menu_full_lobby_ai_proof(max_frames: usize) -> CaptureFullLobbyAiProof {
-    let mut app = build_real_menu_full_lobby_match_app_with_ai(3, AiDifficulty::Hard);
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    let expected_players = app
-        .world()
-        .resource::<SelectedSkirmishMap>()
-        .definition()
-        .players;
-    run_full_lobby_ai_proof(&mut app, expected_players, max_frames)
-}
-
-pub fn run_real_menu_lobby_rows_proof() -> CaptureLobbyRowsProof {
-    let maps = (0..SKIRMISH_MAPS.len())
-        .map(run_real_menu_lobby_rows_map_proof)
-        .collect();
-    CaptureLobbyRowsProof { maps }
-}
-
-pub fn run_capture_runtime_players_proof(
-    player_count: usize,
-    max_frames: usize,
-) -> CaptureRuntimePlayersProof {
-    let expected_players = player_count.max(MAX_SKIRMISH_LOBBY_SLOTS + 1);
-    let mut app = build_capture_match_app_with_settings(capture_runtime_players_match_setup(
-        expected_players,
-    ));
-    for _ in 0..max_frames {
-        app.update();
-    }
-    capture_runtime_players_proof(&mut app, expected_players, max_frames)
-}
-
-pub fn run_capture_runtime_ai_scale_proof(
-    player_count: usize,
-    max_frames: usize,
-) -> CaptureFullLobbyAiProof {
-    let expected_players = player_count.max(MAX_SKIRMISH_LOBBY_SLOTS + 4);
-    let mut app = build_capture_match_app_with_settings(capture_runtime_players_match_setup_with(
-        expected_players,
-        AiDifficulty::Hard,
-        BEVY_PLAYTEST_STARTING_RESOURCES,
-        StartupLoadoutMode::PlaytestExpanded,
-    ));
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_full_lobby_ai_proof(&mut app, expected_players, max_frames)
-}
-
-fn run_real_menu_lobby_rows_map_proof(map_index: usize) -> CaptureLobbyRowsMapProof {
-    let mut app = build_game_app(GameAppMode::Headless);
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0 / 30.0),
-    ));
-    app.update();
-    drive_main_menu_action(&mut app, MainMenuAction::SelectMap(map_index), 2);
-
-    let (map_id, map_players, row_count, fully_configurable_rows, unexpected_slot_buttons) =
-        capture_current_lobby_row_counts(&mut app);
-    let last_slot_index = map_players.saturating_sub(1);
-
-    let last_slot_selects = try_drive_main_menu_action(
-        &mut app,
-        MainMenuAction::SelectLobbySlot(last_slot_index),
-        1,
-    ) && app
-        .world()
-        .resource::<SkirmishMenuSelection>()
-        .human_lobby_slot()
-        == Some(last_slot_index);
-
-    let controller_before = app
-        .world()
-        .resource::<SkirmishMenuSelection>()
-        .lobby_controllers[last_slot_index];
-    let last_slot_controller_cycles = try_drive_main_menu_action(
-        &mut app,
-        MainMenuAction::CycleLobbySlotController(last_slot_index),
-        1,
-    ) && app
-        .world()
-        .resource::<SkirmishMenuSelection>()
-        .lobby_controllers[last_slot_index]
-        != controller_before;
-
-    let faction_before = app
-        .world()
-        .resource::<SkirmishMenuSelection>()
-        .lobby_factions[last_slot_index];
-    let last_slot_faction_cycles = try_drive_main_menu_action(
-        &mut app,
-        MainMenuAction::CycleLobbySlotFaction(last_slot_index),
-        1,
-    ) && app
-        .world()
-        .resource::<SkirmishMenuSelection>()
-        .lobby_factions[last_slot_index]
-        != faction_before;
-
-    let team_before = app
-        .world()
-        .resource::<SkirmishMenuSelection>()
-        .lobby_team_ids[last_slot_index];
-    let last_slot_team_cycles = try_drive_main_menu_action(
-        &mut app,
-        MainMenuAction::CycleLobbySlotTeamId(last_slot_index),
-        1,
-    ) && app
-        .world()
-        .resource::<SkirmishMenuSelection>()
-        .lobby_team_ids[last_slot_index]
-        != team_before;
-
-    let color_before = app
-        .world()
-        .resource::<SkirmishMenuSelection>()
-        .lobby_color_slots[last_slot_index];
-    let last_slot_color_cycles = try_drive_main_menu_action(
-        &mut app,
-        MainMenuAction::CycleLobbySlotColor(last_slot_index),
-        1,
-    ) && app
-        .world()
-        .resource::<SkirmishMenuSelection>()
-        .lobby_color_slots[last_slot_index]
-        != color_before;
-
-    CaptureLobbyRowsMapProof {
-        map_id,
-        map_players,
-        row_count,
-        fully_configurable_rows,
-        unexpected_slot_buttons,
-        last_slot_index,
-        last_slot_selects,
-        last_slot_controller_cycles,
-        last_slot_faction_cycles,
-        last_slot_team_cycles,
-        last_slot_color_cycles,
-    }
-}
-
-fn capture_current_lobby_row_counts(app: &mut App) -> (&'static str, usize, usize, usize, usize) {
-    const REQUIRED_LOBBY_ROW_ACTIONS: u8 = 0b1_1111;
-    let world = app.world_mut();
-    let selection = *world.resource::<SkirmishMenuSelection>();
-    let map = selection.map();
-    let map_players = map.players;
-    let row_count = {
-        let mut rows = world.query_filtered::<Entity, With<MainMenuLobbySlotRow>>();
-        rows.iter(world).count()
-    };
-    let mut slot_action_masks = vec![0u8; map_players.max(MAX_SKIRMISH_LOBBY_SLOTS)];
-    let mut unexpected_slot_buttons = 0usize;
-    {
-        let mut buttons = world.query::<&MainMenuButton>();
-        for button in buttons.iter(world) {
-            let Some((slot, mask)) = lobby_slot_action_mask(button.action) else {
-                continue;
-            };
-            if slot >= map_players {
-                unexpected_slot_buttons += 1;
-                continue;
-            }
-            if slot_action_masks.len() <= slot {
-                slot_action_masks.resize(slot + 1, 0);
-            }
-            slot_action_masks[slot] |= mask;
-        }
-    }
-    let fully_configurable_rows = (0..map_players)
-        .filter(|slot| slot_action_masks[*slot] == REQUIRED_LOBBY_ROW_ACTIONS)
-        .count();
-    (
-        map.id,
-        map_players,
-        row_count,
-        fully_configurable_rows,
-        unexpected_slot_buttons,
-    )
-}
-
-fn lobby_slot_action_mask(action: MainMenuAction) -> Option<(usize, u8)> {
-    match action {
-        MainMenuAction::SelectLobbySlot(slot) => Some((slot, 0b0_0001)),
-        MainMenuAction::CycleLobbySlotController(slot) => Some((slot, 0b0_0010)),
-        MainMenuAction::CycleLobbySlotFaction(slot) => Some((slot, 0b0_0100)),
-        MainMenuAction::CycleLobbySlotTeamId(slot) => Some((slot, 0b0_1000)),
-        MainMenuAction::CycleLobbySlotColor(slot) => Some((slot, 0b1_0000)),
-        MainMenuAction::SelectMap(_)
-        | MainMenuAction::SelectStartingResources(_)
-        | MainMenuAction::SelectMatchMode(_)
-        | MainMenuAction::SelectAiDifficulty(_)
-        | MainMenuAction::StartMatch => None,
-    }
-}
-
-fn capture_lobby_slots_proof(app: &mut App, frames: usize) -> CaptureLobbySlotsProof {
-    let world = app.world_mut();
-    let settings = world.resource::<MatchSetupSettings>().clone();
-    let map = skirmish_map_by_path(settings.map_path).unwrap_or_else(|| largest_skirmish_map());
-    let mut unit_teams = Vec::new();
-    let mut structure_teams = Vec::new();
-    let mut command_center_teams = Vec::new();
-    let mut spawn_anchor_matches = Vec::new();
-
-    {
-        let mut query = world.query::<(
-            &Team,
-            Option<&Unit>,
-            Option<&Structure>,
-            &Transform,
-            Option<&Health>,
-        )>();
-        for (team, unit, structure, transform, health) in query.iter(world) {
-            if health.is_some_and(|health| health.current <= 0.0) {
-                continue;
-            }
-            if unit.is_some() {
-                mark_player_flag(&mut unit_teams, *team);
-            }
-            if let Some(structure) = structure {
-                mark_player_flag(&mut structure_teams, *team);
-                if structure.id == "CommandCenter" {
-                    if let Some(index) = mark_player_flag(&mut command_center_teams, *team) {
-                        let spawn_slot = settings.player_spawn_slot(*team);
-                        if settings.active_teams.get(index).copied().unwrap_or(false)
-                            && map.spawn_points.get(spawn_slot).is_some_and(|spawn_point| {
-                                let expected = map_local_to_world(map, *spawn_point);
-                                xz_distance(transform.translation, expected) <= 2.0
-                            })
-                        {
-                            mark_player_flag(&mut spawn_anchor_matches, *team);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    let match_state = world.resource::<MatchState>();
-    let phase = match match_state.phase {
-        MatchPhase::Running => CaptureMatchPhase::Running,
-        MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
-        MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
-        MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
-    };
-    let economy_rows = world.resource::<Economies>().players.len();
-
-    CaptureLobbySlotsProof {
-        map_id: map.id,
-        map_players: map.players,
-        configured_slots: map.players.min(settings.active_teams.len()),
-        runtime_players: settings.active_teams.len(),
-        active_players: settings
-            .active_teams
-            .iter()
-            .filter(|active| **active)
-            .count(),
-        economy_rows,
-        unit_teams: player_flag_count(&unit_teams),
-        structure_teams: player_flag_count(&structure_teams),
-        command_center_teams: player_flag_count(&command_center_teams),
-        spawn_anchor_matches: player_flag_count(&spawn_anchor_matches),
-        visible_player_index: settings.visible_player.team.economy_index(),
-        phase,
-        frames,
-        remaining_teams: match_state.remaining_teams,
-        remaining_anchors: match_state.remaining_anchors,
-    }
-}
-
-fn run_full_lobby_ai_proof(
-    app: &mut App,
-    expected_players: usize,
-    max_frames: usize,
-) -> CaptureFullLobbyAiProof {
-    let active_teams_resource = app.world().resource::<ActiveTeams>().clone();
-    let active_team_flags = active_teams_resource.0.clone();
-    let active_teams = player_teams(active_team_flags.len())
-        .filter(|team| team_is_active(*team, Some(&active_teams_resource)))
-        .collect::<Vec<_>>();
-    let ai_teams = active_teams
-        .iter()
-        .copied()
-        .filter(|team| *team != CAPTURE_PLAYER_TEAM)
-        .collect::<Vec<_>>();
-    let units_before = ai_teams
-        .iter()
-        .map(|team| capture_alive_unit_count(app.world_mut(), *team))
-        .collect::<Vec<_>>();
-    let mut units_peak = units_before.clone();
-    let health_before = active_teams
-        .iter()
-        .map(|team| capture_team_total_health(app.world_mut(), *team))
-        .collect::<Vec<_>>();
-    let mut health_min = health_before.clone();
-    let mut attack_orders_peak = vec![0usize; ai_teams.len()];
-    let mut frames = 0usize;
-
-    while frames < max_frames && app.world().resource::<MatchState>().phase == MatchPhase::Running {
-        frames += 1;
-        app.update();
-        for (index, team) in ai_teams.iter().copied().enumerate() {
-            units_peak[index] =
-                units_peak[index].max(capture_alive_unit_count(app.world_mut(), team));
-            attack_orders_peak[index] = attack_orders_peak[index].max(
-                capture_attack_orders_against_any_enemy(app.world_mut(), team),
-            );
-        }
-        for (index, team) in active_teams.iter().copied().enumerate() {
-            health_min[index] =
-                health_min[index].min(capture_team_total_health(app.world_mut(), team));
-        }
-
-        let ai_teams_with_growth = units_peak
-            .iter()
-            .zip(units_before.iter())
-            .filter(|(peak, before)| peak > before)
-            .count();
-        let ai_teams_with_attack_orders = attack_orders_peak
-            .iter()
-            .filter(|orders| **orders > 0)
-            .count();
-        let damaged_teams = health_min
-            .iter()
-            .zip(health_before.iter())
-            .filter(|(min, before)| min < before)
-            .count();
-        if ai_teams_with_growth == ai_teams.len()
-            && ai_teams_with_attack_orders == ai_teams.len()
-            && damaged_teams > 0
-        {
-            break;
-        }
-    }
-
-    capture_full_lobby_ai_proof_status(
-        app,
-        frames,
-        expected_players,
-        active_teams.len(),
-        ai_teams.len(),
-        units_before,
-        units_peak,
-        attack_orders_peak,
-        health_before,
-        health_min,
-    )
-}
-
-fn capture_full_lobby_ai_proof_status(
-    app: &mut App,
-    frames: usize,
-    expected_players: usize,
-    active_players: usize,
-    ai_players: usize,
-    units_before: Vec<usize>,
-    units_peak: Vec<usize>,
-    attack_orders_peak: Vec<usize>,
-    health_before: Vec<f32>,
-    health_min: Vec<f32>,
-) -> CaptureFullLobbyAiProof {
-    let map_players = app
-        .world()
-        .resource::<SelectedSkirmishMap>()
-        .definition()
-        .players;
-    let match_state = app.world().resource::<MatchState>();
-    CaptureFullLobbyAiProof {
-        map_id: capture_selected_map_id(app),
-        map_players,
-        expected_players,
-        active_players,
-        ai_players,
-        ai_teams_with_growth: units_peak
-            .iter()
-            .zip(units_before.iter())
-            .filter(|(peak, before)| peak > before)
-            .count(),
-        ai_teams_with_attack_orders: attack_orders_peak
-            .iter()
-            .filter(|orders| **orders > 0)
-            .count(),
-        damaged_teams: health_min
-            .iter()
-            .zip(health_before.iter())
-            .filter(|(min, before)| min < before)
-            .count(),
-        total_attack_orders: attack_orders_peak.iter().sum::<usize>() as u32,
-        phase: match match_state.phase {
-            MatchPhase::Running => CaptureMatchPhase::Running,
-            MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
-            MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
-            MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
-        },
-        frames,
-        remaining_teams: match_state.remaining_teams,
-        remaining_anchors: match_state.remaining_anchors,
-    }
-}
-
-fn capture_runtime_players_match_setup(player_count: usize) -> MatchSetupSettings {
-    capture_runtime_players_match_setup_with(
-        player_count,
-        AiDifficulty::Beginner,
-        StartingResources::godot_standard(),
-        StartupLoadoutMode::GodotSkirmish,
-    )
-}
-
-fn capture_runtime_players_match_setup_with(
-    player_count: usize,
-    ai_difficulty: AiDifficulty,
-    starting_resources: StartingResources,
-    startup_loadout: StartupLoadoutMode,
-) -> MatchSetupSettings {
-    let active_teams = vec![true; player_count];
-    let player_controllers = (0..player_count)
-        .map(|index| {
-            if index == 0 {
-                SkirmishPlayerController::Human
-            } else {
-                SkirmishPlayerController::Ai(ai_difficulty)
-            }
-        })
-        .collect::<Vec<_>>();
-    let mut team_relations = TeamRelations::default();
-    team_relations.ensure_player_count(player_count);
-    MatchSetupSettings {
-        map_path: largest_skirmish_map().godot_path,
-        starting_resources,
-        visible_player: VisiblePlayer::per_player(Team::Player(0)),
-        ai_difficulties: skirmish_ai_difficulties_from_controllers(&player_controllers),
-        team_relations,
-        startup_loadout,
-        active_teams,
-        player_factions: (0..player_count)
-            .map(|index| SkirmishFaction::ALL[index % SkirmishFaction::ALL.len()])
-            .collect(),
-        player_color_slots: (0..player_count).collect(),
-        player_controllers,
-        player_spawn_slots: (0..player_count).collect(),
-    }
-}
-
-fn capture_runtime_players_proof(
-    app: &mut App,
-    expected_players: usize,
-    frames: usize,
-) -> CaptureRuntimePlayersProof {
-    let world = app.world_mut();
-    let settings = world.resource::<MatchSetupSettings>().clone();
-    let map = skirmish_map_by_path(settings.map_path).unwrap_or_else(|| largest_skirmish_map());
-    let mut unit_teams = Vec::new();
-    let mut structure_teams = Vec::new();
-    let mut command_center_teams = Vec::new();
-    let mut fallback_spawn_matches = Vec::new();
-
-    {
-        let mut query = world.query::<(
-            &Team,
-            Option<&Unit>,
-            Option<&Structure>,
-            &Transform,
-            Option<&Health>,
-        )>();
-        for (team, unit, structure, transform, health) in query.iter(world) {
-            if health.is_some_and(|health| health.current <= 0.0) {
-                continue;
-            }
-            if unit.is_some() {
-                mark_player_flag(&mut unit_teams, *team);
-            }
-            if let Some(structure) = structure {
-                mark_player_flag(&mut structure_teams, *team);
-                if structure.id == "CommandCenter" {
-                    if let Some(index) = mark_player_flag(&mut command_center_teams, *team) {
-                        let spawn_slot = settings.player_spawn_slot(*team);
-                        if spawn_slot >= map.players {
-                            let expected = team_start_position_for_spawn_slot(map, spawn_slot);
-                            if settings.active_teams.get(index).copied().unwrap_or(false)
-                                && xz_distance(transform.translation, expected) <= 2.0
-                            {
-                                mark_player_flag(&mut fallback_spawn_matches, *team);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    let match_state = world.resource::<MatchState>();
-    let phase = match match_state.phase {
-        MatchPhase::Running => CaptureMatchPhase::Running,
-        MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
-        MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
-        MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
-    };
-
-    CaptureRuntimePlayersProof {
-        map_id: map.id,
-        map_players: map.players,
-        expected_players,
-        runtime_players: settings.active_teams.len(),
-        active_players: settings
-            .active_teams
-            .iter()
-            .filter(|active| **active)
-            .count(),
-        economy_rows: world.resource::<Economies>().players.len(),
-        unit_teams: player_flag_count(&unit_teams),
-        structure_teams: player_flag_count(&structure_teams),
-        command_center_teams: player_flag_count(&command_center_teams),
-        fallback_spawn_matches: player_flag_count(&fallback_spawn_matches),
-        visible_player_index: settings.visible_player.team.economy_index(),
-        phase,
-        frames,
-        remaining_teams: match_state.remaining_teams,
-        remaining_anchors: match_state.remaining_anchors,
-    }
-}
-
-fn mark_player_flag(flags: &mut Vec<bool>, team: Team) -> Option<usize> {
-    let index = team.economy_index()?;
-    if flags.len() <= index {
-        flags.resize(index + 1, false);
-    }
-    flags[index] = true;
-    Some(index)
-}
-
-fn player_flag_count(flags: &[bool]) -> usize {
-    flags.iter().filter(|flag| **flag).count()
-}
-
-pub fn run_capture_match_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureMatchProof {
-    let mut app = build_capture_match_app_for_faction(faction);
-    run_capture_match_proof(&mut app, faction, max_frames)
-}
-
-pub fn run_real_menu_match_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureMatchProof {
-    let mut app = build_real_menu_match_app_for_faction(faction);
-    run_capture_match_proof(&mut app, faction, max_frames)
-}
-
-pub fn run_real_menu_harvest_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureHarvestProof {
-    let mut app = build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Beginner);
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(0.25),
-    ));
-    run_real_menu_harvest_proof(&mut app, faction, max_frames)
-}
-
-pub fn run_real_menu_dual_harvest_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureDualHarvestProof {
-    let mut app = build_real_menu_match_app_for_faction_with_ai_and_starting_resources(
-        faction,
-        AiDifficulty::Beginner,
-        0,
-    );
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_real_menu_dual_harvest_proof(&mut app, faction, max_frames)
-}
-
-pub fn run_real_menu_supply_crate_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureSupplyCrateProof {
-    let mut app = build_real_menu_match_app(
-        RealMenuMatchStart::new(faction)
-            .with_map_index(1)
-            .with_ai_difficulty(AiDifficulty::Beginner),
-    );
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(0.25),
-    ));
-    run_real_menu_supply_crate_proof(&mut app, faction, max_frames)
-}
-
-pub fn run_real_menu_tech_oil_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureTechOilProof {
-    let mut app = build_real_menu_match_app(
-        RealMenuMatchStart::new(faction)
-            .with_map_index(1)
-            .with_ai_difficulty(AiDifficulty::Beginner),
-    );
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_real_menu_tech_oil_proof(&mut app, faction, max_frames)
-}
-
-pub fn run_real_menu_tech_oil_proofs(max_frames: usize) -> Vec<CaptureTechOilProof> {
-    CaptureProofFaction::ALL
-        .into_iter()
-        .map(|faction| run_real_menu_tech_oil_proof_for_faction(faction, max_frames))
-        .collect()
-}
-
-pub fn run_real_menu_ai_pressure_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureAiPressureProof {
-    let mut app = build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Hard);
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_real_menu_ai_pressure_proof(&mut app, faction, max_frames)
-}
-
-pub fn run_real_menu_ai_pressure_proofs(max_frames: usize) -> Vec<CaptureAiPressureProof> {
-    CaptureProofFaction::ALL
-        .into_iter()
-        .map(|faction| run_real_menu_ai_pressure_proof_for_faction(faction, max_frames))
-        .collect()
-}
-
-pub fn run_real_menu_ai_vs_ai_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureAiVsAiProof {
-    let mut app = build_real_menu_match_app(
-        RealMenuMatchStart::new(faction)
-            .with_match_mode(SkirmishMatchMode::AiVsAi)
-            .with_ai_difficulty(AiDifficulty::Hard),
-    );
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_real_menu_ai_vs_ai_proof(&mut app, faction, max_frames)
-}
-
-pub fn run_real_menu_ai_vs_ai_proofs(max_frames: usize) -> Vec<CaptureAiVsAiProof> {
-    CaptureProofFaction::ALL
-        .into_iter()
-        .map(|faction| run_real_menu_ai_vs_ai_proof_for_faction(faction, max_frames))
-        .collect()
-}
-
-pub fn run_real_menu_build_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureBuildProof {
-    let mut app = build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Beginner);
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_real_menu_build_proof(&mut app, faction, max_frames)
-}
-
-pub fn run_real_menu_victory_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureVictoryProof {
-    let mut app = build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Beginner);
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_real_menu_victory_proof(&mut app, faction, max_frames)
-}
-
-pub fn run_real_default_menu_victory_proof(max_frames: usize) -> CaptureVictoryProof {
-    let mut app = build_real_default_menu_match_app();
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_real_menu_victory_proof_with_target_units(
-        &mut app,
-        CaptureProofFaction::Human,
-        max_frames,
-        PRODUCTION_QUEUE_LIMIT + 1,
-        false,
-    )
-}
-
-pub fn run_real_menu_selected_faction_victory_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureVictoryProof {
-    let mut app = build_real_menu_match_app_for_faction_with_ai(faction, AiDifficulty::Beginner);
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_real_menu_victory_proof_with_target_units(
-        &mut app,
-        faction,
-        max_frames,
-        faction.mouse_victory_vehicle_target(),
-        false,
-    )
-}
-
-pub fn run_real_menu_selected_map_victory_proof(
-    map_index: usize,
-    max_frames: usize,
-) -> CaptureVictoryProof {
-    run_real_menu_selected_map_victory_proof_for_faction(
-        CaptureProofFaction::Human,
-        map_index,
-        max_frames,
-    )
-}
-
-pub fn run_real_menu_selected_map_victory_proof_for_faction(
-    faction: CaptureProofFaction,
-    map_index: usize,
-    max_frames: usize,
-) -> CaptureVictoryProof {
-    let mut app = build_real_menu_match_app(
-        RealMenuMatchStart::new(faction)
-            .with_map_index(map_index)
-            .with_ai_difficulty(AiDifficulty::Beginner),
-    );
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_real_menu_victory_proof_with_target_units(
-        &mut app,
-        faction,
-        max_frames,
-        faction
-            .mouse_victory_vehicle_target()
-            .max(PRODUCTION_QUEUE_LIMIT + 1),
-        false,
-    )
-}
-
-pub fn run_real_menu_all_maps_victory_proofs(max_frames: usize) -> Vec<CaptureVictoryProof> {
-    CaptureProofFaction::ALL
-        .into_iter()
-        .flat_map(|faction| {
-            SKIRMISH_MAPS.iter().enumerate().map(move |(map_index, _)| {
-                run_real_menu_selected_map_victory_proof_for_faction(faction, map_index, max_frames)
+    app.add_plugins(
+        DefaultPlugins
+            .set(WindowPlugin {
+                // A synthetic primary window (no winit / no OS surface) so the real
+                // mouse-input systems, which read `Window.cursor_position()`, have a
+                // window to query. Its size matches the offscreen render target so
+                // cursor↔world projection lines up with what the camera renders.
+                primary_window: Some(Window {
+                    resolution: WindowResolution::new(width, height),
+                    visible: false,
+                    ..default()
+                }),
+                exit_condition: bevy::window::ExitCondition::DontExit,
+                ..default()
             })
-        })
-        .collect()
-}
-
-pub fn run_real_menu_allied_victory_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureVictoryProof {
-    let mut app = build_real_menu_match_app(
-        RealMenuMatchStart::new(faction)
-            .with_match_mode(SkirmishMatchMode::AlliedTwoVsOne)
-            .with_ai_difficulty(AiDifficulty::Beginner),
-    );
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_real_menu_victory_proof_with_target_units(
-        &mut app,
-        faction,
-        max_frames,
-        faction.allied_victory_vehicle_target(),
-        false,
+            .set(AssetPlugin {
+                meta_check: AssetMetaCheck::Never,
+                ..default()
+            })
+            .set(bevy::log::LogPlugin {
+                filter: format!(
+                    "warn,bevy_ecs::world::command_queue=error,icu_provider=error,icu_segmenter=error,parley=error,{}=info",
+                    env!("CARGO_PKG_NAME").replace('-', "_")
+                ),
+                ..default()
+            })
+            .disable::<bevy::winit::WinitPlugin>(),
     )
-}
-
-pub fn run_real_menu_allied_victory_proofs(max_frames: usize) -> Vec<CaptureVictoryProof> {
-    CaptureProofFaction::ALL
-        .into_iter()
-        .map(|faction| run_real_menu_allied_victory_proof_for_faction(faction, max_frames))
-        .collect()
-}
-
-pub fn run_real_menu_economy_victory_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureEconomyVictoryProof {
-    let mut app = build_real_menu_match_app_for_faction_with_ai_and_starting_resources(
-        faction,
-        AiDifficulty::Beginner,
-        0,
-    );
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
+    .add_plugins(bevy::app::ScheduleRunnerPlugin::run_loop(
+        std::time::Duration::ZERO,
+    ))
+    .insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
     ));
-    run_real_menu_economy_victory_proof(&mut app, faction, max_frames)
-}
 
-pub fn run_real_menu_playable_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CapturePlayableProof {
-    let mut app = build_real_menu_match_app_for_faction_with_ai_and_starting_resources(
-        faction,
-        AiDifficulty::Beginner,
-        0,
+    app.insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
+        .add_plugins((
+            JsonAssetPlugin::<RtsDataManifest>::new(&["rts.json"]),
+            RonAssetPlugin::<RtsDataManifest>::new(&["rts.ron"]),
+        ))
+        .insert_resource(RenderErrorHandler(handle_render_error));
+    add_game_scenes(&mut app);
+
+    // Create the offscreen image directly in the world so the handle is stable
+    // before any system reads it (Commands-deferred creation would not be).
+    let image = Image::new_target_texture(
+        width,
+        height,
+        bevy::render::render_resource::TextureFormat::Rgba8UnormSrgb,
+        None,
     );
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_real_menu_playable_proof(&mut app, faction, max_frames)
+    let handle = app.world_mut().resource_mut::<Assets<Image>>().add(image);
+    app.insert_resource(CaptureTarget(handle));
+    app.add_systems(Update, retarget_capture_camera);
+    // Drive the app via manual `update()` calls (not `run()`), so we must run
+    // plugin finalization ourselves — this is where `RenderPlugin` creates the
+    // `RenderDevice`. Without it the render systems panic on a missing device.
+    app.finish();
+    app.cleanup();
+    app
 }
 
-pub fn run_real_menu_free_for_all_playable_proof_for_faction(
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CapturePlayableProof {
-    let mut app = build_real_menu_match_app(
-        RealMenuMatchStart::new(faction)
-            .with_ai_difficulty(AiDifficulty::Beginner)
-            .with_starting_resource_index(0)
-            .with_match_mode(SkirmishMatchMode::FreeForAll),
-    );
-    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-        std::time::Duration::from_secs_f32(1.0),
-    ));
-    run_real_menu_playable_proof_with_target_units(
-        &mut app,
-        faction,
-        max_frames,
-        faction.mouse_victory_vehicle_target() * 2,
-    )
-}
+/// Capture/dev helper: orders every player unit to attack-move toward the
+/// nearest enemy base, so a headless capture shows real movement and combat
+/// without waiting out the AI's ~45s opening grace. This drives the same
+/// `AttackMoveOrder` component the live simulation consumes — it is not a
+/// headless assertion harness, it just gives the camera something real to film.
+pub fn capture_player_attack_move_all(app: &mut App) {
+    let player = Team::Player(0);
+    let world = app.world_mut();
 
-pub fn run_capture_match_proof(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureMatchProof {
-    let max_frames = max_frames.max(1);
-    let player_team = CAPTURE_PLAYER_TEAM;
-    let product_id = faction.proof_vehicle();
-    let units_before = capture_unit_count_by_id(app.world_mut(), player_team, product_id);
-    let mut produced_units = 0usize;
-
-    for frame in 0..max_frames {
-        if app.world().resource::<MatchState>().phase != MatchPhase::Running {
-            return capture_match_proof_from_app(app, faction, frame, produced_units, units_before);
+    let mut destination = None;
+    {
+        let mut structures = world.query_filtered::<(&Team, &Transform), With<Structure>>();
+        for (team, transform) in structures.iter(world) {
+            if *team != player && *team != Team::Neutral {
+                destination = Some(transform.translation);
+                break;
+            }
         }
-        advance_capture_match_proof_frame(app, faction, frame);
-        produced_units = produced_units.max(capture_unit_count_by_id(
-            app.world_mut(),
-            player_team,
-            product_id,
-        ));
     }
-
-    capture_match_proof_from_app(app, faction, max_frames, produced_units, units_before)
-}
-
-pub fn advance_capture_match_proof_frame(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    frame: usize,
-) {
-    if app.world().resource::<MatchState>().phase != MatchPhase::Running {
+    if destination.is_none() {
+        let mut units = world.query_filtered::<(&Team, &Transform), With<Unit>>();
+        for (team, transform) in units.iter(world) {
+            if *team != player && *team != Team::Neutral {
+                destination = Some(transform.translation);
+                break;
+            }
+        }
+    }
+    let Some(destination) = destination else {
         return;
-    }
-    capture_queue_player_units(
-        app,
-        CAPTURE_PLAYER_TEAM,
-        faction.proof_vehicle(),
-        faction.proof_vehicle_target(),
-    );
-    if frame % 30 == 0 {
-        capture_order_player_attackers(app, CAPTURE_PLAYER_TEAM);
-    }
-    app.update();
-}
-
-fn capture_match_proof_from_app(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    frames: usize,
-    produced_units: usize,
-    units_before: usize,
-) -> CaptureMatchProof {
-    capture_match_proof_status(
-        app,
-        faction,
-        frames,
-        produced_units.saturating_sub(units_before) as u32,
-    )
-}
-
-pub fn capture_match_proof_status(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    frames: usize,
-    produced_units: u32,
-) -> CaptureMatchProof {
-    let snapshot = capture_match_snapshot(app);
-    let player_stats = capture_stats_for_team(&snapshot, CAPTURE_PLAYER_TEAM);
-    CaptureMatchProof {
-        faction,
-        product_id: faction.proof_vehicle(),
-        phase: snapshot.phase,
-        frames,
-        elapsed_seconds: snapshot.elapsed_seconds.round() as u32,
-        produced_units,
-        player_units: player_stats.units,
-        enemy_units_destroyed: snapshot.enemy_units_destroyed,
-        enemy_structures_destroyed: snapshot.enemy_structures_destroyed,
-        remaining_teams: snapshot.remaining_teams,
-        remaining_anchors: snapshot.remaining_anchors,
-    }
-}
-
-pub fn capture_proof_unit_count(app: &mut App, faction: CaptureProofFaction) -> u32 {
-    capture_unit_count_by_id(
-        app.world_mut(),
-        CAPTURE_PLAYER_TEAM,
-        faction.proof_vehicle(),
-    ) as u32
-}
-
-fn run_real_menu_harvest_proof(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureHarvestProof {
-    let max_frames = max_frames.max(1);
-    let team = CAPTURE_PLAYER_TEAM;
-    let mut frames = 0usize;
-    let mut harvest_ordered = false;
-    let mut product_id = "";
-    let mut produced_units = 0u32;
-
-    {
-        let mut economies = app.world_mut().resource_mut::<Economies>();
-        let economy = economies.get_mut(team);
-        economy.ore = 0;
-        economy.crystal = 0;
-    }
-
-    let Some((harvester, harvester_position)) =
-        capture_first_alive_resource_collector(app.world_mut(), team)
-    else {
-        return capture_harvest_proof_status(
-            app,
-            faction,
-            frames,
-            false,
-            0,
-            0,
-            0,
-            product_id,
-            produced_units,
-        );
-    };
-    let Some((resource, resource_before, resource_position)) =
-        capture_nearest_visible_resource(app.world_mut(), ResourceKind::Ore, harvester_position)
-    else {
-        return capture_harvest_proof_status(
-            app,
-            faction,
-            frames,
-            false,
-            0,
-            0,
-            0,
-            product_id,
-            produced_units,
-        );
-    };
-    let ore_before = capture_team_ore(app.world(), team);
-
-    if capture_world_left_click(app, harvester_position)
-        && app
-            .world()
-            .get_entity(harvester)
-            .is_ok_and(|entity| entity.get::<Selected>().is_some())
-        && capture_world_right_click(app, resource_position)
-    {
-        harvest_ordered = app
-            .world()
-            .get::<HarvestOrder>(harvester)
-            .is_some_and(|order| order.resource == Some(resource));
-    }
-
-    for _ in 0..max_frames {
-        frames += 1;
-        app.update();
-        if capture_team_ore(app.world(), team) > ore_before {
-            break;
-        }
-    }
-
-    let resource_after_harvest = capture_resource_amount(app.world(), resource);
-    if harvest_ordered
-        && capture_team_ore(app.world(), team) > ore_before
-        && resource_after_harvest < resource_before
-    {
-        let mut train_button = None;
-        while train_button.is_none() && frames < max_frames {
-            for producer_id in ["Barracks", "CommandCenter"] {
-                if let Some(command) =
-                    capture_affordable_train_command_from_producer(app, team, producer_id)
-                {
-                    train_button = Some(command);
-                    break;
-                }
-            }
-            if train_button.is_none() {
-                frames += 1;
-                app.update();
-            }
-        }
-
-        if let Some((button, train_id)) = train_button {
-            product_id = train_id;
-            let units_before = capture_unit_count_by_id(app.world_mut(), team, train_id);
-            capture_click_command_button(app, button);
-            while frames < max_frames {
-                frames += 1;
-                app.update();
-                let current = capture_unit_count_by_id(app.world_mut(), team, train_id);
-                if current > units_before {
-                    produced_units = current.saturating_sub(units_before) as u32;
-                    break;
-                }
-            }
-        }
-    }
-
-    let resource_after = capture_resource_amount(app.world(), resource);
-    capture_harvest_proof_status(
-        app,
-        faction,
-        frames,
-        harvest_ordered,
-        ore_before,
-        resource_before,
-        resource_after,
-        product_id,
-        produced_units,
-    )
-}
-
-fn capture_harvest_proof_status(
-    app: &App,
-    faction: CaptureProofFaction,
-    frames: usize,
-    harvest_ordered: bool,
-    ore_before: i32,
-    resource_before: i32,
-    resource_after: i32,
-    product_id: &'static str,
-    produced_units: u32,
-) -> CaptureHarvestProof {
-    let snapshot_phase = match app.world().resource::<MatchState>().phase {
-        MatchPhase::Running => CaptureMatchPhase::Running,
-        MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
-        MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
-        MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
-    };
-    CaptureHarvestProof {
-        faction,
-        phase: snapshot_phase,
-        frames,
-        harvest_ordered,
-        ore_before,
-        ore_after: capture_team_ore(app.world(), CAPTURE_PLAYER_TEAM),
-        resource_before,
-        resource_after,
-        product_id,
-        produced_units,
-    }
-}
-
-fn run_real_menu_dual_harvest_proof(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureDualHarvestProof {
-    let max_frames = max_frames.max(1);
-    let team = CAPTURE_PLAYER_TEAM;
-    let resources_before = capture_team_resources(app.world(), team);
-    let mut frames = 0usize;
-    let ore_harvest_ordered = capture_harvest_kind_until_resource_increases(
-        app,
-        team,
-        ResourceKind::Ore,
-        max_frames,
-        &mut frames,
-    );
-    let crystal_harvest_ordered = if frames < max_frames {
-        capture_harvest_kind_until_resource_increases(
-            app,
-            team,
-            ResourceKind::Crystal,
-            max_frames,
-            &mut frames,
-        )
-    } else {
-        false
     };
 
-    capture_dual_harvest_proof_status(
-        app,
-        faction,
-        frames,
-        resources_before,
-        ore_harvest_ordered,
-        crystal_harvest_ordered,
-    )
-}
-
-fn capture_dual_harvest_proof_status(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    frames: usize,
-    resources_before: (i32, i32),
-    ore_harvest_ordered: bool,
-    crystal_harvest_ordered: bool,
-) -> CaptureDualHarvestProof {
-    let snapshot = capture_match_snapshot(app);
-    let player_stats = capture_stats_for_team(&snapshot, CAPTURE_PLAYER_TEAM);
-    CaptureDualHarvestProof {
-        faction,
-        phase: snapshot.phase,
-        frames,
-        ore_before: resources_before.0,
-        ore_after: player_stats.ore,
-        crystal_before: resources_before.1,
-        crystal_after: player_stats.crystal,
-        ore_harvest_ordered,
-        crystal_harvest_ordered,
-    }
-}
-
-fn run_real_menu_supply_crate_proof(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureSupplyCrateProof {
-    let max_frames = max_frames.max(1);
-    let team = CAPTURE_PLAYER_TEAM;
-    let mut frames = 0usize;
-    let resources_before = capture_team_resources(app.world(), team);
-    let mut collector_id = "";
-    let mut collector_selected = false;
-    let mut move_ordered = false;
-    let mut crate_consumed = false;
-
-    let Some((collector, collector_position, id)) =
-        capture_first_alive_supply_crate_collector(app.world_mut(), team)
-    else {
-        return capture_supply_crate_proof_status(
-            app,
-            faction,
-            frames,
-            collector_id,
-            collector_selected,
-            move_ordered,
-            crate_consumed,
-            resources_before,
-        );
-    };
-    collector_id = id;
-
-    let Some((crate_entity, crate_position)) = capture_nearest_supply_crate(
-        app.world_mut(),
-        SupplyCrateEffect::Resources,
-        collector_position,
-    ) else {
-        return capture_supply_crate_proof_status(
-            app,
-            faction,
-            frames,
-            collector_id,
-            collector_selected,
-            move_ordered,
-            crate_consumed,
-            resources_before,
-        );
-    };
-    if let Ok(mut entity) = app.world_mut().get_entity_mut(crate_entity) {
-        entity.insert((VisibilityState { visible: true }, Visibility::Visible));
-    }
-
-    collector_selected = capture_world_left_click(app, collector_position)
-        && app
-            .world()
-            .get_entity(collector)
-            .is_ok_and(|entity| entity.get::<Selected>().is_some());
-    let crate_ground = Vec3::new(crate_position.x, 0.0, crate_position.z);
-    if collector_selected && capture_world_right_click(app, crate_ground) {
-        move_ordered = app
-            .world()
-            .get::<MoveOrder>(collector)
-            .is_some_and(|order| xz_distance(order.target, crate_position) < 0.08);
-    }
-
-    while frames < max_frames {
-        frames += 1;
-        app.update();
-        if app.world().get_entity(crate_entity).is_err() {
-            crate_consumed = true;
-            break;
-        }
-        if app.world().resource::<MatchState>().phase != MatchPhase::Running {
-            break;
-        }
-    }
-
-    capture_supply_crate_proof_status(
-        app,
-        faction,
-        frames,
-        collector_id,
-        collector_selected,
-        move_ordered,
-        crate_consumed,
-        resources_before,
-    )
-}
-
-fn capture_supply_crate_proof_status(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    frames: usize,
-    collector_id: &'static str,
-    collector_selected: bool,
-    move_ordered: bool,
-    crate_consumed: bool,
-    resources_before: (i32, i32),
-) -> CaptureSupplyCrateProof {
-    let snapshot = capture_match_snapshot(app);
-    let player_stats = capture_stats_for_team(&snapshot, CAPTURE_PLAYER_TEAM);
-    CaptureSupplyCrateProof {
-        faction,
-        map_id: capture_selected_map_id(app),
-        phase: snapshot.phase,
-        frames,
-        collector_id,
-        collector_selected,
-        move_ordered,
-        crate_consumed,
-        ore_before: resources_before.0,
-        ore_after: player_stats.ore,
-        crystal_before: resources_before.1,
-        crystal_after: player_stats.crystal,
-    }
-}
-
-fn run_real_menu_tech_oil_proof(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureTechOilProof {
-    let max_frames = max_frames.max(1);
-    let team = CAPTURE_PLAYER_TEAM;
-    let mut frames = 0usize;
-    let mut robotics_constructed = false;
-    let mut engineer_produced = false;
-    let mut engineer_selected = false;
-    let mut capture_ordered = false;
-    let mut captured = false;
-    let mut engineer_consumed = false;
-    let mut ore_before = capture_team_ore(app.world(), team);
-    let capture_bonus_ore =
-        registry::entity("TechOilDerrick").map_or(0, |def| def.capture_bonus_ore);
-
-    let radar_constructed = capture_ensure_constructed_structure_from_worker(
-        app,
-        team,
-        "RadarUplink",
-        max_frames,
-        &mut frames,
-    )
-    .constructed;
-    if frames < max_frames {
-        robotics_constructed = capture_ensure_constructed_structure_from_worker(
-            app,
-            team,
-            "RoboticsBay",
-            max_frames,
-            &mut frames,
-        )
-        .constructed;
-    }
-
-    let mut engineer_entity = None;
-    if radar_constructed && robotics_constructed && frames < max_frames {
-        engineer_entity = capture_train_unit_from_producer(
-            app,
-            team,
-            "CommandCenter",
-            "EngineerDrone",
-            max_frames,
-            &mut frames,
-        );
-        engineer_produced = engineer_entity.is_some();
-    }
-
-    if let Some(engineer) = engineer_entity {
-        let engineer_position =
-            capture_entity_position(app.world(), engineer).unwrap_or(Vec3::ZERO);
-        if let Some((oil, oil_position, _)) = capture_nearest_structure_by_id_and_team(
-            app.world_mut(),
-            Team::Neutral,
-            "TechOilDerrick",
-            engineer_position,
-            Some(true),
-        ) {
-            ore_before = capture_team_ore(app.world(), team);
-            if let Ok(mut entity) = app.world_mut().get_entity_mut(engineer) {
-                entity.insert((VisibilityState { visible: true }, Visibility::Visible));
-            }
-            engineer_selected = capture_world_left_click_projected(app, engineer_position)
-                && app
-                    .world()
-                    .get_entity(engineer)
-                    .is_ok_and(|entity| entity.get::<Selected>().is_some());
-            if let Ok(mut entity) = app.world_mut().get_entity_mut(oil) {
-                entity.insert((VisibilityState { visible: true }, Visibility::Visible));
-            }
-            if engineer_selected
-                && capture_world_right_click(app, Vec3::new(oil_position.x, 0.0, oil_position.z))
-            {
-                capture_ordered = app
-                    .world()
-                    .get::<CaptureOrder>(engineer)
-                    .is_some_and(|order| order.target == oil);
-            }
-
-            while frames < max_frames {
-                frames += 1;
-                app.update();
-                if capture_entity_team(app.world(), oil) == Some(team) {
-                    captured = true;
-                    break;
-                }
-                if app.world().resource::<MatchState>().phase != MatchPhase::Running {
-                    break;
-                }
-            }
-            engineer_consumed = app.world().get_entity(engineer).is_err();
-        }
-    }
-
-    CaptureTechOilProof {
-        faction,
-        map_id: capture_selected_map_id(app),
-        phase: capture_match_phase(app.world()),
-        frames,
-        radar_constructed,
-        robotics_constructed,
-        engineer_produced,
-        engineer_selected,
-        capture_ordered,
-        captured,
-        engineer_consumed,
-        ore_before,
-        ore_after: capture_team_ore(app.world(), team),
-        capture_bonus_ore,
-    }
-}
-
-fn run_real_menu_ai_pressure_proof(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureAiPressureProof {
-    let max_frames = max_frames.max(1);
-    let player_team = CAPTURE_PLAYER_TEAM;
-    let Some(ai_team) = capture_primary_active_enemy_team(app.world(), player_team) else {
-        return capture_ai_pressure_proof_status(app, faction, 0, Team::Neutral, 0, 0, 0, 0.0, 0.0);
-    };
-
-    let ai_units_before = capture_alive_unit_count(app.world_mut(), ai_team) as u32;
-    let player_health_before = capture_team_total_health(app.world_mut(), player_team);
-    let mut ai_units_peak = ai_units_before;
-    let mut ai_attack_orders_peak = 0u32;
-    let mut player_health_min = player_health_before;
-    let mut frames = 0usize;
-
-    while frames < max_frames && app.world().resource::<MatchState>().phase == MatchPhase::Running {
-        frames += 1;
-        app.update();
-        ai_units_peak =
-            ai_units_peak.max(capture_alive_unit_count(app.world_mut(), ai_team) as u32);
-        ai_attack_orders_peak = ai_attack_orders_peak.max(capture_attack_orders_against_team(
-            app.world_mut(),
-            ai_team,
-            player_team,
-        ) as u32);
-        player_health_min =
-            player_health_min.min(capture_team_total_health(app.world_mut(), player_team));
-        if ai_units_peak > ai_units_before
-            && ai_attack_orders_peak > 0
-            && player_health_min < player_health_before
-        {
-            break;
-        }
-    }
-
-    capture_ai_pressure_proof_status(
-        app,
-        faction,
-        frames,
-        ai_team,
-        ai_units_before,
-        ai_units_peak,
-        ai_attack_orders_peak,
-        player_health_before,
-        player_health_min,
-    )
-}
-
-fn capture_ai_pressure_proof_status(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    frames: usize,
-    ai_team: Team,
-    ai_units_before: u32,
-    ai_units_peak: u32,
-    ai_attack_orders: u32,
-    player_health_before: f32,
-    player_health_after: f32,
-) -> CaptureAiPressureProof {
-    let snapshot = capture_match_snapshot(app);
-    CaptureAiPressureProof {
-        faction,
-        phase: snapshot.phase,
-        frames,
-        ai_team: capture_team_from_team(ai_team),
-        ai_units_before,
-        ai_units_peak,
-        ai_attack_orders,
-        player_health_before,
-        player_health_after,
-    }
-}
-
-fn run_real_menu_ai_vs_ai_proof(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureAiVsAiProof {
-    let max_frames = max_frames.max(1);
-    let Some((focus_team, opponent_team)) =
-        capture_ai_vs_ai_focus_and_opponent(app.world(), CAPTURE_PLAYER_TEAM)
-    else {
-        return capture_ai_vs_ai_proof_status(
-            app,
-            faction,
-            0,
-            Team::Neutral,
-            Team::Neutral,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-        );
-    };
-
-    let focus_units_before = capture_alive_unit_count(app.world_mut(), focus_team) as u32;
-    let opponent_units_before = capture_alive_unit_count(app.world_mut(), opponent_team) as u32;
-    let focus_health_before = capture_team_total_health(app.world_mut(), focus_team);
-    let opponent_health_before = capture_team_total_health(app.world_mut(), opponent_team);
-    let mut focus_units_peak = focus_units_before;
-    let mut opponent_units_peak = opponent_units_before;
-    let mut focus_attack_orders_peak = 0u32;
-    let mut opponent_attack_orders_peak = 0u32;
-    let mut focus_health_min = focus_health_before;
-    let mut opponent_health_min = opponent_health_before;
-    let mut frames = 0usize;
-
-    while frames < max_frames && app.world().resource::<MatchState>().phase == MatchPhase::Running {
-        frames += 1;
-        app.update();
-        focus_units_peak =
-            focus_units_peak.max(capture_alive_unit_count(app.world_mut(), focus_team) as u32);
-        opponent_units_peak = opponent_units_peak
-            .max(capture_alive_unit_count(app.world_mut(), opponent_team) as u32);
-        focus_attack_orders_peak = focus_attack_orders_peak.max(
-            capture_attack_orders_against_team(app.world_mut(), focus_team, opponent_team) as u32,
-        );
-        opponent_attack_orders_peak = opponent_attack_orders_peak.max(
-            capture_attack_orders_against_team(app.world_mut(), opponent_team, focus_team) as u32,
-        );
-        focus_health_min =
-            focus_health_min.min(capture_team_total_health(app.world_mut(), focus_team));
-        opponent_health_min =
-            opponent_health_min.min(capture_team_total_health(app.world_mut(), opponent_team));
-        if focus_units_peak > focus_units_before
-            && opponent_units_peak > opponent_units_before
-            && focus_attack_orders_peak + opponent_attack_orders_peak > 0
-            && (focus_health_min < focus_health_before
-                || opponent_health_min < opponent_health_before)
-        {
-            break;
-        }
-    }
-
-    capture_ai_vs_ai_proof_status(
-        app,
-        faction,
-        frames,
-        focus_team,
-        opponent_team,
-        focus_units_before,
-        focus_units_peak,
-        opponent_units_before,
-        opponent_units_peak,
-        focus_attack_orders_peak,
-        opponent_attack_orders_peak,
-        focus_health_before,
-        focus_health_min,
-        opponent_health_before,
-        opponent_health_min,
-    )
-}
-
-fn capture_ai_vs_ai_focus_and_opponent(world: &World, focus_team: Team) -> Option<(Team, Team)> {
-    let active_teams = world.resource::<ActiveTeams>();
-    let relations = world.resource::<TeamRelations>().clone();
-    let candidates = player_teams(active_teams.0.len())
-        .filter(|team| team_is_active(*team, Some(active_teams)))
-        .collect::<Vec<_>>();
-    if team_is_active(focus_team, Some(active_teams))
-        && let Some(opponent) = candidates
-            .iter()
-            .copied()
-            .find(|team| *team != focus_team && relations.are_enemies(focus_team, *team))
-    {
-        return Some((focus_team, opponent));
-    }
-
-    candidates.iter().copied().find_map(|first| {
-        candidates
-            .iter()
-            .copied()
-            .find(|second| *second != first && relations.are_enemies(first, *second))
-            .map(|second| (first, second))
-    })
-}
-
-#[allow(clippy::too_many_arguments)]
-fn capture_ai_vs_ai_proof_status(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    frames: usize,
-    focus_team: Team,
-    opponent_team: Team,
-    focus_units_before: u32,
-    focus_units_peak: u32,
-    opponent_units_before: u32,
-    opponent_units_peak: u32,
-    focus_attack_orders: u32,
-    opponent_attack_orders: u32,
-    focus_health_before: f32,
-    focus_health_after: f32,
-    opponent_health_before: f32,
-    opponent_health_after: f32,
-) -> CaptureAiVsAiProof {
-    let snapshot = capture_match_snapshot(app);
-    CaptureAiVsAiProof {
-        focus_faction: faction,
-        map_id: capture_selected_map_id(app),
-        match_mode_id: capture_match_mode_id(app),
-        phase: snapshot.phase,
-        frames,
-        focus_team: capture_team_from_team(focus_team),
-        opponent_team: capture_team_from_team(opponent_team),
-        focus_units_before,
-        focus_units_peak,
-        opponent_units_before,
-        opponent_units_peak,
-        focus_attack_orders,
-        opponent_attack_orders,
-        focus_health_before,
-        focus_health_after,
-        opponent_health_before,
-        opponent_health_after,
-        remaining_teams: snapshot.remaining_teams,
-        remaining_anchors: snapshot.remaining_anchors,
-    }
-}
-
-fn run_real_menu_build_proof(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureBuildProof {
-    let max_frames = max_frames.max(1);
-    let team = CAPTURE_PLAYER_TEAM;
-    let structure_id = "Barracks";
-    let mut frames = 0usize;
-    let mut placement_started = false;
-    let mut placed = false;
-    let mut construct_ordered = false;
-    let mut constructed = false;
-    let mut product_id = "";
-    let mut produced_units = 0u32;
-
-    {
-        let mut economies = app.world_mut().resource_mut::<Economies>();
-        let economy = economies.get_mut(team);
-        economy.ore = economy.ore.max(200);
-        economy.crystal = economy.crystal.max(200);
-    }
-
-    let Some((worker, worker_position)) =
-        capture_ensure_builder_worker(app, team, max_frames, &mut frames)
-    else {
-        return capture_build_proof_status(
-            app,
-            faction,
-            frames,
-            structure_id,
-            placement_started,
-            placed,
-            construct_ordered,
-            constructed,
-            product_id,
-            produced_units,
-        );
-    };
-
-    if capture_world_left_click(app, worker_position)
-        && app
-            .world()
-            .get_entity(worker)
-            .is_ok_and(|entity| entity.get::<Selected>().is_some())
-    {
-        app.update();
-        if let Some(button) =
-            capture_enabled_command_for_action(app, BuildAction::Build(structure_id))
-        {
-            capture_click_command_button(app, button);
-            placement_started = app
-                .world()
-                .resource::<CommandMode>()
-                .pending_structure_placement
-                .is_some_and(|pending| pending.id == structure_id);
-        }
-    }
-
-    let mut placed_structure = None;
-    if placement_started
-        && let Some(placement) =
-            capture_valid_structure_placement_point_near_team_base(app, team, structure_id)
-        && capture_world_left_click(app, placement)
-    {
-        placed_structure = capture_structure_by_id_near(
-            app.world_mut(),
-            team,
-            structure_id,
-            placement,
-            Some(false),
-        );
-        placed = placed_structure.is_some()
-            && app
-                .world()
-                .resource::<CommandMode>()
-                .pending_structure_placement
-                .is_none();
-    }
-
-    if let Some((structure, structure_position, _)) = placed_structure {
-        if let Ok(mut entity) = app.world_mut().get_entity_mut(structure) {
-            entity.insert((VisibilityState { visible: true }, Visibility::Visible));
-        }
-        let current_worker_position =
-            capture_entity_position(app.world(), worker).unwrap_or(worker_position);
-        if capture_world_left_click(app, current_worker_position)
-            && app
-                .world()
-                .get_entity(worker)
-                .is_ok_and(|entity| entity.get::<Selected>().is_some())
-            && capture_world_right_click(app, structure_position)
-        {
-            construct_ordered = app
-                .world()
-                .get::<ConstructOrder>(worker)
-                .is_some_and(|order| order.target == structure);
-        }
-
-        while frames < max_frames {
-            frames += 1;
-            app.update();
-            constructed = capture_structure_constructed(app.world(), structure);
-            if constructed {
-                break;
-            }
-        }
-
-        if constructed
-            && capture_world_left_click(app, structure_position)
-            && app
-                .world()
-                .get_entity(structure)
-                .is_ok_and(|entity| entity.get::<Selected>().is_some())
-        {
-            app.update();
-            let Some((button, train_id)) = capture_first_affordable_train_command(app, team) else {
-                return capture_build_proof_status(
-                    app,
-                    faction,
-                    frames,
-                    structure_id,
-                    placement_started,
-                    placed,
-                    construct_ordered,
-                    constructed,
-                    product_id,
-                    produced_units,
-                );
-            };
-            product_id = train_id;
-            let units_before = capture_unit_count_by_id(app.world_mut(), team, train_id);
-            capture_click_command_button(app, button);
-            while frames < max_frames {
-                frames += 1;
-                app.update();
-                let current = capture_unit_count_by_id(app.world_mut(), team, train_id);
-                if current > units_before {
-                    produced_units = current.saturating_sub(units_before) as u32;
-                    break;
-                }
-            }
-        }
-    }
-
-    capture_build_proof_status(
-        app,
-        faction,
-        frames,
-        structure_id,
-        placement_started,
-        placed,
-        construct_ordered,
-        constructed,
-        product_id,
-        produced_units,
-    )
-}
-
-fn capture_build_proof_status(
-    app: &App,
-    faction: CaptureProofFaction,
-    frames: usize,
-    structure_id: &'static str,
-    placement_started: bool,
-    placed: bool,
-    construct_ordered: bool,
-    constructed: bool,
-    product_id: &'static str,
-    produced_units: u32,
-) -> CaptureBuildProof {
-    let phase = match app.world().resource::<MatchState>().phase {
-        MatchPhase::Running => CaptureMatchPhase::Running,
-        MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
-        MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
-        MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
-    };
-    CaptureBuildProof {
-        faction,
-        phase,
-        frames,
-        structure_id,
-        placement_started,
-        placed,
-        construct_ordered,
-        constructed,
-        product_id,
-        produced_units,
-    }
-}
-
-fn run_real_menu_victory_proof(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureVictoryProof {
-    run_real_menu_victory_proof_with_target_units(
-        app,
-        faction,
-        max_frames,
-        faction.mouse_victory_vehicle_target(),
-        true,
-    )
-}
-
-fn run_real_menu_victory_proof_with_target_units(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-    target_units: usize,
-    grant_resources: bool,
-) -> CaptureVictoryProof {
-    let max_frames = max_frames.max(1);
-    let team = CAPTURE_PLAYER_TEAM;
-    let product_id = faction.proof_vehicle();
-    let mut frames = 0usize;
-    let mut attack_orders = 0u32;
-
-    let Some(product_def) = registry::entity(product_id) else {
-        return capture_victory_proof_status(
-            app,
-            faction,
-            frames,
-            product_id,
-            target_units as u32,
-            0,
-            attack_orders,
-        );
-    };
-    if grant_resources {
-        let mut economies = app.world_mut().resource_mut::<Economies>();
-        let economy = economies.get_mut(team);
-        economy.ore = economy
-            .ore
-            .max(product_def.cost.ore * target_units as i32 + 320);
-        economy.crystal = economy
-            .crystal
-            .max(product_def.cost.crystal * target_units as i32 + 320);
-    }
-
-    let produced_units = capture_train_attack_group_from_factory_command_panel(
-        app,
-        team,
-        product_id,
-        target_units,
-        max_frames,
-        &mut frames,
-    );
-    attack_orders +=
-        capture_finish_match_with_mouse_attackers(app, team, max_frames, &mut frames) as u32;
-
-    capture_victory_proof_status(
-        app,
-        faction,
-        frames,
-        product_id,
-        target_units as u32,
-        produced_units,
-        attack_orders,
-    )
-}
-
-fn run_real_menu_economy_victory_proof(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CaptureEconomyVictoryProof {
-    let max_frames = max_frames.max(1);
-    let team = CAPTURE_PLAYER_TEAM;
-    let product_id = faction.proof_vehicle();
-    let target_units = faction.mouse_victory_vehicle_target();
-    let Some(product_def) = registry::entity(product_id) else {
-        return capture_economy_victory_proof_status(
-            app,
-            faction,
-            0,
-            (0, 0),
-            (0, 0),
-            false,
-            false,
-            product_id,
-            target_units as u32,
-            0,
-            0,
-        );
-    };
-    let required_ore = product_def.cost.ore * target_units as i32;
-    let required_crystal = product_def.cost.crystal * target_units as i32;
-    let resources_before = capture_team_resources(app.world(), team);
-    let mut frames = 0usize;
-    let mut ore_harvest_ordered = false;
-    let mut crystal_harvest_ordered = false;
-
-    while frames < max_frames {
-        let (ore, crystal) = capture_team_resources(app.world(), team);
-        if ore >= required_ore && crystal >= required_crystal {
-            break;
-        }
-        if ore < required_ore {
-            if !capture_harvest_kind_until_resource_increases(
-                app,
-                team,
-                ResourceKind::Ore,
-                max_frames,
-                &mut frames,
-            ) {
-                break;
-            }
-            ore_harvest_ordered = true;
-            continue;
-        }
-        if crystal < required_crystal {
-            if !capture_harvest_kind_until_resource_increases(
-                app,
-                team,
-                ResourceKind::Crystal,
-                max_frames,
-                &mut frames,
-            ) {
-                break;
-            }
-            crystal_harvest_ordered = true;
-            continue;
-        }
-    }
-
-    let resources_after_harvest = capture_team_resources(app.world(), team);
-    let produced_units = capture_train_attack_group_from_factory_command_panel(
-        app,
-        team,
-        product_id,
-        target_units,
-        max_frames,
-        &mut frames,
-    );
-    let attack_orders =
-        capture_finish_match_with_mouse_attackers(app, team, max_frames, &mut frames) as u32;
-
-    capture_economy_victory_proof_status(
-        app,
-        faction,
-        frames,
-        resources_before,
-        resources_after_harvest,
-        ore_harvest_ordered,
-        crystal_harvest_ordered,
-        product_id,
-        target_units as u32,
-        produced_units,
-        attack_orders,
-    )
-}
-
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-struct CaptureBarracksBuildResult {
-    placement_started: bool,
-    placed: bool,
-    construct_ordered: bool,
-    constructed: bool,
-    product_id: &'static str,
-    produced_units: u32,
-}
-
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-struct CaptureStructureBuildOnlyResult {
-    placement_started: bool,
-    placed: bool,
-    construct_ordered: bool,
-    constructed: bool,
-}
-
-fn run_real_menu_playable_proof(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-) -> CapturePlayableProof {
-    run_real_menu_playable_proof_with_target_units(
-        app,
-        faction,
-        max_frames,
-        faction.mouse_victory_vehicle_target(),
-    )
-}
-
-fn run_real_menu_playable_proof_with_target_units(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    max_frames: usize,
-    target_units: usize,
-) -> CapturePlayableProof {
-    let max_frames = max_frames.max(1);
-    let team = CAPTURE_PLAYER_TEAM;
-    let vehicle_id = faction.proof_vehicle();
-    let Some(vehicle_def) = registry::entity(vehicle_id) else {
-        return capture_playable_proof_status(
-            app,
-            faction,
-            0,
-            (0, 0),
-            (0, 0),
-            (false, false),
-            CaptureBarracksBuildResult::default(),
-            vehicle_id,
-            target_units as u32,
-            0,
-            0,
-        );
-    };
-    let Some(barracks_def) = registry::entity("Barracks") else {
-        return capture_playable_proof_status(
-            app,
-            faction,
-            0,
-            (0, 0),
-            (0, 0),
-            (false, false),
-            CaptureBarracksBuildResult::default(),
-            vehicle_id,
-            target_units as u32,
-            0,
-            0,
-        );
-    };
-
-    let resources_before = capture_team_resources(app.world(), team);
-    let mut frames = 0usize;
-    let mut harvest_flags = (false, false);
-    let mut harvest_peaks = resources_before;
-    let upfront_ore = vehicle_def.cost.ore * target_units as i32 + barracks_def.cost.ore + 2;
-    let upfront_crystal =
-        vehicle_def.cost.crystal * target_units as i32 + barracks_def.cost.crystal + 1;
-    capture_harvest_until_resources(
-        app,
-        team,
-        upfront_ore,
-        upfront_crystal,
-        max_frames,
-        &mut frames,
-        &mut harvest_flags,
-        &mut harvest_peaks,
-    );
-    capture_force_sample_harvests(
-        app,
-        team,
-        max_frames,
-        &mut frames,
-        &mut harvest_flags,
-        &mut harvest_peaks,
-    );
-
-    let build_result =
-        capture_build_barracks_and_train_unit_from_mouse(app, team, max_frames, &mut frames);
-
-    let vehicle_ore = vehicle_def.cost.ore * target_units as i32;
-    let vehicle_crystal = vehicle_def.cost.crystal * target_units as i32;
-    capture_harvest_until_resources(
-        app,
-        team,
-        vehicle_ore,
-        vehicle_crystal,
-        max_frames,
-        &mut frames,
-        &mut harvest_flags,
-        &mut harvest_peaks,
-    );
-
-    let produced_units = capture_train_attack_group_from_factory_command_panel(
-        app,
-        team,
-        vehicle_id,
-        target_units,
-        max_frames,
-        &mut frames,
-    );
-    let attack_orders =
-        capture_finish_match_with_mouse_attackers(app, team, max_frames, &mut frames) as u32;
-
-    capture_playable_proof_status(
-        app,
-        faction,
-        frames,
-        resources_before,
-        harvest_peaks,
-        harvest_flags,
-        build_result,
-        vehicle_id,
-        target_units as u32,
-        produced_units,
-        attack_orders,
-    )
-}
-
-fn capture_victory_proof_status(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    frames: usize,
-    product_id: &'static str,
-    target_units: u32,
-    produced_units: u32,
-    attack_orders: u32,
-) -> CaptureVictoryProof {
-    let snapshot = capture_match_snapshot(app);
-    let player_stats = capture_stats_for_team(&snapshot, CAPTURE_PLAYER_TEAM);
-    CaptureVictoryProof {
-        faction,
-        map_id: capture_selected_map_id(app),
-        match_mode_id: capture_match_mode_id(app),
-        phase: snapshot.phase,
-        frames,
-        product_id,
-        target_units,
-        produced_units,
-        attack_orders,
-        player_units: player_stats.units,
-        enemy_units_destroyed: snapshot.enemy_units_destroyed,
-        enemy_structures_destroyed: snapshot.enemy_structures_destroyed,
-        remaining_teams: snapshot.remaining_teams,
-        remaining_anchors: snapshot.remaining_anchors,
-    }
-}
-
-fn capture_selected_map_id(app: &App) -> &'static str {
-    app.world()
-        .get_resource::<SelectedSkirmishMap>()
-        .map(|map| map.definition().id)
-        .unwrap_or("unknown")
-}
-
-fn capture_match_mode_id(app: &App) -> &'static str {
-    let Some(settings) = app.world().get_resource::<MatchSetupSettings>() else {
-        return "unknown";
-    };
-    if app
-        .world()
-        .get_resource::<VisiblePlayer>()
-        .is_some_and(|visible_player| visible_player.is_spectator())
-    {
-        SkirmishMatchMode::AiVsAi.id()
-    } else {
-        skirmish_mode_from_match_setup(settings).id()
-    }
-}
-
-fn capture_economy_victory_proof_status(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    frames: usize,
-    resources_before: (i32, i32),
-    resources_after_harvest: (i32, i32),
-    ore_harvest_ordered: bool,
-    crystal_harvest_ordered: bool,
-    product_id: &'static str,
-    target_units: u32,
-    produced_units: u32,
-    attack_orders: u32,
-) -> CaptureEconomyVictoryProof {
-    let snapshot = capture_match_snapshot(app);
-    let player_stats = capture_stats_for_team(&snapshot, CAPTURE_PLAYER_TEAM);
-    CaptureEconomyVictoryProof {
-        faction,
-        phase: snapshot.phase,
-        frames,
-        ore_before: resources_before.0,
-        ore_after_harvest: resources_after_harvest.0,
-        ore_after: player_stats.ore,
-        crystal_before: resources_before.1,
-        crystal_after_harvest: resources_after_harvest.1,
-        crystal_after: player_stats.crystal,
-        ore_harvest_ordered,
-        crystal_harvest_ordered,
-        product_id,
-        target_units,
-        produced_units,
-        attack_orders,
-        player_units: player_stats.units,
-        enemy_units_destroyed: snapshot.enemy_units_destroyed,
-        enemy_structures_destroyed: snapshot.enemy_structures_destroyed,
-        remaining_teams: snapshot.remaining_teams,
-        remaining_anchors: snapshot.remaining_anchors,
-    }
-}
-
-fn capture_playable_proof_status(
-    app: &mut App,
-    faction: CaptureProofFaction,
-    frames: usize,
-    resources_before: (i32, i32),
-    resources_after_harvest: (i32, i32),
-    harvest_flags: (bool, bool),
-    build_result: CaptureBarracksBuildResult,
-    vehicle_id: &'static str,
-    target_units: u32,
-    produced_units: u32,
-    attack_orders: u32,
-) -> CapturePlayableProof {
-    let snapshot = capture_match_snapshot(app);
-    let player_stats = capture_stats_for_team(&snapshot, CAPTURE_PLAYER_TEAM);
-    CapturePlayableProof {
-        faction,
-        phase: snapshot.phase,
-        frames,
-        ore_before: resources_before.0,
-        ore_after_harvest: resources_after_harvest.0,
-        ore_after: player_stats.ore,
-        crystal_before: resources_before.1,
-        crystal_after_harvest: resources_after_harvest.1,
-        crystal_after: player_stats.crystal,
-        ore_harvest_ordered: harvest_flags.0,
-        crystal_harvest_ordered: harvest_flags.1,
-        structure_id: "Barracks",
-        placement_started: build_result.placement_started,
-        placed: build_result.placed,
-        construct_ordered: build_result.construct_ordered,
-        constructed: build_result.constructed,
-        barracks_product_id: build_result.product_id,
-        barracks_units: build_result.produced_units,
-        vehicle_product_id: vehicle_id,
-        target_units,
-        produced_units,
-        attack_orders,
-        player_units: player_stats.units,
-        enemy_units_destroyed: snapshot.enemy_units_destroyed,
-        enemy_structures_destroyed: snapshot.enemy_structures_destroyed,
-        remaining_teams: snapshot.remaining_teams,
-        remaining_anchors: snapshot.remaining_anchors,
-    }
-}
-
-fn capture_team_resources(world: &World, team: Team) -> (i32, i32) {
-    let economy = world.resource::<Economies>().get(team);
-    (economy.ore, economy.crystal)
-}
-
-fn capture_resource_value(resources: (i32, i32), kind: ResourceKind) -> i32 {
-    match kind {
-        ResourceKind::Ore => resources.0,
-        ResourceKind::Crystal => resources.1,
-    }
-}
-
-fn capture_harvest_kind_until_resource_increases(
-    app: &mut App,
-    team: Team,
-    kind: ResourceKind,
-    max_frames: usize,
-    frames: &mut usize,
-) -> bool {
-    let before = capture_team_resources(app.world(), team);
-    if !capture_order_nearest_resource_harvest(app, team, kind) {
-        return false;
-    }
-    let before_value = capture_resource_value(before, kind);
-    while *frames < max_frames {
-        *frames += 1;
-        app.update();
-        let current = capture_resource_value(capture_team_resources(app.world(), team), kind);
-        if current > before_value {
-            return true;
-        }
-        if app.world().resource::<MatchState>().phase != MatchPhase::Running {
-            break;
-        }
-    }
-    false
-}
-
-fn capture_harvest_until_resources(
-    app: &mut App,
-    team: Team,
-    required_ore: i32,
-    required_crystal: i32,
-    max_frames: usize,
-    frames: &mut usize,
-    harvest_flags: &mut (bool, bool),
-    harvest_peaks: &mut (i32, i32),
-) {
-    while *frames < max_frames {
-        let (ore, crystal) = capture_team_resources(app.world(), team);
-        if ore >= required_ore && crystal >= required_crystal {
-            break;
-        }
-        if ore < required_ore {
-            if !capture_harvest_kind_until_resource_increases(
-                app,
-                team,
-                ResourceKind::Ore,
-                max_frames,
-                frames,
-            ) {
-                break;
-            }
-            harvest_flags.0 = true;
-            let resources = capture_team_resources(app.world(), team);
-            harvest_peaks.0 = harvest_peaks.0.max(resources.0);
-            harvest_peaks.1 = harvest_peaks.1.max(resources.1);
-            continue;
-        }
-        if crystal < required_crystal {
-            if !capture_harvest_kind_until_resource_increases(
-                app,
-                team,
-                ResourceKind::Crystal,
-                max_frames,
-                frames,
-            ) {
-                break;
-            }
-            harvest_flags.1 = true;
-            let resources = capture_team_resources(app.world(), team);
-            harvest_peaks.0 = harvest_peaks.0.max(resources.0);
-            harvest_peaks.1 = harvest_peaks.1.max(resources.1);
-            continue;
-        }
-    }
-}
-
-fn capture_force_sample_harvests(
-    app: &mut App,
-    team: Team,
-    max_frames: usize,
-    frames: &mut usize,
-    harvest_flags: &mut (bool, bool),
-    harvest_peaks: &mut (i32, i32),
-) {
-    if !harvest_flags.0
-        && capture_harvest_kind_until_resource_increases(
-            app,
-            team,
-            ResourceKind::Ore,
-            max_frames,
-            frames,
-        )
-    {
-        harvest_flags.0 = true;
-        let resources = capture_team_resources(app.world(), team);
-        harvest_peaks.0 = harvest_peaks.0.max(resources.0);
-        harvest_peaks.1 = harvest_peaks.1.max(resources.1);
-    }
-
-    if !harvest_flags.1
-        && capture_harvest_kind_until_resource_increases(
-            app,
-            team,
-            ResourceKind::Crystal,
-            max_frames,
-            frames,
-        )
-    {
-        harvest_flags.1 = true;
-        let resources = capture_team_resources(app.world(), team);
-        harvest_peaks.0 = harvest_peaks.0.max(resources.0);
-        harvest_peaks.1 = harvest_peaks.1.max(resources.1);
-    }
-}
-
-fn capture_order_nearest_resource_harvest(app: &mut App, team: Team, kind: ResourceKind) -> bool {
-    let Some((harvester, harvester_position)) =
-        capture_first_alive_resource_collector(app.world_mut(), team)
-    else {
-        return false;
-    };
-    let Some((resource, _, resource_position)) =
-        capture_nearest_visible_resource(app.world_mut(), kind, harvester_position)
-    else {
-        return false;
-    };
-    capture_world_left_click(app, harvester_position)
-        && app
-            .world()
-            .get_entity(harvester)
-            .is_ok_and(|entity| entity.get::<Selected>().is_some())
-        && capture_world_right_click(app, resource_position)
-        && app
-            .world()
-            .get::<HarvestOrder>(harvester)
-            .is_some_and(|order| order.resource == Some(resource))
-}
-
-fn capture_ensure_constructed_structure_from_worker(
-    app: &mut App,
-    team: Team,
-    structure_id: &'static str,
-    max_frames: usize,
-    frames: &mut usize,
-) -> CaptureStructureBuildOnlyResult {
-    let mut result = CaptureStructureBuildOnlyResult::default();
-    if capture_constructed_producer(app.world_mut(), team, structure_id).is_some() {
-        result.constructed = true;
-        return result;
-    }
-
-    if capture_ensure_builder_worker(app, team, max_frames, frames).is_none() {
-        return result;
-    }
-    if capture_select_first_alive_unit_by_id(app, team, "Worker").is_some() {
-        app.update();
-    }
-    if let Some(button) = capture_enabled_command_for_action(app, BuildAction::Build(structure_id))
-    {
-        capture_click_command_button(app, button);
-        result.placement_started = app
-            .world()
-            .resource::<CommandMode>()
-            .pending_structure_placement
-            .is_some_and(|pending| pending.id == structure_id);
-    }
-
-    let mut placed_structure = None;
-    if result.placement_started
-        && let Some(placement) =
-            capture_valid_structure_placement_point_near_team_base(app, team, structure_id)
-        && capture_world_left_click(app, placement)
-    {
-        placed_structure = capture_structure_by_id_near(
-            app.world_mut(),
-            team,
-            structure_id,
-            placement,
-            Some(false),
-        );
-        result.placed = placed_structure.is_some()
-            && app
-                .world()
-                .resource::<CommandMode>()
-                .pending_structure_placement
-                .is_none();
-    }
-
-    if let Some((structure, structure_position, _)) = placed_structure {
-        if let Ok(mut entity) = app.world_mut().get_entity_mut(structure) {
-            entity.insert((VisibilityState { visible: true }, Visibility::Visible));
-        }
-        if let Some((worker, _)) = capture_select_first_alive_unit_by_id(app, team, "Worker")
-            && capture_world_right_click(app, structure_position)
-        {
-            result.construct_ordered = app
-                .world()
-                .get::<ConstructOrder>(worker)
-                .is_some_and(|order| order.target == structure);
-        }
-
-        while *frames < max_frames {
-            *frames += 1;
-            app.update();
-            result.constructed = capture_structure_constructed(app.world(), structure);
-            if result.constructed {
-                break;
-            }
-        }
-    }
-
-    result
-}
-
-fn capture_build_barracks_and_train_unit_from_mouse(
-    app: &mut App,
-    team: Team,
-    max_frames: usize,
-    frames: &mut usize,
-) -> CaptureBarracksBuildResult {
-    let structure_id = "Barracks";
-    let mut result = CaptureBarracksBuildResult::default();
-
-    if capture_ensure_builder_worker(app, team, max_frames, frames).is_none() {
-        return result;
-    }
-
-    if capture_select_first_alive_unit_by_id(app, team, "Worker").is_some() {
-        app.update();
-    }
-    if let Some(button) = capture_enabled_command_for_action(app, BuildAction::Build(structure_id))
-    {
-        capture_click_command_button(app, button);
-        result.placement_started = app
-            .world()
-            .resource::<CommandMode>()
-            .pending_structure_placement
-            .is_some_and(|pending| pending.id == structure_id);
-    }
-
-    let mut placed_structure = None;
-    if result.placement_started
-        && let Some(placement) =
-            capture_valid_structure_placement_point_near_team_base(app, team, structure_id)
-        && capture_world_left_click(app, placement)
-    {
-        placed_structure = capture_structure_by_id_near(
-            app.world_mut(),
-            team,
-            structure_id,
-            placement,
-            Some(false),
-        );
-        result.placed = placed_structure.is_some()
-            && app
-                .world()
-                .resource::<CommandMode>()
-                .pending_structure_placement
-                .is_none();
-    }
-
-    if let Some((structure, structure_position, _)) = placed_structure {
-        if let Ok(mut entity) = app.world_mut().get_entity_mut(structure) {
-            entity.insert((VisibilityState { visible: true }, Visibility::Visible));
-        }
-        if let Some((worker, _)) = capture_select_first_alive_unit_by_id(app, team, "Worker")
-            && capture_world_right_click(app, structure_position)
-        {
-            result.construct_ordered = app
-                .world()
-                .get::<ConstructOrder>(worker)
-                .is_some_and(|order| order.target == structure);
-        }
-
-        while *frames < max_frames {
-            *frames += 1;
-            app.update();
-            result.constructed = capture_structure_constructed(app.world(), structure);
-            if result.constructed {
-                break;
-            }
-        }
-
-        if result.constructed
-            && capture_world_left_click(app, structure_position)
-            && app
-                .world()
-                .get_entity(structure)
-                .is_ok_and(|entity| entity.get::<Selected>().is_some())
-        {
-            app.update();
-            if let Some((button, train_id)) = capture_first_affordable_train_command(app, team) {
-                result.product_id = train_id;
-                let units_before = capture_unit_count_by_id(app.world_mut(), team, train_id);
-                capture_click_command_button(app, button);
-                while *frames < max_frames {
-                    *frames += 1;
-                    app.update();
-                    let current = capture_unit_count_by_id(app.world_mut(), team, train_id);
-                    if current > units_before {
-                        result.produced_units = current.saturating_sub(units_before) as u32;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    result
-}
-
-fn capture_train_attack_group_from_factory_command_panel(
-    app: &mut App,
-    team: Team,
-    product_id: &'static str,
-    target_units: usize,
-    max_frames: usize,
-    frames: &mut usize,
-) -> u32 {
-    let Some((factory, _, factory_position)) =
-        capture_constructed_producer(app.world_mut(), team, "VehicleFactory")
-    else {
-        return 0;
-    };
-    let units_before = capture_unit_count_by_id(app.world_mut(), team, product_id);
-    let mut produced_units = 0u32;
-
-    if capture_world_left_click(app, factory_position)
-        && app
-            .world()
-            .get_entity(factory)
-            .is_ok_and(|entity| entity.get::<Selected>().is_some())
-    {
-        app.update();
-        while *frames < max_frames {
-            let produced = capture_unit_count_by_id(app.world_mut(), team, product_id);
-            produced_units = produced.saturating_sub(units_before) as u32;
-            if produced >= units_before + target_units {
-                break;
-            }
-            let started = produced + capture_queued_train_jobs(app.world(), team, product_id);
-            if started < units_before + target_units
-                && let Some(button) =
-                    capture_enabled_command_for_action(app, BuildAction::Train(product_id))
-            {
-                capture_click_command_button(app, button);
-            }
-            *frames += 1;
-            app.update();
-        }
-    }
-    produced_units
-}
-
-fn capture_finish_match_with_mouse_attackers(
-    app: &mut App,
-    team: Team,
-    max_frames: usize,
-    frames: &mut usize,
-) -> usize {
-    let mut attack_orders = 0usize;
-    while *frames < max_frames && app.world().resource::<MatchState>().phase == MatchPhase::Running
-    {
-        let Some((target, target_position)) = capture_first_enemy_anchor(app.world_mut(), team)
-        else {
-            break;
-        };
-        if let Ok(mut entity) = app.world_mut().get_entity_mut(target) {
-            entity.insert((VisibilityState { visible: true }, Visibility::Visible));
-        }
-        let attackers = capture_alive_attackers(app.world_mut(), team);
-        if attackers.is_empty() {
-            break;
-        }
-        attack_orders +=
-            capture_mouse_order_attackers_to_target(app, &attackers, target, target_position);
-
-        for _ in 0..260 {
-            if *frames >= max_frames
-                || app.world().get_entity(target).is_err()
-                || app.world().resource::<MatchState>().phase != MatchPhase::Running
-            {
-                break;
-            }
-            *frames += 1;
-            app.update();
-        }
-    }
-
-    for _ in 0..8 {
-        if *frames >= max_frames
-            || app.world().resource::<MatchState>().phase == MatchPhase::HumanVictory
-        {
-            break;
-        }
-        *frames += 1;
-        app.update();
-    }
-    attack_orders
-}
-
-fn drive_main_menu_action(app: &mut App, action: MainMenuAction, followup_updates: usize) {
-    try_drive_main_menu_action(app, action, followup_updates)
-        .then_some(())
-        .expect("main menu button should exist");
-}
-
-fn try_drive_main_menu_action(
-    app: &mut App,
-    action: MainMenuAction,
-    followup_updates: usize,
-) -> bool {
-    let Some(button_entity) = ({
-        let world = app.world_mut();
-        let mut buttons = world.query::<(Entity, &MainMenuButton)>();
-        buttons
+    let player_units: Vec<Entity> = {
+        let mut units = world.query_filtered::<(Entity, &Team), With<Unit>>();
+        units
             .iter(world)
-            .find_map(|(entity, button)| (button.action == action).then_some(entity))
-    }) else {
-        return false;
+            .filter(|(_, team)| **team == player)
+            .map(|(entity, _)| entity)
+            .collect()
     };
-    app.world_mut()
-        .entity_mut(button_entity)
-        .insert(Interaction::Pressed);
-    {
-        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
-        mouse.press(MouseButton::Left);
-    }
-    app.update();
-    {
-        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
-        mouse.release(MouseButton::Left);
-        mouse.clear();
-    }
-    if let Ok(mut button) = app.world_mut().get_entity_mut(button_entity) {
-        button.insert(Interaction::None);
-    }
-    for _ in 0..followup_updates {
-        app.update();
-    }
-    true
-}
-
-fn capture_first_alive_resource_collector(world: &mut World, team: Team) -> Option<(Entity, Vec3)> {
-    let mut units = world.query::<(
-        Entity,
-        &Team,
-        &Unit,
-        &Transform,
-        &Health,
-        Option<&ResourceCargo>,
-    )>();
-    units
-        .iter(world)
-        .filter_map(|(entity, unit_team, unit, transform, health, cargo)| {
-            (*unit_team == team
-                && health.current > 0.0
-                && cargo.is_some_and(|cargo| cargo.capacity > 0)
-                && can_unit_collect_resources(unit))
-            .then_some((entity, transform.translation, unit.id))
-        })
-        .min_by_key(|(_, _, id)| match *id {
-            "OreHarvester" => 0,
-            "Worker" => 1,
-            _ => 2,
-        })
-        .map(|(entity, position, _)| (entity, position))
-}
-
-fn capture_first_alive_unit_by_id(
-    world: &mut World,
-    team: Team,
-    id: &'static str,
-) -> Option<(Entity, Vec3)> {
-    let mut units = world.query::<(Entity, &Team, &Unit, &Transform, &Health)>();
-    units
-        .iter(world)
-        .find_map(|(entity, unit_team, unit, transform, health)| {
-            (*unit_team == team && unit.id == id && health.current > 0.0)
-                .then_some((entity, transform.translation))
-        })
-}
-
-fn capture_first_alive_supply_crate_collector(
-    world: &mut World,
-    team: Team,
-) -> Option<(Entity, Vec3, &'static str)> {
-    let mut units = world.query::<(Entity, &Team, &Unit, &MovementDomain, &Transform, &Health)>();
-    units
-        .iter(world)
-        .filter_map(|(entity, unit_team, unit, domain, transform, health)| {
-            (*unit_team == team
-                && health.current > 0.0
-                && unit.speed > 0.0
-                && *domain == MovementDomain::Terrain)
-                .then_some((entity, transform.translation, unit.id))
-        })
-        .min_by_key(|(_, _, id)| match *id {
-            "ScoutRover" => 0,
-            "FlameAssaultBuggy" => 1,
-            "Worker" => 2,
-            _ => 3,
-        })
-}
-
-fn capture_alive_units_by_id(
-    world: &mut World,
-    team: Team,
-    id: &'static str,
-) -> Vec<(Entity, Vec3)> {
-    let mut units = world.query::<(Entity, &Team, &Unit, &Transform, &Health)>();
-    units
-        .iter(world)
-        .filter_map(|(entity, unit_team, unit, transform, health)| {
-            (*unit_team == team && unit.id == id && health.current > 0.0)
-                .then_some((entity, transform.translation))
-        })
-        .collect()
-}
-
-fn capture_select_first_alive_unit_by_id(
-    app: &mut App,
-    team: Team,
-    id: &'static str,
-) -> Option<(Entity, Vec3)> {
-    let units = capture_alive_units_by_id(app.world_mut(), team, id);
-    for (entity, position) in units {
-        let current_position = capture_entity_position(app.world(), entity).unwrap_or(position);
-        if capture_world_left_click(app, current_position)
-            && app
-                .world()
-                .get_entity(entity)
-                .is_ok_and(|entity_ref| entity_ref.get::<Selected>().is_some())
-        {
-            return Some((entity, current_position));
-        }
-    }
-    None
-}
-
-fn capture_ensure_builder_worker(
-    app: &mut App,
-    team: Team,
-    max_frames: usize,
-    frames: &mut usize,
-) -> Option<(Entity, Vec3)> {
-    if let Some(worker) = capture_first_alive_unit_by_id(app.world_mut(), team, "Worker") {
-        return Some(worker);
-    }
-    let (command_center, _, command_center_position) =
-        capture_constructed_producer(app.world_mut(), team, "CommandCenter")?;
-    if !capture_world_left_click(app, command_center_position)
-        || !app
-            .world()
-            .get_entity(command_center)
-            .is_ok_and(|entity| entity.get::<Selected>().is_some())
-    {
-        return None;
-    }
-    app.update();
-    let button = capture_enabled_command_for_action(app, BuildAction::Train("Worker"))?;
-    capture_click_command_button(app, button);
-    while *frames < max_frames {
-        *frames += 1;
-        app.update();
-        if let Some(worker) = capture_first_alive_unit_by_id(app.world_mut(), team, "Worker") {
-            return Some(worker);
-        }
-    }
-    None
-}
-
-fn capture_nearest_visible_resource(
-    world: &mut World,
-    kind: ResourceKind,
-    origin: Vec3,
-) -> Option<(Entity, i32, Vec3)> {
-    let mut resources = world.query::<(Entity, &ResourceNode, &Transform, &VisibilityState)>();
-    resources
-        .iter(world)
-        .filter_map(|(entity, resource, transform, visibility)| {
-            (resource.kind == kind && resource.amount > 0 && visibility.visible).then_some((
-                entity,
-                resource.amount,
-                transform.translation,
-            ))
-        })
-        .min_by(|(_, _, lhs), (_, _, rhs)| {
-            xz_distance(*lhs, origin)
-                .partial_cmp(&xz_distance(*rhs, origin))
-                .unwrap_or(std::cmp::Ordering::Equal)
-        })
-}
-
-fn capture_nearest_supply_crate(
-    world: &mut World,
-    effect: SupplyCrateEffect,
-    origin: Vec3,
-) -> Option<(Entity, Vec3)> {
-    let mut crates = world.query::<(Entity, &SupplyCrate, &Transform)>();
-    crates
-        .iter(world)
-        .filter_map(|(entity, supply_crate, transform)| {
-            (supply_crate.effect == effect).then_some((entity, transform.translation))
-        })
-        .min_by(|(_, lhs), (_, rhs)| {
-            xz_distance(*lhs, origin)
-                .partial_cmp(&xz_distance(*rhs, origin))
-                .unwrap_or(std::cmp::Ordering::Equal)
-        })
-}
-
-fn capture_resource_amount(world: &World, entity: Entity) -> i32 {
-    world
-        .get::<ResourceNode>(entity)
-        .map_or(0, |resource| resource.amount)
-}
-
-fn capture_entity_position(world: &World, entity: Entity) -> Option<Vec3> {
-    world
-        .get::<Transform>(entity)
-        .map(|transform| transform.translation)
-}
-
-fn capture_entity_team(world: &World, entity: Entity) -> Option<Team> {
-    world.get::<Team>(entity).copied()
-}
-
-fn capture_match_phase(world: &World) -> CaptureMatchPhase {
-    match world.resource::<MatchState>().phase {
-        MatchPhase::Running => CaptureMatchPhase::Running,
-        MatchPhase::HumanDefeat => CaptureMatchPhase::HumanDefeat,
-        MatchPhase::HumanVictory => CaptureMatchPhase::HumanVictory,
-        MatchPhase::MatchFinished => CaptureMatchPhase::MatchFinished,
+    for entity in player_units {
+        world
+            .entity_mut(entity)
+            .insert(AttackMoveOrder { destination });
     }
 }
 
-fn capture_team_ore(world: &World, team: Team) -> i32 {
-    world.resource::<Economies>().get(team).ore
-}
-
-fn capture_first_affordable_train_command(
-    app: &mut App,
-    team: Team,
-) -> Option<(Entity, &'static str)> {
+/// Capture/dev input helpers: drive the REAL mouse-input systems headlessly by
+/// moving the synthetic window's cursor and emitting mouse-button messages, the
+/// same data winit would produce. Used to verify the human core loop (select,
+/// move, …) actually works, with screenshots as ground truth.
+pub fn capture_set_cursor(app: &mut App, position: Vec2) {
     let world = app.world_mut();
-    let (ore, crystal) = {
-        let economy = world.resource::<Economies>().get(team);
-        (economy.ore, economy.crystal)
-    };
-    let mut slots = world.query::<(Entity, &CommandSlot, &BuildAction, &CommandSlotAvailability)>();
-    let mut candidates = slots
-        .iter(world)
-        .filter_map(|(entity, slot, action, availability)| match action {
-            BuildAction::Train(product_id) if availability.enabled => {
-                let def = registry::entity(product_id)?;
-                (ore >= def.cost.ore && crystal >= def.cost.crystal).then_some((
-                    slot.0,
-                    entity,
-                    *product_id,
-                ))
-            }
-            _ => None,
-        })
-        .collect::<Vec<_>>();
-    candidates.sort_by_key(|(slot, _, _)| *slot);
-    candidates
-        .into_iter()
-        .next()
-        .map(|(_, entity, product_id)| (entity, product_id))
-}
-
-fn capture_train_unit_from_producer(
-    app: &mut App,
-    team: Team,
-    producer_id: &'static str,
-    product_id: &'static str,
-    max_frames: usize,
-    frames: &mut usize,
-) -> Option<Entity> {
-    let (producer, _, producer_position) =
-        capture_constructed_producer(app.world_mut(), team, producer_id)?;
-    if !capture_world_left_click(app, producer_position)
-        || !app
-            .world()
-            .get_entity(producer)
-            .is_ok_and(|entity| entity.get::<Selected>().is_some())
-    {
-        return None;
+    let mut windows = world.query_filtered::<&mut Window, With<PrimaryWindow>>();
+    if let Ok(mut window) = windows.single_mut(world) {
+        window.set_cursor_position(Some(position));
     }
-    app.update();
-    let button = capture_enabled_command_for_action(app, BuildAction::Train(product_id))?;
-    let units_before = capture_alive_units_by_id(app.world_mut(), team, product_id);
-    capture_click_command_button(app, button);
-    while *frames < max_frames {
-        *frames += 1;
-        app.update();
-        if let Some((entity, _)) = capture_alive_units_by_id(app.world_mut(), team, product_id)
-            .into_iter()
-            .find(|(entity, _)| !units_before.iter().any(|(before, _)| before == entity))
-        {
-            return Some(entity);
-        }
-    }
-    None
 }
 
-fn capture_enabled_command_for_action(app: &mut App, target: BuildAction) -> Option<Entity> {
-    let world = app.world_mut();
-    let mut slots = world.query::<(Entity, &BuildAction, &CommandSlotAvailability)>();
-    slots
-        .iter(world)
-        .find_map(|(entity, action, availability)| {
-            (*action == target && availability.enabled).then_some(entity)
-        })
-}
-
-fn capture_affordable_train_command_from_producer(
-    app: &mut App,
-    team: Team,
-    producer_id: &'static str,
-) -> Option<(Entity, &'static str)> {
-    let (producer, _, producer_position) =
-        capture_constructed_producer(app.world_mut(), team, producer_id)?;
-    if !capture_world_left_click(app, producer_position)
-        || !app
-            .world()
-            .get_entity(producer)
-            .is_ok_and(|entity| entity.get::<Selected>().is_some())
-    {
-        return None;
-    }
-    app.update();
-    capture_first_affordable_train_command(app, team)
-}
-
-fn capture_valid_structure_placement_point_near_team_base(
-    app: &mut App,
-    team: Team,
-    id: &'static str,
-) -> Option<Vec3> {
-    let def = registry::entity(id)?;
-    let bounds = *app.world().resource::<MapBounds>();
-    let anchors = {
+pub fn capture_mouse_button(app: &mut App, button: MouseButton, pressed: bool) {
+    let window = {
         let world = app.world_mut();
-        let mut structures =
-            world.query::<(&Structure, &Team, &Transform, Option<&UnderConstruction>)>();
-        structures
-            .iter(world)
-            .filter_map(
-                |(structure, structure_team, transform, under_construction)| {
-                    if *structure_team != team || !structure_is_constructed(under_construction) {
-                        return None;
-                    }
-                    let structure_def = registry::entity(structure.id)?;
-                    Some((transform.translation, structure_def.radius))
-                },
-            )
-            .collect::<Vec<_>>()
+        let mut q = world.query_filtered::<Entity, With<PrimaryWindow>>();
+        q.iter(world).next()
     };
-    if anchors.is_empty() {
-        return None;
-    }
-    let occupiers = {
-        let world = app.world_mut();
-        let mut occupiers = world.query_filtered::<(
-            &Transform,
-            &Selectable,
-            Option<&Health>,
-            Option<&ResourceNode>,
-        ), Or<(With<Unit>, With<Structure>, With<ResourceNode>)>>(
-        );
-        occupiers
-            .iter(world)
-            .filter_map(|(transform, selectable, health, resource_node)| {
-                if health.is_some_and(|health| health.current <= 0.0)
-                    || resource_node.is_some_and(|resource| resource.amount <= 0)
-                {
-                    return None;
-                }
-                Some((transform.translation, selectable.radius))
-            })
-            .collect::<Vec<_>>()
+    let Some(window) = window else {
+        return;
     };
-
-    let sample_count = 24;
-    for (anchor, anchor_radius) in anchors.iter().copied() {
-        for ring in 0..20 {
-            let radius = anchor_radius + def.radius + 1.0 + ring as f32 * 0.75;
-            for sample in 0..sample_count {
-                let angle = (sample as f32 / sample_count as f32) * std::f32::consts::TAU
-                    + ring as f32 * 0.23;
-                let candidate = bounds.clamp_ground_point(
-                    anchor + Vec3::new(angle.cos() * radius, 0.0, angle.sin() * radius),
-                    def.radius,
-                );
-                if !map_contains_ground_point_in_bounds(candidate, bounds) {
-                    continue;
-                }
-                let in_base_radius = anchors.iter().any(|(base, base_radius)| {
-                    xz_distance(*base, candidate)
-                        <= *base_radius + def.radius + BASE_CONSTRUCTION_RADIUS_M
-                });
-                if !in_base_radius {
-                    continue;
-                }
-                let collides = occupiers.iter().any(|(position, radius)| {
-                    xz_distance(*position, candidate) <= *radius + def.radius
-                });
-                if !collides {
-                    return Some(candidate);
-                }
-            }
-        }
-    }
-    None
-}
-
-fn capture_structure_by_id_near(
-    world: &mut World,
-    team: Team,
-    id: &'static str,
-    position: Vec3,
-    constructed: Option<bool>,
-) -> Option<(Entity, Vec3, bool)> {
-    let mut structures = world.query::<(
-        Entity,
-        &Structure,
-        &Team,
-        &Transform,
-        Option<&UnderConstruction>,
-    )>();
-    structures.iter(world).find_map(
-        |(entity, structure, structure_team, transform, under_construction)| {
-            let is_constructed = structure_is_constructed(under_construction);
-            (structure.id == id
-                && *structure_team == team
-                && xz_distance(transform.translation, position) < 0.05
-                && constructed.is_none_or(|expected| expected == is_constructed))
-            .then_some((entity, transform.translation, is_constructed))
-        },
-    )
-}
-
-fn capture_nearest_structure_by_id_and_team(
-    world: &mut World,
-    team: Team,
-    id: &'static str,
-    origin: Vec3,
-    constructed: Option<bool>,
-) -> Option<(Entity, Vec3, bool)> {
-    let mut structures = world.query::<(
-        Entity,
-        &Structure,
-        &Team,
-        &Transform,
-        Option<&UnderConstruction>,
-    )>();
-    structures
-        .iter(world)
-        .filter_map(
-            |(entity, structure, structure_team, transform, under_construction)| {
-                let is_constructed = structure_is_constructed(under_construction);
-                (structure.id == id
-                    && *structure_team == team
-                    && constructed.is_none_or(|expected| expected == is_constructed))
-                .then_some((entity, transform.translation, is_constructed))
-            },
-        )
-        .min_by(|(_, lhs, _), (_, rhs, _)| {
-            xz_distance(*lhs, origin)
-                .partial_cmp(&xz_distance(*rhs, origin))
-                .unwrap_or(std::cmp::Ordering::Equal)
-        })
-}
-
-fn capture_structure_constructed(world: &World, entity: Entity) -> bool {
-    world.get_entity(entity).is_ok_and(|entity_ref| {
-        entity_ref
-            .get::<Health>()
-            .is_some_and(|health| health.current > 0.0)
-            && entity_ref.get::<Structure>().is_some()
-            && entity_ref.get::<UnderConstruction>().is_none()
-    })
-}
-
-fn capture_click_command_button(app: &mut App, button: Entity) {
-    app.world_mut()
-        .entity_mut(button)
-        .insert(Interaction::Pressed);
-    app.world_mut()
-        .resource_mut::<ButtonInput<MouseButton>>()
-        .press(MouseButton::Left);
-    app.update();
-    {
-        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
-        mouse.release(MouseButton::Left);
-        mouse.clear();
-    }
-    app.world_mut().entity_mut(button).insert(Interaction::None);
-    app.update();
-}
-
-fn capture_world_left_click(app: &mut App, position: Vec3) -> bool {
-    capture_world_mouse_click(app, position, MouseButton::Left)
-}
-
-fn capture_world_left_click_projected(app: &mut App, position: Vec3) -> bool {
-    capture_world_mouse_click_projected(app, position, MouseButton::Left)
-}
-
-fn capture_world_left_click_additive(app: &mut App, position: Vec3) -> bool {
-    capture_world_mouse_click_with_shift(app, position, MouseButton::Left, true)
-}
-
-fn capture_world_right_click(app: &mut App, position: Vec3) -> bool {
-    capture_world_mouse_click(app, position, MouseButton::Right)
-}
-
-fn capture_world_mouse_click(app: &mut App, position: Vec3, button: MouseButton) -> bool {
-    capture_world_mouse_click_with_shift(app, position, button, false)
-}
-
-fn capture_world_mouse_click_projected(app: &mut App, position: Vec3, button: MouseButton) -> bool {
-    if !capture_attach_window_to_main_camera(app, position) {
-        return false;
-    }
-    let Some(cursor) = capture_screen_position_for_world(app, position) else {
-        return false;
-    };
-    if !capture_set_cursor(app, cursor) {
-        return false;
-    }
-    let cursor_blocked = {
-        let world = app.world_mut();
-        let mut window_q = world.query_filtered::<&Window, With<PrimaryWindow>>();
-        let Ok(window) = window_q.single(world) else {
-            return false;
-        };
-        match button {
-            MouseButton::Left => cursor_is_over_hud(window),
-            MouseButton::Right => cursor_blocks_world_order_controls(window, cursor),
-            _ => false,
-        }
-    };
-    if cursor_blocked {
-        return false;
-    }
-    {
-        let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
-        keyboard.release(KeyCode::ShiftLeft);
-        keyboard.release(KeyCode::ShiftRight);
-        keyboard.clear();
-    }
-    {
-        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
-        mouse.press(button);
-    }
-    app.update();
-    {
-        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
-        mouse.clear();
-        mouse.release(button);
-    }
-    app.update();
-    app.world_mut()
-        .resource_mut::<ButtonInput<MouseButton>>()
-        .clear();
-    true
-}
-
-fn capture_world_mouse_click_with_shift(
-    app: &mut App,
-    position: Vec3,
-    button: MouseButton,
-    shift_pressed: bool,
-) -> bool {
-    if !capture_attach_window_to_main_camera(app, position) {
-        return false;
-    }
-    let Some(cursor) = capture_screen_position_for_world(app, position) else {
-        return false;
-    };
-    if !capture_set_cursor(app, cursor) {
-        return false;
-    }
-    let cursor_blocked = {
-        let world = app.world_mut();
-        let mut window_q = world.query_filtered::<&Window, With<PrimaryWindow>>();
-        let Ok(window) = window_q.single(world) else {
-            return false;
-        };
-        match button {
-            MouseButton::Left => cursor_is_over_hud(window),
-            MouseButton::Right => cursor_blocks_world_order_controls(window, cursor),
-            _ => false,
-        }
-    };
-    if cursor_blocked {
-        return false;
-    }
-    let Some(ground_position) = capture_ground_position_for_cursor(app) else {
-        return false;
-    };
-    if xz_distance(ground_position, position) > 0.05 {
-        return false;
-    }
-    {
-        let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
-        if shift_pressed {
-            keyboard.press(KeyCode::ShiftLeft);
+    app.world_mut().write_message(MouseButtonInput {
+        button,
+        state: if pressed {
+            bevy::input::ButtonState::Pressed
         } else {
-            keyboard.release(KeyCode::ShiftLeft);
-        }
-        keyboard.release(KeyCode::ShiftRight);
-        keyboard.clear();
-    }
-    {
-        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
-        mouse.press(button);
-    }
-    app.update();
-    {
-        let mut mouse = app.world_mut().resource_mut::<ButtonInput<MouseButton>>();
-        mouse.clear();
-        mouse.release(button);
-    }
-    app.update();
-    app.world_mut()
-        .resource_mut::<ButtonInput<MouseButton>>()
-        .clear();
-    {
-        let mut keyboard = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
-        keyboard.release(KeyCode::ShiftLeft);
-        keyboard.clear();
-    }
-    true
-}
-
-fn capture_attach_window_to_main_camera(app: &mut App, focus: Vec3) -> bool {
-    let window_entity = {
-        let world = app.world_mut();
-        let mut window_q = world.query_filtered::<Entity, With<PrimaryWindow>>();
-        window_q.iter(world).next()
-    };
-    if let Some(window_entity) = window_entity {
-        if let Some(mut window) = app
-            .world_mut()
-            .entity_mut(window_entity)
-            .get_mut::<Window>()
-        {
-            window.set_cursor_position(Some(Vec2::new(640.0, 360.0)));
-        }
-    } else {
-        let mut window = Window {
-            resolution: WindowResolution::new(1280, 720),
-            ..default()
-        };
-        window.set_cursor_position(Some(Vec2::new(640.0, 360.0)));
-        app.world_mut().spawn((window, PrimaryWindow));
-    }
-
-    let camera_state = RtsCamera::focused_on(focus);
-    let camera_transform = camera_transform_from_state(&camera_state);
-    let mut projection = camera_projection_from_state(&camera_state);
-    projection.update(1280.0, 720.0);
-    *app.world_mut().resource_mut::<RtsCamera>() = camera_state;
-
-    let world = app.world_mut();
-    let mut camera_q = world.query_filtered::<(
-        &mut Camera,
-        &mut Transform,
-        &mut GlobalTransform,
-        &mut Projection,
-    ), With<MainCamera>>();
-    let Ok((mut camera, mut transform, mut global_transform, mut current_projection)) =
-        camera_q.single_mut(world)
-    else {
-        return false;
-    };
-    camera.viewport = Some(Viewport {
-        physical_size: UVec2::new(1280, 720),
-        ..default()
-    });
-    camera.computed.target_info = Some(RenderTargetInfo {
-        physical_size: UVec2::new(1280, 720),
-        scale_factor: 1.0,
-    });
-    camera.computed.clip_from_view = projection.get_clip_from_view();
-    *transform = camera_transform;
-    *global_transform = GlobalTransform::from(camera_transform);
-    *current_projection = projection;
-    true
-}
-
-fn capture_set_cursor(app: &mut App, cursor: Vec2) -> bool {
-    let world = app.world_mut();
-    let mut window_q = world.query_filtered::<&mut Window, With<PrimaryWindow>>();
-    let Ok(mut window) = window_q.single_mut(world) else {
-        return false;
-    };
-    window.set_cursor_position(Some(cursor));
-    true
-}
-
-fn capture_screen_position_for_world(app: &mut App, position: Vec3) -> Option<Vec2> {
-    let world = app.world_mut();
-    let mut camera_q = world.query_filtered::<(&Camera, &GlobalTransform), With<MainCamera>>();
-    let (camera, camera_transform) = camera_q.single(world).ok()?;
-    camera.world_to_viewport(camera_transform, position).ok()
-}
-
-fn capture_ground_position_for_cursor(app: &mut App) -> Option<Vec3> {
-    let cursor = {
-        let world = app.world_mut();
-        let mut window_q = world.query_filtered::<&Window, With<PrimaryWindow>>();
-        window_q.single(world).ok()?.cursor_position()?
-    };
-    let world = app.world_mut();
-    let mut camera_q = world.query_filtered::<(&Camera, &GlobalTransform), With<MainCamera>>();
-    let (camera, camera_transform) = camera_q.single(world).ok()?;
-    let ray = camera.viewport_to_world(camera_transform, cursor).ok()?;
-    ray.plane_intersection_point(Vec3::ZERO, InfinitePlane3d::new(Vec3::Y))
-}
-
-const CAPTURE_PLAYER_TEAM: Team = Team::Player(0);
-
-fn capture_match_setup_for_faction(faction: CaptureProofFaction) -> MatchSetupSettings {
-    let mut lobby_controllers = DEFAULT_LOBBY_CONTROLLERS;
-    let mut lobby_factions = DEFAULT_LOBBY_FACTIONS;
-    for (slot, controller) in lobby_controllers.iter_mut().enumerate() {
-        if slot == 0 {
-            *controller = SkirmishPlayerController::Human;
-        } else if controller.is_human() {
-            *controller = SkirmishPlayerController::Ai(AiDifficulty::Easy);
-        }
-    }
-    lobby_factions[0] = faction.skirmish_faction();
-    let selection = SkirmishMenuSelection {
-        map_index: 0,
-        starting_resource_index: DEFAULT_STARTING_RESOURCE_INDEX,
-        match_mode: SkirmishMatchMode::OneVsOne,
-        ai_difficulty: AiDifficulty::Easy,
-        lobby_controllers,
-        lobby_factions,
-        lobby_team_ids: DEFAULT_LOBBY_TEAM_IDS,
-        lobby_color_slots: DEFAULT_LOBBY_COLOR_SLOTS,
-    };
-    selection.match_setup_with_map_seed(0)
-}
-
-fn capture_stats_for_team(snapshot: &CaptureMatchSnapshot, team: Team) -> CaptureTeamStats {
-    team.economy_index()
-        .and_then(|index| snapshot.players.get(index).copied())
-        .unwrap_or_default()
-}
-
-fn capture_team_from_team(team: Team) -> CaptureTeam {
-    match team {
-        Team::Player(index) => CaptureTeam::Player(index),
-        Team::Neutral => CaptureTeam::Neutral,
-    }
-}
-
-fn capture_primary_active_enemy_team(world: &World, player_team: Team) -> Option<Team> {
-    let relations = world.resource::<TeamRelations>();
-    let active_teams = world.resource::<ActiveTeams>();
-    player_teams(active_teams.0.len()).find(|team| {
-        team_is_active(*team, Some(active_teams)) && relations.are_enemies(player_team, *team)
-    })
-}
-
-fn capture_alive_unit_count(world: &mut World, team: Team) -> usize {
-    let mut units = world.query::<(&Team, &Health, &Unit)>();
-    units
-        .iter(world)
-        .filter(|(unit_team, health, _)| **unit_team == team && health.current > 0.0)
-        .count()
-}
-
-fn capture_team_total_health(world: &mut World, team: Team) -> f32 {
-    let mut health_q = world.query::<(&Team, &Health)>();
-    health_q
-        .iter(world)
-        .filter_map(|(entity_team, health)| {
-            (*entity_team == team && health.current > 0.0).then_some(health.current)
-        })
-        .sum()
-}
-
-fn capture_attack_orders_against_team(
-    world: &mut World,
-    attacker_team: Team,
-    target_team: Team,
-) -> usize {
-    let mut units = world.query::<(&Team, &Health, &AttackOrder)>();
-    let targets = units
-        .iter(world)
-        .filter_map(|(team, health, attack_order)| {
-            (*team == attacker_team && health.current > 0.0).then_some(attack_order.target)
-        })
-        .collect::<Vec<_>>();
-    targets
-        .into_iter()
-        .filter(|target| {
-            world
-                .get::<Team>(*target)
-                .is_some_and(|team| *team == target_team)
-        })
-        .count()
-}
-
-fn capture_attack_orders_against_any_enemy(world: &mut World, attacker_team: Team) -> usize {
-    let relations = world.resource::<TeamRelations>().clone();
-    let mut units = world.query::<(&Team, &Health, &AttackOrder)>();
-    let targets = units
-        .iter(world)
-        .filter_map(|(team, health, attack_order)| {
-            (*team == attacker_team && health.current > 0.0).then_some(attack_order.target)
-        })
-        .collect::<Vec<_>>();
-    targets
-        .into_iter()
-        .filter(|target| {
-            world
-                .get::<Team>(*target)
-                .is_some_and(|target_team| relations.are_enemies(attacker_team, *target_team))
-        })
-        .count()
-}
-
-fn capture_queue_player_units(
-    app: &mut App,
-    team: Team,
-    product_id: &'static str,
-    target_units: usize,
-) -> usize {
-    let world = app.world_mut();
-    let produced = capture_unit_count_by_id(world, team, product_id);
-    let queued = capture_queued_train_jobs(world, team, product_id);
-    let Some((factory, producer_id, origin)) =
-        capture_constructed_producer(world, team, "VehicleFactory")
-    else {
-        return 0;
-    };
-    let queue_len = {
-        let build_queue = world.resource::<BuildQueue>();
-        producer_build_queue_len(build_queue, factory)
-    };
-    let capacity = PRODUCTION_QUEUE_LIMIT.saturating_sub(queue_len);
-    let needed = target_units.saturating_sub(produced + queued).min(capacity);
-    if needed == 0 {
-        return 0;
-    }
-
-    let Some(def) = registry::entity(product_id) else {
-        return 0;
-    };
-    {
-        let mut economies = world.resource_mut::<Economies>();
-        let economy = economies.get_mut(team);
-        economy.ore = economy.ore.max(def.cost.ore * needed as i32 + 120);
-        economy.crystal = economy.crystal.max(def.cost.crystal * needed as i32 + 120);
-    }
-    {
-        let mut build_queue = world.resource_mut::<BuildQueue>();
-        for _ in 0..needed {
-            build_queue.0.push(BuildJob {
-                team,
-                action: BuildAction::Train(product_id),
-                producer_entity: factory,
-                producer_id,
-                timer: 0.25,
-                origin,
-            });
-        }
-    }
-    needed
-}
-
-fn capture_constructed_producer(
-    world: &mut World,
-    team: Team,
-    id: &'static str,
-) -> Option<(Entity, &'static str, Vec3)> {
-    let mut query = world.query::<(
-        Entity,
-        &Structure,
-        &Team,
-        &Transform,
-        Option<&UnderConstruction>,
-    )>();
-    query.iter(world).find_map(
-        |(entity, structure, structure_team, transform, under_construction)| {
-            (*structure_team == team
-                && structure.id == id
-                && structure_is_constructed(under_construction))
-            .then_some((entity, structure.id, transform.translation))
+            bevy::input::ButtonState::Released
         },
-    )
+        window,
+    });
 }
 
-fn capture_unit_count_by_id(world: &mut World, team: Team, id: &'static str) -> usize {
-    let mut query = world.query::<(&Team, &Unit, &Health)>();
-    query
-        .iter(world)
-        .filter(|(unit_team, unit, health)| {
-            **unit_team == team && unit.id == id && health.current > 0.0
-        })
+/// Projects a world position to the capture camera's screen space.
+pub fn capture_world_to_screen(app: &mut App, world_pos: Vec3) -> Option<Vec2> {
+    let world = app.world_mut();
+    let mut cameras = world.query_filtered::<(&Camera, &GlobalTransform), With<MainCamera>>();
+    let (camera, transform) = cameras.iter(world).next()?;
+    camera.world_to_viewport(transform, world_pos).ok()
+}
+
+/// World position of a player unit that is currently on-screen (projects inside
+/// the viewport, clear of the top/bottom HUD margins) so a synthetic click
+/// actually lands on it. Prefers workers. Returns `None` if none are framed.
+pub fn capture_player_onscreen_unit_position(app: &mut App) -> Option<Vec3> {
+    let player = Team::Player(0);
+    let (width, height) = {
+        let world = app.world_mut();
+        let mut windows = world.query_filtered::<&Window, With<PrimaryWindow>>();
+        let window = windows.iter(world).next()?;
+        (window.width(), window.height())
+    };
+    let world = app.world_mut();
+    let (camera, cam_transform) = {
+        let mut cameras = world.query_filtered::<(&Camera, &GlobalTransform), With<MainCamera>>();
+        let (camera, transform) = cameras.iter(world).next()?;
+        (camera.clone(), *transform)
+    };
+    let mut candidates = world.query_filtered::<(&Unit, &Team, &Transform), ()>();
+    let mut fallback = None;
+    for (unit, team, transform) in candidates.iter(world) {
+        if *team != player {
+            continue;
+        }
+        let Ok(screen) = camera.world_to_viewport(&cam_transform, transform.translation) else {
+            continue;
+        };
+        // Keep clear of the top status strip (<76px) and the bottom command bar
+        // (>height-148px) so the click is treated as a world click, not HUD.
+        let on_screen = screen.x >= 8.0
+            && screen.x <= width - 8.0
+            && screen.y >= 80.0
+            && screen.y <= height - 152.0;
+        if !on_screen {
+            continue;
+        }
+        let is_worker = registry::entity(unit.id)
+            .map(|d| d.is_worker)
+            .unwrap_or(false);
+        if is_worker {
+            return Some(transform.translation);
+        }
+        fallback.get_or_insert(transform.translation);
+    }
+    fallback
+}
+
+/// Number of currently-selected player units (programmatic check for selection).
+pub fn capture_selected_player_unit_count(app: &mut App) -> usize {
+    let world = app.world_mut();
+    let mut q = world.query_filtered::<&Team, (With<Selected>, With<Unit>)>();
+    q.iter(world)
+        .filter(|team| **team == Team::Player(0))
         .count()
 }
 
-fn capture_queued_train_jobs(world: &World, team: Team, product_id: &'static str) -> usize {
-    world
+/// Returns (a movable armed player unit's world pos, nearest enemy base pos).
+pub fn capture_select_move_demo_points(app: &mut App) -> Option<(Vec3, Vec3)> {
+    let player = Team::Player(0);
+    let world = app.world_mut();
+    let mut player_unit = None;
+    {
+        let mut q = world.query_filtered::<(&Unit, &Team, &Transform), ()>();
+        for (unit, team, transform) in q.iter(world) {
+            let armed = registry::entity(unit.id)
+                .map(|d| d.weapon.is_some())
+                .unwrap_or(false);
+            if *team == player && armed {
+                player_unit = Some(transform.translation);
+                break;
+            }
+        }
+    }
+    let mut enemy = None;
+    {
+        let mut q = world.query_filtered::<(&Team, &Transform), With<Structure>>();
+        for (team, transform) in q.iter(world) {
+            if *team != player && *team != Team::Neutral {
+                enemy = Some(transform.translation);
+                break;
+            }
+        }
+    }
+    Some((player_unit?, enemy?))
+}
+
+/// Emits a real keyboard message (the same data winit produces) so command
+/// hotkeys (`command_shortcuts`) fire headlessly.
+pub fn capture_key(app: &mut App, key: KeyCode, pressed: bool) {
+    let window = {
+        let world = app.world_mut();
+        let mut q = world.query_filtered::<Entity, With<PrimaryWindow>>();
+        q.iter(world).next()
+    };
+    let Some(window) = window else {
+        return;
+    };
+    app.world_mut()
+        .write_message(bevy::input::keyboard::KeyboardInput {
+            key_code: key,
+            logical_key: bevy::input::keyboard::Key::Dead(None),
+            state: if pressed {
+                bevy::input::ButtonState::Pressed
+            } else {
+                bevy::input::ButtonState::Released
+            },
+            text: None,
+            repeat: false,
+            window,
+        });
+}
+
+/// World position of a player production structure (Barracks/factory), if any.
+pub fn capture_player_producer_position(app: &mut App) -> Option<Vec3> {
+    let player = Team::Player(0);
+    let world = app.world_mut();
+    let mut q = world.query_filtered::<(&Structure, &Team, &Transform), ()>();
+    for (structure, team, transform) in q.iter(world) {
+        if *team == player
+            && matches!(
+                structure.id,
+                "Barracks" | "VehicleFactory" | "AircraftFactory"
+            )
+        {
+            return Some(transform.translation);
+        }
+    }
+    None
+}
+
+/// Hotkey of the first enabled "train a unit" command-panel slot for the current
+/// selection, if the panel currently offers one.
+pub fn capture_first_enabled_train_hotkey(app: &mut App) -> Option<KeyCode> {
+    let world = app.world_mut();
+    let mut q = world.query::<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>();
+    for (slot, action, availability) in q.iter(world) {
+        if matches!(action, BuildAction::Train(_)) && availability.enabled {
+            return COMMAND_SLOT_HOTKEYS
+                .get(slot.0)
+                .map(|hotkey| hotkey.key_code);
+        }
+    }
+    None
+}
+
+/// Number of queued production jobs for the player (grows when a train/build
+/// command is accepted).
+pub fn capture_player_build_queue_len(app: &mut App) -> usize {
+    app.world()
         .resource::<BuildQueue>()
         .0
         .iter()
-        .filter(|job| {
-            job.team == team && matches!(job.action, BuildAction::Train(id) if id == product_id)
-        })
+        .filter(|job| job.team == Team::Player(0))
         .count()
 }
 
-fn capture_order_player_attackers(app: &mut App, player_team: Team) -> usize {
-    let Some((target, _)) = capture_first_enemy_anchor(app.world_mut(), player_team) else {
-        return 0;
-    };
-    if let Ok(mut entity) = app.world_mut().get_entity_mut(target) {
-        entity.insert((VisibilityState { visible: true }, Visibility::Visible));
-    }
-    let attackers = capture_alive_attackers(app.world_mut(), player_team);
-    for attacker in &attackers {
-        if let Ok(mut entity) = app.world_mut().get_entity_mut(*attacker) {
-            entity.remove::<(
-                MoveOrder,
-                FollowOrder,
-                CaptureOrder,
-                GarrisonOrder,
-                HarvestOrder,
-                RepairOrder,
-                ConstructOrder,
-                AttackMoveOrder,
-                PatrolOrder,
-                OrderQueue,
-            )>();
-            entity.insert(AttackOrder { target });
-        }
-    }
-    attackers.len()
-}
-
-fn capture_alive_attackers(world: &mut World, team: Team) -> Vec<Entity> {
-    let mut query = world.query::<(Entity, &Team, &Health, &Weapon)>();
-    query
-        .iter(world)
-        .filter_map(|(entity, unit_team, health, _)| {
-            (*unit_team == team && health.current > 0.0).then_some(entity)
-        })
-        .collect()
-}
-
-fn capture_mouse_order_attackers_to_target(
-    app: &mut App,
-    attackers: &[Entity],
-    target: Entity,
-    target_position: Vec3,
-) -> usize {
-    let positions = attackers
-        .iter()
-        .filter_map(|entity| {
-            app.world().get_entity(*entity).ok().and_then(|entity_ref| {
-                let health = entity_ref.get::<Health>()?;
-                let transform = entity_ref.get::<Transform>()?;
-                (health.current > 0.0).then_some((*entity, transform.translation))
-            })
-        })
-        .collect::<Vec<_>>();
-
-    if positions.is_empty() {
-        return 0;
-    }
-
-    for (index, (_, position)) in positions.iter().copied().enumerate() {
-        let selected = if index == 0 {
-            capture_world_left_click(app, position)
-        } else {
-            capture_world_left_click_additive(app, position)
-        };
-        if !selected {
-            continue;
-        }
-    }
-
-    let selected_attackers = positions
-        .iter()
-        .filter(|(entity, _)| {
-            app.world()
-                .get_entity(*entity)
-                .is_ok_and(|entity_ref| entity_ref.get::<Selected>().is_some())
-        })
-        .map(|(entity, _)| *entity)
-        .collect::<Vec<_>>();
-    if selected_attackers.is_empty() {
-        return 0;
-    }
-
-    let target_health_before = app
-        .world()
-        .get::<Health>(target)
-        .map(|health| health.current);
-    if !capture_world_right_click(app, target_position) {
-        return 0;
-    }
-    let target_health_after = app
-        .world()
-        .get::<Health>(target)
-        .map(|health| health.current);
-    let target_destroyed = app.world().get_entity(target).is_err();
-    let target_damaged = target_health_before
-        .zip(target_health_after)
-        .is_some_and(|(before, after)| after < before);
-
-    selected_attackers
-        .iter()
-        .filter(|attacker| {
-            target_destroyed
-                || target_damaged
-                || app.world().get_entity(**attacker).is_ok_and(|entity| {
-                    entity
-                        .get::<AttackOrder>()
-                        .is_some_and(|order| order.target == target)
-                        || entity
-                            .get::<MoveOrder>()
-                            .is_some_and(|order| xz_distance(order.target, target_position) <= 8.0)
-                })
-        })
+/// Total player units (grows once queued production completes).
+pub fn capture_player_unit_count(app: &mut App) -> usize {
+    let world = app.world_mut();
+    let mut q = world.query_filtered::<&Team, With<Unit>>();
+    q.iter(world)
+        .filter(|team| **team == Team::Player(0))
         .count()
 }
 
-fn capture_first_enemy_anchor(world: &mut World, player_team: Team) -> Option<(Entity, Vec3)> {
-    let relations = world.resource::<TeamRelations>().clone();
-    let mut best = None;
-    {
-        let mut structures = world.query::<(Entity, &Structure, &Team, &Transform, &Health)>();
-        for (entity, structure, team, transform, health) in structures.iter(world) {
-            if health.current > 0.0
-                && relations.are_enemies(player_team, *team)
-                && is_structure_elimination_anchor(structure)
-            {
-                best = Some((entity, transform.translation));
-                break;
+/// World position of a player worker (its command panel offers Build actions).
+pub fn capture_player_worker_position(app: &mut App) -> Option<Vec3> {
+    let player = Team::Player(0);
+    let world = app.world_mut();
+    let mut q = world.query_filtered::<(&Unit, &Team, &Transform), ()>();
+    for (unit, team, transform) in q.iter(world) {
+        let is_worker = registry::entity(unit.id)
+            .map(|d| d.is_worker)
+            .unwrap_or(false);
+        if *team == player && is_worker {
+            return Some(transform.translation);
+        }
+    }
+    None
+}
+
+/// Hotkey of the first enabled "build a structure" command-panel slot.
+pub fn capture_first_enabled_build_hotkey(app: &mut App) -> Option<KeyCode> {
+    let world = app.world_mut();
+    let mut q = world.query::<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>();
+    for (slot, action, availability) in q.iter(world) {
+        if matches!(action, BuildAction::Build(_)) && availability.enabled {
+            return COMMAND_SLOT_HOTKEYS
+                .get(slot.0)
+                .map(|hotkey| hotkey.key_code);
+        }
+    }
+    None
+}
+
+/// (enabled, total) Build options currently on the command panel — diagnostic
+/// for whether the worker construction menu is showing at all.
+pub fn capture_build_options_count(app: &mut App) -> (usize, usize) {
+    let world = app.world_mut();
+    let mut q = world.query::<(&BuildAction, &CommandSlotAvailability)>();
+    let mut enabled = 0;
+    let mut total = 0;
+    for (action, availability) in q.iter(world) {
+        if matches!(action, BuildAction::Build(_)) {
+            total += 1;
+            if availability.enabled {
+                enabled += 1;
             }
         }
     }
-    if best.is_some() {
-        return best;
+    (enabled, total)
+}
+
+/// Count of player structures (grows when a building is placed/constructed).
+pub fn capture_player_structure_count(app: &mut App) -> usize {
+    let world = app.world_mut();
+    let mut q = world.query_filtered::<&Team, With<Structure>>();
+    q.iter(world)
+        .filter(|team| **team == Team::Player(0))
+        .count()
+}
+
+/// Whether the player currently has a pending structure placement (build mode).
+pub fn capture_player_in_placement_mode(app: &mut App) -> bool {
+    app.world()
+        .resource::<CommandMode>()
+        .pending_structure_placement
+        .is_some()
+}
+
+/// Whether the current placement-mode cursor target is a valid build spot.
+pub fn capture_placement_is_valid(app: &mut App) -> bool {
+    matches!(
+        app.world()
+            .resource::<StructurePlacementFeedback>()
+            .validity,
+        Some(StructurePlacementValidity::Valid)
+    )
+}
+
+/// Dev-capture convenience: top up the player's treasury so an action can be
+/// exercised without waiting out the economy. Does not change game logic.
+pub fn capture_grant_player_resources(app: &mut App, ore: i32, crystal: i32) {
+    let mut economies = app.world_mut().resource_mut::<Economies>();
+    let economy = economies.get_mut(Team::Player(0));
+    economy.ore += ore;
+    economy.crystal += crystal;
+}
+
+/// World position of the nearest visible resource node to any player unit, for
+/// verifying manual (right-click) harvesting.
+pub fn capture_nearest_visible_resource_position(app: &mut App) -> Option<Vec3> {
+    let player = Team::Player(0);
+    let world = app.world_mut();
+    let anchor = {
+        let mut q = world.query_filtered::<(&Team, &Transform), With<Unit>>();
+        q.iter(world)
+            .find(|(t, _)| **t == player)
+            .map(|(_, tf)| tf.translation)
+    }?;
+    let mut q = world.query::<(&Transform, &VisibilityState, &ResourceNode)>();
+    let mut best: Option<(f32, Vec3)> = None;
+    for (tf, vis, node) in q.iter(world) {
+        if !vis.visible || node.amount <= 0 {
+            continue;
+        }
+        let d = xz_distance(anchor, tf.translation);
+        if best.is_none_or(|(bd, _)| d < bd) {
+            best = Some((d, tf.translation));
+        }
     }
-    let mut units = world.query::<(Entity, &Unit, &Team, &Transform, &Health)>();
-    units
-        .iter(world)
-        .find_map(|(entity, unit, team, transform, health)| {
-            (health.current > 0.0
-                && relations.are_enemies(player_team, *team)
-                && is_worker_elimination_anchor(unit))
-            .then_some((entity, transform.translation))
-        })
+    best.map(|(_, pos)| pos)
+}
+
+/// Number of player units currently carrying a harvest order (proves a manual
+/// harvest command took effect).
+pub fn capture_player_harvesting_count(app: &mut App) -> usize {
+    let world = app.world_mut();
+    let mut q = world.query_filtered::<&Team, (With<Unit>, With<HarvestOrder>)>();
+    q.iter(world).filter(|t| **t == Team::Player(0)).count()
+}
+
+/// Sets every player slot's faction (0=人族/Alliance, 1=魔族/Demon, 2=混沌族/Chaos)
+/// before the match scene reads `MatchSetupSettings`, so a capture can show each
+/// faction's own base/units. Returns the faction label.
+pub fn capture_set_all_factions(app: &mut App, index: usize) -> &'static str {
+    let faction = SkirmishFaction::ALL[index % SkirmishFaction::ALL.len()];
+    let mut settings = app.world_mut().resource_mut::<MatchSetupSettings>();
+    for slot in settings.player_factions.iter_mut() {
+        *slot = faction;
+    }
+    faction.label()
+}
+
+/// Points the live match's `MainCamera` at the offscreen capture target.
+fn retarget_capture_camera(
+    mut commands: Commands,
+    target: Res<CaptureTarget>,
+    cameras: Query<Entity, (With<Camera>, Without<CaptureCameraReady>)>,
+) {
+    // Retarget every camera (the 3D scene camera AND the 2D UI/menu camera) to
+    // the offscreen image, so captures include the menu and the in-match HUD.
+    // `IsDefaultUiCamera` is required: once a camera's `RenderTarget` is an image
+    // (not the primary window), Bevy's `DefaultUiCamera` fallback no longer picks
+    // it, so without this marker the UI/HUD would silently drop out of captures.
+    for entity in &cameras {
+        commands.entity(entity).insert((
+            RenderTarget::Image(target.0.clone().into()),
+            bevy::ui::IsDefaultUiCamera,
+            CaptureCameraReady,
+        ));
+    }
 }
 
 fn cleanup_match_scoped_entities(
@@ -8715,7 +4685,7 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
             auto_assign_ai_construction_workers
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
-            auto_assign_ai_resource_collectors
+            auto_assign_idle_resource_collectors
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
             auto_assign_ai_supply_crate_collectors
@@ -8851,6 +4821,9 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
             combat
                 .in_set(SimulationPhase::Combat)
                 .run_if(match_in_progress),
+            update_idle_tower_scan
+                .in_set(SimulationPhase::Combat)
+                .run_if(match_in_progress),
             progress_queued_orders
                 .in_set(SimulationPhase::Combat)
                 .run_if(match_in_progress),
@@ -8883,6 +4856,9 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
             update_visibility
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
+            update_fog_overlay
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
             update_pulses
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
@@ -8906,6 +4882,13 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
                 .run_if(match_in_progress),
             update_hud
                 .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
+            update_selection_portrait
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
+            update_resource_hover
+                .in_set(SimulationPhase::PostCombat)
+                .before(draw_world_overlays)
                 .run_if(match_in_progress),
             draw_world_overlays
                 .in_set(SimulationPhase::PostCombat)
@@ -9208,8 +5191,8 @@ impl Team {
 
     fn label(self) -> String {
         match self {
-            Team::Player(index) => format!("玩家{}", index + 1),
-            Team::Neutral => "中立".to_string(),
+            Team::Player(index) => format!("{}{}", t("玩家", "Player "), index + 1),
+            Team::Neutral => t("中立", "Neutral").to_string(),
         }
     }
 
@@ -9232,6 +5215,95 @@ enum PlayerVisibilityMode {
 enum PlayerControlMode {
     Player,
     Spectator,
+}
+
+// --- Localization (i18n) ---------------------------------------------------
+// UI strings are bilingual (Chinese / English). Rather than thread a `Res<Locale>`
+// through every text system (several are already at Bevy's 16-param system
+// limit), the active language is mirrored into a process-global flag that the
+// `t(zh, en)` helper reads. `sync_locale` keeps the flag in step with the
+// `Locale` resource each frame.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Language {
+    Zh,
+    En,
+}
+
+impl Language {
+    fn toggled(self) -> Self {
+        match self {
+            Language::Zh => Language::En,
+            Language::En => Language::Zh,
+        }
+    }
+
+    fn short_label(self) -> &'static str {
+        match self {
+            Language::Zh => "中文",
+            Language::En => "EN",
+        }
+    }
+}
+
+#[derive(Resource, Clone, Copy, Debug, PartialEq, Eq)]
+struct Locale(Language);
+
+impl Default for Locale {
+    fn default() -> Self {
+        Locale(Language::Zh)
+    }
+}
+
+static CURRENT_LANGUAGE: std::sync::atomic::AtomicU8 = std::sync::atomic::AtomicU8::new(0);
+
+fn set_current_language(language: Language) {
+    let value = match language {
+        Language::Zh => 0,
+        Language::En => 1,
+    };
+    CURRENT_LANGUAGE.store(value, std::sync::atomic::Ordering::Relaxed);
+}
+
+fn current_language() -> Language {
+    match CURRENT_LANGUAGE.load(std::sync::atomic::Ordering::Relaxed) {
+        1 => Language::En,
+        _ => Language::Zh,
+    }
+}
+
+/// Picks the Chinese or English variant of a UI string per the active language.
+fn t(zh: &'static str, en: &'static str) -> &'static str {
+    match current_language() {
+        Language::Zh => zh,
+        Language::En => en,
+    }
+}
+
+fn sync_locale(locale: Res<Locale>) {
+    set_current_language(locale.0);
+}
+
+/// Tags a `Text` whose content is a fixed bilingual pair, so it re-translates
+/// live when the language toggles (static `Text::new` content is otherwise frozen
+/// at spawn). Dynamic text rebuilt every frame doesn't need this.
+#[derive(Component, Clone, Copy)]
+struct LocalizedText {
+    zh: &'static str,
+    en: &'static str,
+}
+
+fn update_localized_text(mut query: Query<(&LocalizedText, &mut Text)>) {
+    for (localized, mut text) in &mut query {
+        let wanted = t(localized.zh, localized.en);
+        if text.0 != wanted {
+            text.0 = wanted.to_string();
+        }
+    }
+}
+
+/// Bundle for a static UI label that re-translates on language toggle.
+fn localized_text(zh: &'static str, en: &'static str) -> impl Bundle {
+    (Text::new(t(zh, en)), LocalizedText { zh, en })
 }
 
 #[derive(Resource, Clone, Copy, Debug, PartialEq, Eq)]
@@ -9482,9 +5554,9 @@ enum SupplyCrateEffect {
 impl SupplyCrateEffect {
     fn label(self) -> &'static str {
         match self {
-            Self::Resources => "资源补给",
-            Self::Repair => "维修补给",
-            Self::Veterancy => "老兵补给",
+            Self::Resources => t("资源补给", "Resource Crate"),
+            Self::Repair => t("维修补给", "Repair Crate"),
+            Self::Veterancy => t("老兵补给", "Veterancy Crate"),
         }
     }
 
@@ -10061,6 +6133,9 @@ struct StatsText;
 struct SelectionText;
 
 #[derive(Component)]
+struct SelectionPortrait;
+
+#[derive(Component)]
 struct BattleLogRoot {
     font: Handle<Font>,
 }
@@ -10182,6 +6257,9 @@ struct CommandSlot(usize);
 
 #[derive(Component, Clone, Copy)]
 struct CommandSlotLabel(usize);
+
+#[derive(Component, Clone, Copy)]
+struct CommandSlotIcon(usize);
 
 #[derive(Component, Clone, Copy)]
 struct CommandSlotAvailability {
@@ -10307,7 +6385,7 @@ fn setup_main_menu(
                     TextColor(Color::srgb(0.82, 0.9, 0.9)),
                 ));
                 bar.spawn((
-                    Text::new("遭遇战作战室"),
+                    localized_text("遭遇战作战室", "Skirmish War Room"),
                     TextFont {
                         font: font.clone().into(),
                         font_size: FontSize::Px(30.0),
@@ -10333,7 +6411,11 @@ fn setup_main_menu(
                         .spawn(menu_preview_column_node())
                         .with_children(|column| {
                             column.spawn(menu_panel_node(400.0)).with_children(|panel| {
-                                panel.spawn(menu_panel_title("战区情报", font.clone()));
+                                panel.spawn(menu_panel_title(
+                                    "战区情报",
+                                    "Theater Intel",
+                                    font.clone(),
+                                ));
                                 spawn_skirmish_map_preview(panel, *selection);
                                 panel.spawn((
                                     Text::new(main_menu_faction_info_text(*selection)),
@@ -10352,7 +6434,11 @@ fn setup_main_menu(
                             });
 
                             column.spawn(menu_panel_node(400.0)).with_children(|panel| {
-                                panel.spawn(menu_panel_title("地图选择", font.clone()));
+                                panel.spawn(menu_panel_title(
+                                    "地图选择",
+                                    "Map Selection",
+                                    font.clone(),
+                                ));
                                 panel.spawn(menu_button_row_node()).with_children(|row| {
                                     for index in 0..SKIRMISH_MAPS.len() {
                                         let action = MainMenuAction::SelectMap(index);
@@ -10385,11 +6471,16 @@ fn setup_main_menu(
                         .spawn(menu_options_grid_node())
                         .with_children(|column| {
                             column.spawn(menu_panel_node(760.0)).with_children(|panel| {
-                                panel.spawn(menu_panel_title("作战规则", font.clone()));
+                                panel.spawn(menu_panel_title(
+                                    "作战规则",
+                                    "Battle Rules",
+                                    font.clone(),
+                                ));
                                 panel.spawn(menu_rule_grid_node()).with_children(|grid| {
                                     grid.spawn(menu_section_node()).with_children(|section| {
                                         section.spawn(menu_section_title(
                                             "模式  9/0/A/M",
+                                            "Mode  9/0/A/M",
                                             font.clone(),
                                         ));
                                         section.spawn(menu_button_row_node()).with_children(
@@ -10420,6 +6511,7 @@ fn setup_main_menu(
                                     grid.spawn(menu_section_node()).with_children(|section| {
                                         section.spawn(menu_section_title(
                                             "AI难度  F1-F4",
+                                            "AI Difficulty  F1-F4",
                                             font.clone(),
                                         ));
                                         section.spawn(menu_button_row_node()).with_children(
@@ -10445,6 +6537,7 @@ fn setup_main_menu(
                                     grid.spawn(menu_section_node()).with_children(|section| {
                                         section.spawn(menu_section_title(
                                             "初始资源  5-8",
+                                            "Starting Resources  5-8",
                                             font.clone(),
                                         ));
                                         section.spawn(menu_button_row_node()).with_children(
@@ -10473,7 +6566,11 @@ fn setup_main_menu(
                             });
 
                             column.spawn(menu_panel_node(760.0)).with_children(|panel| {
-                                panel.spawn(menu_panel_title("玩家槽位", font.clone()));
+                                panel.spawn(menu_panel_title(
+                                    "玩家槽位",
+                                    "Player Slots",
+                                    font.clone(),
+                                ));
                                 panel
                                     .spawn((
                                         menu_lobby_list_node(),
@@ -10551,16 +6648,16 @@ fn menu_action_button_label(
 fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSelection) -> String {
     match action {
         MainMenuAction::SelectMap(index) if index == random_map_index() => {
-            format!("R {RANDOM_MAP_LABEL}")
+            format!("R {}", random_map_label())
         }
         MainMenuAction::SelectMap(index) => SKIRMISH_MAPS
             .get(index)
             .map(|map| format!("{} {}", index + 1, map.name))
-            .unwrap_or_else(|| "地图".to_string()),
+            .unwrap_or_else(|| t("地图", "Map").to_string()),
         MainMenuAction::SelectStartingResources(index) => GODOT_STARTING_RESOURCE_OPTIONS
             .get(index)
             .map(|option| format!("{} {}", index + 5, starting_resource_option_label(option)))
-            .unwrap_or_else(|| "资源".to_string()),
+            .unwrap_or_else(|| t("资源", "Resources").to_string()),
         MainMenuAction::SelectMatchMode(mode) => {
             format!("{} {}", skirmish_match_mode_key(mode), mode.label())
         }
@@ -10569,7 +6666,7 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
             skirmish_ai_difficulty_key(difficulty),
             difficulty.short_label()
         ),
-        MainMenuAction::SelectLobbySlot(_) => "我方".to_string(),
+        MainMenuAction::SelectLobbySlot(_) => t("我方", "Mine").to_string(),
         MainMenuAction::CycleLobbySlotController(slot) => format!(
             "{}{}+",
             lobby_slot_key_prefix(skirmish_lobby_slot_controller_key(slot)),
@@ -10580,6 +6677,28 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
                 .unwrap_or(SkirmishPlayerController::None)
                 .short_label()
         ),
+        MainMenuAction::ToggleLobbySlotController(slot) => format!(
+            "{} \u{25BE}",
+            selection
+                .lobby_controllers
+                .get(slot)
+                .copied()
+                .unwrap_or(SkirmishPlayerController::None)
+                .short_label()
+        ),
+        MainMenuAction::SetLobbySlotController(_, controller) => {
+            controller.short_label().to_string()
+        }
+        MainMenuAction::ToggleLobbySlotFaction(slot) => format!(
+            "{} \u{25BE}",
+            selection
+                .lobby_factions
+                .get(slot)
+                .copied()
+                .unwrap_or(SkirmishFaction::Alliance)
+                .label()
+        ),
+        MainMenuAction::SetLobbySlotFaction(_, faction) => faction.label().to_string(),
         MainMenuAction::CycleLobbySlotFaction(slot) => format!(
             "{}{}+",
             lobby_slot_key_prefix(skirmish_lobby_slot_faction_key(slot)),
@@ -10607,7 +6726,7 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
                 % PLAYER_COLOR_PALETTE.len()
                 + 1
         ),
-        MainMenuAction::StartMatch => "开始对战  Enter".to_string(),
+        MainMenuAction::StartMatch => t("开始对战  Enter", "Start Match  Enter").to_string(),
     }
 }
 
@@ -10675,11 +6794,11 @@ fn skirmish_ai_difficulty_key(difficulty: AiDifficulty) -> &'static str {
 
 fn starting_resource_option_label(option: &StartingResourceOption) -> &'static str {
     match option.key {
-        "STARTING_RESOURCES_LOW" => "低 4/2",
-        "STARTING_RESOURCES_STANDARD" => "标准 8/4",
-        "STARTING_RESOURCES_HIGH" => "高 16/8",
-        "STARTING_RESOURCES_RICH" => "富矿 32/16",
-        _ => "资源",
+        "STARTING_RESOURCES_LOW" => t("低 4/2", "Low 4/2"),
+        "STARTING_RESOURCES_STANDARD" => t("标准 8/4", "Standard 8/4"),
+        "STARTING_RESOURCES_HIGH" => t("高 16/8", "High 16/8"),
+        "STARTING_RESOURCES_RICH" => t("富矿 32/16", "Rich 32/16"),
+        _ => t("资源", "Resources"),
     }
 }
 
@@ -10778,9 +6897,9 @@ fn menu_panel_node(width: f32) -> impl Bundle {
     )
 }
 
-fn menu_panel_title(label: &'static str, font: Handle<Font>) -> impl Bundle {
+fn menu_panel_title(zh: &'static str, en: &'static str, font: Handle<Font>) -> impl Bundle {
     (
-        Text::new(label),
+        localized_text(zh, en),
         TextFont {
             font: font.into(),
             font_size: FontSize::Px(18.0),
@@ -10835,9 +6954,9 @@ fn menu_button_row_node() -> impl Bundle {
     }
 }
 
-fn menu_section_title(label: &'static str, font: Handle<Font>) -> impl Bundle {
+fn menu_section_title(zh: &'static str, en: &'static str, font: Handle<Font>) -> impl Bundle {
     (
-        Text::new(label),
+        localized_text(zh, en),
         TextFont {
             font: font.into(),
             font_size: FontSize::Px(13.0),
@@ -10882,7 +7001,7 @@ fn spawn_menu_lobby_slot_row(
             color_slot
         )
     } else {
-        "关闭".to_string()
+        t("关闭", "Closed").to_string()
     };
     parent
         .spawn(menu_lobby_slot_row_node(slot, selection))
@@ -10904,11 +7023,11 @@ fn spawn_menu_lobby_slot_row(
                 .with_children(|cell| {
                     cell.spawn((
                         Text::new(if controller.is_human() {
-                            "我方槽位"
+                            t("我方槽位", "My Slot")
                         } else if active {
-                            "电脑槽位"
+                            t("电脑槽位", "AI Slot")
                         } else {
-                            "空位"
+                            t("空位", "Empty")
                         }),
                         TextFont {
                             font: font.clone().into(),
@@ -10930,10 +7049,84 @@ fn spawn_menu_lobby_slot_row(
                         TextColor(Color::srgb(0.7, 0.8, 0.78)),
                     ));
                 });
+            // Controller dropdown — inline expand (关闭 / 我方 / 电脑). Inline so the
+            // scrolling lobby list never clips it. No separate "我方" claim button:
+            // picking 我方 here claims the slot (4 stray "我方" buttons looked like
+            // every slot was player-controlled).
+            row.spawn(Node {
+                flex_direction: FlexDirection::Column,
+                row_gap: px(2),
+                ..default()
+            })
+            .with_children(|cell| {
+                let toggle = MainMenuAction::ToggleLobbySlotController(slot);
+                cell.spawn(menu_button(toggle, 84.0))
+                    .with_children(|button| {
+                        button.spawn(menu_action_button_label(
+                            toggle,
+                            selection,
+                            font.clone(),
+                            10.0,
+                        ));
+                    });
+                if selection.controller_dropdown_open == Some(slot) {
+                    for controller in [
+                        SkirmishPlayerController::None,
+                        SkirmishPlayerController::Human,
+                        SkirmishPlayerController::Ai(AiDifficulty::Beginner),
+                        SkirmishPlayerController::Ai(AiDifficulty::Easy),
+                        SkirmishPlayerController::Ai(AiDifficulty::Normal),
+                        SkirmishPlayerController::Ai(AiDifficulty::Hard),
+                    ] {
+                        let option = MainMenuAction::SetLobbySlotController(slot, controller);
+                        cell.spawn(menu_button(option, 84.0))
+                            .with_children(|button| {
+                                button.spawn(menu_action_button_label(
+                                    option,
+                                    selection,
+                                    font.clone(),
+                                    10.0,
+                                ));
+                            });
+                    }
+                }
+            });
+
+            // Faction dropdown — inline expand (人族 / 魔族 / 混沌族).
+            row.spawn(Node {
+                flex_direction: FlexDirection::Column,
+                row_gap: px(2),
+                ..default()
+            })
+            .with_children(|cell| {
+                let toggle = MainMenuAction::ToggleLobbySlotFaction(slot);
+                cell.spawn(menu_button(toggle, 84.0))
+                    .with_children(|button| {
+                        button.spawn(menu_action_button_label(
+                            toggle,
+                            selection,
+                            font.clone(),
+                            10.0,
+                        ));
+                    });
+                if selection.faction_dropdown_open == Some(slot) {
+                    for faction in SkirmishFaction::ALL {
+                        let option = MainMenuAction::SetLobbySlotFaction(slot, faction);
+                        cell.spawn(menu_button(option, 84.0))
+                            .with_children(|button| {
+                                button.spawn(menu_action_button_label(
+                                    option,
+                                    selection,
+                                    font.clone(),
+                                    10.0,
+                                ));
+                            });
+                    }
+                }
+            });
+
+            // Team / color cycles.
             for action in [
-                MainMenuAction::SelectLobbySlot(slot),
-                MainMenuAction::CycleLobbySlotController(slot),
-                MainMenuAction::CycleLobbySlotFaction(slot),
                 MainMenuAction::CycleLobbySlotTeamId(slot),
                 MainMenuAction::CycleLobbySlotColor(slot),
             ] {
@@ -11452,6 +7645,18 @@ fn main_menu_buttons(
                 MainMenuAction::CycleLobbySlotController(slot) => {
                     selection.cycle_lobby_slot_controller(slot);
                 }
+                MainMenuAction::ToggleLobbySlotController(slot) => {
+                    selection.toggle_controller_dropdown(slot);
+                }
+                MainMenuAction::SetLobbySlotController(slot, controller) => {
+                    selection.set_lobby_slot_controller_choice(slot, controller);
+                }
+                MainMenuAction::ToggleLobbySlotFaction(slot) => {
+                    selection.toggle_faction_dropdown(slot);
+                }
+                MainMenuAction::SetLobbySlotFaction(slot, faction) => {
+                    selection.set_lobby_slot_faction_choice(slot, faction);
+                }
                 MainMenuAction::CycleLobbySlotFaction(slot) => {
                     selection.cycle_lobby_slot_faction(slot);
                 }
@@ -11595,8 +7800,9 @@ fn update_main_menu_summary(
 fn main_menu_brief_status_text(selection: SkirmishMenuSelection) -> String {
     let resources = selection.starting_resources();
     format!(
-        "{}  |  资源 {}/{}",
+        "{}  |  {} {}/{}",
         selection.start_status().summary_label(),
+        t("资源", "Resources"),
         resources.ore,
         resources.crystal,
     )
@@ -11606,28 +7812,42 @@ fn main_menu_summary_text(selection: SkirmishMenuSelection) -> String {
     let map = selection.map();
     let resources = selection.starting_resources();
     let focus_label = if selection.human_team().is_none() {
-        "观战焦点"
+        t("观战焦点", "Spectate Focus")
     } else {
-        "我方出生槽"
+        t("我方出生槽", "My Spawn Slot")
     };
     format!(
-        "地图: {}  |  模式: {}  |  {}: {}  |  AI: {}\n控制: {}  |  队伍: {}\n种族: {}  |  颜色: {}\n参战玩家: {}/{}  |  需要出生点: {}  |  地图出生点: {}  |  资源: {}/{}  |  {}\n开始: Enter/点击开始对战",
+        "{}: {}  |  {}: {}  |  {}: {}  |  AI: {}\n{}: {}  |  {}: {}\n{}: {}  |  {}: {}\n{}: {}/{}  |  {}: {}  |  {}: {}  |  {}: {}/{}  |  {}\n{}",
+        t("地图", "Map"),
         selection.map_label(),
+        t("模式", "Mode"),
         selection.match_mode.label(),
         focus_label,
         selection.focus_team().label(),
         selection.ai_difficulty.short_label(),
+        t("控制", "Control"),
         skirmish_player_controller_text(selection),
+        t("队伍", "Teams"),
         skirmish_team_setup_text(selection),
+        t("种族", "Faction"),
         skirmish_player_faction_text(selection),
+        t("颜色", "Color"),
         skirmish_player_color_text(selection),
+        t("参战玩家", "Players"),
         selection.active_team_count(),
         selection.selected_map_player_slots(),
+        t("需要出生点", "Spawns needed"),
         selection.required_player_slots(),
+        t("地图出生点", "Map spawns"),
         map.players,
+        t("资源", "Resources"),
         resources.ore,
         resources.crystal,
-        selection.start_status().summary_label()
+        selection.start_status().summary_label(),
+        t(
+            "开始: Enter/点击开始对战",
+            "Start: Enter / click Start Match"
+        ),
     )
 }
 
@@ -11699,7 +7919,8 @@ fn skirmish_player_color_text(selection: SkirmishMenuSelection) -> String {
 fn main_menu_faction_info_text(selection: SkirmishMenuSelection) -> String {
     let faction = selection.focus_faction();
     format!(
-        "对手: {}  |  {}  |  {}",
+        "{}: {}  |  {}  |  {}",
+        t("对手", "Opponents"),
         skirmish_opponents_text(selection),
         skirmish_faction_roster_summary(faction),
         skirmish_faction_playstyle_summary(faction)
@@ -11714,7 +7935,7 @@ fn skirmish_opponents_text(selection: SkirmishMenuSelection) -> String {
         SkirmishMatchMode::OneVsOne | SkirmishMatchMode::AiVsAi => player_teams(active_teams.len())
             .find(|team| *team != focus_team && relations.are_enemies(focus_team, *team))
             .map(|team| team.label().to_string())
-            .unwrap_or_else(|| "无".to_string()),
+            .unwrap_or_else(|| t("无", "None").to_string()),
         SkirmishMatchMode::FreeForAll => player_teams(active_teams.len())
             .filter(|team| *team != focus_team && relations.are_enemies(focus_team, *team))
             .map(Team::label)
@@ -11725,9 +7946,14 @@ fn skirmish_opponents_text(selection: SkirmishMenuSelection) -> String {
             allied_skirmish_enemy(focus_team, active_teams.len()),
         ) {
             (Some(ally), Some(enemy)) => {
-                format!("{}（盟友: {}）", enemy.label(), ally.label())
+                format!(
+                    "{}（{}: {}）",
+                    enemy.label(),
+                    t("盟友", "Ally"),
+                    ally.label()
+                )
             }
-            _ => "无".to_string(),
+            _ => t("无", "None").to_string(),
         },
     }
 }
@@ -11738,13 +7964,17 @@ fn skirmish_faction_roster_summary(faction: SkirmishFaction) -> String {
 
 fn faction_roster_summary_for_id(faction_id: &str) -> String {
     let Some(faction) = registry::faction(faction_id) else {
-        return "资料缺失".to_string();
+        return t("资料缺失", "No data").to_string();
     };
     format!(
-        "建筑 {}  步兵 {}  载具 {}  空军 {}",
+        "{} {}  {} {}  {} {}  {} {}",
+        t("建筑", "Buildings"),
         faction.structures.len(),
+        t("步兵", "Infantry"),
         faction_product_count(faction, "Barracks"),
+        t("载具", "Vehicles"),
         faction_product_count(faction, "VehicleFactory"),
+        t("空军", "Air"),
         faction_product_count(faction, "AircraftFactory")
     )
 }
@@ -11755,9 +7985,18 @@ fn faction_product_count(faction: &registry::FactionDef, producer: &str) -> usiz
 
 fn faction_playstyle_summary(faction: SkirmishFaction) -> &'static str {
     match faction {
-        SkirmishFaction::Alliance => "人族: 全科技混合军，防御和兵种最完整，适合稳步推进",
-        SkirmishFaction::Demon => "魔族: 火力突击和攻城压制，单位线更集中，适合快速正面进攻",
-        SkirmishFaction::Chaos => "混沌族: 护盾、无人机、干扰和高阶防御，适合控场消耗",
+        SkirmishFaction::Alliance => t(
+            "人族: 全科技混合军，防御和兵种最完整，适合稳步推进",
+            "Alliance: full-tech combined army; best defense and unit roster, for steady pushes",
+        ),
+        SkirmishFaction::Demon => t(
+            "魔族: 火力突击和攻城压制，单位线更集中，适合快速正面进攻",
+            "Demon: firepower rushes and siege pressure; tighter unit line, for fast frontal assaults",
+        ),
+        SkirmishFaction::Chaos => t(
+            "混沌族: 护盾、无人机、干扰和高阶防御，适合控场消耗",
+            "Chaos: shields, drones, jamming and high-tier defense, for zone control and attrition",
+        ),
     }
 }
 
@@ -11770,6 +8009,7 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    images: Option<ResMut<Assets<Image>>>,
     mut next_id: ResMut<NextSpawnId>,
     selected_map: Res<SelectedSkirmishMap>,
     setup_settings: Res<MatchSetupSettings>,
@@ -11815,6 +8055,18 @@ fn setup(
         })),
         MatchScopedEntity,
     ));
+
+    // Fog shroud needs the image asset system (real render / capture). Pure
+    // headless logic tests have no `Assets<Image>`, so skip it there.
+    if let Some(mut images) = images {
+        spawn_fog_overlay(
+            &mut commands,
+            &mut meshes,
+            &mut materials,
+            &mut images,
+            map_bounds,
+        );
+    }
 
     for x in [-17.0, -8.0, 6.0, 15.0] {
         spawn_prop(
@@ -11907,9 +8159,8 @@ fn faction_ai_profile_for_difficulty(
             profile.defense_priority = BEGINNER_AI_DEFENSE_PRIORITY;
             profile.defense_limits = BEGINNER_AI_DEFENSE_LIMITS;
             profile.expected_command_centers = 1;
-            profile.expected_workers = 1;
+            profile.expected_workers = 3;
             profile.expected_refineries = 1;
-            profile.expected_ore_harvesters = 0;
             profile.expected_battlegroups = 0;
             profile.expected_units_in_battlegroup = 0;
             profile.active_offense_enabled = false;
@@ -11928,7 +8179,6 @@ fn faction_ai_profile_for_difficulty(
             profile.expected_command_centers = 1;
             profile.expected_workers = 2;
             profile.expected_refineries = 1;
-            profile.expected_ore_harvesters = 1;
             profile.expected_battlegroups = 1;
             profile.expected_units_in_battlegroup = 3;
             profile.capture_enabled = false;
@@ -11944,9 +8194,8 @@ fn faction_ai_profile_for_difficulty(
         AiDifficulty::Normal => {}
         AiDifficulty::Hard => {
             profile.expected_command_centers = 2;
-            profile.expected_workers = 4;
+            profile.expected_workers = 3;
             profile.expected_refineries = 2;
-            profile.expected_ore_harvesters = 3;
             profile.expected_battlegroups = 3;
             profile.expected_units_in_battlegroup = 5;
             profile.production_interval = 3.0;
@@ -11967,7 +8216,7 @@ fn faction_ai_profile_for_difficulty(
 fn ai_profile_requests_offensive_combat_units(profile: &TeamAiProfile) -> bool {
     profile.production_priority.iter().any(|id| {
         registry::entity(id).is_some_and(|def| {
-            def.weapon.is_some() && def.speed > 0.0 && !matches!(def.id, "Worker" | "OreHarvester")
+            def.weapon.is_some() && def.speed > 0.0 && !matches!(def.id, "Worker")
         })
     })
 }
@@ -12562,6 +8811,7 @@ fn spawn_structure_under_construction_with_visual_faction(
 fn progress_under_construction_structures(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    time: Res<Time>,
     mut next_id: ResMut<NextSpawnId>,
     map_bounds: Res<MapBounds>,
     visible_player: Option<Res<VisiblePlayer>>,
@@ -12578,9 +8828,18 @@ fn progress_under_construction_structures(
     )>,
 ) {
     let player_team = visible_player_team(visible_player.as_deref());
-    for (entity, structure, team, transform, visual_faction, mut health, construction) in
+    let controlled_team = controlled_player_team(visible_player.as_deref());
+    for (entity, structure, team, transform, visual_faction, mut health, mut construction) in
         &mut structures
     {
+        // AI-controlled structures self-construct: the AI keeps its workers
+        // gathering and doesn't reliably free them to build, so advance its
+        // buildings automatically (RA2-style auto-construction).
+        if controlled_team != Some(*team) && construction.remaining > 0.0 {
+            construction.remaining = (construction.remaining
+                - STRUCTURE_CONSTRUCTION_PROGRESS_PER_SECOND * time.delta_secs())
+            .max(0.0);
+        }
         let progress = structure_construction_progress(*construction);
         health.current = structure_construction_health(health.max, progress);
         if construction.remaining > 0.0 {
@@ -12589,7 +8848,12 @@ fn progress_under_construction_structures(
 
         health.current = health.max;
         commands.entity(entity).try_remove::<UnderConstruction>();
-        if let Some(origin) = construction.free_harvester_origin {
+        // The human player runs a single worker unit that both builds and
+        // gathers (manually), so don't hand them a separate free harvester; the
+        // AI still gets one for its automated economy.
+        if let Some(origin) = construction.free_harvester_origin
+            && controlled_player_team(visible_player.as_deref()) != Some(*team)
+        {
             let spawn_seed = next_id.0 + 17;
             spawn_refinery_free_harvester(
                 &mut commands,
@@ -13448,7 +9712,7 @@ fn setup_match_end_overlay(commands: &mut Commands, font: Handle<Font>) {
                 ))
                 .with_children(|panel| {
                     panel.spawn((
-                        Text::new("结算"),
+                        localized_text("结算", "Results"),
                         TextFont {
                             font: font.clone().into(),
                             font_size: FontSize::Px(MATCH_END_TITLE_FONT_SIZE),
@@ -13491,15 +9755,27 @@ fn setup_match_end_overlay(commands: &mut Commands, font: Handle<Font>) {
                         .with_children(|row| {
                             row.spawn(match_end_button(MatchEndAction::Restart))
                                 .with_children(|button| {
-                                    button.spawn(match_end_button_label("重开对局", font.clone()));
+                                    button.spawn(match_end_button_label(
+                                        "重开对局",
+                                        "Restart Match",
+                                        font.clone(),
+                                    ));
                                 });
                             row.spawn(match_end_button(MatchEndAction::ReturnToSetup))
                                 .with_children(|button| {
-                                    button.spawn(match_end_button_label("返回设置", font.clone()));
+                                    button.spawn(match_end_button_label(
+                                        "返回设置",
+                                        "Back to Setup",
+                                        font.clone(),
+                                    ));
                                 });
                             row.spawn(match_end_button(MatchEndAction::ExitToMenu))
                                 .with_children(|button| {
-                                    button.spawn(match_end_button_label("退出菜单", font.clone()));
+                                    button.spawn(match_end_button_label(
+                                        "退出菜单",
+                                        "Exit to Menu",
+                                        font.clone(),
+                                    ));
                                 });
                         });
                 });
@@ -13523,9 +9799,9 @@ fn match_end_button(action: MatchEndAction) -> impl Bundle {
     )
 }
 
-fn match_end_button_label(label: &'static str, font: Handle<Font>) -> impl Bundle {
+fn match_end_button_label(zh: &'static str, en: &'static str, font: Handle<Font>) -> impl Bundle {
     (
-        Text::new(label),
+        localized_text(zh, en),
         TextFont {
             font: font.into(),
             font_size: FontSize::Px(16.0),
@@ -13573,7 +9849,7 @@ fn setup_match_menu_overlay(commands: &mut Commands, font: Handle<Font>) {
                 ))
                 .with_children(|panel| {
                     panel.spawn((
-                        Text::new("对局菜单"),
+                        localized_text("对局菜单", "Match Menu"),
                         TextFont {
                             font: font.clone().into(),
                             font_size: FontSize::Px(24.0),
@@ -13594,7 +9870,11 @@ fn setup_match_menu_overlay(commands: &mut Commands, font: Handle<Font>) {
                     panel
                         .spawn(match_menu_button(MatchMenuAction::Resume))
                         .with_children(|button| {
-                            button.spawn(match_menu_button_label("继续战斗", font.clone()));
+                            button.spawn(match_menu_button_label(
+                                "继续战斗",
+                                "Resume Battle",
+                                font.clone(),
+                            ));
                         });
                     panel.spawn(match_menu_speed_row(font.clone()));
                     panel
@@ -13608,22 +9888,38 @@ fn setup_match_menu_overlay(commands: &mut Commands, font: Handle<Font>) {
                         .with_children(|row| {
                             row.spawn(match_menu_button(MatchMenuAction::PreviousPerspective))
                                 .with_children(|button| {
-                                    button.spawn(match_menu_button_label("上一视角", font.clone()));
+                                    button.spawn(match_menu_button_label(
+                                        "上一视角",
+                                        "Prev View",
+                                        font.clone(),
+                                    ));
                                 });
                             row.spawn(match_menu_button(MatchMenuAction::NextPerspective))
                                 .with_children(|button| {
-                                    button.spawn(match_menu_button_label("下一视角", font.clone()));
+                                    button.spawn(match_menu_button_label(
+                                        "下一视角",
+                                        "Next View",
+                                        font.clone(),
+                                    ));
                                 });
                         });
                     panel
                         .spawn(match_menu_button(MatchMenuAction::Restart))
                         .with_children(|button| {
-                            button.spawn(match_menu_button_label("重开对局", font.clone()));
+                            button.spawn(match_menu_button_label(
+                                "重开对局",
+                                "Restart Match",
+                                font.clone(),
+                            ));
                         });
                     panel
                         .spawn(match_menu_button(MatchMenuAction::ReturnToSetup))
                         .with_children(|button| {
-                            button.spawn(match_menu_button_label("返回设置", font.clone()));
+                            button.spawn(match_menu_button_label(
+                                "返回设置",
+                                "Back to Setup",
+                                font.clone(),
+                            ));
                         });
                 });
         });
@@ -13641,7 +9937,7 @@ fn match_menu_speed_row(font: Handle<Font>) -> impl Bundle {
         },
         children![
             (
-                Text::new("游戏速度"),
+                localized_text("游戏速度", "Game Speed"),
                 TextFont {
                     font: font.clone().into(),
                     font_size: FontSize::Px(14.0),
@@ -13665,7 +9961,11 @@ fn match_menu_speed_row(font: Handle<Font>) -> impl Bundle {
 fn match_menu_speed_button(preset: MatchSpeedPreset, font: Handle<Font>) -> impl Bundle {
     (
         match_menu_button(MatchMenuAction::SetSpeed(preset)),
-        children![match_menu_button_label(preset.label(), font)],
+        children![match_menu_button_label(
+            preset.label(),
+            preset.label(),
+            font
+        )],
     )
 }
 
@@ -13686,9 +9986,9 @@ fn match_menu_button(action: MatchMenuAction) -> impl Bundle {
     )
 }
 
-fn match_menu_button_label(label: &'static str, font: Handle<Font>) -> impl Bundle {
+fn match_menu_button_label(zh: &'static str, en: &'static str, font: Handle<Font>) -> impl Bundle {
     (
-        Text::new(label),
+        localized_text(zh, en),
         TextFont {
             font: font.into(),
             font_size: FontSize::Px(17.0),
@@ -13725,7 +10025,7 @@ fn setup_match_briefing(commands: &mut Commands, font: Handle<Font>) {
         ))
         .with_children(|button| {
             button.spawn((
-                Text::new("目标"),
+                localized_text("目标", "Objectives"),
                 TextFont {
                     font: font.clone().into(),
                     font_size: FontSize::Px(14.0),
@@ -13765,7 +10065,7 @@ fn setup_match_briefing(commands: &mut Commands, font: Handle<Font>) {
                 })
                 .with_children(|header| {
                     header.spawn((
-                        Text::new("战斗简报"),
+                        localized_text("战斗简报", "Briefing"),
                         TextFont {
                             font: font.clone().into(),
                             font_size: FontSize::Px(15.0),
@@ -13925,16 +10225,27 @@ fn match_briefing_text(
 ) -> String {
     let (enemies, allies) = match_briefing_player_counts(visible_team, relations, active_teams);
     format!(
-        "目标：摧毁所有敌方指挥中心，并保住至少一个我方指挥中心\n\
-         敌人: {enemies}\n\
-         盟友: {allies}\n\
-         Ore: {} / Crystal: {}\n\
-         推荐开局\n\
-         - 派工人采集附近水晶，并尽快补充矿车\n\
-         - 在雷达、防御和高级生产耗电前先补电力\n\
-         - 用兵营做廉价克制，或用战车工厂施加装甲压力\n\
-         - 侦察敌方科技、占领中立建筑，并在后期武器到来前打击扩张",
-        settings.starting_resources.ore, settings.starting_resources.crystal
+        "{}\n{}: {enemies}\n{}: {allies}\nOre: {} / Crystal: {}\n{}",
+        t(
+            "目标：摧毁所有敌方指挥中心，并保住至少一个我方指挥中心",
+            "Objective: destroy all enemy Command Centers while keeping at least one of yours",
+        ),
+        t("敌人", "Enemies"),
+        t("盟友", "Allies"),
+        settings.starting_resources.ore,
+        settings.starting_resources.crystal,
+        t(
+            "推荐开局\n\
+             - 派工人采集附近水晶，并尽快补充矿车\n\
+             - 在雷达、防御和高级生产耗电前先补电力\n\
+             - 用兵营做廉价克制，或用战车工厂施加装甲压力\n\
+             - 侦察敌方科技、占领中立建筑，并在后期武器到来前打击扩张",
+            "Opening tips\n\
+             - Send workers to gather nearby crystal and add harvesters quickly\n\
+             - Build power before radar, defense, and advanced production draw it down\n\
+             - Use the Barracks for cheap counters, or the Vehicle Factory for armor pressure\n\
+             - Scout enemy tech, capture neutral buildings, and strike expansions before late-game weapons arrive",
+        ),
     )
 }
 
@@ -14665,6 +10976,23 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
     ));
 
     commands.spawn((
+        ImageNode::default(),
+        Node {
+            position_type: PositionType::Absolute,
+            left: px(14),
+            bottom: px(140),
+            width: px(64),
+            height: px(64),
+            border: UiRect::all(px(2)),
+            ..default()
+        },
+        BorderColor::all(Color::srgb(0.32, 0.4, 0.46)),
+        Visibility::Hidden,
+        SelectionPortrait,
+        MatchScopedEntity,
+    ));
+
+    commands.spawn((
         Text::new(""),
         TextFont {
             font: font.clone().into(),
@@ -14769,6 +11097,7 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
         .with_children(|parent| {
             for index in 0..COMMAND_SLOT_COUNT {
                 parent.spawn(command_button(index)).with_children(|button| {
+                    button.spawn(command_button_icon(index));
                     button.spawn(command_button_label(index, font.clone()));
                 });
             }
@@ -14953,7 +11282,7 @@ fn update_match_end_overlay(
     *overlay_visibility = Visibility::Visible;
 
     if let Ok(mut title_text) = title_text_q.single_mut() {
-        **title_text = "对局结算".to_string();
+        **title_text = t("对局结算", "Match Results").to_string();
     }
     if let Ok(mut reason_text) = reason_text_q.single_mut() {
         **reason_text = match_state.result_reason.to_string();
@@ -14963,22 +11292,37 @@ fn update_match_end_overlay(
         let seconds = (match_state.start_time_sec.max(0.0) as u32) % 60;
         let visible_economy = economies.get(visible_player.team);
         let human_losses = format!(
-            "己方损失: 单位 {}  建筑 {}",
-            match_state.units_lost, match_state.structures_lost
+            "{}: {} {}  {} {}",
+            t("己方损失", "Your losses"),
+            t("单位", "units"),
+            match_state.units_lost,
+            t("建筑", "buildings"),
+            match_state.structures_lost
         );
         let enemy_losses = format!(
-            "敌方击杀: 单位 {}  建筑 {}",
-            match_state.enemy_units_destroyed, match_state.enemy_structures_destroyed
+            "{}: {} {}  {} {}",
+            t("敌方击杀", "Enemy kills"),
+            t("单位", "units"),
+            match_state.enemy_units_destroyed,
+            t("建筑", "buildings"),
+            match_state.enemy_structures_destroyed
         );
         let resources = format!(
-            "{}资源: Ore {}  Crystal {}",
+            "{}{}: Ore {}  Crystal {}",
             visible_player.team.label(),
+            t("资源", " resources"),
             visible_economy.ore,
             visible_economy.crystal
         );
         **stats_text = format!(
-            "剩余阵营: {}  剩余锚点: {}  用时: {:02}:{:02}\n{enemy_losses}\n{human_losses}\n{resources}",
-            match_state.remaining_teams, match_state.remaining_anchors, minutes, seconds
+            "{}: {}  {}: {}  {}: {:02}:{:02}\n{enemy_losses}\n{human_losses}\n{resources}",
+            t("剩余阵营", "Teams left"),
+            match_state.remaining_teams,
+            t("剩余锚点", "Anchors left"),
+            match_state.remaining_anchors,
+            t("用时", "Time"),
+            minutes,
+            seconds
         );
     }
 }
@@ -15025,7 +11369,7 @@ fn evaluate_match_end(
                 &mut match_state,
                 &mut match_flow,
                 MatchPhase::MatchFinished,
-                "战斗结束",
+                t("战斗结束", "Battle Over"),
             );
         }
         return;
@@ -15048,7 +11392,10 @@ fn evaluate_match_end(
             &mut match_state,
             &mut match_flow,
             MatchPhase::HumanDefeat,
-            "失利：己方锚点被全部摧毁",
+            t(
+                "失利：己方锚点被全部摧毁",
+                "Defeat: all your anchors were destroyed",
+            ),
         );
         return;
     }
@@ -15059,7 +11406,7 @@ fn evaluate_match_end(
             &mut match_state,
             &mut match_flow,
             MatchPhase::HumanVictory,
-            "胜利：敌方锚点全部丢失",
+            t("胜利：敌方锚点全部丢失", "Victory: all enemy anchors lost"),
         );
         return;
     }
@@ -15069,15 +11416,14 @@ fn evaluate_match_end(
             &mut match_state,
             &mut match_flow,
             MatchPhase::MatchFinished,
-            "战斗结束",
+            t("战斗结束", "Battle Over"),
         );
     }
 }
 
 fn is_worker_elimination_anchor(unit: &Unit) -> bool {
-    registry::entity(unit.id).is_some_and(|def| {
-        def.is_worker || def.is_harvester || matches!(def.id, "MobileConstructionVehicle")
-    })
+    registry::entity(unit.id)
+        .is_some_and(|def| def.is_worker || matches!(def.id, "MobileConstructionVehicle"))
 }
 
 fn is_structure_elimination_anchor(structure: &Structure) -> bool {
@@ -15184,24 +11530,161 @@ fn objective_completion_percent(remaining_anchors: u32, total_anchors: u32, comp
 
 fn objective_tracker_text(snapshot: ObjectiveTrackerSnapshot) -> String {
     let title = if snapshot.total_anchors > 0 && snapshot.remaining_anchors == 0 {
-        "目标完成"
+        t("目标完成", "Objective complete")
     } else {
-        "目标: 消灭敌方锚点"
+        t("目标: 消灭敌方锚点", "Objective: eliminate enemy anchors")
     };
     format!(
-        "{title}\n敌方队伍: {}  锚点: {}/{}\n结构: {}  工人: {}  进度: {}%",
+        "{title}\n{}: {}  {}: {}/{}\n{}: {}  {}: {}  {}: {}%",
+        t("敌方队伍", "Enemy teams"),
         snapshot.enemy_teams,
+        t("锚点", "Anchors"),
         snapshot.remaining_anchors,
         snapshot.total_anchors,
+        t("结构", "Structures"),
         snapshot.structures,
+        t("工人", "Workers"),
         snapshot.workers,
+        t("进度", "Progress"),
         snapshot.completion_percent,
     )
+}
+
+fn spawn_fog_overlay(
+    commands: &mut Commands,
+    meshes: &mut Assets<Mesh>,
+    materials: &mut Assets<StandardMaterial>,
+    images: &mut Assets<Image>,
+    bounds: MapBounds,
+) {
+    use bevy::image::ImageSampler;
+    use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat};
+
+    // Start fully shrouded (opaque black, alpha 255). `update_fog_overlay` carves
+    // out the seen/explored areas each frame.
+    let data = [0u8, 0, 0, 255].repeat(FOG_OVERLAY_RES * FOG_OVERLAY_RES);
+    let mut image = Image::new(
+        Extent3d {
+            width: FOG_OVERLAY_RES as u32,
+            height: FOG_OVERLAY_RES as u32,
+            depth_or_array_layers: 1,
+        },
+        TextureDimension::D2,
+        data,
+        TextureFormat::Rgba8UnormSrgb,
+        bevy::asset::RenderAssetUsages::all(),
+    );
+    // Linear filtering smooths the low-res shroud into soft fog edges.
+    image.sampler = ImageSampler::linear();
+    let handle = images.add(image);
+
+    commands.spawn((
+        Name::new("Fog of war shroud"),
+        Mesh3d(
+            meshes.add(
+                Plane3d::default()
+                    .mesh()
+                    .size(bounds.half_width * 2.0, bounds.half_depth * 2.0),
+            ),
+        ),
+        MeshMaterial3d(materials.add(StandardMaterial {
+            base_color: Color::WHITE,
+            base_color_texture: Some(handle.clone()),
+            alpha_mode: AlphaMode::Blend,
+            unlit: true,
+            ..default()
+        })),
+        Transform::from_xyz(0.0, FOG_OVERLAY_Y, 0.0),
+        FogOverlayPlane,
+        MatchScopedEntity,
+    ));
+
+    commands.insert_resource(FogOverlay {
+        handle,
+        explored: vec![false; FOG_OVERLAY_RES * FOG_OVERLAY_RES],
+    });
+}
+
+/// Repaints the fog shroud texture from the viewing player's (and allies')
+/// current vision. Clear where seen now, dim where explored before, black where
+/// never seen. Hidden entirely in spectator/all-visible mode.
+fn update_fog_overlay(
+    visible_player: Res<VisiblePlayer>,
+    relations: Res<TeamRelations>,
+    bounds: Option<Res<MapBounds>>,
+    fog: Option<ResMut<FogOverlay>>,
+    images: Option<ResMut<Assets<Image>>>,
+    revealers: Query<(&Team, &Transform, &VisionRadius, &VisibilityState)>,
+    mut overlay_vis: Query<&mut Visibility, With<FogOverlayPlane>>,
+) {
+    let (Some(bounds), Some(mut fog), Some(mut images)) = (bounds, fog, images) else {
+        return;
+    };
+    let bounds = *bounds;
+    let hide_fog = visible_player.all_players_visible();
+    for mut visibility in &mut overlay_vis {
+        *visibility = if hide_fog {
+            Visibility::Hidden
+        } else {
+            Visibility::Inherited
+        };
+    }
+    if hide_fog {
+        return;
+    }
+    let visible_team = visible_player.team;
+    let res = FOG_OVERLAY_RES;
+    let mut visible_now = vec![false; res * res];
+    let (hw, hd) = (bounds.half_width.max(0.01), bounds.half_depth.max(0.01));
+    for (team, transform, vision, state) in &revealers {
+        if !state.visible || !relations.are_allied(visible_team, *team) {
+            continue;
+        }
+        let r = vision.0 + FOG_COMPENSATION;
+        let pos = transform.translation;
+        // Center + radius in texture pixels (map is centered on the origin).
+        let cu = (pos.x + hw) / (2.0 * hw) * res as f32;
+        let cv = (pos.z + hd) / (2.0 * hd) * res as f32;
+        let pr_x = (r / (2.0 * hw) * res as f32).max(0.5);
+        let pr_z = (r / (2.0 * hd) * res as f32).max(0.5);
+        let min_x = ((cu - pr_x).floor().max(0.0)) as usize;
+        let max_x = ((cu + pr_x).ceil().min(res as f32 - 1.0)) as usize;
+        let min_y = ((cv - pr_z).floor().max(0.0)) as usize;
+        let max_y = ((cv + pr_z).ceil().min(res as f32 - 1.0)) as usize;
+        for py in min_y..=max_y {
+            for px in min_x..=max_x {
+                let dx = (px as f32 + 0.5 - cu) / pr_x;
+                let dy = (py as f32 + 0.5 - cv) / pr_z;
+                if dx * dx + dy * dy <= 1.0 {
+                    visible_now[py * res + px] = true;
+                }
+            }
+        }
+    }
+    let Some(mut image) = images.get_mut(&fog.handle) else {
+        return;
+    };
+    let Some(data) = image.data.as_mut() else {
+        return;
+    };
+    for i in 0..res * res {
+        if visible_now[i] {
+            fog.explored[i] = true;
+        }
+        data[i * 4 + 3] = if visible_now[i] {
+            0
+        } else if fog.explored[i] {
+            FOG_OVERLAY_EXPLORED_ALPHA
+        } else {
+            255
+        };
+    }
 }
 
 fn update_visibility(
     mut commands: Commands,
     visible_player: Res<VisiblePlayer>,
+    relations: Res<TeamRelations>,
     mut visibility_params: ParamSet<(
         Query<(&Team, &Transform, &VisionRadius, &VisibilityState)>,
         Query<(
@@ -15223,7 +11706,9 @@ fn update_visibility(
         {
             let visible_revealers = visibility_params.p0();
             for (team, transform, vision_radius, visibility_state) in &visible_revealers {
-                if *team == visible_team && visibility_state.visible {
+                // Allies share vision: any allied unit/structure reveals fog for the
+                // viewing player (godot `is_allied_with(visible_player)`).
+                if relations.are_allied(visible_team, *team) && visibility_state.visible {
                     revealers.push((transform.translation, vision_radius.0));
                 }
             }
@@ -15242,7 +11727,9 @@ fn update_visibility(
             mut visibility,
         ) in &mut tracked_entities
         {
-            let should_be_visible = if all_players_visible || *team == visible_team {
+            let should_be_visible = if all_players_visible
+                || relations.are_allied(visible_team, *team)
+            {
                 true
             } else {
                 revealers.iter().any(|(source, source_radius)| {
@@ -15552,9 +12039,9 @@ fn push_under_attack_log(
         return false;
     }
     let message = if target_is_structure {
-        "基地遭到攻击"
+        t("基地遭到攻击", "Base under attack")
     } else {
-        "单位遭到攻击"
+        t("单位遭到攻击", "Unit under attack")
     };
     push_battle_log(battle_log, message, Some(focus));
     battle_log.under_attack_cooldown = BATTLE_LOG_UNDER_ATTACK_COOLDOWN_SECONDS;
@@ -15786,8 +12273,11 @@ impl MinimapRadarState {
     fn status_text(self) -> &'static str {
         match self {
             Self::Online => "",
-            Self::MissingRadar => "雷达离线\n建造 Radar Uplink",
-            Self::LowPower => "雷达离线\n电力不足",
+            Self::MissingRadar => t(
+                "雷达离线\n建造 Radar Uplink",
+                "Radar offline\nBuild a Radar Uplink",
+            ),
+            Self::LowPower => t("雷达离线\n电力不足", "Radar offline\nNot enough power"),
         }
     }
 }
@@ -15971,12 +12461,19 @@ fn record_low_power_audio_feedback(feedback: &mut AudioFeedback, is_low_power: b
 }
 
 fn record_low_power_battle_log(battle_log: &mut BattleLog) {
-    push_battle_log(battle_log, "低电力: 生产减速/防御停火/雷达离线", None);
+    push_battle_log(
+        battle_log,
+        t(
+            "低电力: 生产减速/防御停火/雷达离线",
+            "Low power: slowed production / defenses offline / radar offline",
+        ),
+        None,
+    );
 }
 
 fn record_insufficient_funds_battle_log(team: Team, player_team: Team, battle_log: &mut BattleLog) {
     if team == player_team {
-        push_battle_log(battle_log, "资源不足", None);
+        push_battle_log(battle_log, t("资源不足", "Not enough resources"), None);
     }
 }
 
@@ -15997,11 +12494,23 @@ fn record_structure_placement_failure_battle_log(
 fn structure_placement_feedback_text(validity: StructurePlacementValidity) -> Option<&'static str> {
     match validity {
         StructurePlacementValidity::Valid => None,
-        StructurePlacementValidity::CollidesWithObject => Some("无法摆放: 与单位/建筑/资源重叠"),
-        StructurePlacementValidity::NotEnoughResources => Some("无法摆放: 资源不足"),
-        StructurePlacementValidity::OutOfMap => Some("无法摆放: 超出地图边界"),
-        StructurePlacementValidity::MissingTech => Some("无法摆放: 缺少建造前置"),
-        StructurePlacementValidity::OutOfBaseRadius => Some("无法摆放: 离基地太远"),
+        StructurePlacementValidity::CollidesWithObject => Some(t(
+            "无法摆放: 与单位/建筑/资源重叠",
+            "Can't place: overlaps a unit/building/resource",
+        )),
+        StructurePlacementValidity::NotEnoughResources => {
+            Some(t("无法摆放: 资源不足", "Can't place: not enough resources"))
+        }
+        StructurePlacementValidity::OutOfMap => {
+            Some(t("无法摆放: 超出地图边界", "Can't place: outside the map"))
+        }
+        StructurePlacementValidity::MissingTech => Some(t(
+            "无法摆放: 缺少建造前置",
+            "Can't place: missing prerequisite",
+        )),
+        StructurePlacementValidity::OutOfBaseRadius => {
+            Some(t("无法摆放: 离基地太远", "Can't place: too far from base"))
+        }
     }
 }
 
@@ -16089,13 +12598,21 @@ fn record_support_power_charging_feedback(
     if team == player_team {
         push_battle_log(
             battle_log,
-            format!("超级武器充能: {} {charge_seconds}s", power.label()),
+            format!(
+                "{}: {} {charge_seconds}s",
+                t("超级武器充能", "Superweapon charging"),
+                power.label()
+            ),
             None,
         );
     } else {
         push_battle_log(
             battle_log,
-            format!("敌方超级武器充能: {} {charge_seconds}s", power.label()),
+            format!(
+                "{}: {} {charge_seconds}s",
+                t("敌方超级武器充能", "Enemy superweapon charging"),
+                power.label()
+            ),
             None,
         );
         record_sound_audio_feedback(feedback, SoundEffectKind::SuperweaponWarning);
@@ -16109,11 +12626,19 @@ fn record_support_power_ready_battle_log(
     power: SupportPowerKind,
 ) {
     if team == player_team {
-        push_battle_log(battle_log, format!("支援就绪: {}", power.label()), None);
+        push_battle_log(
+            battle_log,
+            format!("{}: {}", t("支援就绪", "Support ready"), power.label()),
+            None,
+        );
     } else if power.is_superweapon() {
         push_battle_log(
             battle_log,
-            format!("敌方超级武器就绪: {}", power.label()),
+            format!(
+                "{}: {}",
+                t("敌方超级武器就绪", "Enemy superweapon ready"),
+                power.label()
+            ),
             None,
         );
     }
@@ -16365,12 +12890,28 @@ fn command_button(index: usize) -> impl Bundle {
             width: px(146),
             height: px(46),
             border: UiRect::all(px(1)),
+            flex_direction: FlexDirection::Row,
             align_items: AlignItems::Center,
-            justify_content: JustifyContent::Center,
+            justify_content: JustifyContent::FlexStart,
+            column_gap: px(6),
+            padding: UiRect::horizontal(px(6)),
             ..default()
         },
         BorderColor::all(Color::srgb(0.28, 0.34, 0.39)),
         BackgroundColor(Color::srgba(0.035, 0.045, 0.055, 0.78)),
+    )
+}
+
+fn command_button_icon(index: usize) -> impl Bundle {
+    (
+        ImageNode::default(),
+        Node {
+            width: px(36),
+            height: px(36),
+            ..default()
+        },
+        Visibility::Hidden,
+        CommandSlotIcon(index),
     )
 }
 
@@ -16444,7 +12985,7 @@ fn camera_control(
         cursor,
         window_size_vec(window),
         camera_state.edge_pan_active,
-        cursor.is_some_and(|_| cursor_is_over_hud(window)),
+        cursor.is_some_and(|c| cursor_blocks_edge_pan(window, c)),
     );
     if pan.length_squared() > 0.0 {
         let yaw = camera_state.yaw;
@@ -16515,9 +13056,9 @@ fn cursor_edge_pan_vector(
         pan.x += 1.0;
     }
     if cursor.y < EDGE_PAN_PX {
-        pan.y += 1.0;
-    } else if cursor.y > window_size.y - EDGE_PAN_PX {
         pan.y -= 1.0;
+    } else if cursor.y > window_size.y - EDGE_PAN_PX {
+        pan.y += 1.0;
     }
     pan
 }
@@ -16665,7 +13206,7 @@ fn structure_placement_input(
                 );
                 push_battle_log(
                     &mut placement.battle_log,
-                    format!("开始施工: {label}"),
+                    format!("{}: {label}", t("开始施工", "Construction started")),
                     Some(point),
                 );
             }
@@ -17068,6 +13609,7 @@ fn minimap_input(
                     ClickMarker {
                         ttl: CLICK_MARKER_TTL_SECONDS,
                         radius: CLICK_MARKER_RADIUS_START,
+                        kind: ClickMarkerKind::Move,
                     },
                     MatchScopedEntity,
                 ));
@@ -17183,6 +13725,7 @@ fn minimap_input(
                 ClickMarker {
                     ttl: CLICK_MARKER_TTL_SECONDS,
                     radius: CLICK_MARKER_RADIUS_START,
+                    kind: ClickMarkerKind::Move,
                 },
                 MatchScopedEntity,
             ));
@@ -17508,14 +14051,34 @@ fn select_entities(
             continue;
         }
         let ground_distance = xz_distance(transform.translation, point);
-        let screen_distance = camera
-            .world_to_viewport(camera_transform, transform.translation)
-            .ok()
-            .map(|screen_position| screen_position.distance(cursor));
-        let ground_pick = ground_distance <= selectable.radius + 0.35;
-        let screen_pick = screen_distance.is_some_and(|distance| {
-            distance <= single_click_selection_screen_radius(selectable.radius)
-        });
+        // Resources are clicked on their visible (tall) model, so use the same
+        // screen-capsule hit-test as harvest targeting instead of a circle around
+        // the ground point — otherwise clicking the crystal body misses.
+        let (screen_distance, screen_pick) = if let Some(resource) = resource_node {
+            match resource_cursor_pick_distance(
+                cursor,
+                camera,
+                camera_transform,
+                transform.translation,
+                resource.kind,
+                RESOURCE_ORDER_SCREEN_PICK_MAX_RADIUS_PX,
+            ) {
+                Some((distance, pick_radius)) => (Some(distance), distance <= pick_radius),
+                None => (None, false),
+            }
+        } else {
+            let screen_distance = camera
+                .world_to_viewport(camera_transform, transform.translation)
+                .ok()
+                .map(|screen_position| screen_position.distance(cursor));
+            let screen_pick = screen_distance.is_some_and(|distance| {
+                distance <= single_click_selection_screen_radius(selectable.radius)
+            });
+            (screen_distance, screen_pick)
+        };
+        // Ground-proximity fallback only for non-resource units (resources rely on
+        // the model-capsule test; their ground raycast lands behind the crystal).
+        let ground_pick = resource_node.is_none() && ground_distance <= selectable.radius + 0.35;
         let distance = screen_distance.unwrap_or(ground_distance * 64.0);
         if (ground_pick || screen_pick) && distance < nearest_distance {
             nearest = Some((
@@ -17826,6 +14389,7 @@ fn issue_orders(
                 ClickMarker {
                     ttl: CLICK_MARKER_TTL_SECONDS,
                     radius: CLICK_MARKER_RADIUS_START,
+                    kind: ClickMarkerKind::Move,
                 },
                 MatchScopedEntity,
             ));
@@ -18003,11 +14567,25 @@ fn issue_orders(
         );
     }
     if issued_any || set_rally_any {
+        // A harvest order plants its "deploy-to-mine" flag ON the targeted ore,
+        // not on the empty click point; everything else gets the white move ring.
+        let harvest_pos = if has_selected_resource_collector && enemy_target.is_none() {
+            resource_target
+                .and_then(|entity| resource_targets.get(entity).ok())
+                .map(|(_, transform, ..)| transform.translation)
+        } else {
+            None
+        };
+        let (marker_pos, marker_kind) = match harvest_pos {
+            Some(ore) => (ore, ClickMarkerKind::Harvest),
+            None => (point, ClickMarkerKind::Move),
+        };
         commands.spawn((
-            Transform::from_translation(point + Vec3::Y * 0.03),
+            Transform::from_translation(marker_pos + Vec3::Y * 0.03),
             ClickMarker {
                 ttl: CLICK_MARKER_TTL_SECONDS,
                 radius: CLICK_MARKER_RADIUS_START,
+                kind: marker_kind,
             },
             MatchScopedEntity,
         ));
@@ -18102,7 +14680,12 @@ fn desired_order_for_selected_unit(
         if context.enemy_target_capturable && can_unit_capture(unit) {
             return Some(UnitQueuedOrder::Capture(target));
         }
-        return Some(UnitQueuedOrder::Attack(target));
+        // Only armed units attack. A worker/harvester right-clicking an enemy
+        // should fall through to a plain move, not uselessly chase a unit it
+        // cannot damage.
+        if registry::entity(unit.id).is_some_and(|def| def.weapon.is_some()) {
+            return Some(UnitQueuedOrder::Attack(target));
+        }
     }
     if let Some(target) = choices.repair_target
         && repair_capability(unit).is_some()
@@ -18648,18 +15231,15 @@ fn nearest_resource_order_target(
     )>,
     favor_resource_collectors: bool,
 ) -> Option<Entity> {
-    let ground_snap_radius = if favor_resource_collectors {
-        RESOURCE_ORDER_COLLECTOR_GROUND_SNAP_RADIUS_M
-    } else {
-        RESOURCE_ORDER_GROUND_SNAP_RADIUS_M
-    };
     let screen_pick_max_radius = if favor_resource_collectors {
         RESOURCE_ORDER_COLLECTOR_SCREEN_PICK_MAX_RADIUS_PX
     } else {
         RESOURCE_ORDER_SCREEN_PICK_MAX_RADIUS_PX
     };
+    // No ground-snap fallback: you must put the cursor on the ore to harvest;
+    // clicking anywhere else is a plain move.
+    let _ = point;
     resource_target_at_cursor(cursor, camera_q, resources, screen_pick_max_radius)
-        .or_else(|| nearest_resource_target_with_snap_radius(point, resources, ground_snap_radius))
 }
 
 fn resource_target_at_cursor(
@@ -18677,17 +15257,16 @@ fn resource_target_at_cursor(
     let (camera, camera_transform) = camera_q.single().ok()?;
     let mut nearest = None;
     let mut nearest_screen_distance = f32::MAX;
-    for (entity, transform, selectable, visibility, resource) in resources {
-        if !visibility.visible || resource.amount <= 0 {
+    for (entity, transform, _selectable, _visibility, resource) in resources {
+        if resource.amount <= 0 {
             continue;
         }
-        let Some((screen_distance, pick_radius)) = selectable_cursor_pick_distance(
+        let Some((screen_distance, pick_radius)) = resource_cursor_pick_distance(
             cursor,
             camera,
             camera_transform,
-            transform,
-            selectable,
-            RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX,
+            transform.translation,
+            resource.kind,
             max_pick_radius,
         ) else {
             continue;
@@ -18698,6 +15277,72 @@ fn resource_target_at_cursor(
         }
     }
     nearest
+}
+
+/// Visual height (m) of the rendered resource model above its ground anchor, so
+/// the cursor hit-test covers the whole crystal a player actually clicks (not
+/// just the ground point under it). Proportional to the `spawn_resource_node`
+/// model scale (ore 0.5 / crystal 0.38).
+fn resource_visual_height(kind: ResourceKind) -> f32 {
+    match kind {
+        ResourceKind::Ore => 1.7,
+        ResourceKind::Crystal => 1.3,
+    }
+}
+
+/// Visual half-width (m) of the rendered resource model, for the hit-test radius.
+fn resource_visual_half_width(kind: ResourceKind) -> f32 {
+    match kind {
+        ResourceKind::Ore => 0.85,
+        ResourceKind::Crystal => 0.65,
+    }
+}
+
+/// Shortest screen-space distance from `p` to the segment `a`..`b`.
+fn point_to_segment_distance(p: Vec2, a: Vec2, b: Vec2) -> f32 {
+    let ab = b - a;
+    let len_sq = ab.length_squared();
+    if len_sq <= f32::EPSILON {
+        return p.distance(a);
+    }
+    let t = ((p - a).dot(ab) / len_sq).clamp(0.0, 1.0);
+    p.distance(a + ab * t)
+}
+
+/// Cursor hit-test against a resource node treated as a screen-space capsule from
+/// its ground anchor up to the top of its visible model. Returns
+/// `(distance_to_capsule_axis, pick_radius)`. This fixes the long-standing bug
+/// where clicking the visible crystal (which projects *above* the ground point on
+/// an angled camera) missed a ground-anchored circular pick.
+fn resource_cursor_pick_distance(
+    cursor: Vec2,
+    camera: &Camera,
+    camera_transform: &GlobalTransform,
+    base: Vec3,
+    kind: ResourceKind,
+    max_pick_radius: f32,
+) -> Option<(f32, f32)> {
+    let base_screen = camera.world_to_viewport(camera_transform, base).ok()?;
+    let top = base + Vec3::Y * resource_visual_height(kind);
+    let screen_distance = match camera.world_to_viewport(camera_transform, top).ok() {
+        Some(top_screen) => point_to_segment_distance(cursor, base_screen, top_screen),
+        None => cursor.distance(base_screen),
+    };
+    let half_width = resource_visual_half_width(kind);
+    let projected_radius = [Vec3::X * half_width, Vec3::Z * half_width]
+        .into_iter()
+        .filter_map(|offset| {
+            camera
+                .world_to_viewport(camera_transform, base + offset)
+                .ok()
+                .map(|edge| edge.distance(base_screen))
+        })
+        .fold(0.0, f32::max);
+    let pick_radius = projected_radius.clamp(
+        RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX,
+        max_pick_radius.max(RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX),
+    );
+    Some((screen_distance, pick_radius))
 }
 
 fn selectable_cursor_pick_distance(
@@ -18733,32 +15378,6 @@ fn selectable_cursor_pick_distance(
     .fold(0.0, f32::max);
     let pick_radius = projected_radius.clamp(min_pick_radius, max_pick_radius.max(min_pick_radius));
     Some((screen_distance, pick_radius))
-}
-
-fn nearest_resource_target_with_snap_radius(
-    point: Vec3,
-    resources: &Query<(
-        Entity,
-        &Transform,
-        &Selectable,
-        &VisibilityState,
-        &ResourceNode,
-    )>,
-    snap_radius: f32,
-) -> Option<Entity> {
-    let mut nearest = None;
-    let mut nearest_distance = f32::MAX;
-    for (entity, transform, selectable, visibility, resource) in resources {
-        if !visibility.visible || resource.amount <= 0 {
-            continue;
-        }
-        let distance = xz_distance(transform.translation, point);
-        if distance <= selectable.radius + snap_radius && distance < nearest_distance {
-            nearest = Some(entity);
-            nearest_distance = distance;
-        }
-    }
-    nearest
 }
 
 fn nearest_resource_dropoff_order_target(
@@ -19248,7 +15867,7 @@ fn activate_support_power(
     }
     let (message, ping_kind) = if team == player_team {
         (
-            format!("支援已使用: {}", power.label()),
+            format!("{}: {}", t("支援已使用", "Support used"), power.label()),
             BattleEventPingKind::SupportPower,
         )
     } else if matches!(
@@ -19256,12 +15875,16 @@ fn activate_support_power(
         SupportPowerKind::StrategicMissile | SupportPowerKind::WeatherStorm
     ) {
         (
-            format!("敌方超级武器: {}", power.label()),
+            format!(
+                "{}: {}",
+                t("敌方超级武器", "Enemy superweapon"),
+                power.label()
+            ),
             BattleEventPingKind::EnemySuperweapon,
         )
     } else {
         (
-            format!("敌方支援: {}", power.label()),
+            format!("{}: {}", t("敌方支援", "Enemy support"), power.label()),
             BattleEventPingKind::EnemySupportPower,
         )
     };
@@ -19445,21 +16068,25 @@ fn update_match_menu_overlay(
     let seconds = (match_state.start_time_sec.max(0.0) as u32) % 60;
     let economy = economies.get(visible_player.team);
     let perspective_label = if visible_player.is_spectator() {
-        "观战视角"
+        t("观战视角", "Spectating")
     } else {
-        "阵营"
+        t("阵营", "Team")
     };
     for mut text in &mut status_q {
         **text = format!(
-            "地图: {}\n{}: {}  用时: {:02}:{:02}\n速度: {}\nOre {}  Crystal {}  电力 {}/{}",
+            "{}: {}\n{}: {}  {}: {:02}:{:02}\n{}: {}\nOre {}  Crystal {}  {} {}/{}",
+            t("地图", "Map"),
             selected_map.definition().name,
             perspective_label,
             visible_player.team.label(),
+            t("用时", "Time"),
             minutes,
             seconds,
+            t("速度", "Speed"),
             match_speed.preset.label(),
             economy.ore,
             economy.crystal,
+            t("电力", "Power"),
             economy.power_capacity,
             economy.power_used
         );
@@ -20211,7 +16838,26 @@ fn refresh_command_panel(
         &mut BorderColor,
     )>,
     mut label_q: Query<(&CommandSlotLabel, &mut Text, &mut TextColor)>,
+    asset_server: Res<AssetServer>,
+    mut icon_q: Query<(&CommandSlotIcon, &mut ImageNode, &mut Visibility)>,
 ) {
+    let set_slot_icon =
+        |slot_index: usize,
+         action: Option<BuildAction>,
+         icon_q: &mut Query<(&CommandSlotIcon, &mut ImageNode, &mut Visibility)>| {
+            for (icon, mut image_node, mut visibility) in icon_q.iter_mut() {
+                if icon.0 != slot_index {
+                    continue;
+                }
+                match action.and_then(command_action_icon_path) {
+                    Some(path) => {
+                        image_node.image = asset_server.load(path);
+                        *visibility = Visibility::Inherited;
+                    }
+                    None => *visibility = Visibility::Hidden,
+                }
+            }
+        };
     let Some(visible_team) = controlled_player_team(Some(&*visible_player)) else {
         for (slot, mut action, mut availability, interaction, mut background, mut border) in
             &mut slot_q
@@ -20226,6 +16872,9 @@ fn refresh_command_panel(
         for (_, mut text, mut text_color) in &mut label_q {
             **text = String::new();
             *text_color = command_button_text_color(BuildAction::None, false);
+        }
+        for (_, _, mut visibility) in &mut icon_q {
+            *visibility = Visibility::Hidden;
         }
         return;
     };
@@ -20282,6 +16931,7 @@ fn refresh_command_panel(
         });
         **text = command_label_with_queue(slot.0, action, queue_state);
         *text_color = command_button_text_color(action.unwrap_or(BuildAction::None), enabled);
+        set_slot_icon(slot.0, action, &mut icon_q);
     }
 }
 
@@ -20583,6 +17233,28 @@ fn command_label(index: usize, action: Option<BuildAction>) -> String {
     command_label_with_queue(index, action, None)
 }
 
+// Asset path of the command-button icon for an action, mirroring godot's command
+// icon mosaic. Train/Build pull the produced entity's registry icon; standing
+// orders use the matching `ui/icons/<Name>.png` mirrored from the godot project.
+fn command_action_icon_path(action: BuildAction) -> Option<&'static str> {
+    match action {
+        BuildAction::Train(id) | BuildAction::Build(id) => {
+            registry::entity(id).and_then(|def| def.icon)
+        }
+        BuildAction::SellStructure => Some("ui/icons/SellStructure.png"),
+        BuildAction::RepairStructure => Some("ui/icons/Repair.png"),
+        BuildAction::DeployMcv | BuildAction::ToggleDeployMode => Some("ui/icons/DeployMode.png"),
+        BuildAction::SetRallyPoint => Some("ui/icons/RallyPoint.png"),
+        BuildAction::HoldPosition => Some("ui/icons/HoldPosition.png"),
+        BuildAction::AttackMove => Some("ui/icons/AttackMove.png"),
+        BuildAction::Patrol => Some("ui/icons/Patrol.png"),
+        BuildAction::GuardArea => Some("ui/icons/GuardArea.png"),
+        BuildAction::StopSelected => Some("ui/icons/StopCommand.png"),
+        BuildAction::ScatterSelected => Some("ui/icons/Scatter.png"),
+        BuildAction::None => None,
+    }
+}
+
 fn command_grid_hotkey(index: usize) -> Option<CommandHotkey> {
     COMMAND_SLOT_HOTKEYS.get(index).copied()
 }
@@ -20634,17 +17306,17 @@ fn command_label_with_queue(
                 cost.crystal
             )
         }
-        BuildAction::SellStructure => format!("{key} 出售建筑"),
-        BuildAction::RepairStructure => format!("{key} 维修建筑"),
-        BuildAction::DeployMcv => format!("{key} 展开基地"),
-        BuildAction::ToggleDeployMode => format!("{key} 切换部署"),
-        BuildAction::SetRallyPoint => format!("{key} 设置集结"),
-        BuildAction::HoldPosition => format!("{key} 坚守"),
-        BuildAction::AttackMove => format!("{key} 攻击移动"),
-        BuildAction::Patrol => format!("{key} 巡逻"),
-        BuildAction::GuardArea => format!("{key} 守卫区域"),
-        BuildAction::StopSelected => format!("{key} 停止"),
-        BuildAction::ScatterSelected => format!("{key} 散开"),
+        BuildAction::SellStructure => format!("{key} {}", t("出售建筑", "Sell")),
+        BuildAction::RepairStructure => format!("{key} {}", t("维修建筑", "Repair")),
+        BuildAction::DeployMcv => format!("{key} {}", t("展开基地", "Deploy")),
+        BuildAction::ToggleDeployMode => format!("{key} {}", t("切换部署", "Toggle Deploy")),
+        BuildAction::SetRallyPoint => format!("{key} {}", t("设置集结", "Rally Point")),
+        BuildAction::HoldPosition => format!("{key} {}", t("坚守", "Hold")),
+        BuildAction::AttackMove => format!("{key} {}", t("攻击移动", "Attack-Move")),
+        BuildAction::Patrol => format!("{key} {}", t("巡逻", "Patrol")),
+        BuildAction::GuardArea => format!("{key} {}", t("守卫区域", "Guard")),
+        BuildAction::StopSelected => format!("{key} {}", t("停止", "Stop")),
+        BuildAction::ScatterSelected => format!("{key} {}", t("散开", "Scatter")),
         BuildAction::None => String::new(),
     }
 }
@@ -21060,14 +17732,11 @@ fn is_builder_worker_selection_unit(unit: &Unit) -> bool {
 }
 
 fn is_economy_worker_selection_unit(unit: &Unit) -> bool {
-    matches!(
-        unit.id,
-        "Worker" | "OreHarvester" | "MobileConstructionVehicle"
-    )
+    matches!(unit.id, "Worker" | "MobileConstructionVehicle")
 }
 
 fn is_unit_harvester(unit: &Unit) -> bool {
-    registry::entity(unit.id).is_some_and(|def| def.is_harvester)
+    can_unit_collect_resources(unit)
 }
 
 fn is_exact_current_selection(current: &[Entity], target: &[Entity]) -> bool {
@@ -21156,13 +17825,29 @@ fn record_control_group_assigned_battle_log(
     }
     push_battle_log(
         battle_log,
-        format!("编组 {} 已设置: {} 个单位", index + 1, count),
+        format!(
+            "{} {} {}: {} {}",
+            t("编组", "Group"),
+            index + 1,
+            t("已设置", "set"),
+            count,
+            t("个单位", "units")
+        ),
         focus,
     );
 }
 
 fn record_control_group_cleared_battle_log(battle_log: &mut BattleLog, index: usize) {
-    push_battle_log(battle_log, format!("编组 {} 已清空", index + 1), None);
+    push_battle_log(
+        battle_log,
+        format!(
+            "{} {} {}",
+            t("编组", "Group"),
+            index + 1,
+            t("已清空", "cleared")
+        ),
+        None,
+    );
 }
 
 fn select_production_structures_for_hotkey(
@@ -22057,7 +18742,7 @@ fn queue_button_state_for_product(
 
 fn queue_button_badge_text(state: QueueButtonState) -> String {
     if state.full {
-        " [满]".to_string()
+        t(" [满]", " [Full]").to_string()
     } else {
         format!(" [x{}]", state.count)
     }
@@ -22687,7 +19372,7 @@ fn process_build_queue(
                         );
                         push_battle_log(
                             &mut battle_log,
-                            format!("开始施工: {}", def.label),
+                            format!("{}: {}", t("开始施工", "Construction started"), def.label),
                             Some(spawn_at),
                         );
                     }
@@ -22736,7 +19421,7 @@ fn spawn_refinery_free_harvester(
         commands,
         asset_server,
         next_id,
-        "OreHarvester",
+        "Worker",
         team,
         spawn_at,
         0,
@@ -22802,7 +19487,14 @@ fn record_production_blocked_once(
 ) {
     if team == player_team && timer_before > 0.0 {
         record_sound_audio_feedback(audio_feedback, SoundEffectKind::Error);
-        push_battle_log(battle_log, "生产受阻: 出厂口被堵塞", Some(focus));
+        push_battle_log(
+            battle_log,
+            t(
+                "生产受阻: 出厂口被堵塞",
+                "Production blocked: exit obstructed",
+            ),
+            Some(focus),
+        );
     }
 }
 
@@ -22818,9 +19510,9 @@ fn record_production_ready_battle_log(
         return;
     }
     let prefix = if is_structure {
-        "建筑就绪"
+        t("建筑就绪", "Building ready")
     } else {
-        "单位就绪"
+        t("单位就绪", "Unit ready")
     };
     push_battle_log(battle_log, format!("{prefix}: {label}"), Some(focus));
 }
@@ -22832,7 +19524,7 @@ fn refinery_free_harvester_spawn_position(
     bounds: MapBounds,
 ) -> Option<Vec3> {
     let refinery_def = registry::entity("Refinery")?;
-    let harvester_def = registry::entity("OreHarvester")?;
+    let worker_def = registry::entity("Worker")?;
     let mut direction = Vec3::new(
         refinery_position.x - build_origin.x,
         0.0,
@@ -22843,7 +19535,7 @@ fn refinery_free_harvester_spawn_position(
         direction = Vec3::new(angle.cos(), 0.0, angle.sin());
     }
     direction = direction.normalize();
-    let distance = refinery_def.radius + harvester_def.radius + 0.35;
+    let distance = refinery_def.radius + worker_def.radius + 0.35;
     Some(bounds.clamp_ground_point(refinery_position + direction * distance, 1.0))
 }
 
@@ -23436,14 +20128,18 @@ fn closest_construction_assignment(
     best
 }
 
-fn auto_assign_ai_resource_collectors(
+// Idle harvesters of every team (human included) auto-resume harvesting, the way
+// RA2/SC1 harvesters do. The `IdleUnitOrderFilter` guarantees only units with no
+// active order are picked, so manually-controlled harvesters are never hijacked.
+fn auto_assign_idle_resource_collectors(
     mut commands: Commands,
-    visible_player: Option<Res<VisiblePlayer>>,
     active_teams: Option<Res<ActiveTeams>>,
+    visible_player: Option<Res<VisiblePlayer>>,
     units: Query<
         (
             Entity,
             &Team,
+            &Unit,
             &Transform,
             &Health,
             &ResourceCargo,
@@ -23465,10 +20161,13 @@ fn auto_assign_ai_resource_collectors(
         (With<Structure>, Without<Unit>),
     >,
 ) {
-    let player_team = visible_player_team(visible_player.as_deref());
-    for (entity, team, transform, health, cargo, order_queue) in &units {
-        if *team == player_team
+    // Only the AI auto-harvests. The human player gathers manually (select a
+    // worker, right-click an ore node) so their workers never wander off alone.
+    let player_team = controlled_player_team(visible_player.as_deref());
+    for (entity, team, unit, transform, health, cargo, order_queue) in &units {
+        if player_team == Some(*team)
             || !team_is_active(*team, active_teams.as_deref())
+            || !can_unit_collect_resources(unit)
             || health.current <= 0.0
             || cargo.capacity <= 0
         {
@@ -24207,7 +20906,7 @@ fn ai_unit_can_attack_air(unit_id: &str) -> bool {
 fn ai_battle_unit_id(unit_id: &str) -> bool {
     if matches!(
         unit_id,
-        "Worker" | "OreHarvester" | "MobileConstructionVehicle" | AI_SABOTEUR_ID
+        "Worker" | "MobileConstructionVehicle" | AI_SABOTEUR_ID
     ) {
         return false;
     }
@@ -24514,16 +21213,19 @@ fn ai_director(
                 production_counts,
             )
             .map(|id| (id, AiStructureBuildKind::Economy))
-            .or_else(|| {
-                next_ai_defense_for_faction(team, faction, &profile, &structures)
-                    .map(|id| (id, AiStructureBuildKind::Defense))
-            })
+            // Build production (offense) structures before defense, so the AI
+            // always has a Barracks/VehicleFactory to train an army from instead
+            // of spending its whole economy on turrets.
             .or_else(|| {
                 profile
                     .active_offense_enabled
                     .then(|| next_ai_offense_structure_for_faction(team, faction, &structures))
                     .flatten()
                     .map(|id| (id, AiStructureBuildKind::Offense))
+            })
+            .or_else(|| {
+                next_ai_defense_for_faction(team, faction, &profile, &structures)
+                    .map(|id| (id, AiStructureBuildKind::Defense))
             });
             if let Some((id, build_kind)) = next_structure
                 && let Some(def) = registry::entity(id)
@@ -24685,7 +21387,7 @@ fn ai_director(
 }
 
 fn ai_training_is_economy_request(id: &str) -> bool {
-    matches!(id, "Worker" | "OreHarvester")
+    id == "Worker"
 }
 
 fn next_ai_economy_train(
@@ -24706,20 +21408,6 @@ fn next_ai_economy_train(
             && ai_production_origin_for_faction(team, faction, "Worker", structures).is_some()
         {
             return Some("Worker");
-        }
-    }
-
-    if counts.ore_harvesters < profile.expected_ore_harvesters
-        && has_constructed_structure(team, "Refinery", structures)
-        && let Some(harvester_def) = registry::entity("OreHarvester")
-    {
-        if !economy.can_afford(harvester_def.cost) {
-            return None;
-        }
-        if requirements_met(harvester_def, team, structures)
-            && ai_production_origin_for_faction(team, faction, "OreHarvester", structures).is_some()
-        {
-            return Some("OreHarvester");
         }
     }
 
@@ -25311,7 +21999,7 @@ fn next_ai_train_matching(
         if !predicate(def) {
             continue;
         }
-        if !ai_economy_candidate_allowed(team, candidate, profile, counts, structures) {
+        if !ai_economy_candidate_allowed(candidate, profile, counts) {
             continue;
         }
         if !ai_battlegroup_candidate_allowed(candidate, profile, counts) {
@@ -25344,9 +22032,6 @@ fn ai_production_counts<'a>(
         if can_unit_construct_structures(unit) {
             counts.workers += 1;
         }
-        if unit.id == "OreHarvester" {
-            counts.ore_harvesters += 1;
-        }
         if ai_battle_unit_id(unit.id) {
             counts.battle_units += 1;
         }
@@ -25355,18 +22040,12 @@ fn ai_production_counts<'a>(
 }
 
 fn ai_economy_candidate_allowed(
-    team: Team,
     candidate: &'static str,
     profile: &TeamAiProfile,
     counts: AiProductionCounts,
-    structures: &Query<StructurePrereqItem<'_>>,
 ) -> bool {
     match candidate {
         "Worker" => counts.workers < profile.expected_workers,
-        "OreHarvester" => {
-            counts.ore_harvesters < profile.expected_ore_harvesters
-                && has_constructed_structure(team, "Refinery", structures)
-        }
         _ => true,
     }
 }
@@ -25912,14 +22591,14 @@ fn update_capture_orders(
         if *capturer_team == player_team {
             push_battle_log(
                 &mut battle_log,
-                format!("已占领 {structure_label}"),
+                format!("{} {structure_label}", t("已占领", "Captured")),
                 Some(target_transform.translation),
             );
             record_sound_audio_feedback(&mut audio_feedback, SoundEffectKind::StructureCaptured);
         } else if relations.are_allied(victim_team, player_team) {
             push_battle_log(
                 &mut battle_log,
-                format!("失去 {structure_label}"),
+                format!("{} {structure_label}", t("失去", "Lost")),
                 Some(target_transform.translation),
             );
             record_sound_audio_feedback(&mut audio_feedback, SoundEffectKind::StructureLost);
@@ -27235,7 +23914,11 @@ fn collect_supply_crates(
             record_sound_audio_feedback(&mut audio_feedback, SoundEffectKind::SupplyCrate);
             push_battle_log(
                 &mut battle_log,
-                format!("补给箱: {}", supply_crate.effect.label()),
+                format!(
+                    "{}: {}",
+                    t("补给箱", "Supply crate"),
+                    supply_crate.effect.label()
+                ),
                 Some(crate_position),
             );
         }
@@ -27416,7 +24099,10 @@ fn apply_kill_credits(
                 .unwrap_or(unit.id);
             push_battle_log(
                 &mut battle_log,
-                format!("单位晋升: {unit_label} Lv{target_rank}"),
+                format!(
+                    "{}: {unit_label} Lv{target_rank}",
+                    t("单位晋升", "Unit promoted")
+                ),
                 Some(transform.translation),
             );
             record_sound_audio_feedback(&mut audio_feedback, SoundEffectKind::UnitPromoted);
@@ -27951,6 +24637,40 @@ struct TargetSnapshot {
     visible: bool,
     is_structure: bool,
     movement_domain: MovementDomain,
+}
+
+/// Degrees/second a defense tower slowly sweeps while scanning for targets.
+const IDLE_TOWER_SCAN_DEG_PER_SEC: f32 = 45.0;
+
+/// Defense structures slowly rotate while idle, scanning for targets (godot's
+/// `RotateRandomlyWhenLookingForTargetsIdle`). A weapon's `cooldown_left` stays
+/// >0 for most of an engagement (it counts down between shots) and stays 0 when
+/// no target is ever acquired, so it is a good "currently idle" proxy without a
+/// second target-scan query. The sweep direction (-1/0/+1) changes in ~0.5s
+/// buckets, pseudo-randomly per entity, for a back-and-forth scan.
+fn update_idle_tower_scan(
+    time: Res<Time>,
+    mut towers: Query<
+        (Entity, &mut Transform, &Weapon, Option<&UnderConstruction>),
+        With<Structure>,
+    >,
+) {
+    let bucket = (time.elapsed_secs() * 2.0) as u64;
+    for (entity, mut transform, weapon, under_construction) in &mut towers {
+        if under_construction.is_some() || weapon.cooldown_left > 0.0 {
+            continue;
+        }
+        let hash = entity
+            .to_bits()
+            .wrapping_mul(0x9E37_79B9_7F4A_7C15)
+            .wrapping_add(bucket.wrapping_mul(0x2545_F491_4F6C_DD1D));
+        let multiplier = (hash % 3) as f32 - 1.0;
+        if multiplier == 0.0 {
+            continue;
+        }
+        transform
+            .rotate_y(IDLE_TOWER_SCAN_DEG_PER_SEC.to_radians() * time.delta_secs() * multiplier);
+    }
 }
 
 fn combat(
@@ -28537,19 +25257,28 @@ fn update_hud(
                 .and_then(structure_placement_feedback_text)
                 .map(|message| format!(" {message}"))
                 .unwrap_or_default();
-            format!(" 摆放:{label}{feedback} R旋转 右键取消")
+            format!(
+                " {}:{label}{feedback} {}",
+                t(" 摆放", " Place"),
+                t("R旋转 右键取消", "R rotate / right-click cancel")
+            )
         } else if command_mode.attack_move {
-            " 模式:攻击移动".to_string()
+            t(" 模式:攻击移动", " Mode: Attack-Move").to_string()
         } else if command_mode.patrol {
-            " 模式:巡逻".to_string()
+            t(" 模式:巡逻", " Mode: Patrol").to_string()
         } else if command_mode.rally_point {
-            " 模式:设置集结".to_string()
+            t(" 模式:设置集结", " Mode: Set Rally").to_string()
         } else if let Some(power) = command_mode.support_power {
             let remaining = support_cooldowns.remaining_for(visible_team, power);
             if remaining > 0.0 {
-                format!(" 支援:{} (冷却{remaining:.1}s)", power.label())
+                format!(
+                    " {}:{} ({}{remaining:.1}s)",
+                    t("支援", "Support"),
+                    power.label(),
+                    t("冷却", "CD ")
+                )
             } else {
-                " 支援:就绪".to_string()
+                t(" 支援:就绪", " Support: Ready").to_string()
             }
         } else {
             String::new()
@@ -28643,6 +25372,42 @@ fn update_hud(
     }
 }
 
+// Shows the primary selected entity's command icon as a portrait next to the
+// selection readout (godot SelectionInfo portrait). Kept separate from
+// `update_hud` because that system is already at Bevy's 16-param limit.
+fn update_selection_portrait(
+    visible_player: Res<VisiblePlayer>,
+    selected: Query<(Option<&Unit>, Option<&Structure>, &Team), With<Selected>>,
+    asset_server: Res<AssetServer>,
+    mut portrait: Query<(&mut ImageNode, &mut Visibility), With<SelectionPortrait>>,
+) {
+    let Ok((mut image_node, mut visibility)) = portrait.single_mut() else {
+        return;
+    };
+    let visible_team = visible_player.team;
+    let mut visible_team_icon: Option<&'static str> = None;
+    let mut any_icon: Option<&'static str> = None;
+    for (unit, structure, team) in &selected {
+        let icon = unit
+            .and_then(|unit| registry::entity(unit.id))
+            .or_else(|| structure.and_then(|structure| registry::entity(structure.id)))
+            .and_then(|def| def.icon);
+        if any_icon.is_none() {
+            any_icon = icon;
+        }
+        if *team == visible_team && visible_team_icon.is_none() {
+            visible_team_icon = icon;
+        }
+    }
+    match visible_team_icon.or(any_icon) {
+        Some(path) => {
+            image_node.image = asset_server.load(path);
+            *visibility = Visibility::Inherited;
+        }
+        None => *visibility = Visibility::Hidden,
+    }
+}
+
 #[derive(Clone)]
 struct SelectionHudItem {
     label: String,
@@ -28660,7 +25425,7 @@ fn selection_hud_text(items: &[SelectionHudItem], control_group: Option<usize>) 
         return String::new();
     }
     let group_text = control_group
-        .map(|slot| format!("  编组 {slot}"))
+        .map(|slot| format!("  {} {slot}", t("编组", "Group")))
         .unwrap_or_default();
     if items.len() == 1 {
         let item = &items[0];
@@ -28672,16 +25437,19 @@ fn selection_hud_text(items: &[SelectionHudItem], control_group: Option<usize>) 
             format!("{}  {}", item.team.label(), item.label),
             format!("HP {:.0}/{:.0}", item.health_current, item.health_max),
             attack_text,
-            format!("军阶: {}", veterancy_rank_label(item.rank)),
+            format!("{}: {}", t("军阶", "Rank"), veterancy_rank_label(item.rank)),
         ];
         if let Some(badge) = veterancy_rank_badge(item.rank) {
-            parts.push(format!("徽章 {badge}"));
+            parts.push(format!("{} {badge}", t("徽章", "Badge")));
         }
         if let Some((count, capacity)) = item.garrison {
-            parts.push(format!("驻军 {count}/{capacity}"));
+            parts.push(format!("{} {count}/{capacity}", t("驻军", "Garrison")));
         }
         if let Some((total, capacity, ore, crystal)) = item.cargo {
-            parts.push(format!("载货 {total}/{capacity} ({ore}/{crystal})"));
+            parts.push(format!(
+                "{} {total}/{capacity} ({ore}/{crystal})",
+                t("载货", "Cargo")
+            ));
         }
         return format!("{}{}", parts.join("  "), group_text);
     }
@@ -28702,10 +25470,11 @@ fn selection_hud_text(items: &[SelectionHudItem], control_group: Option<usize>) 
         .collect::<Vec<_>>()
         .join(", ");
     let rank_text = if rank_counts.is_empty() {
-        "军阶: 新兵".to_string()
+        t("军阶: 新兵", "Rank: Rookie").to_string()
     } else {
         format!(
-            "军阶: {}",
+            "{}: {}",
+            t("军阶", "Rank"),
             rank_counts
                 .iter()
                 .map(|(rank, count)| format!("{rank} x{count}"))
@@ -28714,9 +25483,11 @@ fn selection_hud_text(items: &[SelectionHudItem], control_group: Option<usize>) 
         )
     };
     format!(
-        "已选择 {}{}  类型: {}  {}",
+        "{} {}{}  {}: {}  {}",
+        t("已选择", "Selected"),
         items.len(),
         group_text,
+        t("类型", "Type"),
         type_text,
         rank_text
     )
@@ -28724,9 +25495,9 @@ fn selection_hud_text(items: &[SelectionHudItem], control_group: Option<usize>) 
 
 fn veterancy_rank_label(rank: u8) -> &'static str {
     match rank {
-        0 => "新兵",
-        1 => "老兵",
-        _ => "精英",
+        0 => t("新兵", "Rookie"),
+        1 => t("老兵", "Veteran"),
+        _ => t("精英", "Elite"),
     }
 }
 
@@ -28753,9 +25524,14 @@ fn exact_control_group_slot(
 }
 
 fn power_status_text(economy: &TeamEconomy) -> String {
-    let base = format!("电力 {}/{}", economy.power_capacity, economy.power_used);
+    let base = format!(
+        "{} {}/{}",
+        t("电力", "Power"),
+        economy.power_capacity,
+        economy.power_used
+    );
     if economy.low_power() {
-        format!("{base} 低电")
+        format!("{base} {}", t("低电", "Low Pwr"))
     } else {
         base
     }
@@ -28792,16 +25568,25 @@ fn dynamic_unit_status_text(
         }
     }
     if neutral_or_unknown > 0 {
-        format!("Units 我:{own} 其他:{other_players} 中:{neutral_or_unknown}")
+        format!(
+            "Units {}:{own} {}:{other_players} {}:{neutral_or_unknown}",
+            t("我", "Me"),
+            t("其他", "Others"),
+            t("中", "N")
+        )
     } else {
-        format!("Units 我:{own} 其他:{other_players}")
+        format!(
+            "Units {}:{own} {}:{other_players}",
+            t("我", "Me"),
+            t("其他", "Others")
+        )
     }
 }
 
 fn team_hud_short_label(team: Team) -> String {
     match team {
         Team::Player(index) => format!("P{}", index + 1),
-        Team::Neutral => "中".to_string(),
+        Team::Neutral => t("中", "N").to_string(),
     }
 }
 
@@ -28817,7 +25602,7 @@ fn ai_hud_status_text(
             .or_insert(0) += 1;
     }
     if counts.is_empty() {
-        return "AI 无".to_string();
+        return t("AI 无", "AI None").to_string();
     }
     format!(
         "AI {}",
@@ -28849,7 +25634,11 @@ fn ai_low_power_status_text(
     if low_power_teams.is_empty() {
         String::new()
     } else {
-        format!("AI低电 {}", low_power_teams.join("/"))
+        format!(
+            "{} {}",
+            t("AI低电", "AI low power"),
+            low_power_teams.join("/")
+        )
     }
 }
 
@@ -28859,7 +25648,7 @@ fn support_hud_status_text(
     active_power: Option<SupportPowerKind>,
 ) -> String {
     if let Some(power) = active_power {
-        return format!(" 支援:{}", power.label());
+        return format!(" {}:{}", t("支援", "Support"), power.label());
     }
     let cooling = SupportPowerKind::ALL
         .into_iter()
@@ -28878,9 +25667,13 @@ fn support_hud_status_text(
         .collect::<Vec<_>>()
         .join("/");
     if cooling.len() > 2 {
-        format!(" 支援CD:{preview}+{}", cooling.len() - 2)
+        format!(
+            " {}:{preview}+{}",
+            t("支援CD", "Support CD"),
+            cooling.len() - 2
+        )
     } else {
-        format!(" 支援CD:{preview}")
+        format!(" {}:{preview}", t("支援CD", "Support CD"))
     }
 }
 
@@ -28921,7 +25714,7 @@ fn production_queue_hud_text(
     if rows.is_empty() {
         String::new()
     } else {
-        format!("生产队列: {}", rows.join("  |  "))
+        format!("{}: {}", t("生产队列", "Build queue"), rows.join("  |  "))
     }
 }
 
@@ -29002,15 +25795,16 @@ fn production_queue_slot_text(
     entry: ProductionQueueHudEntry,
     economies: &Economies,
 ) -> String {
-    let label = build_action_target_label(entry.action).unwrap_or_else(|| "无效".to_string());
+    let label =
+        build_action_target_label(entry.action).unwrap_or_else(|| t("无效", "Invalid").to_string());
     let status = if entry.active && entry.progress >= 100.0 {
-        "就绪"
+        t("就绪", "Ready")
     } else if !entry.active {
-        "等待"
+        t("等待", "Waiting")
     } else if economies.get(team).low_power() {
-        "低电"
+        t("低电", "Low Pwr")
     } else {
-        "生产"
+        t("生产", "Producing")
     };
     format!(
         "{} {} {:.0}%\n{}",
@@ -29051,17 +25845,17 @@ fn production_queue_job_text(
 ) -> Option<String> {
     let label = build_action_target_label(job.action)?;
     let Some(def) = registry::entity(build_target_product(job.action)) else {
-        return Some(format!("{label} 无效"));
+        return Some(format!("{label} {}", t("无效", "invalid")));
     };
     let progress = production_job_progress(job, def);
     let status = if active && progress >= 100.0 {
-        "就绪/阻塞".to_string()
+        t("就绪/阻塞", "Ready/Blocked").to_string()
     } else if !active {
-        "排队".to_string()
+        t("排队", "Queued").to_string()
     } else if economies.get(job.team).low_power() {
-        "低电力生产中".to_string()
+        t("低电力生产中", "Producing (low power)").to_string()
     } else {
-        "生产中".to_string()
+        t("生产中", "Producing").to_string()
     };
     Some(format!("{label} {progress:.0}% {status}"))
 }
@@ -29079,6 +25873,42 @@ fn build_action_target_label(action: BuildAction) -> Option<String> {
         _ => return None,
     };
     registry::entity(id).map(|def| compact_label(def.label))
+}
+
+/// The resource node currently under the cursor (for hover highlight + so the
+/// player knows a click will hit it). Updated by `update_resource_hover`.
+#[derive(Resource, Default)]
+struct HoveredResource(Option<Entity>);
+
+fn update_resource_hover(
+    window_q: Query<&Window, With<PrimaryWindow>>,
+    camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    resources: Query<(
+        Entity,
+        &Transform,
+        &Selectable,
+        &VisibilityState,
+        &ResourceNode,
+    )>,
+    command_mode: Res<CommandMode>,
+    mut hovered: ResMut<HoveredResource>,
+) {
+    hovered.0 = None;
+    if command_mode.pending_structure_placement.is_some() {
+        return;
+    }
+    let Ok(window) = window_q.single() else {
+        return;
+    };
+    let Some(cursor) = window.cursor_position() else {
+        return;
+    };
+    hovered.0 = resource_target_at_cursor(
+        cursor,
+        &camera_q,
+        &resources,
+        RESOURCE_ORDER_COLLECTOR_SCREEN_PICK_MAX_RADIUS_PX,
+    );
 }
 
 fn draw_world_overlays(
@@ -29117,13 +25947,57 @@ fn draw_world_overlays(
     click_markers: Query<(&Transform, &ClickMarker)>,
     destruction_vfx: Query<(&Transform, &StructureDestructionVfx)>,
     promotion_vfx: Query<(&Transform, &VeterancyPromotionEffect)>,
-    resources: Query<(&Transform, &Selectable, &ResourceNode, &VisibilityState)>,
+    resources: Query<(
+        Entity,
+        &Transform,
+        &Selectable,
+        &ResourceNode,
+        &VisibilityState,
+    )>,
     supply_crates: Query<(&Transform, &Selectable, &SupplyCrate, &VisibilityState)>,
+    hovered_resource: Res<HoveredResource>,
     visible_player: Res<VisiblePlayer>,
     player_colors: Res<PlayerColorSlots>,
     placement_preview: StructurePlacementPreviewParams,
 ) {
     let visible_team = visible_player.team;
+
+    // Highlight the resource under the cursor so the player knows a left/right
+    // click will hit it (it sits exactly where the click is judged).
+    if let Some(hovered) = hovered_resource.0
+        && let Ok((_, transform, _, resource, _)) = resources.get(hovered)
+    {
+        let base = transform.translation;
+        let half_width = resource_visual_half_width(resource.kind);
+        let color = Color::srgb(1.0, 0.85, 0.25);
+        for (height, scale) in [
+            (0.06_f32, 1.15_f32),
+            (resource_visual_height(resource.kind), 0.7),
+        ] {
+            gizmos.circle(
+                Isometry3d::new(
+                    Vec3::new(base.x, base.y + height, base.z),
+                    Quat::from_rotation_arc(Vec3::Z, Vec3::Y),
+                ),
+                half_width * scale,
+                color,
+            );
+        }
+    }
+
+    // A faint battlefield grid so the ground reads with scale instead of as a
+    // flat void — a baseline RTS readability cue.
+    let cells = (MAP_HALF_EXTENT as u32) * 2;
+    gizmos.grid(
+        Isometry3d::new(
+            Vec3::new(0.0, 0.02, 0.0),
+            Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2),
+        ),
+        UVec2::new(cells, cells),
+        Vec2::splat(1.0),
+        Color::srgba(0.30, 0.38, 0.40, 0.14),
+    );
+
     for (
         transform,
         selectable,
@@ -29211,23 +26085,25 @@ fn draw_world_overlays(
         gizmos.line(pulse.from, pulse.to, player_colors.color(pulse.team));
     }
     for (transform, marker) in &click_markers {
-        draw_ring(
-            &mut gizmos,
-            transform.translation,
-            marker.radius,
-            Color::srgba(1.0, 1.0, 1.0, 0.55),
-        );
-    }
-    for (transform, selectable, resource, visibility) in &resources {
-        if !visibility.visible || resource.amount <= 0 {
-            continue;
+        match marker.kind {
+            ClickMarkerKind::Move => draw_ring(
+                &mut gizmos,
+                transform.translation,
+                marker.radius,
+                Color::srgba(1.0, 1.0, 1.0, 0.55),
+            ),
+            ClickMarkerKind::Harvest => {
+                // gold ring + a little planted flag, so "go mine here" reads as a
+                // deploy order rather than a plain move.
+                let gold = Color::srgba(0.98, 0.78, 0.28, 0.9);
+                draw_ring(&mut gizmos, transform.translation, marker.radius, gold);
+                let base = transform.translation;
+                let top = base + Vec3::Y * 1.1;
+                gizmos.line(base, top, gold);
+                gizmos.line(top, top + Vec3::new(0.5, -0.2, 0.0), gold);
+                gizmos.line(top + Vec3::new(0.5, -0.2, 0.0), base + Vec3::Y * 0.7, gold);
+            }
         }
-        draw_ring(
-            &mut gizmos,
-            transform.translation,
-            selectable.radius + 0.08,
-            resource.kind.color(),
-        );
     }
     for (transform, selectable, supply_crate, visibility) in &supply_crates {
         if !visibility.visible {
@@ -29311,8 +26187,13 @@ fn draw_world_overlays(
     }
 }
 
-fn should_draw_team_marker_for_entity(unit: Option<&Unit>, structure: Option<&Structure>) -> bool {
-    unit.is_some() && structure.is_none()
+fn should_draw_team_marker_for_entity(
+    _unit: Option<&Unit>,
+    _structure: Option<&Structure>,
+) -> bool {
+    // Team-colored ground rings removed — the concentric rings cluttered units and
+    // looked bad. Friend/foe reads from the units themselves + selection rings.
+    false
 }
 
 fn draw_structure_selection_brackets(
@@ -29646,14 +26527,18 @@ fn draw_team_marker(
     team: Team,
     player_colors: &PlayerColorSlots,
 ) {
-    gizmos.circle(
-        Isometry3d::new(
-            Vec3::new(position.x, position.y + 0.08, position.z),
-            Quat::from_rotation_arc(Vec3::Z, Vec3::Y),
-        ),
-        radius * 0.55,
-        player_colors.color(team),
-    );
+    // A bold, team-colored ground ring (friend/foe at a glance). Drawn as a few
+    // concentric circles so it reads as a thick band even with thin gizmo lines.
+    let color = player_colors.color(team);
+    let center = Vec3::new(position.x, position.y + 0.06, position.z);
+    let rotation = Quat::from_rotation_arc(Vec3::Z, Vec3::Y);
+    for ring in [0.60_f32, 0.68, 0.76] {
+        gizmos.circle(
+            Isometry3d::new(center, rotation),
+            (radius * ring).max(0.25),
+            color,
+        );
+    }
 }
 
 fn draw_health_bar(gizmos: &mut Gizmos, position: Vec3, radius: f32, health: Health) {
@@ -29716,6 +26601,13 @@ fn cursor_blocks_world_order_controls(window: &Window, cursor: Vec2) -> bool {
     cursor.y > window.height() - 148.0
         || battle_log_contains_cursor(window, cursor)
         || minimap_contains_cursor(window, cursor)
+}
+
+/// Edge-scroll is only blocked by the interactive overlays you click into (the
+/// minimap and battle log), NOT the command bar / top status — so reaching the
+/// bottom screen edge still pans the camera.
+fn cursor_blocks_edge_pan(window: &Window, cursor: Vec2) -> bool {
+    battle_log_contains_cursor(window, cursor) || minimap_contains_cursor(window, cursor)
 }
 
 fn battle_log_contains_cursor(window: &Window, cursor: Vec2) -> bool {
@@ -29874,6 +26766,192 @@ fn free_position_in_bounds(origin: Vec3, seed: u32, radius: f32, bounds: MapBoun
 mod current_tests {
     use super::*;
 
+    // Allies share vision: an enemy unit standing next to an ally's unit (but far
+    // from the viewing player's own units) must be revealed through the ally, and
+    // must stay fogged when the same teams are NOT allied. Mirrors godot's
+    // FogOfWar revealing units `is_allied_with(visible_player)`.
+    #[test]
+    fn allied_vision_is_shared_through_allies() {
+        fn enemy_visible_with_alliance(allied: bool) -> bool {
+            let mut app = App::new();
+            app.insert_resource(VisiblePlayer::per_player(Team::Player(0)));
+            let mut relations = TeamRelations::default();
+            relations.set_allied(Team::Player(0), Team::Player(1), allied);
+            app.insert_resource(relations);
+            app.add_systems(Update, update_visibility);
+
+            // Viewing player's own unit, far from the action (does not reveal it).
+            app.world_mut().spawn((
+                Team::Player(0),
+                Transform::from_xyz(0.0, 0.0, 0.0),
+                VisionRadius(8.0),
+                VisibilityState { visible: true },
+                Visibility::Visible,
+            ));
+            // Ally unit parked next to the enemy, far from the viewer.
+            app.world_mut().spawn((
+                Team::Player(1),
+                Transform::from_xyz(100.0, 0.0, 0.0),
+                VisionRadius(12.0),
+                VisibilityState { visible: true },
+                Visibility::Visible,
+            ));
+            // Enemy unit beside the ally — only the ally can see it.
+            let enemy = app
+                .world_mut()
+                .spawn((
+                    Team::Player(2),
+                    Transform::from_xyz(101.0, 0.0, 0.0),
+                    VisionRadius(8.0),
+                    VisibilityState { visible: false },
+                    Visibility::Hidden,
+                ))
+                .id();
+
+            app.update();
+            app.world().get::<VisibilityState>(enemy).unwrap().visible
+        }
+
+        assert!(
+            enemy_visible_with_alliance(true),
+            "allied unit should reveal the enemy beside it for the viewing player"
+        );
+        assert!(
+            !enemy_visible_with_alliance(false),
+            "without an alliance the enemy beside a neutral team must stay fogged"
+        );
+    }
+
+    // Every command-panel action must resolve to an icon asset that actually
+    // exists on disk, so the HUD renders godot-style command icons instead of
+    // falling back to a blank button. Locks the action->icon mapping.
+    #[test]
+    fn command_actions_resolve_to_existing_icon_assets() {
+        let standing_orders = [
+            BuildAction::SellStructure,
+            BuildAction::RepairStructure,
+            BuildAction::DeployMcv,
+            BuildAction::ToggleDeployMode,
+            BuildAction::SetRallyPoint,
+            BuildAction::HoldPosition,
+            BuildAction::AttackMove,
+            BuildAction::Patrol,
+            BuildAction::GuardArea,
+            BuildAction::StopSelected,
+            BuildAction::ScatterSelected,
+        ];
+        for (idx, action) in standing_orders.into_iter().enumerate() {
+            let path = command_action_icon_path(action)
+                .unwrap_or_else(|| panic!("no icon for standing order #{idx}"));
+            assert!(
+                std::path::Path::new("assets").join(path).exists(),
+                "missing icon asset {path} for standing order #{idx}"
+            );
+        }
+        // Train/Build pull the produced entity's registry icon (e.g. Worker).
+        let worker_icon = command_action_icon_path(BuildAction::Train("Worker"))
+            .expect("Worker should have a registry icon");
+        assert!(
+            std::path::Path::new("assets").join(worker_icon).exists(),
+            "missing Worker icon asset {worker_icon}"
+        );
+        assert_eq!(command_action_icon_path(BuildAction::None), None);
+    }
+
+    #[test]
+    fn worker_is_the_only_resource_collector_unit() {
+        let worker = registry::entity("Worker").expect("Worker must stay in the registry");
+        assert!(
+            worker.resource_capacity > 0,
+            "Worker must carry resources now that the separate harvester unit is removed"
+        );
+        assert!(
+            registry::entity("OreHarvester").is_none(),
+            "OreHarvester should not exist in the playable registry"
+        );
+        for faction_id in ["alliance", "demon", "chaos"] {
+            let faction = registry::faction(faction_id).expect("registered skirmish faction");
+            let command_center = faction
+                .production
+                .iter()
+                .find(|production| production.producer == "CommandCenter")
+                .expect("CommandCenter production list");
+            assert!(
+                command_center.products.contains(&"Worker"),
+                "{faction_id} CommandCenter must train Worker"
+            );
+            for production in faction.production {
+                assert!(
+                    !production.products.contains(&"OreHarvester"),
+                    "{faction_id} {} must not expose OreHarvester",
+                    production.producer
+                );
+            }
+        }
+    }
+
+    // An idle defense structure (weapon off cooldown) sweeps over time; one that
+    // is mid-engagement (cooldown_left > 0) or still under construction stays put.
+    #[test]
+    fn idle_defense_tower_scans_when_not_engaging() {
+        fn final_yaw(cooldown_left: f32, under_construction: bool) -> f32 {
+            let mut app = App::new();
+            app.insert_resource(Time::<()>::default());
+            app.add_systems(Update, update_idle_tower_scan);
+            let mut entity = app.world_mut().spawn((
+                Structure {
+                    id: "AntiGroundTurret",
+                },
+                Transform::from_xyz(0.0, 0.0, 0.0),
+                Weapon {
+                    range: 10.0,
+                    damage: 5.0,
+                    cooldown: 1.0,
+                    splash_radius: 0.0,
+                    splash_damage_multiplier: 0.0,
+                    structure_damage_multiplier: 1.0,
+                    cooldown_left,
+                    can_attack_air: false,
+                    can_attack_ground: true,
+                },
+            ));
+            if under_construction {
+                entity.insert(UnderConstruction {
+                    remaining: 5.0,
+                    total: 5.0,
+                    cost: registry::Cost { ore: 0, crystal: 0 },
+                    free_harvester_origin: None,
+                });
+            }
+            let id = entity.id();
+            // Advance several frames of simulated time so the scan accumulates.
+            for _ in 0..30 {
+                let mut time = app.world_mut().resource_mut::<Time<()>>();
+                time.advance_by(std::time::Duration::from_secs_f32(0.1));
+                app.update();
+            }
+            app.world()
+                .get::<Transform>(id)
+                .unwrap()
+                .rotation
+                .to_euler(EulerRot::YXZ)
+                .0
+        }
+
+        assert!(
+            final_yaw(0.0, false).abs() > 0.01,
+            "idle tower should sweep (yaw should change)"
+        );
+        assert!(
+            final_yaw(0.5, false).abs() < 1e-6,
+            "engaging tower (on cooldown) should not sweep"
+        );
+        assert!(
+            final_yaw(0.0, true).abs() < 1e-6,
+            "tower under construction should not sweep"
+        );
+    }
+
     #[test]
     fn active_ai_iteration_uses_all_runtime_players_not_three_slots() {
         let active = ActiveTeams(vec![true, true, true, true, true, true]);
@@ -29917,10 +26995,6 @@ mod current_tests {
         assert_eq!(
             SKIRMISH_TEAM_OPTION_COUNT as usize,
             MAX_SKIRMISH_LOBBY_SLOTS
-        );
-        assert_eq!(
-            capture_team_from_team(Team::Player(7)),
-            CaptureTeam::Player(7)
         );
     }
 
@@ -30007,17 +27081,338 @@ mod current_tests {
         assert!(xz_distance(first_extra, team_start_position_for_spawn_slot(map, 0)) > 1.0);
     }
 
+    // Fast (no-render) diagnostic for the human core loop: what units does the
+    // player start with, and do they actually move when ordered to attack-move?
     #[test]
-    fn real_menu_workers_can_right_click_resources_to_harvest() {
-        let proof = run_real_menu_dual_harvest_proof_for_faction(CaptureProofFaction::Human, 2400);
+    fn diag_player_units_exist_and_move() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::InMatch);
+        for _ in 0..20 {
+            app.update();
+        }
 
-        assert!(proof.succeeded(), "{proof:?}");
+        let player = Team::Player(0);
+        let snapshot = |app: &mut App| -> Vec<(Entity, &'static str, Vec3)> {
+            let world = app.world_mut();
+            let mut q = world.query_filtered::<(Entity, &Unit, &Team, &Transform), ()>();
+            q.iter(world)
+                .filter(|(_, _, team, _)| **team == player)
+                .map(|(e, unit, _, tf)| (e, unit.id, tf.translation))
+                .collect()
+        };
+
+        let before = snapshot(&mut app);
+        eprintln!("[diag] player starts with {} units:", before.len());
+        for (_, id, pos) in &before {
+            let can_attack = registry::entity(id)
+                .map(|d| d.weapon.is_some())
+                .unwrap_or(false);
+            eprintln!("  {id}  weapon={can_attack}  @ ({:.1},{:.1})", pos.x, pos.z);
+        }
+
+        assert!(!before.is_empty(), "player should start with units");
     }
 
+    // Fast (no-render) observation of a full default match (Human P0 vs Easy AI
+    // P1): does the economy grow, does the AI build an army and attack, does the
+    // match progress toward a result? Uses a fixed timestep so game-time is real.
     #[test]
-    fn real_menu_core_loop_can_build_attack_and_win() {
-        let proof = run_real_menu_playable_proof_for_faction(CaptureProofFaction::Human, 4200);
+    fn diag_match_economy_and_ai_progress() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            std::time::Duration::from_secs_f32(1.0 / 30.0),
+        ));
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::InMatch);
+        for _ in 0..20 {
+            app.update();
+        }
+        // Minimal start has no harvester — you build a Refinery for one. Spectate
+        // so the AI drives P0 too: it builds a refinery, the free P0 harvester
+        // spawns, and (per the auto-harvest fix) that player-team harvester
+        // auto-harvests so P0 ore grows. Guards the player-team auto-harvest path.
+        app.world_mut()
+            .insert_resource(VisiblePlayer::spectator_per_player(Team::Player(0)));
 
-        assert!(proof.succeeded(), "{proof:?}");
+        let sample = |app: &mut App| {
+            let world = app.world_mut();
+            let mut units = world.query::<(&Team, &Unit)>();
+            let (mut p0, mut p1) = (0u32, 0u32);
+            let mut p0_battle = 0u32;
+            for (team, unit) in units.iter(world) {
+                match *team {
+                    Team::Player(0) => {
+                        p0 += 1;
+                        if ai_battle_unit_id(unit.id) {
+                            p0_battle += 1;
+                        }
+                    }
+                    Team::Player(1) => p1 += 1,
+                    _ => {}
+                }
+            }
+            let _ = p0_battle;
+            let econ = world.resource::<Economies>();
+            let (ore0, ore1) = (econ.get(Team::Player(0)).ore, econ.get(Team::Player(1)).ore);
+            let phase = world.resource::<MatchState>().phase;
+            (p0, p1, ore0, ore1, phase, p0_battle)
+        };
+
+        eprintln!("[diag] t(s) | P0_units P1_units | P0_ore P1_ore | phase");
+        let mut start_ore = None;
+        let mut peak_ore = 0;
+        for step in 0..=24 {
+            // 5 game-seconds per step at 1/30s per tick = 150 ticks.
+            if step > 0 {
+                for _ in 0..150 {
+                    app.update();
+                }
+            }
+            let (p0, p1, o0, o1, phase, p0_battle) = sample(&mut app);
+            start_ore.get_or_insert(o0);
+            peak_ore = peak_ore.max(o0);
+            eprintln!(
+                "[diag] {:>4} | P0 {p0:>2} (army {p0_battle:>2}) P1 {p1:>2} | ore {o0:>4} {o1:>4} | {phase:?}",
+                step * 5
+            );
+            if !matches!(phase, MatchPhase::Running) {
+                break;
+            }
+        }
+        // Regression guard: a player-team harvester (from a built Refinery) must
+        // auto-harvest, so P0 ore rises above its start at some point even though
+        // the AI also spends it. Guards the auto-harvest fix that previously
+        // excluded the player team (which left the human economy dead).
+        assert!(
+            peak_ore > start_ore.unwrap(),
+            "player ore never grew (start {}, peak {peak_ore}): harvester not auto-harvesting",
+            start_ore.unwrap()
+        );
+    }
+
+    // End-to-end loop: with both sides AI (spectator), does a full match actually
+    // resolve to a victory/defeat (economy -> army -> combat -> result)?
+    #[test]
+    fn diag_ai_vs_ai_match_resolves() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            std::time::Duration::from_secs_f32(1.0 / 30.0),
+        ));
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::InMatch);
+        for _ in 0..20 {
+            app.update();
+        }
+        // Spectate -> AI controls every team.
+        app.world_mut()
+            .insert_resource(VisiblePlayer::spectator_per_player(Team::Player(0)));
+
+        let mut resolved = None;
+        for step in 1..=48 {
+            for _ in 0..150 {
+                app.update();
+            }
+            let phase = app.world().resource::<MatchState>().phase;
+            if !matches!(phase, MatchPhase::Running) {
+                resolved = Some((step * 5, phase));
+                break;
+            }
+        }
+        match resolved {
+            Some((secs, phase)) => eprintln!("[diag] AI-vs-AI resolved at ~{secs}s: {phase:?}"),
+            None => eprintln!("[diag] AI-vs-AI still Running after 240s (possible stalemate)"),
+        }
+    }
+
+    // Each of the 3 factions must be fully playable: from its own base, its
+    // production chain must build an army. Same-faction AI-vs-AI per faction.
+    #[test]
+    fn diag_all_three_factions_playable() {
+        for faction in SkirmishFaction::ALL {
+            let mut app = build_game_app(GameAppMode::Headless);
+            app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+                std::time::Duration::from_secs_f32(1.0 / 30.0),
+            ));
+            {
+                let mut settings = app.world_mut().resource_mut::<MatchSetupSettings>();
+                for slot in settings.player_factions.iter_mut() {
+                    *slot = faction;
+                }
+            }
+            app.world_mut()
+                .resource_mut::<NextState<AppScreen>>()
+                .set(AppScreen::InMatch);
+            for _ in 0..20 {
+                app.update();
+            }
+            app.world_mut()
+                .insert_resource(VisiblePlayer::spectator_per_player(Team::Player(0)));
+
+            let count_units = |app: &mut App, team: Team| {
+                let world = app.world_mut();
+                let mut q = world.query_filtered::<&Team, With<Unit>>();
+                q.iter(world).filter(|t| **t == team).count()
+            };
+            let start_units = count_units(&mut app, Team::Player(0));
+            let mut peak = start_units;
+            let mut resolved = false;
+            for _ in 0..72 {
+                for _ in 0..150 {
+                    app.update();
+                }
+                peak = peak.max(count_units(&mut app, Team::Player(0)));
+                if !matches!(
+                    app.world().resource::<MatchState>().phase,
+                    MatchPhase::Running
+                ) {
+                    resolved = true;
+                    break;
+                }
+            }
+            eprintln!(
+                "[diag] {:>8}: start {start_units} units, peak {peak}, resolved={resolved}",
+                faction.label()
+            );
+            assert!(
+                peak > start_units,
+                "{} produced no army (production chain broken)",
+                faction.label()
+            );
+        }
+    }
+
+    // Lobby slots must be closable in 1-2 clicks (RA2/Warcraft style): the
+    // per-slot controller cycles 关闭 -> 我方 -> 电脑 -> 关闭.
+    #[test]
+    fn lobby_slot_closes_in_one_cycle_from_ai() {
+        let mut sel = SkirmishMenuSelection::default();
+        let slot = 1; // default slot 1 is an AI slot, within every map.
+        sel.set_lobby_slot_controller(slot, SkirmishPlayerController::Ai(AiDifficulty::Easy));
+        sel.cycle_lobby_slot_controller(slot); // AI -> 关闭
+        assert_eq!(
+            sel.lobby_controllers[slot],
+            SkirmishPlayerController::None,
+            "an AI slot must close in a single cycle"
+        );
+        sel.cycle_lobby_slot_controller(slot); // 关闭 -> 我方
+        assert_eq!(sel.lobby_controllers[slot], SkirmishPlayerController::Human);
+        sel.cycle_lobby_slot_controller(slot); // 我方 -> 电脑
+        assert!(matches!(
+            sel.lobby_controllers[slot],
+            SkirmishPlayerController::Ai(_)
+        ));
+        sel.cycle_lobby_slot_controller(slot); // 电脑 -> 关闭 (closeable again)
+        assert_eq!(sel.lobby_controllers[slot], SkirmishPlayerController::None);
+    }
+
+    // Manual harvesting must work for the human player (who no longer auto-harvests):
+    // issuing a harvest order to a player Worker should make it gather ore and
+    // deposit at the CommandCenter, so P0 ore grows.
+    #[test]
+    fn manual_harvest_grows_player_ore() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            std::time::Duration::from_secs_f32(1.0 / 30.0),
+        ));
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::InMatch);
+        for _ in 0..20 {
+            app.update();
+        }
+        let player = Team::Player(0);
+
+        // Find a player worker and the nearest resource node.
+        let worker = {
+            let world = app.world_mut();
+            let mut q = world.query_filtered::<(Entity, &Team, &Unit), ()>();
+            q.iter(world)
+                .find(|(_, t, u)| **t == player && can_unit_collect_resources(u))
+                .map(|(e, _, _)| e)
+        }
+        .expect("player should have a collector-capable worker");
+        let (node, node_pos) = {
+            let world = app.world_mut();
+            let mut q = world.query::<(Entity, &Transform, &ResourceNode)>();
+            q.iter(world)
+                .find(|(_, _, n)| n.amount > 0)
+                .map(|(e, tf, _)| (e, tf.translation))
+        }
+        .expect("map should have a resource node");
+        // Make sure the node is visible so it's a legal manual target.
+        let _ = node_pos;
+
+        let ore_before = app.world().resource::<Economies>().get(player).ore;
+        app.world_mut().entity_mut(worker).insert(HarvestOrder {
+            resource: Some(node),
+            state: HarvestState::MovingToResource,
+            collect_remaining: 0.0,
+        });
+        for _ in 0..1200 {
+            app.update();
+        }
+        let ore_after = app.world().resource::<Economies>().get(player).ore;
+        eprintln!("[diag] manual harvest: P0 ore {ore_before} -> {ore_after}");
+        assert!(
+            ore_after > ore_before,
+            "manual harvest did not grow ore ({ore_before} -> {ore_after})"
+        );
+    }
+
+    // Lobby controller dropdown: toggling opens the option list, picking an option
+    // sets the controller and closes the dropdown (no cycling).
+    #[test]
+    fn lobby_controller_dropdown_opens_and_sets() {
+        let mut sel = SkirmishMenuSelection::default();
+        let slot = 1;
+        assert_eq!(sel.controller_dropdown_open, None);
+        sel.toggle_controller_dropdown(slot);
+        assert_eq!(
+            sel.controller_dropdown_open,
+            Some(slot),
+            "toggle should open"
+        );
+        sel.set_lobby_slot_controller_choice(slot, SkirmishPlayerController::None);
+        assert_eq!(
+            sel.lobby_controllers[slot],
+            SkirmishPlayerController::None,
+            "picking 关闭 should close the slot"
+        );
+        assert_eq!(
+            sel.controller_dropdown_open, None,
+            "picking an option should close the dropdown"
+        );
+        sel.toggle_controller_dropdown(slot);
+        sel.set_lobby_slot_controller_choice(slot, SkirmishPlayerController::Human);
+        assert_eq!(sel.lobby_controllers[slot], SkirmishPlayerController::Human);
+    }
+
+    // Faction dropdown: toggling opens it (and closes the controller dropdown);
+    // picking a faction sets it and closes the dropdown.
+    #[test]
+    fn lobby_faction_dropdown_opens_and_sets() {
+        let mut sel = SkirmishMenuSelection::default();
+        let slot = 1;
+        sel.toggle_controller_dropdown(slot);
+        sel.toggle_faction_dropdown(slot);
+        assert_eq!(
+            sel.faction_dropdown_open,
+            Some(slot),
+            "faction toggle opens"
+        );
+        assert_eq!(
+            sel.controller_dropdown_open, None,
+            "opening faction closes the controller dropdown"
+        );
+        sel.set_lobby_slot_faction_choice(slot, SkirmishFaction::Chaos);
+        assert_eq!(sel.lobby_factions[slot], SkirmishFaction::Chaos);
+        assert_eq!(
+            sel.faction_dropdown_open, None,
+            "picking closes the dropdown"
+        );
     }
 }

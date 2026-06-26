@@ -118,7 +118,6 @@ PRODUCTION_ORDER_OVERRIDES = {
     "VehicleFactory": [
         "Tank",
         "ScoutRover",
-        "OreHarvester",
         "MobileConstructionVehicle",
         "MirageScoutTank",
         "FlameAssaultBuggy",
@@ -150,6 +149,12 @@ PRODUCTION_ORDER_OVERRIDES = {
         "SiegeAirship",
     ],
 }
+
+REMOVED_PRODUCTION_PRODUCTS = {
+    "VehicleFactory": {"OreHarvester"},
+}
+
+REMOVED_ENTITY_IDS = {"OreHarvester"}
 
 
 def read_balanced(text: str, start: int) -> tuple[str, int]:
@@ -250,6 +255,9 @@ def scene_path_to_id(path: str) -> str:
 
 
 def apply_production_order_override(producer_id: str, products: list[str]) -> list[str]:
+    removed = REMOVED_PRODUCTION_PRODUCTS.get(producer_id, set())
+    if removed:
+        products = [product_id for product_id in products if product_id not in removed]
     order = PRODUCTION_ORDER_OVERRIDES.get(producer_id)
     if order is None:
         return products
@@ -796,6 +804,8 @@ def build_registry() -> dict[str, object]:
     entities = []
     for scene_path in sorted(all_scene_paths, key=scene_path_to_id):
         entity_id = scene_path_to_id(scene_path)
+        if entity_id in REMOVED_ENTITY_IDS:
+            continue
         role = "structure" if scene_path in structure_name_keys or scene_path in construction_costs else "unit"
         scene_file = GODOT_ROOT / scene_path.removeprefix("res://")
         scene_data = parse_scene(scene_file) if scene_file.exists() else {
@@ -840,6 +850,10 @@ def build_registry() -> dict[str, object]:
         cost = construction_costs.get(scene_path) if role == "structure" else production_costs.get(scene_path)
         if cost is None:
             cost = {"ore": 0, "crystal": 0}
+        resource_capacity = int(props.get("resources_max", 0))
+        if entity_id == "Worker":
+            resource_capacity = max(resource_capacity, 6)
+
         entities.append(
             {
                 "id": entity_id,
@@ -884,7 +898,7 @@ def build_registry() -> dict[str, object]:
                     if scene_path in infiltration_production_veterancy_targets
                     else None
                 ),
-                "resource_capacity": int(props.get("resources_max", 0)),
+                "resource_capacity": resource_capacity,
                 "mine_damage": float(props.get("mine_damage", 0.0)),
                 "mine_trigger_radius": float(props.get("trigger_radius", 0.0)),
                 "mine_blast_radius": float(props.get("blast_radius", 0.0)),
@@ -922,7 +936,6 @@ def build_registry() -> dict[str, object]:
                 "blueprint_scene": structure_blueprints.get(scene_path),
                 "is_resource_producer": entity_id in {"Refinery", "OrePurifier"},
                 "is_worker": entity_id in {"Worker", "EngineerDrone", "MobileConstructionVehicle"},
-                "is_harvester": entity_id == "OreHarvester",
                 "can_crush": scene_path in crusher_paths,
                 "can_be_crushed": scene_path in crushable_paths,
             }
@@ -1057,7 +1070,6 @@ def write_rust(registry: dict[str, object]) -> None:
         "    pub power_delta: i32,",
         "    pub is_resource_producer: bool,",
         "    pub is_worker: bool,",
-        "    pub is_harvester: bool,",
         "    pub can_crush: bool,",
         "    pub can_be_crushed: bool,",
         "    pub requirements: &'static [&'static str],",
@@ -1178,7 +1190,6 @@ def write_rust(registry: dict[str, object]) -> None:
                 f"        power_delta: {entity['power_delta']},",
                 f"        is_resource_producer: {rust_bool(entity['is_resource_producer'])},",
                 f"        is_worker: {rust_bool(entity['is_worker'])},",
-                f"        is_harvester: {rust_bool(entity['is_harvester'])},",
                 f"        can_crush: {rust_bool(entity['can_crush'])},",
                 f"        can_be_crushed: {rust_bool(entity['can_be_crushed'])},",
             ]

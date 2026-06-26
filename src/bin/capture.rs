@@ -1,1727 +1,508 @@
-use std::{
-    env,
-    fs::{self, File},
-    io::BufWriter,
-    path::{Path, PathBuf},
-};
+//! Headless screenshot / video-frame capture for the **real** Bevy RTS scene.
+//!
+//! Renders the actual game offscreen (no window) and saves PNG frames via
+//! Bevy's `Screenshot::image` + `save_to_disk`. This replaces the previous
+//! binary, which was a hand-written 2D rasterizer that drew its own diamond/
+//! circle approximation of the scene from a headless simulation snapshot — so
+//! its "screenshots" never reflected what the game actually looked like, which
+//! defeated the whole point of frame-grounded self-repair.
+//!
+//! Usage:
+//!   capture screenshot [path]            single still (default screenshots/capture/still.png)
+//!   capture frames <dir> [count]         numbered frameXXXXX.png sequence (default 450)
+
+use std::env;
+use std::path::{Path, PathBuf};
+
+use bevy::prelude::*;
+use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 
 use bevy_open_rts::{
-    CaptureAiPressureProof, CaptureAiVsAiProof, CaptureDualHarvestProof, CaptureEntityKind,
-    CaptureFullLobbyAiProof, CaptureLobbyRowsMapProof, CaptureLobbyRowsProof, CaptureMatchPhase,
-    CaptureMatchSnapshot, CapturePlayableProof, CaptureProofFaction, CaptureRuntimePlayersProof,
-    CaptureSupplyCrateProof, CaptureTeam, CaptureTechOilProof, CaptureVictoryProof,
-    advance_capture_match, advance_capture_match_proof_frame, build_capture_match_app,
-    build_capture_match_app_for_faction, capture_match_proof_status, capture_match_snapshot,
-    capture_proof_unit_count, run_capture_match_proof_for_faction,
-    run_capture_runtime_ai_scale_proof, run_capture_runtime_players_proof,
-    run_real_default_menu_victory_proof, run_real_menu_ai_pressure_proof_for_faction,
-    run_real_menu_ai_pressure_proofs, run_real_menu_ai_vs_ai_proof_for_faction,
-    run_real_menu_ai_vs_ai_proofs, run_real_menu_all_maps_victory_proofs,
-    run_real_menu_allied_victory_proof_for_faction, run_real_menu_allied_victory_proofs,
-    run_real_menu_build_proof_for_faction, run_real_menu_dual_harvest_proof_for_faction,
-    run_real_menu_economy_victory_proof_for_faction,
-    run_real_menu_free_for_all_playable_proof_for_faction, run_real_menu_full_lobby_ai_proof,
-    run_real_menu_harvest_proof_for_faction, run_real_menu_lobby_rows_proof,
-    run_real_menu_lobby_slots_proof, run_real_menu_match_proof_for_faction,
-    run_real_menu_playable_proof_for_faction,
-    run_real_menu_selected_faction_victory_proof_for_faction,
-    run_real_menu_selected_map_victory_proof, run_real_menu_supply_crate_proof_for_faction,
-    run_real_menu_tech_oil_proof_for_faction, run_real_menu_tech_oil_proofs,
-    run_real_menu_victory_proof_for_faction,
+    CaptureTarget, build_capture_app, capture_build_options_count,
+    capture_first_enabled_build_hotkey, capture_first_enabled_train_hotkey,
+    capture_grant_player_resources, capture_key, capture_mouse_button,
+    capture_nearest_visible_resource_position, capture_placement_is_valid,
+    capture_player_attack_move_all, capture_player_build_queue_len,
+    capture_player_harvesting_count, capture_player_in_placement_mode,
+    capture_player_onscreen_unit_position, capture_player_producer_position,
+    capture_player_structure_count, capture_player_worker_position,
+    capture_select_move_demo_points, capture_selected_player_unit_count, capture_set_all_factions,
+    capture_set_cursor, capture_world_to_screen, start_shared_match_scene_with_current_setup,
 };
 
 const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 720;
-const FPS: f32 = 30.0;
-
-#[derive(Clone, Copy)]
-struct Rgba {
-    r: u8,
-    g: u8,
-    b: u8,
-    a: u8,
-}
-
-impl Rgba {
-    const fn rgb(r: u8, g: u8, b: u8) -> Self {
-        Self { r, g, b, a: 255 }
-    }
-
-    const fn rgba(r: u8, g: u8, b: u8, a: u8) -> Self {
-        Self { r, g, b, a }
-    }
-}
-
-#[derive(Clone, Copy)]
-struct Vec2 {
-    x: f32,
-    y: f32,
-}
-
-impl Vec2 {
-    const fn new(x: f32, y: f32) -> Self {
-        Self { x, y }
-    }
-
-    fn lerp(self, other: Self, t: f32) -> Self {
-        Self {
-            x: self.x + (other.x - self.x) * t,
-            y: self.y + (other.y - self.y) * t,
-        }
-    }
-}
-
-#[derive(Clone, Copy)]
-struct CaptureView {
-    center: Vec2,
-    scale: f32,
-}
+/// Ticks to let assets load and the menu initialize before starting a match.
+const WARMUP_TICKS: usize = 90;
+/// Ticks to let the match scene populate (bases, units) before first capture.
+const MATCH_SETTLE_TICKS: usize = 60;
+/// Extra ticks after the final screenshot request so async readback/save lands.
+const FLUSH_TICKS: usize = 16;
 
 fn main() {
-    if let Err(error) = run() {
+    let mut args = env::args().skip(1);
+    let result = match args.next().as_deref() {
+        Some("screenshot") | None => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/capture/still.png"));
+            render_still(&path)
+        }
+        Some("frames") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/capture"));
+            let count = args.next().and_then(|s| s.parse().ok()).unwrap_or(450usize);
+            render_frames(&dir, count)
+        }
+        Some("play") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/play"));
+            render_play(&dir)
+        }
+        Some("menu") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/menu/menu.png"));
+            render_menu(&path)
+        }
+        Some("harvest") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/harvest"));
+            render_harvest(&dir)
+        }
+        Some("factions") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/factions"));
+            render_factions(&dir)
+        }
+        Some(other) => Err(format!(
+            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | play <dir> | factions <dir>]"
+        )),
+    };
+    if let Err(error) = result {
         eprintln!("[capture] error: {error}");
         std::process::exit(1);
     }
 }
 
-fn run() -> Result<(), String> {
-    let mut args = env::args().skip(1);
-    match args.next().as_deref() {
-        None => {
-            let path = PathBuf::from("screenshots/capture/still.png");
-            render_still(&path, 0)?;
-            println!("[capture] wrote {}", path.display());
-        }
-        Some("screenshot") => {
-            let path = args
-                .next()
-                .map(PathBuf::from)
-                .unwrap_or_else(|| PathBuf::from("screenshots/capture/still.png"));
-            render_still(&path, 0)?;
-            println!("[capture] wrote {}", path.display());
-        }
-        Some("frames") => {
-            let directory = args
-                .next()
-                .map(PathBuf::from)
-                .unwrap_or_else(|| PathBuf::from("screenshots/capture"));
-            let count = args
-                .next()
-                .as_deref()
-                .unwrap_or("120")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid frame count: {error}"))?;
-            render_frames(&directory, count)?;
-            println!("[capture] wrote {count} frames to {}", directory.display());
-        }
-        Some("proof-frames") => {
-            let directory = args
-                .next()
-                .map(PathBuf::from)
-                .unwrap_or_else(|| PathBuf::from("screenshots/capture-proof"));
-            let count = args
-                .next()
-                .as_deref()
-                .unwrap_or("900")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = render_proof_frames(&directory, count, faction)?;
-            println!(
-                "[capture] proof-frames faction={} label={} product={} phase={:?} frames={} elapsed={}s produced_units={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={} dir={}",
-                proof.faction.key(),
-                proof.faction.label(),
-                proof.product_id,
-                proof.phase,
-                proof.frames,
-                proof.elapsed_seconds,
-                proof.produced_units,
-                proof.player_units,
-                proof.enemy_units_destroyed,
-                proof.enemy_structures_destroyed,
-                proof.remaining_teams,
-                proof.remaining_anchors,
-                directory.display()
-            );
-            if !proof.succeeded() {
-                return Err(format!(
-                    "proof frames did not reach player victory within {count} frames"
-                ));
-            }
-        }
-        Some("match-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("7200")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_capture_match_proof_for_faction(faction, max_frames);
-            println!(
-                "[capture] match-proof faction={} label={} product={} phase={:?} frames={} elapsed={}s produced_units={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
-                proof.faction.key(),
-                proof.faction.label(),
-                proof.product_id,
-                proof.phase,
-                proof.frames,
-                proof.elapsed_seconds,
-                proof.produced_units,
-                proof.player_units,
-                proof.enemy_units_destroyed,
-                proof.enemy_structures_destroyed,
-                proof.remaining_teams,
-                proof.remaining_anchors
-            );
-            if !proof.succeeded() {
-                return Err(format!(
-                    "match proof did not reach player victory within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-match-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("7200")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_match_proof_for_faction(faction, max_frames);
-            println!(
-                "[capture] real-match-proof faction={} label={} product={} phase={:?} frames={} elapsed={}s produced_units={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
-                proof.faction.key(),
-                proof.faction.label(),
-                proof.product_id,
-                proof.phase,
-                proof.frames,
-                proof.elapsed_seconds,
-                proof.produced_units,
-                proof.player_units,
-                proof.enemy_units_destroyed,
-                proof.enemy_structures_destroyed,
-                proof.remaining_teams,
-                proof.remaining_anchors
-            );
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu match proof did not reach player victory within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-lobby-slots-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("120")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let proof = run_real_menu_lobby_slots_proof(max_frames);
-            println!(
-                "[capture] real-lobby-slots-proof map={} map_players={} configured_slots={} runtime_players={} active_players={} economy_rows={} unit_teams={} structure_teams={} command_center_teams={} spawn_anchor_matches={} visible_player={:?} phase={:?} frames={} remaining_teams={} remaining_anchors={}",
-                proof.map_id,
-                proof.map_players,
-                proof.configured_slots,
-                proof.runtime_players,
-                proof.active_players,
-                proof.economy_rows,
-                proof.unit_teams,
-                proof.structure_teams,
-                proof.command_center_teams,
-                proof.spawn_anchor_matches,
-                proof.visible_player_index,
-                proof.phase,
-                proof.frames,
-                proof.remaining_teams,
-                proof.remaining_anchors
-            );
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu lobby slots proof did not preserve all active map slots within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-lobby-rows-proof") => {
-            let proof = run_real_menu_lobby_rows_proof();
-            print_lobby_rows_proof("real-lobby-rows-proof", &proof);
-            if !proof.succeeded() {
-                return Err("real menu lobby rows proof did not preserve map slot rows".to_string());
-            }
-        }
-        Some("real-harvest-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("900")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_harvest_proof_for_faction(faction, max_frames);
-            println!(
-                "[capture] real-harvest-proof faction={} label={} phase={:?} frames={} harvest_ordered={} ore={}->{} resource={}->{} product={} produced_units={}",
-                proof.faction.key(),
-                proof.faction.label(),
-                proof.phase,
-                proof.frames,
-                proof.harvest_ordered,
-                proof.ore_before,
-                proof.ore_after,
-                proof.resource_before,
-                proof.resource_after,
-                proof.product_id,
-                proof.produced_units
-            );
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu harvest proof did not mine and train within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-dual-harvest-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("1800")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_dual_harvest_proof_for_faction(faction, max_frames);
-            print_dual_harvest_proof("real-dual-harvest-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu dual harvest proof did not mine both Ore and Crystal within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-supply-crate-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("900")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_supply_crate_proof_for_faction(faction, max_frames);
-            print_supply_crate_proof("real-supply-crate-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu supply crate proof did not collect a FourCorners resource crate within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-tech-oil-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("1800")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_tech_oil_proof_for_faction(faction, max_frames);
-            print_tech_oil_proof("real-tech-oil-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu tech oil proof did not unlock EngineerDrone and capture TechOilDerrick within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-tech-oil-all-factions-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("1800")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let proofs = run_real_menu_tech_oil_proofs(max_frames);
-            let mut failures = Vec::new();
-            for proof in &proofs {
-                print_tech_oil_proof("real-tech-oil-all-factions-proof", proof);
-                if !proof.succeeded() {
-                    failures.push(proof.faction.key());
-                }
-            }
-            if !failures.is_empty() {
-                return Err(format!(
-                    "real menu tech oil all-factions proof failed for {}",
-                    failures.join(", ")
-                ));
-            }
-        }
-        Some("real-ai-pressure-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("1200")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_ai_pressure_proof_for_faction(faction, max_frames);
-            print_ai_pressure_proof("real-ai-pressure-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu AI pressure proof did not produce, attack, and damage the player within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-ai-pressure-all-factions-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("1200")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let proofs = run_real_menu_ai_pressure_proofs(max_frames);
-            for proof in &proofs {
-                print_ai_pressure_proof("real-ai-pressure-all-factions-proof", proof);
-            }
-            if let Some(proof) = proofs.iter().find(|proof| !proof.succeeded()) {
-                return Err(format!(
-                    "real menu AI pressure all-factions proof failed for faction={} within {max_frames} frames",
-                    proof.faction.key()
-                ));
-            }
-        }
-        Some("real-full-lobby-ai-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("1800")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let proof = run_real_menu_full_lobby_ai_proof(max_frames);
-            print_full_lobby_ai_proof("real-full-lobby-ai-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real full-lobby AI proof did not make all {} AI players produce and fight within {max_frames} frames",
-                    proof.ai_players
-                ));
-            }
-        }
-        Some("runtime-ai-scale-proof") => {
-            let player_count = args
-                .next()
-                .as_deref()
-                .unwrap_or("12")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid player count: {error}"))?;
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("1800")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let proof = run_capture_runtime_ai_scale_proof(player_count, max_frames);
-            print_full_lobby_ai_proof("runtime-ai-scale-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "runtime AI scale proof did not make all {} AI players produce and fight within {max_frames} frames",
-                    proof.ai_players
-                ));
-            }
-        }
-        Some("real-ai-vs-ai-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("2400")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_ai_vs_ai_proof_for_faction(faction, max_frames);
-            print_ai_vs_ai_proof("real-ai-vs-ai-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu AI-vs-AI proof did not produce, attack, and damage either side within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-ai-vs-ai-all-factions-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("2400")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let proofs = run_real_menu_ai_vs_ai_proofs(max_frames);
-            for proof in &proofs {
-                print_ai_vs_ai_proof("real-ai-vs-ai-all-factions-proof", proof);
-            }
-            if let Some(proof) = proofs.iter().find(|proof| !proof.succeeded()) {
-                return Err(format!(
-                    "real menu AI-vs-AI all-factions proof failed for focus={} within {max_frames} frames",
-                    proof.focus_faction.key()
-                ));
-            }
-        }
-        Some("real-build-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("900")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_build_proof_for_faction(faction, max_frames);
-            println!(
-                "[capture] real-build-proof faction={} label={} phase={:?} frames={} structure={} placement_started={} placed={} construct_ordered={} constructed={} product={} produced_units={}",
-                proof.faction.key(),
-                proof.faction.label(),
-                proof.phase,
-                proof.frames,
-                proof.structure_id,
-                proof.placement_started,
-                proof.placed,
-                proof.construct_ordered,
-                proof.constructed,
-                proof.product_id,
-                proof.produced_units
-            );
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu build proof did not place, construct, and train within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-victory-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("3600")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_victory_proof_for_faction(faction, max_frames);
-            print_victory_proof("real-victory-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu victory proof did not train, attack, and win within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-default-victory-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("3600")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let proof = run_real_default_menu_victory_proof(max_frames);
-            print_victory_proof("real-default-victory-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real default menu victory proof did not train, attack, and win within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-selected-faction-victory-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("3600")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof =
-                run_real_menu_selected_faction_victory_proof_for_faction(faction, max_frames);
-            print_victory_proof("real-selected-faction-victory-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real selected-faction victory proof did not train, attack, and win within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-selected-map-victory-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("7200")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let map_index = args
-                .next()
-                .as_deref()
-                .unwrap_or("1")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid map index: {error}"))?;
-            let proof = run_real_menu_selected_map_victory_proof(map_index, max_frames);
-            print_victory_proof("real-selected-map-victory-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real selected-map victory proof did not train, attack, and win within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-all-maps-victory-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("7200")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let proofs = run_real_menu_all_maps_victory_proofs(max_frames);
-            for proof in &proofs {
-                print_victory_proof("real-all-maps-victory-proof", proof);
-            }
-            if let Some(proof) = proofs.iter().find(|proof| !proof.succeeded()) {
-                return Err(format!(
-                    "real all-maps victory proof failed for faction={} on map={} within {max_frames} frames",
-                    proof.faction.key(),
-                    proof.map_id
-                ));
-            }
-        }
-        Some("real-allied-victory-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("7200")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_allied_victory_proof_for_faction(faction, max_frames);
-            print_victory_proof("real-allied-victory-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real allied 2v1 victory proof did not train, attack, and win within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-allied-all-factions-victory-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("7200")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let proofs = run_real_menu_allied_victory_proofs(max_frames);
-            for proof in &proofs {
-                print_victory_proof("real-allied-all-factions-victory-proof", proof);
-            }
-            if let Some(proof) = proofs.iter().find(|proof| !proof.succeeded()) {
-                return Err(format!(
-                    "real allied all-factions victory proof failed for faction={} within {max_frames} frames",
-                    proof.faction.key()
-                ));
-            }
-        }
-        Some("real-economy-victory-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("3600")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_economy_victory_proof_for_faction(faction, max_frames);
-            println!(
-                "[capture] real-economy-victory-proof faction={} label={} phase={:?} frames={} ore={}=>{}=>{} crystal={}=>{}=>{} harvest_ore={} harvest_crystal={} product={} target_units={} produced_units={} attack_orders={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
-                proof.faction.key(),
-                proof.faction.label(),
-                proof.phase,
-                proof.frames,
-                proof.ore_before,
-                proof.ore_after_harvest,
-                proof.ore_after,
-                proof.crystal_before,
-                proof.crystal_after_harvest,
-                proof.crystal_after,
-                proof.ore_harvest_ordered,
-                proof.crystal_harvest_ordered,
-                proof.product_id,
-                proof.target_units,
-                proof.produced_units,
-                proof.attack_orders,
-                proof.player_units,
-                proof.enemy_units_destroyed,
-                proof.enemy_structures_destroyed,
-                proof.remaining_teams,
-                proof.remaining_anchors
-            );
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu economy victory proof did not harvest, train, attack, and win within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-playable-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("4200")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_playable_proof_for_faction(faction, max_frames);
-            print_playable_proof("real-playable-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu playable proof did not harvest, build, train, attack, and win within {max_frames} frames"
-                ));
-            }
-        }
-        Some("real-free-for-all-playable-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("7200")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let faction = parse_optional_faction(args.next())?;
-            let proof = run_real_menu_free_for_all_playable_proof_for_faction(faction, max_frames);
-            print_playable_proof("real-free-for-all-playable-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "real menu free-for-all playable proof did not harvest, build, train, attack, and win within {max_frames} frames"
-                ));
-            }
-        }
-        Some("runtime-players-proof") => {
-            let max_frames = args
-                .next()
-                .as_deref()
-                .unwrap_or("120")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid max frame count: {error}"))?;
-            let player_count = args
-                .next()
-                .as_deref()
-                .unwrap_or("12")
-                .parse::<usize>()
-                .map_err(|error| format!("invalid player count: {error}"))?;
-            let proof = run_capture_runtime_players_proof(player_count, max_frames);
-            print_runtime_players_proof("runtime-players-proof", &proof);
-            if !proof.succeeded() {
-                return Err(format!(
-                    "runtime players proof did not preserve {} active players within {max_frames} frames",
-                    proof.expected_players
-                ));
-            }
-        }
-        Some("real-playability-suite-proof") => {
-            run_real_playability_suite()?;
-        }
-        Some("help" | "-h" | "--help") => {
-            print_help();
-        }
-        Some(other) => {
-            return Err(format!(
-                "unknown command '{other}'. Use: capture [screenshot <path>|frames <dir> <count>]"
-            ));
-        }
+/// Builds the offscreen render app, warms up assets, and starts a real match.
+fn start_match_app() -> App {
+    let mut app = build_capture_app(WIDTH, HEIGHT);
+    for _ in 0..WARMUP_TICKS {
+        app.update();
     }
-    Ok(())
+    start_shared_match_scene_with_current_setup(&mut app);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    app
 }
 
-fn run_real_playability_suite() -> Result<(), String> {
-    const DUAL_HARVEST_FRAMES: usize = 1800;
-    const SUPPLY_CRATE_FRAMES: usize = 900;
-    const TECH_OIL_FRAMES: usize = 1800;
-    const PLAYABLE_FRAMES: usize = 4200;
-    const FREE_FOR_ALL_FRAMES: usize = 7200;
-    const ALL_MAPS_FRAMES: usize = 7200;
-    const ALLIED_FRAMES: usize = 7200;
-    const AI_PRESSURE_FRAMES: usize = 1200;
-    const FULL_LOBBY_AI_FRAMES: usize = 1800;
-    const RUNTIME_AI_SCALE_FRAMES: usize = 1800;
-    const AI_VS_AI_FRAMES: usize = 2400;
-    const RUNTIME_PLAYERS_FRAMES: usize = 120;
-    const RUNTIME_PLAYERS: usize = 12;
+fn capture_handle(app: &App) -> Handle<Image> {
+    app.world().resource::<CaptureTarget>().0.clone()
+}
 
-    let mut failures = Vec::new();
-    let mut checks = 0usize;
-
-    let lobby_rows_proof = run_real_menu_lobby_rows_proof();
-    print_lobby_rows_proof("real-playability-suite-proof:lobby-rows", &lobby_rows_proof);
-    checks += lobby_rows_proof.maps.len();
-    if !lobby_rows_proof.succeeded() {
-        failures.push("lobby-rows".to_string());
-    }
-
-    for faction in CaptureProofFaction::ALL {
-        let proof = run_real_menu_dual_harvest_proof_for_faction(faction, DUAL_HARVEST_FRAMES);
-        print_dual_harvest_proof("real-playability-suite-proof:dual-harvest", &proof);
-        checks += 1;
-        if !proof.succeeded() {
-            failures.push(format!("dual-harvest:{}", faction.key()));
-        }
-    }
-
-    let supply_crate_proof = run_real_menu_supply_crate_proof_for_faction(
-        CaptureProofFaction::Human,
-        SUPPLY_CRATE_FRAMES,
-    );
-    print_supply_crate_proof(
-        "real-playability-suite-proof:supply-crate",
-        &supply_crate_proof,
-    );
-    checks += 1;
-    if !supply_crate_proof.succeeded() {
-        failures.push(format!("supply-crate:{}", supply_crate_proof.faction.key()));
-    }
-
-    let tech_oil_proofs = run_real_menu_tech_oil_proofs(TECH_OIL_FRAMES);
-    for proof in &tech_oil_proofs {
-        print_tech_oil_proof("real-playability-suite-proof:tech-oil", proof);
-        checks += 1;
-        if !proof.succeeded() {
-            failures.push(format!("tech-oil:{}", proof.faction.key()));
-        }
-    }
-
-    for faction in CaptureProofFaction::ALL {
-        let proof = run_real_menu_playable_proof_for_faction(faction, PLAYABLE_FRAMES);
-        print_playable_proof("real-playability-suite-proof:playable", &proof);
-        checks += 1;
-        if !proof.succeeded() {
-            failures.push(format!("playable:{}", faction.key()));
-        }
-    }
-
-    for faction in CaptureProofFaction::ALL {
-        let proof =
-            run_real_menu_free_for_all_playable_proof_for_faction(faction, FREE_FOR_ALL_FRAMES);
-        print_playable_proof("real-playability-suite-proof:free-for-all", &proof);
-        checks += 1;
-        if !proof.succeeded() {
-            failures.push(format!("free-for-all:{}", faction.key()));
-        }
-    }
-
-    let all_map_proofs = run_real_menu_all_maps_victory_proofs(ALL_MAPS_FRAMES);
-    for proof in &all_map_proofs {
-        print_victory_proof("real-playability-suite-proof:all-maps", proof);
-        checks += 1;
-        if !proof.succeeded() {
-            failures.push(format!("all-maps:{}:{}", proof.faction.key(), proof.map_id));
-        }
-    }
-
-    let allied_proofs = run_real_menu_allied_victory_proofs(ALLIED_FRAMES);
-    for proof in &allied_proofs {
-        print_victory_proof("real-playability-suite-proof:allied", proof);
-        checks += 1;
-        if !proof.succeeded() {
-            failures.push(format!("allied:{}", proof.faction.key()));
-        }
-    }
-
-    let ai_pressure_proofs = run_real_menu_ai_pressure_proofs(AI_PRESSURE_FRAMES);
-    for proof in &ai_pressure_proofs {
-        print_ai_pressure_proof("real-playability-suite-proof:ai-pressure", proof);
-        checks += 1;
-        if !proof.succeeded() {
-            failures.push(format!("ai-pressure:{}", proof.faction.key()));
-        }
-    }
-
-    let full_lobby_ai_proof = run_real_menu_full_lobby_ai_proof(FULL_LOBBY_AI_FRAMES);
-    print_full_lobby_ai_proof(
-        "real-playability-suite-proof:full-lobby-ai",
-        &full_lobby_ai_proof,
-    );
-    checks += 1;
-    if !full_lobby_ai_proof.succeeded() {
-        failures.push("full-lobby-ai".to_string());
-    }
-
-    let runtime_ai_scale_proof =
-        run_capture_runtime_ai_scale_proof(RUNTIME_PLAYERS, RUNTIME_AI_SCALE_FRAMES);
-    print_full_lobby_ai_proof(
-        "real-playability-suite-proof:runtime-ai-scale",
-        &runtime_ai_scale_proof,
-    );
-    checks += 1;
-    if !runtime_ai_scale_proof.succeeded() {
-        failures.push(format!(
-            "runtime-ai-scale:{}",
-            runtime_ai_scale_proof.expected_players
-        ));
-    }
-
-    let ai_vs_ai_proofs = run_real_menu_ai_vs_ai_proofs(AI_VS_AI_FRAMES);
-    for proof in &ai_vs_ai_proofs {
-        print_ai_vs_ai_proof("real-playability-suite-proof:ai-vs-ai", proof);
-        checks += 1;
-        if !proof.succeeded() {
-            failures.push(format!("ai-vs-ai:{}", proof.focus_faction.key()));
-        }
-    }
-
-    let runtime_players_proof =
-        run_capture_runtime_players_proof(RUNTIME_PLAYERS, RUNTIME_PLAYERS_FRAMES);
-    print_runtime_players_proof(
-        "real-playability-suite-proof:runtime-players",
-        &runtime_players_proof,
-    );
-    checks += 1;
-    if !runtime_players_proof.succeeded() {
-        failures.push(format!(
-            "runtime-players:{}",
-            runtime_players_proof.expected_players
-        ));
-    }
-
-    if failures.is_empty() {
-        println!("[capture] real-playability-suite-proof passed checks={checks}");
-        Ok(())
-    } else {
-        Err(format!(
-            "real playability suite failed checks={}: {}",
-            failures.len(),
-            failures.join(", ")
-        ))
+fn shoot(app: &mut App, handle: &Handle<Image>, path: PathBuf) {
+    app.world_mut()
+        .spawn(Screenshot::image(handle.clone()))
+        .observe(save_to_disk(path));
+    for _ in 0..FLUSH_TICKS {
+        app.update();
     }
 }
 
-fn print_dual_harvest_proof(command: &str, proof: &CaptureDualHarvestProof) {
-    println!(
-        "[capture] {} faction={} label={} phase={:?} frames={} ore={}->{} crystal={}->{} harvest_ore={} harvest_crystal={}",
-        command,
-        proof.faction.key(),
-        proof.faction.label(),
-        proof.phase,
-        proof.frames,
-        proof.ore_before,
-        proof.ore_after,
-        proof.crystal_before,
-        proof.crystal_after,
-        proof.ore_harvest_ordered,
-        proof.crystal_harvest_ordered,
-    );
-}
-
-fn print_lobby_rows_proof(command: &str, proof: &CaptureLobbyRowsProof) {
-    for map in &proof.maps {
-        print_lobby_rows_map_proof(command, map);
-    }
-}
-
-fn print_lobby_rows_map_proof(command: &str, proof: &CaptureLobbyRowsMapProof) {
-    println!(
-        "[capture] {} map={} map_players={} row_count={} configurable_rows={} unexpected_slot_buttons={} last_slot={} select={} controller={} faction={} team={} color={}",
-        command,
-        proof.map_id,
-        proof.map_players,
-        proof.row_count,
-        proof.fully_configurable_rows,
-        proof.unexpected_slot_buttons,
-        proof.last_slot_index + 1,
-        proof.last_slot_selects,
-        proof.last_slot_controller_cycles,
-        proof.last_slot_faction_cycles,
-        proof.last_slot_team_cycles,
-        proof.last_slot_color_cycles,
-    );
-}
-
-fn print_supply_crate_proof(command: &str, proof: &CaptureSupplyCrateProof) {
-    println!(
-        "[capture] {} faction={} label={} map={} phase={:?} frames={} collector={} selected={} move_ordered={} consumed={} ore={}->{} crystal={}->{}",
-        command,
-        proof.faction.key(),
-        proof.faction.label(),
-        proof.map_id,
-        proof.phase,
-        proof.frames,
-        proof.collector_id,
-        proof.collector_selected,
-        proof.move_ordered,
-        proof.crate_consumed,
-        proof.ore_before,
-        proof.ore_after,
-        proof.crystal_before,
-        proof.crystal_after,
-    );
-}
-
-fn print_tech_oil_proof(command: &str, proof: &CaptureTechOilProof) {
-    println!(
-        "[capture] {} faction={} label={} map={} phase={:?} frames={} radar={} robotics={} engineer={} selected={} capture_ordered={} captured={} engineer_consumed={} ore={}->{} bonus={}",
-        command,
-        proof.faction.key(),
-        proof.faction.label(),
-        proof.map_id,
-        proof.phase,
-        proof.frames,
-        proof.radar_constructed,
-        proof.robotics_constructed,
-        proof.engineer_produced,
-        proof.engineer_selected,
-        proof.capture_ordered,
-        proof.captured,
-        proof.engineer_consumed,
-        proof.ore_before,
-        proof.ore_after,
-        proof.capture_bonus_ore,
-    );
-}
-
-fn print_playable_proof(command: &str, proof: &CapturePlayableProof) {
-    println!(
-        "[capture] {} faction={} label={} phase={:?} frames={} ore={}=>{}=>{} crystal={}=>{}=>{} harvest_ore={} harvest_crystal={} structure={} placement_started={} placed={} construct_ordered={} constructed={} barracks_product={} barracks_units={} vehicle={} target_units={} produced_units={} attack_orders={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
-        command,
-        proof.faction.key(),
-        proof.faction.label(),
-        proof.phase,
-        proof.frames,
-        proof.ore_before,
-        proof.ore_after_harvest,
-        proof.ore_after,
-        proof.crystal_before,
-        proof.crystal_after_harvest,
-        proof.crystal_after,
-        proof.ore_harvest_ordered,
-        proof.crystal_harvest_ordered,
-        proof.structure_id,
-        proof.placement_started,
-        proof.placed,
-        proof.construct_ordered,
-        proof.constructed,
-        proof.barracks_product_id,
-        proof.barracks_units,
-        proof.vehicle_product_id,
-        proof.target_units,
-        proof.produced_units,
-        proof.attack_orders,
-        proof.player_units,
-        proof.enemy_units_destroyed,
-        proof.enemy_structures_destroyed,
-        proof.remaining_teams,
-        proof.remaining_anchors
-    );
-}
-
-fn print_ai_pressure_proof(command: &str, proof: &CaptureAiPressureProof) {
-    println!(
-        "[capture] {} faction={} label={} phase={:?} frames={} ai_team={:?} ai_units={}=>{} ai_attack_orders={} player_health={:.1}->{:.1}",
-        command,
-        proof.faction.key(),
-        proof.faction.label(),
-        proof.phase,
-        proof.frames,
-        proof.ai_team,
-        proof.ai_units_before,
-        proof.ai_units_peak,
-        proof.ai_attack_orders,
-        proof.player_health_before,
-        proof.player_health_after,
-    );
-}
-
-fn print_full_lobby_ai_proof(command: &str, proof: &CaptureFullLobbyAiProof) {
-    println!(
-        "[capture] {} map={} map_players={} expected_players={} active_players={} ai_players={} ai_growth={}/{} ai_attackers={} damaged_teams={} total_attack_orders={} phase={:?} frames={} remaining_teams={} remaining_anchors={}",
-        command,
-        proof.map_id,
-        proof.map_players,
-        proof.expected_players,
-        proof.active_players,
-        proof.ai_players,
-        proof.ai_teams_with_growth,
-        proof.ai_players,
-        proof.ai_teams_with_attack_orders,
-        proof.damaged_teams,
-        proof.total_attack_orders,
-        proof.phase,
-        proof.frames,
-        proof.remaining_teams,
-        proof.remaining_anchors,
-    );
-}
-
-fn print_ai_vs_ai_proof(command: &str, proof: &CaptureAiVsAiProof) {
-    println!(
-        "[capture] {} focus={} label={} map={} mode={} phase={:?} frames={} focus_team={:?} opponent_team={:?} focus_units={}=>{} opponent_units={}=>{} focus_attack_orders={} opponent_attack_orders={} focus_health={:.1}->{:.1} opponent_health={:.1}->{:.1} remaining_teams={} remaining_anchors={}",
-        command,
-        proof.focus_faction.key(),
-        proof.focus_faction.label(),
-        proof.map_id,
-        proof.match_mode_id,
-        proof.phase,
-        proof.frames,
-        proof.focus_team,
-        proof.opponent_team,
-        proof.focus_units_before,
-        proof.focus_units_peak,
-        proof.opponent_units_before,
-        proof.opponent_units_peak,
-        proof.focus_attack_orders,
-        proof.opponent_attack_orders,
-        proof.focus_health_before,
-        proof.focus_health_after,
-        proof.opponent_health_before,
-        proof.opponent_health_after,
-        proof.remaining_teams,
-        proof.remaining_anchors
-    );
-}
-
-fn print_victory_proof(command: &str, proof: &CaptureVictoryProof) {
-    println!(
-        "[capture] {} faction={} label={} map={} mode={} phase={:?} frames={} product={} target_units={} produced_units={} attack_orders={} player_units={} enemy_kills={} enemy_structures={} remaining_teams={} remaining_anchors={}",
-        command,
-        proof.faction.key(),
-        proof.faction.label(),
-        proof.map_id,
-        proof.match_mode_id,
-        proof.phase,
-        proof.frames,
-        proof.product_id,
-        proof.target_units,
-        proof.produced_units,
-        proof.attack_orders,
-        proof.player_units,
-        proof.enemy_units_destroyed,
-        proof.enemy_structures_destroyed,
-        proof.remaining_teams,
-        proof.remaining_anchors
-    );
-}
-
-fn print_runtime_players_proof(command: &str, proof: &CaptureRuntimePlayersProof) {
-    println!(
-        "[capture] {} map={} map_players={} expected_players={} runtime_players={} active_players={} economy_rows={} unit_teams={} structure_teams={} command_center_teams={} fallback_spawn_matches={} visible_player={:?} phase={:?} frames={} remaining_teams={} remaining_anchors={}",
-        command,
-        proof.map_id,
-        proof.map_players,
-        proof.expected_players,
-        proof.runtime_players,
-        proof.active_players,
-        proof.economy_rows,
-        proof.unit_teams,
-        proof.structure_teams,
-        proof.command_center_teams,
-        proof.fallback_spawn_matches,
-        proof.visible_player_index,
-        proof.phase,
-        proof.frames,
-        proof.remaining_teams,
-        proof.remaining_anchors,
-    );
-}
-
-fn print_help() {
-    println!("Usage:");
-    println!("  cargo run --bin capture");
-    println!("  cargo run --bin capture -- screenshot screenshots/capture/still.png");
-    println!("  cargo run --bin capture -- frames screenshots/result/1 450");
-    println!("  cargo run --bin capture -- proof-frames screenshots/result/2 900 human");
-    println!("  cargo run --bin capture -- match-proof 7200 human");
-    println!("  cargo run --bin capture -- match-proof 7200 demon");
-    println!("  cargo run --bin capture -- match-proof 7200 chaos");
-    println!("  cargo run --bin capture -- real-match-proof 7200 human");
-    println!("  cargo run --bin capture -- real-lobby-rows-proof");
-    println!("  cargo run --bin capture -- real-harvest-proof 900 human");
-    println!("  cargo run --bin capture -- real-dual-harvest-proof 1800 human");
-    println!("  cargo run --bin capture -- real-supply-crate-proof 900 human");
-    println!("  cargo run --bin capture -- real-tech-oil-proof 1800 human");
-    println!("  cargo run --bin capture -- real-tech-oil-all-factions-proof 1800");
-    println!("  cargo run --bin capture -- real-ai-pressure-proof 1200 human");
-    println!("  cargo run --bin capture -- real-ai-pressure-all-factions-proof 1200");
-    println!("  cargo run --bin capture -- real-full-lobby-ai-proof 1800");
-    println!("  cargo run --bin capture -- runtime-ai-scale-proof 12 1800");
-    println!("  cargo run --bin capture -- real-ai-vs-ai-proof 2400 human");
-    println!("  cargo run --bin capture -- real-ai-vs-ai-all-factions-proof 2400");
-    println!("  cargo run --bin capture -- real-build-proof 900 human");
-    println!("  cargo run --bin capture -- real-victory-proof 3600 human");
-    println!("  cargo run --bin capture -- real-default-victory-proof 3600");
-    println!("  cargo run --bin capture -- real-selected-faction-victory-proof 3600 chaos");
-    println!("  cargo run --bin capture -- real-selected-map-victory-proof 7200 1");
-    println!("  cargo run --bin capture -- real-all-maps-victory-proof 7200");
-    println!("  cargo run --bin capture -- real-allied-victory-proof 7200 demon");
-    println!("  cargo run --bin capture -- real-allied-all-factions-victory-proof 7200");
-    println!("  cargo run --bin capture -- real-economy-victory-proof 3600 human");
-    println!("  cargo run --bin capture -- real-playable-proof 4200 human");
-    println!("  cargo run --bin capture -- real-free-for-all-playable-proof 7200 human");
-    println!("  cargo run --bin capture -- runtime-players-proof 120 12");
-    println!("  cargo run --bin capture -- real-playability-suite-proof");
-}
-
-fn parse_optional_faction(value: Option<String>) -> Result<CaptureProofFaction, String> {
-    let Some(value) = value else {
-        return Ok(CaptureProofFaction::Human);
+/// Selects a producer and presses its train hotkey via real input; returns true
+/// if the command reached the build queue.
+fn faction_try_train(app: &mut App) -> bool {
+    let Some(pos) = capture_player_producer_position(app) else {
+        return false;
     };
-    CaptureProofFaction::parse(&value).ok_or_else(|| {
-        format!(
-            "invalid faction '{value}'. Expected one of: {}",
-            CaptureProofFaction::ALL
-                .iter()
-                .map(|faction| faction.key())
-                .collect::<Vec<_>>()
-                .join(", ")
-        )
-    })
+    let Some(screen) = capture_world_to_screen(app, pos) else {
+        return false;
+    };
+    capture_set_cursor(app, screen);
+    capture_mouse_button(app, MouseButton::Left, true);
+    app.update();
+    capture_mouse_button(app, MouseButton::Left, false);
+    app.update();
+    for _ in 0..5 {
+        app.update();
+    }
+    let before = capture_player_build_queue_len(app);
+    let Some(key) = capture_first_enabled_train_hotkey(app) else {
+        return false;
+    };
+    capture_key(app, key, true);
+    app.update();
+    capture_key(app, key, false);
+    app.update();
+    for _ in 0..3 {
+        app.update();
+    }
+    capture_player_build_queue_len(app) > before
 }
 
-fn render_still(path: &Path, frame: usize) -> Result<(), String> {
+/// Selects a worker, enters placement via the build hotkey, and places a
+/// structure via real input; returns true if a structure was built.
+fn faction_try_build(app: &mut App) -> bool {
+    let Some(worker_pos) = capture_player_worker_position(app) else {
+        return false;
+    };
+    let Some(screen) = capture_world_to_screen(app, worker_pos) else {
+        return false;
+    };
+    capture_set_cursor(app, screen);
+    capture_mouse_button(app, MouseButton::Left, true);
+    app.update();
+    capture_mouse_button(app, MouseButton::Left, false);
+    app.update();
+    for _ in 0..5 {
+        app.update();
+    }
+    let before = capture_player_structure_count(app);
+    let Some(key) = capture_first_enabled_build_hotkey(app) else {
+        return false;
+    };
+    capture_key(app, key, true);
+    app.update();
+    capture_key(app, key, false);
+    app.update();
+    // Scan a radial grid for a spot the game reports as a VALID placement.
+    for radius in [3.0_f32, 4.0, 5.0, 6.0, 7.0, 8.0] {
+        for step in 0..12 {
+            if !capture_player_in_placement_mode(app) {
+                return capture_player_structure_count(app) > before;
+            }
+            let angle = step as f32 * std::f32::consts::TAU / 12.0;
+            let candidate = worker_pos + Vec3::new(angle.cos() * radius, 0.0, angle.sin() * radius);
+            let Some(screen) = capture_world_to_screen(app, candidate) else {
+                continue;
+            };
+            capture_set_cursor(app, screen);
+            app.update();
+            if !capture_placement_is_valid(app) {
+                continue;
+            }
+            capture_mouse_button(app, MouseButton::Left, true);
+            app.update();
+            capture_mouse_button(app, MouseButton::Left, false);
+            app.update();
+            for _ in 0..3 {
+                app.update();
+            }
+            if capture_player_structure_count(app) > before {
+                return true;
+            }
+        }
+    }
+    capture_player_structure_count(app) > before
+}
+
+/// Screenshots the lobby / setup menu (no match started) so menu UI can be
+/// visually verified.
+fn render_menu(path: &Path) -> Result<(), String> {
     if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent)
-            .map_err(|error| format!("could not create {}: {error}", parent.display()))?;
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
-    let mut app = build_capture_match_app();
-    advance_capture_match(&mut app, frame);
-    let snapshot = capture_match_snapshot(&mut app);
-    let pixels = render_frame(frame, 90, &snapshot, Some(CaptureTeam::Player(0)));
-    write_png(path, WIDTH, HEIGHT, &pixels)
-}
-
-fn render_frames(directory: &Path, count: usize) -> Result<(), String> {
-    fs::create_dir_all(directory)
-        .map_err(|error| format!("could not create {}: {error}", directory.display()))?;
-    let mut app = build_capture_match_app();
-    for frame in 0..count {
-        if frame > 0 {
-            advance_capture_match(&mut app, 1);
-        }
-        let path = directory.join(format!("frame{frame:05}.png"));
-        let snapshot = capture_match_snapshot(&mut app);
-        let pixels = render_frame(frame, count.max(1), &snapshot, Some(CaptureTeam::Player(0)));
-        write_png(&path, WIDTH, HEIGHT, &pixels)?;
+    let mut app = build_capture_app(WIDTH, HEIGHT);
+    for _ in 0..120 {
+        app.update();
     }
+    let handle = capture_handle(&app);
+    shoot(&mut app, &handle, path.to_path_buf());
+    println!("[capture] wrote menu screenshot to {}", path.display());
     Ok(())
 }
 
-fn render_proof_frames(
-    directory: &Path,
-    count: usize,
-    faction: CaptureProofFaction,
-) -> Result<bevy_open_rts::CaptureMatchProof, String> {
-    fs::create_dir_all(directory)
-        .map_err(|error| format!("could not create {}: {error}", directory.display()))?;
-    let mut app = build_capture_match_app_for_faction(faction);
-    let units_before = capture_proof_unit_count(&mut app, faction);
-    let mut unit_peak = units_before;
-    for frame in 0..count {
-        advance_capture_match_proof_frame(&mut app, faction, frame);
-        unit_peak = unit_peak.max(capture_proof_unit_count(&mut app, faction));
-        let path = directory.join(format!("frame{frame:05}.png"));
-        let snapshot = capture_match_snapshot(&mut app);
-        let pixels = render_frame(
-            frame,
-            count.max(1),
-            &snapshot,
-            Some(capture_team_for_faction(faction)),
+/// Verifies MANUAL harvesting: select a worker, right-click an ore node, and
+/// confirm the worker takes a harvest order and the player's ore grows.
+fn render_harvest(dir: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    let mut app = start_match_app();
+    let handle = capture_handle(&app);
+    shoot(&mut app, &handle, dir.join("00_start.png"));
+
+    // Pick a worker that is actually framed on-screen (the first worker by spawn
+    // order can be below the viewport, so a click there would select nothing).
+    let worker = capture_player_onscreen_unit_position(&mut app)
+        .or_else(|| capture_player_worker_position(&mut app))
+        .ok_or("no player worker")?;
+    let ore =
+        capture_nearest_visible_resource_position(&mut app).ok_or("no visible resource node")?;
+
+    // Select the worker.
+    let worker_screen = capture_world_to_screen(&mut app, worker).ok_or("worker offscreen")?;
+    capture_set_cursor(&mut app, worker_screen);
+    capture_mouse_button(&mut app, MouseButton::Left, true);
+    app.update();
+    capture_mouse_button(&mut app, MouseButton::Left, false);
+    app.update();
+    for _ in 0..3 {
+        app.update();
+    }
+    println!(
+        "[capture] selected {} player unit(s)",
+        capture_selected_player_unit_count(&mut app)
+    );
+
+    // Right-click the ore node to harvest.
+    let ore_screen = capture_world_to_screen(&mut app, ore).ok_or("ore offscreen")?;
+    capture_set_cursor(&mut app, ore_screen);
+    capture_mouse_button(&mut app, MouseButton::Right, true);
+    app.update();
+    capture_mouse_button(&mut app, MouseButton::Right, false);
+    app.update();
+    for _ in 0..3 {
+        app.update();
+    }
+    let harvesting = capture_player_harvesting_count(&mut app);
+    println!("[capture] after right-click ore: {harvesting} player unit(s) harvesting");
+    shoot(&mut app, &handle, dir.join("01_harvest_order.png"));
+
+    // Let it gather and deposit; watch ore grow.
+    for _ in 0..600 {
+        app.update();
+    }
+    shoot(&mut app, &handle, dir.join("02_after_gather.png"));
+    println!(
+        "[capture] wrote manual-harvest verification to {}",
+        dir.display()
+    );
+    Ok(())
+}
+
+/// Captures each of the 3 factions' starting base so their distinct units and
+/// structures can be visually verified (no missing / fallback models).
+fn render_factions(dir: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    for index in 0..3 {
+        let mut app = build_capture_app(WIDTH, HEIGHT);
+        for _ in 0..WARMUP_TICKS {
+            app.update();
+        }
+        let label = capture_set_all_factions(&mut app, index);
+        start_shared_match_scene_with_current_setup(&mut app);
+        for _ in 0..MATCH_SETTLE_TICKS {
+            app.update();
+        }
+        let handle = capture_handle(&app);
+        shoot(&mut app, &handle, dir.join(format!("faction_{index}.png")));
+
+        // Verify the human train + build input path works for THIS faction.
+        capture_grant_player_resources(&mut app, 2000, 1000);
+        let trained = faction_try_train(&mut app);
+        let built = faction_try_build(&mut app);
+        shoot(
+            &mut app,
+            &handle,
+            dir.join(format!("faction_{index}_built.png")),
         );
-        write_png(&path, WIDTH, HEIGHT, &pixels)?;
-    }
-    Ok(capture_match_proof_status(
-        &mut app,
-        faction,
-        count,
-        unit_peak.saturating_sub(units_before),
-    ))
-}
-
-fn capture_team_for_faction(faction: CaptureProofFaction) -> CaptureTeam {
-    let _ = faction;
-    CaptureTeam::Player(0)
-}
-
-fn write_png(path: &Path, width: u32, height: u32, pixels: &[u8]) -> Result<(), String> {
-    let file = File::create(path)
-        .map_err(|error| format!("could not create {}: {error}", path.display()))?;
-    let writer = BufWriter::new(file);
-    let mut encoder = png::Encoder::new(writer, width, height);
-    encoder.set_color(png::ColorType::Rgba);
-    encoder.set_depth(png::BitDepth::Eight);
-    let mut png_writer = encoder
-        .write_header()
-        .map_err(|error| format!("could not write PNG header for {}: {error}", path.display()))?;
-    png_writer
-        .write_image_data(pixels)
-        .map_err(|error| format!("could not write PNG data for {}: {error}", path.display()))
-}
-
-fn render_frame(
-    frame: usize,
-    total_frames: usize,
-    snapshot: &CaptureMatchSnapshot,
-    focus_team: Option<CaptureTeam>,
-) -> Vec<u8> {
-    let mut pixels = vec![0; (WIDTH * HEIGHT * 4) as usize];
-    clear(&mut pixels, Rgba::rgb(20, 31, 35));
-
-    let seconds = frame as f32 / FPS;
-    let view = capture_view(snapshot, focus_team);
-
-    draw_ground(&mut pixels, view);
-    draw_snapshot(&mut pixels, snapshot, seconds, view, focus_team);
-    draw_ui(&mut pixels, frame, total_frames, snapshot);
-    pixels
-}
-
-fn clear(pixels: &mut [u8], color: Rgba) {
-    for chunk in pixels.chunks_exact_mut(4) {
-        chunk[0] = color.r;
-        chunk[1] = color.g;
-        chunk[2] = color.b;
-        chunk[3] = color.a;
-    }
-}
-
-fn draw_ground(pixels: &mut [u8], view: CaptureView) {
-    let horizon = 80;
-    fill_rect(
-        pixels,
-        0,
-        horizon,
-        WIDTH as i32,
-        HEIGHT as i32,
-        Rgba::rgb(104, 122, 112),
-    );
-    fill_rect(pixels, 0, 0, WIDTH as i32, horizon, Rgba::rgb(9, 12, 14));
-
-    let grid_extent = 44;
-    for i in -grid_extent..=grid_extent {
-        let a = world_to_screen(Vec2::new(i as f32, -grid_extent as f32), view);
-        let b = world_to_screen(Vec2::new(i as f32, grid_extent as f32), view);
-        draw_line(pixels, a, b, Rgba::rgba(134, 152, 142, 54), 1.0);
-        let c = world_to_screen(Vec2::new(-grid_extent as f32, i as f32), view);
-        let d = world_to_screen(Vec2::new(grid_extent as f32, i as f32), view);
-        draw_line(pixels, c, d, Rgba::rgba(134, 152, 142, 54), 1.0);
-    }
-}
-
-fn draw_base(pixels: &mut [u8], center: Vec2, color: Rgba, ring: Rgba, view: CaptureView) {
-    let screen = world_to_screen(center, view);
-    fill_iso_diamond(pixels, screen, 70.0, 34.0, Rgba::rgba(28, 35, 35, 180));
-    fill_iso_diamond(pixels, screen, 55.0, 27.0, color);
-    fill_iso_diamond(
-        pixels,
-        Vec2::new(screen.x, screen.y - 18.0),
-        31.0,
-        17.0,
-        Rgba::rgb(231, 236, 237),
-    );
-    fill_rect(
-        pixels,
-        (screen.x - 10.0) as i32,
-        (screen.y - 45.0) as i32,
-        20,
-        34,
-        Rgba::rgb(178, 190, 194),
-    );
-    draw_ring(pixels, screen, 66.0, ring);
-}
-
-fn draw_snapshot(
-    pixels: &mut [u8],
-    snapshot: &CaptureMatchSnapshot,
-    seconds: f32,
-    view: CaptureView,
-    focus_team: Option<CaptureTeam>,
-) {
-    for entity in snapshot
-        .entities
-        .iter()
-        .filter(|entity| entity.kind == CaptureEntityKind::Resource)
-    {
-        let screen = world_to_screen(Vec2::new(entity.x, entity.z), view);
-        let pulse = ((seconds * 3.0 + entity.x * 0.31 + entity.z * 0.17).sin() + 1.0) * 0.5;
-        fill_circle(
-            pixels,
-            screen,
-            8.0 + pulse * 3.0,
-            Rgba::rgba(83, 196, 221, 210),
-        );
-        fill_circle(pixels, screen, 4.0, Rgba::rgb(210, 241, 244));
-    }
-
-    for entity in snapshot
-        .entities
-        .iter()
-        .filter(|entity| entity.kind == CaptureEntityKind::Structure)
-    {
-        let (body, ring) = team_colors(entity.team, entity.visible);
-        draw_base(pixels, Vec2::new(entity.x, entity.z), body, ring, view);
-    }
-
-    for entity in snapshot
-        .entities
-        .iter()
-        .filter(|entity| entity.kind == CaptureEntityKind::Unit)
-    {
-        let (body, ring) = team_colors(entity.team, entity.visible);
-        draw_unit(pixels, Vec2::new(entity.x, entity.z), body, ring, view);
-    }
-
-    if let Some(target) = snapshot.entities.iter().find(|entity| {
-        focus_team.is_some_and(|focus_team| is_enemy_capture_team(focus_team, entity.team))
-            && entity.kind == CaptureEntityKind::Structure
-    }) {
-        let impact = world_to_screen(Vec2::new(target.x, target.z), view);
-        let pulse = ((seconds * 2.0) % 1.0) * 26.0;
-        draw_ring(pixels, impact, 22.0 + pulse, Rgba::rgba(255, 88, 64, 150));
-    }
-}
-
-fn team_colors(team: CaptureTeam, visible: bool) -> (Rgba, Rgba) {
-    let alpha = if visible { 230 } else { 95 };
-    match team {
-        CaptureTeam::Player(index) => indexed_team_colors(index, alpha),
-        CaptureTeam::Neutral => (
-            Rgba::rgba(216, 202, 137, alpha),
-            Rgba::rgba(222, 210, 132, alpha),
-        ),
-    }
-}
-
-fn indexed_team_colors(index: usize, alpha: u8) -> (Rgba, Rgba) {
-    const COLORS: [(u8, u8, u8); 8] = [
-        (85, 155, 245),
-        (242, 63, 58),
-        (174, 93, 245),
-        (72, 184, 205),
-        (235, 158, 46),
-        (214, 74, 159),
-        (150, 199, 57),
-        (70, 109, 224),
-    ];
-    let (r, g, b) = COLORS[index % COLORS.len()];
-    (
-        Rgba::rgba(
-            ((r as u16 + 216) / 2) as u8,
-            ((g as u16 + 226) / 2) as u8,
-            ((b as u16 + 229) / 2) as u8,
-            alpha,
-        ),
-        Rgba::rgba(r, g, b, alpha),
-    )
-}
-
-fn draw_unit(pixels: &mut [u8], world: Vec2, body: Rgba, ring: Rgba, view: CaptureView) {
-    let screen = world_to_screen(world, view);
-    draw_ring(pixels, screen, 19.0, ring);
-    fill_iso_diamond(
-        pixels,
-        Vec2::new(screen.x + 5.0, screen.y + 10.0),
-        23.0,
-        9.0,
-        Rgba::rgba(20, 28, 28, 120),
-    );
-    fill_rect(
-        pixels,
-        (screen.x - 9.0) as i32,
-        (screen.y - 9.0) as i32,
-        18,
-        18,
-        body,
-    );
-    fill_rect(
-        pixels,
-        (screen.x + 5.0) as i32,
-        (screen.y - 3.0) as i32,
-        18,
-        5,
-        Rgba::rgb(42, 48, 49),
-    );
-}
-
-fn draw_ui(pixels: &mut [u8], frame: usize, total_frames: usize, snapshot: &CaptureMatchSnapshot) {
-    fill_rect(pixels, 0, 0, WIDTH as i32, 43, Rgba::rgba(14, 20, 23, 218));
-    draw_match_status(pixels, snapshot);
-    fill_rect(
-        pixels,
-        0,
-        HEIGHT as i32 - 86,
-        WIDTH as i32,
-        86,
-        Rgba::rgba(17, 27, 30, 220),
-    );
-    for index in 0..16 {
-        fill_rect(
-            pixels,
-            16 + index * 76,
-            HEIGHT as i32 - 70,
-            68,
-            46,
-            Rgba::rgba(58, 73, 74, 235),
+        println!(
+            "[capture] faction {index} ({label}): base ok, human train={trained}, build={built}"
         );
     }
-    fill_rect(
-        pixels,
-        WIDTH as i32 - 210,
-        HEIGHT as i32 - 210,
-        178,
-        178,
-        Rgba::rgba(9, 20, 21, 230),
-    );
-    let marker_x =
-        WIDTH as i32 - 185 + ((frame as f32 / total_frames.max(1) as f32) * 112.0) as i32;
-    fill_rect(
-        pixels,
-        marker_x,
-        HEIGHT as i32 - 112,
-        12,
-        12,
-        Rgba::rgb(101, 168, 245),
-    );
+    println!("[capture] wrote faction bases to {}", dir.display());
+    Ok(())
 }
 
-fn draw_match_status(pixels: &mut [u8], snapshot: &CaptureMatchSnapshot) {
-    let phase_color = match snapshot.phase {
-        CaptureMatchPhase::Running => Rgba::rgb(95, 196, 142),
-        CaptureMatchPhase::HumanVictory => Rgba::rgb(104, 178, 255),
-        CaptureMatchPhase::HumanDefeat => Rgba::rgb(230, 82, 74),
-        CaptureMatchPhase::MatchFinished => Rgba::rgb(214, 192, 112),
+/// Drives the human core loop through the REAL mouse-input systems and captures
+/// each step, so selection/move can be verified visually (selection ring) and
+/// programmatically (Selected count).
+fn render_play(dir: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    let mut app = start_match_app();
+    let handle = capture_handle(&app);
+
+    let (unit_pos, enemy_pos) = capture_select_move_demo_points(&mut app)
+        .ok_or("no armed player unit / enemy base found")?;
+    shoot(&mut app, &handle, dir.join("00_start.png"));
+
+    // SELECT: left-click on the unit's screen position via real input.
+    let Some(unit_screen) = capture_world_to_screen(&mut app, unit_pos) else {
+        return Err("unit not on screen".into());
     };
-    fill_rect(pixels, 12, 11, 8, 21, phase_color);
+    capture_set_cursor(&mut app, unit_screen);
+    capture_mouse_button(&mut app, MouseButton::Left, true);
+    app.update();
+    capture_mouse_button(&mut app, MouseButton::Left, false);
+    app.update();
+    for _ in 0..3 {
+        app.update();
+    }
+    let selected = capture_selected_player_unit_count(&mut app);
+    println!("[capture] after left-click select: {selected} player unit(s) selected");
+    shoot(&mut app, &handle, dir.join("01_selected.png"));
 
-    let time_fill = ((snapshot.elapsed_seconds / 180.0).clamp(0.0, 1.0) * 170.0) as i32;
-    fill_rect(pixels, 28, 11, 174, 7, Rgba::rgba(62, 78, 82, 230));
-    fill_rect(pixels, 30, 13, time_fill, 3, Rgba::rgb(126, 201, 232));
+    // MOVE: right-click a ground point partway toward the enemy.
+    let move_target = unit_pos.lerp(enemy_pos, 0.4);
+    if let Some(move_screen) = capture_world_to_screen(&mut app, move_target) {
+        capture_set_cursor(&mut app, move_screen);
+        capture_mouse_button(&mut app, MouseButton::Right, true);
+        app.update();
+        capture_mouse_button(&mut app, MouseButton::Right, false);
+        app.update();
+    }
+    for _ in 0..90 {
+        app.update();
+    }
+    shoot(&mut app, &handle, dir.join("02_moved.png"));
 
-    let anchors_fill = (snapshot.remaining_anchors.min(8) as i32 * 17).max(2);
-    fill_rect(pixels, 28, 25, 140, 6, Rgba::rgba(62, 78, 82, 230));
-    fill_rect(pixels, 30, 27, anchors_fill, 2, Rgba::rgb(221, 210, 138));
+    // TRAIN: select a production structure, then press the train hotkey via real
+    // keyboard input and confirm the command reaches the build queue.
+    if let Some(producer_pos) = capture_player_producer_position(&mut app)
+        && let Some(producer_screen) = capture_world_to_screen(&mut app, producer_pos)
+    {
+        capture_set_cursor(&mut app, producer_screen);
+        capture_mouse_button(&mut app, MouseButton::Left, true);
+        app.update();
+        capture_mouse_button(&mut app, MouseButton::Left, false);
+        app.update();
+        for _ in 0..5 {
+            app.update();
+        }
+        let queue_before = capture_player_build_queue_len(&mut app);
+        match capture_first_enabled_train_hotkey(&mut app) {
+            Some(key) => {
+                capture_key(&mut app, key, true);
+                app.update();
+                capture_key(&mut app, key, false);
+                app.update();
+                for _ in 0..3 {
+                    app.update();
+                }
+                let queue_after = capture_player_build_queue_len(&mut app);
+                println!(
+                    "[capture] train hotkey {key:?}: player build queue {queue_before} -> {queue_after}"
+                );
+            }
+            None => println!("[capture] no enabled train hotkey on the command panel"),
+        }
+    }
+    shoot(&mut app, &handle, dir.join("03_trained.png"));
 
-    let team_capacity = snapshot.players.len().max(1) as u32;
-    let teams_fill =
-        (snapshot.remaining_teams.min(team_capacity) as i32 * 86 / team_capacity as i32).max(2);
-    fill_rect(pixels, 176, 25, 86, 6, Rgba::rgba(62, 78, 82, 230));
-    fill_rect(pixels, 178, 27, teams_fill, 2, Rgba::rgb(156, 227, 181));
-
-    for (index, stats) in snapshot.players.iter().take(6).enumerate() {
-        let (_, ring) = indexed_team_colors(index, 230);
-        draw_team_status_row(
-            pixels,
-            292 + index as i32 * 108,
-            stats.units,
-            stats.structures,
-            stats.ore + stats.crystal,
-            ring,
+    // BUILD: top up resources so a structure is affordable, then select a
+    // worker, enter placement via the build hotkey, and left-click a ground spot.
+    capture_grant_player_resources(&mut app, 1000, 500);
+    if let Some(worker_pos) = capture_player_worker_position(&mut app)
+        && let Some(worker_screen) = capture_world_to_screen(&mut app, worker_pos)
+    {
+        capture_set_cursor(&mut app, worker_screen);
+        capture_mouse_button(&mut app, MouseButton::Left, true);
+        app.update();
+        capture_mouse_button(&mut app, MouseButton::Left, false);
+        app.update();
+        for _ in 0..5 {
+            app.update();
+        }
+        let sel = capture_selected_player_unit_count(&mut app);
+        let (opts_enabled, opts_total) = capture_build_options_count(&mut app);
+        println!(
+            "[capture] build menu: {sel} unit(s) selected, build options {opts_enabled} enabled / {opts_total} total"
         );
+        let structures_before = capture_player_structure_count(&mut app);
+        match capture_first_enabled_build_hotkey(&mut app) {
+            Some(key) => {
+                capture_key(&mut app, key, true);
+                app.update();
+                capture_key(&mut app, key, false);
+                app.update();
+                let placement = capture_player_in_placement_mode(&mut app);
+                println!("[capture] build hotkey {key:?}: placement mode = {placement}");
+                // The base is crowded; scan a grid for a VALID spot (checking the
+                // game's own placement feedback) before committing the click.
+                let mut placed_at = None;
+                'search: for radius in [3.0_f32, 4.0, 5.0, 6.0, 7.0, 8.0] {
+                    for step in 0..12 {
+                        if !capture_player_in_placement_mode(&mut app) {
+                            break 'search;
+                        }
+                        let angle = step as f32 * std::f32::consts::TAU / 12.0;
+                        let candidate =
+                            worker_pos + Vec3::new(angle.cos() * radius, 0.0, angle.sin() * radius);
+                        let Some(screen) = capture_world_to_screen(&mut app, candidate) else {
+                            continue;
+                        };
+                        capture_set_cursor(&mut app, screen);
+                        app.update();
+                        if !capture_placement_is_valid(&mut app) {
+                            continue;
+                        }
+                        capture_mouse_button(&mut app, MouseButton::Left, true);
+                        app.update();
+                        capture_mouse_button(&mut app, MouseButton::Left, false);
+                        app.update();
+                        for _ in 0..3 {
+                            app.update();
+                        }
+                        if capture_player_structure_count(&mut app) > structures_before {
+                            placed_at = Some(candidate);
+                            break 'search;
+                        }
+                    }
+                }
+                if let Some(at) = placed_at {
+                    println!("[capture] placed structure at ({:.1},{:.1})", at.x, at.z);
+                }
+                let structures_after = capture_player_structure_count(&mut app);
+                println!(
+                    "[capture] build: player structures {structures_before} -> {structures_after}"
+                );
+            }
+            None => println!("[capture] no enabled build hotkey on the command panel"),
+        }
     }
+    shoot(&mut app, &handle, dir.join("04_built.png"));
 
-    let destroyed_width =
-        ((snapshot.enemy_units_destroyed + snapshot.enemy_structures_destroyed).min(24) as i32 * 5)
-            .max(2);
-    fill_rect(pixels, 948, 18, 124, 8, Rgba::rgba(62, 78, 82, 230));
-    fill_rect(pixels, 950, 20, destroyed_width, 4, Rgba::rgb(244, 147, 90));
-}
-
-fn draw_team_status_row(
-    pixels: &mut [u8],
-    x: i32,
-    units: u32,
-    structures: u32,
-    resources: i32,
-    color: Rgba,
-) {
-    fill_rect(pixels, x, 11, 98, 22, Rgba::rgba(34, 47, 50, 210));
-    fill_rect(pixels, x + 7, 16, 8, 8, color);
-    let unit_width = (units.min(24) as i32 * 4).max(2);
-    let structure_width = (structures.min(12) as i32 * 7).max(2);
-    let resource_width = ((resources.max(0).min(360) as f32 / 360.0) * 22.0) as i32;
-    fill_rect(pixels, x + 22, 15, 62, 4, Rgba::rgba(74, 89, 92, 230));
-    fill_rect(pixels, x + 22, 15, unit_width.min(62), 4, color);
-    fill_rect(pixels, x + 22, 24, 62, 4, Rgba::rgba(74, 89, 92, 230));
-    fill_rect(
-        pixels,
-        x + 22,
-        24,
-        structure_width.min(62),
-        4,
-        Rgba::rgb(217, 222, 214),
+    println!(
+        "[capture] wrote select/move/train/build playthrough to {}",
+        dir.display()
     );
-    fill_rect(pixels, x + 66, 18, 22, 7, Rgba::rgba(74, 89, 92, 230));
-    fill_rect(
-        pixels,
-        x + 66,
-        18,
-        resource_width,
-        7,
-        Rgba::rgb(94, 219, 204),
-    );
+    Ok(())
 }
 
-fn capture_view(snapshot: &CaptureMatchSnapshot, focus_team: Option<CaptureTeam>) -> CaptureView {
-    let Some(focus_team) = focus_team else {
-        return CaptureView {
-            center: Vec2::new(0.0, 0.0),
-            scale: 28.0,
-        };
-    };
-    let focus_points = snapshot
-        .entities
-        .iter()
-        .filter(|entity| {
-            entity.team == focus_team
-                && matches!(
-                    entity.kind,
-                    CaptureEntityKind::Unit | CaptureEntityKind::Structure
-                )
-        })
-        .map(entity_position)
-        .collect::<Vec<_>>();
-    let mut center = average_point(&focus_points).unwrap_or(Vec2::new(0.0, 0.0));
-    if let Some(enemy) = nearest_enemy_point(snapshot, focus_team, center) {
-        center = center.lerp(enemy, 0.28);
+fn render_still(path: &Path) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
-    let mut frame_points = focus_points
-        .iter()
-        .copied()
-        .filter(|point| world_distance(*point, center) <= 20.0)
-        .collect::<Vec<_>>();
-    if let Some(enemy) = nearest_enemy_point(snapshot, focus_team, center) {
-        frame_points.push(enemy);
+    let mut app = start_match_app();
+    let handle = capture_handle(&app);
+    app.world_mut()
+        .spawn(Screenshot::image(handle))
+        .observe(save_to_disk(path.to_path_buf()));
+    for _ in 0..FLUSH_TICKS {
+        app.update();
     }
-    if frame_points.is_empty() {
-        frame_points.push(center);
+    println!("[capture] wrote {}", path.display());
+    Ok(())
+}
+
+fn render_frames(dir: &Path, count: usize) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    let mut app = start_match_app();
+    // Give the camera real action to film: send the player army at the enemy
+    // base instead of waiting out the AI's opening grace.
+    capture_player_attack_move_all(&mut app);
+    let handle = capture_handle(&app);
+    for i in 0..count {
+        app.update();
+        let path = dir.join(format!("frame{i:05}.png"));
+        app.world_mut()
+            .spawn(Screenshot::image(handle.clone()))
+            .observe(save_to_disk(path));
     }
-    let radius = frame_points
-        .iter()
-        .map(|point| world_distance(*point, center))
-        .fold(6.0_f32, f32::max);
-    let scale = (220.0 / radius).clamp(24.0, 42.0);
-    CaptureView { center, scale }
-}
-
-fn entity_position(entity: &bevy_open_rts::CaptureEntitySnapshot) -> Vec2 {
-    Vec2::new(entity.x, entity.z)
-}
-
-fn average_point(points: &[Vec2]) -> Option<Vec2> {
-    if points.is_empty() {
-        return None;
+    for _ in 0..FLUSH_TICKS {
+        app.update();
     }
-    let mut sum = Vec2::new(0.0, 0.0);
-    for point in points {
-        sum.x += point.x;
-        sum.y += point.y;
-    }
-    Some(Vec2::new(
-        sum.x / points.len() as f32,
-        sum.y / points.len() as f32,
-    ))
-}
-
-fn nearest_enemy_point(
-    snapshot: &CaptureMatchSnapshot,
-    focus_team: CaptureTeam,
-    from: Vec2,
-) -> Option<Vec2> {
-    snapshot
-        .entities
-        .iter()
-        .filter(|entity| {
-            is_enemy_capture_team(focus_team, entity.team)
-                && matches!(
-                    entity.kind,
-                    CaptureEntityKind::Structure | CaptureEntityKind::Unit
-                )
-        })
-        .map(entity_position)
-        .min_by(|lhs, rhs| {
-            world_distance(*lhs, from)
-                .partial_cmp(&world_distance(*rhs, from))
-                .unwrap_or(std::cmp::Ordering::Equal)
-        })
-}
-
-fn is_enemy_capture_team(focus_team: CaptureTeam, team: CaptureTeam) -> bool {
-    !matches!(team, CaptureTeam::Neutral) && team != focus_team
-}
-
-fn world_distance(a: Vec2, b: Vec2) -> f32 {
-    let dx = a.x - b.x;
-    let dy = a.y - b.y;
-    (dx * dx + dy * dy).sqrt()
-}
-
-fn world_to_screen(world: Vec2, view: CaptureView) -> Vec2 {
-    let local_x = world.x - view.center.x;
-    let local_y = world.y - view.center.y;
-    Vec2::new(
-        WIDTH as f32 * 0.5 + (local_x - local_y) * view.scale,
-        330.0 + (local_x + local_y) * view.scale * 0.54,
-    )
-}
-
-fn fill_rect(pixels: &mut [u8], x: i32, y: i32, width: i32, height: i32, color: Rgba) {
-    for yy in y.max(0)..(y + height).min(HEIGHT as i32) {
-        for xx in x.max(0)..(x + width).min(WIDTH as i32) {
-            blend_pixel(pixels, xx, yy, color);
-        }
-    }
-}
-
-fn fill_circle(pixels: &mut [u8], center: Vec2, radius: f32, color: Rgba) {
-    let min_x = (center.x - radius).floor() as i32;
-    let max_x = (center.x + radius).ceil() as i32;
-    let min_y = (center.y - radius).floor() as i32;
-    let max_y = (center.y + radius).ceil() as i32;
-    let radius_squared = radius * radius;
-    for y in min_y..=max_y {
-        for x in min_x..=max_x {
-            let dx = x as f32 - center.x;
-            let dy = y as f32 - center.y;
-            if dx * dx + dy * dy <= radius_squared {
-                blend_pixel(pixels, x, y, color);
-            }
-        }
-    }
-}
-
-fn fill_iso_diamond(
-    pixels: &mut [u8],
-    center: Vec2,
-    half_width: f32,
-    half_height: f32,
-    color: Rgba,
-) {
-    let min_x = (center.x - half_width).floor() as i32;
-    let max_x = (center.x + half_width).ceil() as i32;
-    let min_y = (center.y - half_height).floor() as i32;
-    let max_y = (center.y + half_height).ceil() as i32;
-    for y in min_y..=max_y {
-        for x in min_x..=max_x {
-            let dx = (x as f32 - center.x).abs() / half_width;
-            let dy = (y as f32 - center.y).abs() / half_height;
-            if dx + dy <= 1.0 {
-                blend_pixel(pixels, x, y, color);
-            }
-        }
-    }
-}
-
-fn draw_ring(pixels: &mut [u8], center: Vec2, radius: f32, color: Rgba) {
-    let min_x = (center.x - radius - 2.0).floor() as i32;
-    let max_x = (center.x + radius + 2.0).ceil() as i32;
-    let min_y = (center.y - radius - 2.0).floor() as i32;
-    let max_y = (center.y + radius + 2.0).ceil() as i32;
-    for y in min_y..=max_y {
-        for x in min_x..=max_x {
-            let dx = x as f32 - center.x;
-            let dy = y as f32 - center.y;
-            let distance = (dx * dx + dy * dy).sqrt();
-            if (distance - radius).abs() <= 1.4 {
-                blend_pixel(pixels, x, y, color);
-            }
-        }
-    }
-}
-
-fn draw_line(pixels: &mut [u8], start: Vec2, end: Vec2, color: Rgba, thickness: f32) {
-    let dx = end.x - start.x;
-    let dy = end.y - start.y;
-    let steps = dx.abs().max(dy.abs()).ceil().max(1.0) as i32;
-    for step in 0..=steps {
-        let t = step as f32 / steps as f32;
-        let point = start.lerp(end, t);
-        fill_circle(pixels, point, thickness, color);
-    }
-}
-
-fn blend_pixel(pixels: &mut [u8], x: i32, y: i32, color: Rgba) {
-    if x < 0 || y < 0 || x >= WIDTH as i32 || y >= HEIGHT as i32 {
-        return;
-    }
-    let index = ((y as u32 * WIDTH + x as u32) * 4) as usize;
-    let alpha = color.a as f32 / 255.0;
-    let inv_alpha = 1.0 - alpha;
-    pixels[index] = (color.r as f32 * alpha + pixels[index] as f32 * inv_alpha) as u8;
-    pixels[index + 1] = (color.g as f32 * alpha + pixels[index + 1] as f32 * inv_alpha) as u8;
-    pixels[index + 2] = (color.b as f32 * alpha + pixels[index + 2] as f32 * inv_alpha) as u8;
-    pixels[index + 3] = 255;
+    println!("[capture] wrote {count} frames to {}", dir.display());
+    Ok(())
 }
