@@ -122,6 +122,8 @@ const AI_SUPPORT_SHIELD_OVERDRIVE_MIN_SCORE: f32 = 2.0;
 const AI_SUPPORT_SHIELD_OVERDRIVE_MOBILE_PRESSURE_BONUS: f32 = 12.0;
 const AI_SUPPORT_SHIELD_PRESSURE_EXTRA_RADIUS: f32 = 4.0;
 const AI_SUPPORT_SHIELD_PRESSURE_DISTANCE_WEIGHT: f32 = 0.3;
+const AI_DRONE_SCOUT_SWITCH_MIN_SECONDS: f32 = 0.5;
+const AI_DRONE_SCOUT_SWITCH_MAX_SECONDS: f32 = 1.0;
 const STRUCTURE_CONSTRUCTION_PROGRESS_PER_SECOND: f32 = 0.3;
 const CONSTRUCTION_ENTRY_MARGIN_M: f32 = UNIT_ADHERENCE_MARGIN_M;
 const BASE_CONSTRUCTION_RADIUS_M: f32 = 9.0;
@@ -4812,6 +4814,12 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
     )
     .add_systems(
         Update,
+        update_ai_drone_scouting
+            .in_set(SimulationPhase::UiAndManagement)
+            .run_if(match_in_progress),
+    )
+    .add_systems(
+        Update,
         battle_log_entry_buttons
             .in_set(SimulationPhase::UiAndManagement)
             .run_if(match_in_progress),
@@ -5855,6 +5863,12 @@ struct PatrolOrder {
     origin: Vec3,
     destination: Vec3,
     moving_to_destination: bool,
+}
+
+#[derive(Component, Clone, Copy, Debug)]
+struct AiDroneScout {
+    last_target: Option<Entity>,
+    cooldown_remaining: f32,
 }
 
 type ActiveUnitOrderFilter = Or<(
@@ -20345,6 +20359,118 @@ fn auto_assign_ai_supply_crate_collectors(
     }
 }
 
+fn update_ai_drone_scouting(
+    mut commands: Commands,
+    time: Res<Time>,
+    visible_player: Option<Res<VisiblePlayer>>,
+    active_teams: Option<Res<ActiveTeams>>,
+    relations: Res<TeamRelations>,
+    mut drones: Query<
+        (
+            Entity,
+            &Team,
+            &Unit,
+            &Health,
+            Option<&OrderQueue>,
+            Option<&mut AiDroneScout>,
+        ),
+        (With<Unit>, IdleUnitOrderFilter, Without<Selected>),
+    >,
+    targets: Query<(Entity, &Team, &Transform, &Health, &Unit), With<Unit>>,
+) {
+    let controlled_team = controlled_player_team(visible_player.as_deref());
+    let delta = time.delta_secs();
+    for (drone_entity, drone_team, drone_unit, drone_health, order_queue, scout_state) in
+        &mut drones
+    {
+        if drone_unit.id != "Drone"
+            || drone_health.current <= 0.0
+            || controlled_team == Some(*drone_team)
+            || !team_is_active(*drone_team, active_teams.as_deref())
+            || order_queue.is_some_and(|queue| !queue.orders.is_empty())
+        {
+            continue;
+        }
+
+        let last_target = scout_state.as_ref().and_then(|state| state.last_target);
+        let Some((target, target_position)) = choose_ai_drone_scout_target(
+            *drone_team,
+            drone_entity,
+            last_target,
+            &relations,
+            &targets,
+        ) else {
+            continue;
+        };
+
+        if let Some(mut state) = scout_state {
+            state.cooldown_remaining -= delta;
+            if state.cooldown_remaining > 0.0 {
+                continue;
+            }
+            state.last_target = Some(target);
+            state.cooldown_remaining = ai_drone_scout_delay(drone_entity, target);
+        } else {
+            commands.entity(drone_entity).try_insert(AiDroneScout {
+                last_target: Some(target),
+                cooldown_remaining: ai_drone_scout_delay(drone_entity, target),
+            });
+        }
+
+        issue_unit_order(
+            &mut commands,
+            drone_entity,
+            UnitQueuedOrder::Move(target_position),
+        );
+    }
+}
+
+fn choose_ai_drone_scout_target(
+    drone_team: Team,
+    drone_entity: Entity,
+    last_target: Option<Entity>,
+    relations: &TeamRelations,
+    targets: &Query<(Entity, &Team, &Transform, &Health, &Unit), With<Unit>>,
+) -> Option<(Entity, Vec3)> {
+    let mut best_new_target = None;
+    let mut best_new_score = u64::MAX;
+    let mut best_any_target = None;
+    let mut best_any_score = u64::MAX;
+    for (target_entity, target_team, target_transform, target_health, target_unit) in targets {
+        if target_health.current <= 0.0
+            || target_unit.speed <= 0.0
+            || !relations.are_enemies(drone_team, *target_team)
+        {
+            continue;
+        }
+        let score = entity_pair_hash(drone_entity, target_entity);
+        if score < best_any_score {
+            best_any_score = score;
+            best_any_target = Some((target_entity, target_transform.translation));
+        }
+        if Some(target_entity) != last_target && score < best_new_score {
+            best_new_score = score;
+            best_new_target = Some((target_entity, target_transform.translation));
+        }
+    }
+    best_new_target.or(best_any_target)
+}
+
+fn ai_drone_scout_delay(drone: Entity, target: Entity) -> f32 {
+    let range = AI_DRONE_SCOUT_SWITCH_MAX_SECONDS - AI_DRONE_SCOUT_SWITCH_MIN_SECONDS;
+    let fraction = (entity_pair_hash(drone, target) % 1_000) as f32 / 1_000.0;
+    AI_DRONE_SCOUT_SWITCH_MIN_SECONDS + range * fraction
+}
+
+fn entity_pair_hash(a: Entity, b: Entity) -> u64 {
+    let mut x = a.to_bits().wrapping_mul(0x9E37_79B1_85EB_CA87)
+        ^ b.to_bits().wrapping_mul(0xC2B2_AE3D_27D4_EB4F);
+    x ^= x >> 33;
+    x = x.wrapping_mul(0xFF51_AFD7_ED55_8CCD);
+    x ^= x >> 33;
+    x
+}
+
 fn ai_supply_crate_distance_to_team_units(
     team: Team,
     crate_position: Vec3,
@@ -27086,6 +27212,53 @@ mod current_tests {
                 Team::Player(4),
                 Team::Player(5),
             ]
+        );
+    }
+
+    #[test]
+    fn ai_drone_scouting_moves_idle_ai_drones() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            std::time::Duration::from_secs_f32(1.0 / 30.0),
+        ));
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::InMatch);
+        for _ in 0..20 {
+            app.update();
+        }
+
+        let (drone, before) = {
+            let world = app.world_mut();
+            let mut q = world.query::<(Entity, &Team, &Unit, &Transform, &Health)>();
+            q.iter(world)
+                .find(|(_, team, unit, _, health)| {
+                    **team == Team::Player(1) && unit.id == "Drone" && health.current > 0.0
+                })
+                .map(|(entity, _, _, transform, _)| (entity, transform.translation))
+        }
+        .expect("default skirmish AI should start with a Drone");
+
+        for _ in 0..180 {
+            app.update();
+        }
+
+        let world = app.world();
+        let after = world
+            .get::<Transform>(drone)
+            .expect("AI Drone should still exist")
+            .translation;
+        let distance = xz_distance(before, after);
+        eprintln!("[diag] AI Drone scout moved {distance:.2}m");
+        assert!(
+            distance > 0.5,
+            "AI Drone did not leave its spawn point for scouting"
+        );
+        assert!(
+            world
+                .get::<AiDroneScout>(drone)
+                .is_some_and(|scout| scout.last_target.is_some()),
+            "AI Drone should remember the current scout target"
         );
     }
 

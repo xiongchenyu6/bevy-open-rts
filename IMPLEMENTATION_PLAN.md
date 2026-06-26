@@ -37,6 +37,11 @@ saboteur/crates/garrison/support/difficulty).
   existence.
 - **Selection portrait** (was text-only): `update_selection_portrait` shows the
   primary selected entity's icon as a 64px portrait (`SelectionPortrait`).
+- **AI drone scouting**: ported godot's `IntelligenceController` behavior for
+  idle AI `Drone` units. AI drones now choose living enemy units, move to their
+  positions, avoid immediately repeating the previous target when possible, and
+  wait 0.5-1.0s before retargeting. Test
+  `ai_drone_scouting_moves_idle_ai_drones`.
 
 ## Localization / i18n — DONE (Chinese / English)
 `Language`/`Locale` resource + a process-global flag (`CURRENT_LANGUAGE`) synced by
@@ -51,8 +56,6 @@ feedback, radar/power notices. Verified end-to-end in capture: full menu AND
 in-match HUD render correctly in both languages. Default is Chinese.
 
 ## Other remaining gaps (none block core playability)
-- AI drone scouting behavior — AI has inherent clairvoyance; godot's active
-  IntelligenceController drone-roam is not a distinct behavior.
 - Tesla fence inter-segment linking — both godot and bevy are per-segment (≈parity).
 
 ## Fog "explored terrain" shroud — DONE
@@ -91,7 +94,7 @@ panel. Capture apps disable `LogPlugin` so multi-app capture runs no longer emit
 duplicate global-logger errors.
 
 ## Verification notes
-- 20/20 `cargo test current_tests` pass; `cargo build --bins` clean.
+- 21/21 `cargo test current_tests` pass; `cargo build --bins` clean.
 - Command icons + portrait + lobby dropdowns are confirmed in capture output
   (no longer need `cargo run` eyeballing for UI in this headless environment).
 - `capture play`, `capture harvest`, `capture match`, and `capture factions`

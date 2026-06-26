@@ -12,7 +12,7 @@
 - `start_shared_match_scene_with_current_setup()` advances any app with the shared scene plugin into `AppScreen::InMatch`.
 - `start_shared_match_scene_with_settings()` is the internal helper for capture/test apps that need to inject a specific `MatchSetupSettings` before entering the same live scene.
 - The main menu uses `start_shared_match_from_menu_selection()` so `cargo run` and capture/test proofs enter through the same setup contract.
-- Match start camera focus is derived from the selected player's actual base anchor: first the `MobileConstructionVehicle` spawn when present, then the `CommandCenter`. It no longer blends toward nearby resources, so `cargo run` opens over the player's base instead of a zoomed-out map work area.
+- Match start camera focus is derived from the selected player's actual base anchor: first a `Worker` spawn when present, then the `CommandCenter`. It no longer blends toward nearby resources, so `cargo run` opens over the player's base instead of a zoomed-out map work area.
 - Resource nodes are left-click selectable for target confirmation, and selected harvesters use a wider resource-specific right-click snap so clicking the visible ore/crystal model edge still issues `HarvestOrder`.
 - World overlays keep selected rings, resource/supply rings, active command markers, and the current placement footprint. Unselected structures and construction-range anchors no longer draw permanent rings.
 - Runtime player state is data-driven from `ActiveTeams` / `MatchSetupSettings`: economies, team relations, AI timers, support cooldowns, HUD counts, and match-end checks grow by player index instead of assuming three hard-coded teams.
@@ -20,6 +20,7 @@
 - Lobby team buttons remain an 8-row setup UI concern, but runtime team IDs are stored and derived as unbounded `usize` values. The battle core no longer clamps alliances to three teams or to the current lobby button count.
 - Runtime spawning is not capped to the map's authored spawn-point count. Players beyond the map rows receive clamped virtual fallback base positions instead of being skipped.
 - AI/runtime fallback helpers are not capped to the lobby slot count: active AI iteration, opponent helpers, late-slot resources, cooldowns, fallback home positions, virtual spawn positions, runtime team relation IDs, and battle AI participation are verified beyond eight players.
+- AI drones have an active scouting controller: idle AI `Drone` units pick living enemy units, move to their positions, avoid repeating the previous target when possible, and retarget after a short 0.5-1.0s delay.
 
 ## Capture And Proofs
 
