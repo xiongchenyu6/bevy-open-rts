@@ -12,8 +12,8 @@
 - `start_shared_match_scene_with_current_setup()` advances any app with the shared scene plugin into `AppScreen::InMatch`.
 - `start_shared_match_scene_with_settings()` is the internal helper for capture/test apps that need to inject a specific `MatchSetupSettings` before entering the same live scene.
 - The main menu uses `start_shared_match_from_menu_selection()` so `cargo run` and capture/test proofs enter through the same setup contract.
-- Match start camera focus is derived from the selected player's actual base anchor: first a `Worker` spawn when present, then the `CommandCenter`. It no longer blends toward nearby resources, so `cargo run` opens over the player's base instead of a zoomed-out map work area.
-- Resource nodes are left-click selectable for target confirmation, and selected harvesters use a wider resource-specific right-click snap so clicking the visible ore/crystal model edge still issues `HarvestOrder`.
+- Match start camera focus is derived from the selected player's actual base anchor: first the `CommandCenter`, then a fallback `Worker` spawn. It no longer blends toward nearby resources, so `cargo run` opens over the player's base instead of a zoomed-out map work area.
+- Resource nodes are left-click selectable for target confirmation, and selected Workers use a wider resource-specific right-click snap so clicking the visible ore/crystal model edge still issues `HarvestOrder`.
 - World overlays keep selected rings, resource/supply rings, active command markers, and the current placement footprint. Unselected structures and construction-range anchors no longer draw permanent rings.
 - Runtime player state is data-driven from `ActiveTeams` / `MatchSetupSettings`: economies, team relations, AI timers, support cooldowns, HUD counts, and match-end checks grow by player index instead of assuming three hard-coded teams.
 - `Team` is runtime identity only (`Player(index)` / `Neutral`). Playable faction identity comes from `PlayerFactions`, so 人族/魔族/混沌族 rules follow the configured player slot instead of being tied to Player0/1/2.
@@ -22,6 +22,7 @@
 - AI/runtime fallback helpers are not capped to the lobby slot count: active AI iteration, opponent helpers, late-slot resources, cooldowns, fallback home positions, virtual spawn positions, runtime team relation IDs, and battle AI participation are verified beyond eight players.
 - AI drones have an active scouting controller: idle AI `Drone` units pick living enemy units, move to their positions, avoid repeating the previous target when possible, and retarget after a short 0.5-1.0s delay.
 - AI defense profiles follow the godot difficulty targets: Beginner/Easy do not inherit Normal advanced-defense construction, Normal targets one standard defense layer plus 2 Tesla fence segments where the faction supports them, and Hard scales standard defenses to 2 plus 4 Tesla fence segments.
+- The minimal `GodotSkirmish` opening remains one `CommandCenter` plus two `Worker` economy units, but each faction gets a distinct starter combat/scout unit (`ScoutRover`, `RocketInfantry`, `ShieldTrooper`) so the default `cargo run` start is not visually identical across races.
 
 ## Capture And Proofs
 

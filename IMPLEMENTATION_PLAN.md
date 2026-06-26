@@ -25,7 +25,8 @@ saboteur/crates/garrison/support/difficulty).
   worker, builder, or trainable VehicleFactory product. Workers now carry
   resources and are the only trained collector/builder unit; refineries spawn a
   free Worker on completion. Worker visuals/icons now use infantry/engineer art
-  instead of the old rover/miner silhouette.
+  instead of the old rover/miner silhouette. Visible OreHarvester translations
+  and the redundant Ctrl+Alt+I idle-collector selection shortcut are removed.
 - **Shared allied vision** (was MISSING): `update_visibility` now treats any
   `are_allied(visible_team, team)` unit/structure as a fog revealer, and allied
   entities are always visible. Test `allied_vision_is_shared_through_allies`.

@@ -1272,7 +1272,7 @@ impl Default for CommandMode {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 struct SpawnSpec {
     id: &'static str,
     offset: (f32, f32),
@@ -3040,14 +3040,56 @@ const CHAOS_STARTUP: TeamStartup = TeamStartup {
     ],
 };
 
-const GODOT_SKIRMISH_STARTUP: TeamStartup = TeamStartup {
+const HUMAN_GODOT_SKIRMISH_STARTUP: TeamStartup = TeamStartup {
     structures: &[SpawnSpec {
         id: "CommandCenter",
         offset: (0.0, 0.0),
     }],
     units: &[
         SpawnSpec {
-            id: "Drone",
+            id: "ScoutRover",
+            offset: (-2.0, -2.0),
+        },
+        SpawnSpec {
+            id: "Worker",
+            offset: (-3.0, 3.0),
+        },
+        SpawnSpec {
+            id: "Worker",
+            offset: (3.0, 3.0),
+        },
+    ],
+};
+
+const DEMON_GODOT_SKIRMISH_STARTUP: TeamStartup = TeamStartup {
+    structures: &[SpawnSpec {
+        id: "CommandCenter",
+        offset: (0.0, 0.0),
+    }],
+    units: &[
+        SpawnSpec {
+            id: "RocketInfantry",
+            offset: (-2.0, -2.0),
+        },
+        SpawnSpec {
+            id: "Worker",
+            offset: (-3.0, 3.0),
+        },
+        SpawnSpec {
+            id: "Worker",
+            offset: (3.0, 3.0),
+        },
+    ],
+};
+
+const CHAOS_GODOT_SKIRMISH_STARTUP: TeamStartup = TeamStartup {
+    structures: &[SpawnSpec {
+        id: "CommandCenter",
+        offset: (0.0, 0.0),
+    }],
+    units: &[
+        SpawnSpec {
+            id: "ShieldTrooper",
             offset: (-2.0, -2.0),
         },
         SpawnSpec {
@@ -3628,8 +3670,8 @@ fn team_start_camera_focus_from_base(
 }
 
 fn startup_camera_focus_offset(startup: &TeamStartup) -> Vec3 {
-    startup_spawn_offset(startup.units, CAMERA_START_PRIMARY_UNITS)
-        .or_else(|| startup_spawn_offset(startup.structures, CAMERA_START_PRIMARY_STRUCTURES))
+    startup_spawn_offset(startup.structures, CAMERA_START_PRIMARY_STRUCTURES)
+        .or_else(|| startup_spawn_offset(startup.units, CAMERA_START_PRIMARY_UNITS))
         .or_else(|| startup_aabb_pivot_offset(startup.units))
         .unwrap_or(Vec3::ZERO)
 }
@@ -8253,7 +8295,11 @@ fn faction_startup_for_loadout(
     loadout: StartupLoadoutMode,
 ) -> &'static TeamStartup {
     if loadout == StartupLoadoutMode::GodotSkirmish {
-        return &GODOT_SKIRMISH_STARTUP;
+        return match faction {
+            SkirmishFaction::Alliance => &HUMAN_GODOT_SKIRMISH_STARTUP,
+            SkirmishFaction::Demon => &DEMON_GODOT_SKIRMISH_STARTUP,
+            SkirmishFaction::Chaos => &CHAOS_GODOT_SKIRMISH_STARTUP,
+        };
     }
     match faction {
         SkirmishFaction::Alliance => &HUMAN_STARTUP,
@@ -10376,7 +10422,7 @@ fn match_briefing_text(
              - 用兵营做廉价克制，或用战车工厂施加装甲压力\n\
              - 侦察敌方科技、占领中立建筑，并在后期武器到来前打击扩张",
             "Opening tips\n\
-             - Send workers to gather nearby crystal and add collectors quickly\n\
+             - Send workers to gather nearby crystal and add workers quickly\n\
              - Build power before radar, defense, and advanced production draw it down\n\
              - Use the Barracks for cheap counters, or the Vehicle Factory for armor pressure\n\
              - Scout enemy tech, capture neutral buildings, and strike expansions before late-game weapons arrive",
@@ -17700,53 +17746,6 @@ fn selection_hotkeys(
         return;
     }
 
-    if alt && ctrl && keyboard.just_pressed(KeyCode::KeyI) {
-        let ids = unit_q
-            .iter()
-            .filter_map(
-                |(
-                    entity,
-                    team,
-                    unit,
-                    order_queue,
-                    move_order,
-                    follow_order,
-                    attack_order,
-                    capture_order,
-                    garrison_order,
-                    harvest_order,
-                    repair_order,
-                    construct_order,
-                    attack_move_order,
-                    patrol_order,
-                    visibility,
-                )| {
-                    if *team != visible_team
-                        || !visibility.visible
-                        || !is_unit_resource_collector(unit)
-                    {
-                        return None;
-                    }
-                    is_unit_idle(
-                        order_queue,
-                        move_order,
-                        follow_order,
-                        attack_order,
-                        capture_order,
-                        garrison_order,
-                        harvest_order,
-                        repair_order,
-                        construct_order,
-                        attack_move_order,
-                        patrol_order,
-                    )
-                    .then_some(entity)
-                },
-            )
-            .collect::<Vec<_>>();
-        apply_selected_from_ids(&mut commands, &selectable_q, &ids, false, visible_team);
-        return;
-    }
     if alt && keyboard.just_pressed(KeyCode::KeyI) {
         let ids = unit_q
             .iter()
@@ -17861,10 +17860,6 @@ fn is_builder_worker_selection_unit(unit: &Unit) -> bool {
 
 fn is_economy_worker_selection_unit(unit: &Unit) -> bool {
     unit.id == "Worker"
-}
-
-fn is_unit_resource_collector(unit: &Unit) -> bool {
-    can_unit_collect_resources(unit)
 }
 
 fn is_exact_current_selection(current: &[Entity], target: &[Entity]) -> bool {
@@ -27248,16 +27243,30 @@ mod current_tests {
             app.update();
         }
 
-        let (drone, before) = {
-            let world = app.world_mut();
-            let mut q = world.query::<(Entity, &Team, &Unit, &Transform, &Health)>();
-            q.iter(world)
-                .find(|(_, team, unit, _, health)| {
-                    **team == Team::Player(1) && unit.id == "Drone" && health.current > 0.0
-                })
-                .map(|(entity, _, _, transform, _)| (entity, transform.translation))
-        }
-        .expect("default skirmish AI should start with a Drone");
+        let drone_def = registry::entity("Drone").expect("Drone must stay in the registry");
+        let before = Vec3::new(12.0, 0.0, 12.0);
+        let drone = app
+            .world_mut()
+            .spawn((
+                Unit {
+                    id: "Drone",
+                    speed: drone_def.speed,
+                    can_crush: drone_def.can_crush,
+                    can_be_crushed: drone_def.can_be_crushed,
+                },
+                Team::Player(1),
+                Transform::from_translation(before),
+                Selectable {
+                    radius: drone_def.radius,
+                },
+                Health::new(drone_def.health),
+                VisionRadius(unit_vision_radius(drone_def)),
+                MovementDomain::from_registry(drone_def.domain),
+                VisibilityState { visible: true },
+                Visibility::Visible,
+                MatchScopedEntity,
+            ))
+            .id();
 
         for _ in 0..180 {
             app.update();
@@ -27326,6 +27335,68 @@ mod current_tests {
         assert_eq!(
             ai_structure_profile_limit("TeslaFenceSegment", &chaos_hard),
             4
+        );
+    }
+
+    #[test]
+    fn godot_skirmish_startup_is_faction_specific_without_harvesters() {
+        let mut flavor_units = Vec::new();
+        for faction in SkirmishFaction::ALL {
+            let startup = faction_startup_for_loadout(faction, StartupLoadoutMode::GodotSkirmish);
+            assert_eq!(
+                startup.structures,
+                &[SpawnSpec {
+                    id: "CommandCenter",
+                    offset: (0.0, 0.0),
+                }],
+                "{} should keep the minimal one-base skirmish opening",
+                faction.label()
+            );
+            assert_eq!(
+                startup
+                    .units
+                    .iter()
+                    .filter(|spec| spec.id == "Worker")
+                    .count(),
+                2,
+                "{} should still start with two worker economy units",
+                faction.label()
+            );
+            assert!(
+                startup
+                    .units
+                    .iter()
+                    .all(|spec| !matches!(spec.id, "OreHarvester" | "MobileConstructionVehicle")),
+                "{} must not reintroduce a separate harvester/MCV economy start",
+                faction.label()
+            );
+            let flavor = startup
+                .units
+                .iter()
+                .find(|spec| spec.id != "Worker")
+                .map(|spec| spec.id)
+                .expect("each faction should have a visible faction-specific starter");
+            flavor_units.push(flavor);
+        }
+        flavor_units.sort_unstable();
+        flavor_units.dedup();
+        assert_eq!(
+            flavor_units.len(),
+            SkirmishFaction::ALL.len(),
+            "each faction should have a distinct starter unit in the default cargo-run opening"
+        );
+    }
+
+    #[test]
+    fn start_camera_focus_prefers_command_center_over_worker() {
+        let startup = faction_startup_for_loadout(
+            SkirmishFaction::Alliance,
+            StartupLoadoutMode::GodotSkirmish,
+        );
+        assert_eq!(
+            startup_camera_focus_offset(startup),
+            Vec3::ZERO,
+            "default cargo-run camera should start over the CommandCenter, not the worker offset"
         );
     }
 

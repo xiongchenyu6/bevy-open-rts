@@ -196,7 +196,7 @@ MATCH_CONTROLS_TOOLTIP,Show movement combat production and camera shortcuts,Poka
 MATCH_CONTROLS_TITLE,Controls,Sterowanie,操作指南
 MATCH_CONTROLS_INTRO,Open this from Escape during battle to check core RTS commands,Otwórz z Escape podczas bitwy aby sprawdzić podstawowe rozkazy RTS,战斗中按 Esc 打开这里查看核心 RTS 操作
 MATCH_CONTROLS_SELECTION,Selection,Zaznaczanie,选择单位
-MATCH_CONTROLS_SELECTION_DESC,Drag select units; double click selects matching visible units; Alt+A selects army on screen; Ctrl+Alt+A selects all army; Alt+I finds idle workers; Ctrl+Alt+I finds idle harvesters,Zaznaczaj ramką; podwójne kliknięcie wybiera takie same widoczne jednostki; Alt+A wybiera armię na ekranie; Ctrl+Alt+A wybiera całą armię; Alt+I szuka bezczynnych robotników; Ctrl+Alt+I szuka bezczynnych zbieraczy,框选单位；双击选择屏幕内同类单位；Alt+A 选择当前屏幕军队；Ctrl+Alt+A 选择全部军队；Alt+I 找空闲工人；Ctrl+Alt+I 找空闲采矿单位
+MATCH_CONTROLS_SELECTION_DESC,Drag select units; double click selects matching visible units; Alt+A selects army on screen; Ctrl+Alt+A selects all army; Alt+I finds idle workers,Zaznaczaj ramką; podwójne kliknięcie wybiera takie same widoczne jednostki; Alt+A wybiera armię na ekranie; Ctrl+Alt+A wybiera całą armię; Alt+I szuka bezczynnych robotników,框选单位；双击选择屏幕内同类单位；Alt+A 选择当前屏幕军队；Ctrl+Alt+A 选择全部军队；Alt+I 找空闲工人
 MATCH_CONTROLS_MOVEMENT,Movement,Ruch,移动
 MATCH_CONTROLS_MOVEMENT_DESC,Right click moves attacks or uses context actions; Shift+right click queues waypoints; Alt+right click forces movement through enemies,Prawy klik przesuwa atakuje albo używa akcji kontekstowych; Shift+prawy klik kolejkuje punkty ruchu; Alt+prawy klik wymusza ruch przez wrogów,右键移动 攻击或执行上下文操作；Shift+右键排队路径点；Alt+右键强制穿过敌人移动
 MATCH_CONTROLS_COMBAT,Combat orders,Rozkazy bojowe,战斗命令
@@ -310,8 +310,6 @@ TACTICAL_OFFICER,Tactical officer,Oficer taktyczny,战术军官
 TACTICAL_OFFICER_DESCRIPTION,long-sight command infantry that can engage ground and air targets,piechota dowódcza z dalekim polem widzenia zwalczająca cele naziemne i powietrzne,提升附近友军作战效率
 SCOUT_ROVER,Scout rover,Pojazd zwiadowczy,侦察车
 SCOUT_ROVER_DESCRIPTION,fast scout with light weaponry,szybki zwiadowca z lekkim uzbrojeniem,快速侦察和骚扰单位
-ORE_HARVESTER,Ore harvester,Kombajn rudy,矿车
-ORE_HARVESTER_DESCRIPTION,armored economy vehicle with a large resource hold,opancerzony pojazd ekonomiczny z dużą ładownią zasobów,采集并运输水晶资源
 MOBILE_CONSTRUCTION_VEHICLE,Mobile construction vehicle,Mobilny pojazd konstrukcyjny,机动基地车
 MOBILE_CONSTRUCTION_VEHICLE_DESCRIPTION,heavy mobile builder for forward base expansion,ciężki mobilny budowniczy do wysuniętej rozbudowy bazy,可部署为前线指挥中心
 MIRAGE_SCOUT_TANK,Mirage scout tank,Czołg zwiadowczy Mirage,幻影侦察坦克
@@ -419,7 +417,7 @@ BRIEFING_OBJECTIVE_ELIMINATION,Objective: destroy every enemy command center and
 BRIEFING_ENEMIES,Enemies,Wrogowie,敌人
 BRIEFING_ALLIES,Allies,Sojusznicy,盟友
 BRIEFING_OPENING_TITLE,Recommended opening,Zalecane otwarcie,推荐开局
-BRIEFING_OPENING_ECONOMY,Send workers to nearby crystals and queue extra harvesters quickly,Wyślij robotników do pobliskich kryształów i szybko zamów dodatkowe kombajny,派工人采集附近水晶，并尽快补充矿车
+BRIEFING_OPENING_ECONOMY,Send workers to nearby crystals and queue extra workers quickly,Wyślij robotników do pobliskich kryształów i szybko zamów dodatkowych robotników,派工人采集附近水晶，并尽快补充工人
 BRIEFING_OPENING_POWER,Add power before radar defenses and advanced production drain the grid,Dodaj energię zanim radar obrona i zaawansowana produkcja obciążą sieć,在雷达、防御和高级生产耗电前先补电力
 BRIEFING_OPENING_PRODUCTION,Use barracks for cheap counters or vehicle factory for armor pressure,Użyj koszar do tanich kontr albo fabryki pojazdów do presji pancernej,用兵营做廉价克制，或用战车工厂施加装甲压力
 BRIEFING_OPENING_SCOUT,Scout enemy tech capture neutral structures and hit expansions before late weapons arrive,Zwiaduj technologię wroga przejmuj neutralne struktury i atakuj ekspansje zanim nadejdzie późna broń,侦察敌方科技、占领中立建筑，并在后期武器到来前打击扩张
