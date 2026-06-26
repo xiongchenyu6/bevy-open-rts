@@ -29,35 +29,15 @@
 - `src/bin/capture.rs` exposes proof commands for live match simulation.
 - Capture snapshots use `CaptureTeam::Player(index)` and `players: Vec<CaptureTeamStats>` rather than fixed human/demon/chaos fields, so proof output can represent every runtime player row.
 - `build_capture_match_app_for_faction()` uses `SharedMatchScenePlugin` plus `start_shared_match_scene_with_settings()`.
-- Real menu proofs use `RealMenuMatchStart` plus the actual setup menu buttons before running proof logic. The same path can select faction, match mode, starting resources, and AI difficulty before entering the shared live scene.
-- Current proof surfaces:
-  - `real-match-proof`: direct production/order proof from a menu-started match.
-  - `real-harvest-proof`: mouse select collector, right-click ore, harvest, then train.
-  - `real-dual-harvest-proof`: low-resource menu start, mouse-order both Ore and Crystal gathering, and require both player resource totals to increase.
-  - `real-supply-crate-proof`: real menu FourCorners Human start, mouse-select a movable unit, right-click a visible resource supply crate, consume it, and require Ore/Crystal rewards.
-  - `real-tech-oil-proof`: real menu FourCorners start, satisfy EngineerDrone tech, train EngineerDrone, right-click a neutral TechOilDerrick, capture it, consume the engineer, and require the capture bonus.
-  - `real-tech-oil-all-factions-proof`: batch CLI wrapper over the FourCorners tech-oil capture proof for every playable faction.
-  - `real-ai-pressure-proof`: menu-started Hard AI match that requires AI production growth, AI attack orders, and real damage to the selected player's army/base.
-  - `real-ai-pressure-all-factions-proof`: batch CLI wrapper over the Hard AI pressure proof for every playable faction.
-  - `real-full-lobby-ai-proof`: real menu Big Arena full-lobby start that requires all seven AI players to grow and issue enemy attack orders in the shared battle scene.
-  - `runtime-ai-scale-proof`: direct shared-scene proof that starts twelve active runtime players on an eight-spawn map and requires all eleven AI players to grow and issue enemy attack orders.
-  - `real-ai-vs-ai-proof`: real menu AI-vs-AI spectator mode selection that requires both AI sides to grow armies, at least one side to issue attack orders, and live combat damage in the shared match scene while reporting `mode=ai_vs_ai`.
-  - `real-ai-vs-ai-all-factions-proof`: batch CLI wrapper over the AI-vs-AI spectator proof for every playable focus faction.
-  - `real-build-proof`: mouse select worker, place and construct Barracks, then train.
-  - `real-victory-proof`: mouse select VehicleFactory, train combat vehicles, right-click enemy anchors, and win.
-  - `real-default-victory-proof`: default `cargo run` menu start, no setup changes or proof-side resource grant, train combat vehicles from the real command panel, right-click enemy anchors, and win.
-  - `real-selected-faction-victory-proof`: real menu faction selection, default resources, no proof-side resource grant, train that faction's vehicle roster from the real command panel, right-click enemy anchors, and win.
-  - `real-selected-map-victory-proof`: real menu map selection, default resources, no proof-side resource grant, train combat vehicles from the real command panel, right-click enemy anchors, and win while reporting the loaded map id.
-  - `real-all-maps-victory-proof`: batch CLI wrapper over the selected-map real menu proof for every playable faction on every migrated skirmish map.
-  - `real-allied-victory-proof`: real menu Allied 2v1 mode selection, default resources, no proof-side resource grant, train combat vehicles from the real command panel, right-click enemy anchors, and win while reporting the loaded match mode id.
-  - `real-allied-all-factions-victory-proof`: batch CLI wrapper over the Allied 2v1 real menu proof for every playable faction.
-  - `real-economy-victory-proof`: low-resource menu start, mouse harvest required resources, train combat vehicles, right-click enemy anchors, and win without proof-side resource injection.
-  - `real-playable-proof`: low-resource menu start, mouse harvest both Ore and Crystal, build Barracks, train a Barracks unit, train combat vehicles, right-click enemy anchors, and win.
-  - `real-free-for-all-playable-proof`: low-resource real menu start, select free-for-all skirmish mode, use the same playable proof flow with a larger attack group, and finish all enemy anchors.
-  - `real-lobby-rows-proof`: real menu proof that every authored skirmish map renders one configurable player row per map spawn slot, including the 8-row Big Arena lobby.
-  - `real-lobby-slots-proof`: real menu Big Arena setup that enables every map spawn slot and verifies all eight active player rows reach the live scene with economies, units, structures, command centers, and spawn anchors.
-  - `runtime-players-proof`: direct shared-scene proof that starts more runtime players than the authored map spawn count and verifies economies, units, structures, command centers, and virtual fallback spawns.
-  - `real-playability-suite-proof`: top-level CLI regression gate that runs the real menu lobby-row, dual-harvest, supply-crate, tech-oil, playable, free-for-all, all-map, Allied 2v1, AI pressure, full-lobby AI, runtime AI scale, AI-vs-AI, and runtime-player-count proof surfaces.
+- Current capture commands are the authoritative smoke surfaces:
+  - `capture menu [path]`: renders the real lobby/setup screen.
+  - `capture screenshot [path]`: renders one still from the shared live match.
+  - `capture frames <dir> [count]`: records a frame sequence from the shared live match.
+  - `capture harvest <dir>`: selects a real Worker, right-clicks ore, and requires `HarvestOrder` plus resource growth.
+  - `capture play <dir>`: uses the real default-start economy for select, move, CommandCenter training, Worker build placement, and screenshots.
+  - `capture factions <dir>`: starts each playable faction and verifies train/build through the human command panel using default resources.
+  - `capture match [max-seconds]`: runs a headless AI-vs-AI shared match and requires economy, production, combat, and elimination to resolve.
+- The old `real-*-proof` CLI surfaces were removed; do not use them as completion gates.
 
 ## Verification
 

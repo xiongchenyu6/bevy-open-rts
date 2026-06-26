@@ -95,12 +95,13 @@ dropped. Fix: insert `bevy::ui::IsDefaultUiCamera` on the retargeted camera. Now
 (command-bar icons, selection portrait, resource bar, briefing, minimap) and the
 setup menu/lobby. `capture harvest` selects a click-safe Worker and exits
 non-zero unless a `HarvestOrder` is issued. `capture play` now hard-checks
-select, movement delta, train queue insertion, and Worker building placement.
+select, movement delta, train queue insertion, and Worker building placement
+using the real default-start resources rather than capture-side treasury grants.
 `capture match` runs headless AI-vs-AI and exits non-zero unless economy,
 production, combat, and elimination resolve a match. `capture factions` exits
 non-zero unless all three factions can train and build through the human command
-panel. Capture apps disable `LogPlugin` so multi-app capture runs no longer emit
-duplicate global-logger errors.
+panel with default resources. Capture apps disable `LogPlugin` so multi-app
+capture runs no longer emit duplicate global-logger errors.
 
 ## Verification notes
 - 22/22 `cargo test current_tests` pass; `cargo build --bins` clean.

@@ -4601,15 +4601,6 @@ pub fn capture_placement_is_valid(app: &mut App) -> bool {
     )
 }
 
-/// Dev-capture convenience: top up the player's treasury so an action can be
-/// exercised without waiting out the economy. Does not change game logic.
-pub fn capture_grant_player_resources(app: &mut App, ore: i32, crystal: i32) {
-    let mut economies = app.world_mut().resource_mut::<Economies>();
-    let economy = economies.get_mut(Team::Player(0));
-    economy.ore += ore;
-    economy.crystal += crystal;
-}
-
 /// World position of the nearest visible resource node to any player unit, for
 /// verifying manual (right-click) harvesting.
 pub fn capture_nearest_visible_resource_position(app: &mut App) -> Option<Vec3> {

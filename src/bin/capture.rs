@@ -25,9 +25,9 @@ use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 use bevy_open_rts::{
     CaptureTarget, build_capture_app, capture_build_options_count,
     capture_enemy_structure_position, capture_first_enabled_build_hotkey,
-    capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_grant_player_resources,
-    capture_key, capture_mouse_button, capture_nearest_visible_resource_click_position_to,
-    capture_placement_is_valid, capture_player_attack_move_all, capture_player_build_queue_len,
+    capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_key, capture_mouse_button,
+    capture_nearest_visible_resource_click_position_to, capture_placement_is_valid,
+    capture_player_attack_move_all, capture_player_build_queue_len,
     capture_player_harvesting_count, capture_player_in_placement_mode,
     capture_player_onscreen_unit_position, capture_player_onscreen_worker_position,
     capture_player_producer_position, capture_player_structure_count,
@@ -357,8 +357,8 @@ fn render_factions(dir: &Path) -> Result<(), String> {
         let handle = capture_handle(&app);
         shoot(&mut app, &handle, dir.join(format!("faction_{index}.png")));
 
-        // Verify the human train + build input path works for THIS faction.
-        capture_grant_player_resources(&mut app, 2000, 1000);
+        // Verify the human train + build input path works for THIS faction
+        // using the real default-start economy.
         let trained = faction_try_train(&mut app);
         let built = faction_try_build(&mut app);
         shoot(
@@ -489,9 +489,8 @@ fn render_play(dir: &Path) -> Result<(), String> {
         return Err("train hotkey did not add a player build-queue job".into());
     }
 
-    // BUILD: top up resources so a structure is affordable, then select a
-    // worker, enter placement via the build hotkey, and left-click a ground spot.
-    capture_grant_player_resources(&mut app, 1000, 500);
+    // BUILD: use the real default-start resources, select a worker, enter
+    // placement via the build hotkey, and left-click a ground spot.
     let mut built = false;
     if let Some(worker_anchor) = capture_player_worker_position(&mut app) {
         capture_focus_camera_on(&mut app, worker_anchor);
