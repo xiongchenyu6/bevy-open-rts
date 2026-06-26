@@ -49,7 +49,7 @@ const CAMERA_DEFAULT_PITCH: f32 = -1.02;
 const CAMERA_BOUNDS_MARGIN: f32 = 1.2;
 const CAMERA_PAN_SPEED_MULTIPLIER: f32 = 0.48;
 const CAMERA_MOUSE_ROTATION_SPEED: f32 = 0.005;
-const CAMERA_START_PRIMARY_UNITS: &[&str] = &["MobileConstructionVehicle"];
+const CAMERA_START_PRIMARY_UNITS: &[&str] = &["Worker"];
 const CAMERA_START_PRIMARY_STRUCTURES: &[&str] = &["CommandCenter"];
 const RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 48.0;
 const RESOURCE_ORDER_SCREEN_PICK_MAX_RADIUS_PX: f32 = 95.0;
@@ -63,7 +63,6 @@ const COMMAND_KEY_GUARD_AREA: &str = "guard_area";
 const COMMAND_KEY_SCATTER: &str = "scatter";
 const COMMAND_KEY_HOLD_POSITION: &str = "hold_position";
 const COMMAND_KEY_MINIMAP_MOVE: &str = "minimap_move";
-const COMMAND_KEY_DEPLOY_MCV: &str = "deploy_mcv";
 const COMMAND_KEY_TOGGLE_DEPLOY: &str = "toggle_deploy";
 const MOVE_ORDER_REACHED_DISTANCE_M: f32 = 0.22;
 const CONTACT_ACTION_REACHED_TOLERANCE_M: f32 = MOVE_ORDER_REACHED_DISTANCE_M;
@@ -4621,6 +4620,45 @@ pub fn capture_player_harvesting_count(app: &mut App) -> usize {
     q.iter(world).filter(|t| **t == Team::Player(0)).count()
 }
 
+/// Runs the default AI-vs-AI skirmish using the headless simulation path and
+/// returns the first non-running match phase. Used by capture/CI to prove that
+/// the economy -> production -> combat loop can finish a match.
+pub fn capture_run_ai_match_until_resolved(max_seconds: u32) -> Option<(u32, &'static str)> {
+    let mut app = build_game_app(GameAppMode::Headless);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
+    ));
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::InMatch);
+    for _ in 0..20 {
+        app.update();
+    }
+    app.world_mut()
+        .insert_resource(VisiblePlayer::all_players(Team::Player(0)));
+
+    let steps = max_seconds.div_ceil(5).max(1);
+    for step in 1..=steps {
+        for _ in 0..150 {
+            app.update();
+        }
+        let phase = app.world().resource::<MatchState>().phase;
+        if !matches!(phase, MatchPhase::Running) {
+            return Some((step * 5, match_phase_label(phase)));
+        }
+    }
+    None
+}
+
+fn match_phase_label(phase: MatchPhase) -> &'static str {
+    match phase {
+        MatchPhase::Running => "Running",
+        MatchPhase::HumanDefeat => "HumanDefeat",
+        MatchPhase::HumanVictory => "HumanVictory",
+        MatchPhase::MatchFinished => "MatchFinished",
+    }
+}
+
 /// Sets every player slot's faction (0=人族/Alliance, 1=魔族/Demon, 2=混沌族/Chaos)
 /// before the match scene reads `MatchSetupSettings`, so a capture can show each
 /// faction's own base/units. Returns the faction label.
@@ -6036,7 +6074,6 @@ enum BuildAction {
     None,
     Train(&'static str),
     Build(&'static str),
-    DeployMcv,
     SellStructure,
     RepairStructure,
     ToggleDeployMode,
@@ -6064,7 +6101,6 @@ impl CommandHotkey {
 impl BuildAction {
     fn audio_command_key(self) -> Option<&'static str> {
         match self {
-            Self::DeployMcv => Some(COMMAND_KEY_DEPLOY_MCV),
             Self::ToggleDeployMode => Some(COMMAND_KEY_TOGGLE_DEPLOY),
             Self::HoldPosition => Some(COMMAND_KEY_HOLD_POSITION),
             Self::GuardArea => Some(COMMAND_KEY_GUARD_AREA),
@@ -6275,7 +6311,6 @@ struct CommandActionResources<'w> {
     build_queue: ResMut<'w, BuildQueue>,
     command_mode: ResMut<'w, CommandMode>,
     economies: ResMut<'w, Economies>,
-    next_id: ResMut<'w, NextSpawnId>,
     player_factions: Res<'w, PlayerFactions>,
     audio_feedback: ResMut<'w, AudioFeedback>,
     battle_log: ResMut<'w, BattleLog>,
@@ -10312,7 +10347,7 @@ fn match_briefing_text(
         settings.starting_resources.crystal,
         t(
             "推荐开局\n\
-             - 派工人采集附近水晶，并尽快补充矿车\n\
+             - 派工人采集附近水晶，并尽快补充工人\n\
              - 在雷达、防御和高级生产耗电前先补电力\n\
              - 用兵营做廉价克制，或用战车工厂施加装甲压力\n\
              - 侦察敌方科技、占领中立建筑，并在后期武器到来前打击扩张",
@@ -11498,8 +11533,7 @@ fn evaluate_match_end(
 }
 
 fn is_worker_elimination_anchor(unit: &Unit) -> bool {
-    registry::entity(unit.id)
-        .is_some_and(|def| def.is_worker || matches!(def.id, "MobileConstructionVehicle"))
+    unit.id == "Worker"
 }
 
 fn is_structure_elimination_anchor(structure: &Structure) -> bool {
@@ -12632,7 +12666,6 @@ fn record_build_action_audio_feedback(
             record_sound_audio_feedback(feedback, SoundEffectKind::StructureSold);
         }
         BuildAction::None
-        | BuildAction::DeployMcv
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
         | BuildAction::HoldPosition
@@ -15620,7 +15653,7 @@ fn can_unit_garrison(unit: &Unit) -> bool {
 }
 
 fn can_unit_construct_structures(unit: &Unit) -> bool {
-    matches!(unit.id, "Worker" | "MobileConstructionVehicle")
+    unit.id == "Worker"
 }
 
 fn can_unit_collect_resources(unit: &Unit) -> bool {
@@ -17105,12 +17138,6 @@ fn current_command_actions_for_faction(
     }
     if selected_units
         .iter()
-        .any(|(unit, unit_team, ..)| *unit_team == team && unit.id == "MobileConstructionVehicle")
-    {
-        push_action_unique(&mut actions, BuildAction::DeployMcv);
-    }
-    if selected_units
-        .iter()
         .any(|(unit, unit_team, ..)| *unit_team == team && unit.id == "SiegeDrillTank")
     {
         push_action_unique(&mut actions, BuildAction::ToggleDeployMode);
@@ -17242,8 +17269,7 @@ fn command_action_enabled_for_panel(
             )
             .is_some()
         }
-        BuildAction::DeployMcv
-        | BuildAction::SellStructure
+        BuildAction::SellStructure
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
@@ -17319,7 +17345,7 @@ fn command_action_icon_path(action: BuildAction) -> Option<&'static str> {
         }
         BuildAction::SellStructure => Some("ui/icons/SellStructure.png"),
         BuildAction::RepairStructure => Some("ui/icons/Repair.png"),
-        BuildAction::DeployMcv | BuildAction::ToggleDeployMode => Some("ui/icons/DeployMode.png"),
+        BuildAction::ToggleDeployMode => Some("ui/icons/DeployMode.png"),
         BuildAction::SetRallyPoint => Some("ui/icons/RallyPoint.png"),
         BuildAction::HoldPosition => Some("ui/icons/HoldPosition.png"),
         BuildAction::AttackMove => Some("ui/icons/AttackMove.png"),
@@ -17384,7 +17410,6 @@ fn command_label_with_queue(
         }
         BuildAction::SellStructure => format!("{key} {}", t("出售建筑", "Sell")),
         BuildAction::RepairStructure => format!("{key} {}", t("维修建筑", "Repair")),
-        BuildAction::DeployMcv => format!("{key} {}", t("展开基地", "Deploy")),
         BuildAction::ToggleDeployMode => format!("{key} {}", t("切换部署", "Toggle Deploy")),
         BuildAction::SetRallyPoint => format!("{key} {}", t("设置集结", "Rally Point")),
         BuildAction::HoldPosition => format!("{key} {}", t("坚守", "Hold")),
@@ -17807,11 +17832,11 @@ fn is_visible_army_selection_candidate(
 }
 
 fn is_builder_worker_selection_unit(unit: &Unit) -> bool {
-    matches!(unit.id, "Worker" | "MobileConstructionVehicle")
+    unit.id == "Worker"
 }
 
 fn is_economy_worker_selection_unit(unit: &Unit) -> bool {
-    matches!(unit.id, "Worker" | "MobileConstructionVehicle")
+    unit.id == "Worker"
 }
 
 fn is_unit_resource_collector(unit: &Unit) -> bool {
@@ -18070,7 +18095,6 @@ fn apply_selected_from_ids(
 
 fn command_shortcuts(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     keyboard: Res<ButtonInput<KeyCode>>,
     visible_player: Res<VisiblePlayer>,
     mut action_resources: CommandActionResources,
@@ -18110,8 +18134,6 @@ fn command_shortcuts(
 
         let _ = execute_command_action(
             &mut commands,
-            &asset_server,
-            &mut action_resources.next_id,
             visible_team,
             action_resources.player_factions.slot_faction(visible_team),
             *action,
@@ -18134,7 +18156,6 @@ fn command_shortcuts(
 
 fn command_buttons(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     mouse: Res<ButtonInput<MouseButton>>,
     keyboard: Res<ButtonInput<KeyCode>>,
     visible_player: Res<VisiblePlayer>,
@@ -18181,8 +18202,6 @@ fn command_buttons(
                     } else if mouse.just_pressed(MouseButton::Left) {
                         let _ = execute_command_action(
                             &mut commands,
-                            &asset_server,
-                            &mut action_resources.next_id,
                             visible_team,
                             action_resources.player_factions.slot_faction(visible_team),
                             *action,
@@ -18270,8 +18289,6 @@ fn production_queue_slot_buttons(
 
 fn execute_command_action(
     commands: &mut Commands,
-    asset_server: &AssetServer,
-    next_id: &mut NextSpawnId,
     team: Team,
     faction: SkirmishFaction,
     action: BuildAction,
@@ -18309,14 +18326,6 @@ fn execute_command_action(
             )
             .is_some();
     let handled = match action {
-        BuildAction::DeployMcv => deploy_selected_mcv(
-            commands,
-            asset_server,
-            next_id,
-            team,
-            faction,
-            selected_units,
-        ),
         BuildAction::SellStructure => sell_selected_structures(
             commands,
             team,
@@ -18450,35 +18459,6 @@ fn request_selected_deploy_toggle(
         }
     }
     requested_any
-}
-
-fn deploy_selected_mcv(
-    commands: &mut Commands,
-    asset_server: &AssetServer,
-    next_id: &mut NextSpawnId,
-    team: Team,
-    faction: SkirmishFaction,
-    selected_units: &Query<SelectedCommandUnitItem<'_>, SelectedCommandUnitFilter>,
-) -> bool {
-    for (entity, unit, unit_team, transform, ..) in selected_units {
-        if *unit_team != team || unit.id != "MobileConstructionVehicle" {
-            continue;
-        }
-        let deploy_position = Vec3::new(transform.translation.x, 0.0, transform.translation.z);
-        spawn_structure_for_faction(
-            commands,
-            asset_server,
-            next_id,
-            "CommandCenter",
-            team,
-            team,
-            deploy_position,
-            faction,
-        );
-        commands.entity(entity).try_despawn();
-        return true;
-    }
-    false
 }
 
 fn sell_selected_structures(
@@ -18635,8 +18615,7 @@ fn cancellation_producers_for_action(
                 )
                 .collect()
         }
-        BuildAction::DeployMcv
-        | BuildAction::SellStructure
+        BuildAction::SellStructure
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
@@ -18780,8 +18759,7 @@ fn command_queue_producers_for_action(
                 )
                 .collect()
         }
-        BuildAction::DeployMcv
-        | BuildAction::SellStructure
+        BuildAction::SellStructure
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
@@ -19227,8 +19205,7 @@ fn process_build_queue(
         let queued_job = build_queue.0[index];
         let action_id = match queued_job.action {
             BuildAction::Train(id) | BuildAction::Build(id) => id,
-            BuildAction::DeployMcv
-            | BuildAction::SellStructure
+            BuildAction::SellStructure
             | BuildAction::RepairStructure
             | BuildAction::ToggleDeployMode
             | BuildAction::SetRallyPoint
@@ -19459,8 +19436,7 @@ fn process_build_queue(
                     build_queue.0.remove(index);
                 }
             }
-            BuildAction::DeployMcv
-            | BuildAction::SellStructure
+            BuildAction::SellStructure
             | BuildAction::RepairStructure
             | BuildAction::ToggleDeployMode
             | BuildAction::SetRallyPoint
@@ -19661,8 +19637,7 @@ fn enqueue_build_action_for_faction(
             Some(def) => def,
             None => return EnqueueBuildActionResult::Unavailable,
         },
-        BuildAction::DeployMcv
-        | BuildAction::SellStructure
+        BuildAction::SellStructure
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
@@ -19726,8 +19701,7 @@ fn enqueue_build_action_for_faction(
                 build_queue,
             )
         }
-        BuildAction::DeployMcv
-        | BuildAction::SellStructure
+        BuildAction::SellStructure
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
@@ -19955,8 +19929,7 @@ fn has_producer_for_job(
                 && *team == job.team
                 && structure.id == "CommandCenter"
         }
-        BuildAction::DeployMcv
-        | BuildAction::SellStructure
+        BuildAction::SellStructure
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
@@ -19973,8 +19946,7 @@ fn has_producer_for_job(
 fn build_target_product(action: BuildAction) -> &'static str {
     match action {
         BuildAction::Train(product) | BuildAction::Build(product) => product,
-        BuildAction::DeployMcv
-        | BuildAction::SellStructure
+        BuildAction::SellStructure
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
@@ -20983,10 +20955,7 @@ fn ai_unit_can_attack_air(unit_id: &str) -> bool {
 }
 
 fn ai_battle_unit_id(unit_id: &str) -> bool {
-    if matches!(
-        unit_id,
-        "Worker" | "MobileConstructionVehicle" | AI_SABOTEUR_ID
-    ) {
+    if matches!(unit_id, "Worker" | AI_SABOTEUR_ID) {
         return false;
     }
     registry::entity(unit_id).is_some_and(|def| {
@@ -26909,7 +26878,6 @@ mod current_tests {
         let standing_orders = [
             BuildAction::SellStructure,
             BuildAction::RepairStructure,
-            BuildAction::DeployMcv,
             BuildAction::ToggleDeployMode,
             BuildAction::SetRallyPoint,
             BuildAction::HoldPosition,
@@ -26944,9 +26912,25 @@ mod current_tests {
             worker.resource_capacity > 0,
             "Worker must carry resources now that the separate harvester unit is removed"
         );
+        for entity in registry::ENTITY_DEFS {
+            assert!(
+                !entity.is_worker || entity.id == "Worker",
+                "{} must not share the worker classification",
+                entity.id
+            );
+            assert!(
+                entity.resource_capacity <= 0 || entity.id == "Worker",
+                "{} must not share the resource collector role",
+                entity.id
+            );
+        }
         assert!(
             registry::entity("OreHarvester").is_none(),
             "OreHarvester should not exist in the playable registry"
+        );
+        assert!(
+            !registry::entity("MobileConstructionVehicle").is_some_and(|def| def.is_worker),
+            "MobileConstructionVehicle must not be classified as a worker"
         );
         for faction_id in ["alliance", "demon", "chaos"] {
             let faction = registry::faction(faction_id).expect("registered skirmish faction");
@@ -26963,6 +26947,11 @@ mod current_tests {
                 assert!(
                     !production.products.contains(&"OreHarvester"),
                     "{faction_id} {} must not expose OreHarvester",
+                    production.producer
+                );
+                assert!(
+                    !production.products.contains(&"MobileConstructionVehicle"),
+                    "{faction_id} {} must not expose MobileConstructionVehicle",
                     production.producer
                 );
             }
@@ -27327,35 +27316,15 @@ mod current_tests {
     // resolve to a victory/defeat (economy -> army -> combat -> result)?
     #[test]
     fn diag_ai_vs_ai_match_resolves() {
-        let mut app = build_game_app(GameAppMode::Headless);
-        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
-            std::time::Duration::from_secs_f32(1.0 / 30.0),
-        ));
-        app.world_mut()
-            .resource_mut::<NextState<AppScreen>>()
-            .set(AppScreen::InMatch);
-        for _ in 0..20 {
-            app.update();
-        }
-        // Spectate -> AI controls every team.
-        app.world_mut()
-            .insert_resource(VisiblePlayer::spectator_per_player(Team::Player(0)));
-
-        let mut resolved = None;
-        for step in 1..=48 {
-            for _ in 0..150 {
-                app.update();
-            }
-            let phase = app.world().resource::<MatchState>().phase;
-            if !matches!(phase, MatchPhase::Running) {
-                resolved = Some((step * 5, phase));
-                break;
-            }
-        }
+        let resolved = capture_run_ai_match_until_resolved(240);
         match resolved {
-            Some((secs, phase)) => eprintln!("[diag] AI-vs-AI resolved at ~{secs}s: {phase:?}"),
+            Some((secs, phase)) => eprintln!("[diag] AI-vs-AI resolved at ~{secs}s: {phase}"),
             None => eprintln!("[diag] AI-vs-AI still Running after 240s (possible stalemate)"),
         }
+        assert!(
+            resolved.is_some(),
+            "AI-vs-AI did not resolve within 240s; economy/combat loop is not a completed match"
+        );
     }
 
     // Each of the 3 factions must be fully playable: from its own base, its

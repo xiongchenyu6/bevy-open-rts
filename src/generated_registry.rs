@@ -3008,7 +3008,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         build_seconds: 5.0,
         power_delta: 0,
         is_resource_producer: false,
-        is_worker: true,
+        is_worker: false,
         can_crush: false,
         can_be_crushed: true,
         requirements: &["RoboticsBay"],
@@ -4281,7 +4281,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         build_seconds: 10.5,
         power_delta: 0,
         is_resource_producer: false,
-        is_worker: true,
+        is_worker: false,
         can_crush: true,
         can_be_crushed: false,
         requirements: &["TechLab"],
@@ -6854,7 +6854,6 @@ const ALLIANCE_PRODUCTS_BARRACKS: &[&str] = &[
 const ALLIANCE_PRODUCTS_VEHICLEFACTORY: &[&str] = &[
     "Tank",
     "ScoutRover",
-    "MobileConstructionVehicle",
     "MirageScoutTank",
     "FlameAssaultBuggy",
     "DroneMineLayer",
@@ -6935,7 +6934,6 @@ const DEMON_PRODUCTS_BARRACKS: &[&str] = &[
 const DEMON_PRODUCTS_VEHICLEFACTORY: &[&str] = &[
     "Tank",
     "ScoutRover",
-    "MobileConstructionVehicle",
     "FlameAssaultBuggy",
     "FlakHoverTank",
     "SiegeArtilleryVehicle",
@@ -7000,7 +6998,6 @@ const CHAOS_PRODUCTS_BARRACKS: &[&str] = &[
 ];
 const CHAOS_PRODUCTS_VEHICLEFACTORY: &[&str] = &[
     "ScoutRover",
-    "MobileConstructionVehicle",
     "MirageScoutTank",
     "DroneMineLayer",
     "TeslaCrawlerMk2",

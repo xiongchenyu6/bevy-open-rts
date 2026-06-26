@@ -12,6 +12,7 @@
 //!   capture frames <dir> [count]         numbered frameXXXXX.png sequence (default 450)
 //!   capture play <dir>                   real input smoke: select/move/train/build
 //!   capture harvest <dir>                real input smoke: Worker right-clicks ore
+//!   capture match [max-seconds]          headless AI-vs-AI match must resolve
 //!   capture menu [path]                  lobby/setup screenshot
 //!   capture factions <dir>               faction base/build smoke screenshots
 
@@ -30,9 +31,10 @@ use bevy_open_rts::{
     capture_player_harvesting_count, capture_player_in_placement_mode,
     capture_player_onscreen_unit_position, capture_player_onscreen_worker_position,
     capture_player_producer_position, capture_player_structure_count,
-    capture_player_worker_position, capture_selected_player_unit_average_position,
-    capture_selected_player_unit_count, capture_selected_player_unit_ids, capture_set_all_factions,
-    capture_set_cursor, capture_world_to_screen, start_shared_match_scene_with_current_setup,
+    capture_player_worker_position, capture_run_ai_match_until_resolved,
+    capture_selected_player_unit_average_position, capture_selected_player_unit_count,
+    capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
+    capture_world_to_screen, start_shared_match_scene_with_current_setup,
 };
 
 const WIDTH: u32 = 1280;
@@ -83,6 +85,10 @@ fn main() {
                 .unwrap_or_else(|| PathBuf::from("screenshots/harvest"));
             render_harvest(&dir)
         }
+        Some("match") => {
+            let max_seconds = args.next().and_then(|s| s.parse().ok()).unwrap_or(240);
+            run_match_proof(max_seconds)
+        }
         Some("factions") => {
             let dir = args
                 .next()
@@ -91,12 +97,24 @@ fn main() {
             render_factions(&dir)
         }
         Some(other) => Err(format!(
-            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | play <dir> | factions <dir>]"
+            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | play <dir> | harvest <dir> | match <seconds> | factions <dir>]"
         )),
     };
     if let Err(error) = result {
         eprintln!("[capture] error: {error}");
         std::process::exit(1);
+    }
+}
+
+fn run_match_proof(max_seconds: u32) -> Result<(), String> {
+    match capture_run_ai_match_until_resolved(max_seconds) {
+        Some((seconds, phase)) => {
+            println!("[capture] AI-vs-AI resolved at ~{seconds}s: {phase}");
+            Ok(())
+        }
+        None => Err(format!(
+            "AI-vs-AI did not resolve within {max_seconds}s; completed-match loop failed"
+        )),
     }
 }
 
@@ -132,6 +150,10 @@ fn faction_try_train(app: &mut App) -> bool {
     let Some(pos) = capture_player_producer_position(app) else {
         return false;
     };
+    capture_focus_camera_on(app, pos);
+    for _ in 0..12 {
+        app.update();
+    }
     let Some(screen) = capture_world_to_screen(app, pos) else {
         return false;
     };
