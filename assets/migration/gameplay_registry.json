@@ -1810,7 +1810,7 @@
       "is_infiltration_power_sabotage_target": false,
       "is_infiltration_resource_target": false,
       "is_resource_producer": false,
-      "is_worker": true,
+      "is_worker": false,
       "label": "Engineer Drone",
       "media_assets": [],
       "mine_arming_delay": 0.0,
@@ -4602,153 +4602,6 @@
         "splash_radius": 0.0,
         "structure_damage_multiplier": 1.0
       }
-    },
-    {
-      "blueprint_scene": null,
-      "build_seconds": 10.5,
-      "can_be_crushed": false,
-      "can_crush": true,
-      "capture_bonus_crystal": 0,
-      "capture_bonus_ore": 0,
-      "capture_time": 0.0,
-      "cost": {
-        "crystal": 6,
-        "ore": 7
-      },
-      "domain": "terrain",
-      "garrison_attack_damage_per_unit": 0.0,
-      "garrison_capacity": 0,
-      "healing_radius": 0.0,
-      "healing_rate": 0.0,
-      "health": 16.0,
-      "height": 0.05,
-      "icon": "ui/icons/MobileConstructionVehicle.png",
-      "id": "MobileConstructionVehicle",
-      "income_interval": 0.0,
-      "infiltration_power_sabotage_duration": 0.0,
-      "infiltration_production_veterancy_producer": null,
-      "infiltration_production_veterancy_rank": 0,
-      "infiltration_resource_steal_cap": 0,
-      "infiltration_resource_steal_ratio": 0.0,
-      "is_infiltration_power_sabotage_target": false,
-      "is_infiltration_resource_target": false,
-      "is_resource_producer": false,
-      "is_worker": true,
-      "label": "Mobile Construction Vehicle",
-      "media_assets": [],
-      "mine_arming_delay": 0.0,
-      "mine_blast_radius": 0.0,
-      "mine_damage": 0.0,
-      "mine_deploy_interval": 0.0,
-      "mine_deploy_radius": 0.0,
-      "mine_limit": 0,
-      "mine_spacing": 0.0,
-      "mine_trigger_radius": 0.0,
-      "model_assets": [
-        "models/kenney-spacekit/gate_simple.glb",
-        "models/kenney-spacekit/machine_generatorLarge.glb",
-        "models/kenney-spacekit/machine_wirelessCable.glb",
-        "models/kenney-spacekit/rover.glb"
-      ],
-      "name_key": null,
-      "power_delta": 0,
-      "procedural_render_note": null,
-      "radius": 0.88,
-      "render_parts": [
-        {
-          "model": "models/kenney-spacekit/rover.glb",
-          "rotation": [
-            0.0,
-            0.0,
-            0.0,
-            1.0
-          ],
-          "scale": [
-            2.15,
-            2.15,
-            2.15
-          ],
-          "translation": [
-            -4.3,
-            0.0,
-            -3.225
-          ]
-        },
-        {
-          "model": "models/kenney-spacekit/machine_generatorLarge.glb",
-          "rotation": [
-            0.0,
-            0.0,
-            0.0,
-            1.0
-          ],
-          "scale": [
-            0.5,
-            0.5,
-            0.5
-          ],
-          "translation": [
-            -0.42,
-            0.42,
-            0.05
-          ]
-        },
-        {
-          "model": "models/kenney-spacekit/machine_wirelessCable.glb",
-          "rotation": [
-            0.0,
-            0.0,
-            0.0,
-            1.0
-          ],
-          "scale": [
-            0.42,
-            0.42,
-            0.42
-          ],
-          "translation": [
-            0.48,
-            0.36,
-            0.15
-          ]
-        },
-        {
-          "model": "models/kenney-spacekit/gate_simple.glb",
-          "rotation": [
-            0.0,
-            0.0,
-            0.0,
-            1.0
-          ],
-          "scale": [
-            0.22,
-            0.22,
-            0.22
-          ],
-          "translation": [
-            0.0,
-            0.54,
-            -0.55
-          ]
-        }
-      ],
-      "repair_radius": 0.0,
-      "repair_rate": 0.0,
-      "requirements": [
-        "TechLab"
-      ],
-      "resource_capacity": 0,
-      "resource_income_crystal": 0,
-      "resource_income_ore": 0,
-      "role": "unit",
-      "scale": 0.65,
-      "scene_path": "res://source/match/units/MobileConstructionVehicle.tscn",
-      "sight_range": 8.5,
-      "speed": 2.15,
-      "support_shield_damage_multiplier": 1.0,
-      "support_shield_duration": 0.0,
-      "support_shield_radius": 0.0,
-      "weapon": null
     },
     {
       "blueprint_scene": null,
@@ -10785,7 +10638,6 @@
           "products": [
             "Tank",
             "ScoutRover",
-            "MobileConstructionVehicle",
             "MirageScoutTank",
             "FlameAssaultBuggy",
             "DroneMineLayer",
@@ -10878,7 +10730,6 @@
           "products": [
             "Tank",
             "ScoutRover",
-            "MobileConstructionVehicle",
             "FlameAssaultBuggy",
             "FlakHoverTank",
             "SiegeArtilleryVehicle",
@@ -10952,7 +10803,6 @@
           "producer": "VehicleFactory",
           "products": [
             "ScoutRover",
-            "MobileConstructionVehicle",
             "MirageScoutTank",
             "DroneMineLayer",
             "TeslaCrawlerMk2",

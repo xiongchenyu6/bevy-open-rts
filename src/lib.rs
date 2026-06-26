@@ -27042,7 +27042,7 @@ mod current_tests {
         let worker = registry::entity("Worker").expect("Worker must stay in the registry");
         assert!(
             worker.resource_capacity > 0,
-            "Worker must carry resources now that the separate harvester unit is removed"
+            "Worker must carry resources now that separate vehicle collectors are removed"
         );
         for entity in registry::ENTITY_DEFS {
             assert!(
@@ -27061,8 +27061,8 @@ mod current_tests {
             "OreHarvester should not exist in the playable registry"
         );
         assert!(
-            !registry::entity("MobileConstructionVehicle").is_some_and(|def| def.is_worker),
-            "MobileConstructionVehicle must not be classified as a worker"
+            registry::entity("MobileConstructionVehicle").is_none(),
+            "MobileConstructionVehicle should not exist in the playable registry"
         );
         for faction_id in ["alliance", "demon", "chaos"] {
             let faction = registry::faction(faction_id).expect("registered skirmish faction");
@@ -27330,7 +27330,7 @@ mod current_tests {
     }
 
     #[test]
-    fn godot_skirmish_startup_is_faction_specific_without_harvesters() {
+    fn godot_skirmish_startup_uses_worker_only_economy() {
         let mut flavor_units = Vec::new();
         for faction in SkirmishFaction::ALL {
             let startup = faction_startup_for_loadout(faction, StartupLoadoutMode::GodotSkirmish);
@@ -27358,7 +27358,7 @@ mod current_tests {
                     .units
                     .iter()
                     .all(|spec| !matches!(spec.id, "OreHarvester" | "MobileConstructionVehicle")),
-                "{} must not reintroduce a separate harvester/MCV economy start",
+                "{} must not reintroduce a separate vehicle collector/builder economy start",
                 faction.label()
             );
             let flavor = startup

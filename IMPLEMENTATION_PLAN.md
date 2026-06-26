@@ -19,14 +19,14 @@ all AI controllers (economy/construction/defense/offense/battlegroup/capture/
 saboteur/crates/garrison/support/difficulty).
 
 ## Gaps closed this session
-- **Worker-only economy**: removed the separate `OreHarvester` playable entity,
-  its icon manifest entry, VehicleFactory production access, AI production demand,
-  and runtime classification paths. `MobileConstructionVehicle` is no longer a
-  worker, builder, or trainable VehicleFactory product. Workers now carry
-  resources and are the only trained collector/builder unit; refineries spawn a
-  free Worker on completion. Worker visuals/icons now use infantry/engineer art
-  instead of the old rover/miner silhouette. Visible OreHarvester translations
-  and the redundant Ctrl+Alt+I idle-collector selection shortcut are removed.
+- **Worker-only economy**: removed the separate `OreHarvester` and
+  `MobileConstructionVehicle` playable registry entries, their icon manifest
+  entries, VehicleFactory production access, AI production demand, and runtime
+  classification paths. Workers now carry resources and are the only trained
+  collector/builder economy unit; refineries spawn a free Worker on completion.
+  Worker visuals/icons now use infantry/engineer art instead of the old
+  rover/miner silhouette. Visible OreHarvester translations and the redundant
+  Ctrl+Alt+I idle-collector selection shortcut are removed.
 - **Shared allied vision** (was MISSING): `update_visibility` now treats any
   `are_allied(visible_team, team)` unit/structure as a fog revealer, and allied
   entities are always visible. Test `allied_vision_is_shared_through_allies`.

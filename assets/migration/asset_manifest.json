@@ -1,5 +1,5 @@
 {
-  "asset_count": 527,
+  "asset_count": 526,
   "assets": [
     "fonts/wqy-microhei-ui.ttf",
     "logos/LOGO_LICENSES.md",
@@ -240,7 +240,6 @@
     "ui/icons/LowPower.png",
     "ui/icons/MineClearingRover.png",
     "ui/icons/MirageScoutTank.png",
-    "ui/icons/MobileConstructionVehicle.png",
     "ui/icons/MobileRepairCrawler.png",
     "ui/icons/MobileSensorJammer.png",
     "ui/icons/MobileShieldProjector.png",
@@ -536,7 +535,7 @@
     "music": 1,
     "sfx": 19,
     "translations": 8,
-    "ui": 321,
+    "ui": 320,
     "vfx": 6,
     "voice": 14
   },

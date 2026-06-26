@@ -81,7 +81,7 @@ Generated outputs:
 ## Current Scope
 
 - Uses Bevy `0.19.0`.
-- Mirrors the non-`.import` Godot asset tree and generates 75 playable
+- Mirrors the non-`.import` Godot asset tree and generates 73 playable
   unit/structure definitions across the three Godot factions.
 - Loads all referenced GLB assets for migrated entities; Godot procedural-only
   render scenes are recreated with Bevy primitive meshes.

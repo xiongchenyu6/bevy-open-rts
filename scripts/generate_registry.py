@@ -150,11 +150,7 @@ PRODUCTION_ORDER_OVERRIDES = {
     ],
 }
 
-REMOVED_PRODUCTION_PRODUCTS = {
-    "VehicleFactory": {"OreHarvester"},
-}
-
-REMOVED_ENTITY_IDS = {"OreHarvester"}
+REMOVED_ENTITY_IDS = {"OreHarvester", "MobileConstructionVehicle"}
 
 ENTITY_RENDER_OVERRIDES = {
     "Worker": {
@@ -269,9 +265,6 @@ def scene_path_to_id(path: str) -> str:
 
 
 def apply_production_order_override(producer_id: str, products: list[str]) -> list[str]:
-    removed = REMOVED_PRODUCTION_PRODUCTS.get(producer_id, set())
-    if removed:
-        products = [product_id for product_id in products if product_id not in removed]
     order = PRODUCTION_ORDER_OVERRIDES.get(producer_id)
     if order is None:
         return products
@@ -951,7 +944,7 @@ def build_registry() -> dict[str, object]:
                 "procedural_render_note": PROCEDURAL_RENDER_IDS.get(entity_id),
                 "blueprint_scene": structure_blueprints.get(scene_path),
                 "is_resource_producer": entity_id in {"Refinery", "OrePurifier"},
-                "is_worker": entity_id in {"Worker", "EngineerDrone", "MobileConstructionVehicle"},
+                "is_worker": entity_id == "Worker",
                 "can_crush": scene_path in crusher_paths,
                 "can_be_crushed": scene_path in crushable_paths,
             }
