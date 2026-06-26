@@ -9,7 +9,7 @@ of mechanics with real behavior (not just registry data). Confirmed DONE at
 parity: all unit orders (move/attack-move/auto-attack/hold/scatter/patrol/queued),
 splash, veterancy, crushing, wreckage; engineer capture/repair, saboteur
 infiltration+power-sabotage, mine layer + mines, mobile shield, siege deploy, MCV
-deploy, garrison; harvesting, refinery dropoff + free harvester, ore purifier,
+deploy, garrison; harvesting, refinery dropoff + free worker, ore purifier,
 tech oil/hospital/repair-depot/pad, structure selling/destruction, supply crates,
 power/low-power, tiered tech; all 9 support powers + AI use; alliances combat
 gating, player colors, vision radius, elimination win; minimap, resources bar,

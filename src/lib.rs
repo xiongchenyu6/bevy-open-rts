@@ -783,7 +783,7 @@ struct UnderConstruction {
     remaining: f32,
     total: f32,
     cost: registry::Cost,
-    free_harvester_origin: Option<Vec3>,
+    free_worker_origin: Option<Vec3>,
 }
 
 type StructurePrereqItem<'a> = (
@@ -8723,7 +8723,7 @@ fn spawn_structure_under_construction(
     id: &'static str,
     team: Team,
     position: Vec3,
-    free_harvester_origin: Option<Vec3>,
+    free_worker_origin: Option<Vec3>,
     rotation_y_radians: f32,
     visible_team: Team,
 ) -> Entity {
@@ -8734,7 +8734,7 @@ fn spawn_structure_under_construction(
         id,
         team,
         position,
-        free_harvester_origin,
+        free_worker_origin,
         rotation_y_radians,
         visible_team,
         default_visual_faction(team),
@@ -8748,7 +8748,7 @@ fn spawn_structure_under_construction_for_faction(
     id: &'static str,
     team: Team,
     position: Vec3,
-    free_harvester_origin: Option<Vec3>,
+    free_worker_origin: Option<Vec3>,
     rotation_y_radians: f32,
     visible_team: Team,
     faction: SkirmishFaction,
@@ -8760,7 +8760,7 @@ fn spawn_structure_under_construction_for_faction(
         id,
         team,
         position,
-        free_harvester_origin,
+        free_worker_origin,
         rotation_y_radians,
         visible_team,
         Some(faction),
@@ -8774,7 +8774,7 @@ fn spawn_structure_under_construction_with_visual_faction(
     id: &'static str,
     team: Team,
     position: Vec3,
-    free_harvester_origin: Option<Vec3>,
+    free_worker_origin: Option<Vec3>,
     rotation_y_radians: f32,
     visible_team: Team,
     visual_faction: Option<SkirmishFaction>,
@@ -8798,7 +8798,7 @@ fn spawn_structure_under_construction_with_visual_faction(
             remaining: 1.0,
             total: 1.0,
             cost: def.cost,
-            free_harvester_origin,
+            free_worker_origin,
         },
         Health {
             current: 1.0,
@@ -8848,14 +8848,11 @@ fn progress_under_construction_structures(
 
         health.current = health.max;
         commands.entity(entity).try_remove::<UnderConstruction>();
-        // The human player runs a single worker unit that both builds and
-        // gathers (manually), so don't hand them a separate free harvester; the
-        // AI still gets one for its automated economy.
-        if let Some(origin) = construction.free_harvester_origin
-            && controlled_player_team(visible_player.as_deref()) != Some(*team)
-        {
+        // A completed refinery grants a Worker for every team. Human-owned
+        // workers still gather manually, so the player keeps direct control.
+        if let Some(origin) = construction.free_worker_origin {
             let spawn_seed = next_id.0 + 17;
-            spawn_refinery_free_harvester(
+            spawn_refinery_free_worker(
                 &mut commands,
                 &asset_server,
                 &mut next_id,
@@ -10241,7 +10238,7 @@ fn match_briefing_text(
              - 用兵营做廉价克制，或用战车工厂施加装甲压力\n\
              - 侦察敌方科技、占领中立建筑，并在后期武器到来前打击扩张",
             "Opening tips\n\
-             - Send workers to gather nearby crystal and add harvesters quickly\n\
+             - Send workers to gather nearby crystal and add collectors quickly\n\
              - Build power before radar, defense, and advanced production draw it down\n\
              - Use the Barracks for cheap counters, or the Vehicle Factory for armor pressure\n\
              - Scout enemy tech, capture neutral buildings, and strike expansions before late-game weapons arrive",
@@ -13305,7 +13302,7 @@ fn place_structure_at_for_faction(
     if !economies.get_mut(team).spend(def.cost) {
         return Err(StructurePlacementValidity::NotEnoughResources);
     }
-    let free_harvester_origin = if id == "Refinery" {
+    let free_worker_origin = if id == "Refinery" {
         nearest_base_construction_anchor(team, point, def.radius, structures)
     } else {
         None
@@ -13317,7 +13314,7 @@ fn place_structure_at_for_faction(
         id,
         team,
         point,
-        free_harvester_origin,
+        free_worker_origin,
         rotation_y_radians,
         visible_team,
         faction,
@@ -14680,7 +14677,7 @@ fn desired_order_for_selected_unit(
         if context.enemy_target_capturable && can_unit_capture(unit) {
             return Some(UnitQueuedOrder::Capture(target));
         }
-        // Only armed units attack. A worker/harvester right-clicking an enemy
+        // Only armed units attack. A worker right-clicking an enemy
         // should fall through to a plain move, not uselessly chase a unit it
         // cannot damage.
         if registry::entity(unit.id).is_some_and(|def| def.weapon.is_some()) {
@@ -17596,7 +17593,10 @@ fn selection_hotkeys(
                     patrol_order,
                     visibility,
                 )| {
-                    if *team != visible_team || !visibility.visible || !is_unit_harvester(unit) {
+                    if *team != visible_team
+                        || !visibility.visible
+                        || !is_unit_resource_collector(unit)
+                    {
                         return None;
                     }
                     is_unit_idle(
@@ -17735,7 +17735,7 @@ fn is_economy_worker_selection_unit(unit: &Unit) -> bool {
     matches!(unit.id, "Worker" | "MobileConstructionVehicle")
 }
 
-fn is_unit_harvester(unit: &Unit) -> bool {
+fn is_unit_resource_collector(unit: &Unit) -> bool {
     can_unit_collect_resources(unit)
 }
 
@@ -19352,7 +19352,7 @@ fn process_build_queue(
                     };
                     build_queue.0.remove(index);
                     occupied_spawn_points.push((spawn_at.with_y(0.0), def.radius));
-                    let free_harvester_origin = (id == "Refinery").then_some(origin);
+                    let free_worker_origin = (id == "Refinery").then_some(origin);
                     spawn_structure_under_construction_for_faction(
                         &mut commands,
                         &asset_server,
@@ -19360,7 +19360,7 @@ fn process_build_queue(
                         id,
                         team,
                         spawn_at,
-                        free_harvester_origin,
+                        free_worker_origin,
                         0.0,
                         player_team,
                         faction,
@@ -19396,7 +19396,7 @@ fn process_build_queue(
     }
 }
 
-fn spawn_refinery_free_harvester(
+fn spawn_refinery_free_worker(
     commands: &mut Commands,
     asset_server: &AssetServer,
     next_id: &mut NextSpawnId,
@@ -19413,7 +19413,7 @@ fn spawn_refinery_free_harvester(
         return;
     }
     let Some(spawn_at) =
-        refinery_free_harvester_spawn_position(refinery_position, build_origin, spawn_seed, bounds)
+        refinery_free_worker_spawn_position(refinery_position, build_origin, spawn_seed, bounds)
     else {
         return;
     };
@@ -19517,7 +19517,7 @@ fn record_production_ready_battle_log(
     push_battle_log(battle_log, format!("{prefix}: {label}"), Some(focus));
 }
 
-fn refinery_free_harvester_spawn_position(
+fn refinery_free_worker_spawn_position(
     refinery_position: Vec3,
     build_origin: Vec3,
     spawn_seed: u32,
@@ -20128,9 +20128,9 @@ fn closest_construction_assignment(
     best
 }
 
-// Idle harvesters of every team (human included) auto-resume harvesting, the way
-// RA2/SC1 harvesters do. The `IdleUnitOrderFilter` guarantees only units with no
-// active order are picked, so manually-controlled harvesters are never hijacked.
+// Idle collectors of every team (human included) auto-resume harvesting, the way
+// RA2/SC1 collectors do. The `IdleUnitOrderFilter` guarantees only units with no
+// active order are picked, so manually-controlled collectors are never hijacked.
 fn auto_assign_idle_resource_collectors(
     mut commands: Commands,
     active_teams: Option<Res<ActiveTeams>>,
@@ -22718,7 +22718,7 @@ fn update_harvest_orders(
     mut commands: Commands,
     time: Res<Time>,
     mut economies: ResMut<Economies>,
-    mut harvesters: Query<
+    mut collectors: Query<
         (
             Entity,
             &Team,
@@ -22761,7 +22761,7 @@ fn update_harvest_orders(
         mut order,
         move_order,
         emp,
-    ) in &mut harvesters
+    ) in &mut collectors
     {
         if cargo.capacity <= 0
             || health.current <= 0.0
@@ -26890,6 +26890,57 @@ mod current_tests {
         }
     }
 
+    #[test]
+    fn right_click_resource_orders_only_workers_to_harvest() {
+        let resource = Entity::from_raw_u32(7).unwrap();
+        let choices = OrderTargetChoices {
+            supply_crate_position: None,
+            resource_target: Some(resource),
+            resource_dropoff_target: None,
+            enemy_target: None,
+            repair_target: None,
+            construct_target: None,
+            garrison_target: None,
+            follow_target: None,
+        };
+        let context = UnitOrderContext {
+            force_move: false,
+            enemy_target_capturable: false,
+            attack_move: false,
+            patrol: false,
+            origin: Vec3::ZERO,
+            point: Vec3::new(4.0, 0.0, 5.0),
+            offset: Vec3::ZERO,
+        };
+        let worker = Unit {
+            id: "Worker",
+            speed: 2.0,
+            can_crush: false,
+            can_be_crushed: true,
+        };
+        let tank = Unit {
+            id: "Tank",
+            speed: 2.0,
+            can_crush: true,
+            can_be_crushed: false,
+        };
+
+        assert!(matches!(
+            desired_order_for_selected_unit(&worker, choices, context),
+            Some(UnitQueuedOrder::Harvest {
+                target,
+                state: HarvestState::MovingToResource
+            }) if target == resource
+        ));
+        assert!(
+            !matches!(
+                desired_order_for_selected_unit(&tank, choices, context),
+                Some(UnitQueuedOrder::Harvest { .. })
+            ),
+            "combat units should not become resource collectors when right-clicking ore"
+        );
+    }
+
     // An idle defense structure (weapon off cooldown) sweeps over time; one that
     // is mid-engagement (cooldown_left > 0) or still under construction stays put.
     #[test]
@@ -26920,7 +26971,7 @@ mod current_tests {
                     remaining: 5.0,
                     total: 5.0,
                     cost: registry::Cost { ore: 0, crystal: 0 },
-                    free_harvester_origin: None,
+                    free_worker_origin: None,
                 });
             }
             let id = entity.id();
@@ -27130,9 +27181,9 @@ mod current_tests {
         for _ in 0..20 {
             app.update();
         }
-        // Minimal start has no harvester — you build a Refinery for one. Spectate
-        // so the AI drives P0 too: it builds a refinery, the free P0 harvester
-        // spawns, and (per the auto-harvest fix) that player-team harvester
+        // Minimal start has workers only — you build a Refinery for one. Spectate
+        // so the AI drives P0 too: it builds a refinery, the free P0 worker
+        // spawns, and (per the auto-harvest fix) that player-team worker
         // auto-harvests so P0 ore grows. Guards the player-team auto-harvest path.
         app.world_mut()
             .insert_resource(VisiblePlayer::spectator_per_player(Team::Player(0)));
@@ -27182,13 +27233,13 @@ mod current_tests {
                 break;
             }
         }
-        // Regression guard: a player-team harvester (from a built Refinery) must
+        // Regression guard: a player-team worker (from a built Refinery) must
         // auto-harvest, so P0 ore rises above its start at some point even though
         // the AI also spends it. Guards the auto-harvest fix that previously
         // excluded the player team (which left the human economy dead).
         assert!(
             peak_ore > start_ore.unwrap(),
-            "player ore never grew (start {}, peak {peak_ore}): harvester not auto-harvesting",
+            "player ore never grew (start {}, peak {peak_ore}): worker not auto-harvesting",
             start_ore.unwrap()
         );
     }
