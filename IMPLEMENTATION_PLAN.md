@@ -42,6 +42,13 @@ saboteur/crates/garrison/support/difficulty).
   positions, avoid immediately repeating the previous target when possible, and
   wait 0.5-1.0s before retargeting. Test
   `ai_drone_scouting_moves_idle_ai_drones`.
+- **AI defense difficulty parity**: audited godot `TeslaFenceSegment.gd` and
+  confirmed Tesla fence behavior is per-segment AoE, not inter-segment linking.
+  Bevy already matched the zap behavior; the real mismatch was AI defense
+  targets. Easy AI no longer inherits the Normal defense queue, Normal AI now
+  targets 2 Tesla fence segments where available, and Hard AI targets 4 while
+  other defense structures scale to 2, matching godot's difficulty profiles.
+  Test `ai_defense_profile_limits_match_godot_difficulty_targets`.
 
 ## Localization / i18n — DONE (Chinese / English)
 `Language`/`Locale` resource + a process-global flag (`CURRENT_LANGUAGE`) synced by
@@ -55,8 +62,9 @@ briefing), battle log, support-power messages, match-end/match-menu, placement
 feedback, radar/power notices. Verified end-to-end in capture: full menu AND
 in-match HUD render correctly in both languages. Default is Chinese.
 
-## Other remaining gaps (none block core playability)
-- Tesla fence inter-segment linking — both godot and bevy are per-segment (≈parity).
+## Other remaining gaps
+No audited gameplay-parity gap is currently listed. Continue validating with
+real `cargo run` / capture playthroughs before treating the migration as complete.
 
 ## Fog "explored terrain" shroud — DONE
 Textured fog-of-war shroud over the map: a `FOG_OVERLAY_RES`² CPU texture on a
@@ -94,7 +102,7 @@ panel. Capture apps disable `LogPlugin` so multi-app capture runs no longer emit
 duplicate global-logger errors.
 
 ## Verification notes
-- 21/21 `cargo test current_tests` pass; `cargo build --bins` clean.
+- 22/22 `cargo test current_tests` pass; `cargo build --bins` clean.
 - Command icons + portrait + lobby dropdowns are confirmed in capture output
   (no longer need `cargo run` eyeballing for UI in this headless environment).
 - `capture play`, `capture harvest`, `capture match`, and `capture factions`

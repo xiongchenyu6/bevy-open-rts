@@ -21,6 +21,7 @@
 - Runtime spawning is not capped to the map's authored spawn-point count. Players beyond the map rows receive clamped virtual fallback base positions instead of being skipped.
 - AI/runtime fallback helpers are not capped to the lobby slot count: active AI iteration, opponent helpers, late-slot resources, cooldowns, fallback home positions, virtual spawn positions, runtime team relation IDs, and battle AI participation are verified beyond eight players.
 - AI drones have an active scouting controller: idle AI `Drone` units pick living enemy units, move to their positions, avoid repeating the previous target when possible, and retarget after a short 0.5-1.0s delay.
+- AI defense profiles follow the godot difficulty targets: Beginner/Easy do not inherit Normal advanced-defense construction, Normal targets one standard defense layer plus 2 Tesla fence segments where the faction supports them, and Hard scales standard defenses to 2 plus 4 Tesla fence segments.
 
 ## Capture And Proofs
 

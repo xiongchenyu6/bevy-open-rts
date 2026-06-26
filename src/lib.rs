@@ -2841,6 +2841,7 @@ struct TeamAiProfile {
     saboteur_interval: f32,
     support_interval: f32,
     defense_limit_bonus: usize,
+    tesla_fence_limit_bonus: usize,
 }
 
 #[derive(Clone, Copy, Default)]
@@ -3772,9 +3773,9 @@ const HUMAN_AI_DEFENSE_PRIORITY: &[&str] = &[
     "RailCannonBunker",
 ];
 const HUMAN_AI_DEFENSE_LIMITS: &[(&str, usize)] = &[
-    ("AntiGroundTurret", 3),
-    ("AntiAirTurret", 2),
-    ("TeslaFenceSegment", 1),
+    ("AntiGroundTurret", 1),
+    ("AntiAirTurret", 1),
+    ("TeslaFenceSegment", 2),
     ("ArcCoilDefenseTower", 1),
     ("LanceBeamDefenseTower", 1),
     ("PrismDefenseObelisk", 1),
@@ -3799,7 +3800,7 @@ const CHAOS_AI_DEFENSE_PRIORITY: &[&str] = &[
     "RailCannonBunker",
 ];
 const CHAOS_AI_DEFENSE_LIMITS: &[(&str, usize)] = &[
-    ("TeslaFenceSegment", 1),
+    ("TeslaFenceSegment", 2),
     ("ArcCoilDefenseTower", 1),
     ("PrismDefenseObelisk", 1),
     ("RailCannonBunker", 1),
@@ -3825,6 +3826,7 @@ const HUMAN_AI_PROFILE: TeamAiProfile = TeamAiProfile {
     saboteur_interval: AI_SABOTEUR_INTERVAL_SECONDS,
     support_interval: 3.5,
     defense_limit_bonus: 0,
+    tesla_fence_limit_bonus: 0,
 };
 
 const DEMON_AI_PROFILE: TeamAiProfile = TeamAiProfile {
@@ -3847,6 +3849,7 @@ const DEMON_AI_PROFILE: TeamAiProfile = TeamAiProfile {
     saboteur_interval: AI_SABOTEUR_INTERVAL_SECONDS,
     support_interval: 3.5,
     defense_limit_bonus: 0,
+    tesla_fence_limit_bonus: 0,
 };
 
 const CHAOS_AI_PROFILE: TeamAiProfile = TeamAiProfile {
@@ -3869,6 +3872,7 @@ const CHAOS_AI_PROFILE: TeamAiProfile = TeamAiProfile {
     saboteur_interval: AI_SABOTEUR_INTERVAL_SECONDS,
     support_interval: 3.5,
     defense_limit_bonus: 0,
+    tesla_fence_limit_bonus: 0,
 };
 
 const BEGINNER_AI_PRODUCTION_PRIORITY: &[&str] = &[];
@@ -8302,8 +8306,11 @@ fn faction_ai_profile_for_difficulty(
             profile.saboteur_interval = 12.0;
             profile.support_interval = 12.0;
             profile.defense_limit_bonus = 0;
+            profile.tesla_fence_limit_bonus = 0;
         }
         AiDifficulty::Easy => {
+            profile.defense_priority = BEGINNER_AI_DEFENSE_PRIORITY;
+            profile.defense_limits = BEGINNER_AI_DEFENSE_LIMITS;
             profile.expected_command_centers = 1;
             profile.expected_workers = 2;
             profile.expected_refineries = 1;
@@ -8318,6 +8325,8 @@ fn faction_ai_profile_for_difficulty(
             profile.capture_interval = AI_CAPTURE_INTERVAL_SECONDS + 2.0;
             profile.saboteur_interval = AI_SABOTEUR_INTERVAL_SECONDS + 3.0;
             profile.support_interval = 5.5;
+            profile.defense_limit_bonus = 0;
+            profile.tesla_fence_limit_bonus = 0;
         }
         AiDifficulty::Normal => {}
         AiDifficulty::Hard => {
@@ -8333,6 +8342,7 @@ fn faction_ai_profile_for_difficulty(
             profile.saboteur_interval = (AI_SABOTEUR_INTERVAL_SECONDS - 1.0).max(1.0);
             profile.support_interval = 2.5;
             profile.defense_limit_bonus = 1;
+            profile.tesla_fence_limit_bonus = 2;
         }
     }
     if matches!(difficulty, AiDifficulty::Beginner) {
@@ -22486,30 +22496,40 @@ fn ai_structure_under_profile_limit(
     structures: &Query<StructurePrereqItem<'_>>,
     profile: &TeamAiProfile,
 ) -> bool {
-    ai_structure_under_limit(
+    ai_structure_under_max(
         team,
         structure_id,
         structures,
-        profile.defense_limits,
-        profile.defense_limit_bonus,
+        ai_structure_profile_limit(structure_id, profile),
     )
 }
 
-fn ai_structure_under_limit(
-    team: Team,
-    structure_id: &str,
-    structures: &Query<StructurePrereqItem<'_>>,
-    limits: &[(&'static str, usize)],
-    limit_bonus: usize,
-) -> bool {
-    let max = limits
+fn ai_structure_profile_limit(structure_id: &str, profile: &TeamAiProfile) -> usize {
+    let base = profile
+        .defense_limits
         .iter()
         .find_map(|(id, max)| (*id == structure_id).then_some(*max))
         .unwrap_or(0);
+    if base == 0 {
+        return 0;
+    }
+    let bonus = if structure_id == "TeslaFenceSegment" {
+        profile.tesla_fence_limit_bonus
+    } else {
+        profile.defense_limit_bonus
+    };
+    base.saturating_add(bonus)
+}
+
+fn ai_structure_under_max(
+    team: Team,
+    structure_id: &str,
+    structures: &Query<StructurePrereqItem<'_>>,
+    max: usize,
+) -> bool {
     if max == 0 {
         return false;
     }
-    let max = max.saturating_add(limit_bonus);
     let count = structures
         .iter()
         .filter(|(structure, structure_team, _, under_construction)| {
@@ -27259,6 +27279,53 @@ mod current_tests {
                 .get::<AiDroneScout>(drone)
                 .is_some_and(|scout| scout.last_target.is_some()),
             "AI Drone should remember the current scout target"
+        );
+    }
+
+    #[test]
+    fn ai_defense_profile_limits_match_godot_difficulty_targets() {
+        let easy = faction_ai_profile_for_difficulty(SkirmishFaction::Alliance, AiDifficulty::Easy);
+        assert!(
+            easy.defense_priority.is_empty(),
+            "Easy AI should not inherit the Normal defense build queue"
+        );
+        assert_eq!(ai_structure_profile_limit("AntiGroundTurret", &easy), 0);
+        assert_eq!(ai_structure_profile_limit("TeslaFenceSegment", &easy), 0);
+
+        let normal =
+            faction_ai_profile_for_difficulty(SkirmishFaction::Alliance, AiDifficulty::Normal);
+        assert_eq!(ai_structure_profile_limit("AntiGroundTurret", &normal), 1);
+        assert_eq!(ai_structure_profile_limit("AntiAirTurret", &normal), 1);
+        assert_eq!(ai_structure_profile_limit("TeslaFenceSegment", &normal), 2);
+        assert_eq!(
+            ai_structure_profile_limit("ArcCoilDefenseTower", &normal),
+            1
+        );
+        assert_eq!(
+            ai_structure_profile_limit("PrismDefenseObelisk", &normal),
+            1
+        );
+        assert_eq!(ai_structure_profile_limit("RailCannonBunker", &normal), 1);
+
+        let hard = faction_ai_profile_for_difficulty(SkirmishFaction::Alliance, AiDifficulty::Hard);
+        assert_eq!(ai_structure_profile_limit("AntiGroundTurret", &hard), 2);
+        assert_eq!(ai_structure_profile_limit("AntiAirTurret", &hard), 2);
+        assert_eq!(ai_structure_profile_limit("TeslaFenceSegment", &hard), 4);
+        assert_eq!(ai_structure_profile_limit("ArcCoilDefenseTower", &hard), 2);
+        assert_eq!(ai_structure_profile_limit("PrismDefenseObelisk", &hard), 2);
+        assert_eq!(ai_structure_profile_limit("RailCannonBunker", &hard), 2);
+
+        let chaos_normal =
+            faction_ai_profile_for_difficulty(SkirmishFaction::Chaos, AiDifficulty::Normal);
+        let chaos_hard =
+            faction_ai_profile_for_difficulty(SkirmishFaction::Chaos, AiDifficulty::Hard);
+        assert_eq!(
+            ai_structure_profile_limit("TeslaFenceSegment", &chaos_normal),
+            2
+        );
+        assert_eq!(
+            ai_structure_profile_limit("TeslaFenceSegment", &chaos_hard),
+            4
         );
     }
 
