@@ -1227,6 +1227,7 @@ struct ClickMarker {
 enum ClickMarkerKind {
     Move,
     Harvest,
+    Attack,
 }
 
 #[derive(Component)]
@@ -2767,16 +2768,16 @@ impl MapBounds {
         let rect = self.minimap_content_rect();
         let x = ((world.x + self.half_width) / (self.half_width * 2.0)).clamp(0.0, 1.0);
         let z = ((world.z + self.half_depth) / (self.half_depth * 2.0)).clamp(0.0, 1.0);
-        Vec2::new(
-            rect.left + x * rect.width,
-            rect.top + (1.0 - z) * rect.height,
-        )
+        // Minimap top = world -Z, matching the view convention (screen-up = -Z,
+        // same as the edge-pan / WASD fixes). Previously top mapped to +Z, so the
+        // minimap was inverted vs the world and clicks moved the camera the wrong way.
+        Vec2::new(rect.left + x * rect.width, rect.top + z * rect.height)
     }
 
     fn minimap_world_position(self, local: Vec2) -> Vec3 {
         let rect = self.minimap_content_rect();
         let x = ((local.x - rect.left) / rect.width).clamp(0.0, 1.0);
-        let z = (1.0 - ((local.y - rect.top) / rect.height)).clamp(0.0, 1.0);
+        let z = ((local.y - rect.top) / rect.height).clamp(0.0, 1.0);
         Vec3::new(
             x * self.half_width * 2.0 - self.half_width,
             0.0,
@@ -15141,9 +15142,17 @@ fn issue_orders(
         } else {
             None
         };
-        let (marker_pos, marker_kind) = match harvest_pos {
-            Some(ore) => (ore, ClickMarkerKind::Harvest),
-            None => (point, ClickMarkerKind::Move),
+        // Right-clicking an enemy plants a red attack marker on it so the order
+        // reads as "attack", not a plain move.
+        let enemy_pos = enemy_target
+            .and_then(|entity| selectable_q.get(entity).ok())
+            .map(|item| item.1.translation);
+        let (marker_pos, marker_kind) = if let Some(enemy) = enemy_pos {
+            (enemy, ClickMarkerKind::Attack)
+        } else if let Some(ore) = harvest_pos {
+            (ore, ClickMarkerKind::Harvest)
+        } else {
+            (point, ClickMarkerKind::Move)
         };
         commands.spawn((
             Transform::from_translation(marker_pos + Vec3::Y * 0.03),
@@ -25515,11 +25524,22 @@ fn combat(
                     );
                 }
             }
+            // Tracer from shooter to target (longer-lived so it's noticeable)…
             commands.spawn((
                 ShotPulse {
                     from: from + Vec3::Y * 0.6,
                     to: to + Vec3::Y * 0.6,
-                    ttl: 0.16,
+                    ttl: 0.30,
+                    team,
+                },
+                MatchScopedEntity,
+            ));
+            // …plus a vertical impact flash on the target.
+            commands.spawn((
+                ShotPulse {
+                    from: to + Vec3::Y * 0.05,
+                    to: to + Vec3::Y * 1.1,
+                    ttl: 0.22,
                     team,
                 },
                 MatchScopedEntity,
@@ -26768,7 +26788,15 @@ fn draw_world_overlays(
         }
     }
     for pulse in &pulses {
-        gizmos.line(pulse.from, pulse.to, player_colors.color(pulse.team));
+        // Brighten the team color toward a hot muzzle/tracer hue so shots read as
+        // attacks, and draw it thick so a brief tracer is actually noticeable.
+        let base = player_colors.color(pulse.team).to_srgba();
+        let tracer = Color::srgb(
+            (base.red * 0.4 + 0.85).min(1.0),
+            (base.green * 0.4 + 0.78).min(1.0),
+            (base.blue * 0.4 + 0.30).min(1.0),
+        );
+        thick_line(&mut gizmos, pulse.from, pulse.to, tracer, 3, 0.05);
     }
     for (transform, marker) in &click_markers {
         match marker.kind {
@@ -26788,6 +26816,15 @@ fn draw_world_overlays(
                 gizmos.line(base, top, gold);
                 gizmos.line(top, top + Vec3::new(0.5, -0.2, 0.0), gold);
                 gizmos.line(top + Vec3::new(0.5, -0.2, 0.0), base + Vec3::Y * 0.7, gold);
+            }
+            ClickMarkerKind::Attack => {
+                // Red ring + crosshair X — "attack here".
+                let red = Color::srgba(1.0, 0.28, 0.22, 0.95);
+                draw_ring(&mut gizmos, transform.translation, marker.radius, red);
+                let c = Vec3::new(transform.translation.x, 0.06, transform.translation.z);
+                let r = marker.radius;
+                gizmos.line(c + Vec3::new(-r, 0.0, -r), c + Vec3::new(r, 0.0, r), red);
+                gizmos.line(c + Vec3::new(-r, 0.0, r), c + Vec3::new(r, 0.0, -r), red);
             }
         }
     }
@@ -27227,20 +27264,31 @@ fn draw_team_marker(
     }
 }
 
+/// Gizmo lines are 1px-thin; stack a few copies (offset in world-Y, which reads
+/// as vertical thickness under the tilted camera) so bars/tracers are actually
+/// visible.
+fn thick_line(gizmos: &mut Gizmos, a: Vec3, b: Vec3, color: Color, layers: u32, step: f32) {
+    for i in 0..layers.max(1) {
+        let off = Vec3::Y * (i as f32 * step);
+        gizmos.line(a + off, b + off, color);
+    }
+}
+
 fn draw_health_bar(gizmos: &mut Gizmos, position: Vec3, radius: f32, health: Health) {
-    let width = radius * 1.7;
+    let width = radius * 1.8;
     let y = position.y + 1.25;
     let ratio = health.ratio();
     let half = width * 0.5;
     let left = Vec3::new(position.x - half, y, position.z);
     let right = Vec3::new(position.x + half, y, position.z);
     let fill = Vec3::new(position.x - half + width * ratio, y, position.z);
-    // Draw the filled and depleted parts as NON-overlapping segments. Drawing a
-    // full-width background line and the fill line on top of it made them
-    // coincident (same y/z) → they z-fought and the dark background usually won,
-    // so every bar looked solid black.
+    // Filled and depleted parts are NON-overlapping segments (drawing a full
+    // background line under the fill made them coincident → z-fought → all black),
+    // and each is a stack of lines so the bar is a visible chunky strip.
+    const LAYERS: u32 = 5;
+    const STEP: f32 = 0.05;
     if ratio < 0.995 {
-        gizmos.line(fill, right, Color::srgb(0.32, 0.05, 0.05));
+        thick_line(gizmos, fill, right, Color::srgb(0.30, 0.05, 0.05), LAYERS, STEP);
     }
     if ratio > 0.005 {
         // Green when healthy → red when low.
@@ -27249,7 +27297,7 @@ fn draw_health_bar(gizmos: &mut Gizmos, position: Vec3, radius: f32, health: Hea
             0.20 + (0.90 - 0.20) * ratio,
             0.16 + (0.30 - 0.16) * ratio,
         );
-        gizmos.line(left, fill, fill_color);
+        thick_line(gizmos, left, fill, fill_color, LAYERS, STEP);
     }
 }
 

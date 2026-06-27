@@ -743,10 +743,22 @@ fn render_assault(dir: &Path, max_seconds: u32) -> Result<(), String> {
     }
 
     let max_ticks = max_seconds as usize * 30;
+    // Keep the camera on the fight and grab several combat frames so at least one
+    // catches active tracers/impacts/health bars (not the empty home base).
+    let combat_focus = capture_nearest_enemy_anchor_position(&mut app);
+    let combat_shot_ticks = [180usize, 360, 540, 720, 1080];
+    let mut combat_shot = 0usize;
     let mut resolved = false;
     let mut since_retarget = 0usize;
-    for _ in 0..max_ticks {
+    for tick in 0..max_ticks {
         app.update();
+        if combat_shot_ticks.contains(&tick) {
+            if let Some(focus) = combat_focus {
+                capture_focus_camera_on(&mut app, focus);
+            }
+            combat_shot += 1;
+            shoot(&mut app, &handle, dir.join(format!("03b_combat_{combat_shot}.png")));
+        }
         if capture_match_phase_label(&mut app) != "Running" {
             resolved = true;
             break;
