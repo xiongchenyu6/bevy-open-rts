@@ -15,8 +15,13 @@ wasm-bindgen \
   target/wasm32-unknown-unknown/release/bevy-open-rts.wasm
 
 if command -v wasm-opt >/dev/null 2>&1; then
-  wasm-opt -Oz -o web/pkg/bevy_open_rts_bg.wasm web/pkg/bevy_open_rts_bg.wasm
+  wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int \
+    -o web/pkg/bevy_open_rts_bg.wasm web/pkg/bevy_open_rts_bg.wasm
 fi
+
+# Precompressed copy the loader streams with a real progress bar (GitHub Pages
+# serves the .gz verbatim, so bytes-received == the actual ~7 MB transfer).
+gzip -9 -kf web/pkg/bevy_open_rts_bg.wasm
 
 BUILD_ID="$(scripts/stamp_web_build_id.py \
   web/index.html \

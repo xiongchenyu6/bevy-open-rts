@@ -39,8 +39,12 @@ serde = { version = "1.0", features = ["derive"] }
 
 [profile.release]
 codegen-units = 1
-lto = "thin"
+lto = "fat"
 opt-level = "z"
+panic = "abort"
+# NOTE: no `strip = true` — it removes the wasm `target_features` section, after
+# which wasm-opt rejects the bulk-memory ops. wasm-opt -Oz already strips the
+# wasm, so strip's marginal (~0.1 MB) gain isn't worth breaking the web build.
 
 [profile.dev.package."*"]
 opt-level = 2
