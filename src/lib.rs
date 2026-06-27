@@ -13597,11 +13597,14 @@ fn camera_screen_pan_vector(
 }
 
 fn camera_keyboard_pan_vector(keyboard: &ButtonInput<KeyCode>) -> Vec2 {
+    // Match the (correct) edge-pan sign convention: pan.y NEGATIVE moves the view
+    // UP (see cursor_edge_pan_vector: top edge → pan.y -= 1). So W (view up) must
+    // map to the "down" arg and S to the "up" arg — otherwise W/S are inverted.
     camera_pan_from_key_states(
         keyboard.pressed(KeyCode::KeyA),
         keyboard.pressed(KeyCode::KeyD),
-        keyboard.pressed(KeyCode::KeyW),
         keyboard.pressed(KeyCode::KeyS),
+        keyboard.pressed(KeyCode::KeyW),
     )
 }
 
@@ -27227,15 +27230,27 @@ fn draw_team_marker(
 fn draw_health_bar(gizmos: &mut Gizmos, position: Vec3, radius: f32, health: Health) {
     let width = radius * 1.7;
     let y = position.y + 1.25;
-    let left = Vec3::new(position.x - width * 0.5, y, position.z);
-    let right = Vec3::new(position.x + width * 0.5, y, position.z);
-    let fill = Vec3::new(
-        position.x - width * 0.5 + width * health.ratio(),
-        y,
-        position.z,
-    );
-    gizmos.line(left, right, Color::srgba(0.04, 0.06, 0.06, 0.92));
-    gizmos.line(left, fill, Color::srgb(0.25, 0.92, 0.36));
+    let ratio = health.ratio();
+    let half = width * 0.5;
+    let left = Vec3::new(position.x - half, y, position.z);
+    let right = Vec3::new(position.x + half, y, position.z);
+    let fill = Vec3::new(position.x - half + width * ratio, y, position.z);
+    // Draw the filled and depleted parts as NON-overlapping segments. Drawing a
+    // full-width background line and the fill line on top of it made them
+    // coincident (same y/z) → they z-fought and the dark background usually won,
+    // so every bar looked solid black.
+    if ratio < 0.995 {
+        gizmos.line(fill, right, Color::srgb(0.32, 0.05, 0.05));
+    }
+    if ratio > 0.005 {
+        // Green when healthy → red when low.
+        let fill_color = Color::srgb(
+            0.92 + (0.22 - 0.92) * ratio,
+            0.20 + (0.90 - 0.20) * ratio,
+            0.16 + (0.30 - 0.16) * ratio,
+        );
+        gizmos.line(left, fill, fill_color);
+    }
 }
 
 fn pointer_ground(
@@ -27453,6 +27468,36 @@ mod current_tests {
     // from the viewing player's own units) must be revealed through the ally, and
     // must stay fogged when the same teams are NOT allied. Mirrors godot's
     // FogOfWar revealing units `is_allied_with(visible_player)`.
+    // W/S keyboard pan must match the edge-pan sign convention (pan.y<0 = view up,
+    // matching cursor at the top edge). Guards against the recurring inversion.
+    #[test]
+    fn camera_keyboard_pan_matches_edge_pan_direction() {
+        let mut keys = ButtonInput::<KeyCode>::default();
+        keys.press(KeyCode::KeyW);
+        assert!(
+            camera_keyboard_pan_vector(&keys).y < 0.0,
+            "W should pan the view up (negative y)"
+        );
+        keys.release(KeyCode::KeyW);
+        keys.press(KeyCode::KeyS);
+        assert!(
+            camera_keyboard_pan_vector(&keys).y > 0.0,
+            "S should pan the view down (positive y)"
+        );
+        keys.release(KeyCode::KeyS);
+        keys.press(KeyCode::KeyD);
+        assert!(
+            camera_keyboard_pan_vector(&keys).x > 0.0,
+            "D should pan the view right (positive x)"
+        );
+        // Same convention as the edge pan: top edge is also negative y.
+        let win = Vec2::new(1280.0, 720.0);
+        assert!(
+            cursor_edge_pan_vector(Some(Vec2::new(640.0, 2.0)), win, true, false).y < 0.0,
+            "top-edge pan and W must share the negative-y = view-up convention"
+        );
+    }
+
     #[test]
     fn allied_vision_is_shared_through_allies() {
         fn enemy_visible_with_alliance(allied: bool) -> bool {
