@@ -29,6 +29,10 @@ scripts/run_desktop.sh
 
 ## Build WebGPU
 
+Live GitHub Pages build:
+
+https://xiongchenyu6.github.io/bevy-open-rts/
+
 ```sh
 scripts/build_web.sh
 scripts/serve_web.py
