@@ -1,7 +1,9 @@
 .direnv
+.codex
 __pycache__
 *.pyc
 result
+screenshots
 target
 web/pkg
 web/assets
