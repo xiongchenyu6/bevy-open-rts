@@ -12,6 +12,7 @@
 //!   capture frames <dir> [count]         numbered frameXXXXX.png sequence (default 450)
 //!   capture play <dir>                   real input smoke: select/move/train/build
 //!   capture harvest <dir>                real input smoke: Worker right-clicks ore
+//!   capture assault <dir> [max-seconds]  real input smoke: select army/attack-move/win
 //!   capture match [max-seconds]          headless AI-vs-AI match must resolve
 //!   capture menu [path]                  lobby/setup screenshot
 //!   capture factions <dir>               faction base/build smoke screenshots
@@ -24,15 +25,19 @@ use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 
 use bevy_open_rts::{
     CaptureTarget, build_capture_app, capture_build_options_count,
-    capture_enemy_structure_position, capture_first_enabled_build_hotkey,
-    capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_key, capture_mouse_button,
-    capture_nearest_visible_resource_click_position_to, capture_placement_is_valid,
-    capture_player_attack_move_all, capture_player_build_queue_len,
-    capture_player_completed_structure_count, capture_player_constructing_count,
-    capture_player_harvesting_count, capture_player_in_placement_mode,
-    capture_player_onscreen_unit_position, capture_player_onscreen_worker_position,
-    capture_player_producer_position, capture_player_resources, capture_player_structure_count,
-    capture_player_unit_count, capture_player_worker_position, capture_run_ai_match_until_resolved,
+    capture_enabled_build_hotkey_for, capture_enabled_train_hotkey_for,
+    capture_enemy_structure_position, capture_first_enabled_attack_move_hotkey,
+    capture_first_enabled_build_hotkey, capture_first_enabled_train_hotkey,
+    capture_focus_camera_on, capture_key, capture_match_phase_label, capture_mouse_button,
+    capture_nearest_enemy_anchor_position, capture_nearest_visible_resource_click_position_to,
+    capture_placement_is_valid, capture_player_army_unit_count, capture_player_attack_move_all,
+    capture_player_build_queue_len, capture_player_combat_order_count,
+    capture_player_completed_structure_count, capture_player_completed_structure_position,
+    capture_player_constructing_count, capture_player_harvesting_count,
+    capture_player_in_placement_mode, capture_player_onscreen_unit_position,
+    capture_player_onscreen_worker_position, capture_player_producer_position,
+    capture_player_resources, capture_player_structure_count, capture_player_unit_count,
+    capture_player_worker_position, capture_run_ai_match_until_resolved,
     capture_selected_player_unit_average_position, capture_selected_player_unit_count,
     capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
     capture_world_to_screen, start_shared_match_scene_with_current_setup,
@@ -48,6 +53,10 @@ const MATCH_SETTLE_TICKS: usize = 60;
 const FLUSH_TICKS: usize = 16;
 const TRAIN_COMPLETION_WAIT_TICKS: usize = 360;
 const BUILD_COMPLETION_WAIT_TICKS: usize = 900;
+const ASSAULT_DEFAULT_MAX_SECONDS: u32 = 240;
+const ASSAULT_TARGET_ARMY_UNITS: usize = 12;
+const ASSAULT_TRAIN_PRODUCT: &str = "HeavyMachinegunTrooper";
+const ASSAULT_RETARGET_TICKS: usize = 450;
 
 fn main() {
     let mut args = env::args().skip(1);
@@ -88,6 +97,17 @@ fn main() {
                 .unwrap_or_else(|| PathBuf::from("screenshots/harvest"));
             render_harvest(&dir)
         }
+        Some("assault") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/assault"));
+            let max_seconds = args
+                .next()
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(ASSAULT_DEFAULT_MAX_SECONDS);
+            render_assault(&dir, max_seconds)
+        }
         Some("match") => {
             let max_seconds = args.next().and_then(|s| s.parse().ok()).unwrap_or(240);
             run_match_proof(max_seconds)
@@ -100,7 +120,7 @@ fn main() {
             render_factions(&dir)
         }
         Some(other) => Err(format!(
-            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | play <dir> | harvest <dir> | match <seconds> | factions <dir>]"
+            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | play <dir> | harvest <dir> | assault <dir> <seconds> | match <seconds> | factions <dir>]"
         )),
     };
     if let Err(error) = result {
@@ -158,6 +178,22 @@ fn wait_until(app: &mut App, max_ticks: usize, mut done: impl FnMut(&mut App) ->
         }
     }
     false
+}
+
+fn tap_key(app: &mut App, key: KeyCode) {
+    capture_key(app, key, true);
+    app.update();
+    capture_key(app, key, false);
+    app.update();
+}
+
+fn select_all_player_army(app: &mut App) {
+    capture_key(app, KeyCode::ControlLeft, true);
+    capture_key(app, KeyCode::AltLeft, true);
+    tap_key(app, KeyCode::KeyA);
+    capture_key(app, KeyCode::AltLeft, false);
+    capture_key(app, KeyCode::ControlLeft, false);
+    app.update();
 }
 
 /// Selects a producer and presses its train hotkey via real input; returns true
@@ -622,6 +658,235 @@ fn render_play(dir: &Path) -> Result<(), String> {
         dir.display()
     );
     Ok(())
+}
+
+fn render_assault(dir: &Path, max_seconds: u32) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    let mut app = start_match_app();
+    let handle = capture_handle(&app);
+    shoot(&mut app, &handle, dir.join("00_start.png"));
+
+    let barracks_pos = build_barracks_via_real_input(&mut app)?;
+    shoot(&mut app, &handle, dir.join("01_barracks.png"));
+    let army_count = train_barracks_army_via_real_input(
+        &mut app,
+        barracks_pos,
+        ASSAULT_TARGET_ARMY_UNITS,
+        ASSAULT_TRAIN_PRODUCT,
+    )?;
+    shoot(&mut app, &handle, dir.join("02_army_ready.png"));
+
+    let mut assault_orders = 0usize;
+    let (selected, attack_key, combat_orders) =
+        issue_player_attack_move_to_nearest_anchor(&mut app)?;
+    assault_orders += 1;
+    println!(
+        "[capture] assault order: army {army_count}, selected {selected}, attack key {attack_key:?}, combat orders {combat_orders}"
+    );
+    shoot(&mut app, &handle, dir.join("03_attack_order.png"));
+    if combat_orders == 0 {
+        return Err("Attack-Move input did not create any player combat orders".into());
+    }
+
+    let max_ticks = max_seconds as usize * 30;
+    let mut resolved = false;
+    let mut since_retarget = 0usize;
+    for _ in 0..max_ticks {
+        app.update();
+        if capture_match_phase_label(&mut app) != "Running" {
+            resolved = true;
+            break;
+        }
+        since_retarget += 1;
+        if since_retarget >= ASSAULT_RETARGET_TICKS {
+            let (_, _, orders) = issue_player_attack_move_to_nearest_anchor(&mut app)?;
+            assault_orders += 1;
+            println!("[capture] assault retarget {assault_orders}: combat orders {orders}");
+            since_retarget = 0;
+        }
+    }
+    let phase = capture_match_phase_label(&mut app);
+    println!(
+        "[capture] assault result after <= {max_seconds}s: {phase}, attack orders issued {assault_orders}"
+    );
+    shoot(&mut app, &handle, dir.join("04_result.png"));
+    if !resolved {
+        return Err(format!(
+            "player assault did not resolve within {max_seconds}s; phase stayed {phase}"
+        ));
+    }
+    if phase != "HumanVictory" {
+        return Err(format!(
+            "player assault resolved as {phase}, expected HumanVictory"
+        ));
+    }
+
+    println!(
+        "[capture] wrote player assault verification to {}",
+        dir.display()
+    );
+    Ok(())
+}
+
+fn issue_player_attack_move_to_nearest_anchor(
+    app: &mut App,
+) -> Result<(usize, KeyCode, usize), String> {
+    select_all_player_army(app);
+    for _ in 0..12 {
+        app.update();
+    }
+    let selected = capture_selected_player_unit_count(app);
+    if selected == 0 {
+        return Err("Ctrl+Alt+A did not select any player army units".into());
+    }
+
+    let Some(attack_key) = capture_first_enabled_attack_move_hotkey(app) else {
+        return Err("selected army does not expose an enabled Attack-Move command".into());
+    };
+    tap_key(app, attack_key);
+
+    let target =
+        capture_nearest_enemy_anchor_position(app).ok_or("no living enemy anchor target")?;
+    capture_focus_camera_on(app, target);
+    for _ in 0..20 {
+        app.update();
+    }
+    let target_screen =
+        capture_world_to_screen(app, target).ok_or("enemy anchor target offscreen")?;
+    capture_set_cursor(app, target_screen);
+    capture_mouse_button(app, MouseButton::Right, true);
+    app.update();
+    capture_mouse_button(app, MouseButton::Right, false);
+    for _ in 0..30 {
+        app.update();
+    }
+
+    Ok((selected, attack_key, capture_player_combat_order_count(app)))
+}
+
+fn build_barracks_via_real_input(app: &mut App) -> Result<Vec3, String> {
+    let worker = capture_player_worker_position(app).ok_or("no player Worker to build Barracks")?;
+    capture_focus_camera_on(app, worker);
+    for _ in 0..12 {
+        app.update();
+    }
+    let worker_screen = capture_world_to_screen(app, worker).ok_or("worker offscreen")?;
+    capture_set_cursor(app, worker_screen);
+    capture_mouse_button(app, MouseButton::Left, true);
+    app.update();
+    capture_mouse_button(app, MouseButton::Left, false);
+    for _ in 0..12 {
+        app.update();
+    }
+
+    let Some(build_key) = capture_enabled_build_hotkey_for(app, "Barracks") else {
+        return Err("selected Worker does not expose an enabled Barracks build command".into());
+    };
+    tap_key(app, build_key);
+    if !capture_player_in_placement_mode(app) {
+        return Err("Barracks build hotkey did not enter placement mode".into());
+    }
+
+    let structures_before = capture_player_structure_count(app);
+    let placement_offsets = [
+        Vec3::new(4.0, 0.0, 2.5),
+        Vec3::new(4.5, 0.0, -3.5),
+        Vec3::new(-4.0, 0.0, 3.0),
+        Vec3::new(0.0, 0.0, 5.0),
+        Vec3::new(6.0, 0.0, 0.0),
+    ];
+    let mut placed_at = None;
+    for offset in placement_offsets {
+        let candidate = worker + offset;
+        capture_focus_camera_on(app, candidate);
+        for _ in 0..8 {
+            app.update();
+        }
+        let Some(screen) = capture_world_to_screen(app, candidate) else {
+            continue;
+        };
+        capture_set_cursor(app, screen);
+        for _ in 0..6 {
+            app.update();
+        }
+        if !capture_placement_is_valid(app) {
+            continue;
+        }
+        capture_mouse_button(app, MouseButton::Left, true);
+        app.update();
+        capture_mouse_button(app, MouseButton::Left, false);
+        for _ in 0..20 {
+            app.update();
+        }
+        if capture_player_structure_count(app) > structures_before {
+            placed_at = Some(candidate);
+            break;
+        }
+    }
+    let placed_at = placed_at.ok_or("could not place Barracks at a valid build location")?;
+    println!(
+        "[capture] assault Barracks placed at ({:.1},{:.1}) via {build_key:?}",
+        placed_at.x, placed_at.z
+    );
+
+    let completed = wait_until(app, BUILD_COMPLETION_WAIT_TICKS, |app| {
+        capture_player_completed_structure_position(app, "Barracks").is_some()
+    });
+    if !completed {
+        return Err("Barracks foundation was placed but did not complete construction".into());
+    }
+    let barracks = capture_player_completed_structure_position(app, "Barracks")
+        .ok_or("completed Barracks position missing after construction wait")?;
+    println!(
+        "[capture] assault Barracks completed at ({:.1},{:.1})",
+        barracks.x, barracks.z
+    );
+    Ok(barracks)
+}
+
+fn train_barracks_army_via_real_input(
+    app: &mut App,
+    barracks: Vec3,
+    target_army_units: usize,
+    product_id: &'static str,
+) -> Result<usize, String> {
+    capture_focus_camera_on(app, barracks);
+    for _ in 0..12 {
+        app.update();
+    }
+    let barracks_screen = capture_world_to_screen(app, barracks).ok_or("Barracks offscreen")?;
+    capture_set_cursor(app, barracks_screen);
+    capture_mouse_button(app, MouseButton::Left, true);
+    app.update();
+    capture_mouse_button(app, MouseButton::Left, false);
+    for _ in 0..12 {
+        app.update();
+    }
+
+    let initial_army = capture_player_army_unit_count(app);
+    let desired_army = target_army_units.max(initial_army);
+    let mut train_inputs = 0usize;
+    let mut ticks = 0usize;
+    while ticks < 3_600 && capture_player_army_unit_count(app) < desired_army {
+        if let Some(train_key) = capture_enabled_train_hotkey_for(app, product_id) {
+            tap_key(app, train_key);
+            train_inputs += 1;
+        }
+        for _ in 0..15 {
+            app.update();
+        }
+        ticks += 15;
+    }
+    let final_army = capture_player_army_unit_count(app);
+    println!(
+        "[capture] assault trained army: {initial_army} -> {final_army}, product {product_id}, train inputs {train_inputs}"
+    );
+    if final_army < desired_army {
+        return Err(format!(
+            "Barracks training only reached {final_army}/{desired_army} combat units"
+        ));
+    }
+    Ok(final_army)
 }
 
 fn render_still(path: &Path) -> Result<(), String> {

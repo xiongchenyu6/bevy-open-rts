@@ -2831,6 +2831,7 @@ struct TeamAiProfile {
     expected_battlegroups: usize,
     expected_units_in_battlegroup: usize,
     active_offense_enabled: bool,
+    opening_attack_grace: f32,
     capture_enabled: bool,
     saboteur_enabled: bool,
     support_powers_enabled: bool,
@@ -3858,6 +3859,7 @@ const HUMAN_AI_PROFILE: TeamAiProfile = TeamAiProfile {
     expected_battlegroups: 2,
     expected_units_in_battlegroup: 4,
     active_offense_enabled: true,
+    opening_attack_grace: AI_OPENING_ATTACK_GRACE_SECONDS,
     capture_enabled: true,
     saboteur_enabled: true,
     support_powers_enabled: true,
@@ -3881,6 +3883,7 @@ const DEMON_AI_PROFILE: TeamAiProfile = TeamAiProfile {
     expected_battlegroups: 2,
     expected_units_in_battlegroup: 4,
     active_offense_enabled: true,
+    opening_attack_grace: AI_OPENING_ATTACK_GRACE_SECONDS,
     capture_enabled: true,
     saboteur_enabled: true,
     support_powers_enabled: true,
@@ -3904,6 +3907,7 @@ const CHAOS_AI_PROFILE: TeamAiProfile = TeamAiProfile {
     expected_battlegroups: 2,
     expected_units_in_battlegroup: 4,
     active_offense_enabled: true,
+    opening_attack_grace: AI_OPENING_ATTACK_GRACE_SECONDS,
     capture_enabled: true,
     saboteur_enabled: true,
     support_powers_enabled: true,
@@ -4447,6 +4451,64 @@ pub fn capture_enemy_structure_position(app: &mut App) -> Option<Vec3> {
     enemy
 }
 
+/// Nearest living enemy elimination-anchor position for player assault captures.
+pub fn capture_nearest_enemy_anchor_position(app: &mut App) -> Option<Vec3> {
+    let player = Team::Player(0);
+    let world = app.world_mut();
+    let origin = {
+        let mut units = world.query_filtered::<(&Team, &Transform), (With<Unit>, With<Selected>)>();
+        let mut sum = Vec3::ZERO;
+        let mut count = 0usize;
+        for (team, transform) in units.iter(world) {
+            if *team == player {
+                sum += transform.translation;
+                count += 1;
+            }
+        }
+        if count > 0 {
+            sum / count as f32
+        } else {
+            Vec3::ZERO
+        }
+    };
+
+    let mut best: Option<(f32, Vec3)> = None;
+    {
+        let mut structures =
+            world.query_filtered::<(&Structure, &Team, &Transform, &Health), With<Structure>>();
+        for (structure, team, transform, health) in structures.iter(world) {
+            if *team == player
+                || *team == Team::Neutral
+                || health.current <= 0.0
+                || !is_structure_elimination_anchor(structure)
+            {
+                continue;
+            }
+            let distance = xz_distance(origin, transform.translation);
+            if best.is_none_or(|(best_distance, _)| distance < best_distance) {
+                best = Some((distance, transform.translation));
+            }
+        }
+    }
+    {
+        let mut units = world.query_filtered::<(&Unit, &Team, &Transform, &Health), With<Unit>>();
+        for (unit, team, transform, health) in units.iter(world) {
+            if *team == player
+                || *team == Team::Neutral
+                || health.current <= 0.0
+                || !is_worker_elimination_anchor(unit)
+            {
+                continue;
+            }
+            let distance = xz_distance(origin, transform.translation);
+            if best.is_none_or(|(best_distance, _)| distance < best_distance) {
+                best = Some((distance, transform.translation));
+            }
+        }
+    }
+    best.map(|(_, position)| position)
+}
+
 /// Emits a real keyboard message (the same data winit produces) so command
 /// hotkeys (`command_shortcuts`) fire headlessly.
 pub fn capture_key(app: &mut App, key: KeyCode, pressed: bool) {
@@ -4498,6 +4560,23 @@ pub fn capture_first_enabled_train_hotkey(app: &mut App) -> Option<KeyCode> {
     let mut q = world.query::<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>();
     for (slot, action, availability) in q.iter(world) {
         if matches!(action, BuildAction::Train(_)) && availability.enabled {
+            return COMMAND_SLOT_HOTKEYS
+                .get(slot.0)
+                .map(|hotkey| hotkey.key_code);
+        }
+    }
+    None
+}
+
+/// Hotkey of a specific enabled "train this unit" command-panel slot.
+pub fn capture_enabled_train_hotkey_for(
+    app: &mut App,
+    product_id: &'static str,
+) -> Option<KeyCode> {
+    let world = app.world_mut();
+    let mut q = world.query::<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>();
+    for (slot, action, availability) in q.iter(world) {
+        if matches!(action, BuildAction::Train(id) if *id == product_id) && availability.enabled {
             return COMMAND_SLOT_HOTKEYS
                 .get(slot.0)
                 .map(|hotkey| hotkey.key_code);
@@ -4562,6 +4641,38 @@ pub fn capture_first_enabled_build_hotkey(app: &mut App) -> Option<KeyCode> {
     None
 }
 
+/// Hotkey of a specific enabled "build this structure" command-panel slot.
+pub fn capture_enabled_build_hotkey_for(
+    app: &mut App,
+    structure_id: &'static str,
+) -> Option<KeyCode> {
+    let world = app.world_mut();
+    let mut q = world.query::<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>();
+    for (slot, action, availability) in q.iter(world) {
+        if matches!(action, BuildAction::Build(id) if *id == structure_id) && availability.enabled {
+            return COMMAND_SLOT_HOTKEYS
+                .get(slot.0)
+                .map(|hotkey| hotkey.key_code);
+        }
+    }
+    None
+}
+
+/// Hotkey of the enabled Attack-Move command-panel slot for the current
+/// selection, if the selected army can issue one.
+pub fn capture_first_enabled_attack_move_hotkey(app: &mut App) -> Option<KeyCode> {
+    let world = app.world_mut();
+    let mut q = world.query::<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>();
+    for (slot, action, availability) in q.iter(world) {
+        if matches!(action, BuildAction::AttackMove) && availability.enabled {
+            return COMMAND_SLOT_HOTKEYS
+                .get(slot.0)
+                .map(|hotkey| hotkey.key_code);
+        }
+    }
+    None
+}
+
 /// (enabled, total) Build options currently on the command panel — diagnostic
 /// for whether the worker construction menu is showing at all.
 pub fn capture_build_options_count(app: &mut App) -> (usize, usize) {
@@ -4599,6 +4710,25 @@ pub fn capture_player_completed_structure_count(app: &mut App) -> usize {
             **team == Team::Player(0) && under_construction.is_none()
         })
         .count()
+}
+
+/// Position of a completed player structure by id.
+pub fn capture_player_completed_structure_position(
+    app: &mut App,
+    structure_id: &'static str,
+) -> Option<Vec3> {
+    let world = app.world_mut();
+    let mut q = world.query_filtered::<
+        (&Structure, &Team, &Transform, Option<&UnderConstruction>),
+        With<Structure>,
+    >();
+    for (structure, team, transform, under_construction) in q.iter(world) {
+        if *team == Team::Player(0) && structure.id == structure_id && under_construction.is_none()
+        {
+            return Some(transform.translation);
+        }
+    }
+    None
 }
 
 /// Whether the player currently has a pending structure placement (build mode).
@@ -4682,6 +4812,32 @@ pub fn capture_player_constructing_count(app: &mut App) -> usize {
     let world = app.world_mut();
     let mut q = world.query_filtered::<&Team, (With<Unit>, With<ConstructOrder>)>();
     q.iter(world).filter(|t| **t == Team::Player(0)).count()
+}
+
+/// Number of player units that currently carry a live combat order.
+pub fn capture_player_combat_order_count(app: &mut App) -> usize {
+    let world = app.world_mut();
+    let mut q = world
+        .query_filtered::<(&Team, Option<&AttackMoveOrder>, Option<&AttackOrder>), With<Unit>>();
+    q.iter(world)
+        .filter(|(team, attack_move, attack)| {
+            **team == Team::Player(0) && (attack_move.is_some() || attack.is_some())
+        })
+        .count()
+}
+
+/// Count of player-owned combat-capable mobile units.
+pub fn capture_player_army_unit_count(app: &mut App) -> usize {
+    let world = app.world_mut();
+    let mut q = world.query_filtered::<(&Team, &Unit), With<Unit>>();
+    q.iter(world)
+        .filter(|(team, unit)| **team == Team::Player(0) && unit_supports_attack_move(unit))
+        .count()
+}
+
+/// Current match phase label for capture smoke tests.
+pub fn capture_match_phase_label(app: &mut App) -> &'static str {
+    match_phase_label(app.world().resource::<MatchState>().phase)
 }
 
 /// Runs the default AI-vs-AI skirmish using the headless simulation path and
@@ -6236,6 +6392,7 @@ struct AiDirector {
     production_timer: Vec<f32>,
     production_cursor: Vec<usize>,
     attack_timer: Vec<f32>,
+    opening_attack_grace_applied: Vec<bool>,
     build_timer: Vec<f32>,
     construction_timer: Vec<f32>,
     capture_timer: Vec<f32>,
@@ -6252,6 +6409,7 @@ impl AiDirector {
             self.production_cursor.resize(index + 1, 0);
             self.attack_timer
                 .resize(index + 1, AI_OPENING_ATTACK_GRACE_SECONDS);
+            self.opening_attack_grace_applied.resize(index + 1, false);
             self.build_timer.resize(index + 1, 8.0);
             self.construction_timer.resize(index + 1, 0.0);
             self.capture_timer.resize(index + 1, 3.0);
@@ -6269,6 +6427,7 @@ impl Default for AiDirector {
             production_timer: Vec::new(),
             production_cursor: Vec::new(),
             attack_timer: Vec::new(),
+            opening_attack_grace_applied: Vec::new(),
             build_timer: Vec::new(),
             construction_timer: Vec::new(),
             capture_timer: Vec::new(),
@@ -8376,6 +8535,7 @@ fn faction_ai_profile_for_difficulty(
             profile.expected_battlegroups = 0;
             profile.expected_units_in_battlegroup = 0;
             profile.active_offense_enabled = false;
+            profile.opening_attack_grace = 120.0;
             profile.capture_enabled = false;
             profile.saboteur_enabled = false;
             profile.support_powers_enabled = false;
@@ -8395,12 +8555,14 @@ fn faction_ai_profile_for_difficulty(
             profile.expected_workers = 2;
             profile.expected_refineries = 1;
             profile.expected_battlegroups = 1;
-            profile.expected_units_in_battlegroup = 3;
+            profile.expected_units_in_battlegroup = 2;
+            profile.active_offense_enabled = false;
+            profile.opening_attack_grace = 90.0;
             profile.capture_enabled = false;
             profile.saboteur_enabled = false;
             profile.support_powers_enabled = false;
-            profile.production_interval = 5.5;
-            profile.attack_interval = 9.0;
+            profile.production_interval = 6.5;
+            profile.attack_interval = 14.0;
             profile.build_interval = 13.0;
             profile.capture_interval = AI_CAPTURE_INTERVAL_SECONDS + 2.0;
             profile.saboteur_interval = AI_SABOTEUR_INTERVAL_SECONDS + 3.0;
@@ -8415,6 +8577,7 @@ fn faction_ai_profile_for_difficulty(
             profile.expected_refineries = 2;
             profile.expected_battlegroups = 3;
             profile.expected_units_in_battlegroup = 5;
+            profile.opening_attack_grace = 35.0;
             profile.production_interval = 3.0;
             profile.attack_interval = 4.5;
             profile.build_interval = 8.0;
@@ -21196,9 +21359,6 @@ fn ai_battlegroup_candidate_allowed(
     if ai_training_is_economy_request(candidate) || !ai_battle_unit_id(candidate) {
         return true;
     }
-    if !profile.active_offense_enabled {
-        return false;
-    }
     let target_units = ai_battlegroup_target_units(profile);
     target_units > 0 && counts.battle_units < target_units
 }
@@ -21400,6 +21560,10 @@ fn ai_director(
         let faction = resources.player_factions.slot_faction(team);
         let profile =
             faction_ai_profile_for_difficulty(faction, resources.ai_settings.difficulty(team));
+        if !resources.director.opening_attack_grace_applied[idx] {
+            resources.director.attack_timer[idx] = profile.opening_attack_grace;
+            resources.director.opening_attack_grace_applied[idx] = true;
+        }
 
         resources.director.support_timer[idx] -= delta;
         if profile.support_powers_enabled && resources.director.support_timer[idx] <= 0.0 {
@@ -27382,6 +27546,15 @@ mod current_tests {
         assert!(
             easy.defense_priority.is_empty(),
             "Easy AI should not inherit the Normal defense build queue"
+        );
+        assert!(
+            !easy.active_offense_enabled,
+            "Easy AI should give the player a build-up window instead of launching attack waves"
+        );
+        assert_eq!(
+            ai_battlegroup_target_units(&easy),
+            2,
+            "Easy AI should still train a small defensive force"
         );
         assert_eq!(ai_structure_profile_limit("AntiGroundTurret", &easy), 0);
         assert_eq!(ai_structure_profile_limit("TeslaFenceSegment", &easy), 0);

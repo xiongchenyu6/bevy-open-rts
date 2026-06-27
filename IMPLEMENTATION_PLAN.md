@@ -102,13 +102,16 @@ treasury grants.
 `capture match` runs headless AI-vs-AI and exits non-zero unless economy,
 production, combat, and elimination resolve a match. `capture factions` exits
 non-zero unless all three factions can train and build through the human command
-panel with default resources. Capture apps disable `LogPlugin` so multi-app
-capture runs no longer emit duplicate global-logger errors.
+panel with default resources. `capture assault` now exercises a player-win loop
+through real input: build Barracks, train Heavy Machinegun Troopers, repeatedly
+attack-move to remaining enemy anchors, and require `HumanVictory`. Capture apps
+disable `LogPlugin` so multi-app capture runs no longer emit duplicate
+global-logger errors.
 
 ## Verification notes
 - 24/24 `cargo test current_tests` pass; `cargo build --bins` clean.
 - Command icons + portrait + lobby dropdowns are confirmed in capture output
   (no longer need `cargo run` eyeballing for UI in this headless environment).
-- `capture play`, `capture harvest`, `capture match`, and `capture factions`
-  are hard self-checking smoke tests for the human input loop and completed
-  AI-vs-AI match loop.
+- `capture play`, `capture harvest`, `capture assault`, `capture match`, and
+  `capture factions` are hard self-checking smoke tests for the human input
+  loop, a player victory loop, and the completed AI-vs-AI match loop.

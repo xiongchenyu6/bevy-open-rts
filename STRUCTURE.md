@@ -23,6 +23,7 @@
 - AI/runtime fallback helpers are not capped to the lobby slot count: active AI iteration, opponent helpers, late-slot resources, cooldowns, fallback home positions, virtual spawn positions, runtime team relation IDs, and battle AI participation are verified beyond eight players.
 - AI drones have an active scouting controller: idle AI `Drone` units pick living enemy units, move to their positions, avoid repeating the previous target when possible, and retarget after a short 0.5-1.0s delay.
 - AI defense profiles follow the godot difficulty targets: Beginner/Easy do not inherit Normal advanced-defense construction, Normal targets one standard defense layer plus 2 Tesla fence segments where the faction supports them, and Hard scales standard defenses to 2 plus 4 Tesla fence segments.
+- Easy AI is tuned as a build-up opponent: it trains a small defensive force but does not launch active attack waves, giving default human starts enough time to build a Barracks and form an army. Normal/Hard keep active offense.
 - The minimal `GodotSkirmish` opening remains one `CommandCenter` plus two `Worker` economy units, but each faction gets a distinct starter combat/scout unit (`ScoutRover`, `RocketInfantry`, `ShieldTrooper`) so the default `cargo run` start is not visually identical across races.
 
 ## Capture And Proofs
@@ -36,6 +37,7 @@
   - `capture frames <dir> [count]`: records a frame sequence from the shared live match.
   - `capture harvest <dir>`: selects a real Worker, right-clicks ore, and requires `HarvestOrder` plus resource growth.
   - `capture play <dir>`: uses the real default-start economy for select, move, CommandCenter training, completed unit spawn, Worker build placement, and completed Worker construction.
+  - `capture assault <dir> [max-seconds]`: uses real input to build a Barracks, train Heavy Machinegun Troopers, retarget attack-move orders onto living enemy anchors, and requires `HumanVictory`.
   - `capture factions <dir>`: starts each playable faction and verifies train/build through the human command panel using default resources.
   - `capture match [max-seconds]`: runs a headless AI-vs-AI shared match and requires economy, production, combat, and elimination to resolve.
 - The old `real-*-proof` CLI surfaces were removed; do not use them as completion gates.
