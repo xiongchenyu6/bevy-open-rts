@@ -30,6 +30,7 @@ use bevy_open_rts::{
     capture_first_enabled_build_hotkey, capture_first_enabled_train_hotkey,
     capture_focus_camera_on, capture_key, capture_match_phase_label, capture_mouse_button,
     capture_nearest_enemy_anchor_position, capture_nearest_visible_resource_click_position_to,
+    capture_nearest_visible_resource_position,
     capture_placement_is_valid, capture_player_army_unit_count, capture_player_attack_move_all,
     capture_player_build_queue_len, capture_player_combat_order_count,
     capture_player_completed_structure_count, capture_player_completed_structure_position,
@@ -38,9 +39,11 @@ use bevy_open_rts::{
     capture_player_onscreen_worker_position, capture_player_producer_position,
     capture_player_resources, capture_player_structure_count, capture_player_unit_count,
     capture_player_worker_position, capture_run_ai_match_until_resolved,
+    capture_entity_is_selected, capture_onscreen_resource_model_center,
     capture_selected_player_unit_average_position, capture_selected_player_unit_count,
     capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
-    capture_world_to_screen, start_shared_match_scene_with_current_setup,
+    capture_world_to_screen, capture_worst_model_alignment_offset,
+    start_shared_match_scene_with_current_setup,
 };
 
 const WIDTH: u32 = 1280;
@@ -112,6 +115,7 @@ fn main() {
             let max_seconds = args.next().and_then(|s| s.parse().ok()).unwrap_or(240);
             run_match_proof(max_seconds)
         }
+        Some("verify") => verify_click_alignment(),
         Some("factions") => {
             let dir = args
                 .next()
@@ -120,13 +124,63 @@ fn main() {
             render_factions(&dir)
         }
         Some(other) => Err(format!(
-            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | play <dir> | harvest <dir> | assault <dir> <seconds> | match <seconds> | factions <dir>]"
+            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | play <dir> | harvest <dir> | assault <dir> <seconds> | match <seconds> | factions <dir> | verify]"
         )),
     };
     if let Err(error) = result {
         eprintln!("[capture] error: {error}");
         std::process::exit(1);
     }
+}
+
+/// Non-self-referential click harness: confirms each entity's VISIBLE model sits
+/// on its logical origin (so gizmos + hit-tests, which use the origin, land on the
+/// model), then clicks a resource where it is actually DRAWN and requires the
+/// click to select it. This is the check that would have caught the off-origin
+/// GLB bug (the old harvest "proof" clicked world_to_viewport(origin) and tested
+/// against the same point, so it could never see the model rendered elsewhere).
+fn verify_click_alignment() -> Result<(), String> {
+    let mut app = start_match_app();
+    // Let scenes finish streaming and the recenter settle window elapse.
+    for _ in 0..90 {
+        app.update();
+    }
+
+    let (offset, label) =
+        capture_worst_model_alignment_offset(&mut app).ok_or("no models with AABBs loaded")?;
+    println!("[verify] worst model-vs-origin offset: {offset:.3}m ({label})");
+    const MAX_OFFSET_M: f32 = 0.3;
+    if offset > MAX_OFFSET_M {
+        return Err(format!(
+            "visible model is {offset:.2}m off the entity origin ({label}) — gizmos/clicks miss the model (limit {MAX_OFFSET_M}m)"
+        ));
+    }
+
+    // Frame a resource so the end-to-end click test has one on-screen.
+    if let Some(resource_pos) = capture_nearest_visible_resource_position(&mut app) {
+        capture_focus_camera_on(&mut app, resource_pos);
+        for _ in 0..20 {
+            app.update();
+        }
+    }
+    let (entity, center) = capture_onscreen_resource_model_center(&mut app)
+        .ok_or("no on-screen resource model found")?;
+    let screen = capture_world_to_screen(&mut app, center).ok_or("resource model offscreen")?;
+    capture_set_cursor(&mut app, screen);
+    capture_mouse_button(&mut app, MouseButton::Left, true);
+    app.update();
+    capture_mouse_button(&mut app, MouseButton::Left, false);
+    for _ in 0..3 {
+        app.update();
+    }
+    let selected = capture_entity_is_selected(&mut app, entity);
+    println!("[verify] clicked visible resource model @ ({:.0},{:.0}): selected={selected}", screen.x, screen.y);
+    if !selected {
+        return Err("left-clicking the visible resource model did not select it".into());
+    }
+
+    println!("[verify] OK: models aligned to origin; the visible resource is clickable");
+    Ok(())
 }
 
 fn run_match_proof(max_seconds: u32) -> Result<(), String> {

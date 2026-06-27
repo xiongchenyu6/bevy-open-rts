@@ -7,6 +7,7 @@ use bevy::{
     ecs::system::SystemParam,
     input::mouse::{MouseButtonInput, MouseMotion, MouseScrollUnit, MouseWheel},
     math::primitives::{ConicalFrustum, Cuboid, Cylinder, Torus},
+    camera::primitives::Aabb,
     prelude::*,
     render::error_handler::{ErrorType, RenderError, RenderErrorHandler, RenderErrorPolicy},
     window::{PrimaryWindow, WindowResolution},
@@ -4410,6 +4411,143 @@ pub fn capture_selected_player_unit_count(app: &mut App) -> usize {
         .count()
 }
 
+/// Combined world-space AABB center of an entity's visible mesh descendants.
+fn entity_visual_world_center(
+    root: Entity,
+    children_map: &std::collections::HashMap<Entity, Vec<Entity>>,
+    aabb_map: &std::collections::HashMap<Entity, (GlobalTransform, Aabb)>,
+) -> Option<Vec3> {
+    let mut min = Vec3::splat(f32::MAX);
+    let mut max = Vec3::splat(f32::MIN);
+    let mut found = false;
+    let mut stack: Vec<Entity> = children_map.get(&root).cloned().unwrap_or_default();
+    while let Some(entity) = stack.pop() {
+        if let Some(children) = children_map.get(&entity) {
+            stack.extend(children.iter().copied());
+        }
+        if let Some((gt, aabb)) = aabb_map.get(&entity) {
+            found = true;
+            let center = Vec3::from(aabb.center);
+            let half = Vec3::from(aabb.half_extents);
+            for sx in [-1.0_f32, 1.0] {
+                for sy in [-1.0_f32, 1.0] {
+                    for sz in [-1.0_f32, 1.0] {
+                        let world =
+                            gt.transform_point(center + Vec3::new(sx * half.x, sy * half.y, sz * half.z));
+                        min = min.min(world);
+                        max = max.max(world);
+                    }
+                }
+            }
+        }
+    }
+    found.then(|| (min + max) * 0.5)
+}
+
+/// Builds child + AABB lookup maps over the whole world (for visual-center math).
+fn capture_world_geometry_maps(
+    app: &mut App,
+) -> (
+    std::collections::HashMap<Entity, Vec<Entity>>,
+    std::collections::HashMap<Entity, (GlobalTransform, Aabb)>,
+) {
+    let world = app.world_mut();
+    let mut children_map = std::collections::HashMap::new();
+    {
+        let mut q = world.query::<(Entity, &Children)>();
+        for (entity, children) in q.iter(world) {
+            children_map.insert(entity, children.iter().collect::<Vec<_>>());
+        }
+    }
+    let mut aabb_map = std::collections::HashMap::new();
+    {
+        let mut q = world.query::<(Entity, &GlobalTransform, &Aabb)>();
+        for (entity, gt, aabb) in q.iter(world) {
+            aabb_map.insert(entity, (*gt, *aabb));
+        }
+    }
+    (children_map, aabb_map)
+}
+
+/// Worst horizontal distance (meters) between any selectable entity's VISIBLE
+/// model center and its `Transform.translation` — the point gizmos and every
+/// cursor hit-test project. This is a NON-self-referential alignment check: it
+/// would have caught the off-origin-GLB bug where clicks missed the model.
+/// Returns `(offset_m, label)` for the worst entity, or `None` if no models
+/// loaded yet.
+pub fn capture_worst_model_alignment_offset(app: &mut App) -> Option<(f32, String)> {
+    let (children_map, aabb_map) = capture_world_geometry_maps(app);
+    let world = app.world_mut();
+    let mut roots = Vec::new();
+    {
+        // Only entities the recenter has FINISHED settling — checking the invariant
+        // "everything we corrected is aligned". Excludes units mid-settle (e.g.
+        // AI-spammed workers within their first few frames), which are transient.
+        let mut q = world.query_filtered::<(Entity, &GlobalTransform, Option<&Name>), (With<Selectable>, With<ModelRecentered>)>();
+        for (entity, gt, name) in q.iter(world) {
+            roots.push((
+                entity,
+                gt.translation(),
+                name.map(|n| n.as_str().to_string()).unwrap_or_default(),
+            ));
+        }
+    }
+    let mut worst: Option<(f32, String)> = None;
+    for (root, translation, label) in roots {
+        let Some(center) = entity_visual_world_center(root, &children_map, &aabb_map) else {
+            continue;
+        };
+        let offset = Vec2::new(center.x - translation.x, center.z - translation.z).length();
+        if worst.as_ref().map_or(true, |(w, _)| offset > *w) {
+            worst = Some((offset, label));
+        }
+    }
+    worst
+}
+
+/// World-space visible-model center of an on-screen, non-empty resource node, with
+/// its entity — for clicking the model where it is actually DRAWN (not its origin).
+pub fn capture_onscreen_resource_model_center(app: &mut App) -> Option<(Entity, Vec3)> {
+    let (children_map, aabb_map) = capture_world_geometry_maps(app);
+    let (width, height) = {
+        let world = app.world_mut();
+        let mut windows = world.query_filtered::<&Window, With<PrimaryWindow>>();
+        let window = windows.iter(world).next()?;
+        (window.width(), window.height())
+    };
+    let world = app.world_mut();
+    let (camera, cam_transform) = {
+        let mut cameras = world.query_filtered::<(&Camera, &GlobalTransform), With<MainCamera>>();
+        let (camera, transform) = cameras.iter(world).next()?;
+        (camera.clone(), *transform)
+    };
+    let mut resources = world.query::<(Entity, &ResourceNode)>();
+    let candidates: Vec<Entity> = resources
+        .iter(world)
+        .filter_map(|(entity, resource)| (resource.amount > 0).then_some(entity))
+        .collect();
+    for entity in candidates {
+        let Some(center) = entity_visual_world_center(entity, &children_map, &aabb_map) else {
+            continue;
+        };
+        if let Ok(screen) = camera.world_to_viewport(&cam_transform, center) {
+            if screen.x >= 8.0
+                && screen.x <= width - 8.0
+                && screen.y >= 80.0
+                && screen.y <= height - 152.0
+            {
+                return Some((entity, center));
+            }
+        }
+    }
+    None
+}
+
+/// Whether the given entity currently has the `Selected` component (capture check).
+pub fn capture_entity_is_selected(app: &mut App, entity: Entity) -> bool {
+    app.world().get::<Selected>(entity).is_some()
+}
+
 /// IDs of currently-selected player units, for capture diagnostics.
 pub fn capture_selected_player_unit_ids(app: &mut App) -> Vec<&'static str> {
     let world = app.world_mut();
@@ -5227,6 +5365,9 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
             update_selection_portrait
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
+            recenter_entity_models
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
             update_resource_hover
@@ -8679,13 +8820,12 @@ fn spawn_resource_node(
     amount: i32,
     position: Vec3,
 ) -> Entity {
-    let scale = match kind {
-        ResourceKind::Ore => 0.5,
-        ResourceKind::Crystal => 0.38,
-    };
-    let radius = match kind {
-        ResourceKind::Ore => 0.68,
-        ResourceKind::Crystal => 0.55,
+    // Ore and Crystal must read as DIFFERENT deposits: Ore = a plain meteor/rock
+    // chunk, Crystal = the green-gem crystal cluster. (Both used the same crystal
+    // model before, so they were indistinguishable.)
+    let (model, scale, radius) = match kind {
+        ResourceKind::Ore => ("models/kenney-spacekit/meteor_detailed.glb", 0.85, 0.68),
+        ResourceKind::Crystal => ("models/kenney-spacekit/rock_crystalsLargeA.glb", 0.45, 0.55),
     };
     let entity_id = commands
         .spawn((
@@ -8701,12 +8841,7 @@ fn spawn_resource_node(
         .id();
     commands.entity(entity_id).with_children(|parent| {
         parent.spawn((
-            WorldAssetRoot(
-                asset_server.load(
-                    GltfAssetLabel::Scene(0)
-                        .from_asset("models/kenney-spacekit/rock_crystalsLargeA.glb"),
-                ),
-            ),
+            WorldAssetRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(model))),
             Transform::from_translation(Vec3::Y * 0.03).with_scale(Vec3::splat(scale)),
         ));
     });
@@ -26311,6 +26446,116 @@ fn build_action_target_label(action: BuildAction) -> Option<String> {
         _ => return None,
     };
     registry::entity(id).map(|def| compact_label(def.label))
+}
+
+/// Marks an entity whose model children have been recentered onto its origin.
+#[derive(Component)]
+struct ModelRecentered;
+
+/// Counts frames a model has had meshes present, so the recenter waits a short
+/// settle window (all parts loaded) before correcting once. Frame-based rather
+/// than mesh-count-based because animated models' mesh counts jitter and never
+/// "stabilize".
+#[derive(Component)]
+struct ModelRecenterTracking {
+    frames: u8,
+}
+
+/// Frames a model must have meshes present before we recenter it (≈0.2s @30fps) —
+/// long enough for all GLB parts to spawn, short enough that freshly-trained units
+/// snap into alignment quickly.
+const MODEL_RECENTER_SETTLE_FRAMES: u8 = 6;
+
+/// Recenters each selectable entity's loaded model so its visible geometry's
+/// horizontal center coincides with the entity `Transform.translation` — the
+/// point gizmos (selection/hover rings) and every cursor hit-test project.
+///
+/// Root cause this fixes: the GLB scenes (and the migrated `render_parts`
+/// offsets, e.g. a turret part at [-2,0,-1.5]) place geometry off the entity
+/// origin, so the *visible* model rendered far from where clicks were judged —
+/// left/right-clicking the model selected/targeted nothing. Runs once per entity,
+/// after its scene meshes have spawned (their `Aabb`s exist).
+fn recenter_entity_models(
+    mut commands: Commands,
+    roots: Query<
+        (Entity, &GlobalTransform, Option<&ModelRecenterTracking>),
+        (With<Selectable>, Without<ModelRecentered>),
+    >,
+    children_q: Query<&Children>,
+    aabb_q: Query<(&GlobalTransform, &Aabb)>,
+    mut model_tf: Query<&mut Transform, With<WorldAssetRoot>>,
+) {
+    for (root, root_gt, tracking) in &roots {
+        // Combined world-space AABB of every mesh descendant + how many meshes.
+        let mut min = Vec3::splat(f32::MAX);
+        let mut max = Vec3::splat(f32::MIN);
+        let mut count: u32 = 0;
+        let mut stack: Vec<Entity> = children_q
+            .get(root)
+            .map(|c| c.iter().collect())
+            .unwrap_or_default();
+        while let Some(entity) = stack.pop() {
+            if let Ok(children) = children_q.get(entity) {
+                stack.extend(children.iter());
+            }
+            if let Ok((gt, aabb)) = aabb_q.get(entity) {
+                count += 1;
+                let center = Vec3::from(aabb.center);
+                let half = Vec3::from(aabb.half_extents);
+                for sx in [-1.0_f32, 1.0] {
+                    for sy in [-1.0_f32, 1.0] {
+                        for sz in [-1.0_f32, 1.0] {
+                            let corner =
+                                center + Vec3::new(sx * half.x, sy * half.y, sz * half.z);
+                            let world = gt.transform_point(corner);
+                            min = min.min(world);
+                            max = max.max(world);
+                        }
+                    }
+                }
+            }
+        }
+        if count == 0 {
+            // Scene meshes not spawned yet; try again next frame.
+            continue;
+        }
+        // Wait a short settle window after meshes first appear, then correct ONCE.
+        // (Applying on first sight left late-loading multi-part models misaligned;
+        // re-applying every frame diverged because GlobalTransform lags a frame;
+        // gating on mesh-count stability failed for animated models whose count
+        // jitters and never settles.)
+        let frames = tracking.map(|t| t.frames).unwrap_or(0).saturating_add(1);
+        if frames < MODEL_RECENTER_SETTLE_FRAMES {
+            commands
+                .entity(root)
+                .insert(ModelRecenterTracking { frames });
+            continue;
+        }
+        let visual_center = (min + max) * 0.5;
+        let (scale, rotation, translation) = root_gt.to_scale_rotation_translation();
+        let scale = scale.x.abs().max(1e-3);
+        // World shift to move the visible center onto the entity origin (XZ only —
+        // keep models sitting on the ground), converted into the root's LOCAL frame
+        // (children's Transforms are parent-local). The root may be rotated (units
+        // face their movement direction), so undo its rotation AND scale — using
+        // only `/scale` left rotated units (workers) misaligned.
+        let world_delta = Vec3::new(
+            translation.x - visual_center.x,
+            0.0,
+            translation.z - visual_center.z,
+        );
+        let local_delta = rotation.inverse() * (world_delta / scale);
+        if let Ok(children) = children_q.get(root) {
+            for child in children.iter() {
+                if let Ok(mut transform) = model_tf.get_mut(child) {
+                    transform.translation.x += local_delta.x;
+                    transform.translation.z += local_delta.z;
+                }
+            }
+        }
+        commands.entity(root).insert(ModelRecentered);
+        commands.entity(root).remove::<ModelRecenterTracking>();
+    }
 }
 
 /// The resource node currently under the cursor (for hover highlight + so the
