@@ -14,6 +14,7 @@
 - The main menu uses `start_shared_match_from_menu_selection()` so `cargo run` and capture/test proofs enter through the same setup contract.
 - Match start camera focus is derived from the selected player's actual base anchor: first the `CommandCenter`, then a fallback `Worker` spawn. It no longer blends toward nearby resources, so `cargo run` opens over the player's base instead of a zoomed-out map work area.
 - Resource nodes are left-click selectable for target confirmation, and selected Workers use a wider resource-specific right-click snap so clicking the visible ore/crystal model edge still issues `HarvestOrder`.
+- Manual structure placement assigns selected construction-capable Workers to the foundation, with a nearest-owned-Worker fallback so a valid player placement enters real construction instead of remaining an idle foundation.
 - World overlays keep selected rings, resource/supply rings, active command markers, and the current placement footprint. Unselected structures and construction-range anchors no longer draw permanent rings.
 - Runtime player state is data-driven from `ActiveTeams` / `MatchSetupSettings`: economies, team relations, AI timers, support cooldowns, HUD counts, and match-end checks grow by player index instead of assuming three hard-coded teams.
 - `Team` is runtime identity only (`Player(index)` / `Neutral`). Playable faction identity comes from `PlayerFactions`, so 人族/魔族/混沌族 rules follow the configured player slot instead of being tied to Player0/1/2.
@@ -34,7 +35,7 @@
   - `capture screenshot [path]`: renders one still from the shared live match.
   - `capture frames <dir> [count]`: records a frame sequence from the shared live match.
   - `capture harvest <dir>`: selects a real Worker, right-clicks ore, and requires `HarvestOrder` plus resource growth.
-  - `capture play <dir>`: uses the real default-start economy for select, move, CommandCenter training, Worker build placement, and screenshots.
+  - `capture play <dir>`: uses the real default-start economy for select, move, CommandCenter training, completed unit spawn, Worker build placement, and completed Worker construction.
   - `capture factions <dir>`: starts each playable faction and verifies train/build through the human command panel using default resources.
   - `capture match [max-seconds]`: runs a headless AI-vs-AI shared match and requires economy, production, combat, and elimination to resolve.
 - The old `real-*-proof` CLI surfaces were removed; do not use them as completion gates.

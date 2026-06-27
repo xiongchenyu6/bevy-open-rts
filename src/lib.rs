@@ -4526,6 +4526,12 @@ pub fn capture_player_unit_count(app: &mut App) -> usize {
         .count()
 }
 
+/// Player resource totals for capture smoke tests.
+pub fn capture_player_resources(app: &mut App) -> (i32, i32) {
+    let economy = app.world().resource::<Economies>().get(Team::Player(0));
+    (economy.ore, economy.crystal)
+}
+
 /// World position of a player worker (its command panel offers Build actions).
 pub fn capture_player_worker_position(app: &mut App) -> Option<Vec3> {
     let player = Team::Player(0);
@@ -4580,6 +4586,18 @@ pub fn capture_player_structure_count(app: &mut App) -> usize {
     let mut q = world.query_filtered::<&Team, With<Structure>>();
     q.iter(world)
         .filter(|team| **team == Team::Player(0))
+        .count()
+}
+
+/// Count of completed player structures. Unlike `capture_player_structure_count`,
+/// this excludes placed foundations that still need worker construction.
+pub fn capture_player_completed_structure_count(app: &mut App) -> usize {
+    let world = app.world_mut();
+    let mut q = world.query_filtered::<(&Team, Option<&UnderConstruction>), With<Structure>>();
+    q.iter(world)
+        .filter(|(team, under_construction)| {
+            **team == Team::Player(0) && under_construction.is_none()
+        })
         .count()
 }
 
@@ -4656,6 +4674,13 @@ pub fn capture_nearest_visible_resource_click_position_to(
 pub fn capture_player_harvesting_count(app: &mut App) -> usize {
     let world = app.world_mut();
     let mut q = world.query_filtered::<&Team, (With<Unit>, With<HarvestOrder>)>();
+    q.iter(world).filter(|t| **t == Team::Player(0)).count()
+}
+
+/// Number of player units currently assigned to construct a placed foundation.
+pub fn capture_player_constructing_count(app: &mut App) -> usize {
+    let world = app.world_mut();
+    let mut q = world.query_filtered::<&Team, (With<Unit>, With<ConstructOrder>)>();
     q.iter(world).filter(|t| **t == Team::Player(0)).count()
 }
 
@@ -6383,7 +6408,7 @@ struct AiDirectorResources<'w> {
 }
 
 #[derive(SystemParam)]
-struct StructurePlacementInputResources<'w> {
+struct StructurePlacementInputResources<'w, 's> {
     visible_player: Res<'w, VisiblePlayer>,
     player_factions: Res<'w, PlayerFactions>,
     asset_server: Res<'w, AssetServer>,
@@ -6394,6 +6419,24 @@ struct StructurePlacementInputResources<'w> {
     placement_feedback: ResMut<'w, StructurePlacementFeedback>,
     audio_feedback: ResMut<'w, AudioFeedback>,
     battle_log: ResMut<'w, BattleLog>,
+    selected_constructors: Query<
+        'w,
+        's,
+        (Entity, &'static Unit, &'static Team, &'static Health),
+        (With<Selected>, With<Unit>, Without<Structure>),
+    >,
+    constructors: Query<
+        'w,
+        's,
+        (
+            Entity,
+            &'static Unit,
+            &'static Team,
+            &'static Transform,
+            &'static Health,
+        ),
+        (With<Unit>, Without<Structure>),
+    >,
 }
 
 #[derive(SystemParam)]
@@ -13366,10 +13409,18 @@ fn structure_placement_input(
         &structures,
         &occupiers,
     ) {
-        Ok((_entity, label)) => {
+        Ok((entity, label)) => {
             placement.command_mode.pending_structure_placement = None;
             *placement.placement_feedback = StructurePlacementFeedback::default();
             if team == player_team {
+                assign_selected_constructors_to_structure(
+                    &mut commands,
+                    team,
+                    entity,
+                    point,
+                    &placement.selected_constructors,
+                    &placement.constructors,
+                );
                 record_sound_audio_feedback(
                     &mut placement.audio_feedback,
                     SoundEffectKind::ConstructionStarted,
@@ -13410,6 +13461,49 @@ fn structure_placement_input(
             }
         }
     }
+}
+
+fn assign_selected_constructors_to_structure(
+    commands: &mut Commands,
+    team: Team,
+    target: Entity,
+    target_position: Vec3,
+    selected_constructors: &Query<
+        (Entity, &Unit, &Team, &Health),
+        (With<Selected>, With<Unit>, Without<Structure>),
+    >,
+    constructors: &Query<
+        (Entity, &Unit, &Team, &Transform, &Health),
+        (With<Unit>, Without<Structure>),
+    >,
+) -> bool {
+    let mut assigned = false;
+    for (entity, unit, unit_team, health) in selected_constructors {
+        if *unit_team != team || health.current <= 0.0 || !can_unit_construct_structures(unit) {
+            continue;
+        }
+        issue_unit_order(commands, entity, UnitQueuedOrder::Construct(target));
+        assigned = true;
+    }
+    if assigned {
+        return true;
+    }
+
+    let mut nearest = None;
+    for (entity, unit, unit_team, transform, health) in constructors {
+        if *unit_team != team || health.current <= 0.0 || !can_unit_construct_structures(unit) {
+            continue;
+        }
+        let distance = xz_distance(transform.translation, target_position);
+        if nearest.is_none_or(|(_, best_distance)| distance < best_distance) {
+            nearest = Some((entity, distance));
+        }
+    }
+    if let Some((entity, _)) = nearest {
+        issue_unit_order(commands, entity, UnitQueuedOrder::Construct(target));
+        assigned = true;
+    }
+    assigned
 }
 
 #[allow(dead_code)]

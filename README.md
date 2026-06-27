@@ -54,13 +54,14 @@ cargo run --bin capture -- factions screenshots/factions
 ```
 
 `capture play` drives the real input systems through select, move, train, and
-build actions, and exits non-zero if any step fails. `capture harvest` selects an
-actual Worker, right-clicks a visible resource node, and exits non-zero if no
-`HarvestOrder` is issued. `capture match` runs a headless AI-vs-AI skirmish and
-exits non-zero unless the economy, production, combat, and elimination loop
-finishes a match within the given seconds. `capture factions` renders every
-faction's starting base and exits non-zero unless each faction can reach human
-train/build input through the command panel.
+build actions, then exits non-zero unless the trained unit actually spawns and a
+Worker completes the placed structure. `capture harvest` selects an actual
+Worker, right-clicks a visible resource node, and exits non-zero unless a
+`HarvestOrder` is issued and player resources grow. `capture match` runs a
+headless AI-vs-AI skirmish and exits non-zero unless the economy, production,
+combat, and elimination loop finishes a match within the given seconds.
+`capture factions` renders every faction's starting base and exits non-zero
+unless each faction can reach human train/build input through the command panel.
 
 ## Regenerate Migration Data
 

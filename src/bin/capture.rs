@@ -28,10 +28,11 @@ use bevy_open_rts::{
     capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_key, capture_mouse_button,
     capture_nearest_visible_resource_click_position_to, capture_placement_is_valid,
     capture_player_attack_move_all, capture_player_build_queue_len,
+    capture_player_completed_structure_count, capture_player_constructing_count,
     capture_player_harvesting_count, capture_player_in_placement_mode,
     capture_player_onscreen_unit_position, capture_player_onscreen_worker_position,
-    capture_player_producer_position, capture_player_structure_count,
-    capture_player_worker_position, capture_run_ai_match_until_resolved,
+    capture_player_producer_position, capture_player_resources, capture_player_structure_count,
+    capture_player_unit_count, capture_player_worker_position, capture_run_ai_match_until_resolved,
     capture_selected_player_unit_average_position, capture_selected_player_unit_count,
     capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
     capture_world_to_screen, start_shared_match_scene_with_current_setup,
@@ -45,6 +46,8 @@ const WARMUP_TICKS: usize = 90;
 const MATCH_SETTLE_TICKS: usize = 60;
 /// Extra ticks after the final screenshot request so async readback/save lands.
 const FLUSH_TICKS: usize = 16;
+const TRAIN_COMPLETION_WAIT_TICKS: usize = 360;
+const BUILD_COMPLETION_WAIT_TICKS: usize = 900;
 
 fn main() {
     let mut args = env::args().skip(1);
@@ -142,6 +145,19 @@ fn shoot(app: &mut App, handle: &Handle<Image>, path: PathBuf) {
     for _ in 0..FLUSH_TICKS {
         app.update();
     }
+}
+
+fn wait_until(app: &mut App, max_ticks: usize, mut done: impl FnMut(&mut App) -> bool) -> bool {
+    if done(app) {
+        return true;
+    }
+    for _ in 0..max_ticks {
+        app.update();
+        if done(app) {
+            return true;
+        }
+    }
+    false
 }
 
 /// Selects a producer and presses its train hotkey via real input; returns true
@@ -310,6 +326,7 @@ fn render_harvest(dir: &Path) -> Result<(), String> {
             selected_ids
         ));
     }
+    let (ore_before, crystal_before) = capture_player_resources(&mut app);
 
     // Right-click the ore node to harvest.
     let ore_screen = capture_world_to_screen(&mut app, ore).ok_or("ore offscreen")?;
@@ -332,7 +349,16 @@ fn render_harvest(dir: &Path) -> Result<(), String> {
     for _ in 0..600 {
         app.update();
     }
+    let (ore_after, crystal_after) = capture_player_resources(&mut app);
+    println!(
+        "[capture] harvest resources: ore {ore_before} -> {ore_after}, crystal {crystal_before} -> {crystal_after}"
+    );
     shoot(&mut app, &handle, dir.join("02_after_gather.png"));
+    if ore_after + crystal_after <= ore_before + crystal_before {
+        return Err(format!(
+            "Worker harvested but player resources did not grow: ore {ore_before}->{ore_after}, crystal {crystal_before}->{crystal_after}"
+        ));
+    }
     println!(
         "[capture] wrote manual-harvest verification to {}",
         dir.display()
@@ -451,8 +477,8 @@ fn render_play(dir: &Path) -> Result<(), String> {
         ));
     }
 
-    // TRAIN: select a production structure, then press the train hotkey via real
-    // keyboard input and confirm the command reaches the build queue.
+    // TRAIN: select a production structure, press the train hotkey via real
+    // keyboard input, then wait for the unit to actually spawn.
     let mut trained = false;
     if let Some(producer_pos) = capture_player_producer_position(&mut app)
         && let Some(producer_screen) = capture_world_to_screen(&mut app, producer_pos)
@@ -466,6 +492,7 @@ fn render_play(dir: &Path) -> Result<(), String> {
             app.update();
         }
         let queue_before = capture_player_build_queue_len(&mut app);
+        let units_before = capture_player_unit_count(&mut app);
         match capture_first_enabled_train_hotkey(&mut app) {
             Some(key) => {
                 capture_key(&mut app, key, true);
@@ -479,14 +506,22 @@ fn render_play(dir: &Path) -> Result<(), String> {
                 println!(
                     "[capture] train hotkey {key:?}: player build queue {queue_before} -> {queue_after}"
                 );
-                trained = queue_after > queue_before;
+                if queue_after > queue_before {
+                    trained = wait_until(&mut app, TRAIN_COMPLETION_WAIT_TICKS, |app| {
+                        capture_player_unit_count(app) > units_before
+                    });
+                    let units_after = capture_player_unit_count(&mut app);
+                    println!(
+                        "[capture] train completed: player units {units_before} -> {units_after}"
+                    );
+                }
             }
             None => println!("[capture] no enabled train hotkey on the command panel"),
         }
     }
     shoot(&mut app, &handle, dir.join("03_trained.png"));
     if !trained {
-        return Err("train hotkey did not add a player build-queue job".into());
+        return Err("train hotkey did not produce a completed player unit".into());
     }
 
     // BUILD: use the real default-start resources, select a worker, enter
@@ -515,6 +550,7 @@ fn render_play(dir: &Path) -> Result<(), String> {
             "[capture] build menu: {sel} unit(s) selected, build options {opts_enabled} enabled / {opts_total} total"
         );
         let structures_before = capture_player_structure_count(&mut app);
+        let completed_before = capture_player_completed_structure_count(&mut app);
         match capture_first_enabled_build_hotkey(&mut app) {
             Some(key) => {
                 capture_key(&mut app, key, true);
@@ -559,17 +595,26 @@ fn render_play(dir: &Path) -> Result<(), String> {
                     println!("[capture] placed structure at ({:.1},{:.1})", at.x, at.z);
                 }
                 let structures_after = capture_player_structure_count(&mut app);
+                let constructing_after = capture_player_constructing_count(&mut app);
                 println!(
-                    "[capture] build: player structures {structures_before} -> {structures_after}"
+                    "[capture] build: player structures {structures_before} -> {structures_after}, constructors active {constructing_after}"
                 );
-                built = structures_after > structures_before;
+                if structures_after > structures_before {
+                    built = wait_until(&mut app, BUILD_COMPLETION_WAIT_TICKS, |app| {
+                        capture_player_completed_structure_count(app) > completed_before
+                    });
+                    let completed_after = capture_player_completed_structure_count(&mut app);
+                    println!(
+                        "[capture] construction completed: player completed structures {completed_before} -> {completed_after}"
+                    );
+                }
             }
             None => println!("[capture] no enabled build hotkey on the command panel"),
         }
     }
     shoot(&mut app, &handle, dir.join("04_built.png"));
     if !built {
-        return Err("build hotkey did not place a player structure".into());
+        return Err("build hotkey did not complete a player structure".into());
     }
 
     println!(
