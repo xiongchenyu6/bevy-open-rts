@@ -1684,10 +1684,10 @@ impl SkirmishPlayerController {
         match self {
             Self::None => t("无", "None"),
             Self::Human => t("人族玩家", "Human"),
-            Self::Ai(AiDifficulty::Beginner) => t("AI新手", "AI Beginner"),
-            Self::Ai(AiDifficulty::Easy) => t("AI简单", "AI Easy"),
-            Self::Ai(AiDifficulty::Normal) => t("AI普通", "AI Normal"),
-            Self::Ai(AiDifficulty::Hard) => t("AI困难", "AI Hard"),
+            Self::Ai(AiDifficulty::Beginner) => t("电脑新手", "AI Beginner"),
+            Self::Ai(AiDifficulty::Easy) => t("电脑简单", "AI Easy"),
+            Self::Ai(AiDifficulty::Normal) => t("电脑普通", "AI Normal"),
+            Self::Ai(AiDifficulty::Hard) => t("电脑困难", "AI Hard"),
         }
     }
 }
@@ -3018,19 +3018,19 @@ impl AiDifficulty {
 
     fn label(self) -> &'static str {
         match self {
-            Self::Beginner => "Beginner AI",
-            Self::Easy => "Easy AI",
-            Self::Normal => "Normal AI",
-            Self::Hard => "Hard AI",
+            Self::Beginner => t("新手", "Beginner AI"),
+            Self::Easy => t("简单", "Easy AI"),
+            Self::Normal => t("普通", "Normal AI"),
+            Self::Hard => t("困难", "Hard AI"),
         }
     }
 
     fn short_label(self) -> &'static str {
         match self {
-            Self::Beginner => "Beginner",
-            Self::Easy => "Easy",
-            Self::Normal => "Normal",
-            Self::Hard => "Hard",
+            Self::Beginner => t("新手", "Beginner"),
+            Self::Easy => t("简单", "Easy"),
+            Self::Normal => t("普通", "Normal"),
+            Self::Hard => t("困难", "Hard"),
         }
     }
 }
@@ -6063,6 +6063,97 @@ pub(crate) fn t(zh: &'static str, en: &'static str) -> &'static str {
     }
 }
 
+fn entity_label_zh(id: &str) -> Option<&'static str> {
+    Some(match id {
+        "AdvancedReactorPlant" => "高级反应堆",
+        "AircraftFactory" => "飞机工厂",
+        "AntiAirTurret" => "防空炮塔",
+        "AntiAirWalker" => "防空机甲",
+        "AntiGroundTurret" => "对地炮塔",
+        "ArcCoilDefenseTower" => "电弧防御塔",
+        "Barracks" => "兵营",
+        "BomberVTOL" => "轰炸垂直机",
+        "CommandCenter" => "指挥中心",
+        "CryoSprayer" => "冷冻喷射兵",
+        "Drone" => "无人机",
+        "DroneMineLayer" => "布雷无人机",
+        "EngineerDrone" => "工程无人机",
+        "FieldMedic" => "战地医疗兵",
+        "FlakHoverTank" => "防空悬浮坦克",
+        "FlakRocketTeam" => "防空火箭小队",
+        "FlakRocketTeamMk2" => "二型防空火箭小队",
+        "FlameAssaultBuggy" => "火焰突击车",
+        "GrenadierTrooper" => "榴弹兵",
+        "HammerSiegeTank" => "重锤攻城坦克",
+        "HeavyBombardmentAirship" => "重型轰炸飞艇",
+        "HeavyMachinegunTrooper" => "重机枪兵",
+        "HeavySiegeWalker" => "重型攻城机甲",
+        "Helicopter" => "直升机",
+        "InterceptorVTOL" => "截击垂直机",
+        "JammerVehicle" => "干扰车",
+        "LanceBeamDefenseTower" => "光矛防御塔",
+        "LanceBeamTank" => "光矛坦克",
+        "LandMine" => "地雷",
+        "LightRifleInfantry" => "轻步枪兵",
+        "LongbowMissileCrawler" => "长弓导弹车",
+        "MirageScoutTank" => "幻影侦察坦克",
+        "MobileRepairCrawler" => "机动维修车",
+        "MobileShieldProjector" => "机动护盾车",
+        "ModularMissileCarrier" => "模块化导弹车",
+        "MortarTeam" => "迫击炮小队",
+        "OrePurifier" => "矿石净化器",
+        "PhaseSaboteur" => "相位破坏者",
+        "PowerReactor" => "发电站",
+        "PrismDefenseObelisk" => "棱镜方尖塔",
+        "PulseRifleCommando" => "脉冲步枪突击队",
+        "RadarUplink" => "雷达站",
+        "RailArtilleryWalker" => "轨道炮机甲",
+        "RailCannonBunker" => "轨道炮地堡",
+        "RailSniperTeam" => "轨道狙击队",
+        "RailgunTank" => "轨道炮坦克",
+        "Refinery" => "精炼厂",
+        "RepairPad" => "维修平台",
+        "RoboticsBay" => "机器人车间",
+        "RocketGunship" => "火箭武装艇",
+        "RocketInfantry" => "火箭兵",
+        "RocketTrooperRobot" => "火箭机器人",
+        "SaboteurInfiltrator" => "渗透破坏者",
+        "ScoutRover" => "侦察车",
+        "ShieldTrooper" => "护盾兵",
+        "ShockTrooper" => "震击兵",
+        "SiegeAirship" => "攻城飞艇",
+        "SiegeArtilleryVehicle" => "攻城火炮车",
+        "SiegeDrillTank" => "攻城钻地坦克",
+        "SniperScout" => "狙击侦察兵",
+        "TacticalOfficer" => "战术军官",
+        "Tank" => "坦克",
+        "TechAirport" => "科技机场",
+        "TechBunker" => "科技地堡",
+        "TechHospital" => "科技医院",
+        "TechLab" => "科技实验室",
+        "TechOilDerrick" => "科技油井",
+        "TechRepairDepot" => "科技维修站",
+        "TeslaCrawlerMk2" => "二型特斯拉履带车",
+        "TeslaFenceSegment" => "特斯拉围栏段",
+        "VehicleFactory" => "载具工厂",
+        "WeatherControlSpire" => "气象控制塔",
+        "Worker" => "工人",
+        _ => return None,
+    })
+}
+
+fn localized_entity_label(id: &str) -> String {
+    let en = registry::entity(id).map_or(id, |def| def.label);
+    match current_language() {
+        Language::Zh => entity_label_zh(id).unwrap_or(en).to_string(),
+        Language::En => en.to_string(),
+    }
+}
+
+fn localized_compact_entity_label(id: &str) -> String {
+    compact_label(&localized_entity_label(id))
+}
+
 fn sync_locale(locale: Res<Locale>) {
     set_current_language(locale.0);
 }
@@ -6263,8 +6354,8 @@ enum ResourceKind {
 impl ResourceKind {
     fn label(self) -> &'static str {
         match self {
-            Self::Ore => "Ore",
-            Self::Crystal => "Crystal",
+            Self::Ore => t("矿石", "Ore"),
+            Self::Crystal => t("水晶", "Crystal"),
         }
     }
 
@@ -10660,16 +10751,14 @@ fn progress_under_construction_structures(
             );
         }
         if *team == player_team {
-            let label = registry::entity(structure.id)
-                .map(|def| def.label)
-                .unwrap_or(structure.id);
+            let label = localized_entity_label(structure.id);
             record_sound_audio_feedback(&mut audio_feedback, SoundEffectKind::ProductionReady);
             record_voice_audio_feedback(&mut audio_feedback, UnitVoiceEvent::ConstructionComplete);
             record_production_ready_battle_log(
                 *team,
                 player_team,
                 true,
-                label,
+                &label,
                 transform.translation,
                 &mut battle_log,
             );
@@ -12015,14 +12104,16 @@ fn match_briefing_text(
 ) -> String {
     let (enemies, allies) = match_briefing_player_counts(visible_team, relations, active_teams);
     format!(
-        "{}\n{}: {enemies}\n{}: {allies}\nOre: {} / Crystal: {}\n{}",
+        "{}\n{}: {enemies}\n{}: {allies}\n{}: {} / {}: {}\n{}",
         t(
             "目标：摧毁所有敌方指挥中心，并保住至少一个我方指挥中心",
             "Objective: destroy all enemy Command Centers while keeping at least one of yours",
         ),
         t("敌人", "Enemies"),
         t("盟友", "Allies"),
+        ResourceKind::Ore.label(),
         settings.starting_resources.ore,
+        ResourceKind::Crystal.label(),
         settings.starting_resources.crystal,
         t(
             "推荐开局\n\
@@ -13098,10 +13189,12 @@ fn update_match_end_overlay(
             match_state.enemy_structures_destroyed
         );
         let resources = format!(
-            "{}{}: Ore {}  Crystal {}",
+            "{}{}: {} {}  {} {}",
             visible_player.team.label(),
             t("资源", " resources"),
+            ResourceKind::Ore.label(),
             visible_economy.ore,
+            ResourceKind::Crystal.label(),
             visible_economy.crystal
         );
         **stats_text = format!(
@@ -14063,7 +14156,7 @@ impl MinimapRadarState {
         match self {
             Self::Online => "",
             Self::MissingRadar => t(
-                "雷达离线\n建造 Radar Uplink",
+                "雷达离线\n建造雷达站",
                 "Radar offline\nBuild a Radar Uplink",
             ),
             Self::LowPower => t("雷达离线\n电力不足", "Radar offline\nNot enough power"),
@@ -15005,7 +15098,11 @@ fn structure_placement_input(
                 );
                 push_battle_log(
                     &mut placement.battle_log,
-                    format!("{}: {label}", t("开始施工", "Construction started")),
+                    format!(
+                        "{}: {}",
+                        t("开始施工", "Construction started"),
+                        localized_entity_label(label)
+                    ),
                     Some(point),
                 );
             }
@@ -15164,7 +15261,7 @@ fn place_structure_at_for_faction(
         visible_team,
         faction,
     );
-    Ok((entity, def.label))
+    Ok((entity, id))
 }
 
 fn rotate_pending_structure_placement(command_mode: &mut CommandMode) -> bool {
@@ -17924,7 +18021,7 @@ fn update_match_menu_overlay(
     };
     for mut text in &mut status_q {
         **text = format!(
-            "{}: {}\n{}: {}  {}: {:02}:{:02}\n{}: {}\nOre {}  Crystal {}  {} {}/{}",
+            "{}: {}\n{}: {}  {}: {:02}:{:02}\n{}: {}\n{} {}  {} {}  {} {}/{}",
             t("地图", "Map"),
             selected_map.definition().name,
             perspective_label,
@@ -17934,7 +18031,9 @@ fn update_match_menu_overlay(
             seconds,
             t("速度", "Speed"),
             match_speed.preset.label(),
+            ResourceKind::Ore.label(),
             economy.ore,
+            ResourceKind::Crystal.label(),
             economy.crystal,
             t("电力", "Power"),
             economy.power_capacity,
@@ -19133,10 +19232,11 @@ fn command_label_with_queue(
                 return String::new();
             };
             let cost = def.cost;
-            let prefix = if matches!(action, BuildAction::Build(_)) {
-                "B"
-            } else {
-                "T"
+            let prefix = match (current_language(), action) {
+                (Language::Zh, BuildAction::Build(_)) => "建",
+                (Language::Zh, BuildAction::Train(_)) => "训",
+                (_, BuildAction::Build(_)) => "B",
+                _ => "T",
             };
             let queue_badge = queue_state
                 .filter(|state| state.count > 0 || state.full)
@@ -19144,7 +19244,7 @@ fn command_label_with_queue(
                 .unwrap_or_default();
             format!(
                 "{key} {prefix} {} {}/{}{queue_badge}",
-                compact_label(def.label),
+                localized_compact_entity_label(id),
                 cost.ore,
                 cost.crystal
             )
@@ -19165,18 +19265,25 @@ fn command_label_with_queue(
 
 fn compact_label(label: &str) -> String {
     let mut value = label.to_string();
-    for (from, to) in [
-        ("Command Center", "Cmd Center"),
-        ("Factory", "Fact."),
-        ("Defense", "Def."),
-        ("Infantry", "Inf."),
-        ("Trooper", "Trp."),
-        ("Vehicle", "Veh."),
-    ] {
-        value = value.replace(from, to);
+    if current_language() == Language::En {
+        for (from, to) in [
+            ("Command Center", "Cmd Center"),
+            ("Factory", "Fact."),
+            ("Defense", "Def."),
+            ("Infantry", "Inf."),
+            ("Trooper", "Trp."),
+            ("Vehicle", "Veh."),
+        ] {
+            value = value.replace(from, to);
+        }
     }
     if value.chars().count() > 18 {
-        value.chars().take(17).collect::<String>() + "."
+        let suffix = if current_language() == Language::Zh {
+            "..."
+        } else {
+            "."
+        };
+        value.chars().take(17).collect::<String>() + suffix
     } else {
         value
     }
@@ -21061,7 +21168,7 @@ fn process_build_queue(
                         team,
                         player_team,
                         false,
-                        def.label,
+                        &localized_entity_label(def.id),
                         spawn_at,
                         &mut battle_log,
                     );
@@ -21118,7 +21225,11 @@ fn process_build_queue(
                         );
                         push_battle_log(
                             &mut battle_log,
-                            format!("{}: {}", t("开始施工", "Construction started"), def.label),
+                            format!(
+                                "{}: {}",
+                                t("开始施工", "Construction started"),
+                                localized_entity_label(def.id)
+                            ),
                             Some(spawn_at),
                         );
                     }
@@ -24446,9 +24557,7 @@ fn update_capture_orders(
         }
 
         *target_team = *capturer_team;
-        let structure_label = registry::entity(structure.id)
-            .map(|def| def.label)
-            .unwrap_or(structure.id);
+        let structure_label = localized_entity_label(structure.id);
         if *capturer_team == player_team {
             push_battle_log(
                 &mut battle_log,
@@ -25955,14 +26064,13 @@ fn apply_kill_credits(
             visibility,
         );
         if *team == player_team {
-            let unit_label = registry::entity(unit.id)
-                .map(|def| def.label)
-                .unwrap_or(unit.id);
+            let unit_label = localized_entity_label(unit.id);
             push_battle_log(
                 &mut battle_log,
                 format!(
-                    "{}: {unit_label} Lv{target_rank}",
-                    t("单位晋升", "Unit promoted")
+                    "{}: {unit_label} {}{target_rank}",
+                    t("单位晋升", "Unit promoted"),
+                    t("等级", "Lv")
                 ),
                 Some(transform.translation),
             );
@@ -27123,7 +27231,7 @@ fn update_hud(
         let unit_status =
             dynamic_unit_status_text(&unit_count, visible_team, active_teams.as_deref());
         let mode_text = if let Some(pending) = command_mode.pending_structure_placement {
-            let label = registry::entity(pending.id).map_or(pending.id, |def| def.label);
+            let label = localized_entity_label(pending.id);
             let feedback = placement_feedback
                 .validity
                 .and_then(structure_placement_feedback_text)
@@ -27158,9 +27266,11 @@ fn update_hud(
         let support_status =
             support_hud_status_text(visible_team, &support_cooldowns, command_mode.support_power);
         **text = format!(
-            "{}  Ore {}  Crystal {}  {}{}{}  {}  {}",
+            "{}  {} {}  {} {}  {}{}{}  {}  {}",
             visible_team.label(),
+            ResourceKind::Ore.label(),
             visible_economy.ore,
+            ResourceKind::Crystal.label(),
             visible_economy.crystal,
             power_status_text(visible_economy),
             mode_text,
@@ -27196,14 +27306,11 @@ fn update_hud(
                 }
             }
             let label = unit
-                .and_then(|unit| registry::entity(unit.id).map(|def| def.label))
-                .or_else(|| {
-                    structure
-                        .and_then(|structure| registry::entity(structure.id).map(|def| def.label))
-                })
-                .unwrap_or("Entity");
+                .map(|unit| localized_entity_label(unit.id))
+                .or_else(|| structure.map(|structure| localized_entity_label(structure.id)))
+                .unwrap_or_else(|| t("实体", "Entity").to_string());
             items.push(SelectionHudItem {
-                label: label.to_string(),
+                label,
                 team: *team,
                 health_current: health.current.max(0.0),
                 health_max: health.max,
@@ -27303,11 +27410,22 @@ fn selection_hud_text(items: &[SelectionHudItem], control_group: Option<usize>) 
         let item = &items[0];
         let attack_text = item
             .attack
-            .map(|(damage, range)| format!("ATK {damage:.1} RNG {range:.1}"))
-            .unwrap_or_else(|| "ATK -".to_string());
+            .map(|(damage, range)| {
+                format!(
+                    "{} {damage:.1} {} {range:.1}",
+                    t("攻击", "ATK"),
+                    t("射程", "RNG")
+                )
+            })
+            .unwrap_or_else(|| format!("{} -", t("攻击", "ATK")));
         let mut parts = vec![
             format!("{}  {}", item.team.label(), item.label),
-            format!("HP {:.0}/{:.0}", item.health_current, item.health_max),
+            format!(
+                "{} {:.0}/{:.0}",
+                t("生命", "HP"),
+                item.health_current,
+                item.health_max
+            ),
             attack_text,
             format!("{}: {}", t("军阶", "Rank"), veterancy_rank_label(item.rank)),
         ];
@@ -27441,14 +27559,16 @@ fn dynamic_unit_status_text(
     }
     if neutral_or_unknown > 0 {
         format!(
-            "Units {}:{own} {}:{other_players} {}:{neutral_or_unknown}",
+            "{} {}:{own} {}:{other_players} {}:{neutral_or_unknown}",
+            t("单位", "Units"),
             t("我", "Me"),
             t("其他", "Others"),
             t("中", "N")
         )
     } else {
         format!(
-            "Units {}:{own} {}:{other_players}",
+            "{} {}:{own} {}:{other_players}",
+            t("单位", "Units"),
             t("我", "Me"),
             t("其他", "Others")
         )
@@ -27474,10 +27594,11 @@ fn ai_hud_status_text(
             .or_insert(0) += 1;
     }
     if counts.is_empty() {
-        return t("AI 无", "AI None").to_string();
+        return t("电脑 无", "AI None").to_string();
     }
     format!(
-        "AI {}",
+        "{} {}",
+        t("电脑", "AI"),
         counts
             .iter()
             .map(|(difficulty, count)| {
@@ -27508,7 +27629,7 @@ fn ai_low_power_status_text(
     } else {
         format!(
             "{} {}",
-            t("AI低电", "AI low power"),
+            t("电脑低电", "AI low power"),
             low_power_teams.join("/")
         )
     }
@@ -27744,7 +27865,7 @@ fn build_action_target_label(action: BuildAction) -> Option<String> {
         BuildAction::Train(id) | BuildAction::Build(id) => id,
         _ => return None,
     };
-    registry::entity(id).map(|def| compact_label(def.label))
+    registry::entity(id).map(|_| localized_compact_entity_label(id))
 }
 
 /// Marks an entity whose model children have been recentered onto its origin.
