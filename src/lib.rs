@@ -4333,6 +4333,47 @@ pub fn capture_focus_camera_on(app: &mut App, focus: Vec3) {
     set_camera_focus_safely(&mut camera, focus, bounds);
 }
 
+/// Zooms the capture camera all the way in (for close-up model inspection).
+pub fn capture_zoom_camera_closest(app: &mut App) {
+    let mut camera = app.world_mut().resource_mut::<RtsCamera>();
+    camera.distance = CAMERA_MIN_DISTANCE;
+}
+
+/// Diagnostic: prints every distinct mesh-material base color under each resource
+/// node, so we can see the real crystal-facet albedo to match for recoloring.
+pub fn capture_dump_resource_materials(app: &mut App) {
+    let (children_map, _aabb, _roots) = capture_world_geometry_maps(app);
+    let world = app.world_mut();
+    let nodes: Vec<(Entity, ResourceKind)> = {
+        let mut q = world.query::<(Entity, &ResourceNode)>();
+        q.iter(world).map(|(e, n)| (e, n.kind)).collect()
+    };
+    let mat_handles: std::collections::HashMap<Entity, Handle<StandardMaterial>> = {
+        let mut q = world.query::<(Entity, &MeshMaterial3d<StandardMaterial>)>();
+        q.iter(world).map(|(e, m)| (e, m.0.clone())).collect()
+    };
+    let materials = world.resource::<Assets<StandardMaterial>>();
+    for (root, kind) in nodes.into_iter().take(2) {
+        println!("[mat] {:?} node {root:?}", kind);
+        let mut stack = children_map.get(&root).cloned().unwrap_or_default();
+        while let Some(e) = stack.pop() {
+            if let Some(ch) = children_map.get(&e) {
+                stack.extend(ch.iter().copied());
+            }
+            if let Some(h) = mat_handles.get(&e) {
+                if let Some(m) = materials.get(h) {
+                    let s = m.base_color.to_srgba();
+                    let l = m.base_color.to_linear();
+                    println!(
+                        "[mat]   srgb=({:.3},{:.3},{:.3}) linear=({:.3},{:.3},{:.3}) metallic={:.2}",
+                        s.red, s.green, s.blue, l.red, l.green, l.blue, m.metallic
+                    );
+                }
+            }
+        }
+    }
+}
+
 /// World position of a player unit that is currently on-screen (projects inside
 /// the viewport, clear of the top/bottom HUD margins) so a synthetic click
 /// actually lands on it. Prefers workers. Returns `None` if none are framed.
@@ -6037,11 +6078,11 @@ impl ResourceKind {
     }
 
     fn color(self) -> Color {
-        // Two strongly-distinct mineral colors (like godot's resource_a/_b albedo
-        // tints): ore = warm red, crystal = green.
+        // Godot's resource_a/_b crystal-material albedo: ResourceA (Ore) = blue,
+        // ResourceB (Crystal) = red. Matches the HUD diamonds and minimap markers.
         match self {
-            Self::Ore => Color::srgb(0.92, 0.26, 0.13),
-            Self::Crystal => Color::srgb(0.20, 0.82, 0.33),
+            Self::Ore => Color::srgb(0.0, 0.0, 1.0),
+            Self::Crystal => Color::srgb(1.0, 0.0, 0.0),
         }
     }
 }
@@ -8888,12 +8929,13 @@ fn spawn_resource_node(
     amount: i32,
     position: Vec3,
 ) -> Entity {
-    // Ore and Crystal must read as DIFFERENT deposits: Ore = a plain meteor/rock
-    // chunk, Crystal = the green-gem crystal cluster. (Both used the same crystal
-    // model before, so they were indistinguishable.)
+    // Match godot's resource models exactly: ResourceA (Ore) = rock_crystalsLargeA,
+    // ResourceB (Crystal) = rock_crystalsLargeB. They differ in crystal-cluster
+    // shape; the crystal facets are recolored per-mineral by tint_resource_models
+    // (Ore=blue, Crystal=red), leaving the grey rock as-is — exactly like godot.
     let (model, scale, radius) = match kind {
-        ResourceKind::Ore => ("models/kenney-spacekit/meteor_detailed.glb", 0.85, 0.68),
-        ResourceKind::Crystal => ("models/kenney-spacekit/rock_crystalsLargeA.glb", 0.45, 0.55),
+        ResourceKind::Ore => ("models/kenney-spacekit/rock_crystalsLargeA.glb", 0.55, 0.6),
+        ResourceKind::Crystal => ("models/kenney-spacekit/rock_crystalsLargeB.glb", 0.55, 0.6),
     };
     let entity_id = commands
         .spawn((
@@ -26675,14 +26717,30 @@ struct ResourceTinted;
 fn resource_tint_material(kind: ResourceKind) -> StandardMaterial {
     let c = kind.color();
     let lin = c.to_linear();
+    // Mirror godot's resource_a/_b crystal material: pure metallic albedo (blue/red)
+    // with a touch of emissive so the gem facets stay vivid under the lighting.
     StandardMaterial {
         base_color: c,
-        // A little emissive so the mineral color stays vivid regardless of the
-        // model's own (pinkish) vertex colors and the lighting.
-        emissive: LinearRgba::new(lin.red * 0.42, lin.green * 0.42, lin.blue * 0.42, 1.0),
-        perceptual_roughness: 0.55,
+        metallic: 1.0,
+        perceptual_roughness: 0.35,
+        emissive: LinearRgba::new(lin.red * 0.30, lin.green * 0.30, lin.blue * 0.30, 1.0),
         ..default()
     }
+}
+
+/// The default crystal-facet albedo baked into kenney's rock_crystals GLBs (the
+/// teal gems) — godot's Color(0.4687, 0.944, 0.7938), which is an sRGB literal and
+/// matches bevy's loaded base_color in sRGB (verified: srgb=(0.469,0.944,0.794)).
+/// godot replaces exactly this material; we match it the same way so only the
+/// crystals recolor and the grey rock is left intact.
+const CRYSTAL_FACET_ALBEDO_SRGB: [f32; 3] = [0.4687, 0.944, 0.7938];
+const CRYSTAL_FACET_ALBEDO_EPSILON: f32 = 0.06;
+
+fn is_crystal_facet_albedo(color: Color) -> bool {
+    let s = color.to_srgba();
+    (s.red - CRYSTAL_FACET_ALBEDO_SRGB[0]).abs() < CRYSTAL_FACET_ALBEDO_EPSILON
+        && (s.green - CRYSTAL_FACET_ALBEDO_SRGB[1]).abs() < CRYSTAL_FACET_ALBEDO_EPSILON
+        && (s.blue - CRYSTAL_FACET_ALBEDO_SRGB[2]).abs() < CRYSTAL_FACET_ALBEDO_EPSILON
 }
 
 /// Recolors each resource node's loaded model meshes with its mineral tint, once
@@ -26690,6 +26748,7 @@ fn resource_tint_material(kind: ResourceKind) -> StandardMaterial {
 fn tint_resource_models(
     mut commands: Commands,
     tints: Option<Res<ResourceTintMaterials>>,
+    materials: Res<Assets<StandardMaterial>>,
     resources: Query<(Entity, &ResourceNode), Without<ResourceTinted>>,
     children_q: Query<&Children>,
     mut material_q: Query<&mut MeshMaterial3d<StandardMaterial>>,
@@ -26702,7 +26761,11 @@ fn tint_resource_models(
             ResourceKind::Ore => &tints.ore,
             ResourceKind::Crystal => &tints.crystal,
         };
-        let mut applied = false;
+        // Recolor ONLY the crystal-facet meshes (those carrying the teal gem
+        // albedo) and leave the grey rock untouched — exactly godot's behavior.
+        // Don't mark ResourceTinted until at least one facet recolors, so we keep
+        // retrying while the GLB materials are still streaming in.
+        let mut recolored = false;
         let mut stack: Vec<Entity> = children_q
             .get(root)
             .map(|c| c.iter().collect())
@@ -26712,11 +26775,16 @@ fn tint_resource_models(
                 stack.extend(children.iter());
             }
             if let Ok(mut material) = material_q.get_mut(entity) {
-                material.0 = handle.clone();
-                applied = true;
+                let Some(current) = materials.get(&material.0) else {
+                    continue;
+                };
+                if is_crystal_facet_albedo(current.base_color) {
+                    material.0 = handle.clone();
+                    recolored = true;
+                }
             }
         }
-        if applied {
+        if recolored {
             commands.entity(root).insert(ResourceTinted);
         }
     }

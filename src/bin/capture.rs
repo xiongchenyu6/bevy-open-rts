@@ -40,7 +40,7 @@ use bevy_open_rts::{
     capture_player_resources, capture_player_structure_count, capture_player_unit_count,
     capture_player_worker_position, capture_run_ai_match_until_resolved,
     capture_entity_is_selected, capture_onscreen_resource_model_center,
-    capture_player_command_center,
+    capture_player_command_center, capture_zoom_camera_closest,
     capture_selected_player_unit_average_position, capture_selected_player_unit_count,
     capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
     capture_world_to_screen, capture_worst_model_alignment_offset,
@@ -123,6 +123,13 @@ fn main() {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("screenshots/base/base.png"));
             render_base_selection(&path)
+        }
+        Some("resources") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/resources/resources.png"));
+            render_resources_closeup(&path)
         }
         Some("factions") => {
             let dir = args
@@ -1028,6 +1035,32 @@ fn render_base_selection(path: &Path) -> Result<(), String> {
         return Err(format!(
             "selection brackets are {offset:.2}m off the base model (limit 0.30m)"
         ));
+    }
+    println!("[capture] wrote {}", path.display());
+    Ok(())
+}
+
+/// Frames the resource deposits (and a nearby worker) close up so the model +
+/// crystal-tint fidelity can be eyeballed against godot's originals.
+fn render_resources_closeup(path: &Path) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let mut app = start_match_app();
+    let focus = capture_nearest_visible_resource_position(&mut app)
+        .or_else(|| capture_player_worker_position(&mut app))
+        .ok_or("no resource or worker found to frame")?;
+    capture_focus_camera_on(&mut app, focus);
+    capture_zoom_camera_closest(&mut app);
+    for _ in 0..30 {
+        app.update();
+    }
+    let handle = capture_handle(&app);
+    app.world_mut()
+        .spawn(Screenshot::image(handle))
+        .observe(save_to_disk(path.to_path_buf()));
+    for _ in 0..FLUSH_TICKS {
+        app.update();
     }
     println!("[capture] wrote {}", path.display());
     Ok(())

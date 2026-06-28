@@ -2190,12 +2190,15 @@ const PARTS_WEATHERCONTROLSPIRE: &[RenderPart] = &[
         scale: [0.3772, 0.3772, 0.3772],
     },
 ];
-const MODELS_WORKER: &[&str] = &["models/kenney-spacekit/astronautA.glb"];
+const MODELS_WORKER: &[&str] = &["models/kenney-spacekit/rover.glb"];
+// Worker uses godot's rover.glb (Worker.tscn), not a humanoid — transform copied
+// from the godot scene (rover instance scaled 2, offset -4,-3; the off-origin bake
+// is corrected at runtime by recenter_entity_models).
 const PARTS_WORKER: &[RenderPart] = &[RenderPart {
-    model: "models/kenney-spacekit/astronautA.glb",
-    translation: [0.0, 0.0, 0.0],
+    model: "models/kenney-spacekit/rover.glb",
+    translation: [-4.0, -0.02, -3.0],
     rotation: [0.0, 0.0, 0.0, 1.0],
-    scale: [0.72, 0.72, 0.72],
+    scale: [2.0, 2.0, 2.0],
 }];
 
 pub const ENTITY_DEFS: &[EntityDef] = &[

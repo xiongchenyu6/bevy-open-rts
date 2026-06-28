@@ -152,19 +152,12 @@ PRODUCTION_ORDER_OVERRIDES = {
 
 REMOVED_ENTITY_IDS = {"OreHarvester", "MobileConstructionVehicle"}
 
-ENTITY_RENDER_OVERRIDES = {
-    "Worker": {
-        "model_assets": ["models/kenney-spacekit/astronautA.glb"],
-        "render_parts": [
-            {
-                "model": "models/kenney-spacekit/astronautA.glb",
-                "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
-                "scale": [0.72, 0.72, 0.72],
-            }
-        ],
-    }
-}
+# Per-entity render overrides. The worker MUST use godot's rover.glb (Worker.tscn);
+# overriding it to a humanoid (astronautA) was the swap that diverged the port from
+# the original. NOTE: the registry has since been hand-expanded well beyond godot
+# (extra factions/units), so a full regen is destructive — fixes are applied
+# surgically in src/generated_registry.rs, not by re-running this script.
+ENTITY_RENDER_OVERRIDES: dict[str, dict] = {}
 
 
 def read_balanced(text: str, start: int) -> tuple[str, int]:

@@ -1,0 +1,40 @@
+   Compiling bevy-open-rts v0.1.0 (/home/freeman.xiong/Documents/github/public/bevy-open-rts)
+warning: method `id` is never used
+    --> src/lib.rs:1709:8
+     |
+1701 | impl SkirmishMatchMode {
+     | ---------------------- method in this implementation
+...
+1709 |     fn id(self) -> &'static str {
+     |        ^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: variants `SelectLobbySlot`, `CycleLobbySlotController`, and `CycleLobbySlotFaction` are never constructed
+    --> src/lib.rs:2615:5
+     |
+2610 | enum MainMenuAction {
+     |      -------------- variants in this enum
+...
+2615 |     SelectLobbySlot(usize),
+     |     ^^^^^^^^^^^^^^^
+2616 |     CycleLobbySlotController(usize),
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+2621 |     CycleLobbySlotFaction(usize),
+     |     ^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `MainMenuAction` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: method `short_label` is never used
+    --> src/lib.rs:5785:8
+     |
+5777 | impl Language {
+     | ------------- method in this implementation
+...
+5785 |     fn short_label(self) -> &'static str {
+     |        ^^^^^^^^^^^
+
+warning: `bevy-open-rts` (lib) generated 3 warnings
+    Finished `release` profile [optimized] target(s) in 6m 09s
+Stamped web build id: 4d214760f515da76
