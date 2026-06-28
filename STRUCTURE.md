@@ -34,6 +34,7 @@
 - Current capture commands are the authoritative smoke surfaces:
   - `capture menu [path]`: renders the Godot-style command menu.
   - `capture menu-wide [path]`: renders the command menu at 2048x1224 to verify desktop proportions.
+  - `capture menu-return [path]`: enters setup, returns to the command menu, and verifies no setup overlay/camera is left behind.
   - `capture menu-options [path]`: renders the migrated options/settings screen.
   - `capture menu-credits [path]`: renders the migrated credits screen.
   - `capture menu-setup [path]`: renders the real lobby/setup screen.

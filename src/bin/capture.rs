@@ -16,6 +16,7 @@
 //!   capture match [max-seconds]          headless AI-vs-AI match must resolve
 //!   capture menu [path]                  command menu screenshot
 //!   capture menu-wide [path]             command menu screenshot at 2048x1224
+//!   capture menu-return [path]           setup -> back -> command menu screenshot
 //!   capture factions <dir>               faction base/build smoke screenshots
 
 use std::env;
@@ -43,8 +44,9 @@ use bevy_open_rts::{
     capture_player_worker_position, capture_run_ai_match_until_resolved,
     capture_selected_player_unit_average_position, capture_selected_player_unit_count,
     capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
-    capture_show_credits_menu, capture_show_options_menu, capture_show_skirmish_setup_menu,
-    capture_world_to_screen, capture_worst_model_alignment_offset, capture_zoom_camera_closest,
+    capture_show_credits_menu, capture_show_main_menu, capture_show_options_menu,
+    capture_show_skirmish_setup_menu, capture_world_to_screen,
+    capture_worst_model_alignment_offset, capture_zoom_camera_closest,
     start_shared_match_scene_with_current_setup,
 };
 
@@ -103,6 +105,13 @@ fn main() {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("screenshots/menu/menu-wide.png"));
             render_menu_at(&path, WIDE_MENU_WIDTH, WIDE_MENU_HEIGHT)
+        }
+        Some("menu-return") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/menu/menu-return.png"));
+            render_menu_return(&path)
         }
         Some("menu-options") => {
             let path = args
@@ -170,7 +179,7 @@ fn main() {
             render_factions(&dir)
         }
         Some(other) => Err(format!(
-            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | menu <path> | menu-wide <path> | menu-options <path> | menu-credits <path> | menu-setup <path> | play <dir> | harvest <dir> | assault <dir> <seconds> | match <seconds> | factions <dir> | verify]"
+            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | menu <path> | menu-wide <path> | menu-return <path> | menu-options <path> | menu-credits <path> | menu-setup <path> | play <dir> | harvest <dir> | assault <dir> <seconds> | match <seconds> | factions <dir> | verify]"
         )),
     };
     if let Err(error) = result {
@@ -410,6 +419,31 @@ fn render_menu_at(path: &Path, width: u32, height: u32) -> Result<(), String> {
     let handle = capture_handle(&app);
     shoot(&mut app, &handle, path.to_path_buf());
     println!("[capture] wrote menu screenshot to {}", path.display());
+    Ok(())
+}
+
+fn render_menu_return(path: &Path) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let mut app = build_capture_app(WIDE_MENU_WIDTH, WIDE_MENU_HEIGHT);
+    for _ in 0..120 {
+        app.update();
+    }
+    capture_show_skirmish_setup_menu(&mut app);
+    for _ in 0..60 {
+        app.update();
+    }
+    capture_show_main_menu(&mut app);
+    for _ in 0..60 {
+        app.update();
+    }
+    let handle = capture_handle(&app);
+    shoot(&mut app, &handle, path.to_path_buf());
+    println!(
+        "[capture] wrote menu return screenshot to {}",
+        path.display()
+    );
     Ok(())
 }
 

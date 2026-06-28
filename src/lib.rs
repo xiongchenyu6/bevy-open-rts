@@ -7986,7 +7986,7 @@ fn setup_main_menu(
     commands.spawn((
         Name::new("Skirmish Menu Camera"),
         Camera2d,
-        DespawnOnExit(AppScreen::MainMenu),
+        DespawnOnExit(AppScreen::SkirmishSetup),
     ));
 
     // Scenic backdrop (godot's assets/ui/background.png) behind everything, with a
@@ -7995,7 +7995,7 @@ fn setup_main_menu(
     commands
         .spawn((
             Name::new("Menu Background"),
-            DespawnOnExit(AppScreen::MainMenu),
+            DespawnOnExit(AppScreen::SkirmishSetup),
             ImageNode::new(asset_server.load("ui/background.png")),
             Node {
                 position_type: PositionType::Absolute,
@@ -8020,7 +8020,7 @@ fn setup_main_menu(
     commands
         .spawn((
             Name::new("Skirmish Setup Menu"),
-            DespawnOnExit(AppScreen::MainMenu),
+            DespawnOnExit(AppScreen::SkirmishSetup),
             Node {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
@@ -8161,12 +8161,7 @@ fn setup_main_menu(
                             ))
                             .with_children(|list| {
                                 for slot in 0..selection.selected_map_player_slots() {
-                                    spawn_menu_lobby_slot_row(
-                                        list,
-                                        slot,
-                                        font.clone(),
-                                        *selection,
-                                    );
+                                    spawn_menu_lobby_slot_row(list, slot, font.clone(), *selection);
                                 }
                             });
                         });
@@ -8182,9 +8177,7 @@ fn setup_main_menu(
                         ..default()
                     })
                     .with_children(|bar| {
-                        for action in
-                            [MainMenuAction::StartMatch, MainMenuAction::BackToMainMenu]
-                        {
+                        for action in [MainMenuAction::StartMatch, MainMenuAction::BackToMainMenu] {
                             bar.spawn((
                                 Button,
                                 MainMenuButton { action },
@@ -8271,19 +8264,26 @@ fn spawn_menu_inline_dropdown(
             ..default()
         })
         .with_children(|cell| {
-            cell.spawn(menu_button(toggle, 240.0)).with_children(|button| {
-                button.spawn(menu_action_button_label(toggle, selection, font.clone(), 12.0));
-            });
+            cell.spawn(menu_button(toggle, 240.0))
+                .with_children(|button| {
+                    button.spawn(menu_action_button_label(
+                        toggle,
+                        selection,
+                        font.clone(),
+                        12.0,
+                    ));
+                });
             if open {
                 for option in options {
-                    cell.spawn(menu_button(*option, 240.0)).with_children(|button| {
-                        button.spawn(menu_action_button_label(
-                            *option,
-                            selection,
-                            font.clone(),
-                            12.0,
-                        ));
-                    });
+                    cell.spawn(menu_button(*option, 240.0))
+                        .with_children(|button| {
+                            button.spawn(menu_action_button_label(
+                                *option,
+                                selection,
+                                font.clone(),
+                                12.0,
+                            ));
+                        });
                 }
             }
         });
@@ -8404,7 +8404,11 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
         MainMenuAction::ToggleLobbySlotColor(slot) => format!(
             "{} \u{25BE}",
             skirmish_color_label(
-                selection.lobby_color_slots.get(slot).copied().unwrap_or(slot)
+                selection
+                    .lobby_color_slots
+                    .get(slot)
+                    .copied()
+                    .unwrap_or(slot)
                     % PLAYER_COLOR_PALETTE.len()
             )
         ),
@@ -8814,19 +8818,25 @@ fn spawn_menu_lobby_slot_row(
                 let toggle = MainMenuAction::ToggleLobbySlotTeam(slot);
                 cell.spawn(menu_button(toggle, 72.0))
                     .with_children(|button| {
-                        button.spawn(menu_action_button_label(toggle, selection, font.clone(), 10.0));
+                        button.spawn(menu_action_button_label(
+                            toggle,
+                            selection,
+                            font.clone(),
+                            10.0,
+                        ));
                     });
                 if selection.team_dropdown_open == Some(slot) {
                     for team_index in 0..SKIRMISH_TEAM_OPTION_COUNT as usize {
                         let option = MainMenuAction::SetLobbySlotTeam(slot, team_index);
-                        cell.spawn(menu_button(option, 72.0)).with_children(|button| {
-                            button.spawn(menu_action_button_label(
-                                option,
-                                selection,
-                                font.clone(),
-                                10.0,
-                            ));
-                        });
+                        cell.spawn(menu_button(option, 72.0))
+                            .with_children(|button| {
+                                button.spawn(menu_action_button_label(
+                                    option,
+                                    selection,
+                                    font.clone(),
+                                    10.0,
+                                ));
+                            });
                     }
                 }
             });
@@ -8841,19 +8851,25 @@ fn spawn_menu_lobby_slot_row(
                 let toggle = MainMenuAction::ToggleLobbySlotColor(slot);
                 cell.spawn(menu_button(toggle, 72.0))
                     .with_children(|button| {
-                        button.spawn(menu_action_button_label(toggle, selection, font.clone(), 10.0));
+                        button.spawn(menu_action_button_label(
+                            toggle,
+                            selection,
+                            font.clone(),
+                            10.0,
+                        ));
                     });
                 if selection.color_dropdown_open == Some(slot) {
                     for color_index in 0..PLAYER_COLOR_PALETTE.len() {
                         let option = MainMenuAction::SetLobbySlotColor(slot, color_index);
-                        cell.spawn(menu_button(option, 72.0)).with_children(|button| {
-                            button.spawn(menu_action_button_label(
-                                option,
-                                selection,
-                                font.clone(),
-                                10.0,
-                            ));
-                        });
+                        cell.spawn(menu_button(option, 72.0))
+                            .with_children(|button| {
+                                button.spawn(menu_action_button_label(
+                                    option,
+                                    selection,
+                                    font.clone(),
+                                    10.0,
+                                ));
+                            });
                     }
                 }
             });
