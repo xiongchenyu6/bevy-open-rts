@@ -47,9 +47,9 @@ struct GodotModelMapEntity {
 #[allow(dead_code)]
 struct GodotModelMapPart {
     model: String,
-    translation: [f32; 3],
-    rotation: [f32; 4],
-    scale: [f32; 3],
+    translation: Vec<f32>,
+    rotation: Vec<f32>,
+    scale: Vec<f32>,
 }
 
 #[derive(Resource, Clone)]
@@ -2057,6 +2057,20 @@ impl SkirmishMenuSelection {
         self.resources_dropdown_open = !was_open;
     }
 
+    fn set_map_choice(&mut self, index: usize) {
+        if index < SKIRMISH_MAPS.len() || is_random_map_index(index) {
+            self.map_index = index;
+        }
+        self.close_all_lobby_dropdowns();
+    }
+
+    fn set_starting_resource_choice(&mut self, index: usize) {
+        if index < GODOT_STARTING_RESOURCE_OPTIONS.len() {
+            self.starting_resource_index = index;
+        }
+        self.close_all_lobby_dropdowns();
+    }
+
     fn toggle_controller_dropdown(&mut self, slot: usize) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
@@ -2858,6 +2872,14 @@ struct MainMenuLobbySlotRow;
 struct MainMenuLobbyListRoot {
     font: Handle<Font>,
 }
+
+#[derive(Component)]
+struct MainMenuMapResourceControlsRoot {
+    font: Handle<Font>,
+}
+
+#[derive(Component)]
+struct MainMenuMapResourceControlElement;
 
 #[derive(Component)]
 struct SkirmishMapPreviewRoot;
@@ -4194,6 +4216,7 @@ fn add_main_menu_scene(app: &mut App) -> &mut App {
                 main_menu_scroll,
                 main_menu_buttons,
                 update_main_menu_summary,
+                update_main_menu_map_resource_controls,
                 update_skirmish_map_preview,
                 update_main_menu_lobby_slots,
             )
@@ -4347,6 +4370,7 @@ fn add_headless_game_plugins(app: &mut App) -> &mut App {
     .add_message::<MouseWheel>()
     .init_resource::<Assets<Mesh>>()
     .init_resource::<Assets<StandardMaterial>>()
+    .init_asset::<Image>()
     .init_asset::<bevy::mesh::skinning::SkinnedMeshInverseBindposes>()
     .init_asset::<WorldAsset>()
     .init_asset::<Font>();
@@ -8214,38 +8238,22 @@ fn setup_main_menu(
                                 },
                                 MainMenuFactionInfoText,
                             ));
-                            // 地图 selection dropdown (kept so the map is changeable).
-                            let map_options: Vec<MainMenuAction> = (0..SKIRMISH_MAPS.len())
-                                .map(MainMenuAction::SelectMap)
-                                .chain(std::iter::once(MainMenuAction::SelectMap(
-                                    random_map_index(),
-                                )))
-                                .collect();
-                            spawn_menu_inline_dropdown(
-                                col,
-                                "地图",
-                                "Map",
-                                MainMenuAction::ToggleMapDropdown,
-                                selection.map_dropdown_open,
-                                &map_options,
-                                *selection,
-                                font.clone(),
-                            );
-                            // 初始资源 dropdown.
-                            let res_options: Vec<MainMenuAction> = (0
-                                ..GODOT_STARTING_RESOURCE_OPTIONS.len())
-                                .map(MainMenuAction::SelectStartingResources)
-                                .collect();
-                            spawn_menu_inline_dropdown(
-                                col,
-                                "初始资源",
-                                "Starting resources",
-                                MainMenuAction::ToggleResourcesDropdown,
-                                selection.resources_dropdown_open,
-                                &res_options,
-                                *selection,
-                                font.clone(),
-                            );
+                            col.spawn((
+                                Node {
+                                    flex_direction: FlexDirection::Column,
+                                    align_items: AlignItems::Stretch,
+                                    row_gap: px(8),
+                                    ..default()
+                                },
+                                MainMenuMapResourceControlsRoot { font: font.clone() },
+                            ))
+                            .with_children(|controls| {
+                                spawn_menu_map_resource_controls(
+                                    controls,
+                                    font.clone(),
+                                    *selection,
+                                );
+                            });
                             col.spawn((
                                 localized_text("行动摘要", "Operation summary"),
                                 TextFont {
@@ -8361,6 +8369,43 @@ fn menu_section_header(zh: &'static str, en: &'static str, font: Handle<Font>) -
     )
 }
 
+fn spawn_menu_map_resource_controls(
+    parent: &mut ChildSpawnerCommands,
+    font: Handle<Font>,
+    selection: SkirmishMenuSelection,
+) {
+    let map_options: Vec<MainMenuAction> = (0..SKIRMISH_MAPS.len())
+        .map(MainMenuAction::SelectMap)
+        .chain(std::iter::once(MainMenuAction::SelectMap(
+            random_map_index(),
+        )))
+        .collect();
+    spawn_menu_inline_dropdown(
+        parent,
+        "地图",
+        "Map",
+        MainMenuAction::ToggleMapDropdown,
+        selection.map_dropdown_open,
+        &map_options,
+        selection,
+        font.clone(),
+    );
+
+    let res_options: Vec<MainMenuAction> = (0..GODOT_STARTING_RESOURCE_OPTIONS.len())
+        .map(MainMenuAction::SelectStartingResources)
+        .collect();
+    spawn_menu_inline_dropdown(
+        parent,
+        "初始资源",
+        "Starting resources",
+        MainMenuAction::ToggleResourcesDropdown,
+        selection.resources_dropdown_open,
+        &res_options,
+        selection,
+        font,
+    );
+}
+
 /// A labelled inline dropdown (toggle button showing the current value + ▾; when
 /// open, the option list expands below). Used for the 地图 + 初始资源 selectors.
 fn spawn_menu_inline_dropdown(
@@ -8385,14 +8430,18 @@ fn spawn_menu_inline_dropdown(
             margin: UiRect::top(px(4)),
             ..default()
         },
+        MainMenuMapResourceControlElement,
     ));
     parent
-        .spawn(Node {
-            flex_direction: FlexDirection::Column,
-            align_items: AlignItems::Stretch,
-            row_gap: px(2),
-            ..default()
-        })
+        .spawn((
+            Node {
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Stretch,
+                row_gap: px(2),
+                ..default()
+            },
+            MainMenuMapResourceControlElement,
+        ))
         .with_children(|cell| {
             cell.spawn(menu_button(toggle, 240.0))
                 .with_children(|button| {
@@ -9366,6 +9415,29 @@ fn update_skirmish_map_preview(
     });
 }
 
+fn update_main_menu_map_resource_controls(
+    mut commands: Commands,
+    selection: Res<SkirmishMenuSelection>,
+    root_q: Query<(Entity, &MainMenuMapResourceControlsRoot)>,
+    elements: Query<Entity, With<MainMenuMapResourceControlElement>>,
+) {
+    if !selection.is_changed() {
+        return;
+    }
+    let Ok((root, controls_root)) = root_q.single() else {
+        return;
+    };
+    for entity in &elements {
+        commands.entity(entity).try_despawn();
+    }
+    let Ok(mut root_commands) = commands.get_entity(root) else {
+        return;
+    };
+    root_commands.with_children(|parent| {
+        spawn_menu_map_resource_controls(parent, controls_root.font.clone(), *selection);
+    });
+}
+
 fn update_main_menu_lobby_slots(
     mut commands: Commands,
     selection: Res<SkirmishMenuSelection>,
@@ -9415,11 +9487,11 @@ fn main_menu_buttons(
     .enumerate()
     {
         if index < SKIRMISH_MAPS.len() && keyboard.just_pressed(key) {
-            selection.map_index = index;
+            selection.set_map_choice(index);
         }
     }
     if keyboard.just_pressed(KeyCode::KeyR) {
-        selection.map_index = random_map_index();
+        selection.set_map_choice(random_map_index());
     }
     for (index, key) in [
         KeyCode::Digit5,
@@ -9431,7 +9503,7 @@ fn main_menu_buttons(
     .enumerate()
     {
         if index < GODOT_STARTING_RESOURCE_OPTIONS.len() && keyboard.just_pressed(key) {
-            selection.starting_resource_index = index;
+            selection.set_starting_resource_choice(index);
         }
     }
     for (slot, key) in [(0, KeyCode::KeyH), (1, KeyCode::KeyD), (2, KeyCode::KeyC)] {
@@ -9490,14 +9562,12 @@ fn main_menu_buttons(
                 MainMenuAction::SelectMap(index)
                     if index < SKIRMISH_MAPS.len() || is_random_map_index(index) =>
                 {
-                    selection.map_index = index;
-                    selection.close_all_lobby_dropdowns();
+                    selection.set_map_choice(index);
                 }
                 MainMenuAction::SelectStartingResources(index)
                     if index < GODOT_STARTING_RESOURCE_OPTIONS.len() =>
                 {
-                    selection.starting_resource_index = index;
-                    selection.close_all_lobby_dropdowns();
+                    selection.set_starting_resource_choice(index);
                 }
                 MainMenuAction::SelectMatchMode(mode) => {
                     selection.set_match_mode(mode);
@@ -30197,6 +30267,86 @@ mod current_tests {
         sel.toggle_controller_dropdown(slot);
         sel.set_lobby_slot_controller_choice(slot, SkirmishPlayerController::Human);
         assert_eq!(sel.lobby_controllers[slot], SkirmishPlayerController::Human);
+    }
+
+    #[test]
+    fn map_and_resource_choices_close_dropdowns() {
+        let mut sel = SkirmishMenuSelection::default();
+        sel.toggle_map_dropdown();
+        assert!(sel.map_dropdown_open);
+        sel.set_map_choice(1);
+        assert_eq!(sel.map_index, 1);
+        assert!(!sel.map_dropdown_open);
+        assert!(!sel.resources_dropdown_open);
+
+        sel.toggle_resources_dropdown();
+        assert!(sel.resources_dropdown_open);
+        sel.set_starting_resource_choice(0);
+        assert_eq!(sel.starting_resource_index, 0);
+        assert!(!sel.map_dropdown_open);
+        assert!(!sel.resources_dropdown_open);
+    }
+
+    #[test]
+    fn setup_menu_rebuilds_map_and_resource_dropdown_options() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::SkirmishSetup);
+        for _ in 0..8 {
+            app.update();
+        }
+
+        let count_buttons = |app: &mut App, predicate: fn(MainMenuAction) -> bool| -> usize {
+            let world = app.world_mut();
+            let mut buttons = world.query::<&MainMenuButton>();
+            buttons
+                .iter(world)
+                .filter(|button| predicate(button.action))
+                .count()
+        };
+
+        assert_eq!(
+            count_buttons(&mut app, |action| matches!(
+                action,
+                MainMenuAction::SelectMap(_)
+            )),
+            0,
+            "closed map dropdown should not render stale map options"
+        );
+        app.world_mut()
+            .resource_mut::<SkirmishMenuSelection>()
+            .toggle_map_dropdown();
+        app.update();
+        assert_eq!(
+            count_buttons(&mut app, |action| matches!(
+                action,
+                MainMenuAction::SelectMap(_)
+            )),
+            SKIRMISH_MAPS.len() + 1,
+            "opening map dropdown should render every map plus random"
+        );
+
+        app.world_mut()
+            .resource_mut::<SkirmishMenuSelection>()
+            .toggle_resources_dropdown();
+        app.update();
+        assert_eq!(
+            count_buttons(&mut app, |action| matches!(
+                action,
+                MainMenuAction::SelectMap(_)
+            )),
+            0,
+            "opening resources dropdown should close map options"
+        );
+        assert_eq!(
+            count_buttons(&mut app, |action| matches!(
+                action,
+                MainMenuAction::SelectStartingResources(_)
+            )),
+            GODOT_STARTING_RESOURCE_OPTIONS.len(),
+            "opening resources dropdown should render every resource preset"
+        );
     }
 
     // Faction dropdown: toggling opens it (and closes the controller dropdown);
