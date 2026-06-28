@@ -214,7 +214,7 @@ const PLAYER_COLOR_PALETTE: [[f32; 3]; 20] = [
     [0.30, 0.50, 0.66],
     [0.76, 0.54, 0.54],
 ];
-const SKIRMISH_MAP_PREVIEW_SIZE: Vec2 = Vec2::new(360.0, 220.0);
+const SKIRMISH_MAP_PREVIEW_SIZE: Vec2 = Vec2::new(232.0, 168.0);
 const SKIRMISH_MAP_PREVIEW_PADDING: f32 = 12.0;
 const SKIRMISH_MAP_PREVIEW_GRID_DIVISIONS: usize = 4;
 const MINE_DEPLOY_OFFSETS: [(f32, f32); 8] = [
@@ -1742,6 +1742,8 @@ struct SkirmishMenuSelection {
     faction_dropdown_open: Option<usize>,
     team_dropdown_open: Option<usize>,
     color_dropdown_open: Option<usize>,
+    map_dropdown_open: bool,
+    resources_dropdown_open: bool,
 }
 
 impl Default for SkirmishMenuSelection {
@@ -1756,6 +1758,8 @@ impl Default for SkirmishMenuSelection {
             faction_dropdown_open: None,
             team_dropdown_open: None,
             color_dropdown_open: None,
+            map_dropdown_open: false,
+            resources_dropdown_open: false,
             lobby_factions: DEFAULT_LOBBY_FACTIONS,
             lobby_team_ids: DEFAULT_LOBBY_TEAM_IDS,
             lobby_color_slots: DEFAULT_LOBBY_COLOR_SLOTS,
@@ -1811,6 +1815,8 @@ impl SkirmishMenuSelection {
             faction_dropdown_open: None,
             team_dropdown_open: None,
             color_dropdown_open: None,
+            map_dropdown_open: false,
+            resources_dropdown_open: false,
             lobby_factions: lobby_factions_from_match_setup(&settings),
             lobby_team_ids: lobby_team_ids_from_match_setup(&settings),
             lobby_color_slots: lobby_color_slots_from_match_setup(&settings),
@@ -2005,6 +2011,20 @@ impl SkirmishMenuSelection {
         self.faction_dropdown_open = None;
         self.team_dropdown_open = None;
         self.color_dropdown_open = None;
+        self.map_dropdown_open = false;
+        self.resources_dropdown_open = false;
+    }
+
+    fn toggle_map_dropdown(&mut self) {
+        let was_open = self.map_dropdown_open;
+        self.close_all_lobby_dropdowns();
+        self.map_dropdown_open = !was_open;
+    }
+
+    fn toggle_resources_dropdown(&mut self) {
+        let was_open = self.resources_dropdown_open;
+        self.close_all_lobby_dropdowns();
+        self.resources_dropdown_open = !was_open;
     }
 
     fn toggle_controller_dropdown(&mut self, slot: usize) {
@@ -2667,6 +2687,9 @@ enum MainMenuAction {
     SetLobbySlotTeam(usize, usize),
     ToggleLobbySlotColor(usize),
     SetLobbySlotColor(usize, usize),
+    ToggleMapDropdown,
+    ToggleResourcesDropdown,
+    BackToMainMenu,
     StartMatch,
 }
 
@@ -2768,6 +2791,9 @@ impl MainMenuAction {
             MainMenuAction::SetLobbySlotColor(slot, color_index) => {
                 selection.lobby_color_slots.get(slot).copied() == Some(color_index)
             }
+            MainMenuAction::ToggleMapDropdown => selection.map_dropdown_open,
+            MainMenuAction::ToggleResourcesDropdown => selection.resources_dropdown_open,
+            MainMenuAction::BackToMainMenu => false,
             MainMenuAction::StartMatch => false,
         }
     }
@@ -8000,7 +8026,7 @@ fn setup_main_menu(
                 height: Val::Percent(100.0),
                 flex_direction: FlexDirection::Column,
                 align_items: AlignItems::Center,
-                justify_content: JustifyContent::FlexStart,
+                justify_content: JustifyContent::Center,
                 row_gap: px(12),
                 padding: UiRect::new(px(12), px(12), px(14), px(16)),
                 ..default()
@@ -8008,251 +8034,258 @@ fn setup_main_menu(
             BackgroundColor(Color::NONE),
         ))
         .with_children(|root| {
-            root.spawn(menu_top_bar_node()).with_children(|bar| {
-                bar.spawn((
-                    Text::new("BEVY OPEN RTS"),
-                    TextFont {
-                        font: font.clone().into(),
-                        font_size: FontSize::Px(16.0),
+            // Centered modal dialog (godot main-menu/Play.tscn PanelContainer).
+            root.spawn((
+                Node {
+                    width: Val::Percent(92.0),
+                    max_width: px(720),
+                    flex_direction: FlexDirection::Column,
+                    align_items: AlignItems::Stretch,
+                    row_gap: px(12),
+                    padding: UiRect::all(px(18)),
+                    border: UiRect::all(px(1)),
+                    ..default()
+                },
+                BorderColor::all(Color::srgb(0.26, 0.32, 0.32)),
+                BackgroundColor(Color::srgba(0.015, 0.025, 0.03, 0.96)),
+            ))
+            .with_children(|modal| {
+                modal
+                    .spawn(Node {
+                        flex_direction: FlexDirection::Row,
+                        align_items: AlignItems::FlexStart,
+                        column_gap: px(14),
                         ..default()
-                    },
-                    TextColor(Color::srgb(0.82, 0.9, 0.9)),
-                ));
-                bar.spawn((
-                    localized_text("遭遇战作战室", "Skirmish War Room"),
-                    TextFont {
-                        font: font.clone().into(),
-                        font_size: FontSize::Px(30.0),
-                        ..default()
-                    },
-                    TextColor(Color::srgb(0.98, 0.78, 0.42)),
-                ));
-                bar.spawn((
-                    Text::new(main_menu_brief_status_text(*selection)),
-                    TextFont {
-                        font: font.clone().into(),
-                        font_size: FontSize::Px(13.0),
-                        ..default()
-                    },
-                    TextColor(Color::srgb(0.58, 0.86, 0.66)),
-                    MainMenuBriefStatusText,
-                ));
-            });
-
-            root.spawn(menu_scroll_area_node())
-                .with_children(|content| {
-                    content
-                        .spawn(menu_preview_column_node())
-                        .with_children(|column| {
-                            column.spawn(menu_panel_node(400.0)).with_children(|panel| {
-                                panel.spawn(menu_panel_title(
-                                    "战区情报",
-                                    "Theater Intel",
-                                    font.clone(),
-                                ));
-                                spawn_skirmish_map_preview(panel, *selection);
-                                panel.spawn((
-                                    Text::new(main_menu_faction_info_text(*selection)),
-                                    TextFont {
-                                        font: font.clone().into(),
-                                        font_size: FontSize::Px(14.0),
-                                        ..default()
-                                    },
-                                    TextColor(Color::srgb(0.76, 0.84, 0.82)),
-                                    Node {
-                                        width: Val::Percent(100.0),
-                                        ..default()
-                                    },
-                                    MainMenuFactionInfoText,
-                                ));
-                            });
-
-                            column.spawn(menu_panel_node(400.0)).with_children(|panel| {
-                                panel.spawn(menu_panel_title(
-                                    "地图选择",
-                                    "Map Selection",
-                                    font.clone(),
-                                ));
-                                panel.spawn(menu_button_row_node()).with_children(|row| {
-                                    for index in 0..SKIRMISH_MAPS.len() {
-                                        let action = MainMenuAction::SelectMap(index);
-                                        row.spawn(menu_button(action, 174.0)).with_children(
-                                            |button| {
-                                                button.spawn(menu_action_button_label(
-                                                    action,
-                                                    *selection,
-                                                    font.clone(),
-                                                    13.0,
-                                                ));
-                                            },
-                                        );
-                                    }
-                                    let action = MainMenuAction::SelectMap(random_map_index());
-                                    row.spawn(menu_button(action, 174.0))
-                                        .with_children(|button| {
-                                            button.spawn(menu_action_button_label(
-                                                action,
-                                                *selection,
-                                                font.clone(),
-                                                13.0,
-                                            ));
-                                        });
-                                });
-                            });
+                    })
+                    .with_children(|cols| {
+                        // LEFT column — 地图 (map preview + details + resources + summary).
+                        cols.spawn(Node {
+                            width: px(272),
+                            flex_shrink: 0.0,
+                            flex_direction: FlexDirection::Column,
+                            align_items: AlignItems::Stretch,
+                            row_gap: px(8),
+                            ..default()
+                        })
+                        .with_children(|col| {
+                            col.spawn(menu_section_header("地图", "Map", font.clone()));
+                            spawn_skirmish_map_preview(col, *selection);
+                            col.spawn((
+                                Text::new(main_menu_faction_info_text(*selection)),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(13.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.78, 0.86, 0.84)),
+                                Node {
+                                    width: Val::Percent(100.0),
+                                    ..default()
+                                },
+                                MainMenuFactionInfoText,
+                            ));
+                            // 地图 selection dropdown (kept so the map is changeable).
+                            let map_options: Vec<MainMenuAction> = (0..SKIRMISH_MAPS.len())
+                                .map(MainMenuAction::SelectMap)
+                                .chain(std::iter::once(MainMenuAction::SelectMap(
+                                    random_map_index(),
+                                )))
+                                .collect();
+                            spawn_menu_inline_dropdown(
+                                col,
+                                "地图",
+                                "Map",
+                                MainMenuAction::ToggleMapDropdown,
+                                selection.map_dropdown_open,
+                                &map_options,
+                                *selection,
+                                font.clone(),
+                            );
+                            // 初始资源 dropdown.
+                            let res_options: Vec<MainMenuAction> = (0
+                                ..GODOT_STARTING_RESOURCE_OPTIONS.len())
+                                .map(MainMenuAction::SelectStartingResources)
+                                .collect();
+                            spawn_menu_inline_dropdown(
+                                col,
+                                "初始资源",
+                                "Starting resources",
+                                MainMenuAction::ToggleResourcesDropdown,
+                                selection.resources_dropdown_open,
+                                &res_options,
+                                *selection,
+                                font.clone(),
+                            );
+                            col.spawn((
+                                localized_text("行动摘要", "Operation summary"),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(12.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.62, 0.72, 0.7)),
+                                Node {
+                                    margin: UiRect::top(px(4)),
+                                    ..default()
+                                },
+                            ));
+                            col.spawn((
+                                Text::new(main_menu_summary_text(*selection)),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(12.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.74, 0.82, 0.8)),
+                                Node {
+                                    width: Val::Percent(100.0),
+                                    ..default()
+                                },
+                                MainMenuSummaryText,
+                            ));
                         });
 
-                    content
-                        .spawn(menu_options_grid_node())
-                        .with_children(|column| {
-                            column.spawn(menu_panel_node(760.0)).with_children(|panel| {
-                                panel.spawn(menu_panel_title(
-                                    "作战规则",
-                                    "Battle Rules",
-                                    font.clone(),
-                                ));
-                                panel.spawn(menu_rule_grid_node()).with_children(|grid| {
-                                    grid.spawn(menu_section_node()).with_children(|section| {
-                                        section.spawn(menu_section_title(
-                                            "模式  9/0/A/M",
-                                            "Mode  9/0/A/M",
-                                            font.clone(),
-                                        ));
-                                        section.spawn(menu_button_row_node()).with_children(
-                                            |row| {
-                                                for mode in SkirmishMatchMode::ALL {
-                                                    let width = match mode {
-                                                        SkirmishMatchMode::OneVsOne => 112.0,
-                                                        SkirmishMatchMode::FreeForAll => 140.0,
-                                                        SkirmishMatchMode::AiVsAi => 132.0,
-                                                        SkirmishMatchMode::AlliedTwoVsOne => 132.0,
-                                                    };
-                                                    let action =
-                                                        MainMenuAction::SelectMatchMode(mode);
-                                                    row.spawn(menu_button(action, width))
-                                                        .with_children(|button| {
-                                                            button.spawn(menu_action_button_label(
-                                                                action,
-                                                                *selection,
-                                                                font.clone(),
-                                                                13.0,
-                                                            ));
-                                                        });
-                                                }
-                                            },
-                                        );
-                                    });
-
-                                    grid.spawn(menu_section_node()).with_children(|section| {
-                                        section.spawn(menu_section_title(
-                                            "AI难度  F1-F4",
-                                            "AI Difficulty  F1-F4",
-                                            font.clone(),
-                                        ));
-                                        section.spawn(menu_button_row_node()).with_children(
-                                            |row| {
-                                                for difficulty in AiDifficulty::ALL {
-                                                    let action = MainMenuAction::SelectAiDifficulty(
-                                                        difficulty,
-                                                    );
-                                                    row.spawn(menu_button(action, 124.0))
-                                                        .with_children(|button| {
-                                                            button.spawn(menu_action_button_label(
-                                                                action,
-                                                                *selection,
-                                                                font.clone(),
-                                                                12.0,
-                                                            ));
-                                                        });
-                                                }
-                                            },
-                                        );
-                                    });
-
-                                    grid.spawn(menu_section_node()).with_children(|section| {
-                                        section.spawn(menu_section_title(
-                                            "初始资源  5-8",
-                                            "Starting Resources  5-8",
-                                            font.clone(),
-                                        ));
-                                        section.spawn(menu_button_row_node()).with_children(
-                                            |row| {
-                                                for index in
-                                                    0..GODOT_STARTING_RESOURCE_OPTIONS.len()
-                                                {
-                                                    let action =
-                                                        MainMenuAction::SelectStartingResources(
-                                                            index,
-                                                        );
-                                                    row.spawn(menu_button(action, 124.0))
-                                                        .with_children(|button| {
-                                                            button.spawn(menu_action_button_label(
-                                                                action,
-                                                                *selection,
-                                                                font.clone(),
-                                                                12.0,
-                                                            ));
-                                                        });
-                                                }
-                                            },
-                                        );
-                                    });
-                                });
-                            });
-
-                            column.spawn(menu_panel_node(760.0)).with_children(|panel| {
-                                panel.spawn(menu_panel_title(
-                                    "玩家槽位",
-                                    "Player Slots",
-                                    font.clone(),
-                                ));
-                                panel
-                                    .spawn((
-                                        menu_lobby_list_node(),
-                                        MainMenuLobbyListRoot { font: font.clone() },
-                                    ))
-                                    .with_children(|list| {
-                                        for slot in 0..selection.selected_map_player_slots() {
-                                            spawn_menu_lobby_slot_row(
-                                                list,
-                                                slot,
-                                                font.clone(),
-                                                *selection,
-                                            );
-                                        }
-                                    });
+                        // RIGHT column — 玩家 (one dropdown row per slot).
+                        cols.spawn(Node {
+                            flex_grow: 1.0,
+                            flex_direction: FlexDirection::Column,
+                            align_items: AlignItems::Stretch,
+                            row_gap: px(8),
+                            ..default()
+                        })
+                        .with_children(|col| {
+                            col.spawn(menu_section_header("玩家", "Players", font.clone()));
+                            col.spawn((
+                                menu_lobby_list_node(),
+                                MainMenuLobbyListRoot { font: font.clone() },
+                            ))
+                            .with_children(|list| {
+                                for slot in 0..selection.selected_map_player_slots() {
+                                    spawn_menu_lobby_slot_row(
+                                        list,
+                                        slot,
+                                        font.clone(),
+                                        *selection,
+                                    );
+                                }
                             });
                         });
-                });
+                    });
 
-            root.spawn(menu_bottom_bar_node()).with_children(|bar| {
-                bar.spawn(menu_button(MainMenuAction::StartMatch, 270.0))
-                    .with_children(|button| {
-                        button.spawn(menu_action_button_label(
-                            MainMenuAction::StartMatch,
-                            *selection,
-                            font.clone(),
-                            18.0,
-                        ));
+                // Bottom — 开始 / 返回, full width, stacked (godot Play.tscn).
+                modal
+                    .spawn(Node {
+                        flex_direction: FlexDirection::Column,
+                        align_items: AlignItems::Stretch,
+                        row_gap: px(6),
+                        margin: UiRect::top(px(6)),
+                        ..default()
+                    })
+                    .with_children(|bar| {
+                        for action in
+                            [MainMenuAction::StartMatch, MainMenuAction::BackToMainMenu]
+                        {
+                            bar.spawn((
+                                Button,
+                                MainMenuButton { action },
+                                Node {
+                                    width: Val::Percent(100.0),
+                                    height: px(40),
+                                    align_items: AlignItems::Center,
+                                    justify_content: JustifyContent::Center,
+                                    border: UiRect::all(px(1)),
+                                    ..default()
+                                },
+                                BorderColor::all(Color::srgb(0.28, 0.34, 0.33)),
+                                BackgroundColor(Color::srgba(0.046, 0.058, 0.06, 0.94)),
+                            ))
+                            .with_children(|button| {
+                                button.spawn(menu_action_button_label(
+                                    action,
+                                    *selection,
+                                    font.clone(),
+                                    16.0,
+                                ));
+                            });
+                        }
                     });
             });
-            root.spawn((
-                Text::new(main_menu_summary_text(*selection)),
-                TextFont {
-                    font: font.clone().into(),
-                    font_size: FontSize::Px(1.0),
-                    ..default()
-                },
-                TextColor(Color::srgba(0.0, 0.0, 0.0, 0.0)),
-                Node {
-                    position_type: PositionType::Absolute,
-                    left: px(-10_000),
-                    top: px(-10_000),
-                    width: px(1),
-                    height: px(1),
-                    ..default()
-                },
-                MainMenuSummaryText,
-            ));
+        });
+}
+
+/// A panel-bar column header (godot's "地图" / "玩家" header labels).
+fn menu_section_header(zh: &'static str, en: &'static str, font: Handle<Font>) -> impl Bundle {
+    (
+        Node {
+            width: Val::Percent(100.0),
+            height: px(30),
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            border: UiRect::all(px(1)),
+            ..default()
+        },
+        BorderColor::all(Color::srgb(0.26, 0.32, 0.32)),
+        BackgroundColor(Color::srgba(0.05, 0.06, 0.065, 0.96)),
+        children![(
+            localized_text(zh, en),
+            TextFont {
+                font: font.into(),
+                font_size: FontSize::Px(15.0),
+                ..default()
+            },
+            TextColor(Color::srgb(0.96, 0.72, 0.38)),
+        )],
+    )
+}
+
+/// A labelled inline dropdown (toggle button showing the current value + ▾; when
+/// open, the option list expands below). Used for the 地图 + 初始资源 selectors.
+fn spawn_menu_inline_dropdown(
+    parent: &mut ChildSpawnerCommands,
+    zh: &'static str,
+    en: &'static str,
+    toggle: MainMenuAction,
+    open: bool,
+    options: &[MainMenuAction],
+    selection: SkirmishMenuSelection,
+    font: Handle<Font>,
+) {
+    parent.spawn((
+        localized_text(zh, en),
+        TextFont {
+            font: font.clone().into(),
+            font_size: FontSize::Px(12.0),
+            ..default()
+        },
+        TextColor(Color::srgb(0.82, 0.88, 0.86)),
+        Node {
+            margin: UiRect::top(px(4)),
+            ..default()
+        },
+    ));
+    parent
+        .spawn(Node {
+            flex_direction: FlexDirection::Column,
+            align_items: AlignItems::Stretch,
+            row_gap: px(2),
+            ..default()
+        })
+        .with_children(|cell| {
+            cell.spawn(menu_button(toggle, 240.0)).with_children(|button| {
+                button.spawn(menu_action_button_label(toggle, selection, font.clone(), 12.0));
+            });
+            if open {
+                for option in options {
+                    cell.spawn(menu_button(*option, 240.0)).with_children(|button| {
+                        button.spawn(menu_action_button_label(
+                            *option,
+                            selection,
+                            font.clone(),
+                            12.0,
+                        ));
+                    });
+                }
+            }
         });
 }
 
@@ -8376,6 +8409,21 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
             )
         ),
         MainMenuAction::SetLobbySlotColor(_, color_index) => skirmish_color_label(color_index),
+        MainMenuAction::ToggleMapDropdown => format!(
+            "{} \u{25BE}",
+            SKIRMISH_MAPS
+                .get(selection.map_index)
+                .map(|map| map.name)
+                .unwrap_or("Map")
+        ),
+        MainMenuAction::ToggleResourcesDropdown => format!(
+            "{} \u{25BE}",
+            GODOT_STARTING_RESOURCE_OPTIONS
+                .get(selection.starting_resource_index)
+                .map(|option| starting_resource_option_label(option).to_string())
+                .unwrap_or_else(|| t("标准", "Standard").to_string())
+        ),
+        MainMenuAction::BackToMainMenu => t("返回", "Back").to_string(),
         MainMenuAction::StartMatch => t("开始对战  Enter", "Start Match  Enter").to_string(),
     }
 }
@@ -8679,36 +8727,7 @@ fn spawn_menu_lobby_slot_row(
                     ));
                 });
 
-            row.spawn(menu_lobby_slot_label_node(96.0))
-                .with_children(|cell| {
-                    cell.spawn((
-                        Text::new(if controller.is_human() {
-                            t("我方槽位", "My Slot")
-                        } else if active {
-                            t("电脑槽位", "AI Slot")
-                        } else {
-                            t("空位", "Empty")
-                        }),
-                        TextFont {
-                            font: font.clone().into(),
-                            font_size: FontSize::Px(13.0),
-                            ..default()
-                        },
-                        TextColor(Color::srgb(0.9, 0.88, 0.74)),
-                    ));
-                });
-            row.spawn(menu_lobby_slot_label_node(176.0))
-                .with_children(|cell| {
-                    cell.spawn((
-                        Text::new(status),
-                        TextFont {
-                            font: font.clone().into(),
-                            font_size: FontSize::Px(12.0),
-                            ..default()
-                        },
-                        TextColor(Color::srgb(0.7, 0.8, 0.78)),
-                    ));
-                });
+            let _ = (active, status);
             // Controller dropdown — inline expand (关闭 / 我方 / 电脑). Inline so the
             // scrolling lobby list never clips it. No separate "我方" claim button:
             // picking 我方 here claims the slot (4 stray "我方" buttons looked like
@@ -9316,6 +9335,7 @@ fn main_menu_buttons(
     }
 
     let mut start_requested = keyboard.just_pressed(KeyCode::Enter);
+    let mut back_requested = keyboard.just_pressed(KeyCode::Escape);
     let selection_snapshot = *selection;
     for (interaction, button, mut background, mut border) in &mut buttons {
         let clicked = *interaction == Interaction::Pressed && mouse.just_pressed(MouseButton::Left);
@@ -9325,11 +9345,13 @@ fn main_menu_buttons(
                     if index < SKIRMISH_MAPS.len() || is_random_map_index(index) =>
                 {
                     selection.map_index = index;
+                    selection.close_all_lobby_dropdowns();
                 }
                 MainMenuAction::SelectStartingResources(index)
                     if index < GODOT_STARTING_RESOURCE_OPTIONS.len() =>
                 {
                     selection.starting_resource_index = index;
+                    selection.close_all_lobby_dropdowns();
                 }
                 MainMenuAction::SelectMatchMode(mode) => {
                     selection.set_match_mode(mode);
@@ -9376,6 +9398,15 @@ fn main_menu_buttons(
                 MainMenuAction::SetLobbySlotColor(slot, color_index) => {
                     selection.set_lobby_slot_color_choice(slot, color_index);
                 }
+                MainMenuAction::ToggleMapDropdown => {
+                    selection.toggle_map_dropdown();
+                }
+                MainMenuAction::ToggleResourcesDropdown => {
+                    selection.toggle_resources_dropdown();
+                }
+                MainMenuAction::BackToMainMenu => {
+                    back_requested = true;
+                }
                 MainMenuAction::StartMatch => {
                     start_requested = true;
                 }
@@ -9389,7 +9420,10 @@ fn main_menu_buttons(
         *border = BorderColor::all(border_color);
     }
 
-    if start_requested {
+    if back_requested {
+        selection.close_all_lobby_dropdowns();
+        next_state.set(AppScreen::MainMenu);
+    } else if start_requested {
         start_shared_match_from_menu_selection(
             *selection,
             &mut setup_settings,
