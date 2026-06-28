@@ -40,6 +40,7 @@ use bevy_open_rts::{
     capture_player_resources, capture_player_structure_count, capture_player_unit_count,
     capture_player_worker_position, capture_run_ai_match_until_resolved,
     capture_entity_is_selected, capture_onscreen_resource_model_center,
+    capture_player_command_center,
     capture_selected_player_unit_average_position, capture_selected_player_unit_count,
     capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
     capture_world_to_screen, capture_worst_model_alignment_offset,
@@ -116,6 +117,13 @@ fn main() {
             run_match_proof(max_seconds)
         }
         Some("verify") => verify_click_alignment(),
+        Some("base") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/base/base.png"));
+            render_base_selection(&path)
+        }
         Some("factions") => {
             let dir = args
                 .next()
@@ -966,6 +974,60 @@ fn render_still(path: &Path) -> Result<(), String> {
         .observe(save_to_disk(path.to_path_buf()));
     for _ in 0..FLUSH_TICKS {
         app.update();
+    }
+    println!("[capture] wrote {}", path.display());
+    Ok(())
+}
+
+/// Selects the player's command center (via the real click path) and screenshots
+/// it framed, so the selection brackets can be eyeballed against the building.
+/// Also asserts the brackets' anchor (entity origin) sits on the building's
+/// visible center — the bug the user reported was an offset between the two.
+fn render_base_selection(path: &Path) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let mut app = start_match_app();
+
+    let (entity, origin, center) =
+        capture_player_command_center(&mut app).ok_or("no player command center found")?;
+    let offset = ((center.x - origin.x).powi(2) + (center.z - origin.z).powi(2)).sqrt();
+    println!(
+        "[base] command center origin=({:.2},{:.2}) visual_center=({:.2},{:.2}) offset={offset:.3}m",
+        origin.x, origin.z, center.x, center.z
+    );
+
+    capture_focus_camera_on(&mut app, center);
+    for _ in 0..20 {
+        app.update();
+    }
+    if let Some(screen) = capture_world_to_screen(&mut app, center) {
+        capture_set_cursor(&mut app, screen);
+        capture_mouse_button(&mut app, MouseButton::Left, true);
+        app.update();
+        capture_mouse_button(&mut app, MouseButton::Left, false);
+        for _ in 0..4 {
+            app.update();
+        }
+        println!(
+            "[base] clicked base @ ({:.0},{:.0}): selected={}",
+            screen.x,
+            screen.y,
+            capture_entity_is_selected(&mut app, entity)
+        );
+    }
+
+    let handle = capture_handle(&app);
+    app.world_mut()
+        .spawn(Screenshot::image(handle))
+        .observe(save_to_disk(path.to_path_buf()));
+    for _ in 0..FLUSH_TICKS {
+        app.update();
+    }
+    if offset > 0.3 {
+        return Err(format!(
+            "selection brackets are {offset:.2}m off the base model (limit 0.30m)"
+        ));
     }
     println!("[capture] wrote {}", path.display());
     Ok(())

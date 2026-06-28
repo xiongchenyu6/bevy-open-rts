@@ -4433,11 +4433,23 @@ fn entity_visual_world_center(
     root: Entity,
     children_map: &std::collections::HashMap<Entity, Vec<Entity>>,
     aabb_map: &std::collections::HashMap<Entity, (GlobalTransform, Aabb)>,
+    model_roots: &std::collections::HashSet<Entity>,
 ) -> Option<Vec3> {
     let mut min = Vec3::splat(f32::MAX);
     let mut max = Vec3::splat(f32::MIN);
     let mut found = false;
-    let mut stack: Vec<Entity> = children_map.get(&root).cloned().unwrap_or_default();
+    // Measure ONLY the GLB (WorldAssetRoot) subtrees — the parts the recenter
+    // aligns to the origin. The procedural faction banner sits forward of the
+    // model; including it would misreport a correctly centered building as offset.
+    let mut stack: Vec<Entity> = children_map
+        .get(&root)
+        .map(|c| {
+            c.iter()
+                .copied()
+                .filter(|e| model_roots.contains(e))
+                .collect()
+        })
+        .unwrap_or_default();
     while let Some(entity) = stack.pop() {
         if let Some(children) = children_map.get(&entity) {
             stack.extend(children.iter().copied());
@@ -4467,6 +4479,7 @@ fn capture_world_geometry_maps(
 ) -> (
     std::collections::HashMap<Entity, Vec<Entity>>,
     std::collections::HashMap<Entity, (GlobalTransform, Aabb)>,
+    std::collections::HashSet<Entity>,
 ) {
     let world = app.world_mut();
     let mut children_map = std::collections::HashMap::new();
@@ -4483,7 +4496,14 @@ fn capture_world_geometry_maps(
             aabb_map.insert(entity, (*gt, *aabb));
         }
     }
-    (children_map, aabb_map)
+    let mut model_roots = std::collections::HashSet::new();
+    {
+        let mut q = world.query_filtered::<Entity, With<WorldAssetRoot>>();
+        for entity in q.iter(world) {
+            model_roots.insert(entity);
+        }
+    }
+    (children_map, aabb_map, model_roots)
 }
 
 /// Worst horizontal distance (meters) between any selectable entity's VISIBLE
@@ -4493,7 +4513,7 @@ fn capture_world_geometry_maps(
 /// Returns `(offset_m, label)` for the worst entity, or `None` if no models
 /// loaded yet.
 pub fn capture_worst_model_alignment_offset(app: &mut App) -> Option<(f32, String)> {
-    let (children_map, aabb_map) = capture_world_geometry_maps(app);
+    let (children_map, aabb_map, model_roots) = capture_world_geometry_maps(app);
     let world = app.world_mut();
     let mut roots = Vec::new();
     {
@@ -4511,7 +4531,8 @@ pub fn capture_worst_model_alignment_offset(app: &mut App) -> Option<(f32, Strin
     }
     let mut worst: Option<(f32, String)> = None;
     for (root, translation, label) in roots {
-        let Some(center) = entity_visual_world_center(root, &children_map, &aabb_map) else {
+        let Some(center) = entity_visual_world_center(root, &children_map, &aabb_map, &model_roots)
+        else {
             continue;
         };
         let offset = Vec2::new(center.x - translation.x, center.z - translation.z).length();
@@ -4525,7 +4546,7 @@ pub fn capture_worst_model_alignment_offset(app: &mut App) -> Option<(f32, Strin
 /// World-space visible-model center of an on-screen, non-empty resource node, with
 /// its entity — for clicking the model where it is actually DRAWN (not its origin).
 pub fn capture_onscreen_resource_model_center(app: &mut App) -> Option<(Entity, Vec3)> {
-    let (children_map, aabb_map) = capture_world_geometry_maps(app);
+    let (children_map, aabb_map, model_roots) = capture_world_geometry_maps(app);
     let (width, height) = {
         let world = app.world_mut();
         let mut windows = world.query_filtered::<&Window, With<PrimaryWindow>>();
@@ -4544,7 +4565,9 @@ pub fn capture_onscreen_resource_model_center(app: &mut App) -> Option<(Entity, 
         .filter_map(|(entity, resource)| (resource.amount > 0).then_some(entity))
         .collect();
     for entity in candidates {
-        let Some(center) = entity_visual_world_center(entity, &children_map, &aabb_map) else {
+        let Some(center) =
+            entity_visual_world_center(entity, &children_map, &aabb_map, &model_roots)
+        else {
             continue;
         };
         if let Ok(screen) = camera.world_to_viewport(&cam_transform, center) {
@@ -4558,6 +4581,24 @@ pub fn capture_onscreen_resource_model_center(app: &mut App) -> Option<(Entity, 
         }
     }
     None
+}
+
+/// The player's command-center entity, its origin (where selection brackets are
+/// drawn) and its GLB visual center (where the building is actually drawn). Used
+/// by the `base` capture to confirm the brackets overlay the building.
+pub fn capture_player_command_center(app: &mut App) -> Option<(Entity, Vec3, Vec3)> {
+    let (children_map, aabb_map, model_roots) = capture_world_geometry_maps(app);
+    let player = Team::Player(0);
+    let world = app.world_mut();
+    let entity = {
+        let mut q = world.query_filtered::<(Entity, &Team, &Structure), ()>();
+        q.iter(world)
+            .find(|(_, team, structure)| **team == player && structure.id == "CommandCenter")
+            .map(|(entity, _, _)| entity)?
+    };
+    let origin = world.get::<Transform>(entity)?.translation;
+    let center = entity_visual_world_center(entity, &children_map, &aabb_map, &model_roots)?;
+    Some((entity, origin, center))
 }
 
 /// Whether the given entity currently has the `Selected` component (capture check).
@@ -26535,14 +26576,26 @@ fn recenter_entity_models(
     mut model_tf: Query<&mut Transform, With<WorldAssetRoot>>,
 ) {
     for (root, root_gt, tracking) in &roots {
-        // Combined world-space AABB of every mesh descendant + how many meshes.
+        // Combined world-space AABB of the GLB model meshes + how many meshes.
+        // Measure ONLY the WorldAssetRoot (GLB) subtrees — the same children the
+        // shift below moves. The faction identity banner is a procedural child of
+        // the root sitting forward at -radius*0.72 in Z; including it pulled the
+        // measured center toward the flag, so the building (and its selection
+        // brackets) ended up offset from the entity origin.
         let mut min = Vec3::splat(f32::MAX);
         let mut max = Vec3::splat(f32::MIN);
         let mut count: u32 = 0;
-        let mut stack: Vec<Entity> = children_q
+        let model_roots: Vec<Entity> = children_q
             .get(root)
-            .map(|c| c.iter().collect())
+            .map(|c| c.iter().filter(|e| model_tf.contains(*e)).collect())
             .unwrap_or_default();
+        if model_roots.is_empty() {
+            // Procedural-only model (authored at the origin) — nothing to shift.
+            commands.entity(root).insert(ModelRecentered);
+            commands.entity(root).remove::<ModelRecenterTracking>();
+            continue;
+        }
+        let mut stack: Vec<Entity> = model_roots;
         while let Some(entity) = stack.pop() {
             if let Ok(children) = children_q.get(entity) {
                 stack.extend(children.iter());
