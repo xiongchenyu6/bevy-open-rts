@@ -1,0 +1,94 @@
+name: Build and Deploy WebGPU
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: bevy-open-rts-pages-${{ github.repository }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-web:
+    name: Build WebAssembly package
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-targets: true
+          cache-on-failure: false
+
+      - name: Cache wasm tool binaries
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/wasm-bindgen
+            ~/.cargo/bin/wasm-opt
+          key: ${{ runner.os }}-wasm-tools-${{ hashFiles('scripts/build_web.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-wasm-tools-
+
+      - name: Install wasm build tools
+        run: |
+          set -euo pipefail
+
+          if ! command -v wasm-bindgen >/dev/null 2>&1; then
+            cargo install -q --locked wasm-bindgen-cli
+          fi
+
+          if ! command -v wasm-opt >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y binaryen
+          fi
+
+      - name: Build web artifacts
+        run: bash scripts/build_web.sh
+
+      - name: Upload web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-${{ github.sha }}
+          path: web/
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy-web:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build-web
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    steps:
+      - name: Download web artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-${{ github.sha }}
+          path: web-dist
+
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          publish_dir: web-dist
+          publish_branch: gh-pages
+          force_orphan: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          commit_message: "Deploy web build ${{ github.sha }}"
