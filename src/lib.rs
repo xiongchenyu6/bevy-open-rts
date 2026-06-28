@@ -5371,6 +5371,9 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
             recenter_entity_models
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
+            tint_resource_models
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
             update_resource_hover
                 .in_set(SimulationPhase::PostCombat)
                 .before(draw_world_overlays)
@@ -5977,9 +5980,11 @@ impl ResourceKind {
     }
 
     fn color(self) -> Color {
+        // Two strongly-distinct mineral colors (like godot's resource_a/_b albedo
+        // tints): ore = warm red, crystal = green.
         match self {
-            Self::Ore => Color::srgb(0.18, 0.52, 1.0),
-            Self::Crystal => Color::srgb(0.95, 0.18, 0.16),
+            Self::Ore => Color::srgb(0.92, 0.26, 0.13),
+            Self::Crystal => Color::srgb(0.20, 0.82, 0.33),
         }
     }
 }
@@ -8576,6 +8581,11 @@ fn setup(
             map_bounds,
         );
     }
+
+    commands.insert_resource(ResourceTintMaterials {
+        ore: materials.add(resource_tint_material(ResourceKind::Ore)),
+        crystal: materials.add(resource_tint_material(ResourceKind::Crystal)),
+    });
 
     for x in [-17.0, -8.0, 6.0, 15.0] {
         spawn_prop(
@@ -26578,6 +26588,68 @@ fn recenter_entity_models(
         }
         commands.entity(root).insert(ModelRecentered);
         commands.entity(root).remove::<ModelRecenterTracking>();
+    }
+}
+
+/// Per-kind tint materials applied to resource models so ore (red) and crystal
+/// (green) read as distinct minerals (mirrors godot's resource_a/_b albedo tints).
+#[derive(Resource)]
+struct ResourceTintMaterials {
+    ore: Handle<StandardMaterial>,
+    crystal: Handle<StandardMaterial>,
+}
+
+/// Marks a resource whose model meshes have been recolored to its mineral tint.
+#[derive(Component)]
+struct ResourceTinted;
+
+fn resource_tint_material(kind: ResourceKind) -> StandardMaterial {
+    let c = kind.color();
+    let lin = c.to_linear();
+    StandardMaterial {
+        base_color: c,
+        // A little emissive so the mineral color stays vivid regardless of the
+        // model's own (pinkish) vertex colors and the lighting.
+        emissive: LinearRgba::new(lin.red * 0.42, lin.green * 0.42, lin.blue * 0.42, 1.0),
+        perceptual_roughness: 0.55,
+        ..default()
+    }
+}
+
+/// Recolors each resource node's loaded model meshes with its mineral tint, once
+/// the GLB scene has spawned its meshes.
+fn tint_resource_models(
+    mut commands: Commands,
+    tints: Option<Res<ResourceTintMaterials>>,
+    resources: Query<(Entity, &ResourceNode), Without<ResourceTinted>>,
+    children_q: Query<&Children>,
+    mut material_q: Query<&mut MeshMaterial3d<StandardMaterial>>,
+) {
+    let Some(tints) = tints else {
+        return;
+    };
+    for (root, node) in &resources {
+        let handle = match node.kind {
+            ResourceKind::Ore => &tints.ore,
+            ResourceKind::Crystal => &tints.crystal,
+        };
+        let mut applied = false;
+        let mut stack: Vec<Entity> = children_q
+            .get(root)
+            .map(|c| c.iter().collect())
+            .unwrap_or_default();
+        while let Some(entity) = stack.pop() {
+            if let Ok(children) = children_q.get(entity) {
+                stack.extend(children.iter());
+            }
+            if let Ok(mut material) = material_q.get_mut(entity) {
+                material.0 = handle.clone();
+                applied = true;
+            }
+        }
+        if applied {
+            commands.entity(root).insert(ResourceTinted);
+        }
     }
 }
 
