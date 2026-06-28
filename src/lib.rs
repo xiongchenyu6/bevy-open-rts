@@ -2640,6 +2640,9 @@ struct FrontMenuButton {
     action: FrontMenuAction,
 }
 
+#[derive(Component)]
+struct FrontMenuRosterPreview;
+
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 enum OptionsMenuAction {
     ToggleFullscreen,
@@ -4055,7 +4058,8 @@ fn add_main_menu_scene(app: &mut App) -> &mut App {
     app.add_systems(OnEnter(AppScreen::MainMenu), setup_front_menu)
         .add_systems(
             Update,
-            front_menu_buttons.run_if(in_state(AppScreen::MainMenu)),
+            (front_menu_buttons, resize_front_menu_roster_preview)
+                .run_if(in_state(AppScreen::MainMenu)),
         )
         .add_systems(OnEnter(AppScreen::OptionsMenu), setup_options_menu)
         .add_systems(
@@ -7190,17 +7194,29 @@ fn setup_front_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                                 },
                                 TextColor(Color::srgb(0.76, 0.96, 0.9)),
                             ));
-                            panel.spawn((
-                                ImageNode::new(asset_server.load("ui/icons/RosterPreview.png")),
-                                Node {
-                                    width: Val::VMin(42.0),
-                                    height: Val::VMin(26.7),
-                                    max_width: Val::Percent(100.0),
-                                    max_height: px(326),
-                                    align_self: AlignSelf::Center,
+                            panel
+                                .spawn(Node {
+                                    width: Val::Percent(100.0),
+                                    min_height: px(326),
+                                    flex_grow: 1.0,
+                                    align_self: AlignSelf::Stretch,
+                                    justify_content: JustifyContent::Center,
+                                    align_items: AlignItems::Center,
                                     ..default()
-                                },
-                            ));
+                                })
+                                .with_children(|preview| {
+                                    preview.spawn((
+                                        ImageNode::new(
+                                            asset_server.load("ui/icons/RosterPreview.png"),
+                                        ),
+                                        FrontMenuRosterPreview,
+                                        Node {
+                                            width: px(326),
+                                            height: px(326),
+                                            ..default()
+                                        },
+                                    ));
+                                });
                         });
                 });
 
@@ -7341,6 +7357,22 @@ fn front_menu_button(action: FrontMenuAction, height: f32) -> impl Bundle {
         },
         BackgroundColor(Color::srgba(0.08, 0.082, 0.082, 0.92)),
     )
+}
+
+fn resize_front_menu_roster_preview(
+    window_q: Query<&Window, With<PrimaryWindow>>,
+    mut preview_q: Query<&mut Node, With<FrontMenuRosterPreview>>,
+) {
+    let Ok(window) = window_q.single() else {
+        return;
+    };
+    let vertical_room = (window.height() - 454.0).clamp(260.0, 860.0);
+    let horizontal_room = (window.width() - 552.0).clamp(260.0, 860.0);
+    let preview_size = vertical_room.min(horizontal_room);
+    for mut node in preview_q.iter_mut() {
+        node.width = px(preview_size);
+        node.height = px(preview_size);
+    }
 }
 
 fn front_menu_buttons(

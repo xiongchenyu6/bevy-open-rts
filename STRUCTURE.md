@@ -33,6 +33,7 @@
 - `build_capture_match_app_for_faction()` uses `SharedMatchScenePlugin` plus `start_shared_match_scene_with_settings()`.
 - Current capture commands are the authoritative smoke surfaces:
   - `capture menu [path]`: renders the Godot-style command menu.
+  - `capture menu-wide [path]`: renders the command menu at 2048x1224 to verify desktop proportions.
   - `capture menu-options [path]`: renders the migrated options/settings screen.
   - `capture menu-credits [path]`: renders the migrated credits screen.
   - `capture menu-setup [path]`: renders the real lobby/setup screen.

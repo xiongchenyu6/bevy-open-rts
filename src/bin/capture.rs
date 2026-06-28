@@ -14,7 +14,8 @@
 //!   capture harvest <dir>                real input smoke: Worker right-clicks ore
 //!   capture assault <dir> [max-seconds]  real input smoke: select army/attack-move/win
 //!   capture match [max-seconds]          headless AI-vs-AI match must resolve
-//!   capture menu [path]                  lobby/setup screenshot
+//!   capture menu [path]                  command menu screenshot
+//!   capture menu-wide [path]             command menu screenshot at 2048x1224
 //!   capture factions <dir>               faction base/build smoke screenshots
 
 use std::env;
@@ -49,6 +50,8 @@ use bevy_open_rts::{
 
 const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 720;
+const WIDE_MENU_WIDTH: u32 = 2048;
+const WIDE_MENU_HEIGHT: u32 = 1224;
 /// Ticks to let assets load and the menu initialize before starting a match.
 const WARMUP_TICKS: usize = 90;
 /// Ticks to let the match scene populate (bases, units) before first capture.
@@ -92,7 +95,14 @@ fn main() {
                 .next()
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("screenshots/menu/menu.png"));
-            render_menu(&path)
+            render_menu_at(&path, WIDTH, HEIGHT)
+        }
+        Some("menu-wide") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/menu/menu-wide.png"));
+            render_menu_at(&path, WIDE_MENU_WIDTH, WIDE_MENU_HEIGHT)
         }
         Some("menu-options") => {
             let path = args
@@ -160,7 +170,7 @@ fn main() {
             render_factions(&dir)
         }
         Some(other) => Err(format!(
-            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | menu <path> | menu-options <path> | menu-credits <path> | menu-setup <path> | play <dir> | harvest <dir> | assault <dir> <seconds> | match <seconds> | factions <dir> | verify]"
+            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | menu <path> | menu-wide <path> | menu-options <path> | menu-credits <path> | menu-setup <path> | play <dir> | harvest <dir> | assault <dir> <seconds> | match <seconds> | factions <dir> | verify]"
         )),
     };
     if let Err(error) = result {
@@ -387,13 +397,13 @@ fn faction_try_build(app: &mut App) -> bool {
     capture_player_structure_count(app) > before
 }
 
-/// Screenshots the lobby / setup menu (no match started) so menu UI can be
-/// visually verified.
-fn render_menu(path: &Path) -> Result<(), String> {
+/// Screenshots the front menu (no match started) so menu UI can be visually
+/// verified at multiple desktop sizes.
+fn render_menu_at(path: &Path, width: u32, height: u32) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
-    let mut app = build_capture_app(WIDTH, HEIGHT);
+    let mut app = build_capture_app(width, height);
     for _ in 0..120 {
         app.update();
     }

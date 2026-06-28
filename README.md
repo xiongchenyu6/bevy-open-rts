@@ -51,6 +51,7 @@ stale game code after a rebuild.
 cargo run --bin capture -- screenshot screenshots/capture/still.png
 cargo run --bin capture -- frames screenshots/result/1 450
 cargo run --bin capture -- menu screenshots/menu/menu.png
+cargo run --bin capture -- menu-wide screenshots/menu/menu-wide.png
 cargo run --bin capture -- menu-options screenshots/menu/options.png
 cargo run --bin capture -- menu-credits screenshots/menu/credits.png
 cargo run --bin capture -- menu-setup screenshots/menu/setup.png
@@ -61,11 +62,13 @@ cargo run --bin capture -- match 240
 cargo run --bin capture -- factions screenshots/factions
 ```
 
-`capture menu` renders the Godot-style command menu; `capture menu-options`,
-`capture menu-credits`, and `capture menu-setup` render the settings, credits,
-and skirmish setup screens. `capture play` drives the real input systems through
-select, move, train, and build actions, then exits non-zero unless the trained
-unit actually spawns and a Worker completes the placed structure. `capture harvest` selects an actual
+`capture menu` renders the Godot-style command menu; `capture menu-wide` renders
+the same screen at 2048x1224 to verify desktop proportions. `capture
+menu-options`, `capture menu-credits`, and `capture menu-setup` render the
+settings, credits, and skirmish setup screens. `capture play` drives the real
+input systems through select, move, train, and build actions, then exits
+non-zero unless the trained unit actually spawns and a Worker completes the
+placed structure. `capture harvest` selects an actual
 Worker, right-clicks a visible resource node, and exits non-zero unless a
 `HarvestOrder` is issued and player resources grow. `capture assault` uses real
 input to build a Barracks, train Heavy Machinegun Troopers, repeatedly
