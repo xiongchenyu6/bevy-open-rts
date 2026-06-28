@@ -27,6 +27,7 @@
 - The minimal `GodotSkirmish` opening remains one `CommandCenter` plus two `Worker` economy units, but each faction gets a distinct starter combat/scout unit (`ScoutRover`, `RocketInfantry`, `ShieldTrooper`) so the default `cargo run` start is not visually identical across races.
 - Godot render-part mapping is audited separately from gameplay generation. `assets/data/godot_model_map.model_map.ron` is a Bevy-loadable baseline asset generated from Godot `*.tscn` scenes, and `scripts/audit_model_mapping.py` compares it against `src/generated_registry.rs` without regenerating or overwriting the hand-expanded registry.
 - `Worker` and `ScoutRover` intentionally share Godot's `rover.glb`; their one-to-one fidelity comes from separate Godot transforms (`Worker` scale 2.0, `ScoutRover` scale 1.65). Harvest sparkle/cargo motion is a runtime behavior/effect layer, not a different static model file.
+- Worker harvesting now has runtime VFX parity for the important Godot cues: collecting emits front sparkles and resource-to-worker pulses, carried ore/crystal draws visible cargo dots on the rover, and dropoff clears the cargo through the existing `ResourceCargo` flow.
 
 ## Capture And Proofs
 

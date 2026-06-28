@@ -24908,11 +24908,23 @@ fn update_harvest_orders(
                     }
 
                     order.collect_remaining -= time.delta_secs();
+                    let resource_position = resource_transform.translation;
+                    let resource_kind = resource.kind;
                     while order.collect_remaining <= 0.0 && resource.amount > 0 && !cargo.is_full()
                     {
                         resource.amount -= 1;
-                        let _ = cargo.add_one(resource.kind);
-                        order.collect_remaining += resource.kind.collect_seconds();
+                        if cargo.add_one(resource_kind) {
+                            commands.spawn((
+                                ShotPulse {
+                                    from: resource_position + Vec3::Y * 0.38,
+                                    to: transform.translation + Vec3::Y * 0.45,
+                                    ttl: 0.14,
+                                    team: *team,
+                                },
+                                MatchScopedEntity,
+                            ));
+                        }
+                        order.collect_remaining += resource_kind.collect_seconds();
                     }
 
                     if resource.amount <= 0 {
@@ -28157,6 +28169,7 @@ struct OverlayVfxQueries<'w, 's> {
     destruction: Query<'w, 's, (&'static Transform, &'static StructureDestructionVfx)>,
     promotion: Query<'w, 's, (&'static Transform, &'static VeterancyPromotionEffect)>,
     camera: Query<'w, 's, &'static GlobalTransform, With<MainCamera>>,
+    time: Res<'w, Time>,
 }
 
 fn draw_world_overlays(
@@ -28175,6 +28188,8 @@ fn draw_world_overlays(
             Option<&OrderQueue>,
             Option<&Unit>,
             Option<&Structure>,
+            Option<&HarvestOrder>,
+            Option<&ResourceCargo>,
         ),
         With<Selected>,
     >,
@@ -28186,6 +28201,8 @@ fn draw_world_overlays(
             &Health,
             Option<&Unit>,
             Option<&Structure>,
+            Option<&HarvestOrder>,
+            Option<&ResourceCargo>,
         ),
         Without<Selected>,
     >,
@@ -28268,6 +28285,8 @@ fn draw_world_overlays(
         order_queue,
         unit,
         structure,
+        harvest_order,
+        cargo,
     ) in &selected
     {
         let selected_color = Color::srgb(0.62, 0.95, 0.64);
@@ -28311,6 +28330,17 @@ fn draw_world_overlays(
             );
             draw_terrain_order_path(&mut gizmos, transform.translation, &path_points);
         }
+        draw_harvest_and_cargo_visuals(
+            &mut gizmos,
+            &mut hud,
+            transform.translation,
+            selectable.radius,
+            harvest_order,
+            cargo,
+            &resources,
+            vfx.time.elapsed_secs(),
+            bar_right,
+        );
         if should_draw_team_marker_for_entity(unit, structure) && *team != visible_team {
             draw_team_marker(
                 &mut gizmos,
@@ -28321,7 +28351,18 @@ fn draw_world_overlays(
             );
         }
     }
-    for (transform, selectable, team, health, unit, structure) in &all {
+    for (transform, selectable, team, health, unit, structure, harvest_order, cargo) in &all {
+        draw_harvest_and_cargo_visuals(
+            &mut gizmos,
+            &mut hud,
+            transform.translation,
+            selectable.radius,
+            harvest_order,
+            cargo,
+            &resources,
+            vfx.time.elapsed_secs(),
+            bar_right,
+        );
         if should_draw_team_marker_for_entity(unit, structure) {
             draw_team_marker(
                 &mut gizmos,
@@ -28696,6 +28737,150 @@ fn draw_ring(gizmos: &mut Gizmos, position: Vec3, radius: f32, color: Color) {
         radius,
         color,
     );
+}
+
+const HARVEST_CARGO_VISUAL_MAX_SLOTS: usize = 6;
+
+fn harvest_cargo_visual_slots(cargo: ResourceCargo) -> Vec<ResourceKind> {
+    let mut slots = Vec::new();
+    for _ in 0..cargo.ore.max(0) {
+        if slots.len() >= HARVEST_CARGO_VISUAL_MAX_SLOTS {
+            return slots;
+        }
+        slots.push(ResourceKind::Ore);
+    }
+    for _ in 0..cargo.crystal.max(0) {
+        if slots.len() >= HARVEST_CARGO_VISUAL_MAX_SLOTS {
+            return slots;
+        }
+        slots.push(ResourceKind::Crystal);
+    }
+    slots
+}
+
+fn harvest_visual_color(kind: ResourceKind, alpha: f32) -> Color {
+    match kind {
+        ResourceKind::Ore => Color::srgba(0.10, 0.22, 1.0, alpha),
+        ResourceKind::Crystal => Color::srgba(1.0, 0.15, 0.08, alpha),
+    }
+}
+
+fn draw_harvest_and_cargo_visuals(
+    gizmos: &mut Gizmos,
+    hud: &mut Gizmos<HudGizmos>,
+    position: Vec3,
+    radius: f32,
+    harvest_order: Option<&HarvestOrder>,
+    cargo: Option<&ResourceCargo>,
+    resources: &Query<(
+        Entity,
+        &Transform,
+        &Selectable,
+        &ResourceNode,
+        &VisibilityState,
+    )>,
+    elapsed_secs: f32,
+    bar_right: Vec3,
+) {
+    if let Some(cargo) = cargo {
+        draw_resource_cargo_visual(
+            gizmos,
+            hud,
+            position,
+            radius,
+            *cargo,
+            elapsed_secs,
+            bar_right,
+        );
+    }
+
+    let Some(order) = harvest_order else {
+        return;
+    };
+    if order.state != HarvestState::Collecting {
+        return;
+    }
+    let Some(target) = order.resource else {
+        return;
+    };
+    let Ok((_, resource_transform, resource_selectable, resource, visibility)) =
+        resources.get(target)
+    else {
+        return;
+    };
+    if !visibility.visible || resource.amount <= 0 {
+        return;
+    }
+
+    let resource_position = resource_transform.translation;
+    let to_resource = Vec3::new(
+        resource_position.x - position.x,
+        0.0,
+        resource_position.z - position.z,
+    )
+    .normalize_or(Vec3::Z);
+    let front = position + to_resource * (radius + 0.16) + Vec3::Y * 0.34;
+    let contact =
+        resource_position - to_resource * (resource_selectable.radius * 0.45) + Vec3::Y * 0.28;
+    let color = harvest_visual_color(resource.kind, 0.84);
+    let hot = Color::srgba(1.0, 0.96, 0.62, 0.78);
+    hud.line(front, contact, color);
+    hud.line(front + Vec3::Y * 0.06, contact + Vec3::Y * 0.03, hot);
+
+    let side = Vec3::new(-to_resource.z, 0.0, to_resource.x).normalize_or(bar_right);
+    let phase = elapsed_secs * 7.5;
+    for i in 0..8 {
+        let seed = i as f32 * 2.399_963;
+        let angle = phase + seed;
+        let spread = 0.10 + 0.07 * ((phase * 0.7 + seed).sin() * 0.5 + 0.5);
+        let lift = 0.10 + 0.38 * ((phase + seed * 0.5).cos() * 0.5 + 0.5);
+        let center = front
+            + side * angle.cos() * spread
+            + to_resource * angle.sin() * spread * 0.55
+            + Vec3::Y * lift;
+        let spark_color = if i % 2 == 0 { hot } else { color };
+        hud.line(
+            center - Vec3::Y * 0.05,
+            center + Vec3::Y * 0.06,
+            spark_color,
+        );
+        gizmos.circle(
+            Isometry3d::new(center, Quat::from_rotation_arc(Vec3::Z, Vec3::Y)),
+            0.035,
+            spark_color,
+        );
+    }
+}
+
+fn draw_resource_cargo_visual(
+    gizmos: &mut Gizmos,
+    hud: &mut Gizmos<HudGizmos>,
+    position: Vec3,
+    radius: f32,
+    cargo: ResourceCargo,
+    elapsed_secs: f32,
+    bar_right: Vec3,
+) {
+    let slots = harvest_cargo_visual_slots(cargo);
+    if slots.is_empty() {
+        return;
+    }
+    let side = bar_right.normalize_or(Vec3::X);
+    let forward = Vec3::new(-side.z, 0.0, side.x).normalize_or(Vec3::Z);
+    let base = position + Vec3::Y * (0.62 + radius * 0.42);
+    for (index, kind) in slots.into_iter().enumerate() {
+        let col = (index % 3) as f32 - 1.0;
+        let row = (index / 3) as f32 - 0.5;
+        let bob = 0.025 * (elapsed_secs * 5.0 + index as f32).sin();
+        let center = base + side * (col * 0.17) + forward * (row * 0.18) + Vec3::Y * bob;
+        let color = harvest_visual_color(kind, 0.92);
+        gizmos.circle(
+            Isometry3d::new(center, Quat::from_rotation_arc(Vec3::Z, Vec3::Y)),
+            0.075,
+            color,
+        );
+        hud.line(center + Vec3::Y * 0.04, center + Vec3::Y * 0.20, color);
+    }
 }
 
 fn draw_structure_destruction_vfx(
@@ -29273,6 +29458,34 @@ mod current_tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn worker_cargo_visual_slots_show_loaded_resources() {
+        let empty = ResourceCargo {
+            capacity: 6,
+            ore: 0,
+            crystal: 0,
+        };
+        assert!(harvest_cargo_visual_slots(empty).is_empty());
+
+        let mixed = ResourceCargo {
+            capacity: 8,
+            ore: 4,
+            crystal: 3,
+        };
+        assert_eq!(
+            harvest_cargo_visual_slots(mixed),
+            vec![
+                ResourceKind::Ore,
+                ResourceKind::Ore,
+                ResourceKind::Ore,
+                ResourceKind::Ore,
+                ResourceKind::Crystal,
+                ResourceKind::Crystal,
+            ],
+            "cargo visuals should show both resource kinds and cap to visible slots"
+        );
     }
 
     #[test]
