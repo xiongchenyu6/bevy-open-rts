@@ -25,6 +25,8 @@
 - AI defense profiles follow the godot difficulty targets: Beginner/Easy do not inherit Normal advanced-defense construction, Normal targets one standard defense layer plus 2 Tesla fence segments where the faction supports them, and Hard scales standard defenses to 2 plus 4 Tesla fence segments.
 - Easy AI is tuned as a build-up opponent: it trains a small defensive force but does not launch active attack waves, giving default human starts enough time to build a Barracks and form an army. Normal/Hard keep active offense.
 - The minimal `GodotSkirmish` opening remains one `CommandCenter` plus two `Worker` economy units, but each faction gets a distinct starter combat/scout unit (`ScoutRover`, `RocketInfantry`, `ShieldTrooper`) so the default `cargo run` start is not visually identical across races.
+- Godot render-part mapping is audited separately from gameplay generation. `assets/data/godot_model_map.model_map.ron` is a Bevy-loadable baseline asset generated from Godot `*.tscn` scenes, and `scripts/audit_model_mapping.py` compares it against `src/generated_registry.rs` without regenerating or overwriting the hand-expanded registry.
+- `Worker` and `ScoutRover` intentionally share Godot's `rover.glb`; their one-to-one fidelity comes from separate Godot transforms (`Worker` scale 2.0, `ScoutRover` scale 1.65). Harvest sparkle/cargo motion is a runtime behavior/effect layer, not a different static model file.
 
 ## Capture And Proofs
 

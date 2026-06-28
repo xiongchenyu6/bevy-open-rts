@@ -27,6 +27,35 @@ struct RtsDataManifest {
     name: String,
 }
 
+#[derive(Asset, TypePath, Deserialize)]
+#[allow(dead_code)]
+struct GodotModelMapAsset {
+    source: String,
+    generated_by: String,
+    entities: Vec<GodotModelMapEntity>,
+}
+
+#[derive(Deserialize)]
+#[allow(dead_code)]
+struct GodotModelMapEntity {
+    id: String,
+    scene_path: String,
+    parts: Vec<GodotModelMapPart>,
+}
+
+#[derive(Deserialize)]
+#[allow(dead_code)]
+struct GodotModelMapPart {
+    model: String,
+    translation: [f32; 3],
+    rotation: [f32; 4],
+    scale: [f32; 3],
+}
+
+#[derive(Resource, Clone)]
+#[allow(dead_code)]
+struct GodotModelMapHandle(Handle<GodotModelMapAsset>);
+
 fn handle_render_error(
     error: &RenderError,
     _main_world: &mut World,
@@ -59,6 +88,7 @@ const RESOURCE_ORDER_COLLECTOR_SCREEN_PICK_MAX_RADIUS_PX: f32 = 95.0;
 const ENEMY_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 32.0;
 const ENEMY_ORDER_SCREEN_PICK_MAX_RADIUS_PX: f32 = 96.0;
 const DEFAULT_MODEL_FALLBACK: &str = "models/kenney-spacekit/rover.glb";
+const GODOT_MODEL_MAP_ASSET_PATH: &str = "data/godot_model_map.model_map.ron";
 const COMMAND_SLOT_COUNT: usize = 24;
 const COMMAND_KEY_CANCEL: &str = "cancel";
 const COMMAND_KEY_GUARD_AREA: &str = "guard_area";
@@ -4204,6 +4234,7 @@ pub fn add_game_scenes(app: &mut App) -> &mut App {
     app.add_plugins(SharedMatchScenePlugin);
     add_main_menu_scene(app);
     app.init_resource::<Locale>();
+    app.add_systems(Startup, load_godot_model_map);
     app.add_systems(
         Update,
         (sync_locale, toggle_language_hotkey, update_localized_text),
@@ -4218,6 +4249,12 @@ pub fn add_game_scenes(app: &mut App) -> &mut App {
         store.config_mut::<HudGizmos>().0.line.width = HUD_GIZMO_LINE_WIDTH;
     }
     app
+}
+
+fn load_godot_model_map(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.insert_resource(GodotModelMapHandle(
+        asset_server.load(GODOT_MODEL_MAP_ASSET_PATH),
+    ));
 }
 
 /// Gizmo group for thick world-space HUD lines (health bars, tracers).
@@ -4357,6 +4394,7 @@ pub fn build_game_app(mode: GameAppMode) -> App {
         .add_plugins((
             JsonAssetPlugin::<RtsDataManifest>::new(&["rts.json"]),
             RonAssetPlugin::<RtsDataManifest>::new(&["rts.ron"]),
+            RonAssetPlugin::<GodotModelMapAsset>::new(&["model_map.ron"]),
         ))
         .insert_resource(RenderErrorHandler(handle_render_error));
     add_game_scenes(&mut app);
@@ -4411,6 +4449,7 @@ pub fn build_capture_app(width: u32, height: u32) -> App {
         .add_plugins((
             JsonAssetPlugin::<RtsDataManifest>::new(&["rts.json"]),
             RonAssetPlugin::<RtsDataManifest>::new(&["rts.ron"]),
+            RonAssetPlugin::<GodotModelMapAsset>::new(&["model_map.ron"]),
         ))
         .insert_resource(RenderErrorHandler(handle_render_error));
     add_game_scenes(&mut app);
@@ -29193,6 +29232,44 @@ mod current_tests {
                     !production.products.contains(&"MobileConstructionVehicle"),
                     "{faction_id} {} must not expose MobileConstructionVehicle",
                     production.producer
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn worker_and_scout_rover_keep_godot_rover_mapping() {
+        let worker = registry::entity("Worker").expect("Worker must stay in the registry");
+        let scout = registry::entity("ScoutRover").expect("ScoutRover must stay in the registry");
+        assert_eq!(worker.render_parts.len(), 1);
+        assert_eq!(scout.render_parts.len(), 1);
+        assert_eq!(
+            worker.render_parts[0].model,
+            "models/kenney-spacekit/rover.glb"
+        );
+        assert_eq!(
+            scout.render_parts[0].model,
+            "models/kenney-spacekit/rover.glb"
+        );
+        assert_eq!(worker.render_parts[0].translation, [-4.0, -0.02, -3.0]);
+        assert_eq!(worker.render_parts[0].scale, [2.0, 2.0, 2.0]);
+        assert_eq!(scout.render_parts[0].translation, [-3.3, 0.0, -2.475]);
+        assert_eq!(scout.render_parts[0].scale, [1.65, 1.65, 1.65]);
+        assert_ne!(
+            worker.render_parts[0].scale, scout.render_parts[0].scale,
+            "Godot uses one rover mesh here, but Worker and ScoutRover must keep separate scene transforms"
+        );
+    }
+
+    #[test]
+    fn registry_render_part_models_exist_on_disk() {
+        for entity in registry::ENTITY_DEFS {
+            for part in entity.render_parts {
+                assert!(
+                    std::path::Path::new("assets").join(part.model).exists(),
+                    "{} references missing model asset {}",
+                    entity.id,
+                    part.model
                 );
             }
         }
