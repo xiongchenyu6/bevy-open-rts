@@ -1,0 +1,433 @@
+keys,en,pl,zh_CN
+LOADING_STEP_PRELOADING,Taking ammunition out of depot...,Wyciąganie amunicji z magazynów...,正在从仓库取出弹药...
+LOADING_STEP_LOADING_MAP,Creating map...,Tworzenie mapy...,正在生成地图...
+LOADING_STEP_LOADING_MATCH,Preparing a ground for combat...,Przygotowywanie ziemi do walki...,正在准备战场...
+LOADING_STEP_INSTANTIATING_MATCH,Setting up a camera...,Ustawianie kamery...,正在设置镜头...
+LOADING_STEP_STARTING_MATCH,Placing units in the field...,Rozmieszczanie jednostek...,正在部署单位...
+BLUEPRINT_COLLIDES_WITH_OBJECT,Something already ocuppies that spot,Inny obiekt jest zbyt blisko,该位置已被占用
+BLUEPRINT_NOT_NAVIGABLE,Irregular terrain,Nierówny teren,地形不平整
+BLUEPRINT_NOT_ENOUGH_RESOURCES,Not enough resources,Brakuje zasobów,资源不足
+NOT_ENOUGH_RESOURCES,Not enough resources,Brakuje zasobów,资源不足
+BLUEPRINT_OUT_OF_MAP,Out of map limits,Poza granicami mapy,超出地图边界
+BLUEPRINT_MISSING_TECH,Requires {0},Wymaga {0},需要 {0}
+BLUEPRINT_OUT_OF_BASE_RADIUS,Too far from base,Zbyt daleko od bazy,距离基地太远
+REQUIRES,Requires,Wymaga,需要
+MISSING_TECH,Missing tech,Brak technologii,缺少科技
+MAP_NAME_PLAIN_AND_SIMPLE,Plain & Simple,Prosto i zwyczajnie,简明战场
+MAP_NAME_FOUR_CORNERS,Four Corners,Cztery narożniki,四角战场
+MAP_NAME_TECH_DIVIDE,Tech Divide,Podział technologiczny,科技分界线
+MAP_NAME_BIG_ARENA,Big Arena,Wielka arena,大型竞技场
+RESOURCE_A,Blue Crystal,Niebieski Kryształ,蓝水晶
+RESOURCE_B,Red Crystal,Czerwony Kryształ,红水晶
+RESOURCE_CAPACITY,capacity,pojemność,容量
+RESOURCE_CAP,cap,limit,上限
+POWER,Power,Energia,电力
+POWER_SHORT,PWR,ENE,电力
+LOW_POWER_STATUS,LOW POWER,NISKA ENERGIA,低电力
+LOW_POWER_EFFECTS,Low power slows production and disables radar/support powers,Niska energia spowalnia produkcję i wyłącza radar/wsparcie,低电力会减慢生产，并关闭雷达/支援能力
+RADAR_OFFLINE,Radar offline,Radar wyłączony,雷达离线
+RADAR_REQUIRES_UPLINK,Build Radar Uplink,Zbuduj łącze radarowe,建造雷达上行站
+RADAR_LOW_POWER,Low power,Niski poziom energii,电力不足
+REPAIR_RATE,HP/s,HP/s,HP/秒
+COOLDOWN,Cooldown,Czas odnowienia,冷却
+RADIUS,Radius,Promień,半径
+DAMAGE,Damage,Obrażenia,伤害
+IMPACT_DELAY,Impact delay,Opóźnienie uderzenia,打击延迟
+HEALING,Healing,Leczenie,治疗
+RESOURCE_BONUS,resource yield,wydajność zasobów,资源收益
+RESOURCE_STEAL,resource steal,kradzież zasobów,资源窃取
+SPEED,Speed,Szybkość,速度
+DPS,DPS,DPS,DPS
+SPLASH_RADIUS,Splash,Obszar,溅射
+STRUCTURE_DAMAGE,Structure damage,Obrażenia budynków,建筑伤害
+SHIELD_RADIUS,Shield radius,Promień tarczy,护盾半径
+DAMAGE_TAKEN,Damage taken,Otrzymywane obrażenia,承受伤害
+MINE_LIMIT,mines,miny,地雷
+DURATION,Duration,Czas trwania,持续时间
+SUPPORT_POWER_READY,Right-click the battlefield or minimap to target,Kliknij prawym przyciskiem pole bitwy lub minimapę aby wskazać cel,右键点击战场或小地图选择目标
+SUPPORT_POWER_TARGETING,Targeting: right-click the battlefield or minimap,Wskazywanie celu: kliknij prawym przyciskiem pole bitwy lub minimapę,目标选择中：右键点击战场或小地图
+SUPPORT_POWER_LOW_POWER,Low power disables support powers,Niski poziom energii wyłącza wsparcie,低电力会禁用支援能力
+REFUND,Refund,Zwrot,返还
+PRODUCTION_QUEUE_CANCEL,Click to cancel production,Kliknij aby anulować produkcję,点击取消生产
+PRODUCTION_QUEUE_FULL,Production queue full,Kolejka produkcji pełna,生产队列已满
+PRODUCTION_BATCH_QUEUE,Shift-click to queue up to 5,Shift-klik aby dodać do kolejki do 5,按住 Shift 点击最多排队 5 个
+PRODUCTION_QUEUE_READY,READY,GOTOWE,就绪
+PRODUCTION_QUEUE_WAITING,WAIT,OCZEK,等待
+PRODUCTION_QUEUE_BLOCKED,Exit blocked: clear space around the factory,Wyjazd zablokowany: zwolnij miejsce przy fabryce,出口被堵：清理工厂周围空间
+PRODUCTION_QUEUE_FULL_SHORT,FULL,PEŁ,满
+COMMAND_TECH_LOCK_SHORT,TECH,TECH,科技
+FACTION_ROSTER_LOCKED,Unavailable for this faction,Niedostępne dla tej frakcji,当前阵营不可用
+COMMAND_PANEL_ORDERS,Orders,Rozkazy,命令
+COMMAND_PANEL_COMMANDS,Commands,Rozkazy,命令数
+COMMAND_PANEL_QUEUE,Queue,Kolejka,队列
+COMMAND_PANEL_PRODUCERS,Producers,Producenci,生产建筑
+PRODUCTION_ROLES,Roles,Role,定位
+PRODUCTION_USE,Use,Użycie,用法
+PRODUCTION_STATS,Stats,Statystyki,属性
+ROLE_INFANTRY,Infantry,Piechota,步兵
+ROLE_VEHICLE,Vehicle,Pojazd,车辆
+ROLE_AIR,Air,Lotnictwo,空军
+ROLE_ECONOMY,Economy,Ekonomia,经济
+ROLE_BASE_EXPANSION,Base expansion,Rozbudowa bazy,基地扩展
+ROLE_REPAIR,Repair,Naprawa,维修
+ROLE_CAPTURE,Capture,Przejęcie,占领
+ROLE_SHIELD_SUPPORT,Shield support,Wsparcie tarczą,护盾支援
+ROLE_AREA_DENIAL,Area denial,Blokowanie terenu,区域封锁
+ROLE_SCOUT,Scout,Zwiad,侦察
+ROLE_ANTI_GROUND,Anti-ground,Przeciw naziemnym,对地
+ROLE_ANTI_AIR,Anti-air,Przeciwlotnicza,防空
+ROLE_AREA_DAMAGE,Area damage,Obszarowe obrażenia,范围伤害
+ROLE_LONG_RANGE,Long range,Daleki zasięg,远程
+ROLE_SIEGE,Siege,Oblężenie,攻城
+ROLE_STRUCTURE_BREAKER,Structure breaker,Niszczyciel budynków,拆建筑
+ROLE_HEAVY_ARMOR,Heavy armor,Ciężki pancerz,重甲
+TACTIC_BASE_EXPANSION,Deploy it near resources or flank routes to start a forward base,Rozstaw przy zasobach lub trasach oskrzydlenia aby założyć wysuniętą bazę,部署到资源点或侧翼路线旁建立前线基地
+TACTIC_ECONOMY,Build early and protect it because it grows your resource flow,Buduj wcześnie i chroń bo zwiększa przepływ zasobów,尽早建造并保护它来提高资源收入
+TACTIC_SHIELD_SUPPORT,Keep it behind your front line to reduce burst damage on nearby allies,Trzymaj za linią frontu aby zmniejszać nagłe obrażenia pobliskich sojuszników,放在前线后方为附近友军减伤
+TACTIC_AREA_DENIAL,Park it near chokepoints or factory exits to punish ground pushes,Ustaw przy wąskich przejściach lub wyjazdach z fabryk aby karać ataki naziemne,部署在隘口或工厂出口惩罚地面推进
+TACTIC_REPAIR_CAPTURE,Use after a fight to repair allies or send it around defenses to capture structures,Używaj po walce do naprawy sojuszników albo obchodź obronę aby przejmować budynki,战后维修友军或绕过防线占领建筑
+TACTIC_REPAIR,Keep it near damaged armor and defenses between attacks,Trzymaj przy uszkodzonym pancerzu i obronie między atakami,停在受损装甲和防御旁进行维修
+TACTIC_INFILTRATION,Send it through weak spots to steal value from economy and power targets,Wyślij przez słabe punkty aby wykradać wartość z ekonomii i celów energetycznych,从薄弱处渗透并打击经济或电力目标
+TACTIC_SIEGE,Anchor it behind screening units and bombard defenses before the main push,Ustaw za osłoną jednostek i bombarduj obronę przed głównym atakiem,放在掩护部队后方先轰开防御
+TACTIC_STRUCTURE_BREAKER,Focus buildings and production during a base breach,Skupiaj ogień na budynkach i produkcji podczas przełamania bazy,突破基地时优先攻击建筑和生产设施
+TACTIC_ANTI_AIR,Add it when the enemy commits to aircraft or air scouting,Dodaj gdy wróg inwestuje w lotnictwo albo zwiad powietrzny,敌人投入空军或空中侦察时补充它
+TACTIC_FLEX_COMBAT,Use as flexible coverage when you need one unit to answer ground and air threats,Używaj jako elastycznej osłony gdy jedna jednostka ma odpowiadać na cele naziemne i powietrzne,需要同时应对地面和空中威胁时使用
+TACTIC_AREA_DAMAGE,Fire into clustered infantry or packed vehicle groups,Strzelaj w skupioną piechotę albo ciasne grupy pojazdów,攻击密集步兵或聚集车辆
+TACTIC_SCOUT,Send ahead of the army to reveal tech paths and incoming attacks,Wyślij przed armią aby odkrywać technologię i nadchodzące ataki,派到主力前方侦察科技路线和来袭部队
+TACTIC_LINE_COMBAT,Use in the main army line and mix with specialist counters,Używaj w głównej linii armii i mieszaj ze specjalistycznymi kontrami,编入主力阵线并搭配专精克制单位
+TACTIC_UTILITY,Use for non-combat utility that supports your economy or army,Używaj do zadań wsparcia ekonomii albo armii,用于支援经济或军队的非战斗任务
+MATCH_VICTORY_TITLE,Mission accomplished,Misja wykonana,任务完成
+MATCH_DEFEAT_TITLE,Mission failed,Misja nieudana,任务失败
+MATCH_FINISH_TITLE,Battlefield secured,Pole bitwy zabezpieczone,战场已控制
+MATCH_RESULT_TITLE,Outcome,Wynik,战斗结果
+MATCH_RESULT_REASON,Result reason,Powód wyniku,原因
+MATCH_RESULT_REMAINING_TEAMS,Remaining teams,Pozostałe drużyny,剩余队伍
+MATCH_RESULT_REMAINING_ANCHORS,Command anchors,Centra dowodzenia,指挥锚点
+MATCH_RESULT_VICTORY_REASON,Enemy command network eliminated,Wroga sieć dowodzenia wyeliminowana,所有敌方指挥锚点已被摧毁
+MATCH_RESULT_DEFEAT_REASON,Allied command network eliminated,Sojusznicza sieć dowodzenia wyeliminowana,我方指挥锚点已全部失守
+MATCH_RESULT_FINISH_REASON,Only one command network remains,Pozostała tylko jedna sieć dowodzenia,只剩一个队伍仍有指挥锚点
+MATCH_STATS_TITLE,Battle report,Raport bitewny,战斗统计
+MATCH_STATS_DURATION,Duration,Czas trwania,时长
+MATCH_STATS_ENEMY_UNITS,Enemy units destroyed,Zniszczone jednostki wroga,摧毁敌方单位
+MATCH_STATS_ENEMY_STRUCTURES,Enemy structures destroyed,Zniszczone budynki wroga,摧毁敌方建筑
+MATCH_STATS_UNITS_LOST,Units lost,Utracone jednostki,损失单位
+MATCH_STATS_STRUCTURES_LOST,Structures lost,Utracone budynki,损失建筑
+MATCH_STATS_RESOURCES,Resources banked,Zgromadzone zasoby,剩余资源
+BATTLE_NOTIFICATION_BATTLE_STARTED,Battle control online,Kontrola pola bitwy online,战场控制已上线
+BATTLE_NOTIFICATION_VICTORY,Mission accomplished,Misja wykonana,任务完成
+BATTLE_NOTIFICATION_DEFEAT,Mission failed,Misja nieudana,任务失败
+BATTLE_NOTIFICATION_UNIT_READY,Unit ready,Jednostka gotowa,单位就绪
+BATTLE_NOTIFICATION_STRUCTURE_READY,Construction complete,Budowa zakończona,建造完成
+BATTLE_NOTIFICATION_INSUFFICIENT_FUNDS,Insufficient funds,Brak funduszy,资金不足
+BATTLE_NOTIFICATION_LOW_POWER,Low power,Niski poziom energii,低电力
+BATTLE_NOTIFICATION_BASE_UNDER_ATTACK,Base under attack,Baza jest atakowana,基地遭到攻击
+BATTLE_NOTIFICATION_UNIT_UNDER_ATTACK,Unit under attack,Jednostka jest atakowana,单位遭到攻击
+BATTLE_NOTIFICATION_UNIT_LOST,Unit lost,Utracono jednostkę,单位损失
+BATTLE_NOTIFICATION_PRODUCTION_BLOCKED,Production blocked: clear factory exit,Produkcja zablokowana: zwolnij wyjazd z fabryki,生产受阻：清理工厂出口
+BATTLE_NOTIFICATION_STRUCTURE_CAPTURED,Structure captured,Budynek przejęty,建筑已占领
+BATTLE_NOTIFICATION_STRUCTURE_LOST,Structure captured by enemy,Budynek przejęty przez wroga,建筑被敌人占领
+BATTLE_NOTIFICATION_UNIT_PROMOTED,Unit promoted: {0},Jednostka awansowała: {0},单位晋升：{0}
+BATTLE_NOTIFICATION_SUPPORT_POWER_USED,Support power fired: {0},Wsparcie użyte: {0},支援能力已发射：{0}
+BATTLE_NOTIFICATION_SUPPORT_POWER_READY,Support power ready: {0},Wsparcie gotowe: {0},支援能力就绪：{0}
+BATTLE_NOTIFICATION_SUPERWEAPON_CHARGING,Superweapon charging: {0} ({1}s),Superbroń ładuje się: {0} ({1}s),超级武器充能中：{0}（{1}秒）
+BATTLE_NOTIFICATION_ENEMY_SUPPORT_POWER_USED,Enemy support power fired: {0},Wróg użył wsparcia: {0},敌方支援能力已发射：{0}
+BATTLE_NOTIFICATION_ENEMY_SUPERWEAPON_CHARGING,Enemy superweapon charging: {0} ({1}s),Wroga superbroń ładuje się: {0} ({1}s),敌方超级武器充能中：{0}（{1}秒）
+BATTLE_NOTIFICATION_ENEMY_SUPERWEAPON_READY,Enemy superweapon ready: {0},Wroga superbroń gotowa: {0},敌方超级武器就绪：{0}
+BATTLE_NOTIFICATION_ENEMY_SUPERWEAPON_USED,Enemy superweapon launched: {0},Wróg odpalił superbroń: {0},敌方超级武器已发射：{0}
+BATTLE_NOTIFICATION_CONTROL_GROUP_ASSIGNED,Control group {0} assigned ({1}),Grupa kontroli {0} przypisana ({1}),控制编队 {0} 已设置（{1}）
+BATTLE_NOTIFICATION_CONTROL_GROUP_CLEARED,Control group {0} cleared,Grupa kontroli {0} wyczyszczona,控制编队 {0} 已清除
+BATTLE_NOTIFICATION_SUPPLY_CRATE,Supply crate collected,Zebrano skrzynię zaopatrzenia,补给箱已拾取
+BATTLE_NOTIFICATION_SUPPLY_CRATE_RESOURCES,Supply crate: resources,Skrzynia zaopatrzenia: zasoby,补给箱：资源
+BATTLE_NOTIFICATION_SUPPLY_CRATE_REPAIR,Supply crate: repairs,Skrzynia zaopatrzenia: naprawy,补给箱：维修
+BATTLE_NOTIFICATION_SUPPLY_CRATE_VETERANCY,Supply crate: field promotion,Skrzynia zaopatrzenia: awans polowy,补给箱：战地晋升
+BATTLE_NOTIFICATION_FOCUS_TOOLTIP,Focus this battlefield event,Przejdź do tego zdarzenia na polu bitwy,聚焦这个战场事件
+SELECTION_SELECTED,{0} selected,Wybrano {0},已选择 {0}
+SELECTION_MULTIPLE_TYPES,{0} types,{0} typy,{0} 类
+SELECTION_CONTROL_GROUP,Group {0},Grupa {0},编队 {0}
+SELECTION_CONTROL_GROUPS,Groups {0},Grupy {0},编队 {0}
+SELECTION_HP,HP,PW,HP
+SELECTION_AVG_HP,Avg HP,Śr. PW,平均 HP
+SELECTION_RANK,Rank,Ranga,等级
+SELECTION_GREEN,Green,Zielony,新兵
+SELECTION_VETERAN,Veteran,Weteran,老兵
+SELECTION_ELITE,Elite,Elita,精英
+SELECTION_ATK,Atk,Atak,攻击
+SELECTION_RANGE,Range,Zasięg,射程
+SELECTION_SIGHT,Sight,Widoczność,视野
+SELECTION_SPEED,Speed,Szybkość,速度
+SELECTION_REPAIR,Repair,Naprawa,维修
+SELECTION_CAPTURE,Capture,Przejęcie,占领
+SELECTION_HOLD_POSITION,Holding position,Utrzymuje pozycję,坚守阵地
+SELECTION_DEPLOYED,Deployed,Rozstawiony,已部署
+SELECTION_EMP_DISABLED,EMP disabled,Unieruchomiony przez EMP,EMP 瘫痪
+SELECTION_POWER,Power,Energia,电力
+SELECTION_INCOME,Income,Dochód,收入
+SELECTION_RESOURCES,Resources,Zasoby,资源
+SELECTION_CONSTRUCTING,Constructing,W budowie,建造中
+SELECTION_UNITS,Units,Jednostki,单位
+SELECTION_STRUCTURES,Structures,Budynki,建筑
+SELECTION_AIR,Air,Lotnictwo,空军
+RESUME_MATCH,Resume,Wznów,继续战斗
+RESTART_MATCH,Restart match,Restartuj bitwę,重新开始
+RETURN_TO_SETUP,Return to setup,Wróć do ustawień,返回设置
+EXIT_TO_MENU,Exit to menu,Wyjdź do menu,退出到主菜单
+MATCH_SPEED,Game speed,Szybkość gry,游戏速度
+MATCH_SPEED_TOOLTIP,Adjust battle simulation speed,Dostosuj szybkość symulacji bitwy,调整战斗模拟速度
+MATCH_SPEED_SLOW,0.75x,"0,75x",0.75x
+MATCH_SPEED_NORMAL,1x,1x,1x
+MATCH_SPEED_FAST,1.25x,"1,25x",1.25x
+MATCH_SPEED_FASTER,1.5x,"1,5x",1.5x
+MATCH_SPEED_MAX,2x,2x,2x
+MATCH_PERSPECTIVE,Perspective,Perspektywa,视角
+MATCH_PERSPECTIVE_TOOLTIP,Switch watched player during AI battles,Zmień obserwowanego gracza podczas bitew AI,AI 对战中切换观察玩家
+MATCH_PERSPECTIVE_PLAYER,Player {0} - {1},Gracz {0} - {1},玩家 {0} - {1}
+MATCH_PERSPECTIVE_TEAM,Team {0},Drużyna {0},队伍 {0}
+MATCH_PERSPECTIVE_NO_TEAM,No team,Bez drużyny,无队伍
+MATCH_STATUS_TITLE,Battle status,Status bitwy,战斗状态
+MATCH_STATUS_OBJECTIVE,Objective,Cel,目标
+MATCH_STATUS_MAP,Map,Mapa,地图
+MATCH_STATUS_DURATION,Duration,Czas trwania,时长
+MATCH_STATUS_SPEED,Game speed,Szybkość gry,游戏速度
+MATCH_STATUS_NO_MATCH,No active battle,Brak aktywnej bitwy,没有进行中的战斗
+MATCH_STATUS_UNKNOWN,Unknown,Nieznane,未知
+MATCH_CONTROLS_BUTTON,Controls,Sterowanie,操作
+MATCH_CONTROLS_HIDE_BUTTON,Hide controls,Ukryj sterowanie,隐藏操作
+MATCH_CONTROLS_TOOLTIP,Show movement combat production and camera shortcuts,Pokaż skróty ruchu walki produkcji i kamery,查看移动 战斗 生产和镜头快捷操作
+MATCH_CONTROLS_TITLE,Controls,Sterowanie,操作指南
+MATCH_CONTROLS_INTRO,Open this from Escape during battle to check core RTS commands,Otwórz z Escape podczas bitwy aby sprawdzić podstawowe rozkazy RTS,战斗中按 Esc 打开这里查看核心 RTS 操作
+MATCH_CONTROLS_SELECTION,Selection,Zaznaczanie,选择单位
+MATCH_CONTROLS_SELECTION_DESC,Drag select units; double click selects matching visible units; Alt+A selects army on screen; Ctrl+Alt+A selects all army; Alt+I finds idle workers,Zaznaczaj ramką; podwójne kliknięcie wybiera takie same widoczne jednostki; Alt+A wybiera armię na ekranie; Ctrl+Alt+A wybiera całą armię; Alt+I szuka bezczynnych robotników,框选单位；双击选择屏幕内同类单位；Alt+A 选择当前屏幕军队；Ctrl+Alt+A 选择全部军队；Alt+I 找空闲工人
+MATCH_CONTROLS_MOVEMENT,Movement,Ruch,移动
+MATCH_CONTROLS_MOVEMENT_DESC,Right click moves attacks or uses context actions; Shift+right click queues waypoints; Alt+right click forces movement through enemies,Prawy klik przesuwa atakuje albo używa akcji kontekstowych; Shift+prawy klik kolejkuje punkty ruchu; Alt+prawy klik wymusza ruch przez wrogów,右键移动 攻击或执行上下文操作；Shift+右键排队路径点；Alt+右键强制穿过敌人移动
+MATCH_CONTROLS_COMBAT,Combat orders,Rozkazy bojowe,战斗命令
+MATCH_CONTROLS_COMBAT_DESC,Use command buttons or keys for attack move patrol guard hold scatter and stop; target orders finish with right click,Używaj przycisków lub klawiszy dla ataku w ruchu patrolu straży pozycji rozproszenia i stop; rozkazy z celem kończą się prawym kliknięciem,用命令按钮或快捷键执行攻击移动 巡逻 警戒 坚守 分散和停止；需要目标的命令用右键确认
+MATCH_CONTROLS_PRODUCTION,Production,Produkcja,生产
+MATCH_CONTROLS_PRODUCTION_DESC,Select a producer and use the visible command grid keys; Shift click batches up to five; right click a queue item cancels it,Wybierz budynek produkcyjny i używaj widocznych klawiszy siatki rozkazów; Shift klik dodaje do pięciu; prawy klik elementu kolejki anuluje go,选择生产建筑后使用可见命令格子的键位；Shift 点击最多批量排队五个；右键队列项目取消
+MATCH_CONTROLS_STRUCTURES,Production buildings,Budynki produkcyjne,生产建筑
+MATCH_CONTROLS_STRUCTURES_DESC,Alt+C selects command center; Alt+B barracks; Alt+V vehicle factory; Alt+F aircraft factory; add Shift to select all of that type,Alt+C wybiera centrum dowodzenia; Alt+B koszary; Alt+V fabrykę pojazdów; Alt+F fabrykę lotniczą; dodaj Shift aby wybrać wszystkie tego typu,Alt+C 选择指挥中心；Alt+B 兵营；Alt+V 车辆工厂；Alt+F 飞机工厂；加 Shift 选择同类全部建筑
+MATCH_CONTROLS_GROUPS,Groups and camera,Grupy i kamera,编队和镜头
+MATCH_CONTROLS_GROUPS_DESC,Ctrl+1 to Ctrl+9 assigns control groups; 1 to 9 selects them; Ctrl+Alt+1 to Ctrl+Alt+4 saves camera bookmarks; Alt+1 to Alt+4 jumps to them,Ctrl+1 do Ctrl+9 przypisuje grupy; 1 do 9 wybiera je; Ctrl+Alt+1 do Ctrl+Alt+4 zapisuje zakładki kamery; Alt+1 do Alt+4 przenosi do nich,Ctrl+1 到 Ctrl+9 设置编队；1 到 9 选择编队；Ctrl+Alt+1 到 Ctrl+Alt+4 保存镜头书签；Alt+1 到 Alt+4 跳转
+MATCH_CONTROLS_SUPPORT,Support powers,Wsparcie,支援能力
+MATCH_CONTROLS_SUPPORT_DESC,F1 to F9 arms support powers when radar tech and power are online; right click the battlefield or minimap to fire,F1 do F9 uzbraja wsparcie gdy radar technologia i energia działają; prawy klik pola bitwy albo minimapy odpala wsparcie,F1 到 F9 选择支援能力；需要雷达科技和电力在线；右键战场或小地图发射
+MATCH_CONTROLS_EVENTS,Battle events,Zdarzenia bitwy,战场事件
+MATCH_CONTROLS_EVENTS_DESC,Space focuses the latest battle event notification; the pause menu shows objective progress and game speed,Spacja przenosi do ostatniego powiadomienia bitewnego; menu pauzy pokazuje postęp celu i szybkość gry,空格聚焦最新战场事件通知；暂停菜单显示目标进度和游戏速度
+CANCEL_CURRENT_ACTION,Cancel current action,Anuluj aktualną akcję,取消当前命令
+CANCEL_CURRENT_ACTION_DESCRIPTION,stop selected units or cancel construction,zatrzymaj wybrane jednostki albo anuluj budowę,停止所选单位或取消建造
+CANCEL_CURRENT_ACTION_DISABLED,select units with active orders,wybierz jednostki z aktywnymi rozkazami,选择正在执行命令的单位
+CAPTURE,Capture,Przejęcie,占领
+COMMAND_HOTKEY,Hotkey,Skrót,快捷键
+HOLD_POSITION,Hold position,Utrzymaj pozycję,坚守阵地
+HOLD_POSITION_DESCRIPTION,do not auto-chase nearby enemies,nie ścigaj automatycznie pobliskich wrogów,不会自动追击附近敌人
+HOLD_POSITION_DISABLED,select combat units,wybierz jednostki bojowe,选择战斗单位
+ATTACK_MOVE,Attack move,Atakuj w ruchu,攻击移动
+ATTACK_MOVE_DESCRIPTION,select a destination and engage enemies along the route,wybierz cel ruchu i atakuj wrogów po drodze,选择目的地并沿途攻击敌人
+ATTACK_MOVE_DISABLED,select mobile combat units,wybierz mobilne jednostki bojowe,选择可移动战斗单位
+PATROL,Patrol,Patrol,巡逻
+PATROL_DESCRIPTION,move between two points and engage enemies along the route,poruszaj się między dwoma punktami i atakuj wrogów po drodze,在两点间移动并沿途攻击敌人
+PATROL_DISABLED,select mobile combat units,wybierz mobilne jednostki bojowe,选择可移动战斗单位
+GUARD_AREA,Guard area,Strzeż obszaru,区域警戒
+GUARD_AREA_DESCRIPTION,stop current orders and automatically defend nearby area,zatrzymaj bieżące rozkazy i automatycznie broń pobliskiego obszaru,停止当前命令并自动防守附近区域
+GUARD_AREA_DISABLED,select mobile combat units,wybierz mobilne jednostki bojowe,选择可移动战斗单位
+SCATTER,Scatter,Rozproszenie,分散
+SCATTER_DESCRIPTION,spread selected mobile units outward,rozsuń wybrane jednostki mobilne na zewnątrz,让所选移动单位向外散开
+SCATTER_DISABLED,select mobile units,wybierz mobilne jednostki,选择可移动单位
+DEPLOY_MODE,Deploy mode,Tryb rozstawienia,部署模式
+DEPLOY_MODE_DESCRIPTION,anchor selected siege units for longer-range heavy fire,rozstaw wybrane jednostki oblężnicze do ognia dalekiego zasięgu,固定所选攻城单位以获得更远重火力
+DEPLOY_MODE_UNDEPLOY_DESCRIPTION,pack up selected siege units so they can move again,zwiń wybrane jednostki oblężnicze aby mogły znowu się poruszać,收起所选攻城单位让它们重新移动
+DEPLOY_MODE_DISABLED,select deployable siege units,wybierz rozstawialne jednostki oblężnicze,选择可部署攻城单位
+SELL_STRUCTURE,Sell structure,Sprzedaj budynek,出售建筑
+SELL_STRUCTURE_DESCRIPTION,refunds part of construction cost,zwraca część kosztu budowy,返还部分建造费用
+SELL_STRUCTURE_DISABLED,select a constructed friendly structure,wybierz ukończony sojuszniczy budynek,选择已建成的友方建筑
+REPAIR_STRUCTURE,Repair structure,Napraw budynek,维修建筑
+REPAIR_STRUCTURE_DESCRIPTION,spends resources to restore structure hit points,wydaje zasoby aby przywrócić punkty wytrzymałości budynku,消耗资源恢复建筑耐久
+REPAIR_STRUCTURE_DISABLED,select a damaged constructed friendly structure,wybierz uszkodzony ukończony sojuszniczy budynek,选择受损且已建成的友方建筑
+REPAIR_STRUCTURE_IN_PROGRESS,repairs already in progress,naprawa już trwa,维修已经进行中
+REPAIR_COST,Repair cost,Koszt naprawy,维修花费
+RALLY_POINT,Rally point,Punkt zborny,集结点
+RALLY_POINT_DESCRIPTION,choose where newly produced units gather,wybierz gdzie zbierają się nowe jednostki,选择新生产单位集结的位置
+RALLY_POINT_DISABLED,select a production structure,wybierz budynek produkcyjny,选择生产建筑
+DEPLOY_MCV,Deploy MCV,Rozstaw MCV,部署基地车
+DEPLOY_MCV_DESCRIPTION,unpack this mobile construction vehicle into a command center,rozstaw ten mobilny pojazd konstrukcyjny jako centrum dowodzenia,将机动基地车展开为指挥中心
+RADAR_SWEEP,Radar sweep,Skan radarowy,雷达扫描
+RADAR_SWEEP_DESCRIPTION,temporarily reveals a targeted battlefield area,tymczasowo odsłania wskazany obszar pola bitwy,短暂揭示目标区域
+ORBITAL_STRIKE,Orbital strike,Uderzenie orbitalne,轨道打击
+ORBITAL_STRIKE_DESCRIPTION,damages enemy units in a targeted area,uszkadza wrogie jednostki we wskazanym obszarze,延迟后轰击目标区域
+EMP_PULSE,EMP pulse,Impuls EMP,EMP 脉冲
+EMP_PULSE_DESCRIPTION,disables enemy mobile units in a targeted area,wyłącza wrogie jednostki mobilne we wskazanym obszarze,瘫痪目标区域内的敌方单位
+CHRONO_RELAY,Chrono relay,Przekaźnik chrono,超时空中继
+CHRONO_RELAY_DESCRIPTION,accelerates friendly mobile units in a targeted area,przyspiesza sojusznicze jednostki mobilne we wskazanym obszarze,加速友军单位行动
+SHIELD_OVERDRIVE,Shield overdrive,Przeciążenie tarczy,护盾过载
+SHIELD_OVERDRIVE_DESCRIPTION,reduces damage to friendly units and structures in a targeted area,zmniejsza obrażenia sojuszniczych jednostek i budynków we wskazanym obszarze,为友军提供临时护盾
+NANITE_REPAIR_SWARM,Nanite repair swarm,Rój naprawczy nanitów,纳米维修蜂群
+NANITE_REPAIR_SWARM_DESCRIPTION,repairs friendly units and structures in a targeted area,naprawia sojusznicze jednostki i budynki we wskazanym obszarze,维修目标区域内的友军
+WEATHER_STORM,Weather storm,Burza pogodowa,天气风暴
+WEATHER_STORM_DESCRIPTION,devastates a wide target area from the weather control spire,niszczy duży wskazany obszar z iglicy kontroli pogody,召唤强力区域风暴打击
+STRATEGIC_MISSILE,Strategic missile,Rakieta strategiczna,战略导弹
+STRATEGIC_MISSILE_DESCRIPTION,launches a high-damage missile into a targeted enemy area,wystrzeliwuje rakietę o dużych obrażeniach we wskazany obszar wroga,发射延迟命中的高伤害导弹
+PARADROP,Paradrop,Zrzut spadochronowy,空降部队
+PARADROP_DESCRIPTION,drops a small infantry squad near the targeted area after capturing a tech airport,zrzuca mały oddział piechoty w pobliżu wskazanego obszaru po przejęciu lotniska technologicznego,向目标区域投送步兵小队
+WORKER,Worker,Robotnik,工人
+WORKER_DESCRIPTION,collects resources,zbiera zasoby,采集资源并建造建筑
+HELICOPTER,Helicopter,Helikopter,直升机
+HELICOPTER_DESCRIPTION,fights ground and air targets,zwlacza cele naziemne i powietrzne,快速空中火力支援
+DRONE,Scout drone,Dron zwiadoczy,无人机
+DRONE_DESCRIPTION,performs scouting,wykonuje loty zwiadowcze,轻型侦察飞行器
+TANK,Tank,Czołg,坦克
+TANK_DESCRIPTION,fights ground targets,zwalcza cele naziemne,主战装甲单位
+LIGHT_RIFLE_INFANTRY,Rifle infantry,Piechota strzelecka,轻步兵
+LIGHT_RIFLE_INFANTRY_DESCRIPTION,cheap anti-ground infantry,tania piechota przeciw celom naziemnym,廉价通用步兵
+ROCKET_INFANTRY,Rocket infantry,Piechota rakietowa,火箭兵
+ROCKET_INFANTRY_DESCRIPTION,anti-armor and anti-air infantry,piechota przeciw pancerzom i lotnictwu,反装甲和防空步兵
+FIELD_MEDIC,Field medic,Medyk polowy,战地医疗兵
+FIELD_MEDIC_DESCRIPTION,light infantry support that repairs friendly units and structures,lekka piechota wsparcia naprawiająca sojusznicze jednostki i budynki,治疗附近友军步兵
+SHIELD_TROOPER,Shield trooper,Szturmowiec tarczowy,护盾步兵
+SHIELD_TROOPER_DESCRIPTION,armored infantry with a passive personal damage shield,opancerzona piechota z pasywną osobistą tarczą redukującą obrażenia,耐打的前线步兵
+FLAK_ROCKET_TEAM,Flak rocket team,Drużyna rakiet przeciwlotniczych,防空火箭组
+FLAK_ROCKET_TEAM_DESCRIPTION,dedicated infantry air defense with splash flak rockets,dedykowana obrona przeciwlotnicza piechoty z rakietami odłamkowymi,专门反制空中目标
+FLAK_ROCKET_TEAM_MK2,Flak rocket team Mk2,Drużyna rakiet przeciwlotniczych Mk2,防空火箭组 Mk2
+FLAK_ROCKET_TEAM_MK2_DESCRIPTION,late-tech flak infantry that can splash both aircraft and ground targets,późna piechota przeciwlotnicza rażąca odłamkami cele powietrzne i naziemne,可打击空中和地面目标的升级小队
+HEAVY_MACHINEGUN_TROOPER,Heavy machinegun trooper,Ciężki strzelec maszynowy,重机枪兵
+HEAVY_MACHINEGUN_TROOPER_DESCRIPTION,suppresses ground targets with high sustained fire,tłumi cele naziemne ciągłym ogniem,压制步兵和轻甲目标
+SHOCK_TROOPER,Shock trooper,Szturmowiec elektryczny,震击兵
+SHOCK_TROOPER_DESCRIPTION,advanced infantry with high burst damage against ground targets,zaawansowana piechota z silnym ogniem przeciw celom naziemnym,近距离高伤害突击步兵
+GRENADIER_TROOPER,Grenadier trooper,Grenadier,榴弹兵
+GRENADIER_TROOPER_DESCRIPTION,splash damage infantry for clustered ground targets,piechota z obrażeniami obszarowymi przeciw skupionym celom naziemnym,对集群目标造成溅射伤害
+MORTAR_TEAM,Mortar team,Obsługa moździerza,迫击炮组
+MORTAR_TEAM_DESCRIPTION,long-range splash infantry for clustered ground targets,piechota dalekiego zasięgu z obrażeniami obszarowymi,远程轰击地面目标
+CRYO_SPRAYER,Cryo sprayer,Miotacz kriogeniczny,冷冻喷射兵
+CRYO_SPRAYER_DESCRIPTION,short-range splash infantry for clustered ground targets,piechota krótkiego zasięgu z obrażeniami obszarowymi,减速并削弱敌方地面单位
+SNIPER_SCOUT,Sniper scout,Zwiadowca snajperski,狙击侦察兵
+SNIPER_SCOUT_DESCRIPTION,long-sight infantry with precise long-range fire,piechota zwiadowcza z precyzyjnym ogniem dalekiego zasięgu,视野远、射程远的侦察步兵
+RAIL_SNIPER_TEAM,Rail sniper team,Drużyna snajperów elektromagnetycznych,轨道狙击组
+RAIL_SNIPER_TEAM_DESCRIPTION,elite long-range infantry that punches through heavy ground targets,elitarna piechota dalekiego zasięgu przebijająca ciężkie cele naziemne,后期高穿透狙击小队
+PHASE_SABOTEUR,Phase saboteur,Sabotażysta fazowy,相位破坏者
+PHASE_SABOTEUR_DESCRIPTION,advanced infiltrator with bonus damage against structures,zaawansowany infiltrator z dodatkowymi obrażeniami przeciw budynkom,潜入并干扰敌方经济
+SABOTEUR_INFILTRATOR,Saboteur infiltrator,Infiltrator sabotażysta,渗透破坏者
+SABOTEUR_INFILTRATOR_DESCRIPTION,elite infiltrator for capture and economy raids,elitarny infiltrator do przejmowania budynków i rajdów ekonomicznych,偷取敌方资源并瘫痪关键目标
+PULSE_RIFLE_COMMANDO,Pulse rifle commando,Komandos z karabinem pulsacyjnym,脉冲步枪突击队
+PULSE_RIFLE_COMMANDO_DESCRIPTION,elite infantry that can engage ground and air targets,elitarna piechota zwalczająca cele naziemne i powietrzne,精英多用途步兵
+TACTICAL_OFFICER,Tactical officer,Oficer taktyczny,战术军官
+TACTICAL_OFFICER_DESCRIPTION,long-sight command infantry that can engage ground and air targets,piechota dowódcza z dalekim polem widzenia zwalczająca cele naziemne i powietrzne,提升附近友军作战效率
+SCOUT_ROVER,Scout rover,Pojazd zwiadowczy,侦察车
+SCOUT_ROVER_DESCRIPTION,fast scout with light weaponry,szybki zwiadowca z lekkim uzbrojeniem,快速侦察和骚扰单位
+MOBILE_CONSTRUCTION_VEHICLE,Mobile construction vehicle,Mobilny pojazd konstrukcyjny,机动基地车
+MOBILE_CONSTRUCTION_VEHICLE_DESCRIPTION,heavy mobile builder for forward base expansion,ciężki mobilny budowniczy do wysuniętej rozbudowy bazy,可部署为前线指挥中心
+MIRAGE_SCOUT_TANK,Mirage scout tank,Czołg zwiadowczy Mirage,幻影侦察坦克
+MIRAGE_SCOUT_TANK_DESCRIPTION,fast radar-guided scout armor with long sight,szybki pojazd zwiadowczy z dalekim zasięgiem widzenia,快速隐蔽侦察装甲
+FLAME_ASSAULT_BUGGY,Flame assault buggy,Buggy szturmowy z miotaczem,火焰突击车
+FLAME_ASSAULT_BUGGY_DESCRIPTION,fast close-range anti-ground raider,szybki rajdowiec bliskiego zasięgu przeciw celom naziemnym,近距离反步兵载具
+DRONE_MINE_LAYER,Drone mine layer,Dronowy stawiacz min,布雷无人车
+DRONE_MINE_LAYER_DESCRIPTION,support crawler that lays proximity mines for ground area denial,pojazd wsparcia rozstawiający miny zbliżeniowe do blokowania terenu,部署区域拒止地雷
+TESLA_CRAWLER_MK2,Tesla crawler,Gąsienicowiec Tesli,特斯拉履带车 Mk2
+TESLA_CRAWLER_MK2_DESCRIPTION,short-range electric assault vehicle with splash damage,krótkodystansowy elektryczny pojazd szturmowy z obrażeniami obszarowymi,电弧攻击装甲单位
+ROCKET_TROOPER_ROBOT,Rocket trooper robot,Robot rakietowy,火箭机器人
+ROCKET_TROOPER_ROBOT_DESCRIPTION,fights armor and aircraft,zwalcza pojazdy i lotnictwo,机器人火箭支援单位
+JAMMER_VEHICLE,Jammer vehicle,Pojazd zakłócający,干扰车
+JAMMER_VEHICLE_DESCRIPTION,long-sight electronic warfare vehicle,pojazd walki elektronicznej z dalekim zasięgiem widzenia,电子战支援载具
+ANTI_AIR_WALKER,Anti-air walker,Krocząca obrona przeciwlotnicza,防空步行机
+ANTI_AIR_WALKER_DESCRIPTION,specialized mobile air defense,mobilna obrona przeciwlotnicza,专门对抗空中单位
+FLAK_HOVER_TANK,Flak hover tank,Czołg przeciwlotniczy,防空悬浮坦克
+FLAK_HOVER_TANK_DESCRIPTION,fast mobile air defense with long anti-air range,szybka mobilna obrona przeciwlotnicza dalekiego zasięgu,快速防空装甲
+MOBILE_REPAIR_CRAWLER,Mobile repair crawler,Mobilny pojazd naprawczy,机动维修车
+MOBILE_REPAIR_CRAWLER_DESCRIPTION,armored support vehicle that repairs friendly units and structures,opancerzony pojazd wsparcia naprawiający sojusznicze jednostki i budynki,维修附近友军载具
+MOBILE_SHIELD_PROJECTOR,Mobile shield projector,Mobilny projektor tarczy,机动护盾车
+MOBILE_SHIELD_PROJECTOR_DESCRIPTION,armored support crawler that projects damage-reducing shields around nearby allies,opancerzony pojazd wsparcia emitujący tarcze redukujące obrażenia wokół pobliskich sojuszników,为附近友军提供护盾
+MODULAR_MISSILE_CARRIER,Modular missile carrier,Modularna wyrzutnia rakiet,模块化导弹车
+MODULAR_MISSILE_CARRIER_DESCRIPTION,long-range missile support against ground and air targets,dalekosiężne wsparcie rakietowe przeciw celom naziemnym i powietrznym,远程导弹支援
+LONGBOW_MISSILE_CRAWLER,Longbow missile crawler,Gąsienicowa wyrzutnia Longbow,长弓导弹履带车
+LONGBOW_MISSILE_CRAWLER_DESCRIPTION,late-tech missile artillery against ground and air targets,późna artyleria rakietowa przeciw celom naziemnym i powietrznym,远程反装甲导弹平台
+SIEGE_ARTILLERY_VEHICLE,Siege artillery,Pojazd artyleryjski,攻城火炮车
+SIEGE_ARTILLERY_VEHICLE_DESCRIPTION,long range ground bombardment,dalekosiężny ostrzał naziemny,远程溅射火炮
+SIEGE_DRILL_TANK,Siege drill tank,Czołg wiertniczy,攻城钻地坦克
+SIEGE_DRILL_TANK_DESCRIPTION,short-range heavy armor with high structure damage,ciężki pojazd krótkiego zasięgu z wysokimi obrażeniami przeciw budynkom,部署后强化攻城火力
+LANCE_BEAM_TANK,Lance beam tank,Czołg promieniowy,长枪光束坦克
+LANCE_BEAM_TANK_DESCRIPTION,advanced direct-fire armor that can engage ground and air targets,zaawansowany pojazd liniowy zwalczający cele naziemne i powietrzne,远程能量装甲单位
+RAILGUN_TANK,Railgun tank,Czołg elektromagnetyczny,轨道炮坦克
+RAILGUN_TANK_DESCRIPTION,advanced long-range armor killer,zaawansowany niszczyciel pancerzy dalekiego zasięgu,高伤害穿甲坦克
+HAMMER_SIEGE_TANK,Hammer siege tank,Czołg oblężniczy Hammer,战锤攻城坦克
+HAMMER_SIEGE_TANK_DESCRIPTION,heavy splash tank for cracking fortified ground positions,ciężki czołg obszarowy do przełamywania umocnionych pozycji naziemnych,重型攻城装甲
+HEAVY_SIEGE_WALKER,Heavy siege walker,Ciężki kroczący pojazd oblężniczy,重型攻城步行机
+HEAVY_SIEGE_WALKER_DESCRIPTION,slow super-heavy walker with extreme splash bombardment,powolny superciężki kroczący pojazd z potężnym ostrzałem obszarowym,后期重装火力平台
+RAIL_ARTILLERY_WALKER,Rail artillery walker,Krocząca artyleria elektromagnetyczna,轨道炮步行机
+RAIL_ARTILLERY_WALKER_DESCRIPTION,experimental long-range walker for extreme ground bombardment,eksperymentalny kroczący pojazd dalekiego zasięgu do ciężkiego ostrzału naziemnego,远程轨道炮火炮平台
+ENGINEER_DRONE,Engineer drone,Dron inżynieryjny,工程无人机
+ENGINEER_DRONE_DESCRIPTION,repairs allies and captures enemy structures,naprawia sojuszników i przejmuje wrogie budynki,维修友军并占领敌方建筑
+INTERCEPTOR_VTOL,Interceptor VTOL,Przechwytujący VTOL,拦截 VTOL
+INTERCEPTOR_VTOL_DESCRIPTION,fast air superiority fighter against aircraft,szybki myśliwiec przewagi powietrznej przeciw lotnictwu,快速制空战斗机
+BOMBER_VTOL,Bomber VTOL,Bombowiec VTOL,轰炸 VTOL
+BOMBER_VTOL_DESCRIPTION,heavy air strike against ground targets,ciężki nalot na cele naziemne,重型对地空袭单位
+ROCKET_GUNSHIP,Rocket gunship,Kanoniarka rakietowa,火箭武装机
+ROCKET_GUNSHIP_DESCRIPTION,fast rocket aircraft that fights ground and air targets,szybki samolot rakietowy zwalczający cele naziemne i powietrzne,可攻击地面和空中的火箭飞机
+HEAVY_BOMBARDMENT_AIRSHIP,Heavy bombardment airship,Ciężki sterowiec bombowy,重型轰炸飞艇
+HEAVY_BOMBARDMENT_AIRSHIP_DESCRIPTION,slow armored airship with heavy ground splash damage,powolny opancerzony sterowiec z silnym ostrzałem obszarowym,慢速重甲空中轰炸平台
+SIEGE_AIRSHIP,Siege airship,Sterowiec oblężniczy,攻城飞艇
+SIEGE_AIRSHIP_DESCRIPTION,late-tech armored airship for massive ground bombardment,późna opancerzona jednostka powietrzna do masowego ostrzału naziemnego,后期大范围对地轰炸飞艇
+AG_TURRET,Anti-ground turret,Wieżyczka przeciwpancerna,对地炮塔
+AG_TURRET_DESCRIPTION,fights ground targets,zwalcza cele naziemne,攻击地面目标
+AA_TURRET,Anti-air turret,Wieżyczka przeciwlotnicza,防空炮塔
+AA_TURRET_DESCRIPTION,fights air targets,zwalcza cele powietrzne,攻击空中目标
+TESLA_FENCE_SEGMENT,Tesla fence segment,Segment ogrodzenia Tesli,特斯拉围栏段
+TESLA_FENCE_SEGMENT_DESCRIPTION,powered perimeter segment that shocks nearby ground units,zasilany segment obwodowy rażący pobliskie jednostki naziemne,通电后电击附近地面单位的外围防线
+ARC_COIL_DEFENSE_TOWER,Arc coil tower,Wieża łuku energetycznego,电弧线圈塔
+ARC_COIL_DEFENSE_TOWER_DESCRIPTION,advanced powered defense with splash damage against ground and air targets,zaawansowana obrona energetyczna z obrażeniami obszarowymi przeciw celom naziemnym i powietrznym,可攻击地面和空中的高级电力防御
+LANCE_BEAM_DEFENSE_TOWER,Lance beam tower,Wieża promienia lancowego,长枪光束塔
+LANCE_BEAM_DEFENSE_TOWER_DESCRIPTION,long-range powered defense against ground and air targets,zasilana obrona dalekiego zasięgu przeciw celom naziemnym i powietrznym,远程对地/对空电力防御
+PRISM_DEFENSE_OBELISK,Prism defense obelisk,Obelisk obronny pryzmatu,棱镜防御方尖塔
+PRISM_DEFENSE_OBELISK_DESCRIPTION,late-tech prism tower with high structure damage against ground and air targets,późna wieża pryzmatyczna z wysokimi obrażeniami przeciw budynkom oraz celom naziemnym i powietrznym,后期高建筑伤害棱镜塔
+RAIL_CANNON_BUNKER,Rail cannon bunker,Bunkier działa szynowego,轨道炮碉堡
+RAIL_CANNON_BUNKER_DESCRIPTION,late-tech artillery defense for breaking armored ground attacks,późna obrona artyleryjska do niszczenia opancerzonych ataków naziemnych,用于击破重甲地面进攻的后期火炮防御
+WEATHER_CONTROL_SPIRE,Weather control spire,Iglica kontroli pogody,天气控制尖塔
+WEATHER_CONTROL_SPIRE_DESCRIPTION,late-game superweapon structure that unlocks weather storm,późna struktura superbroni odblokowująca burzę pogodową,解锁天气风暴的后期超级武器建筑
+CC,Command center,Centrum dowodzenia,指挥中心
+CC_DESCRIPTION,produces workers,produkuje robotników,生产工人
+VEHICLE_FACTORY,Vehicle factory,Fabryka pojazdów,战车工厂
+VEHICLE_FACTORY_DESCRIPTION,produces vehicles,wytwarza pojazdy,生产车辆
+AIRCRAFT_FACTORY,Aircraft factory,Fabryka jednostek powietrznych,空军工厂
+AIRCRAFT_FACTORY_DESCRIPTION,produces air units,wytwarza jednostki powietrzne,生产空中单位
+POWER_REACTOR,Power reactor,Reaktor energetyczny,发电反应堆
+POWER_REACTOR_DESCRIPTION,supplies base power,zasila bazę energią,提供基地电力
+ADVANCED_REACTOR_PLANT,Advanced reactor plant,Zaawansowana elektrownia reaktorowa,高级反应堆
+ADVANCED_REACTOR_PLANT_DESCRIPTION,late-tech power plant with very high output,późna elektrownia o bardzo wysokiej wydajności,后期高输出发电建筑
+REFINERY,Refinery,Rafineria,精炼厂
+REFINERY_DESCRIPTION,drop-off point for gathered resources,punkt odbioru zebranych zasobów,资源卸载点
+ORE_PURIFIER,Ore purifier,Oczyszczacz rudy,矿石提纯器
+ORE_PURIFIER_DESCRIPTION,powered late-tech economy structure that improves resource drop-off yield,zasilana późna struktura ekonomiczna zwiększająca dochód ze zdawanych zasobów,提升资源卸载收益的后期经济建筑
+TECH_OIL_DERRICK,Oil derrick,Wieża wydobywcza,科技油井
+TECH_OIL_DERRICK_DESCRIPTION,capturable neutral tech structure that grants a resource bonus and steady income,neutralna struktura technologiczna do przejęcia dająca premię zasobów i stały dochód,可占领的中立科技建筑，提供资源奖励和持续收入
+TECH_AIRPORT,Tech airport,Lotnisko technologiczne,科技机场
+TECH_AIRPORT_DESCRIPTION,capturable neutral tech structure that unlocks paradrop support,zajmowalna neutralna struktura technologiczna odblokowująca wsparcie zrzutu,可占领的中立科技建筑，解锁空降支援
+TECH_HOSPITAL,Tech hospital,Szpital technologiczny,科技医院
+TECH_HOSPITAL_DESCRIPTION,capturable neutral tech structure that heals nearby friendly infantry,neutralna struktura technologiczna do przejęcia lecząca pobliską sojuszniczą piechotę,可占领的中立科技建筑，治疗附近友军步兵
+TECH_REPAIR_DEPOT,Tech repair depot,Technologiczna baza naprawcza,科技维修站
+TECH_REPAIR_DEPOT_DESCRIPTION,capturable neutral tech structure that repairs nearby friendly ground vehicles,neutralna struktura technologiczna do przejęcia naprawiająca pobliskie sojusznicze pojazdy naziemne,可占领的中立科技建筑，维修附近友军地面载具
+TECH_BUNKER,Tech bunker,Bunkier technologiczny,科技碉堡
+TECH_BUNKER_DESCRIPTION,capturable neutral bunker that gains firepower from garrisoned infantry,neutralny bunkier do przejęcia zwiększający siłę ognia dzięki obsadzonej piechocie,可进驻步兵提升火力的中立碉堡
+BARRACKS,Barracks,Koszary,兵营
+BARRACKS_DESCRIPTION,produces infantry,produkuje piechotę,生产步兵
+RADAR_UPLINK,Radar uplink,Łącze radarowe,雷达上行站
+RADAR_UPLINK_DESCRIPTION,unlocks guided weapons and advanced scouting,odblokowuje broń kierowaną i zaawansowany zwiad,解锁制导武器和高级侦察
+ROBOTICS_BAY,Robotics bay,Zatoka robotyczna,机器人中心
+ROBOTICS_BAY_DESCRIPTION,unlocks repair drones and electronic warfare,odblokowuje drony naprawcze i walkę elektroniczną,解锁维修无人机和电子战
+REPAIR_PAD,Repair pad,Platforma naprawcza,维修平台
+REPAIR_PAD_DESCRIPTION,powered service structure that repairs nearby friendly ground units,zasilana struktura serwisowa naprawiająca pobliskie sojusznicze jednostki naziemne,维修附近友军地面单位的电力服务建筑
+TECH_LAB,Tech lab,Laboratorium technologiczne,科技实验室
+TECH_LAB_DESCRIPTION,unlocks heavy weapons and experimental armor,odblokowuje ciężką broń i eksperymentalny pancerz,解锁重型武器和实验装甲
+BRIEFING_TITLE,Battle briefing,Odprawa bojowa,战斗简报
+BRIEFING_OBJECTIVE_ELIMINATION,Objective: destroy every enemy command center and keep at least one of yours alive,Cel: zniszcz wszystkie wrogie centra dowodzenia i utrzymaj co najmniej jedno własne,目标：摧毁所有敌方指挥中心，并保住至少一个我方指挥中心
+BRIEFING_ENEMIES,Enemies,Wrogowie,敌人
+BRIEFING_ALLIES,Allies,Sojusznicy,盟友
+BRIEFING_OPENING_TITLE,Recommended opening,Zalecane otwarcie,推荐开局
+BRIEFING_OPENING_ECONOMY,Send workers to nearby crystals and queue extra workers quickly,Wyślij robotników do pobliskich kryształów i szybko zamów dodatkowych robotników,派工人采集附近水晶，并尽快补充工人
+BRIEFING_OPENING_POWER,Add power before radar defenses and advanced production drain the grid,Dodaj energię zanim radar obrona i zaawansowana produkcja obciążą sieć,在雷达、防御和高级生产耗电前先补电力
+BRIEFING_OPENING_PRODUCTION,Use barracks for cheap counters or vehicle factory for armor pressure,Użyj koszar do tanich kontr albo fabryki pojazdów do presji pancernej,用兵营做廉价克制，或用战车工厂施加装甲压力
+BRIEFING_OPENING_SCOUT,Scout enemy tech capture neutral structures and hit expansions before late weapons arrive,Zwiaduj technologię wroga przejmuj neutralne struktury i atakuj ekspansje zanim nadejdzie późna broń,侦察敌方科技、占领中立建筑，并在后期武器到来前打击扩张
+BRIEFING_CLOSE,Close briefing,Zamknij odprawę,关闭简报
+OBJECTIVES_BUTTON,Objectives,Cele,目标
+OBJECTIVES_BUTTON_TOOLTIP,Show battle briefing and objectives,Pokaż odprawę bojową i cele,显示战斗简报和目标
+OBJECTIVE_TRACKER_TITLE,Battle objective,Cel bitwy,目标
+OBJECTIVE_TRACKER_ELIMINATION,Destroy enemy command anchors,Zniszcz wrogie punkty dowodzenia,摧毁敌方指挥锚点
+OBJECTIVE_PROGRESS_ENEMY_TEAMS,Enemy teams,Wrogie drużyny,敌方队伍
+OBJECTIVE_PROGRESS_ANCHORS,Anchors,Punkty,锚点
+OBJECTIVE_PROGRESS_STRUCTURES,Structures,Struktury,建筑
+OBJECTIVE_PROGRESS_WORKERS,Workers,Robotnicy,工人
+OBJECTIVE_PROGRESS_COMPLETE,All enemy command anchors destroyed,Wszystkie wrogie punkty dowodzenia zniszczone,所有敌方指挥锚点已摧毁
