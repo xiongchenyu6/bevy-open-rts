@@ -5,6 +5,7 @@ use bevy::{
     camera::{RenderTarget, ScalingMode},
     ecs::query::Or,
     ecs::system::SystemParam,
+    gizmos::config::{GizmoConfigGroup, GizmoConfigStore},
     input::mouse::{MouseButtonInput, MouseMotion, MouseScrollUnit, MouseWheel},
     math::primitives::{ConicalFrustum, Cuboid, Cylinder, Torus},
     camera::primitives::Aabb,
@@ -4046,8 +4047,23 @@ pub fn add_game_scenes(app: &mut App) -> &mut App {
         Update,
         (sync_locale, toggle_language_hotkey, update_localized_text),
     );
+    // A thick gizmo group for HUD-in-world elements (health bars, shot tracers) so
+    // they're chunky/visible, while the default group (grid, rings, order paths)
+    // stays thin. A single wide line beats stacking thin lines, which the angled
+    // camera spreads into separate slivers.
+    app.init_gizmo_group::<HudGizmos>();
+    {
+        let mut store = app.world_mut().resource_mut::<GizmoConfigStore>();
+        store.config_mut::<HudGizmos>().0.line.width = HUD_GIZMO_LINE_WIDTH;
+    }
     app
 }
+
+/// Gizmo group for thick world-space HUD lines (health bars, tracers).
+#[derive(Default, Reflect, GizmoConfigGroup)]
+struct HudGizmos;
+
+const HUD_GIZMO_LINE_WIDTH: f32 = 6.0;
 
 /// F12 toggles the UI language (Chinese / English). Input may be absent in pure
 /// headless apps, so the keyboard resource is optional.
@@ -26689,8 +26705,16 @@ fn update_resource_hover(
     );
 }
 
+#[derive(SystemParam)]
+struct OverlayVfxQueries<'w, 's> {
+    destruction: Query<'w, 's, (&'static Transform, &'static StructureDestructionVfx)>,
+    promotion: Query<'w, 's, (&'static Transform, &'static VeterancyPromotionEffect)>,
+    camera: Query<'w, 's, &'static GlobalTransform, With<MainCamera>>,
+}
+
 fn draw_world_overlays(
     mut gizmos: Gizmos,
+    mut hud: Gizmos<HudGizmos>,
     selected: Query<
         (
             &Transform,
@@ -26723,8 +26747,7 @@ fn draw_world_overlays(
     reveals: Query<(&Transform, &TemporarySupportReveal)>,
     orbital_strikes: Query<(&Transform, &PendingOrbitalStrike)>,
     click_markers: Query<(&Transform, &ClickMarker)>,
-    destruction_vfx: Query<(&Transform, &StructureDestructionVfx)>,
-    promotion_vfx: Query<(&Transform, &VeterancyPromotionEffect)>,
+    vfx: OverlayVfxQueries,
     resources: Query<(
         Entity,
         &Transform,
@@ -26739,6 +26762,16 @@ fn draw_world_overlays(
     placement_preview: StructurePlacementPreviewParams,
 ) {
     let visible_team = visible_player.team;
+    // Camera's horizontal right axis, so health bars draw screen-horizontal.
+    let bar_right = vfx
+        .camera
+        .single()
+        .ok()
+        .map(|gt| {
+            let r = gt.right();
+            Vec3::new(r.x, 0.0, r.z).normalize_or(Vec3::X)
+        })
+        .unwrap_or(Vec3::X);
 
     // Highlight the resource under the cursor so the player knows a left/right
     // click will hit it (it sits exactly where the click is judged).
@@ -26816,10 +26849,11 @@ fn draw_world_overlays(
             );
         }
         draw_health_bar(
-            &mut gizmos,
+            &mut hud,
             transform.translation,
             selectable.radius,
             *health,
+            bar_right,
         );
         if should_draw_action_queue_path(*team, visible_team) {
             let path_points = selected_terrain_order_path_points(
@@ -26852,10 +26886,11 @@ fn draw_world_overlays(
         }
         if health.current < health.max {
             draw_health_bar(
-                &mut gizmos,
+                &mut hud,
                 transform.translation,
                 selectable.radius,
                 *health,
+                bar_right,
             );
         }
     }
@@ -26868,7 +26903,7 @@ fn draw_world_overlays(
             (base.green * 0.4 + 0.78).min(1.0),
             (base.blue * 0.4 + 0.30).min(1.0),
         );
-        thick_line(&mut gizmos, pulse.from, pulse.to, tracer, 3, 0.05);
+        hud.line(pulse.from, pulse.to, tracer);
     }
     for (transform, marker) in &click_markers {
         match marker.kind {
@@ -26935,10 +26970,10 @@ fn draw_world_overlays(
             Color::srgba(1.0, 0.4, 0.15, 0.42),
         );
     }
-    for (transform, effect) in &destruction_vfx {
+    for (transform, effect) in &vfx.destruction {
         draw_structure_destruction_vfx(&mut gizmos, transform.translation, effect, &player_colors);
     }
-    for (transform, effect) in &promotion_vfx {
+    for (transform, effect) in &vfx.promotion {
         draw_veterancy_promotion_effect(&mut gizmos, transform.translation, effect, &player_colors);
     }
     for i in -24..=24 {
@@ -27336,40 +27371,37 @@ fn draw_team_marker(
     }
 }
 
-/// Gizmo lines are 1px-thin; stack a few copies (offset in world-Y, which reads
-/// as vertical thickness under the tilted camera) so bars/tracers are actually
-/// visible.
-fn thick_line(gizmos: &mut Gizmos, a: Vec3, b: Vec3, color: Color, layers: u32, step: f32) {
-    for i in 0..layers.max(1) {
-        let off = Vec3::Y * (i as f32 * step);
-        gizmos.line(a + off, b + off, color);
-    }
-}
-
-fn draw_health_bar(gizmos: &mut Gizmos, position: Vec3, radius: f32, health: Health) {
+/// A single thick health bar (drawn on the wide HudGizmos group, so it's one
+/// solid strip — NOT a stack of thin lines, which the angled camera spreads into
+/// separate slivers).
+fn draw_health_bar(
+    gizmos: &mut Gizmos<HudGizmos>,
+    position: Vec3,
+    radius: f32,
+    health: Health,
+    bar_right: Vec3,
+) {
     let width = radius * 1.8;
-    let y = position.y + 1.25;
+    let center = Vec3::new(position.x, position.y + 1.25, position.z);
     let ratio = health.ratio();
     let half = width * 0.5;
-    let left = Vec3::new(position.x - half, y, position.z);
-    let right = Vec3::new(position.x + half, y, position.z);
-    let fill = Vec3::new(position.x - half + width * ratio, y, position.z);
-    // Filled and depleted parts are NON-overlapping segments (drawing a full
-    // background line under the fill made them coincident → z-fought → all black),
-    // and each is a stack of lines so the bar is a visible chunky strip.
-    const LAYERS: u32 = 5;
-    const STEP: f32 = 0.05;
+    // Extend along the camera's right axis so the bar reads as horizontal on
+    // screen (world-X alignment looked diagonal under the yawed camera).
+    let left = center - bar_right * half;
+    let right = center + bar_right * half;
+    let fill = left + bar_right * (width * ratio);
+    // Filled (green→red) then the depleted remainder (dark red) as adjacent,
+    // non-overlapping segments meeting at `fill`.
     if ratio < 0.995 {
-        thick_line(gizmos, fill, right, Color::srgb(0.30, 0.05, 0.05), LAYERS, STEP);
+        gizmos.line(fill, right, Color::srgb(0.30, 0.05, 0.05));
     }
     if ratio > 0.005 {
-        // Green when healthy → red when low.
         let fill_color = Color::srgb(
             0.92 + (0.22 - 0.92) * ratio,
             0.20 + (0.90 - 0.20) * ratio,
             0.16 + (0.30 - 0.16) * ratio,
         );
-        thick_line(gizmos, left, fill, fill_color, LAYERS, STEP);
+        gizmos.line(left, fill, fill_color);
     }
 }
 
