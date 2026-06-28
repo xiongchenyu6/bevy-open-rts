@@ -301,7 +301,7 @@ enum SimulationPhase {
 }
 
 #[derive(States, Default, Clone, Copy, Debug, Eq, Hash, PartialEq)]
-enum AppScreen {
+pub(crate) enum AppScreen {
     #[default]
     MainMenu,
     InMatch,
@@ -5858,7 +5858,7 @@ fn current_language() -> Language {
 }
 
 /// Picks the Chinese or English variant of a UI string per the active language.
-fn t(zh: &'static str, en: &'static str) -> &'static str {
+pub(crate) fn t(zh: &'static str, en: &'static str) -> &'static str {
     match current_language() {
         Language::Zh => zh,
         Language::En => en,
@@ -5873,9 +5873,9 @@ fn sync_locale(locale: Res<Locale>) {
 /// live when the language toggles (static `Text::new` content is otherwise frozen
 /// at spawn). Dynamic text rebuilt every frame doesn't need this.
 #[derive(Component, Clone, Copy)]
-struct LocalizedText {
-    zh: &'static str,
-    en: &'static str,
+pub(crate) struct LocalizedText {
+    pub(crate) zh: &'static str,
+    pub(crate) en: &'static str,
 }
 
 fn update_localized_text(mut query: Query<(&LocalizedText, &mut Text)>) {
@@ -5888,7 +5888,7 @@ fn update_localized_text(mut query: Query<(&LocalizedText, &mut Text)>) {
 }
 
 /// Bundle for a static UI label that re-translates on language toggle.
-fn localized_text(zh: &'static str, en: &'static str) -> impl Bundle {
+pub(crate) fn localized_text(zh: &'static str, en: &'static str) -> impl Bundle {
     (Text::new(t(zh, en)), LocalizedText { zh, en })
 }
 
@@ -9006,7 +9006,7 @@ fn spawn_supply_crate(
     let entity_id = commands
         .spawn((
             Name::new(effect.label()),
-            Transform::from_translation(position + Vec3::Y * 0.12),
+            Transform::from_translation(position),
             SupplyCrate {
                 effect,
                 pickup_radius: SUPPLY_CRATE_PICKUP_RADIUS,
@@ -9024,12 +9024,30 @@ fn spawn_supply_crate(
             MatchScopedEntity,
         ))
         .id();
+    // godot's SupplyCrate (non-player/SupplyCrate.tscn): barrels on a small platform,
+    // not a single box. Transforms are godot's world values (Geometry 0.62 scale +
+    // 0.08 lift folded into each part). recenter_entity_models settles XZ to origin.
     commands.entity(entity_id).with_children(|parent| {
         parent.spawn((
             WorldAssetRoot(asset_server.load(
-                GltfAssetLabel::Scene(0).from_asset("models/kenney-spacekit/monorail_trainBox.glb"),
+                GltfAssetLabel::Scene(0).from_asset("models/kenney-spacekit/platform_small.glb"),
             )),
-            Transform::from_scale(Vec3::splat(0.42)),
+            Transform::from_translation(Vec3::new(0.0, 0.08, 0.0))
+                .with_scale(Vec3::new(0.2604, 0.1116, 0.2604)),
+        ));
+        parent.spawn((
+            WorldAssetRoot(asset_server.load(
+                GltfAssetLabel::Scene(0).from_asset("models/kenney-spacekit/barrels_rail.glb"),
+            )),
+            Transform::from_translation(Vec3::new(-0.0868, 0.1544, 0.0))
+                .with_scale(Vec3::splat(0.2108)),
+        ));
+        parent.spawn((
+            WorldAssetRoot(asset_server.load(
+                GltfAssetLabel::Scene(0).from_asset("models/kenney-spacekit/barrel.glb"),
+            )),
+            Transform::from_translation(Vec3::new(0.1984, 0.1544, -0.124))
+                .with_scale(Vec3::splat(0.1736)),
         ));
     });
     entity_id

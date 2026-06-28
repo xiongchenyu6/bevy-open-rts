@@ -2393,7 +2393,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 9.0,
         speed: 2.2,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 7.5,
             damage: 2.0,
@@ -2644,7 +2644,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 9.0,
         speed: 3.0,
         height: 1.5,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 6.0,
             damage: 4.0,
@@ -2765,7 +2765,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 7.5,
         speed: 2.85,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 3.2,
             damage: 1.0,
@@ -2830,7 +2830,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 10.0,
         speed: 4.0,
         height: 1.5,
-        scale: 0.65,
+        scale: 1.0,
         weapon: None,
         repair_rate: 0.0,
         repair_radius: 0.0,
@@ -2886,7 +2886,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 9.0,
         speed: 3.35,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: None,
         repair_rate: 0.0,
         repair_radius: 0.0,
@@ -2942,7 +2942,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 9.0,
         speed: 4.0,
         height: 1.5,
-        scale: 0.65,
+        scale: 1.0,
         weapon: None,
         repair_rate: 2.0,
         repair_radius: 0.0,
@@ -2998,7 +2998,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 7.0,
         speed: 3.6,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: None,
         repair_rate: 1.7,
         repair_radius: 3.75,
@@ -3054,7 +3054,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 10.0,
         speed: 3.7,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 7.5,
             damage: 2.0,
@@ -3119,7 +3119,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 9.0,
         speed: 2.9,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 7.0,
             damage: 3.0,
@@ -3184,7 +3184,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 10.5,
         speed: 2.7,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 8.2,
             damage: 4.0,
@@ -3249,7 +3249,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 8.0,
         speed: 4.0,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 3.0,
             damage: 1.0,
@@ -3314,7 +3314,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 7.5,
         speed: 3.2,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 5.0,
             damage: 2.0,
@@ -3379,7 +3379,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 9.5,
         speed: 1.75,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 9.0,
             damage: 6.0,
@@ -3444,7 +3444,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 10.0,
         speed: 1.8,
         height: 1.5,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 8.0,
             damage: 7.0,
@@ -3509,7 +3509,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 7.5,
         speed: 2.8,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 4.5,
             damage: 1.0,
@@ -3574,7 +3574,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 10.0,
         speed: 1.35,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 10.5,
             damage: 8.0,
@@ -3639,7 +3639,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 8.0,
         speed: 4.0,
         height: 1.5,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 5.0,
             damage: 1.0,
@@ -3704,7 +3704,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 12.0,
         speed: 5.2,
         height: 1.5,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 7.5,
             damage: 2.0,
@@ -3769,7 +3769,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 14.0,
         speed: 3.2,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 6.0,
             damage: 1.0,
@@ -3899,7 +3899,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 10.0,
         speed: 2.15,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 7.0,
             damage: 3.0,
@@ -3964,7 +3964,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 1.0,
         speed: 4.0,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: None,
         repair_rate: 0.0,
         repair_radius: 0.0,
@@ -4020,7 +4020,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 7.0,
         speed: 3.4,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 4.5,
             damage: 1.0,
@@ -4085,7 +4085,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 11.0,
         speed: 1.65,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 9.0,
             damage: 4.0,
@@ -4150,7 +4150,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 14.0,
         speed: 4.6,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 4.8,
             damage: 1.0,
@@ -4215,7 +4215,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 9.0,
         speed: 2.9,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: None,
         repair_rate: 2.5,
         repair_radius: 4.0,
@@ -4271,7 +4271,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 9.5,
         speed: 2.85,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: None,
         repair_rate: 0.0,
         repair_radius: 0.0,
@@ -4327,7 +4327,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 10.0,
         speed: 2.35,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 8.0,
             damage: 3.0,
@@ -4392,7 +4392,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 8.5,
         speed: 2.8,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 7.2,
             damage: 3.0,
@@ -4513,7 +4513,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 9.0,
         speed: 3.75,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 4.2,
             damage: 2.0,
@@ -4699,7 +4699,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 9.0,
         speed: 3.55,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 5.5,
             damage: 2.0,
@@ -4820,7 +4820,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 11.0,
         speed: 1.25,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 12.0,
             damage: 10.0,
@@ -4950,7 +4950,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 12.5,
         speed: 2.85,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 10.0,
             damage: 6.0,
@@ -5015,7 +5015,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 10.0,
         speed: 1.95,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 8.5,
             damage: 7.0,
@@ -5248,7 +5248,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 10.0,
         speed: 4.35,
         height: 1.5,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 6.5,
             damage: 3.0,
@@ -5313,7 +5313,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 8.0,
         speed: 3.1,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 6.0,
             damage: 2.0,
@@ -5378,7 +5378,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 8.0,
         speed: 3.2,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 5.5,
             damage: 2.0,
@@ -5443,7 +5443,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 10.0,
         speed: 4.05,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 4.5,
             damage: 2.0,
@@ -5508,7 +5508,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 12.0,
         speed: 4.2,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 4.0,
             damage: 1.0,
@@ -5573,7 +5573,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 7.0,
         speed: 2.7,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 4.2,
             damage: 1.0,
@@ -5638,7 +5638,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 8.0,
         speed: 3.05,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 4.8,
             damage: 3.0,
@@ -5703,7 +5703,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 10.5,
         speed: 1.55,
         height: 1.5,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 8.5,
             damage: 8.0,
@@ -5768,7 +5768,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 9.0,
         speed: 1.8,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 9.5,
             damage: 4.0,
@@ -5833,7 +5833,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 8.5,
         speed: 2.35,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 3.6,
             damage: 4.0,
@@ -5898,7 +5898,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 11.0,
         speed: 3.4,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 8.5,
             damage: 4.0,
@@ -5963,7 +5963,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 12.0,
         speed: 3.25,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 6.2,
             damage: 2.0,
@@ -6028,7 +6028,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 8.0,
         speed: 2.75,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 5.0,
             damage: 2.0,
@@ -6438,7 +6438,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 8.5,
         speed: 3.45,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: Some(WeaponDef {
             range: 3.8,
             damage: 2.0,
@@ -6680,7 +6680,7 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         sight_range: 5.0,
         speed: 2.5,
         height: 0.05,
-        scale: 0.65,
+        scale: 1.0,
         weapon: None,
         repair_rate: 0.0,
         repair_radius: 0.0,
