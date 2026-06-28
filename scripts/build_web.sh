@@ -15,7 +15,14 @@ wasm-bindgen \
   target/wasm32-unknown-unknown/release/bevy-open-rts.wasm
 
 if command -v wasm-opt >/dev/null 2>&1; then
-  wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int \
+  # --enable-reference-types is REQUIRED: wasm-bindgen emits an externref table that
+  # __wbindgen_init_externref_table grows by 4 at boot. Without this flag wasm-opt
+  # rewrites the table without growth headroom, so boot dies with
+  # "WebAssembly.Table.grow(): failed to grow table by 4".
+  wasm-opt -Oz \
+    --enable-reference-types \
+    --enable-bulk-memory \
+    --enable-nontrapping-float-to-int \
     -o web/pkg/bevy_open_rts_bg.wasm web/pkg/bevy_open_rts_bg.wasm
 fi
 
