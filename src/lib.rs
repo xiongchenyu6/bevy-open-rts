@@ -6969,6 +6969,34 @@ fn setup_main_menu(
         DespawnOnExit(AppScreen::MainMenu),
     ));
 
+    // Scenic backdrop (godot's assets/ui/background.png) behind everything, with a
+    // dark tactical tint so the panels stay readable on top. Spawned first so it
+    // renders behind the menu root.
+    commands
+        .spawn((
+            Name::new("Menu Background"),
+            DespawnOnExit(AppScreen::MainMenu),
+            ImageNode::new(asset_server.load("ui/background.png")),
+            Node {
+                position_type: PositionType::Absolute,
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                ..default()
+            },
+            ZIndex(-1),
+        ))
+        .with_children(|bg| {
+            bg.spawn((
+                Node {
+                    position_type: PositionType::Absolute,
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    ..default()
+                },
+                BackgroundColor(Color::srgba(0.0, 0.022, 0.02, 0.55)),
+            ));
+        });
+
     commands
         .spawn((
             Name::new("Skirmish Setup Menu"),
@@ -6983,7 +7011,7 @@ fn setup_main_menu(
                 padding: UiRect::new(px(12), px(12), px(14), px(16)),
                 ..default()
             },
-            BackgroundColor(Color::srgb(0.015, 0.019, 0.024)),
+            BackgroundColor(Color::NONE),
         ))
         .with_children(|root| {
             root.spawn(menu_top_bar_node()).with_children(|bar| {
