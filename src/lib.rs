@@ -2,16 +2,16 @@
 use bevy::audio::Volume;
 use bevy::{
     asset::{AssetMetaCheck, AssetPlugin},
+    camera::primitives::Aabb,
     camera::{RenderTarget, ScalingMode},
     ecs::query::Or,
     ecs::system::SystemParam,
     gizmos::config::{GizmoConfigGroup, GizmoConfigStore},
     input::mouse::{MouseButtonInput, MouseMotion, MouseScrollUnit, MouseWheel},
     math::primitives::{ConicalFrustum, Cuboid, Cylinder, Torus},
-    camera::primitives::Aabb,
     prelude::*,
     render::error_handler::{ErrorType, RenderError, RenderErrorHandler, RenderErrorPolicy},
-    window::{PrimaryWindow, WindowResolution},
+    window::{PrimaryWindow, WindowMode, WindowResolution},
 };
 use bevy_common_assets::{json::JsonAssetPlugin, ron::RonAssetPlugin};
 use serde::Deserialize;
@@ -304,6 +304,9 @@ enum SimulationPhase {
 pub(crate) enum AppScreen {
     #[default]
     MainMenu,
+    SkirmishSetup,
+    OptionsMenu,
+    CreditsMenu,
     InMatch,
     RestartingMatch,
 }
@@ -2624,6 +2627,65 @@ enum MainMenuAction {
     StartMatch,
 }
 
+#[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
+enum FrontMenuAction {
+    Play,
+    Options,
+    Credits,
+    QuitOrFullscreen,
+}
+
+#[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
+struct FrontMenuButton {
+    action: FrontMenuAction,
+}
+
+#[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
+enum OptionsMenuAction {
+    ToggleFullscreen,
+    ToggleLanguage,
+    ToggleMouseRestricted,
+    MasterVolumeUp,
+    MasterVolumeDown,
+    MusicVolumeUp,
+    MusicVolumeDown,
+    SfxVolumeUp,
+    SfxVolumeDown,
+    VoiceVolumeUp,
+    VoiceVolumeDown,
+    Back,
+}
+
+#[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
+struct OptionsMenuButton {
+    action: OptionsMenuAction,
+}
+
+#[derive(Resource, Clone, Copy, Debug)]
+struct MenuOptionsState {
+    fullscreen: bool,
+    language: Language,
+    mouse_restricted: bool,
+    master_volume: f32,
+    music_volume: f32,
+    sfx_volume: f32,
+    voice_volume: f32,
+}
+
+impl Default for MenuOptionsState {
+    fn default() -> Self {
+        Self {
+            fullscreen: true,
+            language: Language::Zh,
+            mouse_restricted: false,
+            master_volume: 1.0,
+            music_volume: 1.0,
+            sfx_volume: 1.0,
+            voice_volume: 1.0,
+        }
+    }
+}
+
 impl MainMenuAction {
     fn is_selected(self, selection: SkirmishMenuSelection) -> bool {
         match self {
@@ -3962,6 +4024,7 @@ fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<SelectedSkirmishMap>()
         .init_resource::<MatchSetupSettings>()
         .init_resource::<SkirmishMenuSelection>()
+        .init_resource::<MenuOptionsState>()
         .init_resource::<RandomMapCursor>()
         .init_resource::<MapBounds>()
         .init_resource::<CommandMode>()
@@ -3989,26 +4052,41 @@ fn add_shared_match_resources(app: &mut App) -> &mut App {
 }
 
 fn add_main_menu_scene(app: &mut App) -> &mut App {
-    app.add_systems(
-        OnEnter(AppScreen::MainMenu),
-        (
-            restore_main_menu_selection_from_match_setup,
-            setup_main_menu,
+    app.add_systems(OnEnter(AppScreen::MainMenu), setup_front_menu)
+        .add_systems(
+            Update,
+            front_menu_buttons.run_if(in_state(AppScreen::MainMenu)),
         )
-            .chain(),
-    )
-    .add_systems(
-        Update,
-        (
-            main_menu_scroll,
-            main_menu_buttons,
-            update_main_menu_summary,
-            update_skirmish_map_preview,
-            update_main_menu_lobby_slots,
+        .add_systems(OnEnter(AppScreen::OptionsMenu), setup_options_menu)
+        .add_systems(
+            Update,
+            options_menu_buttons.run_if(in_state(AppScreen::OptionsMenu)),
         )
-            .chain()
-            .run_if(in_state(AppScreen::MainMenu)),
-    )
+        .add_systems(OnEnter(AppScreen::CreditsMenu), setup_credits_menu)
+        .add_systems(
+            Update,
+            credits_menu_buttons.run_if(in_state(AppScreen::CreditsMenu)),
+        )
+        .add_systems(
+            OnEnter(AppScreen::SkirmishSetup),
+            (
+                restore_main_menu_selection_from_match_setup,
+                setup_main_menu,
+            )
+                .chain(),
+        )
+        .add_systems(
+            Update,
+            (
+                main_menu_scroll,
+                main_menu_buttons,
+                update_main_menu_summary,
+                update_skirmish_map_preview,
+                update_main_menu_lobby_slots,
+            )
+                .chain()
+                .run_if(in_state(AppScreen::SkirmishSetup)),
+        )
 }
 
 /// Registers the live match scene shared by `cargo run`, capture, and gameplay tests.
@@ -4094,6 +4172,42 @@ pub fn start_shared_match_scene_with_current_setup(app: &mut App) {
     app.world_mut()
         .resource_mut::<NextState<AppScreen>>()
         .set(AppScreen::InMatch);
+    for _ in 0..8 {
+        app.update();
+    }
+}
+
+pub fn capture_show_main_menu(app: &mut App) {
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::MainMenu);
+    for _ in 0..8 {
+        app.update();
+    }
+}
+
+pub fn capture_show_skirmish_setup_menu(app: &mut App) {
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::SkirmishSetup);
+    for _ in 0..8 {
+        app.update();
+    }
+}
+
+pub fn capture_show_options_menu(app: &mut App) {
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::OptionsMenu);
+    for _ in 0..8 {
+        app.update();
+    }
+}
+
+pub fn capture_show_credits_menu(app: &mut App) {
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::CreditsMenu);
     for _ in 0..8 {
         app.update();
     }
@@ -4502,8 +4616,9 @@ fn entity_visual_world_center(
             for sx in [-1.0_f32, 1.0] {
                 for sy in [-1.0_f32, 1.0] {
                     for sz in [-1.0_f32, 1.0] {
-                        let world =
-                            gt.transform_point(center + Vec3::new(sx * half.x, sy * half.y, sz * half.z));
+                        let world = gt.transform_point(
+                            center + Vec3::new(sx * half.x, sy * half.y, sz * half.z),
+                        );
                         min = min.min(world);
                         max = max.max(world);
                     }
@@ -6956,6 +7071,800 @@ fn begin_match_from_setup(
     *objective_tracker = ObjectiveTrackerState::default();
 }
 
+fn setup_menu_backdrop(
+    commands: &mut Commands,
+    asset_server: &AssetServer,
+    screen: AppScreen,
+    tint: Color,
+) {
+    commands
+        .spawn((
+            Name::new("Godot Main Menu Background"),
+            DespawnOnExit(screen),
+            ImageNode::new(asset_server.load("ui/background.png")),
+            Node {
+                position_type: PositionType::Absolute,
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                ..default()
+            },
+            ZIndex(-1),
+        ))
+        .with_children(|bg| {
+            bg.spawn((
+                Node {
+                    position_type: PositionType::Absolute,
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    ..default()
+                },
+                BackgroundColor(tint),
+            ));
+        });
+}
+
+fn setup_front_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+    commands.spawn((
+        Name::new("Main Menu Camera"),
+        Camera2d,
+        DespawnOnExit(AppScreen::MainMenu),
+    ));
+    setup_menu_backdrop(
+        &mut commands,
+        &asset_server,
+        AppScreen::MainMenu,
+        Color::srgba(0.0, 0.025, 0.022, 0.48),
+    );
+
+    commands
+        .spawn((
+            Name::new("Godot Style Command Menu"),
+            DespawnOnExit(AppScreen::MainMenu),
+            Node {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                flex_direction: FlexDirection::Row,
+                align_items: AlignItems::Stretch,
+                justify_content: JustifyContent::SpaceBetween,
+                column_gap: px(36),
+                padding: UiRect::new(px(48), px(48), px(40), px(40)),
+                ..default()
+            },
+        ))
+        .with_children(|root| {
+            root.spawn(front_briefing_column_node())
+                .with_children(|column| {
+                    column.spawn((
+                        Text::new("Open RTS"),
+                        TextFont {
+                            font: font.clone().into(),
+                            font_size: FontSize::Px(72.0),
+                            ..default()
+                        },
+                        TextColor(Color::srgb(0.78, 1.0, 0.94)),
+                    ));
+                    column.spawn((
+                        localized_text("前线指挥", "Frontline Command"),
+                        TextFont {
+                            font: font.clone().into(),
+                            font_size: FontSize::Px(22.0),
+                            ..default()
+                        },
+                        TextColor(Color::srgb(0.54, 0.93, 0.85)),
+                    ));
+                    column
+                        .spawn(front_intel_panel_node(148.0, None))
+                        .with_children(|panel| {
+                            panel.spawn((
+                                localized_text("行动：遭遇战指挥", "Operation: Skirmish Command"),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(28.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.86, 1.0, 0.95)),
+                            ));
+                            panel.spawn((
+                                localized_text(
+                                    "扩展武备已上线。选择战区并部署。",
+                                    "Expanded arsenal online. Choose a theater and deploy.",
+                                ),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(18.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.74, 0.9, 0.86)),
+                            ));
+                        });
+                    column
+                        .spawn(front_intel_panel_node(0.0, Some(1.0)))
+                        .with_children(|panel| {
+                            panel.spawn((
+                                localized_text("可用战斗群", "Available Battle Group"),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(18.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.76, 0.96, 0.9)),
+                            ));
+                            panel.spawn((
+                                ImageNode::new(asset_server.load("ui/icons/RosterPreview.png")),
+                                Node {
+                                    width: Val::VMin(42.0),
+                                    height: Val::VMin(26.7),
+                                    max_width: Val::Percent(100.0),
+                                    max_height: px(326),
+                                    align_self: AlignSelf::Center,
+                                    ..default()
+                                },
+                            ));
+                        });
+                });
+
+            root.spawn(front_command_panel_node())
+                .with_children(|panel| {
+                    panel.spawn((
+                        localized_text("指挥菜单", "Command Menu"),
+                        TextFont {
+                            font: font.clone().into(),
+                            font_size: FontSize::Px(24.0),
+                            ..default()
+                        },
+                        TextColor(Color::srgb(0.79, 1.0, 0.94)),
+                        Node {
+                            align_self: AlignSelf::Center,
+                            ..default()
+                        },
+                    ));
+                    panel.spawn(front_divider_node());
+                    for (action, zh, en, height) in [
+                        (FrontMenuAction::Play, "开始游戏", "Play", 62.0),
+                        (FrontMenuAction::Options, "设置", "Options", 58.0),
+                        (FrontMenuAction::Credits, "制作人员", "Credits", 58.0),
+                        (
+                            FrontMenuAction::QuitOrFullscreen,
+                            "全屏",
+                            "Fullscreen",
+                            58.0,
+                        ),
+                    ] {
+                        panel
+                            .spawn(front_menu_button(action, height))
+                            .with_children(|button| {
+                                button.spawn((
+                                    localized_text(zh, en),
+                                    TextFont {
+                                        font: font.clone().into(),
+                                        font_size: FontSize::Px(22.0),
+                                        ..default()
+                                    },
+                                    TextColor(Color::srgb(0.88, 0.9, 0.9)),
+                                ));
+                            });
+                    }
+                    panel.spawn(Node {
+                        flex_grow: 1.0,
+                        ..default()
+                    });
+                    panel.spawn((
+                        localized_text("系统：在线", "Systems: Online"),
+                        TextFont {
+                            font: font.into(),
+                            font_size: FontSize::Px(14.0),
+                            ..default()
+                        },
+                        TextColor(Color::srgb(0.48, 0.76, 0.7)),
+                        Node {
+                            align_self: AlignSelf::Center,
+                            ..default()
+                        },
+                    ));
+                });
+        });
+}
+
+fn front_briefing_column_node() -> impl Bundle {
+    Node {
+        flex_grow: 1.0,
+        flex_direction: FlexDirection::Column,
+        row_gap: px(16),
+        min_width: px(320),
+        margin: UiRect::top(px(26)),
+        ..default()
+    }
+}
+
+fn front_intel_panel_node(min_height: f32, flex_grow: Option<f32>) -> impl Bundle {
+    (
+        Node {
+            width: Val::Percent(100.0),
+            min_height: if min_height > 0.0 {
+                px(min_height)
+            } else {
+                px(0)
+            },
+            flex_grow: flex_grow.unwrap_or(0.0),
+            flex_direction: FlexDirection::Column,
+            row_gap: px(12),
+            padding: UiRect::new(px(18), px(18), px(14), px(14)),
+            border: UiRect::all(px(1)),
+            ..default()
+        },
+        BorderColor::all(Color::srgba(0.22, 0.58, 0.53, 0.48)),
+        BackgroundColor(Color::srgba(0.02, 0.055, 0.052, 0.64)),
+    )
+}
+
+fn front_command_panel_node() -> impl Bundle {
+    (
+        Node {
+            width: px(384),
+            min_width: px(320),
+            height: Val::Percent(100.0),
+            flex_direction: FlexDirection::Column,
+            row_gap: px(14),
+            padding: UiRect::new(px(24), px(24), px(26), px(26)),
+            border: UiRect::all(px(2)),
+            ..default()
+        },
+        BorderColor::all(Color::srgba(0.35, 0.82, 0.74, 0.62)),
+        BackgroundColor(Color::srgba(0.015, 0.029, 0.028, 0.82)),
+    )
+}
+
+fn front_divider_node() -> impl Bundle {
+    (
+        Node {
+            width: Val::Percent(100.0),
+            height: px(1),
+            margin: UiRect::vertical(px(6)),
+            ..default()
+        },
+        BackgroundColor(Color::srgba(0.55, 0.72, 0.68, 0.52)),
+    )
+}
+
+fn front_menu_button(action: FrontMenuAction, height: f32) -> impl Bundle {
+    (
+        Button,
+        FrontMenuButton { action },
+        Node {
+            width: Val::Percent(100.0),
+            height: px(height),
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            border_radius: BorderRadius::all(px(8)),
+            ..default()
+        },
+        BackgroundColor(Color::srgba(0.08, 0.082, 0.082, 0.92)),
+    )
+}
+
+fn front_menu_buttons(
+    mouse: Res<ButtonInput<MouseButton>>,
+    mut next_state: ResMut<NextState<AppScreen>>,
+    mut windows: Query<&mut Window, With<PrimaryWindow>>,
+    mut buttons: Query<(&Interaction, &FrontMenuButton, &mut BackgroundColor)>,
+) {
+    for (interaction, button, mut background) in &mut buttons {
+        let clicked = *interaction == Interaction::Pressed && mouse.just_pressed(MouseButton::Left);
+        if clicked {
+            match button.action {
+                FrontMenuAction::Play => next_state.set(AppScreen::SkirmishSetup),
+                FrontMenuAction::Options => next_state.set(AppScreen::OptionsMenu),
+                FrontMenuAction::Credits => next_state.set(AppScreen::CreditsMenu),
+                FrontMenuAction::QuitOrFullscreen => {
+                    if let Ok(mut window) = windows.single_mut() {
+                        window.mode = if matches!(window.mode, WindowMode::Windowed) {
+                            WindowMode::BorderlessFullscreen(MonitorSelection::Current)
+                        } else {
+                            WindowMode::Windowed
+                        };
+                    }
+                }
+            }
+        }
+        *background = BackgroundColor(match interaction {
+            Interaction::Pressed => Color::srgba(0.13, 0.18, 0.17, 0.96),
+            Interaction::Hovered => Color::srgba(0.105, 0.13, 0.125, 0.94),
+            Interaction::None => Color::srgba(0.08, 0.082, 0.082, 0.92),
+        });
+    }
+}
+
+fn setup_options_menu(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    options: Res<MenuOptionsState>,
+) {
+    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+    commands.spawn((
+        Name::new("Options Menu Camera"),
+        Camera2d,
+        DespawnOnExit(AppScreen::OptionsMenu),
+    ));
+    setup_menu_backdrop(
+        &mut commands,
+        &asset_server,
+        AppScreen::OptionsMenu,
+        Color::srgba(0.05, 0.04, 0.035, 0.58),
+    );
+
+    commands
+        .spawn((
+            Name::new("Godot Style Options Menu"),
+            DespawnOnExit(AppScreen::OptionsMenu),
+            Node {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                ..default()
+            },
+        ))
+        .with_children(|root| {
+            root.spawn(options_panel_node()).with_children(|panel| {
+                spawn_options_group(
+                    panel,
+                    &font,
+                    "视频",
+                    "Video",
+                    &[(
+                        OptionsMenuAction::ToggleFullscreen,
+                        if options.fullscreen {
+                            "全屏"
+                        } else {
+                            "窗口"
+                        },
+                        if options.fullscreen {
+                            "Fullscreen"
+                        } else {
+                            "Window"
+                        },
+                    )],
+                );
+                spawn_options_group(
+                    panel,
+                    &font,
+                    "语言",
+                    "Language",
+                    &[(
+                        OptionsMenuAction::ToggleLanguage,
+                        options.language.short_label(),
+                        options.language.short_label(),
+                    )],
+                );
+                panel.spawn(options_group_node()).with_children(|group| {
+                    group.spawn(options_group_header("音频", "Audio", font.clone()));
+                    for (label_zh, label_en, down, up, value) in [
+                        (
+                            "主音量",
+                            "Master",
+                            OptionsMenuAction::MasterVolumeDown,
+                            OptionsMenuAction::MasterVolumeUp,
+                            options.master_volume,
+                        ),
+                        (
+                            "音乐",
+                            "Music",
+                            OptionsMenuAction::MusicVolumeDown,
+                            OptionsMenuAction::MusicVolumeUp,
+                            options.music_volume,
+                        ),
+                        (
+                            "音效",
+                            "SFX",
+                            OptionsMenuAction::SfxVolumeDown,
+                            OptionsMenuAction::SfxVolumeUp,
+                            options.sfx_volume,
+                        ),
+                        (
+                            "语音",
+                            "Voice",
+                            OptionsMenuAction::VoiceVolumeDown,
+                            OptionsMenuAction::VoiceVolumeUp,
+                            options.voice_volume,
+                        ),
+                    ] {
+                        group.spawn(options_volume_row_node()).with_children(|row| {
+                            row.spawn((
+                                localized_text(label_zh, label_en),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(16.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                                Node {
+                                    width: px(92),
+                                    ..default()
+                                },
+                            ));
+                            row.spawn(options_small_button(down))
+                                .with_children(|button| {
+                                    button.spawn(options_button_text("-", font.clone(), 16.0));
+                                });
+                            row.spawn(options_slider_bar_node(value));
+                            row.spawn(options_small_button(up)).with_children(|button| {
+                                button.spawn(options_button_text("+", font.clone(), 16.0));
+                            });
+                            row.spawn((
+                                Text::new(format!("{:.0}%", value * 100.0)),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(16.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                                Node {
+                                    width: px(50),
+                                    justify_content: JustifyContent::FlexEnd,
+                                    ..default()
+                                },
+                            ));
+                        });
+                    }
+                });
+                spawn_options_group(
+                    panel,
+                    &font,
+                    "鼠标",
+                    "Mouse",
+                    &[(
+                        OptionsMenuAction::ToggleMouseRestricted,
+                        if options.mouse_restricted {
+                            "开启 将鼠标限制在游戏窗口内"
+                        } else {
+                            "关闭 将鼠标限制在游戏窗口内"
+                        },
+                        if options.mouse_restricted {
+                            "On Confine mouse to game window"
+                        } else {
+                            "Off Confine mouse to game window"
+                        },
+                    )],
+                );
+                panel
+                    .spawn(options_button(OptionsMenuAction::Back, 48.0))
+                    .with_children(|button| {
+                        button.spawn((
+                            localized_text("返回", "Back"),
+                            TextFont {
+                                font: font.into(),
+                                font_size: FontSize::Px(24.0),
+                                ..default()
+                            },
+                            TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                        ));
+                    });
+            });
+        });
+}
+
+fn options_panel_node() -> impl Bundle {
+    (
+        Node {
+            width: px(449),
+            flex_direction: FlexDirection::Column,
+            row_gap: px(10),
+            padding: UiRect::all(px(20)),
+            border_radius: BorderRadius::all(px(8)),
+            ..default()
+        },
+        BackgroundColor(Color::srgba(0.055, 0.052, 0.048, 0.88)),
+    )
+}
+
+fn options_group_node() -> impl Bundle {
+    (
+        Node {
+            width: Val::Percent(100.0),
+            flex_direction: FlexDirection::Column,
+            row_gap: px(6),
+            padding: UiRect::all(px(5)),
+            border_radius: BorderRadius::all(px(8)),
+            ..default()
+        },
+        BackgroundColor(Color::srgba(0.035, 0.034, 0.032, 0.84)),
+    )
+}
+
+fn options_group_header(zh: &'static str, en: &'static str, font: Handle<Font>) -> impl Bundle {
+    (
+        localized_text(zh, en),
+        TextFont {
+            font: font.into(),
+            font_size: FontSize::Px(18.0),
+            ..default()
+        },
+        TextColor(Color::srgb(0.88, 0.88, 0.86)),
+        Node {
+            width: Val::Percent(100.0),
+            min_height: px(28),
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            border_radius: BorderRadius::all(px(6)),
+            ..default()
+        },
+        BackgroundColor(Color::srgba(0.065, 0.065, 0.06, 0.88)),
+    )
+}
+
+fn spawn_options_group(
+    parent: &mut ChildSpawnerCommands<'_>,
+    font: &Handle<Font>,
+    title_zh: &'static str,
+    title_en: &'static str,
+    rows: &[(OptionsMenuAction, &'static str, &'static str)],
+) {
+    parent.spawn(options_group_node()).with_children(|group| {
+        group.spawn(options_group_header(title_zh, title_en, font.clone()));
+        for (action, zh, en) in rows {
+            group
+                .spawn(options_button(*action, 32.0))
+                .with_children(|button| {
+                    button.spawn((
+                        localized_text(zh, en),
+                        TextFont {
+                            font: font.clone().into(),
+                            font_size: FontSize::Px(16.0),
+                            ..default()
+                        },
+                        TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                    ));
+                });
+        }
+    });
+}
+
+fn options_button(action: OptionsMenuAction, height: f32) -> impl Bundle {
+    (
+        Button,
+        OptionsMenuButton { action },
+        Node {
+            width: Val::Percent(100.0),
+            height: px(height),
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            border_radius: BorderRadius::all(px(6)),
+            ..default()
+        },
+        BackgroundColor(Color::srgba(0.05, 0.05, 0.048, 0.92)),
+    )
+}
+
+fn options_small_button(action: OptionsMenuAction) -> impl Bundle {
+    (
+        Button,
+        OptionsMenuButton { action },
+        Node {
+            width: px(26),
+            height: px(24),
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            border_radius: BorderRadius::all(px(4)),
+            ..default()
+        },
+        BackgroundColor(Color::srgba(0.075, 0.075, 0.07, 0.94)),
+    )
+}
+
+fn options_button_text(label: &'static str, font: Handle<Font>, font_size: f32) -> impl Bundle {
+    (
+        Text::new(label),
+        TextFont {
+            font: font.into(),
+            font_size: FontSize::Px(font_size),
+            ..default()
+        },
+        TextColor(Color::srgb(0.9, 0.9, 0.88)),
+    )
+}
+
+fn options_volume_row_node() -> impl Bundle {
+    Node {
+        width: Val::Percent(100.0),
+        min_height: px(28),
+        flex_direction: FlexDirection::Row,
+        align_items: AlignItems::Center,
+        column_gap: px(7),
+        ..default()
+    }
+}
+
+fn options_slider_bar_node(value: f32) -> impl Bundle {
+    (
+        Node {
+            width: px(148),
+            height: px(8),
+            align_items: AlignItems::Center,
+            border_radius: BorderRadius::all(px(999)),
+            ..default()
+        },
+        BackgroundColor(Color::srgba(0.5, 0.5, 0.5, 0.76)),
+        children![(
+            Node {
+                width: Val::Percent((value.clamp(0.0, 1.0) * 100.0).max(2.0)),
+                height: px(8),
+                border_radius: BorderRadius::all(px(999)),
+                ..default()
+            },
+            BackgroundColor(Color::srgb(0.72, 0.72, 0.72)),
+        )],
+    )
+}
+
+fn options_menu_buttons(
+    mouse: Res<ButtonInput<MouseButton>>,
+    mut options: ResMut<MenuOptionsState>,
+    mut locale: ResMut<Locale>,
+    mut windows: Query<&mut Window, With<PrimaryWindow>>,
+    mut next_state: ResMut<NextState<AppScreen>>,
+    mut buttons: Query<(&Interaction, &OptionsMenuButton, &mut BackgroundColor)>,
+) {
+    let mut rebuild = false;
+    for (interaction, button, mut background) in &mut buttons {
+        let clicked = *interaction == Interaction::Pressed && mouse.just_pressed(MouseButton::Left);
+        if clicked {
+            match button.action {
+                OptionsMenuAction::ToggleFullscreen => {
+                    options.fullscreen = !options.fullscreen;
+                    if let Ok(mut window) = windows.single_mut() {
+                        window.mode = if options.fullscreen {
+                            WindowMode::BorderlessFullscreen(MonitorSelection::Current)
+                        } else {
+                            WindowMode::Windowed
+                        };
+                    }
+                    rebuild = true;
+                }
+                OptionsMenuAction::ToggleLanguage => {
+                    options.language = options.language.toggled();
+                    locale.0 = options.language;
+                    rebuild = true;
+                }
+                OptionsMenuAction::ToggleMouseRestricted => {
+                    options.mouse_restricted = !options.mouse_restricted;
+                    rebuild = true;
+                }
+                OptionsMenuAction::MasterVolumeUp => {
+                    options.master_volume = (options.master_volume + 0.05).min(1.0);
+                    rebuild = true;
+                }
+                OptionsMenuAction::MasterVolumeDown => {
+                    options.master_volume = (options.master_volume - 0.05).max(0.0);
+                    rebuild = true;
+                }
+                OptionsMenuAction::MusicVolumeUp => {
+                    options.music_volume = (options.music_volume + 0.05).min(1.0);
+                    rebuild = true;
+                }
+                OptionsMenuAction::MusicVolumeDown => {
+                    options.music_volume = (options.music_volume - 0.05).max(0.0);
+                    rebuild = true;
+                }
+                OptionsMenuAction::SfxVolumeUp => {
+                    options.sfx_volume = (options.sfx_volume + 0.05).min(1.0);
+                    rebuild = true;
+                }
+                OptionsMenuAction::SfxVolumeDown => {
+                    options.sfx_volume = (options.sfx_volume - 0.05).max(0.0);
+                    rebuild = true;
+                }
+                OptionsMenuAction::VoiceVolumeUp => {
+                    options.voice_volume = (options.voice_volume + 0.05).min(1.0);
+                    rebuild = true;
+                }
+                OptionsMenuAction::VoiceVolumeDown => {
+                    options.voice_volume = (options.voice_volume - 0.05).max(0.0);
+                    rebuild = true;
+                }
+                OptionsMenuAction::Back => next_state.set(AppScreen::MainMenu),
+            }
+        }
+        *background = BackgroundColor(match interaction {
+            Interaction::Pressed => Color::srgba(0.12, 0.13, 0.125, 0.96),
+            Interaction::Hovered => Color::srgba(0.08, 0.085, 0.082, 0.94),
+            Interaction::None => Color::srgba(0.05, 0.05, 0.048, 0.92),
+        });
+    }
+    if rebuild {
+        next_state.set(AppScreen::OptionsMenu);
+    }
+}
+
+fn setup_credits_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+    commands.spawn((
+        Name::new("Credits Menu Camera"),
+        Camera2d,
+        DespawnOnExit(AppScreen::CreditsMenu),
+    ));
+    setup_menu_backdrop(
+        &mut commands,
+        &asset_server,
+        AppScreen::CreditsMenu,
+        Color::srgba(0.05, 0.04, 0.035, 0.58),
+    );
+    commands
+        .spawn((
+            Name::new("Godot Style Credits Menu"),
+            DespawnOnExit(AppScreen::CreditsMenu),
+            Node {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                ..default()
+            },
+        ))
+        .with_children(|root| {
+            root.spawn(options_panel_node()).with_children(|panel| {
+                panel.spawn(options_group_node()).with_children(|group| {
+                    group.spawn(options_group_header(
+                        "制作人员",
+                        "Credits",
+                        font.clone(),
+                    ));
+                    group.spawn((
+                        localized_text(
+                            "核心贡献者：\n- Pawel Lampe (Scony) | Lampe Games\n\n素材：\n- 3D Space Kit by Kenney.nl",
+                            "Core Contributors:\n- Pawel Lampe (Scony) | Lampe Games\n\nAssets:\n- 3D Space Kit by Kenney.nl",
+                        ),
+                        TextFont {
+                            font: font.clone().into(),
+                            font_size: FontSize::Px(20.0),
+                            ..default()
+                        },
+                        TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                        Node {
+                            width: Val::Percent(100.0),
+                            justify_content: JustifyContent::Center,
+                            padding: UiRect::vertical(px(16)),
+                            ..default()
+                        },
+                    ));
+                });
+                panel
+                    .spawn(options_button(OptionsMenuAction::Back, 48.0))
+                    .with_children(|button| {
+                        button.spawn((
+                            localized_text("返回", "Back"),
+                            TextFont {
+                                font: font.into(),
+                                font_size: FontSize::Px(22.0),
+                                ..default()
+                            },
+                            TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                        ));
+                    });
+            });
+        });
+}
+
+fn credits_menu_buttons(
+    mouse: Res<ButtonInput<MouseButton>>,
+    mut next_state: ResMut<NextState<AppScreen>>,
+    mut buttons: Query<(&Interaction, &OptionsMenuButton, &mut BackgroundColor)>,
+) {
+    for (interaction, button, mut background) in &mut buttons {
+        if *interaction == Interaction::Pressed
+            && mouse.just_pressed(MouseButton::Left)
+            && matches!(button.action, OptionsMenuAction::Back)
+        {
+            next_state.set(AppScreen::MainMenu);
+        }
+        *background = BackgroundColor(match interaction {
+            Interaction::Pressed => Color::srgba(0.12, 0.13, 0.125, 0.96),
+            Interaction::Hovered => Color::srgba(0.08, 0.085, 0.082, 0.94),
+            Interaction::None => Color::srgba(0.05, 0.05, 0.048, 0.92),
+        });
+    }
+}
+
 fn setup_main_menu(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -9043,9 +9952,10 @@ fn spawn_supply_crate(
                 .with_scale(Vec3::splat(0.2108)),
         ));
         parent.spawn((
-            WorldAssetRoot(asset_server.load(
-                GltfAssetLabel::Scene(0).from_asset("models/kenney-spacekit/barrel.glb"),
-            )),
+            WorldAssetRoot(
+                asset_server
+                    .load(GltfAssetLabel::Scene(0).from_asset("models/kenney-spacekit/barrel.glb")),
+            ),
             Transform::from_translation(Vec3::new(0.1984, 0.1544, -0.124))
                 .with_scale(Vec3::splat(0.1736)),
         ));
@@ -26695,8 +27605,7 @@ fn recenter_entity_models(
                 for sx in [-1.0_f32, 1.0] {
                     for sy in [-1.0_f32, 1.0] {
                         for sz in [-1.0_f32, 1.0] {
-                            let corner =
-                                center + Vec3::new(sx * half.x, sy * half.y, sz * half.z);
+                            let corner = center + Vec3::new(sx * half.x, sy * half.y, sz * half.z);
                             let world = gt.transform_point(corner);
                             min = min.min(world);
                             max = max.max(world);

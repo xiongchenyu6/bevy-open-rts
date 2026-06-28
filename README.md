@@ -51,6 +51,9 @@ stale game code after a rebuild.
 cargo run --bin capture -- screenshot screenshots/capture/still.png
 cargo run --bin capture -- frames screenshots/result/1 450
 cargo run --bin capture -- menu screenshots/menu/menu.png
+cargo run --bin capture -- menu-options screenshots/menu/options.png
+cargo run --bin capture -- menu-credits screenshots/menu/credits.png
+cargo run --bin capture -- menu-setup screenshots/menu/setup.png
 cargo run --bin capture -- play screenshots/play
 cargo run --bin capture -- harvest screenshots/harvest
 cargo run --bin capture -- assault screenshots/assault 300
@@ -58,9 +61,11 @@ cargo run --bin capture -- match 240
 cargo run --bin capture -- factions screenshots/factions
 ```
 
-`capture play` drives the real input systems through select, move, train, and
-build actions, then exits non-zero unless the trained unit actually spawns and a
-Worker completes the placed structure. `capture harvest` selects an actual
+`capture menu` renders the Godot-style command menu; `capture menu-options`,
+`capture menu-credits`, and `capture menu-setup` render the settings, credits,
+and skirmish setup screens. `capture play` drives the real input systems through
+select, move, train, and build actions, then exits non-zero unless the trained
+unit actually spawns and a Worker completes the placed structure. `capture harvest` selects an actual
 Worker, right-clicks a visible resource node, and exits non-zero unless a
 `HarvestOrder` is issued and player resources grow. `capture assault` uses real
 input to build a Barracks, train Heavy Machinegun Troopers, repeatedly
@@ -99,12 +104,12 @@ Generated outputs:
 
 ## Controls
 
-- The game opens on the skirmish setup menu. Press 1-4 to choose a map,
-  H/D/C to choose the player slot, Z/X/V to cycle each slot's faction,
-  9/0 to choose 1v1 or three-faction skirmish, J/K/L to cycle team ids,
-  Q/W/E to cycle player controllers, U/I/O to cycle player colors, F1-F4
-  to choose AI difficulty, 5-8 to choose starting resources, then Enter
-  or click `开始对战`.
+- The game opens on the Godot-style command menu. Click `开始游戏` to enter
+  skirmish setup. In setup, press 1-4 to choose a map, H/D/C to choose the
+  player slot, Z/X/V to cycle each slot's faction, 9/0 to choose 1v1 or
+  free-for-all, J/K/L to cycle team ids, Q/W/E to cycle player controllers,
+  U/I/O to cycle player colors, F1-F4 to choose AI difficulty, 5-8 to choose
+  starting resources, then Enter or click `开始对战`.
 - Left click selects a visible unit or structure.
 - Right click orders selected mobile units to move or attack.
 - Drag the mouse near the viewport edge, or use WASD, to pan the camera.

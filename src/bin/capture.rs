@@ -26,24 +26,24 @@ use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 use bevy_open_rts::{
     CaptureTarget, build_capture_app, capture_build_options_count,
     capture_enabled_build_hotkey_for, capture_enabled_train_hotkey_for,
-    capture_enemy_structure_position, capture_first_enabled_attack_move_hotkey,
-    capture_first_enabled_build_hotkey, capture_first_enabled_train_hotkey,
-    capture_focus_camera_on, capture_key, capture_match_phase_label, capture_mouse_button,
-    capture_nearest_enemy_anchor_position, capture_nearest_visible_resource_click_position_to,
-    capture_nearest_visible_resource_position,
-    capture_placement_is_valid, capture_player_army_unit_count, capture_player_attack_move_all,
-    capture_player_build_queue_len, capture_player_combat_order_count,
+    capture_enemy_structure_position, capture_entity_is_selected,
+    capture_first_enabled_attack_move_hotkey, capture_first_enabled_build_hotkey,
+    capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_key,
+    capture_match_phase_label, capture_mouse_button, capture_nearest_enemy_anchor_position,
+    capture_nearest_visible_resource_click_position_to, capture_nearest_visible_resource_position,
+    capture_onscreen_resource_model_center, capture_placement_is_valid,
+    capture_player_army_unit_count, capture_player_attack_move_all, capture_player_build_queue_len,
+    capture_player_combat_order_count, capture_player_command_center,
     capture_player_completed_structure_count, capture_player_completed_structure_position,
     capture_player_constructing_count, capture_player_harvesting_count,
     capture_player_in_placement_mode, capture_player_onscreen_unit_position,
     capture_player_onscreen_worker_position, capture_player_producer_position,
     capture_player_resources, capture_player_structure_count, capture_player_unit_count,
     capture_player_worker_position, capture_run_ai_match_until_resolved,
-    capture_entity_is_selected, capture_onscreen_resource_model_center,
-    capture_player_command_center, capture_zoom_camera_closest,
     capture_selected_player_unit_average_position, capture_selected_player_unit_count,
     capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
-    capture_world_to_screen, capture_worst_model_alignment_offset,
+    capture_show_credits_menu, capture_show_options_menu, capture_show_skirmish_setup_menu,
+    capture_world_to_screen, capture_worst_model_alignment_offset, capture_zoom_camera_closest,
     start_shared_match_scene_with_current_setup,
 };
 
@@ -94,6 +94,27 @@ fn main() {
                 .unwrap_or_else(|| PathBuf::from("screenshots/menu/menu.png"));
             render_menu(&path)
         }
+        Some("menu-options") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/menu/options.png"));
+            render_menu_page(&path, capture_show_options_menu)
+        }
+        Some("menu-credits") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/menu/credits.png"));
+            render_menu_page(&path, capture_show_credits_menu)
+        }
+        Some("menu-setup") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/menu/setup.png"));
+            render_menu_page(&path, capture_show_skirmish_setup_menu)
+        }
         Some("harvest") => {
             let dir = args
                 .next()
@@ -139,7 +160,7 @@ fn main() {
             render_factions(&dir)
         }
         Some(other) => Err(format!(
-            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | play <dir> | harvest <dir> | assault <dir> <seconds> | match <seconds> | factions <dir> | verify]"
+            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | menu <path> | menu-options <path> | menu-credits <path> | menu-setup <path> | play <dir> | harvest <dir> | assault <dir> <seconds> | match <seconds> | factions <dir> | verify]"
         )),
     };
     if let Err(error) = result {
@@ -189,7 +210,10 @@ fn verify_click_alignment() -> Result<(), String> {
         app.update();
     }
     let selected = capture_entity_is_selected(&mut app, entity);
-    println!("[verify] clicked visible resource model @ ({:.0},{:.0}): selected={selected}", screen.x, screen.y);
+    println!(
+        "[verify] clicked visible resource model @ ({:.0},{:.0}): selected={selected}",
+        screen.x, screen.y
+    );
     if !selected {
         return Err("left-clicking the visible resource model did not select it".into());
     }
@@ -376,6 +400,24 @@ fn render_menu(path: &Path) -> Result<(), String> {
     let handle = capture_handle(&app);
     shoot(&mut app, &handle, path.to_path_buf());
     println!("[capture] wrote menu screenshot to {}", path.display());
+    Ok(())
+}
+
+fn render_menu_page(path: &Path, enter_page: fn(&mut App)) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let mut app = build_capture_app(WIDTH, HEIGHT);
+    for _ in 0..120 {
+        app.update();
+    }
+    enter_page(&mut app);
+    for _ in 0..60 {
+        app.update();
+    }
+    let handle = capture_handle(&app);
+    shoot(&mut app, &handle, path.to_path_buf());
+    println!("[capture] wrote menu page screenshot to {}", path.display());
     Ok(())
 }
 
@@ -772,7 +814,11 @@ fn render_assault(dir: &Path, max_seconds: u32) -> Result<(), String> {
                 capture_focus_camera_on(&mut app, focus);
             }
             combat_shot += 1;
-            shoot(&mut app, &handle, dir.join(format!("03b_combat_{combat_shot}.png")));
+            shoot(
+                &mut app,
+                &handle,
+                dir.join(format!("03b_combat_{combat_shot}.png")),
+            );
         }
         if capture_match_phase_label(&mut app) != "Running" {
             resolved = true;

@@ -3,7 +3,7 @@
 ## Runtime Entry
 
 - `src/main.rs` calls `bevy_open_rts::run_game_app()`.
-- `run_game_app()` builds `build_game_app(GameAppMode::Interactive)`, which registers the setup menu and the shared match scene from `src/lib.rs`.
+- `run_game_app()` builds `build_game_app(GameAppMode::Interactive)`, which registers the Godot-style front menu, options/credits screens, setup menu, and the shared match scene from `src/lib.rs`.
 
 ## Shared Match Scene
 
@@ -32,7 +32,10 @@
 - Capture snapshots use `CaptureTeam::Player(index)` and `players: Vec<CaptureTeamStats>` rather than fixed human/demon/chaos fields, so proof output can represent every runtime player row.
 - `build_capture_match_app_for_faction()` uses `SharedMatchScenePlugin` plus `start_shared_match_scene_with_settings()`.
 - Current capture commands are the authoritative smoke surfaces:
-  - `capture menu [path]`: renders the real lobby/setup screen.
+  - `capture menu [path]`: renders the Godot-style command menu.
+  - `capture menu-options [path]`: renders the migrated options/settings screen.
+  - `capture menu-credits [path]`: renders the migrated credits screen.
+  - `capture menu-setup [path]`: renders the real lobby/setup screen.
   - `capture screenshot [path]`: renders one still from the shared live match.
   - `capture frames <dir> [count]`: records a frame sequence from the shared live match.
   - `capture harvest <dir>`: selects a real Worker, right-clicks ore, and requires `HarvestOrder` plus resource growth.
