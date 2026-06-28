@@ -1740,6 +1740,8 @@ struct SkirmishMenuSelection {
     lobby_color_slots: [usize; MAX_SKIRMISH_LOBBY_SLOTS],
     controller_dropdown_open: Option<usize>,
     faction_dropdown_open: Option<usize>,
+    team_dropdown_open: Option<usize>,
+    color_dropdown_open: Option<usize>,
 }
 
 impl Default for SkirmishMenuSelection {
@@ -1752,6 +1754,8 @@ impl Default for SkirmishMenuSelection {
             lobby_controllers: DEFAULT_LOBBY_CONTROLLERS,
             controller_dropdown_open: None,
             faction_dropdown_open: None,
+            team_dropdown_open: None,
+            color_dropdown_open: None,
             lobby_factions: DEFAULT_LOBBY_FACTIONS,
             lobby_team_ids: DEFAULT_LOBBY_TEAM_IDS,
             lobby_color_slots: DEFAULT_LOBBY_COLOR_SLOTS,
@@ -1805,6 +1809,8 @@ impl SkirmishMenuSelection {
             lobby_controllers: lobby_controllers_from_match_setup(&settings),
             controller_dropdown_open: None,
             faction_dropdown_open: None,
+            team_dropdown_open: None,
+            color_dropdown_open: None,
             lobby_factions: lobby_factions_from_match_setup(&settings),
             lobby_team_ids: lobby_team_ids_from_match_setup(&settings),
             lobby_color_slots: lobby_color_slots_from_match_setup(&settings),
@@ -1994,35 +2000,54 @@ impl SkirmishMenuSelection {
         self.set_lobby_slot_controller(slot, next);
     }
 
+    fn close_all_lobby_dropdowns(&mut self) {
+        self.controller_dropdown_open = None;
+        self.faction_dropdown_open = None;
+        self.team_dropdown_open = None;
+        self.color_dropdown_open = None;
+    }
+
     fn toggle_controller_dropdown(&mut self, slot: usize) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
-        self.faction_dropdown_open = None;
-        self.controller_dropdown_open = if self.controller_dropdown_open == Some(slot) {
-            None
-        } else {
-            Some(slot)
-        };
+        let was_open = self.controller_dropdown_open == Some(slot);
+        self.close_all_lobby_dropdowns();
+        self.controller_dropdown_open = (!was_open).then_some(slot);
     }
 
     fn toggle_faction_dropdown(&mut self, slot: usize) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
-        self.controller_dropdown_open = None;
-        self.faction_dropdown_open = if self.faction_dropdown_open == Some(slot) {
-            None
-        } else {
-            Some(slot)
-        };
+        let was_open = self.faction_dropdown_open == Some(slot);
+        self.close_all_lobby_dropdowns();
+        self.faction_dropdown_open = (!was_open).then_some(slot);
+    }
+
+    fn toggle_team_dropdown(&mut self, slot: usize) {
+        if !self.lobby_slot_in_selected_map(slot) {
+            return;
+        }
+        let was_open = self.team_dropdown_open == Some(slot);
+        self.close_all_lobby_dropdowns();
+        self.team_dropdown_open = (!was_open).then_some(slot);
+    }
+
+    fn toggle_color_dropdown(&mut self, slot: usize) {
+        if !self.lobby_slot_in_selected_map(slot) {
+            return;
+        }
+        let was_open = self.color_dropdown_open == Some(slot);
+        self.close_all_lobby_dropdowns();
+        self.color_dropdown_open = (!was_open).then_some(slot);
     }
 
     fn set_lobby_slot_faction_choice(&mut self, slot: usize, faction: SkirmishFaction) {
         if self.lobby_slot_in_selected_map(slot) {
             self.lobby_factions[slot] = faction;
         }
-        self.faction_dropdown_open = None;
+        self.close_all_lobby_dropdowns();
     }
 
     fn set_lobby_slot_controller_choice(
@@ -2031,7 +2056,21 @@ impl SkirmishMenuSelection {
         controller: SkirmishPlayerController,
     ) {
         self.set_lobby_slot_controller(slot, controller);
-        self.controller_dropdown_open = None;
+        self.close_all_lobby_dropdowns();
+    }
+
+    fn set_lobby_slot_team_choice(&mut self, slot: usize, team_index: usize) {
+        if self.lobby_slot_in_selected_map(slot) {
+            self.lobby_team_ids[slot] = (team_index as u8) % SKIRMISH_TEAM_OPTION_COUNT;
+        }
+        self.close_all_lobby_dropdowns();
+    }
+
+    fn set_lobby_slot_color_choice(&mut self, slot: usize, color_index: usize) {
+        if self.lobby_slot_in_selected_map(slot) {
+            self.lobby_color_slots[slot] = color_index % PLAYER_COLOR_PALETTE.len();
+        }
+        self.close_all_lobby_dropdowns();
     }
 
     fn cycle_lobby_slot_faction(&mut self, slot: usize) {
@@ -2624,6 +2663,10 @@ enum MainMenuAction {
     CycleLobbySlotFaction(usize),
     CycleLobbySlotTeamId(usize),
     CycleLobbySlotColor(usize),
+    ToggleLobbySlotTeam(usize),
+    SetLobbySlotTeam(usize, usize),
+    ToggleLobbySlotColor(usize),
+    SetLobbySlotColor(usize, usize),
     StartMatch,
 }
 
@@ -2715,6 +2758,16 @@ impl MainMenuAction {
             MainMenuAction::CycleLobbySlotFaction(_) => false,
             MainMenuAction::CycleLobbySlotTeamId(_) => false,
             MainMenuAction::CycleLobbySlotColor(_) => false,
+            MainMenuAction::ToggleLobbySlotTeam(slot) => selection.team_dropdown_open == Some(slot),
+            MainMenuAction::SetLobbySlotTeam(slot, team_index) => {
+                selection.lobby_team_ids.get(slot).map(|id| *id as usize) == Some(team_index)
+            }
+            MainMenuAction::ToggleLobbySlotColor(slot) => {
+                selection.color_dropdown_open == Some(slot)
+            }
+            MainMenuAction::SetLobbySlotColor(slot, color_index) => {
+                selection.lobby_color_slots.get(slot).copied() == Some(color_index)
+            }
             MainMenuAction::StartMatch => false,
         }
     }
@@ -8307,8 +8360,34 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
                 % PLAYER_COLOR_PALETTE.len()
                 + 1
         ),
+        MainMenuAction::ToggleLobbySlotTeam(slot) => format!(
+            "{} \u{25BE}",
+            skirmish_team_label(
+                selection.lobby_team_ids.get(slot).copied().unwrap_or(0) as usize
+                    % SKIRMISH_TEAM_OPTION_COUNT as usize
+            )
+        ),
+        MainMenuAction::SetLobbySlotTeam(_, team_index) => skirmish_team_label(team_index),
+        MainMenuAction::ToggleLobbySlotColor(slot) => format!(
+            "{} \u{25BE}",
+            skirmish_color_label(
+                selection.lobby_color_slots.get(slot).copied().unwrap_or(slot)
+                    % PLAYER_COLOR_PALETTE.len()
+            )
+        ),
+        MainMenuAction::SetLobbySlotColor(_, color_index) => skirmish_color_label(color_index),
         MainMenuAction::StartMatch => t("开始对战  Enter", "Start Match  Enter").to_string(),
     }
+}
+
+/// "队N" / "Team N" label for a 0-based team index.
+fn skirmish_team_label(team_index: usize) -> String {
+    format!("{}{}", t("队", "Team "), team_index + 1)
+}
+
+/// "色N" / "Color N" label for a 0-based color-palette index.
+fn skirmish_color_label(color_index: usize) -> String {
+    format!("{}{}", t("色", "Color "), color_index + 1)
 }
 
 fn lobby_slot_key_prefix(key: &'static str) -> String {
@@ -8706,21 +8785,59 @@ fn spawn_menu_lobby_slot_row(
                 }
             });
 
-            // Team / color cycles.
-            for action in [
-                MainMenuAction::CycleLobbySlotTeamId(slot),
-                MainMenuAction::CycleLobbySlotColor(slot),
-            ] {
-                row.spawn(menu_button(action, 62.0))
+            // Team dropdown — inline expand (队1 … 队N), like the controller/faction ones.
+            row.spawn(Node {
+                flex_direction: FlexDirection::Column,
+                row_gap: px(2),
+                ..default()
+            })
+            .with_children(|cell| {
+                let toggle = MainMenuAction::ToggleLobbySlotTeam(slot);
+                cell.spawn(menu_button(toggle, 72.0))
                     .with_children(|button| {
-                        button.spawn(menu_action_button_label(
-                            action,
-                            selection,
-                            font.clone(),
-                            10.0,
-                        ));
+                        button.spawn(menu_action_button_label(toggle, selection, font.clone(), 10.0));
                     });
-            }
+                if selection.team_dropdown_open == Some(slot) {
+                    for team_index in 0..SKIRMISH_TEAM_OPTION_COUNT as usize {
+                        let option = MainMenuAction::SetLobbySlotTeam(slot, team_index);
+                        cell.spawn(menu_button(option, 72.0)).with_children(|button| {
+                            button.spawn(menu_action_button_label(
+                                option,
+                                selection,
+                                font.clone(),
+                                10.0,
+                            ));
+                        });
+                    }
+                }
+            });
+
+            // Color dropdown — inline expand (色1 … 色N).
+            row.spawn(Node {
+                flex_direction: FlexDirection::Column,
+                row_gap: px(2),
+                ..default()
+            })
+            .with_children(|cell| {
+                let toggle = MainMenuAction::ToggleLobbySlotColor(slot);
+                cell.spawn(menu_button(toggle, 72.0))
+                    .with_children(|button| {
+                        button.spawn(menu_action_button_label(toggle, selection, font.clone(), 10.0));
+                    });
+                if selection.color_dropdown_open == Some(slot) {
+                    for color_index in 0..PLAYER_COLOR_PALETTE.len() {
+                        let option = MainMenuAction::SetLobbySlotColor(slot, color_index);
+                        cell.spawn(menu_button(option, 72.0)).with_children(|button| {
+                            button.spawn(menu_action_button_label(
+                                option,
+                                selection,
+                                font.clone(),
+                                10.0,
+                            ));
+                        });
+                    }
+                }
+            });
         });
 }
 
@@ -9246,6 +9363,18 @@ fn main_menu_buttons(
                 }
                 MainMenuAction::CycleLobbySlotColor(slot) => {
                     selection.cycle_lobby_slot_color(slot);
+                }
+                MainMenuAction::ToggleLobbySlotTeam(slot) => {
+                    selection.toggle_team_dropdown(slot);
+                }
+                MainMenuAction::SetLobbySlotTeam(slot, team_index) => {
+                    selection.set_lobby_slot_team_choice(slot, team_index);
+                }
+                MainMenuAction::ToggleLobbySlotColor(slot) => {
+                    selection.toggle_color_dropdown(slot);
+                }
+                MainMenuAction::SetLobbySlotColor(slot, color_index) => {
+                    selection.set_lobby_slot_color_choice(slot, color_index);
                 }
                 MainMenuAction::StartMatch => {
                     start_requested = true;
