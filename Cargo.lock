@@ -342,6 +342,7 @@ dependencies = [
  "bevy",
  "bevy_asset_loader",
  "bevy_common_assets",
+ "bevy_rts_camera",
  "icu_provider",
  "png",
  "serde",
@@ -1404,6 +1405,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "bevy_rts_camera"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bb9e9fb2dc04c668f94a47f8f23893d919c73f2b019548562597734ee5303d5b"
+dependencies = [
+ "bevy",
 ]
 
 [[package]]

@@ -3,7 +3,7 @@ use bevy::audio::Volume;
 use bevy::{
     asset::{AssetMetaCheck, AssetPlugin},
     camera::primitives::Aabb,
-    camera::{RenderTarget, ScalingMode},
+    camera::RenderTarget,
     ecs::query::Or,
     ecs::system::SystemParam,
     gizmos::config::{GizmoConfigGroup, GizmoConfigStore},
@@ -14,6 +14,7 @@ use bevy::{
     window::{PrimaryWindow, WindowMode, WindowResolution},
 };
 use bevy_common_assets::{json::JsonAssetPlugin, ron::RonAssetPlugin};
+use bevy_rts_camera::{RtsCamera as RtsCam, RtsCameraControls, RtsCameraPlugin, RtsCameraSystemSet};
 use serde::Deserialize;
 use std::collections::{BTreeMap, VecDeque};
 
@@ -69,17 +70,17 @@ fn handle_render_error(
 }
 
 const MAP_HALF_EXTENT: f32 = 24.0;
-const EDGE_PAN_PX: f32 = 28.0;
 const CAMERA_MIN_DISTANCE: f32 = 5.5;
 const CAMERA_DEFAULT_DISTANCE: f32 = 7.0;
 const CAMERA_MAX_DISTANCE: f32 = 9.0;
-const CAMERA_NEAR_PLANE: f32 = 0.05;
-const CAMERA_FAR_PLANE: f32 = 300.0;
 const CAMERA_DEFAULT_YAW: f32 = -0.72;
 const CAMERA_DEFAULT_PITCH: f32 = -1.02;
 const CAMERA_BOUNDS_MARGIN: f32 = 1.2;
-const CAMERA_PAN_SPEED_MULTIPLIER: f32 = 0.48;
-const CAMERA_MOUSE_ROTATION_SPEED: f32 = 0.005;
+// bevy_rts_camera (perspective, ground-following) framing — steep RTS angle and a
+// height range mapped from the legacy CAMERA_MIN/MAX_DISTANCE zoom span.
+const CAMERA_RTS_ANGLE: f32 = 0.95; // radians (~54° down from horizontal)
+const CAMERA_RTS_HEIGHT_MIN: f32 = 6.0;
+const CAMERA_RTS_HEIGHT_MAX: f32 = 11.0;
 const CAMERA_START_PRIMARY_UNITS: &[&str] = &["Worker"];
 const CAMERA_START_PRIMARY_STRUCTURES: &[&str] = &["CommandCenter"];
 const RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 48.0;
@@ -103,7 +104,6 @@ const PATROL_TURN_DISTANCE: f32 = 2.0;
 const SCATTER_DISTANCE: f32 = 4.0;
 const DRAG_SELECT_THRESHOLD: f32 = 6.0;
 const SELECTION_DRAG_INTERRUPT_MARGIN_PX: f32 = 1.0;
-const CAMERA_ROTATE_SPEED: f32 = 2.0;
 const DOUBLE_CLICK_MIN_SECONDS: f32 = 0.05;
 const DOUBLE_CLICK_MAX_SECONDS: f32 = 0.6;
 const SINGLE_CLICK_SELECTION_SCREEN_RADIUS_PX: f32 = 38.0;
@@ -4149,7 +4149,6 @@ fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<SelectionDragState>()
         .init_resource::<UnitGroups>()
         .init_resource::<CameraBookmarks>()
-        .init_resource::<CameraMouseRotation>()
         .init_resource::<DoubleClickState>()
         .init_resource::<ButtonInput<KeyCode>>()
         .init_resource::<ButtonInput<MouseButton>>()
@@ -4206,6 +4205,9 @@ fn add_main_menu_scene(app: &mut App) -> &mut App {
 
 /// Registers the live match scene shared by `cargo run`, capture, and gameplay tests.
 pub fn add_shared_match_scene(app: &mut App) -> &mut App {
+    if !app.is_plugin_added::<RtsCameraPlugin>() {
+        app.add_plugins(RtsCameraPlugin);
+    }
     add_shared_match_resources(app)
         .add_systems(
             OnEnter(AppScreen::InMatch),
@@ -4587,12 +4589,14 @@ pub fn capture_focus_camera_on(app: &mut App, focus: Vec3) {
     let bounds = *app.world().resource::<MapBounds>();
     let mut camera = app.world_mut().resource_mut::<RtsCamera>();
     set_camera_focus_safely(&mut camera, focus, bounds);
+    camera.pending_jump = true;
 }
 
 /// Zooms the capture camera all the way in (for close-up model inspection).
 pub fn capture_zoom_camera_closest(app: &mut App) {
     let mut camera = app.world_mut().resource_mut::<RtsCamera>();
     camera.distance = CAMERA_MIN_DISTANCE;
+    camera.pending_jump = true;
 }
 
 /// Diagnostic: prints every distinct mesh-material base color under each resource
@@ -5470,10 +5474,8 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
     app.add_systems(
         Update,
         (
-            rotate_camera
-                .in_set(SimulationPhase::UiAndManagement)
-                .run_if(match_in_progress),
             camera_control
+                .before(RtsCameraSystemSet)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
             minimap_input
@@ -5778,7 +5780,11 @@ struct RtsCamera {
     distance: f32,
     yaw: f32,
     pitch: f32,
-    edge_pan_active: bool,
+    /// Set when game code wants to jump the camera to `focus`/`distance`; consumed
+    /// by `camera_control`, which pushes the values into the `bevy_rts_camera`
+    /// component with `snap = true`. When false, the bridge instead mirrors the
+    /// plugin's live camera back into this resource so minimap/bookmarks stay fresh.
+    pending_jump: bool,
 }
 
 impl Default for RtsCamera {
@@ -5788,40 +5794,59 @@ impl Default for RtsCamera {
             distance: CAMERA_DEFAULT_DISTANCE,
             yaw: CAMERA_DEFAULT_YAW,
             pitch: CAMERA_DEFAULT_PITCH,
-            edge_pan_active: false,
+            pending_jump: false,
         }
     }
 }
 
 impl RtsCamera {
     fn focused_on(focus: Vec3) -> Self {
-        Self { focus, ..default() }
+        Self {
+            focus,
+            pending_jump: true,
+            ..default()
+        }
     }
 }
 
-#[derive(Resource, Default)]
-struct CameraMouseRotation {
-    active: bool,
-    start_yaw: f32,
-    accumulated_x: f32,
-    last_middle_press_time: Option<f32>,
+/// Maps the legacy orthographic `distance` (5.5..9.0) onto `bevy_rts_camera`'s
+/// `target_zoom` (0.0 = zoomed out, 1.0 = zoomed in).
+fn camera_zoom_from_distance(distance: f32) -> f32 {
+    let span = CAMERA_MAX_DISTANCE - CAMERA_MIN_DISTANCE;
+    ((CAMERA_MAX_DISTANCE - distance) / span).clamp(0.0, 1.0)
 }
 
-fn camera_transform_from_state(camera: &RtsCamera) -> Transform {
-    let offset = Quat::from_euler(EulerRot::YXZ, camera.yaw, camera.pitch, 0.0)
-        * Vec3::new(0.0, 0.0, camera.distance);
-    Transform::from_translation(camera.focus + offset).looking_at(camera.focus, Vec3::Y)
+fn camera_distance_from_zoom(zoom: f32) -> f32 {
+    let span = CAMERA_MAX_DISTANCE - CAMERA_MIN_DISTANCE;
+    CAMERA_MAX_DISTANCE - zoom.clamp(0.0, 1.0) * span
 }
 
-fn camera_projection_from_state(camera: &RtsCamera) -> Projection {
-    Projection::Orthographic(OrthographicProjection {
-        near: CAMERA_NEAR_PLANE,
-        far: CAMERA_FAR_PLANE,
-        scaling_mode: ScalingMode::FixedVertical {
-            viewport_height: camera.distance,
-        },
-        ..OrthographicProjection::default_3d()
-    })
+/// Builds the `bevy_rts_camera` component from the game's camera state + map bounds.
+fn rts_camera_component(state: &RtsCamera, bounds: MapBounds) -> RtsCam {
+    let mut cam = RtsCam {
+        // Steep, fixed isometric-ish angle to mirror the old godot-style framing.
+        angle: CAMERA_RTS_ANGLE,
+        target_angle: CAMERA_RTS_ANGLE,
+        min_angle: CAMERA_RTS_ANGLE,
+        dynamic_angle: false,
+        height_min: CAMERA_RTS_HEIGHT_MIN,
+        height_max: CAMERA_RTS_HEIGHT_MAX,
+        bounds: camera_bounds_aabb(bounds),
+        target_zoom: camera_zoom_from_distance(state.distance),
+        snap: true,
+        ..default()
+    };
+    cam.target_focus.translation = safe_camera_focus(state.focus, bounds);
+    cam
+}
+
+fn camera_bounds_aabb(bounds: MapBounds) -> bevy::math::bounding::Aabb2d {
+    let min = bounds.clamp_ground_point(Vec3::new(f32::MIN, 0.0, f32::MIN), CAMERA_BOUNDS_MARGIN);
+    let max = bounds.clamp_ground_point(Vec3::new(f32::MAX, 0.0, f32::MAX), CAMERA_BOUNDS_MARGIN);
+    bevy::math::bounding::Aabb2d {
+        min: Vec2::new(min.x, min.z),
+        max: Vec2::new(max.x, max.z),
+    }
 }
 
 #[derive(Resource, Default, Debug)]
@@ -7310,7 +7335,6 @@ fn begin_match_from_setup(
     mut selection_drag: ResMut<SelectionDragState>,
     mut unit_groups: ResMut<UnitGroups>,
     mut camera_bookmarks: ResMut<CameraBookmarks>,
-    mut camera_mouse_rotation: ResMut<CameraMouseRotation>,
     mut match_menu: ResMut<MatchMenuState>,
     mut briefing: ResMut<MatchBriefingState>,
     mut battle_log: ResMut<BattleLog>,
@@ -7330,7 +7354,6 @@ fn begin_match_from_setup(
     *selection_drag = SelectionDragState::default();
     *unit_groups = UnitGroups::default();
     *camera_bookmarks = CameraBookmarks::default();
-    *camera_mouse_rotation = CameraMouseRotation::default();
     match_menu.visible = false;
     *briefing = MatchBriefingState::default();
     briefing.show();
@@ -9819,9 +9842,16 @@ fn setup(
     commands.insert_resource(map_bounds);
 
     commands.spawn((
-        Camera3d::default(),
-        camera_transform_from_state(&camera_state),
-        camera_projection_from_state(&camera_state),
+        rts_camera_component(&camera_state, map_bounds),
+        RtsCameraControls {
+            key_up: KeyCode::KeyW,
+            key_down: KeyCode::KeyS,
+            key_left: KeyCode::KeyA,
+            key_right: KeyCode::KeyD,
+            pan_speed: 18.0,
+            edge_pan_width: 0.05,
+            ..default()
+        },
         MainCamera,
         MatchScopedEntity,
     ));
@@ -14969,54 +14999,34 @@ fn production_queue_slot_label(index: usize, font: Handle<Font>) -> impl Bundle 
     )
 }
 
+/// Bridges the game's `RtsCamera` resource and the `bevy_rts_camera` component.
+///
+/// Live input (WASD/edge-pan/zoom/rotate) is owned by the plugin's
+/// `RtsCameraControls`; this system runs before `RtsCameraSystemSet`. On an
+/// explicit `pending_jump` it pushes `focus`/`distance` into the component with
+/// `snap = true`; otherwise it mirrors the plugin's live target back into the
+/// resource so the minimap and camera bookmarks read up-to-date values.
 fn camera_control(
-    time: Res<Time>,
-    keyboard: Res<ButtonInput<KeyCode>>,
-    mut mouse_motion_events: MessageReader<MouseMotion>,
-    mut wheel_events: MessageReader<MouseWheel>,
     map_bounds: Res<MapBounds>,
-    window_q: Query<&Window, With<PrimaryWindow>>,
     mut camera_state: ResMut<RtsCamera>,
-    mut camera_q: Query<(&mut Transform, &mut Projection), With<MainCamera>>,
+    mut camera_q: Query<&mut RtsCam, With<MainCamera>>,
 ) {
-    let Ok(window) = window_q.single() else {
+    let Ok(mut cam) = camera_q.single_mut() else {
         return;
     };
-    clamp_camera_view_safely(&mut camera_state, *map_bounds);
-    if mouse_motion_events.read().next().is_some() {
-        camera_state.edge_pan_active = true;
+    cam.bounds = camera_bounds_aabb(*map_bounds);
+    if camera_state.pending_jump {
+        let focus = safe_camera_focus(camera_state.focus, *map_bounds);
+        cam.target_focus.translation = focus;
+        cam.target_zoom = camera_zoom_from_distance(camera_state.distance);
+        cam.snap = true;
+        camera_state.focus = focus;
+        camera_state.distance = safe_camera_distance(camera_state.distance);
+        camera_state.pending_jump = false;
+    } else {
+        camera_state.focus = cam.target_focus.translation;
+        camera_state.distance = camera_distance_from_zoom(cam.target_zoom);
     }
-    let cursor = window.cursor_position();
-    let pan = camera_screen_pan_vector(
-        &keyboard,
-        cursor,
-        window_size_vec(window),
-        camera_state.edge_pan_active,
-        cursor.is_some_and(|c| cursor_blocks_edge_pan(window, c)),
-    );
-    if pan.length_squared() > 0.0 {
-        let yaw = camera_state.yaw;
-        let distance = camera_state.distance;
-        let delta_seconds = time.delta_secs();
-        camera_state.focus += camera_pan_delta(yaw, distance, pan, delta_seconds);
-        clamp_camera_focus_safely(&mut camera_state, *map_bounds);
-    }
-    for event in wheel_events.read() {
-        let scroll = match event.unit {
-            MouseScrollUnit::Line => event.y,
-            MouseScrollUnit::Pixel => event.y * 0.05,
-        };
-        camera_state.distance = camera_zoom_distance_after_scroll(camera_state.distance, scroll);
-    }
-    let Ok((mut transform, mut projection)) = camera_q.single_mut() else {
-        return;
-    };
-    *transform = camera_transform_from_state(&camera_state);
-    *projection = camera_projection_from_state(&camera_state);
-}
-
-fn camera_zoom_distance_after_scroll(current_distance: f32, scroll_lines: f32) -> f32 {
-    safe_camera_distance(current_distance - scroll_lines)
 }
 
 fn safe_camera_distance(distance: f32) -> f32 {
@@ -15042,89 +15052,6 @@ fn clamp_camera_distance_safely(camera: &mut RtsCamera) {
 fn clamp_camera_view_safely(camera: &mut RtsCamera, bounds: MapBounds) {
     clamp_camera_focus_safely(camera, bounds);
     clamp_camera_distance_safely(camera);
-}
-
-fn cursor_edge_pan_vector(
-    cursor: Option<Vec2>,
-    window_size: Vec2,
-    edge_pan_active: bool,
-    over_hud: bool,
-) -> Vec2 {
-    if !edge_pan_active || over_hud {
-        return Vec2::ZERO;
-    }
-    let Some(cursor) = cursor else {
-        return Vec2::ZERO;
-    };
-    let mut pan = Vec2::ZERO;
-    if cursor.x < EDGE_PAN_PX {
-        pan.x -= 1.0;
-    } else if cursor.x > window_size.x - EDGE_PAN_PX {
-        pan.x += 1.0;
-    }
-    if cursor.y < EDGE_PAN_PX {
-        pan.y -= 1.0;
-    } else if cursor.y > window_size.y - EDGE_PAN_PX {
-        pan.y += 1.0;
-    }
-    pan
-}
-
-fn window_size_vec(window: &Window) -> Vec2 {
-    Vec2::new(window.width(), window.height())
-}
-
-fn camera_screen_pan_vector(
-    keyboard: &ButtonInput<KeyCode>,
-    cursor: Option<Vec2>,
-    window_size: Vec2,
-    edge_pan_active: bool,
-    over_hud: bool,
-) -> Vec2 {
-    let mut pan = camera_keyboard_pan_vector(keyboard);
-    let edge_pan = cursor_edge_pan_vector(cursor, window_size, edge_pan_active, over_hud);
-    if edge_pan.x != 0.0 {
-        pan.x = edge_pan.x;
-    }
-    if edge_pan.y != 0.0 {
-        pan.y = edge_pan.y;
-    }
-    pan
-}
-
-fn camera_keyboard_pan_vector(keyboard: &ButtonInput<KeyCode>) -> Vec2 {
-    // Match the (correct) edge-pan sign convention: pan.y NEGATIVE moves the view
-    // UP (see cursor_edge_pan_vector: top edge → pan.y -= 1). So W (view up) must
-    // map to the "down" arg and S to the "up" arg — otherwise W/S are inverted.
-    camera_pan_from_key_states(
-        keyboard.pressed(KeyCode::KeyA),
-        keyboard.pressed(KeyCode::KeyD),
-        keyboard.pressed(KeyCode::KeyS),
-        keyboard.pressed(KeyCode::KeyW),
-    )
-}
-
-fn camera_pan_from_key_states(left: bool, right: bool, up: bool, down: bool) -> Vec2 {
-    Vec2::new(
-        (right as i32 - left as i32) as f32,
-        (up as i32 - down as i32) as f32,
-    )
-}
-
-fn camera_pan_delta(yaw: f32, distance: f32, pan: Vec2, delta_seconds: f32) -> Vec3 {
-    if pan.length_squared() <= f32::EPSILON {
-        return Vec3::ZERO;
-    }
-    let forward = Vec3::new(yaw.sin(), 0.0, yaw.cos());
-    let right = Vec3::new(forward.z, 0.0, -forward.x);
-    let screen_move = pan.normalize()
-        * Vec2::new(
-            CAMERA_PAN_SPEED_MULTIPLIER,
-            CAMERA_PAN_SPEED_MULTIPLIER * 2.0,
-        )
-        * distance
-        * delta_seconds;
-    right * screen_move.x + forward * screen_move.y
 }
 
 fn structure_placement_input(
@@ -15796,111 +15723,6 @@ fn minimap_input(
             ));
         }
     }
-}
-
-fn rotate_camera(
-    keyboard: Res<ButtonInput<KeyCode>>,
-    mouse: Res<ButtonInput<MouseButton>>,
-    mut mouse_motion_events: MessageReader<MouseMotion>,
-    time: Res<Time>,
-    window_q: Query<&Window, With<PrimaryWindow>>,
-    mut camera_state: ResMut<RtsCamera>,
-    mut mouse_rotation: ResMut<CameraMouseRotation>,
-) {
-    if mouse.just_pressed(MouseButton::Middle) {
-        let now = time.elapsed_secs();
-        if camera_middle_click_is_reset(mouse_rotation.last_middle_press_time, now) {
-            reset_camera_rotation(&mut camera_state, &mut mouse_rotation);
-            mouse_rotation.last_middle_press_time = Some(now);
-            return;
-        }
-        begin_camera_mouse_rotation(&mut mouse_rotation, camera_state.yaw, now);
-    }
-
-    if mouse.just_released(MouseButton::Middle) {
-        mouse_rotation.active = false;
-    }
-
-    if mouse_rotation.active {
-        let delta_x = mouse_motion_events
-            .read()
-            .map(|event| event.delta.x)
-            .sum::<f32>();
-        if delta_x.abs() > f32::EPSILON {
-            apply_camera_mouse_rotation(&mut camera_state, &mut mouse_rotation, delta_x);
-        }
-        return;
-    }
-    for _ in mouse_motion_events.read() {}
-
-    let movement_active = if let Ok(window) = window_q.single() {
-        let cursor = window.cursor_position();
-        camera_screen_pan_vector(
-            &keyboard,
-            cursor,
-            window_size_vec(window),
-            camera_state.edge_pan_active,
-            cursor.is_some_and(|_| cursor_is_over_hud(window)),
-        )
-        .length_squared()
-            > 0.0
-    } else {
-        camera_keyboard_pan_vector(&keyboard).length_squared() > 0.0
-    };
-    let rotate = camera_arrow_rotation_axis(&keyboard, movement_active);
-    if rotate == 0.0 {
-        return;
-    }
-
-    camera_state.yaw += rotate * CAMERA_ROTATE_SPEED * time.delta_secs();
-}
-
-fn camera_arrow_rotation_axis(keyboard: &ButtonInput<KeyCode>, movement_active: bool) -> f32 {
-    camera_arrow_rotation_from_key_states(
-        keyboard.pressed(KeyCode::KeyQ),
-        keyboard.pressed(KeyCode::KeyE),
-        movement_active,
-    )
-}
-
-fn camera_arrow_rotation_from_key_states(
-    counterclockwise: bool,
-    clockwise: bool,
-    movement_active: bool,
-) -> f32 {
-    if movement_active {
-        return 0.0;
-    }
-    (clockwise as i32 - counterclockwise as i32) as f32
-}
-
-fn begin_camera_mouse_rotation(rotation: &mut CameraMouseRotation, yaw: f32, now: f32) {
-    rotation.active = true;
-    rotation.start_yaw = yaw;
-    rotation.accumulated_x = 0.0;
-    rotation.last_middle_press_time = Some(now);
-}
-
-fn apply_camera_mouse_rotation(
-    camera: &mut RtsCamera,
-    rotation: &mut CameraMouseRotation,
-    delta_x: f32,
-) {
-    rotation.accumulated_x += delta_x;
-    camera.yaw = rotation.start_yaw + rotation.accumulated_x * CAMERA_MOUSE_ROTATION_SPEED;
-}
-
-fn reset_camera_rotation(camera: &mut RtsCamera, rotation: &mut CameraMouseRotation) {
-    camera.yaw = CAMERA_DEFAULT_YAW;
-    rotation.active = false;
-    rotation.accumulated_x = 0.0;
-}
-
-fn camera_middle_click_is_reset(last_click_time: Option<f32>, current_time: f32) -> bool {
-    last_click_time.is_some_and(|last_click_time| {
-        let delta = current_time - last_click_time;
-        (DOUBLE_CLICK_MIN_SECONDS..=DOUBLE_CLICK_MAX_SECONDS).contains(&delta)
-    })
 }
 
 fn focus_latest_battle_event(
@@ -29079,10 +28901,6 @@ fn cursor_blocks_world_order_controls(window: &Window, cursor: Vec2) -> bool {
 /// Edge-scroll is only blocked by the interactive overlays you click into (the
 /// minimap and battle log), NOT the command bar / top status — so reaching the
 /// bottom screen edge still pans the camera.
-fn cursor_blocks_edge_pan(window: &Window, cursor: Vec2) -> bool {
-    battle_log_contains_cursor(window, cursor) || minimap_contains_cursor(window, cursor)
-}
-
 fn battle_log_contains_cursor(window: &Window, cursor: Vec2) -> bool {
     let min_x = window.width() - BATTLE_LOG_RIGHT_PX - BATTLE_LOG_WIDTH_PX;
     cursor.x >= min_x
@@ -29245,34 +29063,6 @@ mod current_tests {
     // FogOfWar revealing units `is_allied_with(visible_player)`.
     // W/S keyboard pan must match the edge-pan sign convention (pan.y<0 = view up,
     // matching cursor at the top edge). Guards against the recurring inversion.
-    #[test]
-    fn camera_keyboard_pan_matches_edge_pan_direction() {
-        let mut keys = ButtonInput::<KeyCode>::default();
-        keys.press(KeyCode::KeyW);
-        assert!(
-            camera_keyboard_pan_vector(&keys).y < 0.0,
-            "W should pan the view up (negative y)"
-        );
-        keys.release(KeyCode::KeyW);
-        keys.press(KeyCode::KeyS);
-        assert!(
-            camera_keyboard_pan_vector(&keys).y > 0.0,
-            "S should pan the view down (positive y)"
-        );
-        keys.release(KeyCode::KeyS);
-        keys.press(KeyCode::KeyD);
-        assert!(
-            camera_keyboard_pan_vector(&keys).x > 0.0,
-            "D should pan the view right (positive x)"
-        );
-        // Same convention as the edge pan: top edge is also negative y.
-        let win = Vec2::new(1280.0, 720.0);
-        assert!(
-            cursor_edge_pan_vector(Some(Vec2::new(640.0, 2.0)), win, true, false).y < 0.0,
-            "top-edge pan and W must share the negative-y = view-up convention"
-        );
-    }
-
     #[test]
     fn allied_vision_is_shared_through_allies() {
         fn enemy_visible_with_alliance(allied: bool) -> bool {
