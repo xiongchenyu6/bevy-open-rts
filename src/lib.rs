@@ -28947,10 +28947,21 @@ fn harvest_cargo_visual_slots(cargo: ResourceCargo) -> Vec<ResourceKind> {
 }
 
 fn harvest_visual_color(kind: ResourceKind, alpha: f32) -> Color {
-    match kind {
-        ResourceKind::Ore => Color::srgba(0.10, 0.22, 1.0, alpha),
-        ResourceKind::Crystal => Color::srgba(1.0, 0.15, 0.08, alpha),
-    }
+    // Beam + cargo dots take the mineral color (ore green, crystal red).
+    let c = kind.color().to_srgba();
+    Color::srgba(c.red, c.green, c.blue, alpha)
+}
+
+/// Brighter tint of the mineral color for the beam's "hot" core + sparks (mixed
+/// halfway to white), so the green ore beam glows green and the red crystal red.
+fn harvest_visual_hot_color(kind: ResourceKind, alpha: f32) -> Color {
+    let c = kind.color().to_srgba();
+    Color::srgba(
+        (c.red + 1.0) * 0.5,
+        (c.green + 1.0) * 0.5,
+        (c.blue + 1.0) * 0.5,
+        alpha,
+    )
 }
 
 fn draw_harvest_and_cargo_visuals(
@@ -29011,7 +29022,7 @@ fn draw_harvest_and_cargo_visuals(
     let contact =
         resource_position - to_resource * (resource_selectable.radius * 0.45) + Vec3::Y * 0.28;
     let color = harvest_visual_color(resource.kind, 0.84);
-    let hot = Color::srgba(1.0, 0.96, 0.62, 0.78);
+    let hot = harvest_visual_hot_color(resource.kind, 0.78);
     hud.line(front, contact, color);
     hud.line(front + Vec3::Y * 0.06, contact + Vec3::Y * 0.03, hot);
 
