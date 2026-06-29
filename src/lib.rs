@@ -197,8 +197,7 @@ const BATTLE_LOG_ENTRY_TTL_SECONDS: f32 = 6.5;
 const BATTLE_EVENT_PING_LIFETIME_SECONDS: f32 = 4.0;
 const BATTLE_LOG_MAX_ENTRIES: usize = 5;
 const BATTLE_LOG_UNDER_ATTACK_COOLDOWN_SECONDS: f32 = 7.0;
-const BATTLE_LOG_TOP_PX: f32 = 74.0;
-const BATTLE_LOG_RIGHT_PX: f32 = 18.0;
+const BATTLE_LOG_TOP_PX: f32 = 104.0;
 const BATTLE_LOG_WIDTH_PX: f32 = 390.0;
 const BATTLE_LOG_HIT_HEIGHT_PX: f32 = 168.0;
 const MINIMAP_SIZE_PX: f32 = 158.0;
@@ -7180,6 +7179,9 @@ struct BattleLogEntryButton(usize);
 #[derive(Component)]
 struct ObjectiveTrackerText;
 
+/// The fill node of the top-center objective progress bar (godot MissionProgressBar).
+#[derive(Component)]
+struct ObjectiveProgressFill;
 
 #[derive(Resource, Clone, Copy, Debug, Default, PartialEq, Eq)]
 struct ObjectiveTrackerState {
@@ -13170,34 +13172,71 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
         MatchScopedEntity,
     ));
 
-    commands.spawn((
-        Text::new(""),
-        TextFont {
-            font: font.clone().into(),
-            font_size: FontSize::Px(14.0),
-            ..default()
-        },
-        TextColor(Color::srgb(0.86, 0.95, 0.88)),
-        Node {
-            position_type: PositionType::Absolute,
-            top: px(12),
-            right: px(18),
-            max_width: px(390),
-            ..default()
-        },
-        ObjectiveTrackerText,
-        MatchScopedEntity,
-    ));
+    // godot: objective tracker (+ progress bar) centered near the top.
+    commands
+        .spawn((
+            Node {
+                position_type: PositionType::Absolute,
+                top: px(12),
+                left: px(0),
+                right: px(0),
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Center,
+                row_gap: px(4),
+                ..default()
+            },
+            MatchScopedEntity,
+        ))
+        .with_children(|center| {
+            center.spawn((
+                Text::new(""),
+                TextFont {
+                    font: font.clone().into(),
+                    font_size: FontSize::Px(14.0),
+                    ..default()
+                },
+                TextColor(Color::srgb(0.86, 0.95, 0.88)),
+                TextLayout::justify(Justify::Center),
+                Node {
+                    max_width: px(460),
+                    ..default()
+                },
+                ObjectiveTrackerText,
+            ));
+            center
+                .spawn((
+                    Node {
+                        width: px(300),
+                        height: px(8),
+                        border: UiRect::all(px(1)),
+                        ..default()
+                    },
+                    BorderColor::all(Color::srgb(0.3, 0.4, 0.42)),
+                    BackgroundColor(Color::srgba(0.02, 0.05, 0.04, 0.7)),
+                ))
+                .with_children(|track| {
+                    track.spawn((
+                        Node {
+                            width: Val::Percent(0.0),
+                            height: Val::Percent(100.0),
+                            ..default()
+                        },
+                        BackgroundColor(Color::srgb(0.3, 0.8, 0.42)),
+                        ObjectiveProgressFill,
+                    ));
+                });
+        });
 
+    // godot: battle notifications/log centered, just below the objective tracker.
     commands.spawn((
         Node {
             position_type: PositionType::Absolute,
             top: px(BATTLE_LOG_TOP_PX),
-            right: px(BATTLE_LOG_RIGHT_PX),
-            width: px(BATTLE_LOG_WIDTH_PX),
+            left: px(0),
+            right: px(0),
             flex_direction: FlexDirection::Column,
             row_gap: px(3),
-            align_items: AlignItems::FlexEnd,
+            align_items: AlignItems::Center,
             ..default()
         },
         BattleLogRoot { font: font.clone() },
@@ -27257,6 +27296,7 @@ fn update_objective_tracker_hud(
     structures: Query<(&Structure, &Team, &Health)>,
     units: Query<(&Unit, &Team, &Health)>,
     mut objective_text: Query<&mut Text, With<ObjectiveTrackerText>>,
+    mut objective_fill: Query<&mut Node, With<ObjectiveProgressFill>>,
 ) {
     let Ok(mut text) = objective_text.single_mut() else {
         return;
@@ -27268,6 +27308,9 @@ fn update_objective_tracker_hud(
         &units,
         &mut objective_tracker,
     );
+    if let Ok(mut fill) = objective_fill.single_mut() {
+        fill.width = Val::Percent(snapshot.completion_percent as f32);
+    }
     **text = objective_tracker_text(snapshot);
 }
 
@@ -28977,7 +29020,8 @@ fn cursor_blocks_world_order_controls(window: &Window, cursor: Vec2) -> bool {
 /// minimap and battle log), NOT the command bar / top status — so reaching the
 /// bottom screen edge still pans the camera.
 fn battle_log_contains_cursor(window: &Window, cursor: Vec2) -> bool {
-    let min_x = window.width() - BATTLE_LOG_RIGHT_PX - BATTLE_LOG_WIDTH_PX;
+    // Battle log is centered along the top (see setup_ui), so the hit rect is too.
+    let min_x = (window.width() - BATTLE_LOG_WIDTH_PX) * 0.5;
     cursor.x >= min_x
         && cursor.x <= min_x + BATTLE_LOG_WIDTH_PX
         && cursor.y >= BATTLE_LOG_TOP_PX
