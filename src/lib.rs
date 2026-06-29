@@ -202,8 +202,9 @@ const BATTLE_LOG_RIGHT_PX: f32 = 18.0;
 const BATTLE_LOG_WIDTH_PX: f32 = 390.0;
 const BATTLE_LOG_HIT_HEIGHT_PX: f32 = 168.0;
 const MINIMAP_SIZE_PX: f32 = 158.0;
-const MINIMAP_RIGHT_PX: f32 = 18.0;
-const MINIMAP_BOTTOM_PX: f32 = 146.0;
+// godot anchors the minimap/radar in the bottom-LEFT corner.
+const MINIMAP_LEFT_PX: f32 = 12.0;
+const MINIMAP_BOTTOM_PX: f32 = 12.0;
 const MINIMAP_ENTITY_MARKER_PX: f32 = 4.6;
 const MINIMAP_STRUCTURE_MARKER_PX: f32 = 6.2;
 const MINIMAP_RESOURCE_MARKER_PX: f32 = 3.8;
@@ -13137,10 +13138,10 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
         TextColor(Color::srgb(0.86, 0.92, 0.94)),
         Node {
             position_type: PositionType::Absolute,
-            // Sits just above the production-queue slot row (which tops out near
-            // bottom:230) so the two no longer overlap.
-            bottom: px(236),
-            left: px(12),
+            // Bottom-center, to the right of the portrait (godot SelectionInfo panel).
+            bottom: px(12),
+            left: px(272),
+            max_width: px(372),
             padding: UiRect::new(px(8), px(10), px(3), px(3)),
             border: UiRect::all(px(1)),
             ..default()
@@ -13155,8 +13156,9 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
         ImageNode::default(),
         Node {
             position_type: PositionType::Absolute,
-            left: px(14),
-            bottom: px(140),
+            // godot: selection/unit panel sits bottom-center (between minimap and command grid).
+            left: px(200),
+            bottom: px(12),
             width: px(64),
             height: px(64),
             border: UiRect::all(px(2)),
@@ -13207,14 +13209,16 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
         .spawn((
             Node {
                 position_type: PositionType::Absolute,
-                left: px(14),
-                bottom: px(142),
-                width: px(790),
+                // godot: production queue sits directly above the command grid (bottom-right).
+                right: px(12),
+                bottom: px(340),
+                width: px(612),
                 height: px(88),
                 flex_wrap: FlexWrap::Wrap,
                 column_gap: px(6),
                 row_gap: px(6),
                 align_items: AlignItems::Center,
+                justify_content: JustifyContent::FlexEnd,
                 ..default()
             },
             MatchScopedEntity,
@@ -13239,14 +13243,17 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
         .spawn((
             Node {
                 position_type: PositionType::Absolute,
-                left: px(14),
-                right: px(14),
-                bottom: px(14),
-                height: px(118),
+                // godot: command/action grid pinned to the bottom-right corner.
+                right: px(12),
+                bottom: px(12),
+                width: px(612),
+                height: px(316),
                 flex_wrap: FlexWrap::Wrap,
                 column_gap: px(8),
                 row_gap: px(8),
+                align_content: AlignContent::FlexEnd,
                 align_items: AlignItems::Center,
+                justify_content: JustifyContent::FlexEnd,
                 ..default()
             },
             MatchScopedEntity,
@@ -13287,7 +13294,7 @@ fn setup_minimap(commands: &mut Commands, font: Handle<Font>) {
             MinimapRoot,
             Node {
                 position_type: PositionType::Absolute,
-                right: px(MINIMAP_RIGHT_PX),
+                left: px(MINIMAP_LEFT_PX),
                 bottom: px(MINIMAP_BOTTOM_PX),
                 width: px(MINIMAP_SIZE_PX),
                 height: px(MINIMAP_SIZE_PX),
@@ -28995,7 +29002,7 @@ fn cursor_minimap_local(window: &Window) -> Option<Vec2> {
 
 fn minimap_screen_min(window: &Window) -> Vec2 {
     Vec2::new(
-        window.width() - MINIMAP_RIGHT_PX - MINIMAP_SIZE_PX,
+        MINIMAP_LEFT_PX,
         window.height() - MINIMAP_BOTTOM_PX - MINIMAP_SIZE_PX,
     )
 }
