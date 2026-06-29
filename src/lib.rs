@@ -18937,6 +18937,7 @@ fn refresh_command_panel(
         &Interaction,
         &mut BackgroundColor,
         &mut BorderColor,
+        &mut Node,
     )>,
     mut label_q: Query<(&CommandSlotLabel, &mut Text, &mut TextColor)>,
     asset_server: Res<AssetServer>,
@@ -18960,12 +18961,14 @@ fn refresh_command_panel(
             }
         };
     let Some(visible_team) = controlled_player_team(Some(&*visible_player)) else {
-        for (slot, mut action, mut availability, interaction, mut background, mut border) in
+        for (slot, mut action, mut availability, interaction, mut background, mut border, mut node) in
             &mut slot_q
         {
             let _ = slot;
             *action = BuildAction::None;
             availability.enabled = false;
+            // No controlled selection -> collapse every slot so no empty grid shows.
+            node.display = Display::None;
             let (bg, border_color) = command_button_colors(BuildAction::None, false, *interaction);
             *background = BackgroundColor(bg);
             *border = BorderColor::all(border_color);
@@ -18987,7 +18990,8 @@ fn refresh_command_panel(
         &selected_structures,
         &structures,
     );
-    for (slot, mut action, mut availability, interaction, mut background, mut border) in &mut slot_q
+    for (slot, mut action, mut availability, interaction, mut background, mut border, mut node) in
+        &mut slot_q
     {
         let next_action = actions.get(slot.0).copied().unwrap_or(BuildAction::None);
         let enabled = command_action_enabled_for_panel(
@@ -19002,6 +19006,13 @@ fn refresh_command_panel(
         );
         *action = next_action;
         availability.enabled = enabled;
+        // Collapse empty slots so the grid only shows the unit's actual commands
+        // (combat units have a few; workers fill many).
+        node.display = if matches!(next_action, BuildAction::None) {
+            Display::None
+        } else {
+            Display::Flex
+        };
         let (bg, border_color) = command_button_colors(next_action, enabled, *interaction);
         *background = BackgroundColor(bg);
         *border = BorderColor::all(border_color);
