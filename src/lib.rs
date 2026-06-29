@@ -2,8 +2,8 @@
 use bevy::audio::Volume;
 use bevy::{
     asset::{AssetMetaCheck, AssetPlugin},
-    camera::primitives::Aabb,
     camera::RenderTarget,
+    camera::primitives::Aabb,
     ecs::query::Or,
     ecs::system::SystemParam,
     gizmos::config::{GizmoConfigGroup, GizmoConfigStore},
@@ -14,7 +14,9 @@ use bevy::{
     window::{PrimaryWindow, WindowMode, WindowResolution},
 };
 use bevy_common_assets::{json::JsonAssetPlugin, ron::RonAssetPlugin};
-use bevy_rts_camera::{RtsCamera as RtsCam, RtsCameraControls, RtsCameraPlugin, RtsCameraSystemSet};
+use bevy_rts_camera::{
+    RtsCamera as RtsCam, RtsCameraControls, RtsCameraPlugin, RtsCameraSystemSet,
+};
 use serde::Deserialize;
 use std::collections::{BTreeMap, VecDeque};
 
@@ -1824,7 +1826,7 @@ impl SkirmishMenuSelection {
         if self.map_choice_is_random() {
             random_map_label()
         } else {
-            self.map().name
+            localized_skirmish_map_name(self.map())
         }
     }
 
@@ -2361,6 +2363,16 @@ impl SkirmishStartStatus {
 
 fn random_map_label() -> &'static str {
     t("随机地图", "Random Map")
+}
+
+fn localized_skirmish_map_name(map: &SkirmishMapDef) -> &'static str {
+    match map.name_key {
+        "MAP_NAME_PLAIN_AND_SIMPLE" => t("简明战场", "Plain & Simple"),
+        "MAP_NAME_FOUR_CORNERS" => t("四角战场", "Four Corners"),
+        "MAP_NAME_TECH_DIVIDE" => t("科技分界线", "Tech Divide"),
+        "MAP_NAME_BIG_ARENA" => t("大型竞技场", "Big Arena"),
+        _ => map.name,
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -6170,6 +6182,7 @@ impl Default for Locale {
 }
 
 static CURRENT_LANGUAGE: std::sync::atomic::AtomicU8 = std::sync::atomic::AtomicU8::new(0);
+const UI_FONT_PATH: &str = "fonts/wqy-microhei-ui.full.ttf";
 
 fn set_current_language(language: Language) {
     let value = match language {
@@ -7430,7 +7443,7 @@ fn setup_menu_backdrop(
 }
 
 fn setup_front_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+    let font = asset_server.load(UI_FONT_PATH);
     commands.spawn((
         Name::new("Main Menu Camera"),
         Camera2d,
@@ -7734,7 +7747,7 @@ fn setup_options_menu(
     asset_server: Res<AssetServer>,
     options: Res<MenuOptionsState>,
 ) {
-    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+    let font = asset_server.load(UI_FONT_PATH);
     commands.spawn((
         Name::new("Options Menu Camera"),
         Camera2d,
@@ -7898,9 +7911,10 @@ fn setup_options_menu(
                                     ..default()
                                 },
                             ));
-                            row.spawn(options_small_button(down)).with_children(|button| {
-                                button.spawn(options_button_text("-", font.clone(), 16.0));
-                            });
+                            row.spawn(options_small_button(down))
+                                .with_children(|button| {
+                                    button.spawn(options_button_text("-", font.clone(), 16.0));
+                                });
                             row.spawn(options_slider_bar_node(value));
                             row.spawn(options_small_button(up)).with_children(|button| {
                                 button.spawn(options_button_text("+", font.clone(), 16.0));
@@ -8211,13 +8225,13 @@ fn options_menu_buttons(
                     rebuild = true;
                 }
                 OptionsMenuAction::CameraPanSpeedUp => {
-                    options.camera_pan_speed =
-                        (options.camera_pan_speed + CAMERA_PAN_SPEED_STEP).min(CAMERA_PAN_SPEED_MAX);
+                    options.camera_pan_speed = (options.camera_pan_speed + CAMERA_PAN_SPEED_STEP)
+                        .min(CAMERA_PAN_SPEED_MAX);
                     rebuild = true;
                 }
                 OptionsMenuAction::CameraPanSpeedDown => {
-                    options.camera_pan_speed =
-                        (options.camera_pan_speed - CAMERA_PAN_SPEED_STEP).max(CAMERA_PAN_SPEED_MIN);
+                    options.camera_pan_speed = (options.camera_pan_speed - CAMERA_PAN_SPEED_STEP)
+                        .max(CAMERA_PAN_SPEED_MIN);
                     rebuild = true;
                 }
                 OptionsMenuAction::ToggleEdgePan => {
@@ -8239,7 +8253,7 @@ fn options_menu_buttons(
 }
 
 fn setup_credits_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+    let font = asset_server.load(UI_FONT_PATH);
     commands.spawn((
         Name::new("Credits Menu Camera"),
         Camera2d,
@@ -8332,7 +8346,7 @@ fn setup_main_menu(
     asset_server: Res<AssetServer>,
     selection: Res<SkirmishMenuSelection>,
 ) {
-    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+    let font = asset_server.load(UI_FONT_PATH);
 
     commands.spawn((
         Name::new("Skirmish Menu Camera"),
@@ -8618,7 +8632,7 @@ fn spawn_menu_map_resource_controls(
     );
 }
 
-/// A labelled inline dropdown (toggle button showing the current value + ▾; when
+/// A labelled inline dropdown (toggle button showing the current value; when
 /// open, the option list expands below). Used for the 地图 + 初始资源 selectors.
 /// Z layer for menu dropdown popups — above all other menu UI. The menu screen and
 /// the in-match HUD are never on screen together, so this won't collide with HUD
@@ -8653,7 +8667,7 @@ fn menu_dropdown_flex_cell_node(basis: f32) -> Node {
 }
 
 /// Spawns a godot-OptionButton-style dropdown INTO an already-spawned cell: the
-/// toggle button (current value + ▾) and, when `open`, a floating popup of options
+/// toggle button (current value) and, when `open`, a floating popup of options
 /// absolutely positioned just below it with a high `GlobalZIndex` so it overlays the
 /// rows beneath instead of pushing them down. The popup is a child of the cell, so
 /// it's despawned with it on the next rebuild.
@@ -8669,7 +8683,12 @@ fn spawn_menu_dropdown_contents(
 ) {
     cell.spawn(menu_button(toggle, Val::Percent(100.0)))
         .with_children(|button| {
-            button.spawn(menu_action_button_label(toggle, selection, font.clone(), font_size));
+            button.spawn(menu_action_button_label(
+                toggle,
+                selection,
+                font.clone(),
+                font_size,
+            ));
         });
     if !open {
         return;
@@ -8774,11 +8793,12 @@ fn spawn_menu_inline_dropdown(
         MainMenuMapResourceControlElement,
     ));
     parent
-        .spawn((menu_dropdown_cell_node(240.0), MainMenuMapResourceControlElement))
+        .spawn((
+            menu_dropdown_cell_node(240.0),
+            MainMenuMapResourceControlElement,
+        ))
         .with_children(|cell| {
-            spawn_menu_dropdown_contents(
-                cell, toggle, open, options, selection, font, 240.0, 12.0,
-            );
+            spawn_menu_dropdown_contents(cell, toggle, open, options, selection, font, 240.0, 12.0);
         });
 }
 
@@ -8812,14 +8832,14 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
         }
         MainMenuAction::SelectMap(index) => SKIRMISH_MAPS
             .get(index)
-            .map(|map| format!("{} {}", index + 1, map.name))
+            .map(|map| format!("{} {}", index + 1, localized_skirmish_map_name(map)))
             .unwrap_or_else(|| t("地图", "Map").to_string()),
         MainMenuAction::SelectStartingResources(index) => GODOT_STARTING_RESOURCE_OPTIONS
             .get(index)
             .map(|option| format!("{} {}", index + 5, starting_resource_option_label(option)))
             .unwrap_or_else(|| t("资源", "Resources").to_string()),
         MainMenuAction::ToggleLobbySlotController(slot) => format!(
-            "{} \u{25BE}",
+            "{}",
             selection
                 .lobby_controllers
                 .get(slot)
@@ -8831,7 +8851,7 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
             controller.short_label().to_string()
         }
         MainMenuAction::ToggleLobbySlotFaction(slot) => format!(
-            "{} \u{25BE}",
+            "{}",
             selection
                 .lobby_factions
                 .get(slot)
@@ -8841,7 +8861,7 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
         ),
         MainMenuAction::SetLobbySlotFaction(_, faction) => faction.label().to_string(),
         MainMenuAction::ToggleLobbySlotTeam(slot) => format!(
-            "{} \u{25BE}",
+            "{}",
             skirmish_team_label(
                 selection.lobby_team_ids.get(slot).copied().unwrap_or(0) as usize
                     % SKIRMISH_TEAM_OPTION_COUNT as usize
@@ -8849,7 +8869,7 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
         ),
         MainMenuAction::SetLobbySlotTeam(_, team_index) => skirmish_team_label(team_index),
         MainMenuAction::ToggleLobbySlotColor(slot) => format!(
-            "{} \u{25BE}",
+            "{}",
             skirmish_color_label(
                 selection
                     .lobby_color_slots
@@ -8860,15 +8880,13 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
             )
         ),
         MainMenuAction::SetLobbySlotColor(_, color_index) => skirmish_color_label(color_index),
-        MainMenuAction::ToggleMapDropdown => format!(
-            "{} \u{25BE}",
-            SKIRMISH_MAPS
-                .get(selection.map_index)
-                .map(|map| map.name)
-                .unwrap_or("Map")
-        ),
+        MainMenuAction::ToggleMapDropdown => SKIRMISH_MAPS
+            .get(selection.map_index)
+            .map(localized_skirmish_map_name)
+            .unwrap_or(t("地图", "Map"))
+            .to_string(),
         MainMenuAction::ToggleResourcesDropdown => format!(
-            "{} \u{25BE}",
+            "{}",
             GODOT_STARTING_RESOURCE_OPTIONS
                 .get(selection.starting_resource_index)
                 .map(|option| starting_resource_option_label(option).to_string())
@@ -8965,113 +8983,117 @@ fn spawn_menu_lobby_slot_row(
 
             let _ = (active, status);
             // Controller dropdown (floating popup): 关闭 / 我方 / 傻瓜~困难 AI.
-            row.spawn(menu_dropdown_flex_cell_node(84.0)).with_children(|cell| {
-                let options: Vec<MainMenuAction> = [
-                    SkirmishPlayerController::None,
-                    SkirmishPlayerController::Human,
-                    SkirmishPlayerController::Ai(AiDifficulty::Beginner),
-                    SkirmishPlayerController::Ai(AiDifficulty::Easy),
-                    SkirmishPlayerController::Ai(AiDifficulty::Normal),
-                    SkirmishPlayerController::Ai(AiDifficulty::Hard),
-                ]
-                .into_iter()
-                .map(|c| MainMenuAction::SetLobbySlotController(slot, c))
-                .collect();
-                spawn_menu_dropdown_contents(
-                    cell,
-                    MainMenuAction::ToggleLobbySlotController(slot),
-                    selection.controller_dropdown_open == Some(slot),
-                    &options,
-                    selection,
-                    font.clone(),
-                    84.0,
-                    13.0,
-                );
-            });
+            row.spawn(menu_dropdown_flex_cell_node(84.0))
+                .with_children(|cell| {
+                    let options: Vec<MainMenuAction> = [
+                        SkirmishPlayerController::None,
+                        SkirmishPlayerController::Human,
+                        SkirmishPlayerController::Ai(AiDifficulty::Beginner),
+                        SkirmishPlayerController::Ai(AiDifficulty::Easy),
+                        SkirmishPlayerController::Ai(AiDifficulty::Normal),
+                        SkirmishPlayerController::Ai(AiDifficulty::Hard),
+                    ]
+                    .into_iter()
+                    .map(|c| MainMenuAction::SetLobbySlotController(slot, c))
+                    .collect();
+                    spawn_menu_dropdown_contents(
+                        cell,
+                        MainMenuAction::ToggleLobbySlotController(slot),
+                        selection.controller_dropdown_open == Some(slot),
+                        &options,
+                        selection,
+                        font.clone(),
+                        84.0,
+                        13.0,
+                    );
+                });
 
             // Faction dropdown (floating popup) with emblems: 苍穹联盟 / 炽炎魔军 / 混沌裂隙.
-            row.spawn(menu_dropdown_flex_cell_node(96.0)).with_children(|cell| {
-                let current = selection
-                    .lobby_factions
-                    .get(slot)
-                    .copied()
-                    .unwrap_or(SkirmishFaction::Alliance);
-                spawn_faction_dropdown_button(
-                    cell,
-                    MainMenuAction::ToggleLobbySlotFaction(slot),
-                    current,
-                    faction_emblems,
-                    selection,
-                    font.clone(),
-                    Val::Percent(100.0),
-                );
-                if selection.faction_dropdown_open == Some(slot) {
-                    cell.spawn((
-                        Node {
-                            position_type: PositionType::Absolute,
-                            top: Val::Percent(100.0),
-                            left: px(0),
-                            min_width: px(124.0),
-                            flex_direction: FlexDirection::Column,
-                            align_items: AlignItems::Stretch,
-                            row_gap: px(1),
-                            padding: UiRect::all(px(2)),
-                            border: UiRect::all(px(1)),
-                            ..default()
-                        },
-                        BorderColor::all(Color::srgb(0.45, 0.56, 0.52)),
-                        BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.98)),
-                        GlobalZIndex(MENU_DROPDOWN_POPUP_Z),
-                    ))
-                    .with_children(|popup| {
-                        for faction in SkirmishFaction::ALL {
-                            spawn_faction_dropdown_button(
-                                popup,
-                                MainMenuAction::SetLobbySlotFaction(slot, faction),
-                                faction,
-                                faction_emblems,
-                                selection,
-                                font.clone(),
-                                px(124.0),
-                            );
-                        }
-                    });
-                }
-            });
+            row.spawn(menu_dropdown_flex_cell_node(96.0))
+                .with_children(|cell| {
+                    let current = selection
+                        .lobby_factions
+                        .get(slot)
+                        .copied()
+                        .unwrap_or(SkirmishFaction::Alliance);
+                    spawn_faction_dropdown_button(
+                        cell,
+                        MainMenuAction::ToggleLobbySlotFaction(slot),
+                        current,
+                        faction_emblems,
+                        selection,
+                        font.clone(),
+                        Val::Percent(100.0),
+                    );
+                    if selection.faction_dropdown_open == Some(slot) {
+                        cell.spawn((
+                            Node {
+                                position_type: PositionType::Absolute,
+                                top: Val::Percent(100.0),
+                                left: px(0),
+                                min_width: px(124.0),
+                                flex_direction: FlexDirection::Column,
+                                align_items: AlignItems::Stretch,
+                                row_gap: px(1),
+                                padding: UiRect::all(px(2)),
+                                border: UiRect::all(px(1)),
+                                ..default()
+                            },
+                            BorderColor::all(Color::srgb(0.45, 0.56, 0.52)),
+                            BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.98)),
+                            GlobalZIndex(MENU_DROPDOWN_POPUP_Z),
+                        ))
+                        .with_children(|popup| {
+                            for faction in SkirmishFaction::ALL {
+                                spawn_faction_dropdown_button(
+                                    popup,
+                                    MainMenuAction::SetLobbySlotFaction(slot, faction),
+                                    faction,
+                                    faction_emblems,
+                                    selection,
+                                    font.clone(),
+                                    px(124.0),
+                                );
+                            }
+                        });
+                    }
+                });
 
             // Team dropdown (floating popup): 队1 … 队N.
-            row.spawn(menu_dropdown_flex_cell_node(72.0)).with_children(|cell| {
-                let options: Vec<MainMenuAction> = (0..SKIRMISH_TEAM_OPTION_COUNT as usize)
-                    .map(|t| MainMenuAction::SetLobbySlotTeam(slot, t))
-                    .collect();
-                spawn_menu_dropdown_contents(
-                    cell,
-                    MainMenuAction::ToggleLobbySlotTeam(slot),
-                    selection.team_dropdown_open == Some(slot),
-                    &options,
-                    selection,
-                    font.clone(),
-                    72.0,
-                    13.0,
-                );
-            });
+            row.spawn(menu_dropdown_flex_cell_node(72.0))
+                .with_children(|cell| {
+                    let options: Vec<MainMenuAction> = (0..SKIRMISH_TEAM_OPTION_COUNT as usize)
+                        .map(|t| MainMenuAction::SetLobbySlotTeam(slot, t))
+                        .collect();
+                    spawn_menu_dropdown_contents(
+                        cell,
+                        MainMenuAction::ToggleLobbySlotTeam(slot),
+                        selection.team_dropdown_open == Some(slot),
+                        &options,
+                        selection,
+                        font.clone(),
+                        72.0,
+                        13.0,
+                    );
+                });
 
             // Color dropdown (floating popup): 色1 … 色N.
-            row.spawn(menu_dropdown_flex_cell_node(72.0)).with_children(|cell| {
-                let options: Vec<MainMenuAction> = (0..PLAYER_COLOR_PALETTE.len())
-                    .map(|c| MainMenuAction::SetLobbySlotColor(slot, c))
-                    .collect();
-                spawn_menu_dropdown_contents(
-                    cell,
-                    MainMenuAction::ToggleLobbySlotColor(slot),
-                    selection.color_dropdown_open == Some(slot),
-                    &options,
-                    selection,
-                    font.clone(),
-                    72.0,
-                    13.0,
-                );
-            });
+            row.spawn(menu_dropdown_flex_cell_node(72.0))
+                .with_children(|cell| {
+                    let options: Vec<MainMenuAction> = (0..PLAYER_COLOR_PALETTE.len())
+                        .map(|c| MainMenuAction::SetLobbySlotColor(slot, c))
+                        .collect();
+                    spawn_menu_dropdown_contents(
+                        cell,
+                        MainMenuAction::ToggleLobbySlotColor(slot),
+                        selection.color_dropdown_open == Some(slot),
+                        &options,
+                        selection,
+                        font.clone(),
+                        72.0,
+                        13.0,
+                    );
+                });
         });
 }
 
@@ -9696,7 +9718,11 @@ fn main_menu_button_visual(
     // the palette swatch), and mark the current pick with a bright border.
     let swatch = match action {
         MainMenuAction::ToggleLobbySlotColor(slot) => Some(
-            selection.lobby_color_slots.get(slot).copied().unwrap_or(slot)
+            selection
+                .lobby_color_slots
+                .get(slot)
+                .copied()
+                .unwrap_or(slot)
                 % PLAYER_COLOR_PALETTE.len(),
         ),
         MainMenuAction::SetLobbySlotColor(_, index) => Some(index % PLAYER_COLOR_PALETTE.len()),
@@ -13078,7 +13104,7 @@ fn update_selection_text_visibility(
 }
 
 fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
-    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+    let font = asset_server.load(UI_FONT_PATH);
 
     // Top-left resource/power bar (godot ResourcesBar): colored swatch + count per
     // resource, then a color-coded power readout + a low-power warning.
@@ -18216,7 +18242,7 @@ fn update_match_menu_overlay(
         **text = format!(
             "{}: {}\n{}: {}  {}: {:02}:{:02}\n{}: {}\n{} {}  {} {}  {} {}/{}",
             t("地图", "Map"),
-            selected_map.definition().name,
+            localized_skirmish_map_name(selected_map.definition()),
             perspective_label,
             visible_player.team.label(),
             t("用时", "Time"),
@@ -19003,8 +19029,15 @@ fn refresh_command_panel(
             }
         };
     let Some(visible_team) = controlled_player_team(Some(&*visible_player)) else {
-        for (slot, mut action, mut availability, interaction, mut background, mut border, mut node) in
-            &mut slot_q
+        for (
+            slot,
+            mut action,
+            mut availability,
+            interaction,
+            mut background,
+            mut border,
+            mut node,
+        ) in &mut slot_q
         {
             let _ = slot;
             *action = BuildAction::None;
@@ -25205,7 +25238,12 @@ fn resolve_harvest_resource_target(
     // When the node runs out, retarget to the nearest node of the SAME mineral type
     // so a crystal harvester doesn't auto-run to ore (or vice-versa). Only fall back
     // to "any nearest" when this harvester hasn't gathered anything yet (no kind).
-    nearest_resource_entity(position, prefer_kind, resources, Some(RESOURCE_SEARCH_RADIUS_M))
+    nearest_resource_entity(
+        position,
+        prefer_kind,
+        resources,
+        Some(RESOURCE_SEARCH_RADIUS_M),
+    )
 }
 
 fn nearest_resource_entity(
@@ -27748,7 +27786,6 @@ struct ProductionQueueHudEntry {
     count: usize,
 }
 
-
 fn render_production_queue_slots(
     team: Team,
     build_queue: &BuildQueue,
@@ -27866,7 +27903,12 @@ fn production_queue_slot_text(
     } else {
         t("生产", "Producing")
     };
-    format!("{} {:.0}%\n{}", compact_label(&label), entry.progress, status)
+    format!(
+        "{} {:.0}%\n{}",
+        compact_label(&label),
+        entry.progress,
+        status
+    )
 }
 
 /// The ×N badge text for an aggregated slot (empty when only one is queued).
@@ -27900,7 +27942,6 @@ fn structure_has_production_queue(structure_id: &str) -> bool {
         "CommandCenter" | "Barracks" | "VehicleFactory" | "AircraftFactory"
     )
 }
-
 
 fn production_job_progress(job: &BuildJob, def: &registry::EntityDef) -> f32 {
     if def.build_seconds <= 0.0 {
