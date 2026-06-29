@@ -7194,6 +7194,10 @@ struct ProductionQueueSlot(usize);
 #[derive(Component, Clone, Copy)]
 struct ProductionQueueSlotLabel(usize);
 
+/// The "×N" count badge in a queued slot's bottom-right corner (aggregated units).
+#[derive(Component, Clone, Copy)]
+struct ProductionQueueSlotCount(usize);
+
 #[derive(Component, Clone, Copy, Default)]
 struct ProductionQueueSlotTarget {
     producer_entity: Option<Entity>,
@@ -13268,67 +13272,71 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
         MatchScopedEntity,
     ));
 
-    let queue_font = font.clone();
-    commands
-        .spawn((
-            Node {
-                position_type: PositionType::Absolute,
-                // godot: production queue sits directly above the command grid (bottom-right).
-                right: px(12),
-                bottom: px(340),
-                width: px(612),
-                height: px(88),
-                flex_wrap: FlexWrap::Wrap,
-                column_gap: px(6),
-                row_gap: px(6),
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::FlexEnd,
-                ..default()
-            },
-            MatchScopedEntity,
-        ))
-        .with_children(|parent| {
-            for index in 0..PRODUCTION_QUEUE_HUD_SLOT_COUNT {
-                parent
-                    .spawn(production_queue_slot(index))
-                    .with_children(|slot| {
-                        slot.spawn(production_queue_slot_label(index, queue_font.clone()));
-                    });
-            }
-        });
-
     setup_minimap(commands, font.clone());
     setup_selection_drag_box(commands);
     setup_match_end_overlay(commands, font.clone());
     setup_match_menu_overlay(commands, font.clone());
     setup_match_briefing(commands, font.clone());
 
+    // godot: production queue stacked directly above the command grid, both pinned to
+    // the bottom-right corner. A column container so the queue always hugs the top of
+    // the grid (no floating) and both size to their content.
+    let queue_font = font.clone();
     commands
         .spawn((
             Node {
                 position_type: PositionType::Absolute,
-                // godot: command/action grid pinned to the bottom-right corner.
                 right: px(12),
                 bottom: px(12),
                 width: px(612),
-                height: px(316),
-                flex_wrap: FlexWrap::Wrap,
-                column_gap: px(8),
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Stretch,
                 row_gap: px(8),
-                align_content: AlignContent::FlexEnd,
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::FlexEnd,
                 ..default()
             },
             MatchScopedEntity,
         ))
-        .with_children(|parent| {
-            for index in 0..COMMAND_SLOT_COUNT {
-                parent.spawn(command_button(index)).with_children(|button| {
-                    button.spawn(command_button_icon(index));
-                    button.spawn(command_button_label(index, font.clone()));
+        .with_children(|stack| {
+            // Production queue row (above the command grid).
+            stack
+                .spawn(Node {
+                    width: Val::Percent(100.0),
+                    flex_wrap: FlexWrap::Wrap,
+                    column_gap: px(6),
+                    row_gap: px(6),
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::FlexEnd,
+                    ..default()
+                })
+                .with_children(|parent| {
+                    for index in 0..PRODUCTION_QUEUE_HUD_SLOT_COUNT {
+                        parent
+                            .spawn(production_queue_slot(index))
+                            .with_children(|slot| {
+                                slot.spawn(production_queue_slot_label(index, queue_font.clone()));
+                                slot.spawn(production_queue_slot_count(index, queue_font.clone()));
+                            });
+                    }
                 });
-            }
+            // Command/action grid (below).
+            stack
+                .spawn(Node {
+                    width: Val::Percent(100.0),
+                    flex_wrap: FlexWrap::Wrap,
+                    column_gap: px(8),
+                    row_gap: px(8),
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::FlexEnd,
+                    ..default()
+                })
+                .with_children(|parent| {
+                    for index in 0..COMMAND_SLOT_COUNT {
+                        parent.spawn(command_button(index)).with_children(|button| {
+                            button.spawn(command_button_icon(index));
+                            button.spawn(command_button_label(index, font.clone()));
+                        });
+                    }
+                });
         });
 }
 
@@ -15187,6 +15195,26 @@ fn production_queue_slot_label(index: usize, font: Handle<Font>) -> impl Bundle 
         TextColor(Color::srgb(0.88, 0.94, 0.96)),
         ProductionQueueSlotLabel(index),
         ButtonLabel,
+    )
+}
+
+/// The "×N" count badge anchored to a queued slot's bottom-right corner.
+fn production_queue_slot_count(index: usize, font: Handle<Font>) -> impl Bundle {
+    (
+        Text::new(""),
+        TextFont {
+            font: font.into(),
+            font_size: FontSize::Px(11.0),
+            ..default()
+        },
+        TextColor(Color::srgb(0.98, 0.86, 0.42)),
+        Node {
+            position_type: PositionType::Absolute,
+            right: px(3),
+            bottom: px(1),
+            ..default()
+        },
+        ProductionQueueSlotCount(index),
     )
 }
 
@@ -27390,6 +27418,7 @@ fn update_hud(
         &mut ProductionQueueSlotTarget,
         &mut BackgroundColor,
         &mut Visibility,
+        &mut Node,
     )>,
     mut production_queue_slot_labels: Query<
         (&ProductionQueueSlotLabel, &mut Text),
@@ -27397,6 +27426,16 @@ fn update_hud(
             Without<StatsText>,
             Without<SelectionText>,
             Without<ObjectiveTrackerText>,
+            Without<ProductionQueueSlotCount>,
+        ),
+    >,
+    mut production_queue_slot_counts: Query<
+        (&ProductionQueueSlotCount, &mut Text),
+        (
+            Without<StatsText>,
+            Without<SelectionText>,
+            Without<ObjectiveTrackerText>,
+            Without<ProductionQueueSlotLabel>,
         ),
     >,
     command_mode: Res<CommandMode>,
@@ -27492,6 +27531,7 @@ fn update_hud(
             observed_queue_producers,
             &mut production_queue_slots,
             &mut production_queue_slot_labels,
+            &mut production_queue_slot_counts,
         );
     }
 }
@@ -27700,6 +27740,8 @@ struct ProductionQueueHudEntry {
     action: BuildAction,
     progress: f32,
     active: bool,
+    /// How many consecutive same-type jobs this slot aggregates (shown as ×N).
+    count: usize,
 }
 
 
@@ -27713,6 +27755,7 @@ fn render_production_queue_slots(
         &mut ProductionQueueSlotTarget,
         &mut BackgroundColor,
         &mut Visibility,
+        &mut Node,
     )>,
     labels: &mut Query<
         (&ProductionQueueSlotLabel, &mut Text),
@@ -27720,19 +27763,32 @@ fn render_production_queue_slots(
             Without<StatsText>,
             Without<SelectionText>,
             Without<ObjectiveTrackerText>,
+            Without<ProductionQueueSlotCount>,
+        ),
+    >,
+    counts: &mut Query<
+        (&ProductionQueueSlotCount, &mut Text),
+        (
+            Without<StatsText>,
+            Without<SelectionText>,
+            Without<ObjectiveTrackerText>,
+            Without<ProductionQueueSlotLabel>,
         ),
     >,
 ) {
     let entries = production_queue_hud_entries(team, build_queue, producer_entities);
-    for (slot, mut target, mut color, mut visibility) in slots {
+    for (slot, mut target, mut color, mut visibility, mut node) in slots {
         if let Some(entry) = entries.get(slot.0).copied() {
             target.producer_entity = Some(entry.producer_entity);
             target.local_index = entry.local_index;
             *visibility = Visibility::Visible;
+            node.display = Display::Flex;
             *color = BackgroundColor(production_queue_slot_color(team, entry, economies));
         } else {
             *target = ProductionQueueSlotTarget::default();
             *visibility = Visibility::Hidden;
+            // Collapse empty slots so the queue row shrinks to the queued items.
+            node.display = Display::None;
             *color = BackgroundColor(Color::srgba(0.025, 0.035, 0.045, 0.9));
         }
     }
@@ -27742,6 +27798,12 @@ fn render_production_queue_slots(
             .map(|entry| production_queue_slot_text(team, label.0, *entry, economies))
             .unwrap_or_default();
     }
+    for (count, mut text) in counts {
+        **text = entries
+            .get(count.0)
+            .map(|entry| production_queue_slot_count_text(*entry))
+            .unwrap_or_default();
+    }
 }
 
 fn production_queue_hud_entries(
@@ -27749,7 +27811,7 @@ fn production_queue_hud_entries(
     build_queue: &BuildQueue,
     producer_entities: &[Entity],
 ) -> Vec<ProductionQueueHudEntry> {
-    let mut entries = Vec::new();
+    let mut entries: Vec<ProductionQueueHudEntry> = Vec::new();
     for producer_entity in producer_entities {
         let mut local_index = 0usize;
         for job in build_queue
@@ -27757,6 +27819,15 @@ fn production_queue_hud_entries(
             .iter()
             .filter(|job| job.team == team && job.producer_entity == *producer_entity)
         {
+            // Aggregate consecutive same-type jobs into one slot with a ×N count
+            // (e.g. queueing 3 workers shows one 工人 slot, not three).
+            if let Some(last) = entries.last_mut() {
+                if last.producer_entity == *producer_entity && last.action == job.action {
+                    last.count += 1;
+                    local_index += 1;
+                    continue;
+                }
+            }
             let progress = registry::entity(build_target_product(job.action))
                 .map(|def| production_job_progress(job, def))
                 .unwrap_or(100.0);
@@ -27766,6 +27837,7 @@ fn production_queue_hud_entries(
                 action: job.action,
                 progress,
                 active: local_index == 0,
+                count: 1,
             });
             local_index += 1;
         }
@@ -27775,7 +27847,7 @@ fn production_queue_hud_entries(
 
 fn production_queue_slot_text(
     team: Team,
-    display_index: usize,
+    _display_index: usize,
     entry: ProductionQueueHudEntry,
     economies: &Economies,
 ) -> String {
@@ -27790,13 +27862,16 @@ fn production_queue_slot_text(
     } else {
         t("生产", "Producing")
     };
-    format!(
-        "{} {} {:.0}%\n{}",
-        display_index + 1,
-        compact_label(&label),
-        entry.progress,
-        status
-    )
+    format!("{} {:.0}%\n{}", compact_label(&label), entry.progress, status)
+}
+
+/// The ×N badge text for an aggregated slot (empty when only one is queued).
+fn production_queue_slot_count_text(entry: ProductionQueueHudEntry) -> String {
+    if entry.count > 1 {
+        format!("×{}", entry.count)
+    } else {
+        String::new()
+    }
 }
 
 fn production_queue_slot_color(
