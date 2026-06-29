@@ -35,7 +35,7 @@ use bevy_open_rts::{
     capture_nearest_visible_resource_click_position_to, capture_nearest_visible_resource_position,
     capture_onscreen_resource_model_center, capture_placement_is_valid,
     capture_player_army_unit_count, capture_player_attack_move_all, capture_player_build_queue_len,
-    capture_player_combat_order_count, capture_player_command_center,
+    capture_player_combat_order_count, capture_player_command_center, capture_set_structure_rally,
     capture_player_completed_structure_count, capture_player_completed_structure_position,
     capture_player_constructing_count, capture_player_harvesting_count,
     capture_player_in_placement_mode, capture_player_onscreen_unit_position,
@@ -1120,6 +1120,12 @@ fn render_base_selection(path: &Path) -> Result<(), String> {
             screen.y,
             capture_entity_is_selected(&mut app, entity)
         );
+    }
+
+    // Plant a rally point so the rally-flag visual is exercised in the screenshot.
+    capture_set_structure_rally(&mut app, entity, origin + bevy::prelude::Vec3::new(6.0, 0.0, 8.0));
+    for _ in 0..4 {
+        app.update();
     }
 
     let handle = capture_handle(&app);

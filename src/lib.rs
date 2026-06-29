@@ -4943,6 +4943,14 @@ pub fn capture_entity_is_selected(app: &mut App, entity: Entity) -> bool {
     app.world().get::<Selected>(entity).is_some()
 }
 
+/// Sets a rally point on the given structure (capture aid for the rally-flag visual).
+pub fn capture_set_structure_rally(app: &mut App, structure: Entity, target: Vec3) {
+    if let Some(mut rally) = app.world_mut().get_mut::<RallyPoint>(structure) {
+        rally.target = Some(target);
+        rally.target_unit = None;
+    }
+}
+
 /// IDs of currently-selected player units, for capture diagnostics.
 pub fn capture_selected_player_unit_ids(app: &mut App) -> Vec<&'static str> {
     let world = app.world_mut();
@@ -5779,6 +5787,9 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
                 .before(draw_world_overlays)
                 .run_if(match_in_progress),
             draw_world_overlays
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
+            draw_selected_rally_flags
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
         ),
@@ -28807,6 +28818,43 @@ fn air_to_terrain_marker_color(team: Team, visible_team: Team) -> Option<Color> 
         Some(Color::srgba(0.3, 0.95, 0.65, 0.8))
     } else {
         Some(Color::srgba(1.0, 0.28, 0.2, 0.8))
+    }
+}
+
+/// Draws a rally flag at each selected production structure's rally point (plus a
+/// line from the building to it), so setting a rally with right-click gives the
+/// player clear feedback — a planted flag — instead of nothing.
+fn draw_selected_rally_flags(
+    mut gizmos: Gizmos<HudGizmos>,
+    visible_player: Res<VisiblePlayer>,
+    selected: Query<(&Transform, &Team, &RallyPoint), (With<Selected>, With<Structure>)>,
+) {
+    let color = Color::srgb(0.55, 0.95, 0.62);
+    let faint = Color::srgba(0.55, 0.95, 0.62, 0.4);
+    for (transform, team, rally) in &selected {
+        if *team != visible_player.team {
+            continue;
+        }
+        let Some(target) = rally.target else {
+            continue;
+        };
+        let base = transform.translation + Vec3::Y * 0.2;
+        let foot = Vec3::new(target.x, 0.05, target.z);
+        // Tether from the building to the rally point.
+        gizmos.line(base, foot + Vec3::Y * 0.15, faint);
+        // Flag: a pole with a small triangular banner at the top.
+        let pole_top = foot + Vec3::Y * 1.5;
+        gizmos.line(foot, pole_top, color);
+        let banner_out = Vec3::new(0.7, 0.0, 0.0);
+        let banner_mid = pole_top - Vec3::Y * 0.22 + banner_out;
+        gizmos.line(pole_top, banner_mid, color);
+        gizmos.line(banner_mid, pole_top - Vec3::Y * 0.44, color);
+        // Ground ring marking the rally spot.
+        gizmos.circle(
+            Isometry3d::new(foot, Quat::from_rotation_arc(Vec3::Z, Vec3::Y)),
+            0.45,
+            color,
+        );
     }
 }
 
