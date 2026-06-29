@@ -78,6 +78,7 @@ const CAMERA_MAX_DISTANCE: f32 = 9.0;
 const CAMERA_DEFAULT_YAW: f32 = -0.72;
 const CAMERA_DEFAULT_PITCH: f32 = -1.02;
 const CAMERA_BOUNDS_MARGIN: f32 = 1.2;
+const CAMERA_EDGE_PAN_WIDTH: f32 = 0.018;
 // bevy_rts_camera (perspective, ground-following) framing — RTS tilt and a height
 // range mapped from the legacy CAMERA_MIN/MAX_DISTANCE zoom span. NOTE the plugin's
 // `angle` is measured from straight-down: 0.0 = top-down, larger = more oblique.
@@ -10048,7 +10049,11 @@ fn setup(
             key_rotate_left: KeyCode::BracketLeft,
             key_rotate_right: KeyCode::BracketRight,
             pan_speed: options.camera_pan_speed,
-            edge_pan_width: if options.camera_edge_pan { 0.05 } else { 0.0 },
+            edge_pan_width: if options.camera_edge_pan {
+                CAMERA_EDGE_PAN_WIDTH
+            } else {
+                0.0
+            },
             ..default()
         },
         MainCamera,
@@ -15278,15 +15283,14 @@ fn camera_control(
     }
 }
 
-/// Applies the player's camera Options (tilt / pan speed / edge pan) to the live
-/// `bevy_rts_camera` entity whenever the settings change.
+/// Applies camera options and gates edge-pan while UI overlays own the cursor.
 fn apply_camera_settings(
     options: Res<MenuOptionsState>,
+    window_q: Query<&Window, With<PrimaryWindow>>,
+    match_menu: Res<MatchMenuState>,
+    briefing: Res<MatchBriefingState>,
     mut camera_q: Query<(&mut RtsCam, &mut RtsCameraControls), With<MainCamera>>,
 ) {
-    if !options.is_changed() {
-        return;
-    }
     let Ok((mut cam, mut controls)) = camera_q.single_mut() else {
         return;
     };
@@ -15294,7 +15298,23 @@ fn apply_camera_settings(
     cam.target_angle = options.camera_tilt;
     cam.min_angle = options.camera_tilt;
     controls.pan_speed = options.camera_pan_speed;
-    controls.edge_pan_width = if options.camera_edge_pan { 0.05 } else { 0.0 };
+    controls.edge_pan_width =
+        effective_camera_edge_pan_width(&options, window_q.single().ok(), &match_menu, &briefing);
+}
+
+fn effective_camera_edge_pan_width(
+    options: &MenuOptionsState,
+    window: Option<&Window>,
+    match_menu: &MatchMenuState,
+    briefing: &MatchBriefingState,
+) -> f32 {
+    if !options.camera_edge_pan || match_menu.visible || briefing.visible {
+        return 0.0;
+    }
+    if window.is_some_and(cursor_is_over_hud) {
+        return 0.0;
+    }
+    CAMERA_EDGE_PAN_WIDTH
 }
 
 fn safe_camera_distance(distance: f32) -> f32 {
@@ -29172,9 +29192,7 @@ fn cursor_blocks_world_order_controls(window: &Window, cursor: Vec2) -> bool {
         || minimap_contains_cursor(window, cursor)
 }
 
-/// Edge-scroll is only blocked by the interactive overlays you click into (the
-/// minimap and battle log), NOT the command bar / top status — so reaching the
-/// bottom screen edge still pans the camera.
+/// Hit rect helpers for HUD areas that should consume world and camera input.
 fn battle_log_contains_cursor(window: &Window, cursor: Vec2) -> bool {
     // Battle log is centered along the top (see setup_ui), so the hit rect is too.
     let min_x = (window.width() - BATTLE_LOG_WIDTH_PX) * 0.5;
@@ -29387,6 +29405,54 @@ mod current_tests {
         assert!(
             !enemy_visible_with_alliance(false),
             "without an alliance the enemy beside a neutral team must stay fogged"
+        );
+    }
+
+    #[test]
+    fn edge_pan_is_disabled_by_options_and_match_overlays() {
+        let options = MenuOptionsState::default();
+        assert_eq!(
+            effective_camera_edge_pan_width(
+                &options,
+                None,
+                &MatchMenuState::default(),
+                &MatchBriefingState::default(),
+            ),
+            CAMERA_EDGE_PAN_WIDTH
+        );
+
+        let mut edge_pan_disabled = options;
+        edge_pan_disabled.camera_edge_pan = false;
+        assert_eq!(
+            effective_camera_edge_pan_width(
+                &edge_pan_disabled,
+                None,
+                &MatchMenuState::default(),
+                &MatchBriefingState::default(),
+            ),
+            0.0
+        );
+
+        assert_eq!(
+            effective_camera_edge_pan_width(
+                &options,
+                None,
+                &MatchMenuState { visible: true },
+                &MatchBriefingState::default(),
+            ),
+            0.0
+        );
+        assert_eq!(
+            effective_camera_edge_pan_width(
+                &options,
+                None,
+                &MatchMenuState::default(),
+                &MatchBriefingState {
+                    visible: true,
+                    ..default()
+                },
+            ),
+            0.0
         );
     }
 
