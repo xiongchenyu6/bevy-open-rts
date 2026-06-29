@@ -1748,22 +1748,6 @@ enum SkirmishMatchMode {
 }
 
 impl SkirmishMatchMode {
-    const ALL: [Self; 4] = [
-        Self::OneVsOne,
-        Self::FreeForAll,
-        Self::AiVsAi,
-        Self::AlliedTwoVsOne,
-    ];
-
-    fn id(self) -> &'static str {
-        match self {
-            Self::OneVsOne => "one_vs_one",
-            Self::FreeForAll => "free_for_all",
-            Self::AiVsAi => "ai_vs_ai",
-            Self::AlliedTwoVsOne => "allied_two_vs_one",
-        }
-    }
-
     fn label(self) -> &'static str {
         match self {
             Self::OneVsOne => "1v1",
@@ -2732,17 +2716,10 @@ fn default_skirmish_opponent(player_team: Team, active_team_count: usize) -> Opt
 enum MainMenuAction {
     SelectMap(usize),
     SelectStartingResources(usize),
-    SelectMatchMode(SkirmishMatchMode),
-    SelectAiDifficulty(AiDifficulty),
-    SelectLobbySlot(usize),
-    CycleLobbySlotController(usize),
     ToggleLobbySlotController(usize),
     SetLobbySlotController(usize, SkirmishPlayerController),
     ToggleLobbySlotFaction(usize),
     SetLobbySlotFaction(usize, SkirmishFaction),
-    CycleLobbySlotFaction(usize),
-    CycleLobbySlotTeamId(usize),
-    CycleLobbySlotColor(usize),
     ToggleLobbySlotTeam(usize),
     SetLobbySlotTeam(usize, usize),
     ToggleLobbySlotColor(usize),
@@ -2822,10 +2799,6 @@ impl MainMenuAction {
             MainMenuAction::SelectStartingResources(index) => {
                 index == selection.starting_resource_index
             }
-            MainMenuAction::SelectMatchMode(mode) => mode == selection.match_mode,
-            MainMenuAction::SelectAiDifficulty(difficulty) => difficulty == selection.ai_difficulty,
-            MainMenuAction::SelectLobbySlot(slot) => selection.human_lobby_slot() == Some(slot),
-            MainMenuAction::CycleLobbySlotController(_) => false,
             MainMenuAction::ToggleLobbySlotController(slot) => {
                 selection.controller_dropdown_open == Some(slot)
             }
@@ -2838,9 +2811,6 @@ impl MainMenuAction {
             MainMenuAction::SetLobbySlotFaction(slot, faction) => {
                 selection.lobby_factions.get(slot).copied() == Some(faction)
             }
-            MainMenuAction::CycleLobbySlotFaction(_) => false,
-            MainMenuAction::CycleLobbySlotTeamId(_) => false,
-            MainMenuAction::CycleLobbySlotColor(_) => false,
             MainMenuAction::ToggleLobbySlotTeam(slot) => selection.team_dropdown_open == Some(slot),
             MainMenuAction::SetLobbySlotTeam(slot, team_index) => {
                 selection.lobby_team_ids.get(slot).map(|id| *id as usize) == Some(team_index)
@@ -3085,15 +3055,6 @@ enum AiDifficulty {
 
 impl AiDifficulty {
     const ALL: [Self; 4] = [Self::Beginner, Self::Easy, Self::Normal, Self::Hard];
-
-    fn label(self) -> &'static str {
-        match self {
-            Self::Beginner => t("新手", "Beginner AI"),
-            Self::Easy => t("简单", "Easy AI"),
-            Self::Normal => t("普通", "Normal AI"),
-            Self::Hard => t("困难", "Hard AI"),
-        }
-    }
 
     fn short_label(self) -> &'static str {
         match self {
@@ -8666,25 +8627,6 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
             .get(index)
             .map(|option| format!("{} {}", index + 5, starting_resource_option_label(option)))
             .unwrap_or_else(|| t("资源", "Resources").to_string()),
-        MainMenuAction::SelectMatchMode(mode) => {
-            format!("{} {}", skirmish_match_mode_key(mode), mode.label())
-        }
-        MainMenuAction::SelectAiDifficulty(difficulty) => format!(
-            "{} {}",
-            skirmish_ai_difficulty_key(difficulty),
-            difficulty.short_label()
-        ),
-        MainMenuAction::SelectLobbySlot(_) => t("我方", "Mine").to_string(),
-        MainMenuAction::CycleLobbySlotController(slot) => format!(
-            "{}{}+",
-            lobby_slot_key_prefix(skirmish_lobby_slot_controller_key(slot)),
-            selection
-                .lobby_controllers
-                .get(slot)
-                .copied()
-                .unwrap_or(SkirmishPlayerController::None)
-                .short_label()
-        ),
         MainMenuAction::ToggleLobbySlotController(slot) => format!(
             "{} \u{25BE}",
             selection
@@ -8707,33 +8649,6 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
                 .label()
         ),
         MainMenuAction::SetLobbySlotFaction(_, faction) => faction.label().to_string(),
-        MainMenuAction::CycleLobbySlotFaction(slot) => format!(
-            "{}{}+",
-            lobby_slot_key_prefix(skirmish_lobby_slot_faction_key(slot)),
-            selection
-                .lobby_factions
-                .get(slot)
-                .copied()
-                .unwrap_or(SkirmishFaction::Alliance)
-                .label()
-        ),
-        MainMenuAction::CycleLobbySlotTeamId(slot) => format!(
-            "{}T{}+",
-            lobby_slot_key_prefix(skirmish_lobby_slot_team_key(slot)),
-            selection.lobby_team_ids.get(slot).copied().unwrap_or(0) % SKIRMISH_TEAM_OPTION_COUNT
-                + 1
-        ),
-        MainMenuAction::CycleLobbySlotColor(slot) => format!(
-            "{}C{}+",
-            lobby_slot_key_prefix(skirmish_lobby_slot_color_key(slot)),
-            selection
-                .lobby_color_slots
-                .get(slot)
-                .copied()
-                .unwrap_or(slot)
-                % PLAYER_COLOR_PALETTE.len()
-                + 1
-        ),
         MainMenuAction::ToggleLobbySlotTeam(slot) => format!(
             "{} \u{25BE}",
             skirmish_team_label(
@@ -8781,68 +8696,6 @@ fn skirmish_team_label(team_index: usize) -> String {
 /// "色N" / "Color N" label for a 0-based color-palette index.
 fn skirmish_color_label(color_index: usize) -> String {
     format!("{}{}", t("色", "Color "), color_index + 1)
-}
-
-fn lobby_slot_key_prefix(key: &'static str) -> String {
-    if key.is_empty() {
-        String::new()
-    } else {
-        format!("{key} ")
-    }
-}
-
-fn skirmish_lobby_slot_controller_key(slot: usize) -> &'static str {
-    match slot {
-        0 => "Q",
-        1 => "W",
-        2 => "E",
-        _ => "",
-    }
-}
-
-fn skirmish_lobby_slot_faction_key(slot: usize) -> &'static str {
-    match slot {
-        0 => "Z",
-        1 => "X",
-        2 => "V",
-        _ => "",
-    }
-}
-
-fn skirmish_lobby_slot_team_key(slot: usize) -> &'static str {
-    match slot {
-        0 => "J",
-        1 => "K",
-        2 => "L",
-        _ => "",
-    }
-}
-
-fn skirmish_lobby_slot_color_key(slot: usize) -> &'static str {
-    match slot {
-        0 => "U",
-        1 => "I",
-        2 => "O",
-        _ => "",
-    }
-}
-
-fn skirmish_match_mode_key(mode: SkirmishMatchMode) -> &'static str {
-    match mode {
-        SkirmishMatchMode::OneVsOne => "9",
-        SkirmishMatchMode::FreeForAll => "0",
-        SkirmishMatchMode::AiVsAi => "A",
-        SkirmishMatchMode::AlliedTwoVsOne => "M",
-    }
-}
-
-fn skirmish_ai_difficulty_key(difficulty: AiDifficulty) -> &'static str {
-    match difficulty {
-        AiDifficulty::Beginner => "F1",
-        AiDifficulty::Easy => "F2",
-        AiDifficulty::Normal => "F3",
-        AiDifficulty::Hard => "F4",
-    }
 }
 
 fn starting_resource_option_label(option: &StartingResourceOption) -> &'static str {
@@ -9551,18 +9404,6 @@ fn main_menu_buttons(
                 {
                     selection.set_starting_resource_choice(index);
                 }
-                MainMenuAction::SelectMatchMode(mode) => {
-                    selection.set_match_mode(mode);
-                }
-                MainMenuAction::SelectAiDifficulty(difficulty) => {
-                    selection.set_ai_difficulty(difficulty);
-                }
-                MainMenuAction::SelectLobbySlot(slot) => {
-                    selection.select_lobby_slot(slot);
-                }
-                MainMenuAction::CycleLobbySlotController(slot) => {
-                    selection.cycle_lobby_slot_controller(slot);
-                }
                 MainMenuAction::ToggleLobbySlotController(slot) => {
                     selection.toggle_controller_dropdown(slot);
                 }
@@ -9574,15 +9415,6 @@ fn main_menu_buttons(
                 }
                 MainMenuAction::SetLobbySlotFaction(slot, faction) => {
                     selection.set_lobby_slot_faction_choice(slot, faction);
-                }
-                MainMenuAction::CycleLobbySlotFaction(slot) => {
-                    selection.cycle_lobby_slot_faction(slot);
-                }
-                MainMenuAction::CycleLobbySlotTeamId(slot) => {
-                    selection.cycle_lobby_slot_team_id(slot);
-                }
-                MainMenuAction::CycleLobbySlotColor(slot) => {
-                    selection.cycle_lobby_slot_color(slot);
                 }
                 MainMenuAction::ToggleLobbySlotTeam(slot) => {
                     selection.toggle_team_dropdown(slot);
