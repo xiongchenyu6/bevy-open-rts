@@ -10005,11 +10005,14 @@ fn setup(
         crystal: materials.add(resource_tint_material(ResourceKind::Crystal)),
     });
 
+    // Decorative scenery rocks (godot's decorations/RockLargeA.tscn uses the PLAIN
+    // rock_largeA, NOT the crystal model — using rock_crystalsLargeA here made them
+    // look like harvestable ore that couldn't be selected/harvested).
     for x in [-17.0, -8.0, 6.0, 15.0] {
         spawn_prop(
             &mut commands,
             &asset_server,
-            "models/kenney-spacekit/rock_crystalsLargeA.glb",
+            "models/kenney-spacekit/rock_largeA.glb",
             Vec3::new(x, 0.0, -2.0 + x.sin() * 8.0),
             0.9,
         );
