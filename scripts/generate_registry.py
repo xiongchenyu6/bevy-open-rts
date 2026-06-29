@@ -19,9 +19,9 @@ OUT_REPORT = REPO_ROOT / "assets/migration/migration_report.md"
 
 
 FACTION_LABELS = {
-    "alliance": "人族",
-    "demon": "魔族",
-    "chaos": "混沌族",
+    "alliance": "苍穹联盟",
+    "demon": "炽炎魔军",
+    "chaos": "混沌裂隙",
 }
 
 FACTION_COLORS = {

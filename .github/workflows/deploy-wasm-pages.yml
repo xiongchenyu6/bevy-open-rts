@@ -1,9 +1,20 @@
-name: Build and Deploy WebGPU
+name: Build, Release, and Deploy WebGPU
+
+# Flow: build the wasm bundle -> publish it as a GitHub Release asset ->
+# deploy to GitHub Pages FROM that release asset. Pages therefore always serves
+# exactly what was released, and every deploy has a downloadable, versioned record.
+#
+# Triggers:
+#   - push to main         -> rolling "web-latest" prerelease + deploy to Pages
+#   - push tag v*          -> versioned release (that tag) + deploy to Pages
+#   - pull_request         -> build only (no release, no deploy)
 
 on:
   push:
     branches:
       - main
+    tags:
+      - "v*"
   pull_request:
     branches:
       - main
@@ -63,26 +74,82 @@ jobs:
       - name: Build web artifacts
         run: bash scripts/build_web.sh
 
-      - name: Upload web artifact
+      - name: Package web bundle
+        run: |
+          set -euo pipefail
+          (cd web && zip -r -q ../web-dist.zip .)
+          ls -la web-dist.zip
+
+      - name: Upload web bundle (passes the build between jobs)
         uses: actions/upload-artifact@v4
         with:
-          name: web-${{ github.sha }}
-          path: web/
+          name: web-dist-${{ github.sha }}
+          path: web-dist.zip
           if-no-files-found: error
           retention-days: 7
 
-  deploy-web:
-    name: Deploy to GitHub Pages
+  release-web:
+    name: Publish GitHub Release
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: build-web
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request'
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
     steps:
-      - name: Download web artifact
+      - name: Download web bundle
         uses: actions/download-artifact@v4
         with:
-          name: web-${{ github.sha }}
-          path: web-dist
+          name: web-dist-${{ github.sha }}
+
+      - name: Determine release tag
+        id: meta
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=web-latest" >> "$GITHUB_OUTPUT"
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish release with the web bundle
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: Web build ${{ steps.meta.outputs.tag }}
+          prerelease: ${{ steps.meta.outputs.prerelease }}
+          # Move the rolling tag to the current commit on main pushes.
+          target_commitish: ${{ github.sha }}
+          body: |
+            WebGPU wasm build for commit ${{ github.sha }}.
+            Download `web-dist.zip` for the full Pages bundle.
+          files: web-dist.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-web:
+    name: Deploy to GitHub Pages from release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: release-web
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Download released bundle
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.release-web.outputs.tag }}
+        run: |
+          set -euo pipefail
+          gh release download "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern web-dist.zip \
+            --output web-dist.zip \
+            --clobber
+          mkdir -p web-dist
+          unzip -q -o web-dist.zip -d web-dist
+          ls -la web-dist
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
@@ -91,4 +158,4 @@ jobs:
           publish_branch: gh-pages
           force_orphan: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          commit_message: "Deploy web build ${{ github.sha }}"
+          commit_message: "Deploy web build ${{ github.sha }} (release ${{ needs.release-web.outputs.tag }})"

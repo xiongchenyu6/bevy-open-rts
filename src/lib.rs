@@ -2,8 +2,8 @@
 use bevy::audio::Volume;
 use bevy::{
     asset::{AssetMetaCheck, AssetPlugin},
+    camera::RenderTarget,
     camera::primitives::Aabb,
-    camera::{RenderTarget, ScalingMode},
     ecs::query::Or,
     ecs::system::SystemParam,
     gizmos::config::{GizmoConfigGroup, GizmoConfigStore},
@@ -14,6 +14,9 @@ use bevy::{
     window::{PrimaryWindow, WindowMode, WindowResolution},
 };
 use bevy_common_assets::{json::JsonAssetPlugin, ron::RonAssetPlugin};
+use bevy_rts_camera::{
+    RtsCamera as RtsCam, RtsCameraControls, RtsCameraPlugin, RtsCameraSystemSet,
+};
 use serde::Deserialize;
 use std::collections::{BTreeMap, VecDeque};
 
@@ -69,17 +72,29 @@ fn handle_render_error(
 }
 
 const MAP_HALF_EXTENT: f32 = 24.0;
-const EDGE_PAN_PX: f32 = 28.0;
 const CAMERA_MIN_DISTANCE: f32 = 5.5;
 const CAMERA_DEFAULT_DISTANCE: f32 = 7.0;
 const CAMERA_MAX_DISTANCE: f32 = 9.0;
-const CAMERA_NEAR_PLANE: f32 = 0.05;
-const CAMERA_FAR_PLANE: f32 = 300.0;
 const CAMERA_DEFAULT_YAW: f32 = -0.72;
 const CAMERA_DEFAULT_PITCH: f32 = -1.02;
 const CAMERA_BOUNDS_MARGIN: f32 = 1.2;
-const CAMERA_PAN_SPEED_MULTIPLIER: f32 = 0.48;
-const CAMERA_MOUSE_ROTATION_SPEED: f32 = 0.005;
+const CAMERA_EDGE_PAN_WIDTH: f32 = 0.018;
+// bevy_rts_camera (perspective, ground-following) framing — RTS tilt and a height
+// range mapped from the legacy CAMERA_MIN/MAX_DISTANCE zoom span. NOTE the plugin's
+// `angle` is measured from straight-down: 0.0 = top-down, larger = more oblique.
+// ~0.55 rad ≈ 32° off vertical ≈ godot's ~58°-below-horizontal isometric look.
+const CAMERA_RTS_ANGLE: f32 = 0.55;
+const CAMERA_RTS_HEIGHT_MIN: f32 = 6.0;
+const CAMERA_RTS_HEIGHT_MAX: f32 = 11.0;
+// Player-adjustable camera ranges (Options menu → 镜头). Tilt is the plugin angle
+// (0 = top-down). Steps/min/max bound the +/- buttons and slider normalisation.
+const CAMERA_TILT_MIN: f32 = 0.15;
+const CAMERA_TILT_MAX: f32 = 1.05;
+const CAMERA_TILT_STEP: f32 = 0.05;
+const CAMERA_RTS_PAN_SPEED: f32 = 18.0;
+const CAMERA_PAN_SPEED_MIN: f32 = 8.0;
+const CAMERA_PAN_SPEED_MAX: f32 = 32.0;
+const CAMERA_PAN_SPEED_STEP: f32 = 2.0;
 const CAMERA_START_PRIMARY_UNITS: &[&str] = &["Worker"];
 const CAMERA_START_PRIMARY_STRUCTURES: &[&str] = &["CommandCenter"];
 const RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 48.0;
@@ -103,7 +118,6 @@ const PATROL_TURN_DISTANCE: f32 = 2.0;
 const SCATTER_DISTANCE: f32 = 4.0;
 const DRAG_SELECT_THRESHOLD: f32 = 6.0;
 const SELECTION_DRAG_INTERRUPT_MARGIN_PX: f32 = 1.0;
-const CAMERA_ROTATE_SPEED: f32 = 2.0;
 const DOUBLE_CLICK_MIN_SECONDS: f32 = 0.05;
 const DOUBLE_CLICK_MAX_SECONDS: f32 = 0.6;
 const SINGLE_CLICK_SELECTION_SCREEN_RADIUS_PX: f32 = 38.0;
@@ -186,13 +200,13 @@ const BATTLE_LOG_ENTRY_TTL_SECONDS: f32 = 6.5;
 const BATTLE_EVENT_PING_LIFETIME_SECONDS: f32 = 4.0;
 const BATTLE_LOG_MAX_ENTRIES: usize = 5;
 const BATTLE_LOG_UNDER_ATTACK_COOLDOWN_SECONDS: f32 = 7.0;
-const BATTLE_LOG_TOP_PX: f32 = 74.0;
-const BATTLE_LOG_RIGHT_PX: f32 = 18.0;
+const BATTLE_LOG_TOP_PX: f32 = 104.0;
 const BATTLE_LOG_WIDTH_PX: f32 = 390.0;
 const BATTLE_LOG_HIT_HEIGHT_PX: f32 = 168.0;
 const MINIMAP_SIZE_PX: f32 = 158.0;
-const MINIMAP_RIGHT_PX: f32 = 18.0;
-const MINIMAP_BOTTOM_PX: f32 = 146.0;
+// godot anchors the minimap/radar in the bottom-LEFT corner.
+const MINIMAP_LEFT_PX: f32 = 12.0;
+const MINIMAP_BOTTOM_PX: f32 = 12.0;
 const MINIMAP_ENTITY_MARKER_PX: f32 = 4.6;
 const MINIMAP_STRUCTURE_MARKER_PX: f32 = 6.2;
 const MINIMAP_RESOURCE_MARKER_PX: f32 = 3.8;
@@ -1448,11 +1462,27 @@ impl SkirmishFaction {
         }
     }
 
+    fn index(self) -> usize {
+        match self {
+            Self::Alliance => 0,
+            Self::Demon => 1,
+            Self::Chaos => 2,
+        }
+    }
+
+    fn emblem_path(self) -> &'static str {
+        match self {
+            Self::Alliance => "ui/factions/alliance_emblem.png",
+            Self::Demon => "ui/factions/demon_emblem.png",
+            Self::Chaos => "ui/factions/chaos_emblem.png",
+        }
+    }
+
     fn label(self) -> &'static str {
         match self {
-            Self::Alliance => t("人族", "Alliance"),
-            Self::Demon => t("魔族", "Demon"),
-            Self::Chaos => t("混沌族", "Chaos"),
+            Self::Alliance => t("苍穹联盟", "Alliance"),
+            Self::Demon => t("炽炎魔军", "Demon"),
+            Self::Chaos => t("混沌裂隙", "Chaos"),
         }
     }
 
@@ -1732,22 +1762,6 @@ enum SkirmishMatchMode {
 }
 
 impl SkirmishMatchMode {
-    const ALL: [Self; 4] = [
-        Self::OneVsOne,
-        Self::FreeForAll,
-        Self::AiVsAi,
-        Self::AlliedTwoVsOne,
-    ];
-
-    fn id(self) -> &'static str {
-        match self {
-            Self::OneVsOne => "one_vs_one",
-            Self::FreeForAll => "free_for_all",
-            Self::AiVsAi => "ai_vs_ai",
-            Self::AlliedTwoVsOne => "allied_two_vs_one",
-        }
-    }
-
     fn label(self) -> &'static str {
         match self {
             Self::OneVsOne => "1v1",
@@ -1813,7 +1827,7 @@ impl SkirmishMenuSelection {
         if self.map_choice_is_random() {
             random_map_label()
         } else {
-            self.map().name
+            localized_skirmish_map_name(self.map())
         }
     }
 
@@ -2352,6 +2366,16 @@ fn random_map_label() -> &'static str {
     t("随机地图", "Random Map")
 }
 
+fn localized_skirmish_map_name(map: &SkirmishMapDef) -> &'static str {
+    match map.name_key {
+        "MAP_NAME_PLAIN_AND_SIMPLE" => t("简明战场", "Plain & Simple"),
+        "MAP_NAME_FOUR_CORNERS" => t("四角战场", "Four Corners"),
+        "MAP_NAME_TECH_DIVIDE" => t("科技分界线", "Tech Divide"),
+        "MAP_NAME_BIG_ARENA" => t("大型竞技场", "Big Arena"),
+        _ => map.name,
+    }
+}
+
 #[derive(Clone, Debug)]
 struct RouletteWheel<T> {
     values_w_accumulated_shares: Vec<(T, f32)>,
@@ -2716,17 +2740,10 @@ fn default_skirmish_opponent(player_team: Team, active_team_count: usize) -> Opt
 enum MainMenuAction {
     SelectMap(usize),
     SelectStartingResources(usize),
-    SelectMatchMode(SkirmishMatchMode),
-    SelectAiDifficulty(AiDifficulty),
-    SelectLobbySlot(usize),
-    CycleLobbySlotController(usize),
     ToggleLobbySlotController(usize),
     SetLobbySlotController(usize, SkirmishPlayerController),
     ToggleLobbySlotFaction(usize),
     SetLobbySlotFaction(usize, SkirmishFaction),
-    CycleLobbySlotFaction(usize),
-    CycleLobbySlotTeamId(usize),
-    CycleLobbySlotColor(usize),
     ToggleLobbySlotTeam(usize),
     SetLobbySlotTeam(usize, usize),
     ToggleLobbySlotColor(usize),
@@ -2766,6 +2783,11 @@ enum OptionsMenuAction {
     SfxVolumeDown,
     VoiceVolumeUp,
     VoiceVolumeDown,
+    CameraTiltUp,
+    CameraTiltDown,
+    CameraPanSpeedUp,
+    CameraPanSpeedDown,
+    ToggleEdgePan,
     Back,
 }
 
@@ -2783,6 +2805,12 @@ struct MenuOptionsState {
     music_volume: f32,
     sfx_volume: f32,
     voice_volume: f32,
+    /// Camera tilt in radians (plugin convention: 0 = top-down, larger = oblique).
+    camera_tilt: f32,
+    /// Keyboard/edge pan speed for `bevy_rts_camera`.
+    camera_pan_speed: f32,
+    /// Whether moving the cursor to the screen edge pans the camera.
+    camera_edge_pan: bool,
 }
 
 impl Default for MenuOptionsState {
@@ -2795,6 +2823,9 @@ impl Default for MenuOptionsState {
             music_volume: 1.0,
             sfx_volume: 1.0,
             voice_volume: 1.0,
+            camera_tilt: CAMERA_RTS_ANGLE,
+            camera_pan_speed: CAMERA_RTS_PAN_SPEED,
+            camera_edge_pan: true,
         }
     }
 }
@@ -2806,10 +2837,6 @@ impl MainMenuAction {
             MainMenuAction::SelectStartingResources(index) => {
                 index == selection.starting_resource_index
             }
-            MainMenuAction::SelectMatchMode(mode) => mode == selection.match_mode,
-            MainMenuAction::SelectAiDifficulty(difficulty) => difficulty == selection.ai_difficulty,
-            MainMenuAction::SelectLobbySlot(slot) => selection.human_lobby_slot() == Some(slot),
-            MainMenuAction::CycleLobbySlotController(_) => false,
             MainMenuAction::ToggleLobbySlotController(slot) => {
                 selection.controller_dropdown_open == Some(slot)
             }
@@ -2822,9 +2849,6 @@ impl MainMenuAction {
             MainMenuAction::SetLobbySlotFaction(slot, faction) => {
                 selection.lobby_factions.get(slot).copied() == Some(faction)
             }
-            MainMenuAction::CycleLobbySlotFaction(_) => false,
-            MainMenuAction::CycleLobbySlotTeamId(_) => false,
-            MainMenuAction::CycleLobbySlotColor(_) => false,
             MainMenuAction::ToggleLobbySlotTeam(slot) => selection.team_dropdown_open == Some(slot),
             MainMenuAction::SetLobbySlotTeam(slot, team_index) => {
                 selection.lobby_team_ids.get(slot).map(|id| *id as usize) == Some(team_index)
@@ -2871,6 +2895,8 @@ struct MainMenuLobbySlotRow;
 #[derive(Component)]
 struct MainMenuLobbyListRoot {
     font: Handle<Font>,
+    /// Faction emblems indexed by SkirmishFaction::index() (Alliance/Demon/Chaos).
+    faction_emblems: [Handle<Image>; 3],
 }
 
 #[derive(Component)]
@@ -3068,15 +3094,6 @@ enum AiDifficulty {
 impl AiDifficulty {
     const ALL: [Self; 4] = [Self::Beginner, Self::Easy, Self::Normal, Self::Hard];
 
-    fn label(self) -> &'static str {
-        match self {
-            Self::Beginner => t("新手", "Beginner AI"),
-            Self::Easy => t("简单", "Easy AI"),
-            Self::Normal => t("普通", "Normal AI"),
-            Self::Hard => t("困难", "Hard AI"),
-        }
-    }
-
     fn short_label(self) -> &'static str {
         match self {
             Self::Beginner => t("新手", "Beginner"),
@@ -3124,7 +3141,7 @@ const HUMAN_STARTUP: TeamStartup = TeamStartup {
             offset: (-1.8, -2.2),
         },
         SpawnSpec {
-            id: "ScoutRover",
+            id: "Drone",
             offset: (0.7, -3.0),
         },
         SpawnSpec {
@@ -3247,7 +3264,7 @@ const HUMAN_GODOT_SKIRMISH_STARTUP: TeamStartup = TeamStartup {
     }],
     units: &[
         SpawnSpec {
-            id: "ScoutRover",
+            id: "Drone",
             offset: (-2.0, -2.0),
         },
         SpawnSpec {
@@ -4170,7 +4187,6 @@ fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<SelectionDragState>()
         .init_resource::<UnitGroups>()
         .init_resource::<CameraBookmarks>()
-        .init_resource::<CameraMouseRotation>()
         .init_resource::<DoubleClickState>()
         .init_resource::<ButtonInput<KeyCode>>()
         .init_resource::<ButtonInput<MouseButton>>()
@@ -4227,6 +4243,9 @@ fn add_main_menu_scene(app: &mut App) -> &mut App {
 
 /// Registers the live match scene shared by `cargo run`, capture, and gameplay tests.
 pub fn add_shared_match_scene(app: &mut App) -> &mut App {
+    if !app.is_plugin_added::<RtsCameraPlugin>() {
+        app.add_plugins(RtsCameraPlugin);
+    }
     add_shared_match_resources(app)
         .add_systems(
             OnEnter(AppScreen::InMatch),
@@ -4334,6 +4353,23 @@ pub fn capture_show_skirmish_setup_menu(app: &mut App) {
         .resource_mut::<NextState<AppScreen>>()
         .set(AppScreen::SkirmishSetup);
     for _ in 0..8 {
+        app.update();
+    }
+}
+
+/// Enters the lobby and opens slot 0's controller dropdown, so the floating popup
+/// overlay is visible for verification.
+pub fn capture_show_skirmish_setup_with_dropdown(app: &mut App) {
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::SkirmishSetup);
+    for _ in 0..8 {
+        app.update();
+    }
+    app.world_mut()
+        .resource_mut::<SkirmishMenuSelection>()
+        .toggle_faction_dropdown(0);
+    for _ in 0..6 {
         app.update();
     }
 }
@@ -4591,12 +4627,14 @@ pub fn capture_focus_camera_on(app: &mut App, focus: Vec3) {
     let bounds = *app.world().resource::<MapBounds>();
     let mut camera = app.world_mut().resource_mut::<RtsCamera>();
     set_camera_focus_safely(&mut camera, focus, bounds);
+    camera.pending_jump = true;
 }
 
 /// Zooms the capture camera all the way in (for close-up model inspection).
 pub fn capture_zoom_camera_closest(app: &mut App) {
     let mut camera = app.world_mut().resource_mut::<RtsCamera>();
     camera.distance = CAMERA_MIN_DISTANCE;
+    camera.pending_jump = true;
 }
 
 /// Diagnostic: prints every distinct mesh-material base color under each resource
@@ -4906,6 +4944,14 @@ pub fn capture_player_command_center(app: &mut App) -> Option<(Entity, Vec3, Vec
 /// Whether the given entity currently has the `Selected` component (capture check).
 pub fn capture_entity_is_selected(app: &mut App, entity: Entity) -> bool {
     app.world().get::<Selected>(entity).is_some()
+}
+
+/// Sets a rally point on the given structure (capture aid for the rally-flag visual).
+pub fn capture_set_structure_rally(app: &mut App, structure: Entity, target: Vec3) {
+    if let Some(mut rally) = app.world_mut().get_mut::<RallyPoint>(structure) {
+        rally.target = Some(target);
+        rally.target_unit = None;
+    }
 }
 
 /// IDs of currently-selected player units, for capture diagnostics.
@@ -5377,7 +5423,7 @@ fn match_phase_label(phase: MatchPhase) -> &'static str {
     }
 }
 
-/// Sets every player slot's faction (0=人族/Alliance, 1=魔族/Demon, 2=混沌族/Chaos)
+/// Sets every player slot's faction (0=苍穹联盟/Alliance, 1=炽炎魔军/Demon, 2=混沌裂隙/Chaos)
 /// before the match scene reads `MatchSetupSettings`, so a capture can show each
 /// faction's own base/units. Returns the faction label.
 pub fn capture_set_all_factions(app: &mut App, index: usize) -> &'static str {
@@ -5466,10 +5512,12 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
     app.add_systems(
         Update,
         (
-            rotate_camera
+            camera_control
+                .before(RtsCameraSystemSet)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
-            camera_control
+            apply_camera_settings
+                .before(RtsCameraSystemSet)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
             minimap_input
@@ -5724,6 +5772,12 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
             update_hud
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
+            update_resource_bar
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
+            update_selection_text_visibility
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
             update_selection_portrait
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
@@ -5738,6 +5792,9 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
                 .before(draw_world_overlays)
                 .run_if(match_in_progress),
             draw_world_overlays
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
+            draw_selected_rally_flags
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
         ),
@@ -5765,7 +5822,11 @@ struct RtsCamera {
     distance: f32,
     yaw: f32,
     pitch: f32,
-    edge_pan_active: bool,
+    /// Set when game code wants to jump the camera to `focus`/`distance`; consumed
+    /// by `camera_control`, which pushes the values into the `bevy_rts_camera`
+    /// component with `snap = true`. When false, the bridge instead mirrors the
+    /// plugin's live camera back into this resource so minimap/bookmarks stay fresh.
+    pending_jump: bool,
 }
 
 impl Default for RtsCamera {
@@ -5775,40 +5836,59 @@ impl Default for RtsCamera {
             distance: CAMERA_DEFAULT_DISTANCE,
             yaw: CAMERA_DEFAULT_YAW,
             pitch: CAMERA_DEFAULT_PITCH,
-            edge_pan_active: false,
+            pending_jump: false,
         }
     }
 }
 
 impl RtsCamera {
     fn focused_on(focus: Vec3) -> Self {
-        Self { focus, ..default() }
+        Self {
+            focus,
+            pending_jump: true,
+            ..default()
+        }
     }
 }
 
-#[derive(Resource, Default)]
-struct CameraMouseRotation {
-    active: bool,
-    start_yaw: f32,
-    accumulated_x: f32,
-    last_middle_press_time: Option<f32>,
+/// Maps the legacy orthographic `distance` (5.5..9.0) onto `bevy_rts_camera`'s
+/// `target_zoom` (0.0 = zoomed out, 1.0 = zoomed in).
+fn camera_zoom_from_distance(distance: f32) -> f32 {
+    let span = CAMERA_MAX_DISTANCE - CAMERA_MIN_DISTANCE;
+    ((CAMERA_MAX_DISTANCE - distance) / span).clamp(0.0, 1.0)
 }
 
-fn camera_transform_from_state(camera: &RtsCamera) -> Transform {
-    let offset = Quat::from_euler(EulerRot::YXZ, camera.yaw, camera.pitch, 0.0)
-        * Vec3::new(0.0, 0.0, camera.distance);
-    Transform::from_translation(camera.focus + offset).looking_at(camera.focus, Vec3::Y)
+fn camera_distance_from_zoom(zoom: f32) -> f32 {
+    let span = CAMERA_MAX_DISTANCE - CAMERA_MIN_DISTANCE;
+    CAMERA_MAX_DISTANCE - zoom.clamp(0.0, 1.0) * span
 }
 
-fn camera_projection_from_state(camera: &RtsCamera) -> Projection {
-    Projection::Orthographic(OrthographicProjection {
-        near: CAMERA_NEAR_PLANE,
-        far: CAMERA_FAR_PLANE,
-        scaling_mode: ScalingMode::FixedVertical {
-            viewport_height: camera.distance,
-        },
-        ..OrthographicProjection::default_3d()
-    })
+/// Builds the `bevy_rts_camera` component from the game's camera state + map bounds.
+fn rts_camera_component(state: &RtsCamera, bounds: MapBounds, tilt: f32) -> RtsCam {
+    let mut cam = RtsCam {
+        // Fixed isometric-ish tilt (player-adjustable via Options → 镜头).
+        angle: tilt,
+        target_angle: tilt,
+        min_angle: tilt,
+        dynamic_angle: false,
+        height_min: CAMERA_RTS_HEIGHT_MIN,
+        height_max: CAMERA_RTS_HEIGHT_MAX,
+        bounds: camera_bounds_aabb(bounds),
+        target_zoom: camera_zoom_from_distance(state.distance),
+        snap: true,
+        ..default()
+    };
+    cam.target_focus.translation = safe_camera_focus(state.focus, bounds);
+    cam
+}
+
+fn camera_bounds_aabb(bounds: MapBounds) -> bevy::math::bounding::Aabb2d {
+    let min = bounds.clamp_ground_point(Vec3::new(f32::MIN, 0.0, f32::MIN), CAMERA_BOUNDS_MARGIN);
+    let max = bounds.clamp_ground_point(Vec3::new(f32::MAX, 0.0, f32::MAX), CAMERA_BOUNDS_MARGIN);
+    bevy::math::bounding::Aabb2d {
+        min: Vec2::new(min.x, min.z),
+        max: Vec2::new(max.x, max.z),
+    }
 }
 
 #[derive(Resource, Default, Debug)]
@@ -5881,6 +5961,7 @@ impl CameraBookmark {
         camera.distance = self.distance;
         camera.yaw = self.yaw;
         camera.pitch = self.pitch;
+        camera.pending_jump = true;
     }
 
     fn restore_safely(self, camera: &mut RtsCamera, bounds: MapBounds) {
@@ -6102,6 +6183,7 @@ impl Default for Locale {
 }
 
 static CURRENT_LANGUAGE: std::sync::atomic::AtomicU8 = std::sync::atomic::AtomicU8::new(0);
+const UI_FONT_PATH: &str = "fonts/wqy-microhei-ui.full.ttf";
 
 fn set_current_language(language: Language) {
     let value = match language {
@@ -6430,10 +6512,12 @@ impl ResourceKind {
     }
 
     fn color(self) -> Color {
-        // Godot's resource_a/_b crystal-material albedo: ResourceA (Ore) = blue,
-        // ResourceB (Crystal) = red. Matches the HUD diamonds and minimap markers.
+        // Match what godot actually renders: Ore (ResourceA) = green, Crystal
+        // (ResourceB) = red. (resource_a.material.tres albedo reads blue, but the
+        // crystal mesh's vertex colors shift it green in-engine, which is what shows.)
+        // Drives the crystal tint, HUD diamonds, and minimap markers.
         match self {
-            Self::Ore => Color::srgb(0.0, 0.0, 1.0),
+            Self::Ore => Color::srgb(0.0, 0.85, 0.18),
             Self::Crystal => Color::srgb(1.0, 0.0, 0.0),
         }
     }
@@ -6649,6 +6733,10 @@ struct HarvestOrder {
     resource: Option<Entity>,
     state: HarvestState,
     collect_remaining: f32,
+    /// The mineral type this harvester has been gathering. When its node runs out it
+    /// retargets to the nearest node OF THIS KIND only, so a crystal harvester won't
+    /// auto-wander off to ore (or vice-versa).
+    last_kind: Option<ResourceKind>,
 }
 
 #[derive(Component, Clone, Copy)]
@@ -7076,6 +7164,18 @@ impl Default for AiDifficultySettings {
 #[derive(Component)]
 struct StatsText;
 
+/// Top-left resource/power bar (godot ResourcesBar): per-resource count label.
+#[derive(Component)]
+struct HudResourceCount(ResourceKind);
+
+/// The "supply/used" power readout in the resource bar (color-coded).
+#[derive(Component)]
+struct HudPowerText;
+
+/// The "low power" warning shown only when underpowered.
+#[derive(Component)]
+struct HudLowPowerText;
+
 #[derive(Component)]
 struct SelectionText;
 
@@ -7093,8 +7193,9 @@ struct BattleLogEntryButton(usize);
 #[derive(Component)]
 struct ObjectiveTrackerText;
 
+/// The fill node of the top-center objective progress bar (godot MissionProgressBar).
 #[derive(Component)]
-struct ProductionQueueText;
+struct ObjectiveProgressFill;
 
 #[derive(Resource, Clone, Copy, Debug, Default, PartialEq, Eq)]
 struct ObjectiveTrackerState {
@@ -7106,6 +7207,10 @@ struct ProductionQueueSlot(usize);
 
 #[derive(Component, Clone, Copy)]
 struct ProductionQueueSlotLabel(usize);
+
+/// The "×N" count badge in a queued slot's bottom-right corner (aggregated units).
+#[derive(Component, Clone, Copy)]
+struct ProductionQueueSlotCount(usize);
 
 #[derive(Component, Clone, Copy, Default)]
 struct ProductionQueueSlotTarget {
@@ -7279,7 +7384,6 @@ fn begin_match_from_setup(
     mut selection_drag: ResMut<SelectionDragState>,
     mut unit_groups: ResMut<UnitGroups>,
     mut camera_bookmarks: ResMut<CameraBookmarks>,
-    mut camera_mouse_rotation: ResMut<CameraMouseRotation>,
     mut match_menu: ResMut<MatchMenuState>,
     mut briefing: ResMut<MatchBriefingState>,
     mut battle_log: ResMut<BattleLog>,
@@ -7299,7 +7403,6 @@ fn begin_match_from_setup(
     *selection_drag = SelectionDragState::default();
     *unit_groups = UnitGroups::default();
     *camera_bookmarks = CameraBookmarks::default();
-    *camera_mouse_rotation = CameraMouseRotation::default();
     match_menu.visible = false;
     *briefing = MatchBriefingState::default();
     briefing.show();
@@ -7341,7 +7444,7 @@ fn setup_menu_backdrop(
 }
 
 fn setup_front_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+    let font = asset_server.load(UI_FONT_PATH);
     commands.spawn((
         Name::new("Main Menu Camera"),
         Camera2d,
@@ -7645,7 +7748,7 @@ fn setup_options_menu(
     asset_server: Res<AssetServer>,
     options: Res<MenuOptionsState>,
 ) {
-    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+    let font = asset_server.load(UI_FONT_PATH);
     commands.spawn((
         Name::new("Options Menu Camera"),
         Camera2d,
@@ -7772,6 +7875,91 @@ fn setup_options_menu(
                             ));
                         });
                     }
+                });
+                panel.spawn(options_group_node()).with_children(|group| {
+                    group.spawn(options_group_header("镜头", "Camera", font.clone()));
+                    for (label_zh, label_en, down, up, value, display) in [
+                        (
+                            "倾斜",
+                            "Tilt",
+                            OptionsMenuAction::CameraTiltDown,
+                            OptionsMenuAction::CameraTiltUp,
+                            (options.camera_tilt - CAMERA_TILT_MIN)
+                                / (CAMERA_TILT_MAX - CAMERA_TILT_MIN),
+                            format!("{:.0}\u{00b0}", options.camera_tilt.to_degrees()),
+                        ),
+                        (
+                            "平移速度",
+                            "Pan Speed",
+                            OptionsMenuAction::CameraPanSpeedDown,
+                            OptionsMenuAction::CameraPanSpeedUp,
+                            (options.camera_pan_speed - CAMERA_PAN_SPEED_MIN)
+                                / (CAMERA_PAN_SPEED_MAX - CAMERA_PAN_SPEED_MIN),
+                            format!("{:.0}", options.camera_pan_speed),
+                        ),
+                    ] {
+                        group.spawn(options_volume_row_node()).with_children(|row| {
+                            row.spawn((
+                                localized_text(label_zh, label_en),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(16.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                                Node {
+                                    width: px(92),
+                                    ..default()
+                                },
+                            ));
+                            row.spawn(options_small_button(down))
+                                .with_children(|button| {
+                                    button.spawn(options_button_text("-", font.clone(), 16.0));
+                                });
+                            row.spawn(options_slider_bar_node(value));
+                            row.spawn(options_small_button(up)).with_children(|button| {
+                                button.spawn(options_button_text("+", font.clone(), 16.0));
+                            });
+                            row.spawn((
+                                Text::new(display),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(16.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                                Node {
+                                    width: px(50),
+                                    justify_content: JustifyContent::FlexEnd,
+                                    ..default()
+                                },
+                            ));
+                        });
+                    }
+                    group
+                        .spawn(options_button(OptionsMenuAction::ToggleEdgePan, 32.0))
+                        .with_children(|button| {
+                            button.spawn((
+                                localized_text(
+                                    if options.camera_edge_pan {
+                                        "边缘平移 开启"
+                                    } else {
+                                        "边缘平移 关闭"
+                                    },
+                                    if options.camera_edge_pan {
+                                        "Edge Pan On"
+                                    } else {
+                                        "Edge Pan Off"
+                                    },
+                                ),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(16.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                            ));
+                        });
                 });
                 spawn_options_group(
                     panel,
@@ -8027,6 +8215,30 @@ fn options_menu_buttons(
                     options.voice_volume = (options.voice_volume - 0.05).max(0.0);
                     rebuild = true;
                 }
+                OptionsMenuAction::CameraTiltUp => {
+                    options.camera_tilt =
+                        (options.camera_tilt + CAMERA_TILT_STEP).min(CAMERA_TILT_MAX);
+                    rebuild = true;
+                }
+                OptionsMenuAction::CameraTiltDown => {
+                    options.camera_tilt =
+                        (options.camera_tilt - CAMERA_TILT_STEP).max(CAMERA_TILT_MIN);
+                    rebuild = true;
+                }
+                OptionsMenuAction::CameraPanSpeedUp => {
+                    options.camera_pan_speed = (options.camera_pan_speed + CAMERA_PAN_SPEED_STEP)
+                        .min(CAMERA_PAN_SPEED_MAX);
+                    rebuild = true;
+                }
+                OptionsMenuAction::CameraPanSpeedDown => {
+                    options.camera_pan_speed = (options.camera_pan_speed - CAMERA_PAN_SPEED_STEP)
+                        .max(CAMERA_PAN_SPEED_MIN);
+                    rebuild = true;
+                }
+                OptionsMenuAction::ToggleEdgePan => {
+                    options.camera_edge_pan = !options.camera_edge_pan;
+                    rebuild = true;
+                }
                 OptionsMenuAction::Back => next_state.set(AppScreen::MainMenu),
             }
         }
@@ -8042,7 +8254,7 @@ fn options_menu_buttons(
 }
 
 fn setup_credits_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+    let font = asset_server.load(UI_FONT_PATH);
     commands.spawn((
         Name::new("Credits Menu Camera"),
         Camera2d,
@@ -8135,7 +8347,7 @@ fn setup_main_menu(
     asset_server: Res<AssetServer>,
     selection: Res<SkirmishMenuSelection>,
 ) {
-    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+    let font = asset_server.load(UI_FONT_PATH);
 
     commands.spawn((
         Name::new("Skirmish Menu Camera"),
@@ -8191,8 +8403,9 @@ fn setup_main_menu(
             // Centered modal dialog (godot main-menu/Play.tscn PanelContainer).
             root.spawn((
                 Node {
-                    width: Val::Percent(92.0),
-                    max_width: px(720),
+                    width: Val::Percent(90.0),
+                    max_width: px(1040),
+                    min_width: px(680),
                     flex_direction: FlexDirection::Column,
                     align_items: AlignItems::Stretch,
                     row_gap: px(12),
@@ -8214,7 +8427,7 @@ fn setup_main_menu(
                     .with_children(|cols| {
                         // LEFT column — 地图 (map preview + details + resources + summary).
                         cols.spawn(Node {
-                            width: px(272),
+                            width: px(320),
                             flex_shrink: 0.0,
                             flex_direction: FlexDirection::Column,
                             align_items: AlignItems::Stretch,
@@ -8228,7 +8441,7 @@ fn setup_main_menu(
                                 Text::new(main_menu_faction_info_text(*selection)),
                                 TextFont {
                                     font: font.clone().into(),
-                                    font_size: FontSize::Px(13.0),
+                                    font_size: FontSize::Px(15.0),
                                     ..default()
                                 },
                                 TextColor(Color::srgb(0.78, 0.86, 0.84)),
@@ -8258,7 +8471,7 @@ fn setup_main_menu(
                                 localized_text("行动摘要", "Operation summary"),
                                 TextFont {
                                     font: font.clone().into(),
-                                    font_size: FontSize::Px(12.0),
+                                    font_size: FontSize::Px(14.0),
                                     ..default()
                                 },
                                 TextColor(Color::srgb(0.62, 0.72, 0.7)),
@@ -8271,7 +8484,7 @@ fn setup_main_menu(
                                 Text::new(main_menu_summary_text(*selection)),
                                 TextFont {
                                     font: font.clone().into(),
-                                    font_size: FontSize::Px(12.0),
+                                    font_size: FontSize::Px(13.0),
                                     ..default()
                                 },
                                 TextColor(Color::srgb(0.74, 0.82, 0.8)),
@@ -8293,13 +8506,27 @@ fn setup_main_menu(
                         })
                         .with_children(|col| {
                             col.spawn(menu_section_header("玩家", "Players", font.clone()));
+                            let faction_emblems = [
+                                asset_server.load(SkirmishFaction::Alliance.emblem_path()),
+                                asset_server.load(SkirmishFaction::Demon.emblem_path()),
+                                asset_server.load(SkirmishFaction::Chaos.emblem_path()),
+                            ];
                             col.spawn((
                                 menu_lobby_list_node(),
-                                MainMenuLobbyListRoot { font: font.clone() },
+                                MainMenuLobbyListRoot {
+                                    font: font.clone(),
+                                    faction_emblems: faction_emblems.clone(),
+                                },
                             ))
                             .with_children(|list| {
                                 for slot in 0..selection.selected_map_player_slots() {
-                                    spawn_menu_lobby_slot_row(list, slot, font.clone(), *selection);
+                                    spawn_menu_lobby_slot_row(
+                                        list,
+                                        slot,
+                                        font.clone(),
+                                        &faction_emblems,
+                                        *selection,
+                                    );
                                 }
                             });
                         });
@@ -8406,8 +8633,142 @@ fn spawn_menu_map_resource_controls(
     );
 }
 
-/// A labelled inline dropdown (toggle button showing the current value + ▾; when
+/// A labelled inline dropdown (toggle button showing the current value; when
 /// open, the option list expands below). Used for the 地图 + 初始资源 selectors.
+/// Z layer for menu dropdown popups — above all other menu UI. The menu screen and
+/// the in-match HUD are never on screen together, so this won't collide with HUD
+/// GlobalZIndex values.
+const MENU_DROPDOWN_POPUP_Z: i32 = 1000;
+
+/// Positioning context for a dropdown: a fixed-width column the floating popup
+/// anchors to (absolute children resolve against it).
+/// Fixed-width dropdown cell (used by the vertical left-column inline dropdowns).
+fn menu_dropdown_cell_node(width: f32) -> Node {
+    Node {
+        position_type: PositionType::Relative,
+        width: px(width),
+        flex_direction: FlexDirection::Column,
+        ..default()
+    }
+}
+
+/// Responsive dropdown cell for the horizontal player rows: flexes to share the row
+/// width evenly (so the rows never overflow the modal and scale with the window).
+/// `basis` biases the natural width (the faction cell is a bit wider than team/color).
+fn menu_dropdown_flex_cell_node(basis: f32) -> Node {
+    Node {
+        position_type: PositionType::Relative,
+        flex_grow: 1.0,
+        flex_shrink: 1.0,
+        flex_basis: px(basis),
+        min_width: px(0.0),
+        flex_direction: FlexDirection::Column,
+        ..default()
+    }
+}
+
+/// Spawns a godot-OptionButton-style dropdown INTO an already-spawned cell: the
+/// toggle button (current value) and, when `open`, a floating popup of options
+/// absolutely positioned just below it with a high `GlobalZIndex` so it overlays the
+/// rows beneath instead of pushing them down. The popup is a child of the cell, so
+/// it's despawned with it on the next rebuild.
+fn spawn_menu_dropdown_contents(
+    cell: &mut ChildSpawnerCommands,
+    toggle: MainMenuAction,
+    open: bool,
+    options: &[MainMenuAction],
+    selection: SkirmishMenuSelection,
+    font: Handle<Font>,
+    width: f32,
+    font_size: f32,
+) {
+    cell.spawn(menu_button(toggle, Val::Percent(100.0)))
+        .with_children(|button| {
+            button.spawn(menu_action_button_label(
+                toggle,
+                selection,
+                font.clone(),
+                font_size,
+            ));
+        });
+    if !open {
+        return;
+    }
+    cell.spawn((
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Percent(100.0),
+            left: px(0),
+            min_width: px(width),
+            flex_direction: FlexDirection::Column,
+            align_items: AlignItems::Stretch,
+            row_gap: px(1),
+            padding: UiRect::all(px(2)),
+            border: UiRect::all(px(1)),
+            ..default()
+        },
+        BorderColor::all(Color::srgb(0.45, 0.56, 0.52)),
+        BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.98)),
+        GlobalZIndex(MENU_DROPDOWN_POPUP_Z),
+    ))
+    .with_children(|popup| {
+        for option in options {
+            popup
+                .spawn(menu_button(*option, px(width)))
+                .with_children(|button| {
+                    button.spawn(menu_action_button_label(
+                        *option,
+                        selection,
+                        font.clone(),
+                        font_size,
+                    ));
+                });
+        }
+    });
+}
+
+/// A faction dropdown button: the faction emblem + its (re-translating) label, tagged
+/// as a MainMenuButton so the click/highlight systems treat it like any other button.
+fn spawn_faction_dropdown_button(
+    parent: &mut ChildSpawnerCommands,
+    action: MainMenuAction,
+    faction: SkirmishFaction,
+    faction_emblems: &[Handle<Image>; 3],
+    selection: SkirmishMenuSelection,
+    font: Handle<Font>,
+    width: Val,
+) {
+    parent
+        .spawn((
+            Button,
+            MainMenuButton { action },
+            Node {
+                width,
+                min_height: px(32),
+                flex_direction: FlexDirection::Row,
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::FlexStart,
+                column_gap: px(4),
+                padding: UiRect::new(px(4), px(4), px(0), px(0)),
+                border: UiRect::all(px(1)),
+                ..default()
+            },
+            BorderColor::all(Color::srgb(0.28, 0.34, 0.33)),
+            BackgroundColor(Color::srgba(0.046, 0.058, 0.06, 0.94)),
+        ))
+        .with_children(|button| {
+            button.spawn((
+                ImageNode::new(faction_emblems[faction.index()].clone()),
+                Node {
+                    width: px(16),
+                    height: px(16),
+                    ..default()
+                },
+            ));
+            button.spawn(menu_action_button_label(action, selection, font, 13.0));
+        });
+}
+
 fn spawn_menu_inline_dropdown(
     parent: &mut ChildSpawnerCommands,
     zh: &'static str,
@@ -8434,37 +8795,11 @@ fn spawn_menu_inline_dropdown(
     ));
     parent
         .spawn((
-            Node {
-                flex_direction: FlexDirection::Column,
-                align_items: AlignItems::Stretch,
-                row_gap: px(2),
-                ..default()
-            },
+            menu_dropdown_cell_node(240.0),
             MainMenuMapResourceControlElement,
         ))
         .with_children(|cell| {
-            cell.spawn(menu_button(toggle, 240.0))
-                .with_children(|button| {
-                    button.spawn(menu_action_button_label(
-                        toggle,
-                        selection,
-                        font.clone(),
-                        12.0,
-                    ));
-                });
-            if open {
-                for option in options {
-                    cell.spawn(menu_button(*option, 240.0))
-                        .with_children(|button| {
-                            button.spawn(menu_action_button_label(
-                                *option,
-                                selection,
-                                font.clone(),
-                                12.0,
-                            ));
-                        });
-                }
-            }
+            spawn_menu_dropdown_contents(cell, toggle, open, options, selection, font, 240.0, 12.0);
         });
 }
 
@@ -8498,33 +8833,14 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
         }
         MainMenuAction::SelectMap(index) => SKIRMISH_MAPS
             .get(index)
-            .map(|map| format!("{} {}", index + 1, map.name))
+            .map(|map| format!("{} {}", index + 1, localized_skirmish_map_name(map)))
             .unwrap_or_else(|| t("地图", "Map").to_string()),
         MainMenuAction::SelectStartingResources(index) => GODOT_STARTING_RESOURCE_OPTIONS
             .get(index)
             .map(|option| format!("{} {}", index + 5, starting_resource_option_label(option)))
             .unwrap_or_else(|| t("资源", "Resources").to_string()),
-        MainMenuAction::SelectMatchMode(mode) => {
-            format!("{} {}", skirmish_match_mode_key(mode), mode.label())
-        }
-        MainMenuAction::SelectAiDifficulty(difficulty) => format!(
-            "{} {}",
-            skirmish_ai_difficulty_key(difficulty),
-            difficulty.short_label()
-        ),
-        MainMenuAction::SelectLobbySlot(_) => t("我方", "Mine").to_string(),
-        MainMenuAction::CycleLobbySlotController(slot) => format!(
-            "{}{}+",
-            lobby_slot_key_prefix(skirmish_lobby_slot_controller_key(slot)),
-            selection
-                .lobby_controllers
-                .get(slot)
-                .copied()
-                .unwrap_or(SkirmishPlayerController::None)
-                .short_label()
-        ),
         MainMenuAction::ToggleLobbySlotController(slot) => format!(
-            "{} \u{25BE}",
+            "{}",
             selection
                 .lobby_controllers
                 .get(slot)
@@ -8536,7 +8852,7 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
             controller.short_label().to_string()
         }
         MainMenuAction::ToggleLobbySlotFaction(slot) => format!(
-            "{} \u{25BE}",
+            "{}",
             selection
                 .lobby_factions
                 .get(slot)
@@ -8545,35 +8861,8 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
                 .label()
         ),
         MainMenuAction::SetLobbySlotFaction(_, faction) => faction.label().to_string(),
-        MainMenuAction::CycleLobbySlotFaction(slot) => format!(
-            "{}{}+",
-            lobby_slot_key_prefix(skirmish_lobby_slot_faction_key(slot)),
-            selection
-                .lobby_factions
-                .get(slot)
-                .copied()
-                .unwrap_or(SkirmishFaction::Alliance)
-                .label()
-        ),
-        MainMenuAction::CycleLobbySlotTeamId(slot) => format!(
-            "{}T{}+",
-            lobby_slot_key_prefix(skirmish_lobby_slot_team_key(slot)),
-            selection.lobby_team_ids.get(slot).copied().unwrap_or(0) % SKIRMISH_TEAM_OPTION_COUNT
-                + 1
-        ),
-        MainMenuAction::CycleLobbySlotColor(slot) => format!(
-            "{}C{}+",
-            lobby_slot_key_prefix(skirmish_lobby_slot_color_key(slot)),
-            selection
-                .lobby_color_slots
-                .get(slot)
-                .copied()
-                .unwrap_or(slot)
-                % PLAYER_COLOR_PALETTE.len()
-                + 1
-        ),
         MainMenuAction::ToggleLobbySlotTeam(slot) => format!(
-            "{} \u{25BE}",
+            "{}",
             skirmish_team_label(
                 selection.lobby_team_ids.get(slot).copied().unwrap_or(0) as usize
                     % SKIRMISH_TEAM_OPTION_COUNT as usize
@@ -8581,7 +8870,7 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
         ),
         MainMenuAction::SetLobbySlotTeam(_, team_index) => skirmish_team_label(team_index),
         MainMenuAction::ToggleLobbySlotColor(slot) => format!(
-            "{} \u{25BE}",
+            "{}",
             skirmish_color_label(
                 selection
                     .lobby_color_slots
@@ -8592,15 +8881,13 @@ fn main_menu_button_label_text(action: MainMenuAction, selection: SkirmishMenuSe
             )
         ),
         MainMenuAction::SetLobbySlotColor(_, color_index) => skirmish_color_label(color_index),
-        MainMenuAction::ToggleMapDropdown => format!(
-            "{} \u{25BE}",
-            SKIRMISH_MAPS
-                .get(selection.map_index)
-                .map(|map| map.name)
-                .unwrap_or("Map")
-        ),
+        MainMenuAction::ToggleMapDropdown => SKIRMISH_MAPS
+            .get(selection.map_index)
+            .map(localized_skirmish_map_name)
+            .unwrap_or(t("地图", "Map"))
+            .to_string(),
         MainMenuAction::ToggleResourcesDropdown => format!(
-            "{} \u{25BE}",
+            "{}",
             GODOT_STARTING_RESOURCE_OPTIONS
                 .get(selection.starting_resource_index)
                 .map(|option| starting_resource_option_label(option).to_string())
@@ -8621,68 +8908,6 @@ fn skirmish_color_label(color_index: usize) -> String {
     format!("{}{}", t("色", "Color "), color_index + 1)
 }
 
-fn lobby_slot_key_prefix(key: &'static str) -> String {
-    if key.is_empty() {
-        String::new()
-    } else {
-        format!("{key} ")
-    }
-}
-
-fn skirmish_lobby_slot_controller_key(slot: usize) -> &'static str {
-    match slot {
-        0 => "Q",
-        1 => "W",
-        2 => "E",
-        _ => "",
-    }
-}
-
-fn skirmish_lobby_slot_faction_key(slot: usize) -> &'static str {
-    match slot {
-        0 => "Z",
-        1 => "X",
-        2 => "V",
-        _ => "",
-    }
-}
-
-fn skirmish_lobby_slot_team_key(slot: usize) -> &'static str {
-    match slot {
-        0 => "J",
-        1 => "K",
-        2 => "L",
-        _ => "",
-    }
-}
-
-fn skirmish_lobby_slot_color_key(slot: usize) -> &'static str {
-    match slot {
-        0 => "U",
-        1 => "I",
-        2 => "O",
-        _ => "",
-    }
-}
-
-fn skirmish_match_mode_key(mode: SkirmishMatchMode) -> &'static str {
-    match mode {
-        SkirmishMatchMode::OneVsOne => "9",
-        SkirmishMatchMode::FreeForAll => "0",
-        SkirmishMatchMode::AiVsAi => "A",
-        SkirmishMatchMode::AlliedTwoVsOne => "M",
-    }
-}
-
-fn skirmish_ai_difficulty_key(difficulty: AiDifficulty) -> &'static str {
-    match difficulty {
-        AiDifficulty::Beginner => "F1",
-        AiDifficulty::Easy => "F2",
-        AiDifficulty::Normal => "F3",
-        AiDifficulty::Hard => "F4",
-    }
-}
-
 fn starting_resource_option_label(option: &StartingResourceOption) -> &'static str {
     match option.key {
         "STARTING_RESOURCES_LOW" => t("低 4/2", "Low 4/2"),
@@ -8690,126 +8915,6 @@ fn starting_resource_option_label(option: &StartingResourceOption) -> &'static s
         "STARTING_RESOURCES_HIGH" => t("高 16/8", "High 16/8"),
         "STARTING_RESOURCES_RICH" => t("富矿 32/16", "Rich 32/16"),
         _ => t("资源", "Resources"),
-    }
-}
-
-fn menu_top_bar_node() -> impl Bundle {
-    (
-        Node {
-            width: Val::Percent(100.0),
-            max_width: px(1280),
-            height: px(66),
-            flex_direction: FlexDirection::Row,
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::SpaceBetween,
-            padding: UiRect::new(px(20), px(20), px(0), px(0)),
-            border: UiRect::all(px(1)),
-            ..default()
-        },
-        BorderColor::all(Color::srgb(0.32, 0.36, 0.34)),
-        BackgroundColor(Color::srgba(0.045, 0.055, 0.058, 0.96)),
-    )
-}
-
-fn menu_bottom_bar_node() -> impl Bundle {
-    (
-        Node {
-            width: Val::Percent(100.0),
-            max_width: px(1280),
-            height: px(92),
-            flex_direction: FlexDirection::Row,
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::FlexEnd,
-            column_gap: px(16),
-            padding: UiRect::new(px(18), px(18), px(10), px(10)),
-            border: UiRect::all(px(1)),
-            ..default()
-        },
-        BorderColor::all(Color::srgb(0.28, 0.34, 0.32)),
-        BackgroundColor(Color::srgba(0.035, 0.046, 0.048, 0.95)),
-    )
-}
-
-fn menu_scroll_area_node() -> impl Bundle {
-    (
-        MainMenuScrollArea,
-        ScrollPosition::default(),
-        Node {
-            width: Val::Percent(100.0),
-            max_width: px(1248),
-            min_height: px(0),
-            flex_grow: 1.0,
-            flex_direction: FlexDirection::Row,
-            flex_wrap: FlexWrap::Wrap,
-            align_items: AlignItems::FlexStart,
-            justify_content: JustifyContent::SpaceBetween,
-            column_gap: px(12),
-            row_gap: px(14),
-            overflow: Overflow::scroll_y(),
-            ..default()
-        },
-    )
-}
-
-fn menu_preview_column_node() -> impl Bundle {
-    Node {
-        width: px(400),
-        flex_direction: FlexDirection::Column,
-        align_items: AlignItems::Stretch,
-        row_gap: px(14),
-        ..default()
-    }
-}
-
-fn menu_options_grid_node() -> impl Bundle {
-    Node {
-        width: px(760),
-        flex_direction: FlexDirection::Column,
-        align_items: AlignItems::Stretch,
-        justify_content: JustifyContent::FlexStart,
-        row_gap: px(14),
-        ..default()
-    }
-}
-
-fn menu_panel_node(width: f32) -> impl Bundle {
-    (
-        Node {
-            width: px(width),
-            flex_direction: FlexDirection::Column,
-            align_items: AlignItems::Stretch,
-            row_gap: px(12),
-            padding: UiRect::all(px(14)),
-            border: UiRect::all(px(1)),
-            ..default()
-        },
-        BorderColor::all(Color::srgb(0.31, 0.36, 0.34)),
-        BackgroundColor(Color::srgba(0.033, 0.044, 0.045, 0.95)),
-    )
-}
-
-fn menu_panel_title(zh: &'static str, en: &'static str, font: Handle<Font>) -> impl Bundle {
-    (
-        localized_text(zh, en),
-        TextFont {
-            font: font.into(),
-            font_size: FontSize::Px(18.0),
-            ..default()
-        },
-        TextColor(Color::srgb(0.96, 0.72, 0.38)),
-    )
-}
-
-fn menu_rule_grid_node() -> impl Bundle {
-    Node {
-        width: Val::Percent(100.0),
-        flex_direction: FlexDirection::Row,
-        flex_wrap: FlexWrap::Wrap,
-        align_items: AlignItems::FlexStart,
-        justify_content: JustifyContent::SpaceBetween,
-        column_gap: px(10),
-        row_gap: px(12),
-        ..default()
     }
 }
 
@@ -8823,44 +8928,11 @@ fn menu_lobby_list_node() -> impl Bundle {
     }
 }
 
-fn menu_section_node() -> impl Bundle {
-    Node {
-        width: px(232),
-        flex_direction: FlexDirection::Column,
-        align_items: AlignItems::Stretch,
-        row_gap: px(8),
-        ..default()
-    }
-}
-
-fn menu_button_row_node() -> impl Bundle {
-    Node {
-        flex_direction: FlexDirection::Row,
-        flex_wrap: FlexWrap::Wrap,
-        align_items: AlignItems::FlexStart,
-        justify_content: JustifyContent::FlexStart,
-        column_gap: px(8),
-        row_gap: px(8),
-        ..default()
-    }
-}
-
-fn menu_section_title(zh: &'static str, en: &'static str, font: Handle<Font>) -> impl Bundle {
-    (
-        localized_text(zh, en),
-        TextFont {
-            font: font.into(),
-            font_size: FontSize::Px(13.0),
-            ..default()
-        },
-        TextColor(Color::srgb(0.62, 0.74, 0.74)),
-    )
-}
-
 fn spawn_menu_lobby_slot_row(
     parent: &mut ChildSpawnerCommands<'_>,
     slot: usize,
     font: Handle<Font>,
+    faction_emblems: &[Handle<Image>; 3],
     selection: SkirmishMenuSelection,
 ) {
     let controller = selection
@@ -8903,7 +8975,7 @@ fn spawn_menu_lobby_slot_row(
                         Text::new(format!("{:02}", slot + 1)),
                         TextFont {
                             font: font.clone().into(),
-                            font_size: FontSize::Px(13.0),
+                            font_size: FontSize::Px(15.0),
                             ..default()
                         },
                         TextColor(Color::srgb(0.96, 0.72, 0.38)),
@@ -8911,147 +8983,118 @@ fn spawn_menu_lobby_slot_row(
                 });
 
             let _ = (active, status);
-            // Controller dropdown — inline expand (关闭 / 我方 / 电脑). Inline so the
-            // scrolling lobby list never clips it. No separate "我方" claim button:
-            // picking 我方 here claims the slot (4 stray "我方" buttons looked like
-            // every slot was player-controlled).
-            row.spawn(Node {
-                flex_direction: FlexDirection::Column,
-                row_gap: px(2),
-                ..default()
-            })
-            .with_children(|cell| {
-                let toggle = MainMenuAction::ToggleLobbySlotController(slot);
-                cell.spawn(menu_button(toggle, 84.0))
-                    .with_children(|button| {
-                        button.spawn(menu_action_button_label(
-                            toggle,
-                            selection,
-                            font.clone(),
-                            10.0,
-                        ));
-                    });
-                if selection.controller_dropdown_open == Some(slot) {
-                    for controller in [
+            // Controller dropdown (floating popup): 关闭 / 我方 / 傻瓜~困难 AI.
+            row.spawn(menu_dropdown_flex_cell_node(84.0))
+                .with_children(|cell| {
+                    let options: Vec<MainMenuAction> = [
                         SkirmishPlayerController::None,
                         SkirmishPlayerController::Human,
                         SkirmishPlayerController::Ai(AiDifficulty::Beginner),
                         SkirmishPlayerController::Ai(AiDifficulty::Easy),
                         SkirmishPlayerController::Ai(AiDifficulty::Normal),
                         SkirmishPlayerController::Ai(AiDifficulty::Hard),
-                    ] {
-                        let option = MainMenuAction::SetLobbySlotController(slot, controller);
-                        cell.spawn(menu_button(option, 84.0))
-                            .with_children(|button| {
-                                button.spawn(menu_action_button_label(
-                                    option,
-                                    selection,
-                                    font.clone(),
-                                    10.0,
-                                ));
-                            });
-                    }
-                }
-            });
+                    ]
+                    .into_iter()
+                    .map(|c| MainMenuAction::SetLobbySlotController(slot, c))
+                    .collect();
+                    spawn_menu_dropdown_contents(
+                        cell,
+                        MainMenuAction::ToggleLobbySlotController(slot),
+                        selection.controller_dropdown_open == Some(slot),
+                        &options,
+                        selection,
+                        font.clone(),
+                        84.0,
+                        13.0,
+                    );
+                });
 
-            // Faction dropdown — inline expand (人族 / 魔族 / 混沌族).
-            row.spawn(Node {
-                flex_direction: FlexDirection::Column,
-                row_gap: px(2),
-                ..default()
-            })
-            .with_children(|cell| {
-                let toggle = MainMenuAction::ToggleLobbySlotFaction(slot);
-                cell.spawn(menu_button(toggle, 84.0))
-                    .with_children(|button| {
-                        button.spawn(menu_action_button_label(
-                            toggle,
-                            selection,
-                            font.clone(),
-                            10.0,
-                        ));
-                    });
-                if selection.faction_dropdown_open == Some(slot) {
-                    for faction in SkirmishFaction::ALL {
-                        let option = MainMenuAction::SetLobbySlotFaction(slot, faction);
-                        cell.spawn(menu_button(option, 84.0))
-                            .with_children(|button| {
-                                button.spawn(menu_action_button_label(
-                                    option,
+            // Faction dropdown (floating popup) with emblems: 苍穹联盟 / 炽炎魔军 / 混沌裂隙.
+            row.spawn(menu_dropdown_flex_cell_node(96.0))
+                .with_children(|cell| {
+                    let current = selection
+                        .lobby_factions
+                        .get(slot)
+                        .copied()
+                        .unwrap_or(SkirmishFaction::Alliance);
+                    spawn_faction_dropdown_button(
+                        cell,
+                        MainMenuAction::ToggleLobbySlotFaction(slot),
+                        current,
+                        faction_emblems,
+                        selection,
+                        font.clone(),
+                        Val::Percent(100.0),
+                    );
+                    if selection.faction_dropdown_open == Some(slot) {
+                        cell.spawn((
+                            Node {
+                                position_type: PositionType::Absolute,
+                                top: Val::Percent(100.0),
+                                left: px(0),
+                                min_width: px(124.0),
+                                flex_direction: FlexDirection::Column,
+                                align_items: AlignItems::Stretch,
+                                row_gap: px(1),
+                                padding: UiRect::all(px(2)),
+                                border: UiRect::all(px(1)),
+                                ..default()
+                            },
+                            BorderColor::all(Color::srgb(0.45, 0.56, 0.52)),
+                            BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.98)),
+                            GlobalZIndex(MENU_DROPDOWN_POPUP_Z),
+                        ))
+                        .with_children(|popup| {
+                            for faction in SkirmishFaction::ALL {
+                                spawn_faction_dropdown_button(
+                                    popup,
+                                    MainMenuAction::SetLobbySlotFaction(slot, faction),
+                                    faction,
+                                    faction_emblems,
                                     selection,
                                     font.clone(),
-                                    10.0,
-                                ));
-                            });
+                                    px(124.0),
+                                );
+                            }
+                        });
                     }
-                }
-            });
+                });
 
-            // Team dropdown — inline expand (队1 … 队N), like the controller/faction ones.
-            row.spawn(Node {
-                flex_direction: FlexDirection::Column,
-                row_gap: px(2),
-                ..default()
-            })
-            .with_children(|cell| {
-                let toggle = MainMenuAction::ToggleLobbySlotTeam(slot);
-                cell.spawn(menu_button(toggle, 72.0))
-                    .with_children(|button| {
-                        button.spawn(menu_action_button_label(
-                            toggle,
-                            selection,
-                            font.clone(),
-                            10.0,
-                        ));
-                    });
-                if selection.team_dropdown_open == Some(slot) {
-                    for team_index in 0..SKIRMISH_TEAM_OPTION_COUNT as usize {
-                        let option = MainMenuAction::SetLobbySlotTeam(slot, team_index);
-                        cell.spawn(menu_button(option, 72.0))
-                            .with_children(|button| {
-                                button.spawn(menu_action_button_label(
-                                    option,
-                                    selection,
-                                    font.clone(),
-                                    10.0,
-                                ));
-                            });
-                    }
-                }
-            });
+            // Team dropdown (floating popup): 队1 … 队N.
+            row.spawn(menu_dropdown_flex_cell_node(72.0))
+                .with_children(|cell| {
+                    let options: Vec<MainMenuAction> = (0..SKIRMISH_TEAM_OPTION_COUNT as usize)
+                        .map(|t| MainMenuAction::SetLobbySlotTeam(slot, t))
+                        .collect();
+                    spawn_menu_dropdown_contents(
+                        cell,
+                        MainMenuAction::ToggleLobbySlotTeam(slot),
+                        selection.team_dropdown_open == Some(slot),
+                        &options,
+                        selection,
+                        font.clone(),
+                        72.0,
+                        13.0,
+                    );
+                });
 
-            // Color dropdown — inline expand (色1 … 色N).
-            row.spawn(Node {
-                flex_direction: FlexDirection::Column,
-                row_gap: px(2),
-                ..default()
-            })
-            .with_children(|cell| {
-                let toggle = MainMenuAction::ToggleLobbySlotColor(slot);
-                cell.spawn(menu_button(toggle, 72.0))
-                    .with_children(|button| {
-                        button.spawn(menu_action_button_label(
-                            toggle,
-                            selection,
-                            font.clone(),
-                            10.0,
-                        ));
-                    });
-                if selection.color_dropdown_open == Some(slot) {
-                    for color_index in 0..PLAYER_COLOR_PALETTE.len() {
-                        let option = MainMenuAction::SetLobbySlotColor(slot, color_index);
-                        cell.spawn(menu_button(option, 72.0))
-                            .with_children(|button| {
-                                button.spawn(menu_action_button_label(
-                                    option,
-                                    selection,
-                                    font.clone(),
-                                    10.0,
-                                ));
-                            });
-                    }
-                }
-            });
+            // Color dropdown (floating popup): 色1 … 色N.
+            row.spawn(menu_dropdown_flex_cell_node(72.0))
+                .with_children(|cell| {
+                    let options: Vec<MainMenuAction> = (0..PLAYER_COLOR_PALETTE.len())
+                        .map(|c| MainMenuAction::SetLobbySlotColor(slot, c))
+                        .collect();
+                    spawn_menu_dropdown_contents(
+                        cell,
+                        MainMenuAction::ToggleLobbySlotColor(slot),
+                        selection.color_dropdown_open == Some(slot),
+                        &options,
+                        selection,
+                        font.clone(),
+                        72.0,
+                        13.0,
+                    );
+                });
         });
 }
 
@@ -9102,12 +9145,12 @@ fn menu_lobby_slot_row_node(slot: usize, selection: SkirmishMenuSelection) -> im
     )
 }
 
-fn menu_button(action: MainMenuAction, width: f32) -> impl Bundle {
+fn menu_button(action: MainMenuAction, width: Val) -> impl Bundle {
     (
         Button,
         MainMenuButton { action },
         Node {
-            width: px(width),
+            width,
             min_height: px(38),
             border: UiRect::all(px(1)),
             align_items: AlignItems::Center,
@@ -9458,7 +9501,13 @@ fn update_main_menu_lobby_slots(
     };
     root_commands.with_children(|parent| {
         for slot in 0..selection.selected_map_player_slots() {
-            spawn_menu_lobby_slot_row(parent, slot, list_root.font.clone(), *selection);
+            spawn_menu_lobby_slot_row(
+                parent,
+                slot,
+                list_root.font.clone(),
+                &list_root.faction_emblems,
+                *selection,
+            );
         }
     });
 }
@@ -9569,18 +9618,6 @@ fn main_menu_buttons(
                 {
                     selection.set_starting_resource_choice(index);
                 }
-                MainMenuAction::SelectMatchMode(mode) => {
-                    selection.set_match_mode(mode);
-                }
-                MainMenuAction::SelectAiDifficulty(difficulty) => {
-                    selection.set_ai_difficulty(difficulty);
-                }
-                MainMenuAction::SelectLobbySlot(slot) => {
-                    selection.select_lobby_slot(slot);
-                }
-                MainMenuAction::CycleLobbySlotController(slot) => {
-                    selection.cycle_lobby_slot_controller(slot);
-                }
                 MainMenuAction::ToggleLobbySlotController(slot) => {
                     selection.toggle_controller_dropdown(slot);
                 }
@@ -9592,15 +9629,6 @@ fn main_menu_buttons(
                 }
                 MainMenuAction::SetLobbySlotFaction(slot, faction) => {
                     selection.set_lobby_slot_faction_choice(slot, faction);
-                }
-                MainMenuAction::CycleLobbySlotFaction(slot) => {
-                    selection.cycle_lobby_slot_faction(slot);
-                }
-                MainMenuAction::CycleLobbySlotTeamId(slot) => {
-                    selection.cycle_lobby_slot_team_id(slot);
-                }
-                MainMenuAction::CycleLobbySlotColor(slot) => {
-                    selection.cycle_lobby_slot_color(slot);
                 }
                 MainMenuAction::ToggleLobbySlotTeam(slot) => {
                     selection.toggle_team_dropdown(slot);
@@ -9685,6 +9713,33 @@ fn main_menu_button_visual(
                 Color::srgb(0.38, 0.64, 0.38),
             ),
         };
+    }
+
+    // Color dropdown: paint each button with the actual player color (godot shows
+    // the palette swatch), and mark the current pick with a bright border.
+    let swatch = match action {
+        MainMenuAction::ToggleLobbySlotColor(slot) => Some(
+            selection
+                .lobby_color_slots
+                .get(slot)
+                .copied()
+                .unwrap_or(slot)
+                % PLAYER_COLOR_PALETTE.len(),
+        ),
+        MainMenuAction::SetLobbySlotColor(_, index) => Some(index % PLAYER_COLOR_PALETTE.len()),
+        _ => None,
+    };
+    if let Some(index) = swatch {
+        let c = PLAYER_COLOR_PALETTE[index];
+        let bg = Color::srgb(c[0], c[1], c[2]);
+        let border = if action.is_selected(selection) {
+            Color::srgb(1.0, 0.95, 0.7)
+        } else if interaction != Interaction::None {
+            Color::WHITE
+        } else {
+            Color::srgba(0.0, 0.0, 0.0, 0.5)
+        };
+        return (bg, border);
     }
 
     let selected = action.is_selected(selection);
@@ -9946,15 +10001,15 @@ fn faction_product_count(faction: &registry::FactionDef, producer: &str) -> usiz
 fn faction_playstyle_summary(faction: SkirmishFaction) -> &'static str {
     match faction {
         SkirmishFaction::Alliance => t(
-            "人族: 全科技混合军，防御和兵种最完整，适合稳步推进",
+            "苍穹联盟: 全科技混合军，防御和兵种最完整，适合稳步推进",
             "Alliance: full-tech combined army; best defense and unit roster, for steady pushes",
         ),
         SkirmishFaction::Demon => t(
-            "魔族: 火力突击和攻城压制，单位线更集中，适合快速正面进攻",
+            "炽炎魔军: 火力突击和攻城压制，单位线更集中，适合快速正面进攻",
             "Demon: firepower rushes and siege pressure; tighter unit line, for fast frontal assaults",
         ),
         SkirmishFaction::Chaos => t(
-            "混沌族: 护盾、无人机、干扰和高阶防御，适合控场消耗",
+            "混沌裂隙: 护盾、无人机、干扰和高阶防御，适合控场消耗",
             "Chaos: shields, drones, jamming and high-tier defense, for zone control and attrition",
         ),
     }
@@ -9974,6 +10029,7 @@ fn setup(
     selected_map: Res<SelectedSkirmishMap>,
     setup_settings: Res<MatchSetupSettings>,
     camera_state: Res<RtsCamera>,
+    options: Res<MenuOptionsState>,
 ) {
     let skirmish_map = selected_map.definition();
     let catalog_consistent = skirmish_map.is_catalog_consistent();
@@ -9982,9 +10038,24 @@ fn setup(
     commands.insert_resource(map_bounds);
 
     commands.spawn((
-        Camera3d::default(),
-        camera_transform_from_state(&camera_state),
-        camera_projection_from_state(&camera_state),
+        rts_camera_component(&camera_state, map_bounds, options.camera_tilt),
+        RtsCameraControls {
+            // Pan with the arrow keys + screen-edge; rotate with middle-drag or [ ].
+            // WASD / Q / E are deliberately left to the godot-style command hotkeys.
+            key_up: KeyCode::ArrowUp,
+            key_down: KeyCode::ArrowDown,
+            key_left: KeyCode::ArrowLeft,
+            key_right: KeyCode::ArrowRight,
+            key_rotate_left: KeyCode::BracketLeft,
+            key_rotate_right: KeyCode::BracketRight,
+            pan_speed: options.camera_pan_speed,
+            edge_pan_width: if options.camera_edge_pan {
+                CAMERA_EDGE_PAN_WIDTH
+            } else {
+                0.0
+            },
+            ..default()
+        },
         MainCamera,
         MatchScopedEntity,
     ));
@@ -10033,11 +10104,14 @@ fn setup(
         crystal: materials.add(resource_tint_material(ResourceKind::Crystal)),
     });
 
+    // Decorative scenery rocks (godot's decorations/RockLargeA.tscn uses the PLAIN
+    // rock_largeA, NOT the crystal model — using rock_crystalsLargeA here made them
+    // look like harvestable ore that couldn't be selected/harvested).
     for x in [-17.0, -8.0, 6.0, 15.0] {
         spawn_prop(
             &mut commands,
             &asset_server,
-            "models/kenney-spacekit/rock_crystalsLargeA.glb",
+            "models/kenney-spacekit/rock_largeA.glb",
             Vec3::new(x, 0.0, -2.0 + x.sin() * 8.0),
             0.9,
         );
@@ -12926,41 +13000,220 @@ fn is_spawn_position_free(
     true
 }
 
-fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
-    let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+/// One resource group in the top-left bar: a colored swatch (the mineral color) +
+/// a count label that `update_resource_bar` keeps current.
+fn spawn_hud_resource_group(
+    bar: &mut ChildSpawnerCommands,
+    kind: ResourceKind,
+    font: Handle<Font>,
+) {
+    bar.spawn(Node {
+        flex_direction: FlexDirection::Row,
+        align_items: AlignItems::Center,
+        column_gap: px(6),
+        ..default()
+    })
+    .with_children(|group| {
+        group.spawn((
+            Node {
+                width: px(14),
+                height: px(14),
+                border: UiRect::all(px(1)),
+                ..default()
+            },
+            BorderColor::all(Color::srgba(0.0, 0.0, 0.0, 0.6)),
+            BackgroundColor(kind.color()),
+        ));
+        group.spawn((
+            Text::new("0"),
+            TextFont {
+                font: font.into(),
+                font_size: FontSize::Px(18.0),
+                ..default()
+            },
+            TextColor(Color::srgb(0.95, 0.97, 1.0)),
+            HudResourceCount(kind),
+        ));
+    });
+}
 
+fn update_resource_bar(
+    economies: Res<Economies>,
+    visible_player: Res<VisiblePlayer>,
+    mut counts: Query<
+        (&HudResourceCount, &mut Text),
+        (Without<HudPowerText>, Without<HudLowPowerText>),
+    >,
+    mut power_text: Query<
+        &mut Text,
+        (
+            With<HudPowerText>,
+            Without<HudResourceCount>,
+            Without<HudLowPowerText>,
+        ),
+    >,
+    mut power_color: Query<&mut TextColor, With<HudPowerText>>,
+    mut low_power: Query<&mut Visibility, With<HudLowPowerText>>,
+) {
+    let econ = economies.get(visible_player.team);
+    for (count, mut text) in &mut counts {
+        let value = match count.0 {
+            ResourceKind::Ore => econ.ore,
+            ResourceKind::Crystal => econ.crystal,
+        };
+        let next = value.to_string();
+        if text.0 != next {
+            text.0 = next;
+        }
+    }
+    let low = econ.low_power();
+    let pwr = format!("{}/{}", econ.power_capacity, econ.power_used);
+    for mut text in &mut power_text {
+        if text.0 != pwr {
+            text.0 = pwr.clone();
+        }
+    }
+    let color = if low {
+        Color::srgb(1.0, 0.42, 0.32)
+    } else {
+        Color::srgb(0.72, 1.0, 0.74)
+    };
+    for mut text_color in &mut power_color {
+        text_color.0 = color;
+    }
+    for mut visibility in &mut low_power {
+        *visibility = if low {
+            Visibility::Inherited
+        } else {
+            Visibility::Hidden
+        };
+    }
+}
+
+/// Hide the status / selected-unit panels when their text is empty, so their
+/// background boxes don't linger (the top-left strip is empty whenever no command
+/// mode is active, leaving just the resource bar like godot).
+fn update_selection_text_visibility(
+    mut query: Query<(&Text, &mut Visibility), Or<(With<SelectionText>, With<StatsText>)>>,
+) {
+    for (text, mut visibility) in &mut query {
+        let wanted = if text.0.trim().is_empty() {
+            Visibility::Hidden
+        } else {
+            Visibility::Inherited
+        };
+        if *visibility != wanted {
+            *visibility = wanted;
+        }
+    }
+}
+
+fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
+    let font = asset_server.load(UI_FONT_PATH);
+
+    // Top-left resource/power bar (godot ResourcesBar): colored swatch + count per
+    // resource, then a color-coded power readout + a low-power warning.
+    commands
+        .spawn((
+            Name::new("Resource Bar"),
+            Node {
+                position_type: PositionType::Absolute,
+                top: px(10),
+                left: px(12),
+                flex_direction: FlexDirection::Row,
+                align_items: AlignItems::Center,
+                column_gap: px(16),
+                padding: UiRect::new(px(12), px(14), px(6), px(6)),
+                border: UiRect::all(px(1)),
+                ..default()
+            },
+            BorderColor::all(Color::srgb(0.26, 0.32, 0.32)),
+            BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.82)),
+            MatchScopedEntity,
+        ))
+        .with_children(|bar| {
+            spawn_hud_resource_group(bar, ResourceKind::Ore, font.clone());
+            spawn_hud_resource_group(bar, ResourceKind::Crystal, font.clone());
+            // Power group.
+            bar.spawn((
+                localized_text("电力", "PWR"),
+                TextFont {
+                    font: font.clone().into(),
+                    font_size: FontSize::Px(16.0),
+                    ..default()
+                },
+                TextColor(Color::srgb(0.7, 0.86, 0.72)),
+            ));
+            bar.spawn((
+                Text::new("0/0"),
+                TextFont {
+                    font: font.clone().into(),
+                    font_size: FontSize::Px(16.0),
+                    ..default()
+                },
+                TextColor(Color::srgb(0.72, 1.0, 0.74)),
+                HudPowerText,
+            ));
+            bar.spawn((
+                localized_text("低电力", "LOW POWER"),
+                TextFont {
+                    font: font.clone().into(),
+                    font_size: FontSize::Px(14.0),
+                    ..default()
+                },
+                TextColor(Color::srgb(1.0, 0.42, 0.32)),
+                Visibility::Hidden,
+                HudLowPowerText,
+            ));
+        });
+
+    // Global status (team / units / AI / mode) — a styled strip just under the
+    // resource bar.
     commands.spawn((
         Text::new(""),
         TextFont {
             font: font.clone().into(),
-            font_size: FontSize::Px(18.0),
+            font_size: FontSize::Px(14.0),
             ..default()
         },
-        TextColor(Color::srgb(0.92, 0.96, 1.0)),
+        TextColor(Color::srgb(0.86, 0.92, 0.96)),
         Node {
             position_type: PositionType::Absolute,
-            top: px(12),
-            left: px(14),
+            top: px(52),
+            left: px(12),
+            padding: UiRect::new(px(8), px(10), px(3), px(3)),
+            border: UiRect::all(px(1)),
             ..default()
         },
+        BorderColor::all(Color::srgb(0.22, 0.28, 0.28)),
+        BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.7)),
         StatsText,
         MatchScopedEntity,
     ));
 
+    // Selected-unit details — bottom-left, just above the portrait/command card so
+    // the unit's text sits with its icon (like godot's unit panel) instead of
+    // overlapping the top-left status.
     commands.spawn((
         Text::new(""),
         TextFont {
             font: font.clone().into(),
-            font_size: FontSize::Px(15.0),
+            font_size: FontSize::Px(14.0),
             ..default()
         },
-        TextColor(Color::srgb(0.84, 0.9, 0.92)),
+        TextColor(Color::srgb(0.86, 0.92, 0.94)),
         Node {
             position_type: PositionType::Absolute,
-            top: px(42),
-            left: px(14),
+            // Bottom-center, to the right of the portrait (godot SelectionInfo panel).
+            bottom: px(12),
+            left: px(272),
+            max_width: px(372),
+            padding: UiRect::new(px(8), px(10), px(3), px(3)),
+            border: UiRect::all(px(1)),
             ..default()
         },
+        BorderColor::all(Color::srgb(0.24, 0.3, 0.32)),
+        BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.7)),
         SelectionText,
         MatchScopedEntity,
     ));
@@ -12969,8 +13222,9 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
         ImageNode::default(),
         Node {
             position_type: PositionType::Absolute,
-            left: px(14),
-            bottom: px(140),
+            // godot: selection/unit panel sits bottom-center (between minimap and command grid).
+            left: px(200),
+            bottom: px(12),
             width: px(64),
             height: px(64),
             border: UiRect::all(px(2)),
@@ -12982,85 +13236,76 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
         MatchScopedEntity,
     ));
 
-    commands.spawn((
-        Text::new(""),
-        TextFont {
-            font: font.clone().into(),
-            font_size: FontSize::Px(14.0),
-            ..default()
-        },
-        TextColor(Color::srgb(0.86, 0.95, 0.88)),
-        Node {
-            position_type: PositionType::Absolute,
-            top: px(12),
-            right: px(18),
-            max_width: px(390),
-            ..default()
-        },
-        ObjectiveTrackerText,
-        MatchScopedEntity,
-    ));
+    // godot: objective tracker (+ progress bar) centered near the top.
+    commands
+        .spawn((
+            Node {
+                position_type: PositionType::Absolute,
+                top: px(12),
+                left: px(0),
+                right: px(0),
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Center,
+                row_gap: px(4),
+                ..default()
+            },
+            MatchScopedEntity,
+        ))
+        .with_children(|center| {
+            center.spawn((
+                Text::new(""),
+                TextFont {
+                    font: font.clone().into(),
+                    font_size: FontSize::Px(14.0),
+                    ..default()
+                },
+                TextColor(Color::srgb(0.86, 0.95, 0.88)),
+                TextLayout::justify(Justify::Center),
+                Node {
+                    max_width: px(460),
+                    ..default()
+                },
+                ObjectiveTrackerText,
+            ));
+            center
+                .spawn((
+                    Node {
+                        width: px(300),
+                        height: px(8),
+                        border: UiRect::all(px(1)),
+                        ..default()
+                    },
+                    BorderColor::all(Color::srgb(0.3, 0.4, 0.42)),
+                    BackgroundColor(Color::srgba(0.02, 0.05, 0.04, 0.7)),
+                ))
+                .with_children(|track| {
+                    track.spawn((
+                        Node {
+                            width: Val::Percent(0.0),
+                            height: Val::Percent(100.0),
+                            ..default()
+                        },
+                        BackgroundColor(Color::srgb(0.3, 0.8, 0.42)),
+                        ObjectiveProgressFill,
+                    ));
+                });
+        });
 
+    // godot: battle notifications/log centered, just below the objective tracker.
     commands.spawn((
         Node {
             position_type: PositionType::Absolute,
             top: px(BATTLE_LOG_TOP_PX),
-            right: px(BATTLE_LOG_RIGHT_PX),
-            width: px(BATTLE_LOG_WIDTH_PX),
+            left: px(0),
+            right: px(0),
             flex_direction: FlexDirection::Column,
             row_gap: px(3),
-            align_items: AlignItems::FlexEnd,
+            align_items: AlignItems::Center,
             ..default()
         },
         BattleLogRoot { font: font.clone() },
         MatchScopedEntity,
     ));
-
-    commands.spawn((
-        Text::new(""),
-        TextFont {
-            font: font.clone().into(),
-            font_size: FontSize::Px(14.0),
-            ..default()
-        },
-        TextColor(Color::srgb(0.8, 0.9, 0.92)),
-        Node {
-            position_type: PositionType::Absolute,
-            left: px(14),
-            bottom: px(238),
-            max_width: px(560),
-            ..default()
-        },
-        ProductionQueueText,
-        MatchScopedEntity,
-    ));
-
-    let queue_font = font.clone();
-    commands
-        .spawn((
-            Node {
-                position_type: PositionType::Absolute,
-                left: px(14),
-                bottom: px(142),
-                width: px(790),
-                height: px(88),
-                flex_wrap: FlexWrap::Wrap,
-                column_gap: px(6),
-                row_gap: px(6),
-                align_items: AlignItems::Center,
-                ..default()
-            },
-            MatchScopedEntity,
-        ))
-        .with_children(|parent| {
-            for index in 0..PRODUCTION_QUEUE_HUD_SLOT_COUNT {
-                parent
-                    .spawn(production_queue_slot(index))
-                    .with_children(|slot| {
-                        slot.spawn(production_queue_slot_label(index, queue_font.clone()));
-                    });
-            }
-        });
 
     setup_minimap(commands, font.clone());
     setup_selection_drag_box(commands);
@@ -13068,29 +13313,65 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
     setup_match_menu_overlay(commands, font.clone());
     setup_match_briefing(commands, font.clone());
 
+    // godot: production queue stacked directly above the command grid, both pinned to
+    // the bottom-right corner. A column container so the queue always hugs the top of
+    // the grid (no floating) and both size to their content.
+    let queue_font = font.clone();
     commands
         .spawn((
             Node {
                 position_type: PositionType::Absolute,
-                left: px(14),
-                right: px(14),
-                bottom: px(14),
-                height: px(118),
-                flex_wrap: FlexWrap::Wrap,
-                column_gap: px(8),
+                right: px(12),
+                bottom: px(12),
+                width: px(612),
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Stretch,
                 row_gap: px(8),
-                align_items: AlignItems::Center,
                 ..default()
             },
             MatchScopedEntity,
         ))
-        .with_children(|parent| {
-            for index in 0..COMMAND_SLOT_COUNT {
-                parent.spawn(command_button(index)).with_children(|button| {
-                    button.spawn(command_button_icon(index));
-                    button.spawn(command_button_label(index, font.clone()));
+        .with_children(|stack| {
+            // Production queue row (above the command grid).
+            stack
+                .spawn(Node {
+                    width: Val::Percent(100.0),
+                    flex_wrap: FlexWrap::Wrap,
+                    column_gap: px(6),
+                    row_gap: px(6),
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::FlexEnd,
+                    ..default()
+                })
+                .with_children(|parent| {
+                    for index in 0..PRODUCTION_QUEUE_HUD_SLOT_COUNT {
+                        parent
+                            .spawn(production_queue_slot(index))
+                            .with_children(|slot| {
+                                slot.spawn(production_queue_slot_label(index, queue_font.clone()));
+                                slot.spawn(production_queue_slot_count(index, queue_font.clone()));
+                            });
+                    }
                 });
-            }
+            // Command/action grid (below).
+            stack
+                .spawn(Node {
+                    width: Val::Percent(100.0),
+                    flex_wrap: FlexWrap::Wrap,
+                    column_gap: px(8),
+                    row_gap: px(8),
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::FlexEnd,
+                    ..default()
+                })
+                .with_children(|parent| {
+                    for index in 0..COMMAND_SLOT_COUNT {
+                        parent.spawn(command_button(index)).with_children(|button| {
+                            button.spawn(command_button_icon(index));
+                            button.spawn(command_button_label(index, font.clone()));
+                        });
+                    }
+                });
         });
 }
 
@@ -13120,7 +13401,7 @@ fn setup_minimap(commands: &mut Commands, font: Handle<Font>) {
             MinimapRoot,
             Node {
                 position_type: PositionType::Absolute,
-                right: px(MINIMAP_RIGHT_PX),
+                left: px(MINIMAP_LEFT_PX),
                 bottom: px(MINIMAP_BOTTOM_PX),
                 width: px(MINIMAP_SIZE_PX),
                 height: px(MINIMAP_SIZE_PX),
@@ -14952,54 +15233,88 @@ fn production_queue_slot_label(index: usize, font: Handle<Font>) -> impl Bundle 
     )
 }
 
-fn camera_control(
-    time: Res<Time>,
-    keyboard: Res<ButtonInput<KeyCode>>,
-    mut mouse_motion_events: MessageReader<MouseMotion>,
-    mut wheel_events: MessageReader<MouseWheel>,
-    map_bounds: Res<MapBounds>,
-    window_q: Query<&Window, With<PrimaryWindow>>,
-    mut camera_state: ResMut<RtsCamera>,
-    mut camera_q: Query<(&mut Transform, &mut Projection), With<MainCamera>>,
-) {
-    let Ok(window) = window_q.single() else {
-        return;
-    };
-    clamp_camera_view_safely(&mut camera_state, *map_bounds);
-    if mouse_motion_events.read().next().is_some() {
-        camera_state.edge_pan_active = true;
-    }
-    let cursor = window.cursor_position();
-    let pan = camera_screen_pan_vector(
-        &keyboard,
-        cursor,
-        window_size_vec(window),
-        camera_state.edge_pan_active,
-        cursor.is_some_and(|c| cursor_blocks_edge_pan(window, c)),
-    );
-    if pan.length_squared() > 0.0 {
-        let yaw = camera_state.yaw;
-        let distance = camera_state.distance;
-        let delta_seconds = time.delta_secs();
-        camera_state.focus += camera_pan_delta(yaw, distance, pan, delta_seconds);
-        clamp_camera_focus_safely(&mut camera_state, *map_bounds);
-    }
-    for event in wheel_events.read() {
-        let scroll = match event.unit {
-            MouseScrollUnit::Line => event.y,
-            MouseScrollUnit::Pixel => event.y * 0.05,
-        };
-        camera_state.distance = camera_zoom_distance_after_scroll(camera_state.distance, scroll);
-    }
-    let Ok((mut transform, mut projection)) = camera_q.single_mut() else {
-        return;
-    };
-    *transform = camera_transform_from_state(&camera_state);
-    *projection = camera_projection_from_state(&camera_state);
+/// The "×N" count badge anchored to a queued slot's bottom-right corner.
+fn production_queue_slot_count(index: usize, font: Handle<Font>) -> impl Bundle {
+    (
+        Text::new(""),
+        TextFont {
+            font: font.into(),
+            font_size: FontSize::Px(11.0),
+            ..default()
+        },
+        TextColor(Color::srgb(0.98, 0.86, 0.42)),
+        Node {
+            position_type: PositionType::Absolute,
+            right: px(3),
+            bottom: px(1),
+            ..default()
+        },
+        ProductionQueueSlotCount(index),
+    )
 }
 
-fn camera_zoom_distance_after_scroll(current_distance: f32, scroll_lines: f32) -> f32 {
-    safe_camera_distance(current_distance - scroll_lines)
+/// Bridges the game's `RtsCamera` resource and the `bevy_rts_camera` component.
+///
+/// Live input (WASD/edge-pan/zoom/rotate) is owned by the plugin's
+/// `RtsCameraControls`; this system runs before `RtsCameraSystemSet`. On an
+/// explicit `pending_jump` it pushes `focus`/`distance` into the component with
+/// `snap = true`; otherwise it mirrors the plugin's live target back into the
+/// resource so the minimap and camera bookmarks read up-to-date values.
+fn camera_control(
+    map_bounds: Res<MapBounds>,
+    mut camera_state: ResMut<RtsCamera>,
+    mut camera_q: Query<&mut RtsCam, With<MainCamera>>,
+) {
+    let Ok(mut cam) = camera_q.single_mut() else {
+        return;
+    };
+    cam.bounds = camera_bounds_aabb(*map_bounds);
+    if camera_state.pending_jump {
+        let focus = safe_camera_focus(camera_state.focus, *map_bounds);
+        cam.target_focus.translation = focus;
+        cam.target_zoom = camera_zoom_from_distance(camera_state.distance);
+        cam.snap = true;
+        camera_state.focus = focus;
+        camera_state.distance = safe_camera_distance(camera_state.distance);
+        camera_state.pending_jump = false;
+    } else {
+        camera_state.focus = cam.target_focus.translation;
+        camera_state.distance = camera_distance_from_zoom(cam.target_zoom);
+    }
+}
+
+/// Applies camera options and gates edge-pan while UI overlays own the cursor.
+fn apply_camera_settings(
+    options: Res<MenuOptionsState>,
+    window_q: Query<&Window, With<PrimaryWindow>>,
+    match_menu: Res<MatchMenuState>,
+    briefing: Res<MatchBriefingState>,
+    mut camera_q: Query<(&mut RtsCam, &mut RtsCameraControls), With<MainCamera>>,
+) {
+    let Ok((mut cam, mut controls)) = camera_q.single_mut() else {
+        return;
+    };
+    cam.angle = options.camera_tilt;
+    cam.target_angle = options.camera_tilt;
+    cam.min_angle = options.camera_tilt;
+    controls.pan_speed = options.camera_pan_speed;
+    controls.edge_pan_width =
+        effective_camera_edge_pan_width(&options, window_q.single().ok(), &match_menu, &briefing);
+}
+
+fn effective_camera_edge_pan_width(
+    options: &MenuOptionsState,
+    window: Option<&Window>,
+    match_menu: &MatchMenuState,
+    briefing: &MatchBriefingState,
+) -> f32 {
+    if !options.camera_edge_pan || match_menu.visible || briefing.visible {
+        return 0.0;
+    }
+    if window.is_some_and(cursor_is_over_hud) {
+        return 0.0;
+    }
+    CAMERA_EDGE_PAN_WIDTH
 }
 
 fn safe_camera_distance(distance: f32) -> f32 {
@@ -15012,6 +15327,9 @@ fn safe_camera_focus(focus: Vec3, bounds: MapBounds) -> Vec3 {
 
 fn set_camera_focus_safely(camera: &mut RtsCamera, focus: Vec3, bounds: MapBounds) {
     camera.focus = safe_camera_focus(focus, bounds);
+    // Flag an explicit jump so `camera_control` pushes it into the plugin instead
+    // of mirroring the (stale) live camera back over it.
+    camera.pending_jump = true;
 }
 
 fn clamp_camera_focus_safely(camera: &mut RtsCamera, bounds: MapBounds) {
@@ -15025,89 +15343,6 @@ fn clamp_camera_distance_safely(camera: &mut RtsCamera) {
 fn clamp_camera_view_safely(camera: &mut RtsCamera, bounds: MapBounds) {
     clamp_camera_focus_safely(camera, bounds);
     clamp_camera_distance_safely(camera);
-}
-
-fn cursor_edge_pan_vector(
-    cursor: Option<Vec2>,
-    window_size: Vec2,
-    edge_pan_active: bool,
-    over_hud: bool,
-) -> Vec2 {
-    if !edge_pan_active || over_hud {
-        return Vec2::ZERO;
-    }
-    let Some(cursor) = cursor else {
-        return Vec2::ZERO;
-    };
-    let mut pan = Vec2::ZERO;
-    if cursor.x < EDGE_PAN_PX {
-        pan.x -= 1.0;
-    } else if cursor.x > window_size.x - EDGE_PAN_PX {
-        pan.x += 1.0;
-    }
-    if cursor.y < EDGE_PAN_PX {
-        pan.y -= 1.0;
-    } else if cursor.y > window_size.y - EDGE_PAN_PX {
-        pan.y += 1.0;
-    }
-    pan
-}
-
-fn window_size_vec(window: &Window) -> Vec2 {
-    Vec2::new(window.width(), window.height())
-}
-
-fn camera_screen_pan_vector(
-    keyboard: &ButtonInput<KeyCode>,
-    cursor: Option<Vec2>,
-    window_size: Vec2,
-    edge_pan_active: bool,
-    over_hud: bool,
-) -> Vec2 {
-    let mut pan = camera_keyboard_pan_vector(keyboard);
-    let edge_pan = cursor_edge_pan_vector(cursor, window_size, edge_pan_active, over_hud);
-    if edge_pan.x != 0.0 {
-        pan.x = edge_pan.x;
-    }
-    if edge_pan.y != 0.0 {
-        pan.y = edge_pan.y;
-    }
-    pan
-}
-
-fn camera_keyboard_pan_vector(keyboard: &ButtonInput<KeyCode>) -> Vec2 {
-    // Match the (correct) edge-pan sign convention: pan.y NEGATIVE moves the view
-    // UP (see cursor_edge_pan_vector: top edge → pan.y -= 1). So W (view up) must
-    // map to the "down" arg and S to the "up" arg — otherwise W/S are inverted.
-    camera_pan_from_key_states(
-        keyboard.pressed(KeyCode::KeyA),
-        keyboard.pressed(KeyCode::KeyD),
-        keyboard.pressed(KeyCode::KeyS),
-        keyboard.pressed(KeyCode::KeyW),
-    )
-}
-
-fn camera_pan_from_key_states(left: bool, right: bool, up: bool, down: bool) -> Vec2 {
-    Vec2::new(
-        (right as i32 - left as i32) as f32,
-        (up as i32 - down as i32) as f32,
-    )
-}
-
-fn camera_pan_delta(yaw: f32, distance: f32, pan: Vec2, delta_seconds: f32) -> Vec3 {
-    if pan.length_squared() <= f32::EPSILON {
-        return Vec3::ZERO;
-    }
-    let forward = Vec3::new(yaw.sin(), 0.0, yaw.cos());
-    let right = Vec3::new(forward.z, 0.0, -forward.x);
-    let screen_move = pan.normalize()
-        * Vec2::new(
-            CAMERA_PAN_SPEED_MULTIPLIER,
-            CAMERA_PAN_SPEED_MULTIPLIER * 2.0,
-        )
-        * distance
-        * delta_seconds;
-    right * screen_move.x + forward * screen_move.y
 }
 
 fn structure_placement_input(
@@ -15779,111 +16014,6 @@ fn minimap_input(
             ));
         }
     }
-}
-
-fn rotate_camera(
-    keyboard: Res<ButtonInput<KeyCode>>,
-    mouse: Res<ButtonInput<MouseButton>>,
-    mut mouse_motion_events: MessageReader<MouseMotion>,
-    time: Res<Time>,
-    window_q: Query<&Window, With<PrimaryWindow>>,
-    mut camera_state: ResMut<RtsCamera>,
-    mut mouse_rotation: ResMut<CameraMouseRotation>,
-) {
-    if mouse.just_pressed(MouseButton::Middle) {
-        let now = time.elapsed_secs();
-        if camera_middle_click_is_reset(mouse_rotation.last_middle_press_time, now) {
-            reset_camera_rotation(&mut camera_state, &mut mouse_rotation);
-            mouse_rotation.last_middle_press_time = Some(now);
-            return;
-        }
-        begin_camera_mouse_rotation(&mut mouse_rotation, camera_state.yaw, now);
-    }
-
-    if mouse.just_released(MouseButton::Middle) {
-        mouse_rotation.active = false;
-    }
-
-    if mouse_rotation.active {
-        let delta_x = mouse_motion_events
-            .read()
-            .map(|event| event.delta.x)
-            .sum::<f32>();
-        if delta_x.abs() > f32::EPSILON {
-            apply_camera_mouse_rotation(&mut camera_state, &mut mouse_rotation, delta_x);
-        }
-        return;
-    }
-    for _ in mouse_motion_events.read() {}
-
-    let movement_active = if let Ok(window) = window_q.single() {
-        let cursor = window.cursor_position();
-        camera_screen_pan_vector(
-            &keyboard,
-            cursor,
-            window_size_vec(window),
-            camera_state.edge_pan_active,
-            cursor.is_some_and(|_| cursor_is_over_hud(window)),
-        )
-        .length_squared()
-            > 0.0
-    } else {
-        camera_keyboard_pan_vector(&keyboard).length_squared() > 0.0
-    };
-    let rotate = camera_arrow_rotation_axis(&keyboard, movement_active);
-    if rotate == 0.0 {
-        return;
-    }
-
-    camera_state.yaw += rotate * CAMERA_ROTATE_SPEED * time.delta_secs();
-}
-
-fn camera_arrow_rotation_axis(keyboard: &ButtonInput<KeyCode>, movement_active: bool) -> f32 {
-    camera_arrow_rotation_from_key_states(
-        keyboard.pressed(KeyCode::KeyQ),
-        keyboard.pressed(KeyCode::KeyE),
-        movement_active,
-    )
-}
-
-fn camera_arrow_rotation_from_key_states(
-    counterclockwise: bool,
-    clockwise: bool,
-    movement_active: bool,
-) -> f32 {
-    if movement_active {
-        return 0.0;
-    }
-    (clockwise as i32 - counterclockwise as i32) as f32
-}
-
-fn begin_camera_mouse_rotation(rotation: &mut CameraMouseRotation, yaw: f32, now: f32) {
-    rotation.active = true;
-    rotation.start_yaw = yaw;
-    rotation.accumulated_x = 0.0;
-    rotation.last_middle_press_time = Some(now);
-}
-
-fn apply_camera_mouse_rotation(
-    camera: &mut RtsCamera,
-    rotation: &mut CameraMouseRotation,
-    delta_x: f32,
-) {
-    rotation.accumulated_x += delta_x;
-    camera.yaw = rotation.start_yaw + rotation.accumulated_x * CAMERA_MOUSE_ROTATION_SPEED;
-}
-
-fn reset_camera_rotation(camera: &mut RtsCamera, rotation: &mut CameraMouseRotation) {
-    camera.yaw = CAMERA_DEFAULT_YAW;
-    rotation.active = false;
-    rotation.accumulated_x = 0.0;
-}
-
-fn camera_middle_click_is_reset(last_click_time: Option<f32>, current_time: f32) -> bool {
-    last_click_time.is_some_and(|last_click_time| {
-        let delta = current_time - last_click_time;
-        (DOUBLE_CLICK_MIN_SECONDS..=DOUBLE_CLICK_MAX_SECONDS).contains(&delta)
-    })
 }
 
 fn focus_latest_battle_event(
@@ -18132,7 +18262,7 @@ fn update_match_menu_overlay(
         **text = format!(
             "{}: {}\n{}: {}  {}: {:02}:{:02}\n{}: {}\n{} {}  {} {}  {} {}/{}",
             t("地图", "Map"),
-            selected_map.definition().name,
+            localized_skirmish_map_name(selected_map.definition()),
             perspective_label,
             visible_player.team.label(),
             t("用时", "Time"),
@@ -18692,6 +18822,7 @@ fn issue_unit_order(commands: &mut Commands, entity: Entity, order: UnitQueuedOr
                 resource: Some(target),
                 state,
                 collect_remaining: 0.0,
+                last_kind: None,
             });
         }
         UnitQueuedOrder::Repair(target) => {
@@ -18894,6 +19025,7 @@ fn refresh_command_panel(
         &Interaction,
         &mut BackgroundColor,
         &mut BorderColor,
+        &mut Node,
     )>,
     mut label_q: Query<(&CommandSlotLabel, &mut Text, &mut TextColor)>,
     asset_server: Res<AssetServer>,
@@ -18917,12 +19049,21 @@ fn refresh_command_panel(
             }
         };
     let Some(visible_team) = controlled_player_team(Some(&*visible_player)) else {
-        for (slot, mut action, mut availability, interaction, mut background, mut border) in
-            &mut slot_q
+        for (
+            slot,
+            mut action,
+            mut availability,
+            interaction,
+            mut background,
+            mut border,
+            mut node,
+        ) in &mut slot_q
         {
             let _ = slot;
             *action = BuildAction::None;
             availability.enabled = false;
+            // No controlled selection -> collapse every slot so no empty grid shows.
+            node.display = Display::None;
             let (bg, border_color) = command_button_colors(BuildAction::None, false, *interaction);
             *background = BackgroundColor(bg);
             *border = BorderColor::all(border_color);
@@ -18944,7 +19085,8 @@ fn refresh_command_panel(
         &selected_structures,
         &structures,
     );
-    for (slot, mut action, mut availability, interaction, mut background, mut border) in &mut slot_q
+    for (slot, mut action, mut availability, interaction, mut background, mut border, mut node) in
+        &mut slot_q
     {
         let next_action = actions.get(slot.0).copied().unwrap_or(BuildAction::None);
         let enabled = command_action_enabled_for_panel(
@@ -18959,6 +19101,13 @@ fn refresh_command_panel(
         );
         *action = next_action;
         availability.enabled = enabled;
+        // Collapse empty slots so the grid only shows the unit's actual commands
+        // (combat units have a few; workers fill many).
+        node.display = if matches!(next_action, BuildAction::None) {
+            Display::None
+        } else {
+            Display::Flex
+        };
         let (bg, border_color) = command_button_colors(next_action, enabled, *interaction);
         *background = BackgroundColor(bg);
         *border = BorderColor::all(border_color);
@@ -21246,6 +21395,7 @@ fn process_build_queue(
                             resource: Some(target_unit),
                             state: HarvestState::MovingToResource,
                             collect_remaining: 0.0,
+                            last_kind: None,
                         });
                     } else if health.is_some_and(|health| health.current > 0.0) {
                         commands.entity(spawned).try_insert(FollowOrder {
@@ -22142,6 +22292,7 @@ fn auto_assign_idle_resource_collectors(
         }
         let nearest_resource = nearest_resource_entity(
             transform.translation,
+            None,
             &resources,
             Some(RESOURCE_SEARCH_RADIUS_M),
         );
@@ -22157,6 +22308,7 @@ fn auto_assign_idle_resource_collectors(
             resource: nearest_resource,
             state,
             collect_remaining: 0.0,
+            last_kind: None,
         });
     }
 }
@@ -24864,6 +25016,7 @@ fn update_harvest_orders(
                     resolve_harvest_resource_target(
                         order.resource,
                         transform.translation,
+                        order.last_kind,
                         &resources,
                     )
                 };
@@ -24980,6 +25133,7 @@ fn update_harvest_orders(
                     order.collect_remaining -= time.delta_secs();
                     let resource_position = resource_transform.translation;
                     let resource_kind = resource.kind;
+                    order.last_kind = Some(resource_kind);
                     while order.collect_remaining <= 0.0 && resource.amount > 0 && !cargo.is_full()
                     {
                         resource.amount -= 1;
@@ -25092,6 +25246,7 @@ fn update_harvest_orders(
 fn resolve_harvest_resource_target(
     current: Option<Entity>,
     position: Vec3,
+    prefer_kind: Option<ResourceKind>,
     resources: &Query<(Entity, &Transform, &Selectable, &ResourceNode)>,
 ) -> Option<Entity> {
     if let Some(current) = current
@@ -25100,11 +25255,20 @@ fn resolve_harvest_resource_target(
     {
         return Some(current);
     }
-    nearest_resource_entity(position, resources, Some(RESOURCE_SEARCH_RADIUS_M))
+    // When the node runs out, retarget to the nearest node of the SAME mineral type
+    // so a crystal harvester doesn't auto-run to ore (or vice-versa). Only fall back
+    // to "any nearest" when this harvester hasn't gathered anything yet (no kind).
+    nearest_resource_entity(
+        position,
+        prefer_kind,
+        resources,
+        Some(RESOURCE_SEARCH_RADIUS_M),
+    )
 }
 
 fn nearest_resource_entity(
     position: Vec3,
+    prefer_kind: Option<ResourceKind>,
     resources: &Query<(Entity, &Transform, &Selectable, &ResourceNode)>,
     max_distance: Option<f32>,
 ) -> Option<Entity> {
@@ -25112,6 +25276,9 @@ fn nearest_resource_entity(
     let mut nearest_distance = f32::MAX;
     for (entity, transform, selectable, resource) in resources {
         if resource.amount <= 0 {
+            continue;
+        }
+        if prefer_kind.is_some_and(|kind| kind != resource.kind) {
             continue;
         }
         let distance = xz_distance(position, transform.translation) - selectable.radius;
@@ -27255,6 +27422,7 @@ fn update_objective_tracker_hud(
     structures: Query<(&Structure, &Team, &Health)>,
     units: Query<(&Unit, &Team, &Health)>,
     mut objective_text: Query<&mut Text, With<ObjectiveTrackerText>>,
+    mut objective_fill: Query<&mut Node, With<ObjectiveProgressFill>>,
 ) {
     let Ok(mut text) = objective_text.single_mut() else {
         return;
@@ -27266,6 +27434,9 @@ fn update_objective_tracker_hud(
         &units,
         &mut objective_tracker,
     );
+    if let Ok(mut fill) = objective_fill.single_mut() {
+        fill.width = Val::Percent(snapshot.completion_percent as f32);
+    }
     **text = objective_tracker_text(snapshot);
 }
 
@@ -27287,7 +27458,6 @@ fn update_hud(
         ),
         With<Selected>,
     >,
-    units: Query<&Team, With<Unit>>,
     support_cooldowns: Res<SupportCooldowns>,
     mut stats_text: Query<
         &mut Text,
@@ -27295,7 +27465,6 @@ fn update_hud(
             With<StatsText>,
             Without<SelectionText>,
             Without<ObjectiveTrackerText>,
-            Without<ProductionQueueText>,
         ),
     >,
     mut selection_text: Query<
@@ -27304,16 +27473,6 @@ fn update_hud(
             With<SelectionText>,
             Without<StatsText>,
             Without<ObjectiveTrackerText>,
-            Without<ProductionQueueText>,
-        ),
-    >,
-    mut production_queue_text: Query<
-        &mut Text,
-        (
-            With<ProductionQueueText>,
-            Without<StatsText>,
-            Without<SelectionText>,
-            Without<ObjectiveTrackerText>,
         ),
     >,
     mut production_queue_slots: Query<(
@@ -27321,36 +27480,35 @@ fn update_hud(
         &mut ProductionQueueSlotTarget,
         &mut BackgroundColor,
         &mut Visibility,
+        &mut Node,
     )>,
     mut production_queue_slot_labels: Query<
         (&ProductionQueueSlotLabel, &mut Text),
         (
             Without<StatsText>,
             Without<SelectionText>,
-            Without<ProductionQueueText>,
             Without<ObjectiveTrackerText>,
+            Without<ProductionQueueSlotCount>,
+        ),
+    >,
+    mut production_queue_slot_counts: Query<
+        (&ProductionQueueSlotCount, &mut Text),
+        (
+            Without<StatsText>,
+            Without<SelectionText>,
+            Without<ObjectiveTrackerText>,
+            Without<ProductionQueueSlotLabel>,
         ),
     >,
     command_mode: Res<CommandMode>,
     placement_feedback: Res<StructurePlacementFeedback>,
     unit_groups: Res<UnitGroups>,
-    ai_settings: Res<AiDifficultySettings>,
-    active_teams: Option<Res<ActiveTeams>>,
 ) {
     let visible_team = visible_player.team;
     if let Ok(mut text) = stats_text.single_mut() {
-        let visible_economy = economies.get(visible_team);
-        let mut unit_count = Vec::new();
-        for team in &units {
-            if let Some(idx) = team.economy_index() {
-                if unit_count.len() <= idx {
-                    unit_count.resize(idx + 1, 0);
-                }
-                unit_count[idx] += 1;
-            }
-        }
-        let unit_status =
-            dynamic_unit_status_text(&unit_count, visible_team, active_teams.as_deref());
+        // godot's top-left is just the resource bar — show only transient command
+        // feedback (placement / attack-move / patrol / rally / support); empty (and
+        // hidden) when idle. No permanent player / unit / AI status line.
         let mode_text = if let Some(pending) = command_mode.pending_structure_placement {
             let label = localized_entity_label(pending.id);
             let feedback = placement_feedback
@@ -27359,58 +27517,34 @@ fn update_hud(
                 .map(|message| format!(" {message}"))
                 .unwrap_or_default();
             format!(
-                " {}:{label}{feedback} {}",
-                t(" 摆放", " Place"),
+                "{}:{label}{feedback} {}",
+                t("摆放", "Place"),
                 t("R旋转 右键取消", "R rotate / right-click cancel")
             )
         } else if command_mode.attack_move {
-            t(" 模式:攻击移动", " Mode: Attack-Move").to_string()
+            t("模式:攻击移动", "Mode: Attack-Move").to_string()
         } else if command_mode.patrol {
-            t(" 模式:巡逻", " Mode: Patrol").to_string()
+            t("模式:巡逻", "Mode: Patrol").to_string()
         } else if command_mode.rally_point {
-            t(" 模式:设置集结", " Mode: Set Rally").to_string()
+            t("模式:设置集结", "Mode: Set Rally").to_string()
         } else if let Some(power) = command_mode.support_power {
             let remaining = support_cooldowns.remaining_for(visible_team, power);
             if remaining > 0.0 {
                 format!(
-                    " {}:{} ({}{remaining:.1}s)",
+                    "{}:{} ({}{remaining:.1}s)",
                     t("支援", "Support"),
                     power.label(),
                     t("冷却", "CD ")
                 )
             } else {
-                t(" 支援:就绪", " Support: Ready").to_string()
+                t("支援:就绪", "Support: Ready").to_string()
             }
         } else {
             String::new()
         };
         let support_status =
             support_hud_status_text(visible_team, &support_cooldowns, command_mode.support_power);
-        **text = format!(
-            "{}  {} {}  {} {}  {}{}{}  {}  {}",
-            visible_team.label(),
-            ResourceKind::Ore.label(),
-            visible_economy.ore,
-            ResourceKind::Crystal.label(),
-            visible_economy.crystal,
-            power_status_text(visible_economy),
-            mode_text,
-            support_status,
-            unit_status,
-            ai_hud_status_text(
-                controlled_player_team(Some(&*visible_player)),
-                &ai_settings,
-                active_teams.as_deref(),
-            ),
-        );
-        let low_power_ai = ai_low_power_status_text(
-            controlled_player_team(Some(&*visible_player)),
-            &economies,
-            active_teams.as_deref(),
-        );
-        if !low_power_ai.is_empty() {
-            text.push_str(&format!("  {low_power_ai}"));
-        }
+        **text = format!("{mode_text}{support_status}").trim().to_string();
     }
 
     if let Ok(mut text) = selection_text.single_mut() {
@@ -27447,28 +27581,20 @@ fn update_hud(
             &items,
             exact_control_group_slot(&unit_groups, &selected_visible_entities),
         );
-        if let Ok(mut text) = production_queue_text.single_mut() {
-            let observed_queue_producers =
-                if selected_visible_count == selected_queue_producers.len() {
-                    selected_queue_producers.as_slice()
-                } else {
-                    &[]
-                };
-            **text = production_queue_hud_text(
-                visible_team,
-                &build_queue,
-                &economies,
-                observed_queue_producers,
-            );
-            render_production_queue_slots(
-                visible_team,
-                &build_queue,
-                &economies,
-                observed_queue_producers,
-                &mut production_queue_slots,
-                &mut production_queue_slot_labels,
-            );
-        }
+        let observed_queue_producers = if selected_visible_count == selected_queue_producers.len() {
+            selected_queue_producers.as_slice()
+        } else {
+            &[]
+        };
+        render_production_queue_slots(
+            visible_team,
+            &build_queue,
+            &economies,
+            observed_queue_producers,
+            &mut production_queue_slots,
+            &mut production_queue_slot_labels,
+            &mut production_queue_slot_counts,
+        );
     }
 }
 
@@ -27634,128 +27760,6 @@ fn exact_control_group_slot(
         .map(|index| index + 1)
 }
 
-fn power_status_text(economy: &TeamEconomy) -> String {
-    let base = format!(
-        "{} {}/{}",
-        t("电力", "Power"),
-        economy.power_capacity,
-        economy.power_used
-    );
-    if economy.low_power() {
-        format!("{base} {}", t("低电", "Low Pwr"))
-    } else {
-        base
-    }
-}
-
-fn dynamic_unit_status_text(
-    unit_count: &[usize],
-    visible_team: Team,
-    active_teams: Option<&ActiveTeams>,
-) -> String {
-    let slot_count = active_teams.map_or(unit_count.len(), |active| {
-        active.0.len().max(unit_count.len())
-    });
-    let mut own = 0usize;
-    let mut other_players = 0usize;
-    let mut neutral_or_unknown = 0usize;
-    for team in player_teams(slot_count) {
-        let Some(index) = team.economy_index() else {
-            continue;
-        };
-        let count = unit_count.get(index).copied().unwrap_or(0);
-        let active = active_teams
-            .and_then(|active| active.0.get(index).copied())
-            .unwrap_or(false);
-        if !active && count == 0 {
-            continue;
-        }
-        if team == visible_team {
-            own += count;
-        } else if active {
-            other_players += count;
-        } else {
-            neutral_or_unknown += count;
-        }
-    }
-    if neutral_or_unknown > 0 {
-        format!(
-            "{} {}:{own} {}:{other_players} {}:{neutral_or_unknown}",
-            t("单位", "Units"),
-            t("我", "Me"),
-            t("其他", "Others"),
-            t("中", "N")
-        )
-    } else {
-        format!(
-            "{} {}:{own} {}:{other_players}",
-            t("单位", "Units"),
-            t("我", "Me"),
-            t("其他", "Others")
-        )
-    }
-}
-
-fn team_hud_short_label(team: Team) -> String {
-    match team {
-        Team::Player(index) => format!("P{}", index + 1),
-        Team::Neutral => t("中", "N").to_string(),
-    }
-}
-
-fn ai_hud_status_text(
-    controlled_team: Option<Team>,
-    ai_settings: &AiDifficultySettings,
-    active_teams: Option<&ActiveTeams>,
-) -> String {
-    let mut counts = BTreeMap::<&'static str, usize>::new();
-    for team in active_ai_teams(controlled_team, active_teams) {
-        *counts
-            .entry(ai_settings.difficulty(team).label())
-            .or_insert(0) += 1;
-    }
-    if counts.is_empty() {
-        return t("电脑 无", "AI None").to_string();
-    }
-    format!(
-        "{} {}",
-        t("电脑", "AI"),
-        counts
-            .iter()
-            .map(|(difficulty, count)| {
-                if *count == 1 {
-                    (*difficulty).to_string()
-                } else {
-                    format!("{difficulty}x{count}")
-                }
-            })
-            .collect::<Vec<_>>()
-            .join("/")
-    )
-}
-
-fn ai_low_power_status_text(
-    controlled_team: Option<Team>,
-    economies: &Economies,
-    active_teams: Option<&ActiveTeams>,
-) -> String {
-    let mut low_power_teams = Vec::new();
-    for team in active_ai_teams(controlled_team, active_teams) {
-        if economies.get(team).low_power() {
-            low_power_teams.push(team_hud_short_label(team));
-        }
-    }
-    if low_power_teams.is_empty() {
-        String::new()
-    } else {
-        format!(
-            "{} {}",
-            t("电脑低电", "AI low power"),
-            low_power_teams.join("/")
-        )
-    }
-}
-
 fn support_hud_status_text(
     team: Team,
     support_cooldowns: &SupportCooldowns,
@@ -27798,38 +27802,8 @@ struct ProductionQueueHudEntry {
     action: BuildAction,
     progress: f32,
     active: bool,
-}
-
-fn production_queue_hud_text(
-    team: Team,
-    build_queue: &BuildQueue,
-    economies: &Economies,
-    producer_entities: &[Entity],
-) -> String {
-    if producer_entities.is_empty() {
-        return String::new();
-    }
-
-    let mut rows = Vec::new();
-    for producer_entity in producer_entities {
-        let mut active = true;
-        for job in build_queue
-            .0
-            .iter()
-            .filter(|job| job.team == team && job.producer_entity == *producer_entity)
-        {
-            if let Some(row) = production_queue_job_text(active, job, economies) {
-                rows.push(row);
-            }
-            active = false;
-        }
-    }
-
-    if rows.is_empty() {
-        String::new()
-    } else {
-        format!("{}: {}", t("生产队列", "Build queue"), rows.join("  |  "))
-    }
+    /// How many consecutive same-type jobs this slot aggregates (shown as ×N).
+    count: usize,
 }
 
 fn render_production_queue_slots(
@@ -27842,27 +27816,40 @@ fn render_production_queue_slots(
         &mut ProductionQueueSlotTarget,
         &mut BackgroundColor,
         &mut Visibility,
+        &mut Node,
     )>,
     labels: &mut Query<
         (&ProductionQueueSlotLabel, &mut Text),
         (
             Without<StatsText>,
             Without<SelectionText>,
-            Without<ProductionQueueText>,
             Without<ObjectiveTrackerText>,
+            Without<ProductionQueueSlotCount>,
+        ),
+    >,
+    counts: &mut Query<
+        (&ProductionQueueSlotCount, &mut Text),
+        (
+            Without<StatsText>,
+            Without<SelectionText>,
+            Without<ObjectiveTrackerText>,
+            Without<ProductionQueueSlotLabel>,
         ),
     >,
 ) {
     let entries = production_queue_hud_entries(team, build_queue, producer_entities);
-    for (slot, mut target, mut color, mut visibility) in slots {
+    for (slot, mut target, mut color, mut visibility, mut node) in slots {
         if let Some(entry) = entries.get(slot.0).copied() {
             target.producer_entity = Some(entry.producer_entity);
             target.local_index = entry.local_index;
             *visibility = Visibility::Visible;
+            node.display = Display::Flex;
             *color = BackgroundColor(production_queue_slot_color(team, entry, economies));
         } else {
             *target = ProductionQueueSlotTarget::default();
             *visibility = Visibility::Hidden;
+            // Collapse empty slots so the queue row shrinks to the queued items.
+            node.display = Display::None;
             *color = BackgroundColor(Color::srgba(0.025, 0.035, 0.045, 0.9));
         }
     }
@@ -27872,6 +27859,12 @@ fn render_production_queue_slots(
             .map(|entry| production_queue_slot_text(team, label.0, *entry, economies))
             .unwrap_or_default();
     }
+    for (count, mut text) in counts {
+        **text = entries
+            .get(count.0)
+            .map(|entry| production_queue_slot_count_text(*entry))
+            .unwrap_or_default();
+    }
 }
 
 fn production_queue_hud_entries(
@@ -27879,7 +27872,7 @@ fn production_queue_hud_entries(
     build_queue: &BuildQueue,
     producer_entities: &[Entity],
 ) -> Vec<ProductionQueueHudEntry> {
-    let mut entries = Vec::new();
+    let mut entries: Vec<ProductionQueueHudEntry> = Vec::new();
     for producer_entity in producer_entities {
         let mut local_index = 0usize;
         for job in build_queue
@@ -27887,6 +27880,15 @@ fn production_queue_hud_entries(
             .iter()
             .filter(|job| job.team == team && job.producer_entity == *producer_entity)
         {
+            // Aggregate consecutive same-type jobs into one slot with a ×N count
+            // (e.g. queueing 3 workers shows one 工人 slot, not three).
+            if let Some(last) = entries.last_mut() {
+                if last.producer_entity == *producer_entity && last.action == job.action {
+                    last.count += 1;
+                    local_index += 1;
+                    continue;
+                }
+            }
             let progress = registry::entity(build_target_product(job.action))
                 .map(|def| production_job_progress(job, def))
                 .unwrap_or(100.0);
@@ -27896,6 +27898,7 @@ fn production_queue_hud_entries(
                 action: job.action,
                 progress,
                 active: local_index == 0,
+                count: 1,
             });
             local_index += 1;
         }
@@ -27905,7 +27908,7 @@ fn production_queue_hud_entries(
 
 fn production_queue_slot_text(
     team: Team,
-    display_index: usize,
+    _display_index: usize,
     entry: ProductionQueueHudEntry,
     economies: &Economies,
 ) -> String {
@@ -27921,12 +27924,20 @@ fn production_queue_slot_text(
         t("生产", "Producing")
     };
     format!(
-        "{} {} {:.0}%\n{}",
-        display_index + 1,
+        "{} {:.0}%\n{}",
         compact_label(&label),
         entry.progress,
         status
     )
+}
+
+/// The ×N badge text for an aggregated slot (empty when only one is queued).
+fn production_queue_slot_count_text(entry: ProductionQueueHudEntry) -> String {
+    if entry.count > 1 {
+        format!("×{}", entry.count)
+    } else {
+        String::new()
+    }
 }
 
 fn production_queue_slot_color(
@@ -27950,28 +27961,6 @@ fn structure_has_production_queue(structure_id: &str) -> bool {
         structure_id,
         "CommandCenter" | "Barracks" | "VehicleFactory" | "AircraftFactory"
     )
-}
-
-fn production_queue_job_text(
-    active: bool,
-    job: &BuildJob,
-    economies: &Economies,
-) -> Option<String> {
-    let label = build_action_target_label(job.action)?;
-    let Some(def) = registry::entity(build_target_product(job.action)) else {
-        return Some(format!("{label} {}", t("无效", "invalid")));
-    };
-    let progress = production_job_progress(job, def);
-    let status = if active && progress >= 100.0 {
-        t("就绪/阻塞", "Ready/Blocked").to_string()
-    } else if !active {
-        t("排队", "Queued").to_string()
-    } else if economies.get(job.team).low_power() {
-        t("低电力生产中", "Producing (low power)").to_string()
-    } else {
-        t("生产中", "Producing").to_string()
-    };
-    Some(format!("{label} {progress:.0}% {status}"))
 }
 
 fn production_job_progress(job: &BuildJob, def: &registry::EntityDef) -> f32 {
@@ -28798,6 +28787,43 @@ fn air_to_terrain_marker_color(team: Team, visible_team: Team) -> Option<Color> 
     }
 }
 
+/// Draws a rally flag at each selected production structure's rally point (plus a
+/// line from the building to it), so setting a rally with right-click gives the
+/// player clear feedback — a planted flag — instead of nothing.
+fn draw_selected_rally_flags(
+    mut gizmos: Gizmos<HudGizmos>,
+    visible_player: Res<VisiblePlayer>,
+    selected: Query<(&Transform, &Team, &RallyPoint), (With<Selected>, With<Structure>)>,
+) {
+    let color = Color::srgb(0.55, 0.95, 0.62);
+    let faint = Color::srgba(0.55, 0.95, 0.62, 0.4);
+    for (transform, team, rally) in &selected {
+        if *team != visible_player.team {
+            continue;
+        }
+        let Some(target) = rally.target else {
+            continue;
+        };
+        let base = transform.translation + Vec3::Y * 0.2;
+        let foot = Vec3::new(target.x, 0.05, target.z);
+        // Tether from the building to the rally point.
+        gizmos.line(base, foot + Vec3::Y * 0.15, faint);
+        // Flag: a pole with a small triangular banner at the top.
+        let pole_top = foot + Vec3::Y * 1.5;
+        gizmos.line(foot, pole_top, color);
+        let banner_out = Vec3::new(0.7, 0.0, 0.0);
+        let banner_mid = pole_top - Vec3::Y * 0.22 + banner_out;
+        gizmos.line(pole_top, banner_mid, color);
+        gizmos.line(banner_mid, pole_top - Vec3::Y * 0.44, color);
+        // Ground ring marking the rally spot.
+        gizmos.circle(
+            Isometry3d::new(foot, Quat::from_rotation_arc(Vec3::Z, Vec3::Y)),
+            0.45,
+            color,
+        );
+    }
+}
+
 fn draw_ring(gizmos: &mut Gizmos, position: Vec3, radius: f32, color: Color) {
     gizmos.circle(
         Isometry3d::new(
@@ -28829,10 +28855,21 @@ fn harvest_cargo_visual_slots(cargo: ResourceCargo) -> Vec<ResourceKind> {
 }
 
 fn harvest_visual_color(kind: ResourceKind, alpha: f32) -> Color {
-    match kind {
-        ResourceKind::Ore => Color::srgba(0.10, 0.22, 1.0, alpha),
-        ResourceKind::Crystal => Color::srgba(1.0, 0.15, 0.08, alpha),
-    }
+    // Beam + cargo dots take the mineral color (ore green, crystal red).
+    let c = kind.color().to_srgba();
+    Color::srgba(c.red, c.green, c.blue, alpha)
+}
+
+/// Brighter tint of the mineral color for the beam's "hot" core + sparks (mixed
+/// halfway to white), so the green ore beam glows green and the red crystal red.
+fn harvest_visual_hot_color(kind: ResourceKind, alpha: f32) -> Color {
+    let c = kind.color().to_srgba();
+    Color::srgba(
+        (c.red + 1.0) * 0.5,
+        (c.green + 1.0) * 0.5,
+        (c.blue + 1.0) * 0.5,
+        alpha,
+    )
 }
 
 fn draw_harvest_and_cargo_visuals(
@@ -28893,7 +28930,7 @@ fn draw_harvest_and_cargo_visuals(
     let contact =
         resource_position - to_resource * (resource_selectable.radius * 0.45) + Vec3::Y * 0.28;
     let color = harvest_visual_color(resource.kind, 0.84);
-    let hot = Color::srgba(1.0, 0.96, 0.62, 0.78);
+    let hot = harvest_visual_hot_color(resource.kind, 0.78);
     hud.line(front, contact, color);
     hud.line(front + Vec3::Y * 0.06, contact + Vec3::Y * 0.03, hot);
 
@@ -29155,15 +29192,10 @@ fn cursor_blocks_world_order_controls(window: &Window, cursor: Vec2) -> bool {
         || minimap_contains_cursor(window, cursor)
 }
 
-/// Edge-scroll is only blocked by the interactive overlays you click into (the
-/// minimap and battle log), NOT the command bar / top status — so reaching the
-/// bottom screen edge still pans the camera.
-fn cursor_blocks_edge_pan(window: &Window, cursor: Vec2) -> bool {
-    battle_log_contains_cursor(window, cursor) || minimap_contains_cursor(window, cursor)
-}
-
+/// Hit rect helpers for HUD areas that should consume world and camera input.
 fn battle_log_contains_cursor(window: &Window, cursor: Vec2) -> bool {
-    let min_x = window.width() - BATTLE_LOG_RIGHT_PX - BATTLE_LOG_WIDTH_PX;
+    // Battle log is centered along the top (see setup_ui), so the hit rect is too.
+    let min_x = (window.width() - BATTLE_LOG_WIDTH_PX) * 0.5;
     cursor.x >= min_x
         && cursor.x <= min_x + BATTLE_LOG_WIDTH_PX
         && cursor.y >= BATTLE_LOG_TOP_PX
@@ -29188,7 +29220,7 @@ fn cursor_minimap_local(window: &Window) -> Option<Vec2> {
 
 fn minimap_screen_min(window: &Window) -> Vec2 {
     Vec2::new(
-        window.width() - MINIMAP_RIGHT_PX - MINIMAP_SIZE_PX,
+        MINIMAP_LEFT_PX,
         window.height() - MINIMAP_BOTTOM_PX - MINIMAP_SIZE_PX,
     )
 }
@@ -29325,34 +29357,6 @@ mod current_tests {
     // W/S keyboard pan must match the edge-pan sign convention (pan.y<0 = view up,
     // matching cursor at the top edge). Guards against the recurring inversion.
     #[test]
-    fn camera_keyboard_pan_matches_edge_pan_direction() {
-        let mut keys = ButtonInput::<KeyCode>::default();
-        keys.press(KeyCode::KeyW);
-        assert!(
-            camera_keyboard_pan_vector(&keys).y < 0.0,
-            "W should pan the view up (negative y)"
-        );
-        keys.release(KeyCode::KeyW);
-        keys.press(KeyCode::KeyS);
-        assert!(
-            camera_keyboard_pan_vector(&keys).y > 0.0,
-            "S should pan the view down (positive y)"
-        );
-        keys.release(KeyCode::KeyS);
-        keys.press(KeyCode::KeyD);
-        assert!(
-            camera_keyboard_pan_vector(&keys).x > 0.0,
-            "D should pan the view right (positive x)"
-        );
-        // Same convention as the edge pan: top edge is also negative y.
-        let win = Vec2::new(1280.0, 720.0);
-        assert!(
-            cursor_edge_pan_vector(Some(Vec2::new(640.0, 2.0)), win, true, false).y < 0.0,
-            "top-edge pan and W must share the negative-y = view-up convention"
-        );
-    }
-
-    #[test]
     fn allied_vision_is_shared_through_allies() {
         fn enemy_visible_with_alliance(allied: bool) -> bool {
             let mut app = App::new();
@@ -29401,6 +29405,54 @@ mod current_tests {
         assert!(
             !enemy_visible_with_alliance(false),
             "without an alliance the enemy beside a neutral team must stay fogged"
+        );
+    }
+
+    #[test]
+    fn edge_pan_is_disabled_by_options_and_match_overlays() {
+        let options = MenuOptionsState::default();
+        assert_eq!(
+            effective_camera_edge_pan_width(
+                &options,
+                None,
+                &MatchMenuState::default(),
+                &MatchBriefingState::default(),
+            ),
+            CAMERA_EDGE_PAN_WIDTH
+        );
+
+        let mut edge_pan_disabled = options;
+        edge_pan_disabled.camera_edge_pan = false;
+        assert_eq!(
+            effective_camera_edge_pan_width(
+                &edge_pan_disabled,
+                None,
+                &MatchMenuState::default(),
+                &MatchBriefingState::default(),
+            ),
+            0.0
+        );
+
+        assert_eq!(
+            effective_camera_edge_pan_width(
+                &options,
+                None,
+                &MatchMenuState { visible: true },
+                &MatchBriefingState::default(),
+            ),
+            0.0
+        );
+        assert_eq!(
+            effective_camera_edge_pan_width(
+                &options,
+                None,
+                &MatchMenuState::default(),
+                &MatchBriefingState {
+                    visible: true,
+                    ..default()
+                },
+            ),
+            0.0
         );
     }
 
@@ -30229,6 +30281,7 @@ mod current_tests {
             resource: Some(node),
             state: HarvestState::MovingToResource,
             collect_remaining: 0.0,
+            last_kind: None,
         });
         for _ in 0..1200 {
             app.update();

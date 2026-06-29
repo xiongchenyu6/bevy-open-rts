@@ -6956,7 +6956,7 @@ const CHAOS_PRODUCTION: &[ProductionDef] = &[
 pub const FACTION_DEFS: &[FactionDef] = &[
     FactionDef {
         id: "alliance",
-        label: "人族",
+        label: "苍穹联盟",
         emblem: "ui/factions/alliance_emblem.png",
         color: [0.18, 0.43, 0.95],
         structures: ALLIANCE_STRUCTURES,
@@ -6964,7 +6964,7 @@ pub const FACTION_DEFS: &[FactionDef] = &[
     },
     FactionDef {
         id: "demon",
-        label: "魔族",
+        label: "炽炎魔军",
         emblem: "ui/factions/demon_emblem.png",
         color: [0.85, 0.2, 0.12],
         structures: DEMON_STRUCTURES,
@@ -6972,7 +6972,7 @@ pub const FACTION_DEFS: &[FactionDef] = &[
     },
     FactionDef {
         id: "chaos",
-        label: "混沌族",
+        label: "混沌裂隙",
         emblem: "ui/factions/chaos_emblem.png",
         color: [0.54, 0.25, 0.88],
         structures: CHAOS_STRUCTURES,
