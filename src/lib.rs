@@ -10013,10 +10013,14 @@ fn setup(
     commands.spawn((
         rts_camera_component(&camera_state, map_bounds, options.camera_tilt),
         RtsCameraControls {
-            key_up: KeyCode::KeyW,
-            key_down: KeyCode::KeyS,
-            key_left: KeyCode::KeyA,
-            key_right: KeyCode::KeyD,
+            // Pan with the arrow keys + screen-edge; rotate with middle-drag or [ ].
+            // WASD / Q / E are deliberately left to the godot-style command hotkeys.
+            key_up: KeyCode::ArrowUp,
+            key_down: KeyCode::ArrowDown,
+            key_left: KeyCode::ArrowLeft,
+            key_right: KeyCode::ArrowRight,
+            key_rotate_left: KeyCode::BracketLeft,
+            key_rotate_right: KeyCode::BracketRight,
             pan_speed: options.camera_pan_speed,
             edge_pan_width: if options.camera_edge_pan { 0.05 } else { 0.0 },
             ..default()
