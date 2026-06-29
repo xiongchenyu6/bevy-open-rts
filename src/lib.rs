@@ -4338,6 +4338,23 @@ pub fn capture_show_skirmish_setup_menu(app: &mut App) {
     }
 }
 
+/// Enters the lobby and opens slot 0's controller dropdown, so the floating popup
+/// overlay is visible for verification.
+pub fn capture_show_skirmish_setup_with_dropdown(app: &mut App) {
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::SkirmishSetup);
+    for _ in 0..8 {
+        app.update();
+    }
+    app.world_mut()
+        .resource_mut::<SkirmishMenuSelection>()
+        .toggle_controller_dropdown(0);
+    for _ in 0..6 {
+        app.update();
+    }
+}
+
 pub fn capture_show_options_menu(app: &mut App) {
     app.world_mut()
         .resource_mut::<NextState<AppScreen>>()
@@ -8408,6 +8425,69 @@ fn spawn_menu_map_resource_controls(
 
 /// A labelled inline dropdown (toggle button showing the current value + ▾; when
 /// open, the option list expands below). Used for the 地图 + 初始资源 selectors.
+/// Z layer for menu dropdown popups — above all other menu UI. The menu screen and
+/// the in-match HUD are never on screen together, so this won't collide with HUD
+/// GlobalZIndex values.
+const MENU_DROPDOWN_POPUP_Z: i32 = 1000;
+
+/// Positioning context for a dropdown: a fixed-width column the floating popup
+/// anchors to (absolute children resolve against it).
+fn menu_dropdown_cell_node(width: f32) -> Node {
+    Node {
+        position_type: PositionType::Relative,
+        width: px(width),
+        flex_direction: FlexDirection::Column,
+        ..default()
+    }
+}
+
+/// Spawns a godot-OptionButton-style dropdown INTO an already-spawned cell: the
+/// toggle button (current value + ▾) and, when `open`, a floating popup of options
+/// absolutely positioned just below it with a high `GlobalZIndex` so it overlays the
+/// rows beneath instead of pushing them down. The popup is a child of the cell, so
+/// it's despawned with it on the next rebuild.
+fn spawn_menu_dropdown_contents(
+    cell: &mut ChildSpawnerCommands,
+    toggle: MainMenuAction,
+    open: bool,
+    options: &[MainMenuAction],
+    selection: SkirmishMenuSelection,
+    font: Handle<Font>,
+    width: f32,
+    font_size: f32,
+) {
+    cell.spawn(menu_button(toggle, width)).with_children(|button| {
+        button.spawn(menu_action_button_label(toggle, selection, font.clone(), font_size));
+    });
+    if !open {
+        return;
+    }
+    cell.spawn((
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Percent(100.0),
+            left: px(0),
+            min_width: px(width),
+            flex_direction: FlexDirection::Column,
+            align_items: AlignItems::Stretch,
+            row_gap: px(1),
+            padding: UiRect::all(px(2)),
+            border: UiRect::all(px(1)),
+            ..default()
+        },
+        BorderColor::all(Color::srgb(0.45, 0.56, 0.52)),
+        BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.98)),
+        GlobalZIndex(MENU_DROPDOWN_POPUP_Z),
+    ))
+    .with_children(|popup| {
+        for option in options {
+            popup.spawn(menu_button(*option, width)).with_children(|button| {
+                button.spawn(menu_action_button_label(*option, selection, font.clone(), font_size));
+            });
+        }
+    });
+}
+
 fn spawn_menu_inline_dropdown(
     parent: &mut ChildSpawnerCommands,
     zh: &'static str,
@@ -8433,38 +8513,11 @@ fn spawn_menu_inline_dropdown(
         MainMenuMapResourceControlElement,
     ));
     parent
-        .spawn((
-            Node {
-                flex_direction: FlexDirection::Column,
-                align_items: AlignItems::Stretch,
-                row_gap: px(2),
-                ..default()
-            },
-            MainMenuMapResourceControlElement,
-        ))
+        .spawn((menu_dropdown_cell_node(240.0), MainMenuMapResourceControlElement))
         .with_children(|cell| {
-            cell.spawn(menu_button(toggle, 240.0))
-                .with_children(|button| {
-                    button.spawn(menu_action_button_label(
-                        toggle,
-                        selection,
-                        font.clone(),
-                        12.0,
-                    ));
-                });
-            if open {
-                for option in options {
-                    cell.spawn(menu_button(*option, 240.0))
-                        .with_children(|button| {
-                            button.spawn(menu_action_button_label(
-                                *option,
-                                selection,
-                                font.clone(),
-                                12.0,
-                            ));
-                        });
-                }
-            }
+            spawn_menu_dropdown_contents(
+                cell, toggle, open, options, selection, font, 240.0, 12.0,
+            );
         });
 }
 
@@ -8911,146 +8964,81 @@ fn spawn_menu_lobby_slot_row(
                 });
 
             let _ = (active, status);
-            // Controller dropdown — inline expand (关闭 / 我方 / 电脑). Inline so the
-            // scrolling lobby list never clips it. No separate "我方" claim button:
-            // picking 我方 here claims the slot (4 stray "我方" buttons looked like
-            // every slot was player-controlled).
-            row.spawn(Node {
-                flex_direction: FlexDirection::Column,
-                row_gap: px(2),
-                ..default()
-            })
-            .with_children(|cell| {
-                let toggle = MainMenuAction::ToggleLobbySlotController(slot);
-                cell.spawn(menu_button(toggle, 84.0))
-                    .with_children(|button| {
-                        button.spawn(menu_action_button_label(
-                            toggle,
-                            selection,
-                            font.clone(),
-                            10.0,
-                        ));
-                    });
-                if selection.controller_dropdown_open == Some(slot) {
-                    for controller in [
-                        SkirmishPlayerController::None,
-                        SkirmishPlayerController::Human,
-                        SkirmishPlayerController::Ai(AiDifficulty::Beginner),
-                        SkirmishPlayerController::Ai(AiDifficulty::Easy),
-                        SkirmishPlayerController::Ai(AiDifficulty::Normal),
-                        SkirmishPlayerController::Ai(AiDifficulty::Hard),
-                    ] {
-                        let option = MainMenuAction::SetLobbySlotController(slot, controller);
-                        cell.spawn(menu_button(option, 84.0))
-                            .with_children(|button| {
-                                button.spawn(menu_action_button_label(
-                                    option,
-                                    selection,
-                                    font.clone(),
-                                    10.0,
-                                ));
-                            });
-                    }
-                }
+            // Controller dropdown (floating popup): 关闭 / 我方 / 傻瓜~困难 AI.
+            row.spawn(menu_dropdown_cell_node(84.0)).with_children(|cell| {
+                let options: Vec<MainMenuAction> = [
+                    SkirmishPlayerController::None,
+                    SkirmishPlayerController::Human,
+                    SkirmishPlayerController::Ai(AiDifficulty::Beginner),
+                    SkirmishPlayerController::Ai(AiDifficulty::Easy),
+                    SkirmishPlayerController::Ai(AiDifficulty::Normal),
+                    SkirmishPlayerController::Ai(AiDifficulty::Hard),
+                ]
+                .into_iter()
+                .map(|c| MainMenuAction::SetLobbySlotController(slot, c))
+                .collect();
+                spawn_menu_dropdown_contents(
+                    cell,
+                    MainMenuAction::ToggleLobbySlotController(slot),
+                    selection.controller_dropdown_open == Some(slot),
+                    &options,
+                    selection,
+                    font.clone(),
+                    84.0,
+                    10.0,
+                );
             });
 
-            // Faction dropdown — inline expand (人族 / 魔族 / 混沌族).
-            row.spawn(Node {
-                flex_direction: FlexDirection::Column,
-                row_gap: px(2),
-                ..default()
-            })
-            .with_children(|cell| {
-                let toggle = MainMenuAction::ToggleLobbySlotFaction(slot);
-                cell.spawn(menu_button(toggle, 84.0))
-                    .with_children(|button| {
-                        button.spawn(menu_action_button_label(
-                            toggle,
-                            selection,
-                            font.clone(),
-                            10.0,
-                        ));
-                    });
-                if selection.faction_dropdown_open == Some(slot) {
-                    for faction in SkirmishFaction::ALL {
-                        let option = MainMenuAction::SetLobbySlotFaction(slot, faction);
-                        cell.spawn(menu_button(option, 84.0))
-                            .with_children(|button| {
-                                button.spawn(menu_action_button_label(
-                                    option,
-                                    selection,
-                                    font.clone(),
-                                    10.0,
-                                ));
-                            });
-                    }
-                }
+            // Faction dropdown (floating popup): 人族 / 魔族 / 混沌族.
+            row.spawn(menu_dropdown_cell_node(84.0)).with_children(|cell| {
+                let options: Vec<MainMenuAction> = SkirmishFaction::ALL
+                    .iter()
+                    .map(|f| MainMenuAction::SetLobbySlotFaction(slot, *f))
+                    .collect();
+                spawn_menu_dropdown_contents(
+                    cell,
+                    MainMenuAction::ToggleLobbySlotFaction(slot),
+                    selection.faction_dropdown_open == Some(slot),
+                    &options,
+                    selection,
+                    font.clone(),
+                    84.0,
+                    10.0,
+                );
             });
 
-            // Team dropdown — inline expand (队1 … 队N), like the controller/faction ones.
-            row.spawn(Node {
-                flex_direction: FlexDirection::Column,
-                row_gap: px(2),
-                ..default()
-            })
-            .with_children(|cell| {
-                let toggle = MainMenuAction::ToggleLobbySlotTeam(slot);
-                cell.spawn(menu_button(toggle, 72.0))
-                    .with_children(|button| {
-                        button.spawn(menu_action_button_label(
-                            toggle,
-                            selection,
-                            font.clone(),
-                            10.0,
-                        ));
-                    });
-                if selection.team_dropdown_open == Some(slot) {
-                    for team_index in 0..SKIRMISH_TEAM_OPTION_COUNT as usize {
-                        let option = MainMenuAction::SetLobbySlotTeam(slot, team_index);
-                        cell.spawn(menu_button(option, 72.0))
-                            .with_children(|button| {
-                                button.spawn(menu_action_button_label(
-                                    option,
-                                    selection,
-                                    font.clone(),
-                                    10.0,
-                                ));
-                            });
-                    }
-                }
+            // Team dropdown (floating popup): 队1 … 队N.
+            row.spawn(menu_dropdown_cell_node(72.0)).with_children(|cell| {
+                let options: Vec<MainMenuAction> = (0..SKIRMISH_TEAM_OPTION_COUNT as usize)
+                    .map(|t| MainMenuAction::SetLobbySlotTeam(slot, t))
+                    .collect();
+                spawn_menu_dropdown_contents(
+                    cell,
+                    MainMenuAction::ToggleLobbySlotTeam(slot),
+                    selection.team_dropdown_open == Some(slot),
+                    &options,
+                    selection,
+                    font.clone(),
+                    72.0,
+                    10.0,
+                );
             });
 
-            // Color dropdown — inline expand (色1 … 色N).
-            row.spawn(Node {
-                flex_direction: FlexDirection::Column,
-                row_gap: px(2),
-                ..default()
-            })
-            .with_children(|cell| {
-                let toggle = MainMenuAction::ToggleLobbySlotColor(slot);
-                cell.spawn(menu_button(toggle, 72.0))
-                    .with_children(|button| {
-                        button.spawn(menu_action_button_label(
-                            toggle,
-                            selection,
-                            font.clone(),
-                            10.0,
-                        ));
-                    });
-                if selection.color_dropdown_open == Some(slot) {
-                    for color_index in 0..PLAYER_COLOR_PALETTE.len() {
-                        let option = MainMenuAction::SetLobbySlotColor(slot, color_index);
-                        cell.spawn(menu_button(option, 72.0))
-                            .with_children(|button| {
-                                button.spawn(menu_action_button_label(
-                                    option,
-                                    selection,
-                                    font.clone(),
-                                    10.0,
-                                ));
-                            });
-                    }
-                }
+            // Color dropdown (floating popup): 色1 … 色N.
+            row.spawn(menu_dropdown_cell_node(72.0)).with_children(|cell| {
+                let options: Vec<MainMenuAction> = (0..PLAYER_COLOR_PALETTE.len())
+                    .map(|c| MainMenuAction::SetLobbySlotColor(slot, c))
+                    .collect();
+                spawn_menu_dropdown_contents(
+                    cell,
+                    MainMenuAction::ToggleLobbySlotColor(slot),
+                    selection.color_dropdown_open == Some(slot),
+                    &options,
+                    selection,
+                    font.clone(),
+                    72.0,
+                    10.0,
+                );
             });
         });
 }

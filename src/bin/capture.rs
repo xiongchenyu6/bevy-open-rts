@@ -45,7 +45,8 @@ use bevy_open_rts::{
     capture_selected_player_unit_average_position, capture_selected_player_unit_count,
     capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
     capture_show_credits_menu, capture_show_main_menu, capture_show_options_menu,
-    capture_show_skirmish_setup_menu, capture_world_to_screen,
+    capture_show_skirmish_setup_menu, capture_show_skirmish_setup_with_dropdown,
+    capture_world_to_screen,
     capture_worst_model_alignment_offset, capture_zoom_camera_closest,
     start_shared_match_scene_with_current_setup,
 };
@@ -133,6 +134,13 @@ fn main() {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("screenshots/menu/setup.png"));
             render_menu_page(&path, capture_show_skirmish_setup_menu)
+        }
+        Some("menu-dropdown") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/menu/dropdown.png"));
+            render_menu_page(&path, capture_show_skirmish_setup_with_dropdown)
         }
         Some("harvest") => {
             let dir = args
