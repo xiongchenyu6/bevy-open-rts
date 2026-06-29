@@ -5762,6 +5762,9 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
             update_resource_bar
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
+            update_selection_text_visibility
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
             update_selection_portrait
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
@@ -13006,6 +13009,21 @@ fn update_resource_bar(
     }
 }
 
+/// Hide the selected-unit status panel when nothing is selected, so its background
+/// box doesn't linger empty.
+fn update_selection_text_visibility(mut query: Query<(&Text, &mut Visibility), With<SelectionText>>) {
+    for (text, mut visibility) in &mut query {
+        let wanted = if text.0.trim().is_empty() {
+            Visibility::Hidden
+        } else {
+            Visibility::Inherited
+        };
+        if *visibility != wanted {
+            *visibility = wanted;
+        }
+    }
+}
+
 fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
     let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
 
@@ -13065,38 +13083,51 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
             ));
         });
 
+    // Global status (team / units / AI / mode) — a styled strip just under the
+    // resource bar.
     commands.spawn((
         Text::new(""),
         TextFont {
             font: font.clone().into(),
-            font_size: FontSize::Px(15.0),
+            font_size: FontSize::Px(14.0),
             ..default()
         },
-        TextColor(Color::srgb(0.92, 0.96, 1.0)),
+        TextColor(Color::srgb(0.86, 0.92, 0.96)),
         Node {
             position_type: PositionType::Absolute,
-            top: px(44),
-            left: px(14),
+            top: px(52),
+            left: px(12),
+            padding: UiRect::new(px(8), px(10), px(3), px(3)),
+            border: UiRect::all(px(1)),
             ..default()
         },
+        BorderColor::all(Color::srgb(0.22, 0.28, 0.28)),
+        BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.7)),
         StatsText,
         MatchScopedEntity,
     ));
 
+    // Selected-unit details — bottom-left, just above the portrait/command card so
+    // the unit's text sits with its icon (like godot's unit panel) instead of
+    // overlapping the top-left status.
     commands.spawn((
         Text::new(""),
         TextFont {
             font: font.clone().into(),
-            font_size: FontSize::Px(15.0),
+            font_size: FontSize::Px(14.0),
             ..default()
         },
-        TextColor(Color::srgb(0.84, 0.9, 0.92)),
+        TextColor(Color::srgb(0.86, 0.92, 0.94)),
         Node {
             position_type: PositionType::Absolute,
-            top: px(42),
-            left: px(14),
+            bottom: px(212),
+            left: px(12),
+            padding: UiRect::new(px(8), px(10), px(3), px(3)),
+            border: UiRect::all(px(1)),
             ..default()
         },
+        BorderColor::all(Color::srgb(0.24, 0.3, 0.32)),
+        BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.7)),
         SelectionText,
         MatchScopedEntity,
     ));
