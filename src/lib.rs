@@ -1448,6 +1448,22 @@ impl SkirmishFaction {
         }
     }
 
+    fn index(self) -> usize {
+        match self {
+            Self::Alliance => 0,
+            Self::Demon => 1,
+            Self::Chaos => 2,
+        }
+    }
+
+    fn emblem_path(self) -> &'static str {
+        match self {
+            Self::Alliance => "ui/factions/alliance_emblem.png",
+            Self::Demon => "ui/factions/demon_emblem.png",
+            Self::Chaos => "ui/factions/chaos_emblem.png",
+        }
+    }
+
     fn label(self) -> &'static str {
         match self {
             Self::Alliance => t("人族", "Alliance"),
@@ -2871,6 +2887,8 @@ struct MainMenuLobbySlotRow;
 #[derive(Component)]
 struct MainMenuLobbyListRoot {
     font: Handle<Font>,
+    /// Faction emblems indexed by SkirmishFaction::index() (Alliance/Demon/Chaos).
+    faction_emblems: [Handle<Image>; 3],
 }
 
 #[derive(Component)]
@@ -4349,7 +4367,7 @@ pub fn capture_show_skirmish_setup_with_dropdown(app: &mut App) {
     }
     app.world_mut()
         .resource_mut::<SkirmishMenuSelection>()
-        .toggle_color_dropdown(0);
+        .toggle_faction_dropdown(0);
     for _ in 0..6 {
         app.update();
     }
@@ -8310,13 +8328,27 @@ fn setup_main_menu(
                         })
                         .with_children(|col| {
                             col.spawn(menu_section_header("玩家", "Players", font.clone()));
+                            let faction_emblems = [
+                                asset_server.load(SkirmishFaction::Alliance.emblem_path()),
+                                asset_server.load(SkirmishFaction::Demon.emblem_path()),
+                                asset_server.load(SkirmishFaction::Chaos.emblem_path()),
+                            ];
                             col.spawn((
                                 menu_lobby_list_node(),
-                                MainMenuLobbyListRoot { font: font.clone() },
+                                MainMenuLobbyListRoot {
+                                    font: font.clone(),
+                                    faction_emblems: faction_emblems.clone(),
+                                },
                             ))
                             .with_children(|list| {
                                 for slot in 0..selection.selected_map_player_slots() {
-                                    spawn_menu_lobby_slot_row(list, slot, font.clone(), *selection);
+                                    spawn_menu_lobby_slot_row(
+                                        list,
+                                        slot,
+                                        font.clone(),
+                                        &faction_emblems,
+                                        *selection,
+                                    );
                                 }
                             });
                         });
@@ -8486,6 +8518,48 @@ fn spawn_menu_dropdown_contents(
             });
         }
     });
+}
+
+/// A faction dropdown button: the faction emblem + its (re-translating) label, tagged
+/// as a MainMenuButton so the click/highlight systems treat it like any other button.
+fn spawn_faction_dropdown_button(
+    parent: &mut ChildSpawnerCommands,
+    action: MainMenuAction,
+    faction: SkirmishFaction,
+    faction_emblems: &[Handle<Image>; 3],
+    selection: SkirmishMenuSelection,
+    font: Handle<Font>,
+    width: f32,
+) {
+    parent
+        .spawn((
+            Button,
+            MainMenuButton { action },
+            Node {
+                width: px(width),
+                min_height: px(30),
+                flex_direction: FlexDirection::Row,
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::FlexStart,
+                column_gap: px(4),
+                padding: UiRect::new(px(4), px(4), px(0), px(0)),
+                border: UiRect::all(px(1)),
+                ..default()
+            },
+            BorderColor::all(Color::srgb(0.28, 0.34, 0.33)),
+            BackgroundColor(Color::srgba(0.046, 0.058, 0.06, 0.94)),
+        ))
+        .with_children(|button| {
+            button.spawn((
+                ImageNode::new(faction_emblems[faction.index()].clone()),
+                Node {
+                    width: px(16),
+                    height: px(16),
+                    ..default()
+                },
+            ));
+            button.spawn(menu_action_button_label(action, selection, font, 10.0));
+        });
 }
 
 fn spawn_menu_inline_dropdown(
@@ -8914,6 +8988,7 @@ fn spawn_menu_lobby_slot_row(
     parent: &mut ChildSpawnerCommands<'_>,
     slot: usize,
     font: Handle<Font>,
+    faction_emblems: &[Handle<Image>; 3],
     selection: SkirmishMenuSelection,
 ) {
     let controller = selection
@@ -8989,22 +9064,54 @@ fn spawn_menu_lobby_slot_row(
                 );
             });
 
-            // Faction dropdown (floating popup): 人族 / 魔族 / 混沌族.
-            row.spawn(menu_dropdown_cell_node(84.0)).with_children(|cell| {
-                let options: Vec<MainMenuAction> = SkirmishFaction::ALL
-                    .iter()
-                    .map(|f| MainMenuAction::SetLobbySlotFaction(slot, *f))
-                    .collect();
-                spawn_menu_dropdown_contents(
+            // Faction dropdown (floating popup) with emblems: 人族 / 魔族 / 混沌族.
+            row.spawn(menu_dropdown_cell_node(96.0)).with_children(|cell| {
+                let current = selection
+                    .lobby_factions
+                    .get(slot)
+                    .copied()
+                    .unwrap_or(SkirmishFaction::Alliance);
+                spawn_faction_dropdown_button(
                     cell,
                     MainMenuAction::ToggleLobbySlotFaction(slot),
-                    selection.faction_dropdown_open == Some(slot),
-                    &options,
+                    current,
+                    faction_emblems,
                     selection,
                     font.clone(),
-                    84.0,
-                    10.0,
+                    96.0,
                 );
+                if selection.faction_dropdown_open == Some(slot) {
+                    cell.spawn((
+                        Node {
+                            position_type: PositionType::Absolute,
+                            top: Val::Percent(100.0),
+                            left: px(0),
+                            min_width: px(96.0),
+                            flex_direction: FlexDirection::Column,
+                            align_items: AlignItems::Stretch,
+                            row_gap: px(1),
+                            padding: UiRect::all(px(2)),
+                            border: UiRect::all(px(1)),
+                            ..default()
+                        },
+                        BorderColor::all(Color::srgb(0.45, 0.56, 0.52)),
+                        BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.98)),
+                        GlobalZIndex(MENU_DROPDOWN_POPUP_Z),
+                    ))
+                    .with_children(|popup| {
+                        for faction in SkirmishFaction::ALL {
+                            spawn_faction_dropdown_button(
+                                popup,
+                                MainMenuAction::SetLobbySlotFaction(slot, faction),
+                                faction,
+                                faction_emblems,
+                                selection,
+                                font.clone(),
+                                96.0,
+                            );
+                        }
+                    });
+                }
             });
 
             // Team dropdown (floating popup): 队1 … 队N.
@@ -9446,7 +9553,13 @@ fn update_main_menu_lobby_slots(
     };
     root_commands.with_children(|parent| {
         for slot in 0..selection.selected_map_player_slots() {
-            spawn_menu_lobby_slot_row(parent, slot, list_root.font.clone(), *selection);
+            spawn_menu_lobby_slot_row(
+                parent,
+                slot,
+                list_root.font.clone(),
+                &list_root.faction_emblems,
+                *selection,
+            );
         }
     });
 }
