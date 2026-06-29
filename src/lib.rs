@@ -7179,8 +7179,6 @@ struct BattleLogEntryButton(usize);
 #[derive(Component)]
 struct ObjectiveTrackerText;
 
-#[derive(Component)]
-struct ProductionQueueText;
 
 #[derive(Resource, Clone, Copy, Debug, Default, PartialEq, Eq)]
 struct ObjectiveTrackerState {
@@ -13139,7 +13137,9 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
         TextColor(Color::srgb(0.86, 0.92, 0.94)),
         Node {
             position_type: PositionType::Absolute,
-            bottom: px(212),
+            // Sits just above the production-queue slot row (which tops out near
+            // bottom:230) so the two no longer overlap.
+            bottom: px(236),
             left: px(12),
             padding: UiRect::new(px(8), px(10), px(3), px(3)),
             border: UiRect::all(px(1)),
@@ -13199,25 +13199,6 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
             ..default()
         },
         BattleLogRoot { font: font.clone() },
-        MatchScopedEntity,
-    ));
-
-    commands.spawn((
-        Text::new(""),
-        TextFont {
-            font: font.clone().into(),
-            font_size: FontSize::Px(14.0),
-            ..default()
-        },
-        TextColor(Color::srgb(0.8, 0.9, 0.92)),
-        Node {
-            position_type: PositionType::Absolute,
-            left: px(14),
-            bottom: px(238),
-            max_width: px(560),
-            ..default()
-        },
-        ProductionQueueText,
         MatchScopedEntity,
     ));
 
@@ -27308,7 +27289,6 @@ fn update_hud(
             With<StatsText>,
             Without<SelectionText>,
             Without<ObjectiveTrackerText>,
-            Without<ProductionQueueText>,
         ),
     >,
     mut selection_text: Query<
@@ -27316,16 +27296,6 @@ fn update_hud(
         (
             With<SelectionText>,
             Without<StatsText>,
-            Without<ObjectiveTrackerText>,
-            Without<ProductionQueueText>,
-        ),
-    >,
-    mut production_queue_text: Query<
-        &mut Text,
-        (
-            With<ProductionQueueText>,
-            Without<StatsText>,
-            Without<SelectionText>,
             Without<ObjectiveTrackerText>,
         ),
     >,
@@ -27340,7 +27310,6 @@ fn update_hud(
         (
             Without<StatsText>,
             Without<SelectionText>,
-            Without<ProductionQueueText>,
             Without<ObjectiveTrackerText>,
         ),
     >,
@@ -27425,28 +27394,19 @@ fn update_hud(
             &items,
             exact_control_group_slot(&unit_groups, &selected_visible_entities),
         );
-        if let Ok(mut text) = production_queue_text.single_mut() {
-            let observed_queue_producers =
-                if selected_visible_count == selected_queue_producers.len() {
-                    selected_queue_producers.as_slice()
-                } else {
-                    &[]
-                };
-            **text = production_queue_hud_text(
-                visible_team,
-                &build_queue,
-                &economies,
-                observed_queue_producers,
-            );
-            render_production_queue_slots(
-                visible_team,
-                &build_queue,
-                &economies,
-                observed_queue_producers,
-                &mut production_queue_slots,
-                &mut production_queue_slot_labels,
-            );
-        }
+        let observed_queue_producers = if selected_visible_count == selected_queue_producers.len() {
+            selected_queue_producers.as_slice()
+        } else {
+            &[]
+        };
+        render_production_queue_slots(
+            visible_team,
+            &build_queue,
+            &economies,
+            observed_queue_producers,
+            &mut production_queue_slots,
+            &mut production_queue_slot_labels,
+        );
     }
 }
 
@@ -27656,37 +27616,6 @@ struct ProductionQueueHudEntry {
     active: bool,
 }
 
-fn production_queue_hud_text(
-    team: Team,
-    build_queue: &BuildQueue,
-    economies: &Economies,
-    producer_entities: &[Entity],
-) -> String {
-    if producer_entities.is_empty() {
-        return String::new();
-    }
-
-    let mut rows = Vec::new();
-    for producer_entity in producer_entities {
-        let mut active = true;
-        for job in build_queue
-            .0
-            .iter()
-            .filter(|job| job.team == team && job.producer_entity == *producer_entity)
-        {
-            if let Some(row) = production_queue_job_text(active, job, economies) {
-                rows.push(row);
-            }
-            active = false;
-        }
-    }
-
-    if rows.is_empty() {
-        String::new()
-    } else {
-        format!("{}: {}", t("生产队列", "Build queue"), rows.join("  |  "))
-    }
-}
 
 fn render_production_queue_slots(
     team: Team,
@@ -27704,7 +27633,6 @@ fn render_production_queue_slots(
         (
             Without<StatsText>,
             Without<SelectionText>,
-            Without<ProductionQueueText>,
             Without<ObjectiveTrackerText>,
         ),
     >,
@@ -27808,27 +27736,6 @@ fn structure_has_production_queue(structure_id: &str) -> bool {
     )
 }
 
-fn production_queue_job_text(
-    active: bool,
-    job: &BuildJob,
-    economies: &Economies,
-) -> Option<String> {
-    let label = build_action_target_label(job.action)?;
-    let Some(def) = registry::entity(build_target_product(job.action)) else {
-        return Some(format!("{label} {}", t("无效", "invalid")));
-    };
-    let progress = production_job_progress(job, def);
-    let status = if active && progress >= 100.0 {
-        t("就绪/阻塞", "Ready/Blocked").to_string()
-    } else if !active {
-        t("排队", "Queued").to_string()
-    } else if economies.get(job.team).low_power() {
-        t("低电力生产中", "Producing (low power)").to_string()
-    } else {
-        t("生产中", "Producing").to_string()
-    };
-    Some(format!("{label} {progress:.0}% {status}"))
-}
 
 fn production_job_progress(job: &BuildJob, def: &registry::EntityDef) -> f32 {
     if def.build_seconds <= 0.0 {
