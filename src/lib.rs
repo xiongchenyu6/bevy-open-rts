@@ -8384,8 +8384,9 @@ fn setup_main_menu(
             // Centered modal dialog (godot main-menu/Play.tscn PanelContainer).
             root.spawn((
                 Node {
-                    width: Val::Percent(92.0),
-                    max_width: px(720),
+                    width: Val::Percent(90.0),
+                    max_width: px(1040),
+                    min_width: px(680),
                     flex_direction: FlexDirection::Column,
                     align_items: AlignItems::Stretch,
                     row_gap: px(12),
@@ -8407,7 +8408,7 @@ fn setup_main_menu(
                     .with_children(|cols| {
                         // LEFT column — 地图 (map preview + details + resources + summary).
                         cols.spawn(Node {
-                            width: px(272),
+                            width: px(320),
                             flex_shrink: 0.0,
                             flex_direction: FlexDirection::Column,
                             align_items: AlignItems::Stretch,
@@ -8421,7 +8422,7 @@ fn setup_main_menu(
                                 Text::new(main_menu_faction_info_text(*selection)),
                                 TextFont {
                                     font: font.clone().into(),
-                                    font_size: FontSize::Px(13.0),
+                                    font_size: FontSize::Px(15.0),
                                     ..default()
                                 },
                                 TextColor(Color::srgb(0.78, 0.86, 0.84)),
@@ -8451,7 +8452,7 @@ fn setup_main_menu(
                                 localized_text("行动摘要", "Operation summary"),
                                 TextFont {
                                     font: font.clone().into(),
-                                    font_size: FontSize::Px(12.0),
+                                    font_size: FontSize::Px(14.0),
                                     ..default()
                                 },
                                 TextColor(Color::srgb(0.62, 0.72, 0.7)),
@@ -8464,7 +8465,7 @@ fn setup_main_menu(
                                 Text::new(main_menu_summary_text(*selection)),
                                 TextFont {
                                     font: font.clone().into(),
-                                    font_size: FontSize::Px(12.0),
+                                    font_size: FontSize::Px(13.0),
                                     ..default()
                                 },
                                 TextColor(Color::srgb(0.74, 0.82, 0.8)),
@@ -8622,10 +8623,16 @@ const MENU_DROPDOWN_POPUP_Z: i32 = 1000;
 
 /// Positioning context for a dropdown: a fixed-width column the floating popup
 /// anchors to (absolute children resolve against it).
-fn menu_dropdown_cell_node(width: f32) -> Node {
+/// Responsive lobby dropdown cell: flexes to share the row width evenly (so the
+/// player rows never overflow the modal and scale with the window). `basis` biases
+/// the natural width (e.g. the faction cell is a bit wider than team/color).
+fn menu_dropdown_cell_node(basis: f32) -> Node {
     Node {
         position_type: PositionType::Relative,
-        width: px(width),
+        flex_grow: 1.0,
+        flex_shrink: 1.0,
+        flex_basis: px(basis),
+        min_width: px(0.0),
         flex_direction: FlexDirection::Column,
         ..default()
     }
@@ -8646,9 +8653,10 @@ fn spawn_menu_dropdown_contents(
     width: f32,
     font_size: f32,
 ) {
-    cell.spawn(menu_button(toggle, width)).with_children(|button| {
-        button.spawn(menu_action_button_label(toggle, selection, font.clone(), font_size));
-    });
+    cell.spawn(menu_button(toggle, Val::Percent(100.0)))
+        .with_children(|button| {
+            button.spawn(menu_action_button_label(toggle, selection, font.clone(), font_size));
+        });
     if !open {
         return;
     }
@@ -8671,9 +8679,16 @@ fn spawn_menu_dropdown_contents(
     ))
     .with_children(|popup| {
         for option in options {
-            popup.spawn(menu_button(*option, width)).with_children(|button| {
-                button.spawn(menu_action_button_label(*option, selection, font.clone(), font_size));
-            });
+            popup
+                .spawn(menu_button(*option, px(width)))
+                .with_children(|button| {
+                    button.spawn(menu_action_button_label(
+                        *option,
+                        selection,
+                        font.clone(),
+                        font_size,
+                    ));
+                });
         }
     });
 }
@@ -8687,15 +8702,15 @@ fn spawn_faction_dropdown_button(
     faction_emblems: &[Handle<Image>; 3],
     selection: SkirmishMenuSelection,
     font: Handle<Font>,
-    width: f32,
+    width: Val,
 ) {
     parent
         .spawn((
             Button,
             MainMenuButton { action },
             Node {
-                width: px(width),
-                min_height: px(30),
+                width,
+                min_height: px(32),
                 flex_direction: FlexDirection::Row,
                 align_items: AlignItems::Center,
                 justify_content: JustifyContent::FlexStart,
@@ -8716,7 +8731,7 @@ fn spawn_faction_dropdown_button(
                     ..default()
                 },
             ));
-            button.spawn(menu_action_button_label(action, selection, font, 10.0));
+            button.spawn(menu_action_button_label(action, selection, font, 13.0));
         });
 }
 
@@ -8927,7 +8942,7 @@ fn spawn_menu_lobby_slot_row(
                         Text::new(format!("{:02}", slot + 1)),
                         TextFont {
                             font: font.clone().into(),
-                            font_size: FontSize::Px(13.0),
+                            font_size: FontSize::Px(15.0),
                             ..default()
                         },
                         TextColor(Color::srgb(0.96, 0.72, 0.38)),
@@ -8956,7 +8971,7 @@ fn spawn_menu_lobby_slot_row(
                     selection,
                     font.clone(),
                     84.0,
-                    10.0,
+                    13.0,
                 );
             });
 
@@ -8974,7 +8989,7 @@ fn spawn_menu_lobby_slot_row(
                     faction_emblems,
                     selection,
                     font.clone(),
-                    96.0,
+                    Val::Percent(100.0),
                 );
                 if selection.faction_dropdown_open == Some(slot) {
                     cell.spawn((
@@ -8982,7 +8997,7 @@ fn spawn_menu_lobby_slot_row(
                             position_type: PositionType::Absolute,
                             top: Val::Percent(100.0),
                             left: px(0),
-                            min_width: px(96.0),
+                            min_width: px(124.0),
                             flex_direction: FlexDirection::Column,
                             align_items: AlignItems::Stretch,
                             row_gap: px(1),
@@ -9003,7 +9018,7 @@ fn spawn_menu_lobby_slot_row(
                                 faction_emblems,
                                 selection,
                                 font.clone(),
-                                96.0,
+                                px(124.0),
                             );
                         }
                     });
@@ -9023,7 +9038,7 @@ fn spawn_menu_lobby_slot_row(
                     selection,
                     font.clone(),
                     72.0,
-                    10.0,
+                    13.0,
                 );
             });
 
@@ -9040,7 +9055,7 @@ fn spawn_menu_lobby_slot_row(
                     selection,
                     font.clone(),
                     72.0,
-                    10.0,
+                    13.0,
                 );
             });
         });
@@ -9093,12 +9108,12 @@ fn menu_lobby_slot_row_node(slot: usize, selection: SkirmishMenuSelection) -> im
     )
 }
 
-fn menu_button(action: MainMenuAction, width: f32) -> impl Bundle {
+fn menu_button(action: MainMenuAction, width: Val) -> impl Bundle {
     (
         Button,
         MainMenuButton { action },
         Node {
-            width: px(width),
+            width,
             min_height: px(38),
             border: UiRect::all(px(1)),
             align_items: AlignItems::Center,
