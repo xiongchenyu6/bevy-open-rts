@@ -3142,7 +3142,7 @@ const HUMAN_STARTUP: TeamStartup = TeamStartup {
             offset: (-1.8, -2.2),
         },
         SpawnSpec {
-            id: "ScoutRover",
+            id: "Drone",
             offset: (0.7, -3.0),
         },
         SpawnSpec {
@@ -3265,7 +3265,7 @@ const HUMAN_GODOT_SKIRMISH_STARTUP: TeamStartup = TeamStartup {
     }],
     units: &[
         SpawnSpec {
-            id: "ScoutRover",
+            id: "Drone",
             offset: (-2.0, -2.0),
         },
         SpawnSpec {
