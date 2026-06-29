@@ -1466,9 +1466,9 @@ impl SkirmishFaction {
 
     fn label(self) -> &'static str {
         match self {
-            Self::Alliance => t("人族", "Alliance"),
-            Self::Demon => t("魔族", "Demon"),
-            Self::Chaos => t("混沌族", "Chaos"),
+            Self::Alliance => t("苍穹联盟", "Alliance"),
+            Self::Demon => t("炽炎魔军", "Demon"),
+            Self::Chaos => t("混沌裂隙", "Chaos"),
         }
     }
 
@@ -5412,7 +5412,7 @@ fn match_phase_label(phase: MatchPhase) -> &'static str {
     }
 }
 
-/// Sets every player slot's faction (0=人族/Alliance, 1=魔族/Demon, 2=混沌族/Chaos)
+/// Sets every player slot's faction (0=苍穹联盟/Alliance, 1=炽炎魔军/Demon, 2=混沌裂隙/Chaos)
 /// before the match scene reads `MatchSetupSettings`, so a capture can show each
 /// faction's own base/units. Returns the faction label.
 pub fn capture_set_all_factions(app: &mut App, index: usize) -> &'static str {
@@ -8910,7 +8910,7 @@ fn spawn_menu_lobby_slot_row(
                 );
             });
 
-            // Faction dropdown (floating popup) with emblems: 人族 / 魔族 / 混沌族.
+            // Faction dropdown (floating popup) with emblems: 苍穹联盟 / 炽炎魔军 / 混沌裂隙.
             row.spawn(menu_dropdown_cell_node(96.0)).with_children(|cell| {
                 let current = selection
                     .lobby_factions
@@ -9916,15 +9916,15 @@ fn faction_product_count(faction: &registry::FactionDef, producer: &str) -> usiz
 fn faction_playstyle_summary(faction: SkirmishFaction) -> &'static str {
     match faction {
         SkirmishFaction::Alliance => t(
-            "人族: 全科技混合军，防御和兵种最完整，适合稳步推进",
+            "苍穹联盟: 全科技混合军，防御和兵种最完整，适合稳步推进",
             "Alliance: full-tech combined army; best defense and unit roster, for steady pushes",
         ),
         SkirmishFaction::Demon => t(
-            "魔族: 火力突击和攻城压制，单位线更集中，适合快速正面进攻",
+            "炽炎魔军: 火力突击和攻城压制，单位线更集中，适合快速正面进攻",
             "Demon: firepower rushes and siege pressure; tighter unit line, for fast frontal assaults",
         ),
         SkirmishFaction::Chaos => t(
-            "混沌族: 护盾、无人机、干扰和高阶防御，适合控场消耗",
+            "混沌裂隙: 护盾、无人机、干扰和高阶防御，适合控场消耗",
             "Chaos: shields, drones, jamming and high-tier defense, for zone control and attrition",
         ),
     }
