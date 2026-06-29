@@ -6703,6 +6703,10 @@ struct HarvestOrder {
     resource: Option<Entity>,
     state: HarvestState,
     collect_remaining: f32,
+    /// The mineral type this harvester has been gathering. When its node runs out it
+    /// retargets to the nearest node OF THIS KIND only, so a crystal harvester won't
+    /// auto-wander off to ore (or vice-versa).
+    last_kind: Option<ResourceKind>,
 }
 
 #[derive(Component, Clone, Copy)]
@@ -18873,6 +18877,7 @@ fn issue_unit_order(commands: &mut Commands, entity: Entity, order: UnitQueuedOr
                 resource: Some(target),
                 state,
                 collect_remaining: 0.0,
+                last_kind: None,
             });
         }
         UnitQueuedOrder::Repair(target) => {
@@ -21427,6 +21432,7 @@ fn process_build_queue(
                             resource: Some(target_unit),
                             state: HarvestState::MovingToResource,
                             collect_remaining: 0.0,
+                            last_kind: None,
                         });
                     } else if health.is_some_and(|health| health.current > 0.0) {
                         commands.entity(spawned).try_insert(FollowOrder {
@@ -22323,6 +22329,7 @@ fn auto_assign_idle_resource_collectors(
         }
         let nearest_resource = nearest_resource_entity(
             transform.translation,
+            None,
             &resources,
             Some(RESOURCE_SEARCH_RADIUS_M),
         );
@@ -22338,6 +22345,7 @@ fn auto_assign_idle_resource_collectors(
             resource: nearest_resource,
             state,
             collect_remaining: 0.0,
+            last_kind: None,
         });
     }
 }
@@ -25045,6 +25053,7 @@ fn update_harvest_orders(
                     resolve_harvest_resource_target(
                         order.resource,
                         transform.translation,
+                        order.last_kind,
                         &resources,
                     )
                 };
@@ -25161,6 +25170,7 @@ fn update_harvest_orders(
                     order.collect_remaining -= time.delta_secs();
                     let resource_position = resource_transform.translation;
                     let resource_kind = resource.kind;
+                    order.last_kind = Some(resource_kind);
                     while order.collect_remaining <= 0.0 && resource.amount > 0 && !cargo.is_full()
                     {
                         resource.amount -= 1;
@@ -25273,6 +25283,7 @@ fn update_harvest_orders(
 fn resolve_harvest_resource_target(
     current: Option<Entity>,
     position: Vec3,
+    prefer_kind: Option<ResourceKind>,
     resources: &Query<(Entity, &Transform, &Selectable, &ResourceNode)>,
 ) -> Option<Entity> {
     if let Some(current) = current
@@ -25281,11 +25292,15 @@ fn resolve_harvest_resource_target(
     {
         return Some(current);
     }
-    nearest_resource_entity(position, resources, Some(RESOURCE_SEARCH_RADIUS_M))
+    // When the node runs out, retarget to the nearest node of the SAME mineral type
+    // so a crystal harvester doesn't auto-run to ore (or vice-versa). Only fall back
+    // to "any nearest" when this harvester hasn't gathered anything yet (no kind).
+    nearest_resource_entity(position, prefer_kind, resources, Some(RESOURCE_SEARCH_RADIUS_M))
 }
 
 fn nearest_resource_entity(
     position: Vec3,
+    prefer_kind: Option<ResourceKind>,
     resources: &Query<(Entity, &Transform, &Selectable, &ResourceNode)>,
     max_distance: Option<f32>,
 ) -> Option<Entity> {
@@ -25293,6 +25308,9 @@ fn nearest_resource_entity(
     let mut nearest_distance = f32::MAX;
     for (entity, transform, selectable, resource) in resources {
         if resource.amount <= 0 {
+            continue;
+        }
+        if prefer_kind.is_some_and(|kind| kind != resource.kind) {
             continue;
         }
         let distance = xz_distance(position, transform.translation) - selectable.radius;
@@ -30300,6 +30318,7 @@ mod current_tests {
             resource: Some(node),
             state: HarvestState::MovingToResource,
             collect_remaining: 0.0,
+            last_kind: None,
         });
         for _ in 0..1200 {
             app.update();
