@@ -6465,10 +6465,12 @@ impl ResourceKind {
     }
 
     fn color(self) -> Color {
-        // Godot's resource_a/_b crystal-material albedo: ResourceA (Ore) = blue,
-        // ResourceB (Crystal) = red. Matches the HUD diamonds and minimap markers.
+        // Match what godot actually renders: Ore (ResourceA) = green, Crystal
+        // (ResourceB) = red. (resource_a.material.tres albedo reads blue, but the
+        // crystal mesh's vertex colors shift it green in-engine, which is what shows.)
+        // Drives the crystal tint, HUD diamonds, and minimap markers.
         match self {
-            Self::Ore => Color::srgb(0.0, 0.0, 1.0),
+            Self::Ore => Color::srgb(0.0, 0.85, 0.18),
             Self::Crystal => Color::srgb(1.0, 0.0, 0.0),
         }
     }
