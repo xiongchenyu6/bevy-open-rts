@@ -5919,6 +5919,7 @@ impl CameraBookmark {
         camera.distance = self.distance;
         camera.yaw = self.yaw;
         camera.pitch = self.pitch;
+        camera.pending_jump = true;
     }
 
     fn restore_safely(self, camera: &mut RtsCamera, bounds: MapBounds) {
@@ -15039,6 +15040,9 @@ fn safe_camera_focus(focus: Vec3, bounds: MapBounds) -> Vec3 {
 
 fn set_camera_focus_safely(camera: &mut RtsCamera, focus: Vec3, bounds: MapBounds) {
     camera.focus = safe_camera_focus(focus, bounds);
+    // Flag an explicit jump so `camera_control` pushes it into the plugin instead
+    // of mirroring the (stale) live camera back over it.
+    camera.pending_jump = true;
 }
 
 fn clamp_camera_focus_safely(camera: &mut RtsCamera, bounds: MapBounds) {
