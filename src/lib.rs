@@ -5759,6 +5759,9 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
             update_hud
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
+            update_resource_bar
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
             update_selection_portrait
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
@@ -7112,6 +7115,18 @@ impl Default for AiDifficultySettings {
 
 #[derive(Component)]
 struct StatsText;
+
+/// Top-left resource/power bar (godot ResourcesBar): per-resource count label.
+#[derive(Component)]
+struct HudResourceCount(ResourceKind);
+
+/// The "supply/used" power readout in the resource bar (color-coded).
+#[derive(Component)]
+struct HudPowerText;
+
+/// The "low power" warning shown only when underpowered.
+#[derive(Component)]
+struct HudLowPowerText;
 
 #[derive(Component)]
 struct SelectionText;
@@ -12901,20 +12916,166 @@ fn is_spawn_position_free(
     true
 }
 
+/// One resource group in the top-left bar: a colored swatch (the mineral color) +
+/// a count label that `update_resource_bar` keeps current.
+fn spawn_hud_resource_group(
+    bar: &mut ChildSpawnerCommands,
+    kind: ResourceKind,
+    font: Handle<Font>,
+) {
+    bar.spawn(Node {
+        flex_direction: FlexDirection::Row,
+        align_items: AlignItems::Center,
+        column_gap: px(6),
+        ..default()
+    })
+    .with_children(|group| {
+        group.spawn((
+            Node {
+                width: px(14),
+                height: px(14),
+                border: UiRect::all(px(1)),
+                ..default()
+            },
+            BorderColor::all(Color::srgba(0.0, 0.0, 0.0, 0.6)),
+            BackgroundColor(kind.color()),
+        ));
+        group.spawn((
+            Text::new("0"),
+            TextFont {
+                font: font.into(),
+                font_size: FontSize::Px(18.0),
+                ..default()
+            },
+            TextColor(Color::srgb(0.95, 0.97, 1.0)),
+            HudResourceCount(kind),
+        ));
+    });
+}
+
+fn update_resource_bar(
+    economies: Res<Economies>,
+    visible_player: Res<VisiblePlayer>,
+    mut counts: Query<
+        (&HudResourceCount, &mut Text),
+        (Without<HudPowerText>, Without<HudLowPowerText>),
+    >,
+    mut power_text: Query<
+        &mut Text,
+        (
+            With<HudPowerText>,
+            Without<HudResourceCount>,
+            Without<HudLowPowerText>,
+        ),
+    >,
+    mut power_color: Query<&mut TextColor, With<HudPowerText>>,
+    mut low_power: Query<&mut Visibility, With<HudLowPowerText>>,
+) {
+    let econ = economies.get(visible_player.team);
+    for (count, mut text) in &mut counts {
+        let value = match count.0 {
+            ResourceKind::Ore => econ.ore,
+            ResourceKind::Crystal => econ.crystal,
+        };
+        let next = value.to_string();
+        if text.0 != next {
+            text.0 = next;
+        }
+    }
+    let low = econ.low_power();
+    let pwr = format!("{}/{}", econ.power_capacity, econ.power_used);
+    for mut text in &mut power_text {
+        if text.0 != pwr {
+            text.0 = pwr.clone();
+        }
+    }
+    let color = if low {
+        Color::srgb(1.0, 0.42, 0.32)
+    } else {
+        Color::srgb(0.72, 1.0, 0.74)
+    };
+    for mut text_color in &mut power_color {
+        text_color.0 = color;
+    }
+    for mut visibility in &mut low_power {
+        *visibility = if low {
+            Visibility::Inherited
+        } else {
+            Visibility::Hidden
+        };
+    }
+}
+
 fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
     let font = asset_server.load("fonts/wqy-microhei-ui.ttf");
+
+    // Top-left resource/power bar (godot ResourcesBar): colored swatch + count per
+    // resource, then a color-coded power readout + a low-power warning.
+    commands
+        .spawn((
+            Name::new("Resource Bar"),
+            Node {
+                position_type: PositionType::Absolute,
+                top: px(10),
+                left: px(12),
+                flex_direction: FlexDirection::Row,
+                align_items: AlignItems::Center,
+                column_gap: px(16),
+                padding: UiRect::new(px(12), px(14), px(6), px(6)),
+                border: UiRect::all(px(1)),
+                ..default()
+            },
+            BorderColor::all(Color::srgb(0.26, 0.32, 0.32)),
+            BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.82)),
+            MatchScopedEntity,
+        ))
+        .with_children(|bar| {
+            spawn_hud_resource_group(bar, ResourceKind::Ore, font.clone());
+            spawn_hud_resource_group(bar, ResourceKind::Crystal, font.clone());
+            // Power group.
+            bar.spawn((
+                localized_text("电力", "PWR"),
+                TextFont {
+                    font: font.clone().into(),
+                    font_size: FontSize::Px(16.0),
+                    ..default()
+                },
+                TextColor(Color::srgb(0.7, 0.86, 0.72)),
+            ));
+            bar.spawn((
+                Text::new("0/0"),
+                TextFont {
+                    font: font.clone().into(),
+                    font_size: FontSize::Px(16.0),
+                    ..default()
+                },
+                TextColor(Color::srgb(0.72, 1.0, 0.74)),
+                HudPowerText,
+            ));
+            bar.spawn((
+                localized_text("低电力", "LOW POWER"),
+                TextFont {
+                    font: font.clone().into(),
+                    font_size: FontSize::Px(14.0),
+                    ..default()
+                },
+                TextColor(Color::srgb(1.0, 0.42, 0.32)),
+                Visibility::Hidden,
+                HudLowPowerText,
+            ));
+        });
 
     commands.spawn((
         Text::new(""),
         TextFont {
             font: font.clone().into(),
-            font_size: FontSize::Px(18.0),
+            font_size: FontSize::Px(15.0),
             ..default()
         },
         TextColor(Color::srgb(0.92, 0.96, 1.0)),
         Node {
             position_type: PositionType::Absolute,
-            top: px(12),
+            top: px(44),
             left: px(14),
             ..default()
         },
@@ -27314,7 +27475,6 @@ fn update_hud(
 ) {
     let visible_team = visible_player.team;
     if let Ok(mut text) = stats_text.single_mut() {
-        let visible_economy = economies.get(visible_team);
         let mut unit_count = Vec::new();
         for team in &units {
             if let Some(idx) = team.economy_index() {
@@ -27361,14 +27521,11 @@ fn update_hud(
         };
         let support_status =
             support_hud_status_text(visible_team, &support_cooldowns, command_mode.support_power);
+        // Resources + power moved to the dedicated top-left bar (update_resource_bar);
+        // this line keeps the team / mode / support / units / AI status.
         **text = format!(
-            "{}  {} {}  {} {}  {}{}{}  {}  {}",
+            "{}{}{}  {}  {}",
             visible_team.label(),
-            ResourceKind::Ore.label(),
-            visible_economy.ore,
-            ResourceKind::Crystal.label(),
-            visible_economy.crystal,
-            power_status_text(visible_economy),
             mode_text,
             support_status,
             unit_status,
@@ -27607,20 +27764,6 @@ fn exact_control_group_slot(
         .iter()
         .position(|slot| is_exact_current_selection(selected_entities, slot))
         .map(|index| index + 1)
-}
-
-fn power_status_text(economy: &TeamEconomy) -> String {
-    let base = format!(
-        "{} {}/{}",
-        t("电力", "Power"),
-        economy.power_capacity,
-        economy.power_used
-    );
-    if economy.low_power() {
-        format!("{base} {}", t("低电", "Low Pwr"))
-    } else {
-        base
-    }
 }
 
 fn dynamic_unit_status_text(
