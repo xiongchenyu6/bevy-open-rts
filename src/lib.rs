@@ -4349,7 +4349,7 @@ pub fn capture_show_skirmish_setup_with_dropdown(app: &mut App) {
     }
     app.world_mut()
         .resource_mut::<SkirmishMenuSelection>()
-        .toggle_controller_dropdown(0);
+        .toggle_color_dropdown(0);
     for _ in 0..6 {
         app.update();
     }
@@ -9673,6 +9673,29 @@ fn main_menu_button_visual(
                 Color::srgb(0.38, 0.64, 0.38),
             ),
         };
+    }
+
+    // Color dropdown: paint each button with the actual player color (godot shows
+    // the palette swatch), and mark the current pick with a bright border.
+    let swatch = match action {
+        MainMenuAction::ToggleLobbySlotColor(slot) => Some(
+            selection.lobby_color_slots.get(slot).copied().unwrap_or(slot)
+                % PLAYER_COLOR_PALETTE.len(),
+        ),
+        MainMenuAction::SetLobbySlotColor(_, index) => Some(index % PLAYER_COLOR_PALETTE.len()),
+        _ => None,
+    };
+    if let Some(index) = swatch {
+        let c = PLAYER_COLOR_PALETTE[index];
+        let bg = Color::srgb(c[0], c[1], c[2]);
+        let border = if action.is_selected(selection) {
+            Color::srgb(1.0, 0.95, 0.7)
+        } else if interaction != Interaction::None {
+            Color::WHITE
+        } else {
+            Color::srgba(0.0, 0.0, 0.0, 0.5)
+        };
+        return (bg, border);
     }
 
     let selected = action.is_selected(selection);
