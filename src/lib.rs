@@ -13009,9 +13009,12 @@ fn update_resource_bar(
     }
 }
 
-/// Hide the selected-unit status panel when nothing is selected, so its background
-/// box doesn't linger empty.
-fn update_selection_text_visibility(mut query: Query<(&Text, &mut Visibility), With<SelectionText>>) {
+/// Hide the status / selected-unit panels when their text is empty, so their
+/// background boxes don't linger (the top-left strip is empty whenever no command
+/// mode is active, leaving just the resource bar like godot).
+fn update_selection_text_visibility(
+    mut query: Query<(&Text, &mut Visibility), Or<(With<SelectionText>, With<StatsText>)>>,
+) {
     for (text, mut visibility) in &mut query {
         let wanted = if text.0.trim().is_empty() {
             Visibility::Hidden
@@ -27454,7 +27457,6 @@ fn update_hud(
         ),
         With<Selected>,
     >,
-    units: Query<&Team, With<Unit>>,
     support_cooldowns: Res<SupportCooldowns>,
     mut stats_text: Query<
         &mut Text,
@@ -27501,22 +27503,12 @@ fn update_hud(
     command_mode: Res<CommandMode>,
     placement_feedback: Res<StructurePlacementFeedback>,
     unit_groups: Res<UnitGroups>,
-    ai_settings: Res<AiDifficultySettings>,
-    active_teams: Option<Res<ActiveTeams>>,
 ) {
     let visible_team = visible_player.team;
     if let Ok(mut text) = stats_text.single_mut() {
-        let mut unit_count = Vec::new();
-        for team in &units {
-            if let Some(idx) = team.economy_index() {
-                if unit_count.len() <= idx {
-                    unit_count.resize(idx + 1, 0);
-                }
-                unit_count[idx] += 1;
-            }
-        }
-        let unit_status =
-            dynamic_unit_status_text(&unit_count, visible_team, active_teams.as_deref());
+        // godot's top-left is just the resource bar — show only transient command
+        // feedback (placement / attack-move / patrol / rally / support); empty (and
+        // hidden) when idle. No permanent player / unit / AI status line.
         let mode_text = if let Some(pending) = command_mode.pending_structure_placement {
             let label = localized_entity_label(pending.id);
             let feedback = placement_feedback
@@ -27525,55 +27517,34 @@ fn update_hud(
                 .map(|message| format!(" {message}"))
                 .unwrap_or_default();
             format!(
-                " {}:{label}{feedback} {}",
-                t(" 摆放", " Place"),
+                "{}:{label}{feedback} {}",
+                t("摆放", "Place"),
                 t("R旋转 右键取消", "R rotate / right-click cancel")
             )
         } else if command_mode.attack_move {
-            t(" 模式:攻击移动", " Mode: Attack-Move").to_string()
+            t("模式:攻击移动", "Mode: Attack-Move").to_string()
         } else if command_mode.patrol {
-            t(" 模式:巡逻", " Mode: Patrol").to_string()
+            t("模式:巡逻", "Mode: Patrol").to_string()
         } else if command_mode.rally_point {
-            t(" 模式:设置集结", " Mode: Set Rally").to_string()
+            t("模式:设置集结", "Mode: Set Rally").to_string()
         } else if let Some(power) = command_mode.support_power {
             let remaining = support_cooldowns.remaining_for(visible_team, power);
             if remaining > 0.0 {
                 format!(
-                    " {}:{} ({}{remaining:.1}s)",
+                    "{}:{} ({}{remaining:.1}s)",
                     t("支援", "Support"),
                     power.label(),
                     t("冷却", "CD ")
                 )
             } else {
-                t(" 支援:就绪", " Support: Ready").to_string()
+                t("支援:就绪", "Support: Ready").to_string()
             }
         } else {
             String::new()
         };
         let support_status =
             support_hud_status_text(visible_team, &support_cooldowns, command_mode.support_power);
-        // Resources + power moved to the dedicated top-left bar (update_resource_bar);
-        // this line keeps the team / mode / support / units / AI status.
-        **text = format!(
-            "{}{}{}  {}  {}",
-            visible_team.label(),
-            mode_text,
-            support_status,
-            unit_status,
-            ai_hud_status_text(
-                controlled_player_team(Some(&*visible_player)),
-                &ai_settings,
-                active_teams.as_deref(),
-            ),
-        );
-        let low_power_ai = ai_low_power_status_text(
-            controlled_player_team(Some(&*visible_player)),
-            &economies,
-            active_teams.as_deref(),
-        );
-        if !low_power_ai.is_empty() {
-            text.push_str(&format!("  {low_power_ai}"));
-        }
+        **text = format!("{mode_text}{support_status}").trim().to_string();
     }
 
     if let Ok(mut text) = selection_text.single_mut() {
@@ -27795,114 +27766,6 @@ fn exact_control_group_slot(
         .iter()
         .position(|slot| is_exact_current_selection(selected_entities, slot))
         .map(|index| index + 1)
-}
-
-fn dynamic_unit_status_text(
-    unit_count: &[usize],
-    visible_team: Team,
-    active_teams: Option<&ActiveTeams>,
-) -> String {
-    let slot_count = active_teams.map_or(unit_count.len(), |active| {
-        active.0.len().max(unit_count.len())
-    });
-    let mut own = 0usize;
-    let mut other_players = 0usize;
-    let mut neutral_or_unknown = 0usize;
-    for team in player_teams(slot_count) {
-        let Some(index) = team.economy_index() else {
-            continue;
-        };
-        let count = unit_count.get(index).copied().unwrap_or(0);
-        let active = active_teams
-            .and_then(|active| active.0.get(index).copied())
-            .unwrap_or(false);
-        if !active && count == 0 {
-            continue;
-        }
-        if team == visible_team {
-            own += count;
-        } else if active {
-            other_players += count;
-        } else {
-            neutral_or_unknown += count;
-        }
-    }
-    if neutral_or_unknown > 0 {
-        format!(
-            "{} {}:{own} {}:{other_players} {}:{neutral_or_unknown}",
-            t("单位", "Units"),
-            t("我", "Me"),
-            t("其他", "Others"),
-            t("中", "N")
-        )
-    } else {
-        format!(
-            "{} {}:{own} {}:{other_players}",
-            t("单位", "Units"),
-            t("我", "Me"),
-            t("其他", "Others")
-        )
-    }
-}
-
-fn team_hud_short_label(team: Team) -> String {
-    match team {
-        Team::Player(index) => format!("P{}", index + 1),
-        Team::Neutral => t("中", "N").to_string(),
-    }
-}
-
-fn ai_hud_status_text(
-    controlled_team: Option<Team>,
-    ai_settings: &AiDifficultySettings,
-    active_teams: Option<&ActiveTeams>,
-) -> String {
-    let mut counts = BTreeMap::<&'static str, usize>::new();
-    for team in active_ai_teams(controlled_team, active_teams) {
-        *counts
-            .entry(ai_settings.difficulty(team).label())
-            .or_insert(0) += 1;
-    }
-    if counts.is_empty() {
-        return t("电脑 无", "AI None").to_string();
-    }
-    format!(
-        "{} {}",
-        t("电脑", "AI"),
-        counts
-            .iter()
-            .map(|(difficulty, count)| {
-                if *count == 1 {
-                    (*difficulty).to_string()
-                } else {
-                    format!("{difficulty}x{count}")
-                }
-            })
-            .collect::<Vec<_>>()
-            .join("/")
-    )
-}
-
-fn ai_low_power_status_text(
-    controlled_team: Option<Team>,
-    economies: &Economies,
-    active_teams: Option<&ActiveTeams>,
-) -> String {
-    let mut low_power_teams = Vec::new();
-    for team in active_ai_teams(controlled_team, active_teams) {
-        if economies.get(team).low_power() {
-            low_power_teams.push(team_hud_short_label(team));
-        }
-    }
-    if low_power_teams.is_empty() {
-        String::new()
-    } else {
-        format!(
-            "{} {}",
-            t("电脑低电", "AI low power"),
-            low_power_teams.join("/")
-        )
-    }
 }
 
 fn support_hud_status_text(
