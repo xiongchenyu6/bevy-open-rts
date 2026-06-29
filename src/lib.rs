@@ -76,11 +76,22 @@ const CAMERA_MAX_DISTANCE: f32 = 9.0;
 const CAMERA_DEFAULT_YAW: f32 = -0.72;
 const CAMERA_DEFAULT_PITCH: f32 = -1.02;
 const CAMERA_BOUNDS_MARGIN: f32 = 1.2;
-// bevy_rts_camera (perspective, ground-following) framing — steep RTS angle and a
-// height range mapped from the legacy CAMERA_MIN/MAX_DISTANCE zoom span.
-const CAMERA_RTS_ANGLE: f32 = 0.95; // radians (~54° down from horizontal)
+// bevy_rts_camera (perspective, ground-following) framing — RTS tilt and a height
+// range mapped from the legacy CAMERA_MIN/MAX_DISTANCE zoom span. NOTE the plugin's
+// `angle` is measured from straight-down: 0.0 = top-down, larger = more oblique.
+// ~0.55 rad ≈ 32° off vertical ≈ godot's ~58°-below-horizontal isometric look.
+const CAMERA_RTS_ANGLE: f32 = 0.55;
 const CAMERA_RTS_HEIGHT_MIN: f32 = 6.0;
 const CAMERA_RTS_HEIGHT_MAX: f32 = 11.0;
+// Player-adjustable camera ranges (Options menu → 镜头). Tilt is the plugin angle
+// (0 = top-down). Steps/min/max bound the +/- buttons and slider normalisation.
+const CAMERA_TILT_MIN: f32 = 0.15;
+const CAMERA_TILT_MAX: f32 = 1.05;
+const CAMERA_TILT_STEP: f32 = 0.05;
+const CAMERA_RTS_PAN_SPEED: f32 = 18.0;
+const CAMERA_PAN_SPEED_MIN: f32 = 8.0;
+const CAMERA_PAN_SPEED_MAX: f32 = 32.0;
+const CAMERA_PAN_SPEED_STEP: f32 = 2.0;
 const CAMERA_START_PRIMARY_UNITS: &[&str] = &["Worker"];
 const CAMERA_START_PRIMARY_STRUCTURES: &[&str] = &["CommandCenter"];
 const RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 48.0;
@@ -2759,6 +2770,11 @@ enum OptionsMenuAction {
     SfxVolumeDown,
     VoiceVolumeUp,
     VoiceVolumeDown,
+    CameraTiltUp,
+    CameraTiltDown,
+    CameraPanSpeedUp,
+    CameraPanSpeedDown,
+    ToggleEdgePan,
     Back,
 }
 
@@ -2776,6 +2792,12 @@ struct MenuOptionsState {
     music_volume: f32,
     sfx_volume: f32,
     voice_volume: f32,
+    /// Camera tilt in radians (plugin convention: 0 = top-down, larger = oblique).
+    camera_tilt: f32,
+    /// Keyboard/edge pan speed for `bevy_rts_camera`.
+    camera_pan_speed: f32,
+    /// Whether moving the cursor to the screen edge pans the camera.
+    camera_edge_pan: bool,
 }
 
 impl Default for MenuOptionsState {
@@ -2788,6 +2810,9 @@ impl Default for MenuOptionsState {
             music_volume: 1.0,
             sfx_volume: 1.0,
             voice_volume: 1.0,
+            camera_tilt: CAMERA_RTS_ANGLE,
+            camera_pan_speed: CAMERA_RTS_PAN_SPEED,
+            camera_edge_pan: true,
         }
     }
 }
@@ -5478,6 +5503,10 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
                 .before(RtsCameraSystemSet)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
+            apply_camera_settings
+                .before(RtsCameraSystemSet)
+                .in_set(SimulationPhase::UiAndManagement)
+                .run_if(match_in_progress),
             minimap_input
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
@@ -5822,12 +5851,12 @@ fn camera_distance_from_zoom(zoom: f32) -> f32 {
 }
 
 /// Builds the `bevy_rts_camera` component from the game's camera state + map bounds.
-fn rts_camera_component(state: &RtsCamera, bounds: MapBounds) -> RtsCam {
+fn rts_camera_component(state: &RtsCamera, bounds: MapBounds, tilt: f32) -> RtsCam {
     let mut cam = RtsCam {
-        // Steep, fixed isometric-ish angle to mirror the old godot-style framing.
-        angle: CAMERA_RTS_ANGLE,
-        target_angle: CAMERA_RTS_ANGLE,
-        min_angle: CAMERA_RTS_ANGLE,
+        // Fixed isometric-ish tilt (player-adjustable via Options → 镜头).
+        angle: tilt,
+        target_angle: tilt,
+        min_angle: tilt,
         dynamic_angle: false,
         height_min: CAMERA_RTS_HEIGHT_MIN,
         height_max: CAMERA_RTS_HEIGHT_MAX,
@@ -7828,6 +7857,90 @@ fn setup_options_menu(
                         });
                     }
                 });
+                panel.spawn(options_group_node()).with_children(|group| {
+                    group.spawn(options_group_header("镜头", "Camera", font.clone()));
+                    for (label_zh, label_en, down, up, value, display) in [
+                        (
+                            "倾斜",
+                            "Tilt",
+                            OptionsMenuAction::CameraTiltDown,
+                            OptionsMenuAction::CameraTiltUp,
+                            (options.camera_tilt - CAMERA_TILT_MIN)
+                                / (CAMERA_TILT_MAX - CAMERA_TILT_MIN),
+                            format!("{:.0}\u{00b0}", options.camera_tilt.to_degrees()),
+                        ),
+                        (
+                            "平移速度",
+                            "Pan Speed",
+                            OptionsMenuAction::CameraPanSpeedDown,
+                            OptionsMenuAction::CameraPanSpeedUp,
+                            (options.camera_pan_speed - CAMERA_PAN_SPEED_MIN)
+                                / (CAMERA_PAN_SPEED_MAX - CAMERA_PAN_SPEED_MIN),
+                            format!("{:.0}", options.camera_pan_speed),
+                        ),
+                    ] {
+                        group.spawn(options_volume_row_node()).with_children(|row| {
+                            row.spawn((
+                                localized_text(label_zh, label_en),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(16.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                                Node {
+                                    width: px(92),
+                                    ..default()
+                                },
+                            ));
+                            row.spawn(options_small_button(down)).with_children(|button| {
+                                button.spawn(options_button_text("-", font.clone(), 16.0));
+                            });
+                            row.spawn(options_slider_bar_node(value));
+                            row.spawn(options_small_button(up)).with_children(|button| {
+                                button.spawn(options_button_text("+", font.clone(), 16.0));
+                            });
+                            row.spawn((
+                                Text::new(display),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(16.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                                Node {
+                                    width: px(50),
+                                    justify_content: JustifyContent::FlexEnd,
+                                    ..default()
+                                },
+                            ));
+                        });
+                    }
+                    group
+                        .spawn(options_button(OptionsMenuAction::ToggleEdgePan, 32.0))
+                        .with_children(|button| {
+                            button.spawn((
+                                localized_text(
+                                    if options.camera_edge_pan {
+                                        "边缘平移 开启"
+                                    } else {
+                                        "边缘平移 关闭"
+                                    },
+                                    if options.camera_edge_pan {
+                                        "Edge Pan On"
+                                    } else {
+                                        "Edge Pan Off"
+                                    },
+                                ),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(16.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                            ));
+                        });
+                });
                 spawn_options_group(
                     panel,
                     &font,
@@ -8080,6 +8193,30 @@ fn options_menu_buttons(
                 }
                 OptionsMenuAction::VoiceVolumeDown => {
                     options.voice_volume = (options.voice_volume - 0.05).max(0.0);
+                    rebuild = true;
+                }
+                OptionsMenuAction::CameraTiltUp => {
+                    options.camera_tilt =
+                        (options.camera_tilt + CAMERA_TILT_STEP).min(CAMERA_TILT_MAX);
+                    rebuild = true;
+                }
+                OptionsMenuAction::CameraTiltDown => {
+                    options.camera_tilt =
+                        (options.camera_tilt - CAMERA_TILT_STEP).max(CAMERA_TILT_MIN);
+                    rebuild = true;
+                }
+                OptionsMenuAction::CameraPanSpeedUp => {
+                    options.camera_pan_speed =
+                        (options.camera_pan_speed + CAMERA_PAN_SPEED_STEP).min(CAMERA_PAN_SPEED_MAX);
+                    rebuild = true;
+                }
+                OptionsMenuAction::CameraPanSpeedDown => {
+                    options.camera_pan_speed =
+                        (options.camera_pan_speed - CAMERA_PAN_SPEED_STEP).max(CAMERA_PAN_SPEED_MIN);
+                    rebuild = true;
+                }
+                OptionsMenuAction::ToggleEdgePan => {
+                    options.camera_edge_pan = !options.camera_edge_pan;
                     rebuild = true;
                 }
                 OptionsMenuAction::Back => next_state.set(AppScreen::MainMenu),
@@ -9835,6 +9972,7 @@ fn setup(
     selected_map: Res<SelectedSkirmishMap>,
     setup_settings: Res<MatchSetupSettings>,
     camera_state: Res<RtsCamera>,
+    options: Res<MenuOptionsState>,
 ) {
     let skirmish_map = selected_map.definition();
     let catalog_consistent = skirmish_map.is_catalog_consistent();
@@ -9843,14 +9981,14 @@ fn setup(
     commands.insert_resource(map_bounds);
 
     commands.spawn((
-        rts_camera_component(&camera_state, map_bounds),
+        rts_camera_component(&camera_state, map_bounds, options.camera_tilt),
         RtsCameraControls {
             key_up: KeyCode::KeyW,
             key_down: KeyCode::KeyS,
             key_left: KeyCode::KeyA,
             key_right: KeyCode::KeyD,
-            pan_speed: 18.0,
-            edge_pan_width: 0.05,
+            pan_speed: options.camera_pan_speed,
+            edge_pan_width: if options.camera_edge_pan { 0.05 } else { 0.0 },
             ..default()
         },
         MainCamera,
@@ -15028,6 +15166,25 @@ fn camera_control(
         camera_state.focus = cam.target_focus.translation;
         camera_state.distance = camera_distance_from_zoom(cam.target_zoom);
     }
+}
+
+/// Applies the player's camera Options (tilt / pan speed / edge pan) to the live
+/// `bevy_rts_camera` entity whenever the settings change.
+fn apply_camera_settings(
+    options: Res<MenuOptionsState>,
+    mut camera_q: Query<(&mut RtsCam, &mut RtsCameraControls), With<MainCamera>>,
+) {
+    if !options.is_changed() {
+        return;
+    }
+    let Ok((mut cam, mut controls)) = camera_q.single_mut() else {
+        return;
+    };
+    cam.angle = options.camera_tilt;
+    cam.target_angle = options.camera_tilt;
+    cam.min_angle = options.camera_tilt;
+    controls.pan_speed = options.camera_pan_speed;
+    controls.edge_pan_width = if options.camera_edge_pan { 0.05 } else { 0.0 };
 }
 
 fn safe_camera_distance(distance: f32) -> f32 {
