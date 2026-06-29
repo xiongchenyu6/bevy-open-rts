@@ -8623,10 +8623,20 @@ const MENU_DROPDOWN_POPUP_Z: i32 = 1000;
 
 /// Positioning context for a dropdown: a fixed-width column the floating popup
 /// anchors to (absolute children resolve against it).
-/// Responsive lobby dropdown cell: flexes to share the row width evenly (so the
-/// player rows never overflow the modal and scale with the window). `basis` biases
-/// the natural width (e.g. the faction cell is a bit wider than team/color).
-fn menu_dropdown_cell_node(basis: f32) -> Node {
+/// Fixed-width dropdown cell (used by the vertical left-column inline dropdowns).
+fn menu_dropdown_cell_node(width: f32) -> Node {
+    Node {
+        position_type: PositionType::Relative,
+        width: px(width),
+        flex_direction: FlexDirection::Column,
+        ..default()
+    }
+}
+
+/// Responsive dropdown cell for the horizontal player rows: flexes to share the row
+/// width evenly (so the rows never overflow the modal and scale with the window).
+/// `basis` biases the natural width (the faction cell is a bit wider than team/color).
+fn menu_dropdown_flex_cell_node(basis: f32) -> Node {
     Node {
         position_type: PositionType::Relative,
         flex_grow: 1.0,
@@ -8951,7 +8961,7 @@ fn spawn_menu_lobby_slot_row(
 
             let _ = (active, status);
             // Controller dropdown (floating popup): 关闭 / 我方 / 傻瓜~困难 AI.
-            row.spawn(menu_dropdown_cell_node(84.0)).with_children(|cell| {
+            row.spawn(menu_dropdown_flex_cell_node(84.0)).with_children(|cell| {
                 let options: Vec<MainMenuAction> = [
                     SkirmishPlayerController::None,
                     SkirmishPlayerController::Human,
@@ -8976,7 +8986,7 @@ fn spawn_menu_lobby_slot_row(
             });
 
             // Faction dropdown (floating popup) with emblems: 苍穹联盟 / 炽炎魔军 / 混沌裂隙.
-            row.spawn(menu_dropdown_cell_node(96.0)).with_children(|cell| {
+            row.spawn(menu_dropdown_flex_cell_node(96.0)).with_children(|cell| {
                 let current = selection
                     .lobby_factions
                     .get(slot)
@@ -9026,7 +9036,7 @@ fn spawn_menu_lobby_slot_row(
             });
 
             // Team dropdown (floating popup): 队1 … 队N.
-            row.spawn(menu_dropdown_cell_node(72.0)).with_children(|cell| {
+            row.spawn(menu_dropdown_flex_cell_node(72.0)).with_children(|cell| {
                 let options: Vec<MainMenuAction> = (0..SKIRMISH_TEAM_OPTION_COUNT as usize)
                     .map(|t| MainMenuAction::SetLobbySlotTeam(slot, t))
                     .collect();
@@ -9043,7 +9053,7 @@ fn spawn_menu_lobby_slot_row(
             });
 
             // Color dropdown (floating popup): 色1 … 色N.
-            row.spawn(menu_dropdown_cell_node(72.0)).with_children(|cell| {
+            row.spawn(menu_dropdown_flex_cell_node(72.0)).with_children(|cell| {
                 let options: Vec<MainMenuAction> = (0..PLAYER_COLOR_PALETTE.len())
                     .map(|c| MainMenuAction::SetLobbySlotColor(slot, c))
                     .collect();
