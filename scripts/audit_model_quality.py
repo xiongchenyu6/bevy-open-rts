@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import json
 import re
 import sys
 from pathlib import Path
@@ -19,6 +20,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_RS = REPO_ROOT / "src/generated_registry.rs"
 DEFAULT_REPORT = REPO_ROOT / "screenshots/model-harness/model-quality-report.md"
+DEFAULT_QUEUE = REPO_ROOT / "docs/model-quality/hunyuan3d-queue.json"
 DEFAULT_SCREENSHOT_DIR = REPO_ROOT / "screenshots/model-harness"
 CRITICAL_DISTINCT_GROUPS = [
     ("Worker", "ScoutRover"),
@@ -45,6 +47,21 @@ def parse_roles(registry_path: Path) -> dict[str, str]:
     for match in entity_re.finditer(text):
         roles[match.group(1)] = match.group(2)
     return roles
+
+
+def parse_labels(registry_path: Path) -> dict[str, str]:
+    text = registry_path.read_text()
+    labels: dict[str, str] = {}
+    entity_re = re.compile(
+        r"EntityDef\s*\{\s*"
+        r'id:\s*"([^"]+)".*?'
+        r'label:\s*"([^"]+)".*?'
+        r"render_parts:\s*(PARTS_[A-Z0-9_]+),",
+        re.S,
+    )
+    for match in entity_re.finditer(text):
+        labels[match.group(1)] = match.group(2)
+    return labels
 
 
 def model_signature(parts: list[dict[str, object]]) -> tuple[tuple[str, int], ...]:
@@ -86,6 +103,40 @@ def markdown_table(rows: list[list[str]], headers: list[str]) -> list[str]:
 
 def rel_path(path: Path) -> str:
     return str(path.relative_to(REPO_ROOT)) if path.is_relative_to(REPO_ROOT) else str(path)
+
+
+def parse_harness_locations(screenshots_dir: Path) -> dict[str, dict[str, str]]:
+    manifest = screenshots_dir / "manifest.md"
+    if not manifest.exists():
+        return {}
+
+    locations: dict[str, dict[str, str]] = {}
+    for line in manifest.read_text().splitlines():
+        if not line.startswith("|") or "`" not in line:
+            continue
+        columns = [column.strip() for column in line.split("|")]
+        if len(columns) < 10:
+            continue
+        entity = columns[4].strip("`")
+        if not entity or entity == "Entity":
+            continue
+        locations[entity] = {
+            "page": columns[2],
+            "cell": columns[3],
+            "screenshot": columns[9],
+        }
+    return locations
+
+
+def generation_prompt(entity_id: str, label: str, signature: str) -> str:
+    return (
+        f"Create a single cohesive low-poly 3D RTS game unit GLB for {label} "
+        f"({entity_id}). Style: clean sci-fi base-building RTS, readable from an "
+        "isometric camera, compact silhouette, team-color accent panels, no floating "
+        "or separated kitbash parts, centered pivot at ground contact, proportions "
+        "compatible with Bevy Open RTS / Kenney spacekit units. Current weak source "
+        f"parts: {signature}. Replace them with one fused production-ready model."
+    )
 
 
 def model_harness_coverage(
@@ -142,6 +193,12 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--registry", type=Path, default=REGISTRY_RS)
     parser.add_argument("--out", type=Path, default=DEFAULT_REPORT)
+    parser.add_argument(
+        "--queue-out",
+        type=Path,
+        default=DEFAULT_QUEUE,
+        help="Write a machine-readable Hunyuan3D replacement queue.",
+    )
     parser.add_argument("--screenshots-dir", type=Path, default=DEFAULT_SCREENSHOT_DIR)
     parser.add_argument(
         "--per-page",
@@ -157,7 +214,10 @@ def main() -> int:
     parser.add_argument(
         "--fail-critical",
         action="store_true",
-        help="Return non-zero for critical duplicate units or missing model files.",
+        help=(
+            "Return non-zero for critical duplicate units, any duplicate unit "
+            "model signatures, or missing model files."
+        ),
     )
     parser.add_argument(
         "--max-unit-parts",
@@ -172,6 +232,8 @@ def main() -> int:
     audit_model_mapping.REGISTRY_RS = args.registry
     registry = audit_model_mapping.parse_registry()
     roles = parse_roles(args.registry)
+    labels = parse_labels(args.registry)
+    harness_locations = parse_harness_locations(args.screenshots_dir)
     harness_rows, harness_failures, expected_harness_pages = model_harness_coverage(
         registry,
         args.screenshots_dir,
@@ -235,14 +297,44 @@ def main() -> int:
         if len(ids) > 1 and sig
     ]
 
-    hunyuan_candidates = sorted(
-        {
-            *critical_failures,
-            *(entity_id for entity_id, _, _ in multipart_units),
-            *(entity for ids, _ in model_duplicate_rows for entity in ids.split(", ")),
-            *empty_visuals,
-        }
-    )
+    candidate_reasons: dict[str, set[str]] = collections.defaultdict(set)
+    for left, right in CRITICAL_DISTINCT_GROUPS:
+        if f"{left} vs {right}" in critical_failures:
+            candidate_reasons[left].add(f"critical visual overlap with {right}")
+            candidate_reasons[right].add(f"critical visual overlap with {left}")
+    for entity_id, count, _signature in multipart_units:
+        candidate_reasons[entity_id].add(f"multipart kitbash above {args.max_unit_parts} parts ({count})")
+    for ids, _signature in model_duplicate_rows:
+        group = ids.split(", ")
+        for entity_id in group:
+            candidate_reasons[entity_id].add("duplicate unit model signature: " + ", ".join(group))
+    for entity_id in empty_visuals:
+        candidate_reasons[entity_id].add("empty non-procedural visual")
+
+    queue_records = []
+    for entity_id in sorted(candidate_reasons):
+        entry = registry[entity_id]
+        parts = entry["parts"]  # type: ignore[assignment]
+        signature = signature_label(model_signature(parts))
+        label = labels.get(entity_id, entity_id)
+        queue_records.append(
+            {
+                "entity": entity_id,
+                "label": label,
+                "role": roles.get(entity_id, "Unknown"),
+                "reasons": sorted(candidate_reasons[entity_id]),
+                "part_count": len(parts),
+                "model_signature": signature,
+                "render_parts": parts,
+                "harness": harness_locations.get(entity_id),
+                "prompt": generation_prompt(entity_id, label, signature),
+                "negative_prompt": (
+                    "floating pieces, separated weapons, disconnected missiles, unreadable tiny "
+                    "details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale"
+                ),
+                "target_path": f"assets/models/hunyuan3d/{entity_id}.glb",
+            }
+        )
 
     lines = [
         "# Model Quality Audit",
@@ -285,12 +377,38 @@ def main() -> int:
     lines.extend(["## Model Harness Screenshot Coverage", ""])
     lines.extend(markdown_table(harness_rows, ["Check", "Status", "Detail"]))
     lines.extend(["## Hunyuan3D Replacement Candidates", ""])
-    lines.extend(markdown_table([[entity] for entity in hunyuan_candidates], ["Entity or pair"]))
+    lines.extend(
+        markdown_table(
+            [
+                [
+                    record["entity"],
+                    "; ".join(record["reasons"]),
+                    (
+                        f"{record['harness']['screenshot']} {record['harness']['cell']}"
+                        if record["harness"]
+                        else "missing harness location"
+                    ),
+                ]
+                for record in queue_records
+            ],
+            ["Entity", "Reasons", "Harness"],
+        )
+    )
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text("\n".join(lines) + "\n")
+    if args.queue_out:
+        args.queue_out.parent.mkdir(parents=True, exist_ok=True)
+        args.queue_out.write_text(json.dumps(queue_records, indent=2, ensure_ascii=False) + "\n")
     display = args.out.relative_to(REPO_ROOT) if args.out.is_relative_to(REPO_ROOT) else args.out
     print(f"[model-quality] wrote {display}")
+    if args.queue_out:
+        queue_display = (
+            args.queue_out.relative_to(REPO_ROOT)
+            if args.queue_out.is_relative_to(REPO_ROOT)
+            else args.queue_out
+        )
+        print(f"[model-quality] wrote {queue_display}")
     print(
         "[model-quality] "
         f"critical_failures={len(critical_failures)} "
@@ -300,7 +418,7 @@ def main() -> int:
         f"harness_failures={len(harness_failures)}"
     )
 
-    if args.fail_critical and (critical_failures or missing_assets):
+    if args.fail_critical and (critical_failures or missing_assets or model_duplicate_rows):
         return 1
     if args.require_screenshots and harness_failures:
         return 1

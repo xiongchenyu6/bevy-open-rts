@@ -902,21 +902,21 @@ const PARTS_LANCEBEAMTANK: &[RenderPart] = &[
 const MODELS_LANDMINE: &[&str] = &[];
 const PARTS_LANDMINE: &[RenderPart] = &[];
 const MODELS_LIGHTRIFLEINFANTRY: &[&str] = &[
-    "models/kenney-spacekit/astronautB.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
+    "models/kenney-spacekit/astronautA.glb",
+    "models/kenney-spacekit/weapon_rifle.glb",
 ];
 const PARTS_LIGHTRIFLEINFANTRY: &[RenderPart] = &[
     RenderPart {
-        model: "models/kenney-spacekit/astronautB.glb",
+        model: "models/kenney-spacekit/astronautA.glb",
         translation: [-0.29, 0.0, -0.29],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [0.58, 0.58, 0.58],
     },
     RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.28, 0.52, -0.62],
+        model: "models/kenney-spacekit/weapon_rifle.glb",
+        translation: [-0.32, 0.52, -0.72],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.48, 0.48, 0.48],
+        scale: [0.58, 0.42, 0.58],
     },
 ];
 const MODELS_LONGBOWMISSILECRAWLER: &[&str] = &[
@@ -1155,28 +1155,28 @@ const PARTS_OREPURIFIER: &[RenderPart] = &[
     },
 ];
 const MODELS_PHASESABOTEUR: &[&str] = &[
-    "models/kenney-spacekit/astronautB.glb",
-    "models/kenney-spacekit/machine_generator.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
+    "models/kenney-spacekit/astronautA.glb",
+    "models/kenney-spacekit/machine_wireless.glb",
+    "models/kenney-spacekit/weapon_rifle.glb",
 ];
 const PARTS_PHASESABOTEUR: &[RenderPart] = &[
     RenderPart {
-        model: "models/kenney-spacekit/astronautB.glb",
+        model: "models/kenney-spacekit/astronautA.glb",
         translation: [-0.27, 0.0, -0.27],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [0.54, 0.54, 0.54],
     },
     RenderPart {
-        model: "models/kenney-spacekit/machine_generator.glb",
-        translation: [-0.07, 0.58, 0.03],
+        model: "models/kenney-spacekit/machine_wireless.glb",
+        translation: [0.12, 0.54, 0.08],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [0.16, 0.16, 0.16],
     },
     RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.36, 0.53, -0.72],
+        model: "models/kenney-spacekit/weapon_rifle.glb",
+        translation: [-0.37, 0.53, -0.79],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.46, 0.46, 0.62],
+        scale: [0.58, 0.36, 0.7],
     },
 ];
 const MODELS_POWERREACTOR: &[&str] = &[
@@ -1257,6 +1257,7 @@ const PARTS_PRISMDEFENSEOBELISK: &[RenderPart] = &[
 ];
 const MODELS_PULSERIFLECOMMANDO: &[&str] = &[
     "models/kenney-spacekit/astronautB.glb",
+    "models/kenney-spacekit/machine_generator.glb",
     "models/kenney-spacekit/weapon_rifle.glb",
 ];
 const PARTS_PULSERIFLECOMMANDO: &[RenderPart] = &[
@@ -1265,6 +1266,12 @@ const PARTS_PULSERIFLECOMMANDO: &[RenderPart] = &[
         translation: [-0.31, 0.0, -0.31],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [0.62, 0.62, 0.62],
+    },
+    RenderPart {
+        model: "models/kenney-spacekit/machine_generator.glb",
+        translation: [0.22, 0.62, 0.04],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [0.18, 0.18, 0.18],
     },
     RenderPart {
         model: "models/kenney-spacekit/weapon_rifle.glb",

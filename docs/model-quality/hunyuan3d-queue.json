@@ -1,0 +1,1669 @@
+[
+  {
+    "entity": "CryoSprayer",
+    "label": "Cryo Sprayer",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (4)"
+    ],
+    "part_count": 4,
+    "model_signature": "1x models/kenney-spacekit/astronautB.glb, 1x models/kenney-spacekit/barrel.glb, 1x models/kenney-spacekit/machine_barrel.glb, 1x models/kenney-spacekit/weapon_gun.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/astronautB.glb",
+        "translation": [
+          -0.31,
+          0.0,
+          -0.31
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.62,
+          0.62,
+          0.62
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          -0.28,
+          0.58,
+          -0.75
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.7,
+          0.55,
+          1.45
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/barrel.glb",
+        "translation": [
+          0.15,
+          0.56,
+          0.16
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.23,
+          0.23,
+          0.23
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_barrel.glb",
+        "translation": [
+          -0.16,
+          0.57,
+          0.17
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2,
+          0.2,
+          0.2
+        ]
+      }
+    ],
+    "harness": {
+      "page": "1",
+      "cell": "r1 c0",
+      "screenshot": "page_01.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Cryo Sprayer (CryoSprayer). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 1x models/kenney-spacekit/astronautB.glb, 1x models/kenney-spacekit/barrel.glb, 1x models/kenney-spacekit/machine_barrel.glb, 1x models/kenney-spacekit/weapon_gun.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/CryoSprayer.glb"
+  },
+  {
+    "entity": "FlakHoverTank",
+    "label": "Flak Hover Tank",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (4)"
+    ],
+    "part_count": 4,
+    "model_signature": "1x models/kenney-spacekit/craft_speederB.glb, 2x models/kenney-spacekit/rocket_finsB.glb, 1x models/kenney-spacekit/turret_double.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/craft_speederB.glb",
+        "translation": [
+          -1.4,
+          0.05,
+          -1.05
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.7,
+          0.7,
+          0.7
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/turret_double.glb",
+        "translation": [
+          -0.35,
+          0.42,
+          -0.4
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.7,
+          0.7,
+          0.7
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/rocket_finsB.glb",
+        "translation": [
+          -0.55,
+          0.45,
+          -0.75
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.28,
+          0.28,
+          0.28
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/rocket_finsB.glb",
+        "translation": [
+          0.55,
+          0.45,
+          -0.75
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.28,
+          0.28,
+          0.28
+        ]
+      }
+    ],
+    "harness": {
+      "page": "2",
+      "cell": "r0 c2",
+      "screenshot": "page_02.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Flak Hover Tank (FlakHoverTank). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 1x models/kenney-spacekit/craft_speederB.glb, 2x models/kenney-spacekit/rocket_finsB.glb, 1x models/kenney-spacekit/turret_double.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/FlakHoverTank.glb"
+  },
+  {
+    "entity": "FlakRocketTeam",
+    "label": "Flak Rocket Team",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (4)"
+    ],
+    "part_count": 4,
+    "model_signature": "2x models/kenney-spacekit/astronautA.glb, 2x models/kenney-spacekit/weapon_gun.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/astronautA.glb",
+        "translation": [
+          -0.34,
+          0.0,
+          -0.26
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.58,
+          0.58,
+          0.58
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/astronautA.glb",
+        "translation": [
+          0.22,
+          0.0,
+          0.2
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.54,
+          0.54,
+          0.54
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          -0.36,
+          0.66,
+          -0.78
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.46,
+          0.46,
+          1.25
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          0.18,
+          0.62,
+          -0.5
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.4,
+          0.4,
+          1.1
+        ]
+      }
+    ],
+    "harness": {
+      "page": "2",
+      "cell": "r1 c0",
+      "screenshot": "page_02.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Flak Rocket Team (FlakRocketTeam). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 2x models/kenney-spacekit/astronautA.glb, 2x models/kenney-spacekit/weapon_gun.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/FlakRocketTeam.glb"
+  },
+  {
+    "entity": "FlakRocketTeamMk2",
+    "label": "Flak Rocket Team Mk2",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (4)"
+    ],
+    "part_count": 4,
+    "model_signature": "2x models/kenney-spacekit/astronautA.glb, 2x models/kenney-spacekit/weapon_rifle.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/astronautA.glb",
+        "translation": [
+          -0.44,
+          0.0,
+          -0.24
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.6,
+          0.6,
+          0.6
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/astronautA.glb",
+        "translation": [
+          0.26,
+          0.0,
+          0.22
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.57,
+          0.57,
+          0.57
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_rifle.glb",
+        "translation": [
+          -0.48,
+          0.62,
+          -0.82
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.64,
+          0.64,
+          1.05
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_rifle.glb",
+        "translation": [
+          0.22,
+          0.58,
+          -0.58
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.58,
+          0.58,
+          0.92
+        ]
+      }
+    ],
+    "harness": {
+      "page": "2",
+      "cell": "r1 c1",
+      "screenshot": "page_02.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Flak Rocket Team Mk2 (FlakRocketTeamMk2). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 2x models/kenney-spacekit/astronautA.glb, 2x models/kenney-spacekit/weapon_rifle.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/FlakRocketTeamMk2.glb"
+  },
+  {
+    "entity": "FlameAssaultBuggy",
+    "label": "Flame Assault Buggy",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (5)"
+    ],
+    "part_count": 5,
+    "model_signature": "2x models/kenney-spacekit/barrel.glb, 1x models/kenney-spacekit/rover.glb, 2x models/kenney-spacekit/weapon_gun.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/rover.glb",
+        "translation": [
+          -3.4,
+          0.0,
+          -2.55
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          1.7,
+          1.7,
+          1.7
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          -0.25,
+          0.35,
+          -0.85
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.9,
+          0.9,
+          1.45
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          0.25,
+          0.35,
+          -0.85
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.9,
+          0.9,
+          1.45
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/barrel.glb",
+        "translation": [
+          -0.55,
+          0.28,
+          0.25
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.45,
+          0.45,
+          0.45
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/barrel.glb",
+        "translation": [
+          0.55,
+          0.28,
+          0.25
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.45,
+          0.45,
+          0.45
+        ]
+      }
+    ],
+    "harness": {
+      "page": "2",
+      "cell": "r1 c2",
+      "screenshot": "page_02.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Flame Assault Buggy (FlameAssaultBuggy). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 2x models/kenney-spacekit/barrel.glb, 1x models/kenney-spacekit/rover.glb, 2x models/kenney-spacekit/weapon_gun.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/FlameAssaultBuggy.glb"
+  },
+  {
+    "entity": "HammerSiegeTank",
+    "label": "Hammer Siege Tank",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (5)"
+    ],
+    "part_count": 5,
+    "model_signature": "1x models/kenney-spacekit/craft_cargoB.glb, 2x models/kenney-spacekit/machine_generatorLarge.glb, 1x models/kenney-spacekit/turret_double.glb, 1x models/kenney-spacekit/weapon_gun.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/craft_cargoB.glb",
+        "translation": [
+          -1.978,
+          -0.0688,
+          -1.4792
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.989,
+          0.989,
+          0.989
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/turret_double.glb",
+        "translation": [
+          -0.6708,
+          0.516,
+          -0.4472
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.774,
+          0.774,
+          0.774
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          -0.6708,
+          0.7052,
+          -1.634
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          1.333,
+          1.333,
+          1.935
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_generatorLarge.glb",
+        "translation": [
+          -1.0148,
+          0.43,
+          0.344
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.3096,
+          0.3096,
+          0.3096
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_generatorLarge.glb",
+        "translation": [
+          -0.2408,
+          0.43,
+          0.344
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.3096,
+          0.3096,
+          0.3096
+        ]
+      }
+    ],
+    "harness": {
+      "page": "3",
+      "cell": "r0 c1",
+      "screenshot": "page_03.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Hammer Siege Tank (HammerSiegeTank). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 1x models/kenney-spacekit/craft_cargoB.glb, 2x models/kenney-spacekit/machine_generatorLarge.glb, 1x models/kenney-spacekit/turret_double.glb, 1x models/kenney-spacekit/weapon_gun.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/HammerSiegeTank.glb"
+  },
+  {
+    "entity": "HeavySiegeWalker",
+    "label": "Heavy Siege Walker",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (9)"
+    ],
+    "part_count": 9,
+    "model_signature": "1x models/kenney-spacekit/craft_cargoA.glb, 1x models/kenney-spacekit/machine_generatorLarge.glb, 4x models/kenney-spacekit/supports_low.glb, 1x models/kenney-spacekit/turret_double.glb, 2x models/kenney-spacekit/weapon_gun.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/craft_cargoA.glb",
+        "translation": [
+          -1.665,
+          0.148,
+          -1.221
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.8288,
+          0.8288,
+          0.8288
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/turret_double.glb",
+        "translation": [
+          -0.5772,
+          0.703,
+          -0.5328
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.666,
+          0.666,
+          0.666
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          -0.74,
+          0.8288,
+          -1.591
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.851,
+          0.851,
+          1.887
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          -0.3848,
+          0.8288,
+          -1.591
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.851,
+          0.851,
+          1.887
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_generatorLarge.glb",
+        "translation": [
+          -0.555,
+          0.6068,
+          0.2664
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2516,
+          0.2516,
+          0.2516
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/supports_low.glb",
+        "translation": [
+          -0.999,
+          -0.1628,
+          -0.6068
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2368,
+          0.3404,
+          0.2368
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/supports_low.glb",
+        "translation": [
+          -0.074,
+          -0.1628,
+          -0.6068
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2368,
+          0.3404,
+          0.2368
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/supports_low.glb",
+        "translation": [
+          -0.999,
+          -0.1628,
+          0.333
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2368,
+          0.3404,
+          0.2368
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/supports_low.glb",
+        "translation": [
+          -0.074,
+          -0.1628,
+          0.333
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2368,
+          0.3404,
+          0.2368
+        ]
+      }
+    ],
+    "harness": {
+      "page": "3",
+      "cell": "r1 c1",
+      "screenshot": "page_03.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Heavy Siege Walker (HeavySiegeWalker). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 1x models/kenney-spacekit/craft_cargoA.glb, 1x models/kenney-spacekit/machine_generatorLarge.glb, 4x models/kenney-spacekit/supports_low.glb, 1x models/kenney-spacekit/turret_double.glb, 2x models/kenney-spacekit/weapon_gun.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/HeavySiegeWalker.glb"
+  },
+  {
+    "entity": "LanceBeamTank",
+    "label": "Lance Beam Tank",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (5)"
+    ],
+    "part_count": 5,
+    "model_signature": "1x models/kenney-spacekit/craft_cargoB.glb, 1x models/kenney-spacekit/machine_barrelLarge.glb, 1x models/kenney-spacekit/machine_generatorLarge.glb, 1x models/kenney-spacekit/turret_single.glb, 1x models/kenney-spacekit/weapon_gun.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/craft_cargoB.glb",
+        "translation": [
+          -1.6416,
+          -0.0608,
+          -1.2312
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.8208,
+          0.8208,
+          0.8208
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/turret_single.glb",
+        "translation": [
+          -0.5472,
+          0.4256,
+          -0.3952
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.6232,
+          0.6232,
+          0.6232
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          -0.57,
+          0.5928,
+          -1.406
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.76,
+          0.76,
+          1.71
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_generatorLarge.glb",
+        "translation": [
+          -0.5624,
+          0.4712,
+          0.2128
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.1976,
+          0.1976,
+          0.1976
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_barrelLarge.glb",
+        "translation": [
+          -0.266,
+          0.4712,
+          0.2128
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.1672,
+          0.1672,
+          0.1672
+        ]
+      }
+    ],
+    "harness": {
+      "page": "4",
+      "cell": "r1 c0",
+      "screenshot": "page_04.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Lance Beam Tank (LanceBeamTank). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 1x models/kenney-spacekit/craft_cargoB.glb, 1x models/kenney-spacekit/machine_barrelLarge.glb, 1x models/kenney-spacekit/machine_generatorLarge.glb, 1x models/kenney-spacekit/turret_single.glb, 1x models/kenney-spacekit/weapon_gun.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/LanceBeamTank.glb"
+  },
+  {
+    "entity": "LongbowMissileCrawler",
+    "label": "Longbow Missile Crawler",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (8)"
+    ],
+    "part_count": 8,
+    "model_signature": "1x models/kenney-spacekit/craft_cargoB.glb, 2x models/kenney-spacekit/machine_generator.glb, 2x models/kenney-spacekit/rocket_fuelA.glb, 2x models/kenney-spacekit/rocket_topA.glb, 1x models/kenney-spacekit/turret_single.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/craft_cargoB.glb",
+        "translation": [
+          -1.638,
+          -0.0624,
+          -1.248
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.819,
+          0.819,
+          0.819
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/turret_single.glb",
+        "translation": [
+          -0.5616,
+          0.468,
+          -0.4056
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.5616,
+          0.5616,
+          0.5616
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/rocket_fuelA.glb",
+        "translation": [
+          -0.858,
+          0.6552,
+          -1.0764
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2808,
+          0.2808,
+          0.5616
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/rocket_topA.glb",
+        "translation": [
+          -0.858,
+          0.6552,
+          -1.3884
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2808,
+          0.2808,
+          0.2808
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/rocket_fuelA.glb",
+        "translation": [
+          -0.3276,
+          0.6552,
+          -1.0764
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2808,
+          0.2808,
+          0.5616
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/rocket_topA.glb",
+        "translation": [
+          -0.3276,
+          0.6552,
+          -1.3884
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2808,
+          0.2808,
+          0.2808
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_generator.glb",
+        "translation": [
+          -0.8736,
+          0.4368,
+          0.2184
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2184,
+          0.2184,
+          0.2184
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_generator.glb",
+        "translation": [
+          -0.2808,
+          0.4368,
+          0.2184
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2184,
+          0.2184,
+          0.2184
+        ]
+      }
+    ],
+    "harness": {
+      "page": "5",
+      "cell": "r0 c0",
+      "screenshot": "page_05.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Longbow Missile Crawler (LongbowMissileCrawler). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 1x models/kenney-spacekit/craft_cargoB.glb, 2x models/kenney-spacekit/machine_generator.glb, 2x models/kenney-spacekit/rocket_fuelA.glb, 2x models/kenney-spacekit/rocket_topA.glb, 1x models/kenney-spacekit/turret_single.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/LongbowMissileCrawler.glb"
+  },
+  {
+    "entity": "MobileShieldProjector",
+    "label": "Mobile Shield Projector",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (4)"
+    ],
+    "part_count": 4,
+    "model_signature": "1x models/kenney-spacekit/machine_generatorLarge.glb, 1x models/kenney-spacekit/machine_wirelessCable.glb, 1x models/kenney-spacekit/rover.glb, 1x models/kenney-spacekit/satelliteDish_large.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/rover.glb",
+        "translation": [
+          -3.8,
+          0.0,
+          -2.85
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          1.9,
+          1.9,
+          1.9
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/satelliteDish_large.glb",
+        "translation": [
+          -0.15,
+          0.72,
+          -0.05
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.32,
+          0.32,
+          0.32
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_generatorLarge.glb",
+        "translation": [
+          0.42,
+          0.38,
+          0.32
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.36,
+          0.36,
+          0.36
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_wirelessCable.glb",
+        "translation": [
+          -0.48,
+          0.3,
+          0.32
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.28,
+          0.28,
+          0.28
+        ]
+      }
+    ],
+    "harness": {
+      "page": "5",
+      "cell": "r1 c0",
+      "screenshot": "page_05.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Mobile Shield Projector (MobileShieldProjector). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 1x models/kenney-spacekit/machine_generatorLarge.glb, 1x models/kenney-spacekit/machine_wirelessCable.glb, 1x models/kenney-spacekit/rover.glb, 1x models/kenney-spacekit/satelliteDish_large.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/MobileShieldProjector.glb"
+  },
+  {
+    "entity": "ModularMissileCarrier",
+    "label": "Modular Missile Carrier",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (4)"
+    ],
+    "part_count": 4,
+    "model_signature": "1x models/kenney-spacekit/craft_cargoA.glb, 1x models/kenney-spacekit/machine_barrelLarge.glb, 1x models/kenney-spacekit/rocket_topA.glb, 1x models/kenney-spacekit/rocket_topB.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/craft_cargoA.glb",
+        "translation": [
+          -1.7472,
+          -0.0468,
+          -1.3104
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.8736,
+          0.8736,
+          0.8736
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/rocket_topA.glb",
+        "translation": [
+          -0.897,
+          0.5616,
+          -0.975
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2964,
+          0.2964,
+          0.546
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/rocket_topB.glb",
+        "translation": [
+          -0.273,
+          0.5616,
+          -0.975
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2964,
+          0.2964,
+          0.546
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_barrelLarge.glb",
+        "translation": [
+          -0.585,
+          0.546,
+          -0.351
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.1716,
+          0.1716,
+          0.1716
+        ]
+      }
+    ],
+    "harness": {
+      "page": "5",
+      "cell": "r1 c1",
+      "screenshot": "page_05.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Modular Missile Carrier (ModularMissileCarrier). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 1x models/kenney-spacekit/craft_cargoA.glb, 1x models/kenney-spacekit/machine_barrelLarge.glb, 1x models/kenney-spacekit/rocket_topA.glb, 1x models/kenney-spacekit/rocket_topB.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/ModularMissileCarrier.glb"
+  },
+  {
+    "entity": "RailArtilleryWalker",
+    "label": "Rail Artillery Walker",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (8)"
+    ],
+    "part_count": 8,
+    "model_signature": "1x models/kenney-spacekit/craft_cargoA.glb, 1x models/kenney-spacekit/machine_generatorLarge.glb, 4x models/kenney-spacekit/supports_low.glb, 1x models/kenney-spacekit/turret_single.glb, 1x models/kenney-spacekit/weapon_gun.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/craft_cargoA.glb",
+        "translation": [
+          -1.6568,
+          0.076,
+          -1.2008
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.8208,
+          0.8208,
+          0.8208
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/turret_single.glb",
+        "translation": [
+          -0.57,
+          0.6536,
+          -0.4864
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.5928,
+          0.5928,
+          0.5928
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          -0.57,
+          0.7752,
+          -1.7328
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          1.026,
+          1.026,
+          2.318
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_generatorLarge.glb",
+        "translation": [
+          -0.5928,
+          0.5472,
+          0.304
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2432,
+          0.2432,
+          0.2432
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/supports_low.glb",
+        "translation": [
+          -1.0184,
+          -0.1672,
+          -0.6232
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.228,
+          0.3192,
+          0.228
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/supports_low.glb",
+        "translation": [
+          -0.0912,
+          -0.1672,
+          -0.6232
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.228,
+          0.3192,
+          0.228
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/supports_low.glb",
+        "translation": [
+          -1.0184,
+          -0.1672,
+          0.3496
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.228,
+          0.3192,
+          0.228
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/supports_low.glb",
+        "translation": [
+          -0.0912,
+          -0.1672,
+          0.3496
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.228,
+          0.3192,
+          0.228
+        ]
+      }
+    ],
+    "harness": {
+      "page": "7",
+      "cell": "r0 c0",
+      "screenshot": "page_07.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Rail Artillery Walker (RailArtilleryWalker). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 1x models/kenney-spacekit/craft_cargoA.glb, 1x models/kenney-spacekit/machine_generatorLarge.glb, 4x models/kenney-spacekit/supports_low.glb, 1x models/kenney-spacekit/turret_single.glb, 1x models/kenney-spacekit/weapon_gun.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/RailArtilleryWalker.glb"
+  },
+  {
+    "entity": "RailgunTank",
+    "label": "Railgun Tank",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (5)"
+    ],
+    "part_count": 5,
+    "model_signature": "1x models/kenney-spacekit/craft_cargoB.glb, 2x models/kenney-spacekit/machine_generator.glb, 1x models/kenney-spacekit/turret_single.glb, 1x models/kenney-spacekit/weapon_gun.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/craft_cargoB.glb",
+        "translation": [
+          -1.716,
+          -0.0624,
+          -1.287
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.858,
+          0.858,
+          0.858
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/turret_single.glb",
+        "translation": [
+          -0.5616,
+          0.4524,
+          -0.4056
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.663,
+          0.663,
+          0.663
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          -0.585,
+          0.6084,
+          -1.482
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          1.014,
+          1.014,
+          1.95
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_generator.glb",
+        "translation": [
+          -0.741,
+          0.429,
+          0.273
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2496,
+          0.2496,
+          0.2496
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_generator.glb",
+        "translation": [
+          -0.273,
+          0.429,
+          0.273
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.2496,
+          0.2496,
+          0.2496
+        ]
+      }
+    ],
+    "harness": {
+      "page": "7",
+      "cell": "r1 c0",
+      "screenshot": "page_07.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Railgun Tank (RailgunTank). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 1x models/kenney-spacekit/craft_cargoB.glb, 2x models/kenney-spacekit/machine_generator.glb, 1x models/kenney-spacekit/turret_single.glb, 1x models/kenney-spacekit/weapon_gun.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/RailgunTank.glb"
+  },
+  {
+    "entity": "TeslaCrawlerMk2",
+    "label": "Tesla Crawler Mk2",
+    "role": "Unit",
+    "reasons": [
+      "multipart kitbash above 3 parts (4)"
+    ],
+    "part_count": 4,
+    "model_signature": "1x models/kenney-spacekit/machine_generator.glb, 1x models/kenney-spacekit/rover.glb, 2x models/kenney-spacekit/weapon_gun.glb",
+    "render_parts": [
+      {
+        "model": "models/kenney-spacekit/rover.glb",
+        "translation": [
+          -3.9,
+          0.0,
+          -2.92
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          1.95,
+          1.95,
+          1.95
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/machine_generator.glb",
+        "translation": [
+          0.0,
+          0.52,
+          -0.08
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.34,
+          0.34,
+          0.34
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          -0.34,
+          0.46,
+          -0.74
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.55,
+          0.55,
+          1.15
+        ]
+      },
+      {
+        "model": "models/kenney-spacekit/weapon_gun.glb",
+        "translation": [
+          0.34,
+          0.46,
+          -0.74
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          0.55,
+          0.55,
+          1.15
+        ]
+      }
+    ],
+    "harness": {
+      "page": "11",
+      "cell": "r0 c2",
+      "screenshot": "page_11.png"
+    },
+    "prompt": "Create a single cohesive low-poly 3D RTS game unit GLB for Tesla Crawler Mk2 (TeslaCrawlerMk2). Style: clean sci-fi base-building RTS, readable from an isometric camera, compact silhouette, team-color accent panels, no floating or separated kitbash parts, centered pivot at ground contact, proportions compatible with Bevy Open RTS / Kenney spacekit units. Current weak source parts: 1x models/kenney-spacekit/machine_generator.glb, 1x models/kenney-spacekit/rover.glb, 2x models/kenney-spacekit/weapon_gun.glb. Replace them with one fused production-ready model.",
+    "negative_prompt": "floating pieces, separated weapons, disconnected missiles, unreadable tiny details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale",
+    "target_path": "assets/models/hunyuan3d/TeslaCrawlerMk2.glb"
+  }
+]

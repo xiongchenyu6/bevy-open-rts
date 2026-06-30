@@ -31,6 +31,7 @@
 - The minimal `GodotSkirmish` opening remains one `CommandCenter` plus two `Worker` economy units, but each faction gets a distinct starter combat/scout unit (`ScoutRover`, `RocketInfantry`, `ShieldTrooper`) so the default `cargo run` start is not visually identical across races.
 - Godot render-part mapping is audited separately from gameplay generation. `assets/data/godot_model_map.model_map.ron` is a Bevy-loadable baseline asset generated from Godot `*.tscn` scenes, and `scripts/audit_model_mapping.py` compares it against `src/generated_registry.rs` without regenerating or overwriting the hand-expanded registry. The baseline is reference data, not permission to keep poor Bevy silhouettes.
 - `Worker` now uses a distinct field-engineer model composition (`astronautB` plus equipment) instead of sharing `ScoutRover`'s `rover.glb`. Critical unit silhouettes are protected by tests and by `scripts/audit_model_quality.py`.
+- `scripts/audit_model_quality.py --fail-critical --require-screenshots` is the model quality gate: it fails missing models, critical shared silhouettes, duplicate unit model signatures, and missing model-harness coverage. It also writes `docs/model-quality/hunyuan3d-queue.json`, a machine-readable Hunyuan3D replacement queue for multipart/kitbashed units with harness page/cell references and generation prompts.
 - Worker harvesting now has runtime VFX parity for the important Godot cues: collecting emits front sparkles and resource-to-worker pulses, carried ore/crystal draws visible cargo dots on the rover, and dropoff clears the cargo through the existing `ResourceCargo` flow.
 - The OS cursor is owned by the shared game scene through `bevy_cursor_kit`. `assets/ui/cursors/rts_cursor.cur.ron` maps the dedicated atlas to default, move/patrol/rally, attack/support targeting, and build/resource targeting cursor states.
 
@@ -57,6 +58,10 @@
     `moonshine-kind::Instance<ModelHarnessRoot>` roots so registry coverage and
     harness spawn boundaries are checked by Rust types instead of loose entity
     plumbing.
+- Current model-harness output is intentionally ignored under `screenshots/`.
+  Regenerate it with `RUST_LOG=warn cargo run --bin capture -- model-harness
+  screenshots/model-harness 6` before running the quality gate when changing
+  unit visuals.
 - The old `real-*-proof` CLI surfaces were removed; do not use them as completion gates.
 
 ## Verification

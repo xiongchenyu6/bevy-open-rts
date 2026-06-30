@@ -114,6 +114,10 @@ Generated outputs:
 - Uses `moonshine-kind 0.5.1` at the model harness boundary so harness roots are
   typed `Instance<ModelHarnessRoot>` values and registry coverage is backed by a
   harness-owned, compiler-checked ID table.
+- Uses `scripts/audit_model_quality.py` as the model quality gate. It verifies
+  distinct unit signatures, model-harness screenshot coverage, and writes
+  `docs/model-quality/hunyuan3d-queue.json` for multipart units that should be
+  replaced by cohesive Hunyuan3D GLB assets.
 - Mirrors the non-`.import` Godot asset tree and generates 73 playable
   unit/structure definitions across the three Godot factions.
 - Loads all referenced GLB assets for migrated entities; Godot procedural-only
@@ -133,6 +137,16 @@ Generated outputs:
 - Right click orders selected mobile units to move or attack.
 - Drag the mouse near the viewport edge, or use WASD, to pan the camera.
 - Mouse wheel zooms.
+
+## Model Harness
+
+```sh
+RUST_LOG=warn cargo run --bin capture -- model-harness screenshots/model-harness 6
+python3 scripts/audit_model_quality.py --fail-critical --require-screenshots
+```
+
+The screenshot directory is ignored by git. The Hunyuan3D replacement queue is
+tracked at `docs/model-quality/hunyuan3d-queue.json`.
 - The OS cursor uses the RTS cursor atlas in `assets/ui/cursors/`: default
   arrow, move/patrol/rally, attack/support targeting, and build/resource
   targeting states.
