@@ -30386,6 +30386,31 @@ mod current_tests {
     }
 
     #[test]
+    fn startup_loading_state_tracks_real_asset_handles_when_enabled() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(StartupLoadingPolicy {
+            preload_assets: true,
+        });
+
+        app.update();
+
+        let retained = app.world().resource::<StartupLoadingAssets>();
+        assert!(
+            retained.handles.len() > registry::ENTITY_DEFS.len(),
+            "iyes_progress startup loading should track UI assets, icons, cursor assets, model-map data, and migrated model scenes"
+        );
+        let loading = app.world().resource::<AssetsLoading<AppScreen>>();
+        assert!(
+            !loading.allow_failures,
+            "startup loading should fail loudly instead of silently skipping missing critical assets"
+        );
+        assert!(
+            loading.track_dependencies,
+            "startup loading should wait for GLB scene dependencies, not only top-level handles"
+        );
+    }
+
+    #[test]
     fn worker_cargo_visual_slots_show_loaded_resources() {
         let empty = ResourceCargo {
             capacity: 6,
