@@ -191,6 +191,39 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             }
         ],
     },
+    "HammerSiegeTank": {
+        "model_assets": ["models/hunyuan3d/HammerSiegeTank.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/HammerSiegeTank.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
+    "HeavySiegeWalker": {
+        "model_assets": ["models/hunyuan3d/HeavySiegeWalker.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/HeavySiegeWalker.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
+    "RailArtilleryWalker": {
+        "model_assets": ["models/hunyuan3d/RailArtilleryWalker.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/RailArtilleryWalker.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
 }
 
 

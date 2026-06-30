@@ -120,8 +120,8 @@ Generated outputs:
   replaced by cohesive Hunyuan3D GLB assets.
 - Uses `scripts/comfy_hunyuan3d_queue.py` to stage and submit those replacements
   to ComfyUI/Hunyuan3D. Current generated single-GLB replacements include
-  `CryoSprayer`, `FlameAssaultBuggy`, and `LongbowMissileCrawler` under
-  `assets/models/hunyuan3d/`.
+  `CryoSprayer`, `FlameAssaultBuggy`, `HammerSiegeTank`, `HeavySiegeWalker`,
+  `LongbowMissileCrawler`, and `RailArtilleryWalker` under `assets/models/hunyuan3d/`.
 - Mirrors the non-`.import` Godot asset tree and generates 73 playable
   unit/structure definitions across the three Godot factions.
 - Loads all referenced GLB assets for migrated entities; Godot procedural-only
