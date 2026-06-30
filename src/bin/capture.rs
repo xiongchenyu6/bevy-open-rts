@@ -18,6 +18,7 @@
 //!   capture menu-wide [path]             command menu screenshot at 2048x1224
 //!   capture menu-return [path]           setup -> back -> command menu screenshot
 //!   capture factions <dir>               faction base/build smoke screenshots
+//!   capture model-harness <dir> [per-page] [page]
 
 use std::env;
 use std::path::{Path, PathBuf};
@@ -26,12 +27,13 @@ use bevy::prelude::*;
 use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 
 use bevy_open_rts::{
-    CaptureTarget, build_capture_app, capture_build_options_count,
+    CaptureTarget, build_capture_app, build_model_harness_capture_app, capture_build_options_count,
     capture_enabled_build_hotkey_for, capture_enabled_train_hotkey_for,
     capture_enemy_structure_position, capture_entity_is_selected,
     capture_first_enabled_attack_move_hotkey, capture_first_enabled_build_hotkey,
     capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_key,
-    capture_match_phase_label, capture_mouse_button, capture_nearest_enemy_anchor_position,
+    capture_match_phase_label, capture_model_harness_manifest, capture_model_harness_page_count,
+    capture_mouse_button, capture_nearest_enemy_anchor_position,
     capture_nearest_visible_resource_click_position_to, capture_nearest_visible_resource_position,
     capture_onscreen_resource_model_center, capture_placement_is_valid,
     capture_player_army_unit_count, capture_player_attack_move_all, capture_player_build_queue_len,
@@ -46,8 +48,8 @@ use bevy_open_rts::{
     capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
     capture_set_structure_rally, capture_show_credits_menu, capture_show_main_menu,
     capture_show_options_menu, capture_show_skirmish_setup_menu,
-    capture_show_skirmish_setup_with_dropdown, capture_world_to_screen,
-    capture_worst_model_alignment_offset, capture_zoom_camera_closest,
+    capture_show_skirmish_setup_with_dropdown, capture_spawn_model_harness_page,
+    capture_world_to_screen, capture_worst_model_alignment_offset, capture_zoom_camera_closest,
     start_shared_match_scene_with_current_setup,
 };
 
@@ -55,6 +57,10 @@ const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 720;
 const WIDE_MENU_WIDTH: u32 = 2048;
 const WIDE_MENU_HEIGHT: u32 = 1224;
+const MODEL_HARNESS_WIDTH: u32 = 1600;
+const MODEL_HARNESS_HEIGHT: u32 = 1000;
+const MODEL_HARNESS_DEFAULT_PER_PAGE: usize = 6;
+const MODEL_HARNESS_SETTLE_TICKS: usize = 180;
 /// Ticks to let assets load and the menu initialize before starting a match.
 const WARMUP_TICKS: usize = 90;
 /// Ticks to let the match scene populate (bases, units) before first capture.
@@ -186,8 +192,20 @@ fn main() {
                 .unwrap_or_else(|| PathBuf::from("screenshots/factions"));
             render_factions(&dir)
         }
+        Some("model-harness") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/model-harness"));
+            let per_page = args
+                .next()
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(MODEL_HARNESS_DEFAULT_PER_PAGE);
+            let page = args.next().and_then(|s| s.parse().ok());
+            render_model_harness(&dir, per_page, page)
+        }
         Some(other) => Err(format!(
-            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | menu <path> | menu-wide <path> | menu-return <path> | menu-options <path> | menu-credits <path> | menu-setup <path> | play <dir> | harvest <dir> | assault <dir> <seconds> | match <seconds> | factions <dir> | verify]"
+            "unknown command '{other}'. Use: capture [screenshot <path> | frames <dir> <count> | menu <path> | menu-wide <path> | menu-return <path> | menu-options <path> | menu-credits <path> | menu-setup <path> | play <dir> | harvest <dir> | assault <dir> <seconds> | match <seconds> | factions <dir> | model-harness <dir> [per-page] [page] | verify]"
         )),
     };
     if let Err(error) = result {
@@ -602,6 +620,76 @@ fn render_factions(dir: &Path) -> Result<(), String> {
     }
     println!("[capture] wrote faction bases to {}", dir.display());
     Ok(())
+}
+
+fn render_model_harness(dir: &Path, per_page: usize, page: Option<usize>) -> Result<(), String> {
+    let per_page = per_page.max(1);
+    std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    write_model_harness_manifest(dir, per_page)?;
+    let page_count = capture_model_harness_page_count(per_page);
+    if page.is_some_and(|page| page >= page_count) {
+        return Err(format!(
+            "model harness page {} out of range 0..{}",
+            page.unwrap(),
+            page_count.saturating_sub(1)
+        ));
+    }
+    let pages: Vec<usize> = page
+        .map(|page| vec![page])
+        .unwrap_or_else(|| (0..page_count).collect());
+    for page in pages {
+        let mut app = build_model_harness_capture_app(MODEL_HARNESS_WIDTH, MODEL_HARNESS_HEIGHT);
+        let slots = capture_spawn_model_harness_page(&mut app, page, per_page);
+        if slots.is_empty() {
+            return Err(format!("model harness page {page} has no slots"));
+        }
+        for _ in 0..MODEL_HARNESS_SETTLE_TICKS {
+            app.update();
+        }
+        let handle = capture_handle(&app);
+        let path = dir.join(format!("page_{page:02}.png"));
+        shoot(&mut app, &handle, path.clone());
+        println!(
+            "[capture] model harness page {}/{}: {} slots -> {}",
+            page + 1,
+            page_count,
+            slots.len(),
+            path.display()
+        );
+    }
+    println!(
+        "[capture] wrote model harness manifest to {}",
+        dir.join("manifest.md").display()
+    );
+    Ok(())
+}
+
+fn write_model_harness_manifest(dir: &Path, per_page: usize) -> Result<(), String> {
+    let mut lines = vec![
+        "# Model Harness Manifest".to_string(),
+        String::new(),
+        format!("- Per page: {per_page}"),
+        format!("- Pages: {}", capture_model_harness_page_count(per_page)),
+        String::new(),
+        "| Index | Page | Cell | Entity | Label | Role | Parts | Models | Screenshot |".to_string(),
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |".to_string(),
+    ];
+    for slot in capture_model_harness_manifest(per_page) {
+        lines.push(format!(
+            "| {} | {} | r{} c{} | `{}` | {} | {} | {} | {} | page_{:02}.png |",
+            slot.index,
+            slot.page,
+            slot.row,
+            slot.column,
+            slot.id,
+            slot.label,
+            slot.role,
+            slot.render_parts,
+            slot.model_assets,
+            slot.page,
+        ));
+    }
+    std::fs::write(dir.join("manifest.md"), lines.join("\n") + "\n").map_err(|e| e.to_string())
 }
 
 /// Drives the human core loop through the REAL mouse-input systems and captures

@@ -14,7 +14,7 @@ can be moved across incrementally. Playable entity data is generated from
 ## Run Native
 
 All native commands should run inside the Nix dev shell so Bevy can find the
-X11/Wayland/Vulkan/audio runtime libraries:
+Wayland/Vulkan/audio runtime libraries:
 
 ```sh
 direnv allow
@@ -61,6 +61,8 @@ cargo run --bin capture -- harvest screenshots/harvest
 cargo run --bin capture -- assault screenshots/assault 300
 cargo run --bin capture -- match 240
 cargo run --bin capture -- factions screenshots/factions
+cargo run --bin capture -- model-harness screenshots/model-harness 6
+python3 scripts/audit_model_quality.py --fail-critical --require-screenshots
 ```
 
 `capture menu` renders the Godot-style command menu; `capture menu-wide` renders
@@ -79,7 +81,11 @@ attack-move to living enemy anchors, and exits non-zero unless the player reache
 non-zero unless the economy, production, combat, and elimination loop finishes a
 match within the given seconds. `capture factions` renders every faction's
 starting base and exits non-zero unless each faction can reach human train/build
-input through the command panel.
+input through the command panel. `capture model-harness` renders the registry in
+isolated model-gallery pages and writes `screenshots/model-harness/manifest.md`;
+`scripts/audit_model_quality.py --require-screenshots` verifies that every
+registry entity is represented by a non-empty harness page before model quality
+work is accepted.
 
 ## Regenerate Migration Data
 
@@ -100,6 +106,8 @@ Generated outputs:
 ## Current Scope
 
 - Uses Bevy `0.19.0`.
+- Registers `bevy_fluent 0.15.0` for future Fluent localization assets while
+  preserving the current lightweight `Locale`/`t()` text path during migration.
 - Mirrors the non-`.import` Godot asset tree and generates 73 playable
   unit/structure definitions across the three Godot factions.
 - Loads all referenced GLB assets for migrated entities; Godot procedural-only
@@ -119,6 +127,9 @@ Generated outputs:
 - Right click orders selected mobile units to move or attack.
 - Drag the mouse near the viewport edge, or use WASD, to pan the camera.
 - Mouse wheel zooms.
+- The OS cursor uses the RTS cursor atlas in `assets/ui/cursors/`: default
+  arrow, move/patrol/rally, attack/support targeting, and build/resource
+  targeting states.
 - Escape opens the in-match menu for resume, restart, or return to setup.
 - The bottom command panel changes with the selected producer. Click commands
   to train/build; number keys 1-9 and 0 activate the first ten slots.

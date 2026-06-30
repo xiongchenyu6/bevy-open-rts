@@ -22,11 +22,14 @@ bevy = { version = "0.19.0", default-features = false, features = [
   "scene",
   "picking",
   "bevy_ui_widgets",
+  "custom_cursor",
   "keyboard",
   "mouse",
   "png",
 ] }
 bevy_asset_loader = { version = "0.27.0", default-features = false }
+bevy_cursor_kit = { version = "0.9.0", default-features = false, features = ["serde_ron_asset"] }
+bevy_fluent = "0.15.0"
 bevy_common_assets = { version = "0.17.0", default-features = false, features = [
   "json",
   "ron",

@@ -19,6 +19,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_RS = REPO_ROOT / "src/generated_registry.rs"
 DEFAULT_REPORT = REPO_ROOT / "screenshots/model-harness/model-quality-report.md"
+DEFAULT_SCREENSHOT_DIR = REPO_ROOT / "screenshots/model-harness"
 CRITICAL_DISTINCT_GROUPS = [
     ("Worker", "ScoutRover"),
     ("ScoutRover", "RocketInfantry"),
@@ -83,10 +84,76 @@ def markdown_table(rows: list[list[str]], headers: list[str]) -> list[str]:
     return out
 
 
+def rel_path(path: Path) -> str:
+    return str(path.relative_to(REPO_ROOT)) if path.is_relative_to(REPO_ROOT) else str(path)
+
+
+def model_harness_coverage(
+    registry: dict[str, dict[str, object]],
+    screenshots_dir: Path,
+    per_page: int,
+) -> tuple[list[list[str]], list[str], int]:
+    entity_ids = sorted(registry.keys())
+    expected_pages = (len(entity_ids) + per_page - 1) // per_page
+    manifest = screenshots_dir / "manifest.md"
+    failures: list[str] = []
+    rows: list[list[str]] = []
+
+    if not manifest.exists():
+        failures.append("manifest missing")
+        rows.append(["Manifest", "FAIL", rel_path(manifest)])
+    else:
+        text = manifest.read_text()
+        missing_entities = [entity_id for entity_id in entity_ids if f"`{entity_id}`" not in text]
+        if missing_entities:
+            failures.append("manifest missing entities")
+            rows.append(
+                [
+                    "Manifest entities",
+                    "FAIL",
+                    ", ".join(missing_entities),
+                ]
+            )
+        else:
+            rows.append(["Manifest entities", "PASS", f"{len(entity_ids)} entities"])
+
+    missing_pages: list[str] = []
+    empty_pages: list[str] = []
+    for page in range(expected_pages):
+        path = screenshots_dir / f"page_{page:02}.png"
+        if not path.exists():
+            missing_pages.append(path.name)
+        elif path.stat().st_size <= 0:
+            empty_pages.append(path.name)
+
+    if missing_pages:
+        failures.append("screenshot pages missing")
+        rows.append(["Screenshot pages", "FAIL", ", ".join(missing_pages)])
+    if empty_pages:
+        failures.append("screenshot pages empty")
+        rows.append(["Screenshot pages empty", "FAIL", ", ".join(empty_pages)])
+    if not missing_pages and not empty_pages:
+        rows.append(["Screenshot pages", "PASS", f"{expected_pages} pages"])
+
+    return rows, failures, expected_pages
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--registry", type=Path, default=REGISTRY_RS)
     parser.add_argument("--out", type=Path, default=DEFAULT_REPORT)
+    parser.add_argument("--screenshots-dir", type=Path, default=DEFAULT_SCREENSHOT_DIR)
+    parser.add_argument(
+        "--per-page",
+        type=int,
+        default=6,
+        help="Model harness screenshot slots per page.",
+    )
+    parser.add_argument(
+        "--require-screenshots",
+        action="store_true",
+        help="Return non-zero unless model-harness manifest and page screenshots cover every entity.",
+    )
     parser.add_argument(
         "--fail-critical",
         action="store_true",
@@ -99,10 +166,17 @@ def main() -> int:
         help="Units above this render-part count are listed for screenshot review.",
     )
     args = parser.parse_args()
+    if args.per_page <= 0:
+        parser.error("--per-page must be positive")
 
     audit_model_mapping.REGISTRY_RS = args.registry
     registry = audit_model_mapping.parse_registry()
     roles = parse_roles(args.registry)
+    harness_rows, harness_failures, expected_harness_pages = model_harness_coverage(
+        registry,
+        args.screenshots_dir,
+        args.per_page,
+    )
 
     missing_assets: list[tuple[str, str]] = []
     empty_visuals: list[str] = []
@@ -180,6 +254,9 @@ def main() -> int:
         f"- Unit model-signature duplicate groups: {len(model_duplicate_rows)}",
         f"- Unit exact-render duplicate groups: {len(exact_duplicate_rows)}",
         f"- Multipart units above {args.max_unit_parts} parts: {len(multipart_units)}",
+        f"- Model harness screenshots dir: `{rel_path(args.screenshots_dir)}`",
+        f"- Model harness expected pages: {expected_harness_pages} at {args.per_page} per page",
+        f"- Model harness coverage failures: {len(harness_failures)}",
         "",
         "## Critical Distinct Units",
         "",
@@ -205,6 +282,8 @@ def main() -> int:
             ["Unit", "Parts", "Signature"],
         )
     )
+    lines.extend(["## Model Harness Screenshot Coverage", ""])
+    lines.extend(markdown_table(harness_rows, ["Check", "Status", "Detail"]))
     lines.extend(["## Hunyuan3D Replacement Candidates", ""])
     lines.extend(markdown_table([[entity] for entity in hunyuan_candidates], ["Entity or pair"]))
 
@@ -217,10 +296,13 @@ def main() -> int:
         f"critical_failures={len(critical_failures)} "
         f"missing_assets={len(missing_assets)} "
         f"model_duplicate_groups={len(model_duplicate_rows)} "
-        f"multipart_units={len(multipart_units)}"
+        f"multipart_units={len(multipart_units)} "
+        f"harness_failures={len(harness_failures)}"
     )
 
     if args.fail_critical and (critical_failures or missing_assets):
+        return 1
+    if args.require_screenshots and harness_failures:
         return 1
     return 0
 

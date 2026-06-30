@@ -2,8 +2,8 @@
 use bevy::audio::Volume;
 use bevy::{
     asset::{AssetMetaCheck, AssetPlugin},
-    camera::RenderTarget,
     camera::primitives::Aabb,
+    camera::{ClearColorConfig, RenderTarget, ScalingMode},
     ecs::query::Or,
     ecs::system::SystemParam,
     gizmos::config::{GizmoConfigGroup, GizmoConfigStore},
@@ -11,9 +11,11 @@ use bevy::{
     math::primitives::{ConicalFrustum, Cuboid, Cylinder, Torus},
     prelude::*,
     render::error_handler::{ErrorType, RenderError, RenderErrorHandler, RenderErrorPolicy},
-    window::{PrimaryWindow, WindowMode, WindowResolution},
+    window::{CursorIcon, PrimaryWindow, WindowMode, WindowResolution},
 };
 use bevy_common_assets::{json::JsonAssetPlugin, ron::RonAssetPlugin};
+use bevy_cursor_kit::prelude::{CursorAssetPlugin, CustomCursorImageBuilder, StaticCursor};
+use bevy_fluent::FluentPlugin;
 use bevy_rts_camera::{
     RtsCamera as RtsCam, RtsCameraControls, RtsCameraPlugin, RtsCameraSystemSet,
 };
@@ -583,6 +585,35 @@ impl CommandMode {
             || self.rally_point
             || self.support_power.is_some()
             || self.pending_structure_placement.is_some()
+    }
+}
+
+const RTS_CURSOR_ASSET_PATH: &str = "ui/cursors/rts_cursor.cur.ron";
+
+#[derive(Resource)]
+struct RtsCursorAssetHandle(Handle<StaticCursor>);
+
+#[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
+struct AppliedRtsCursor {
+    index: usize,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum RtsCursorKind {
+    Default,
+    Move,
+    Attack,
+    Build,
+}
+
+impl RtsCursorKind {
+    fn atlas_index(self) -> usize {
+        match self {
+            Self::Default => 0,
+            Self::Move => 1,
+            Self::Attack => 2,
+            Self::Build => 3,
+        }
     }
 }
 
@@ -4273,13 +4304,24 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
 
 /// Registers the real game scene flow used by `cargo run`: setup menu plus shared match runtime.
 pub fn add_game_scenes(app: &mut App) -> &mut App {
+    if !app.is_plugin_added::<CursorAssetPlugin>() {
+        app.add_plugins(CursorAssetPlugin);
+    }
+    if !app.is_plugin_added::<FluentPlugin>() {
+        app.add_plugins(FluentPlugin);
+    }
     app.add_plugins(SharedMatchScenePlugin);
     add_main_menu_scene(app);
     app.init_resource::<Locale>();
-    app.add_systems(Startup, load_godot_model_map);
+    app.add_systems(Startup, (load_godot_model_map, load_rts_cursor));
     app.add_systems(
         Update,
-        (sync_locale, toggle_language_hotkey, update_localized_text),
+        (
+            sync_locale,
+            toggle_language_hotkey,
+            update_localized_text,
+            update_rts_cursor,
+        ),
     );
     // A thick gizmo group for HUD-in-world elements (health bars, shot tracers) so
     // they're chunky/visible, while the default group (grid, rings, order paths)
@@ -4297,6 +4339,67 @@ fn load_godot_model_map(mut commands: Commands, asset_server: Res<AssetServer>) 
     commands.insert_resource(GodotModelMapHandle(
         asset_server.load(GODOT_MODEL_MAP_ASSET_PATH),
     ));
+}
+
+fn load_rts_cursor(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.insert_resource(RtsCursorAssetHandle(
+        asset_server.load(RTS_CURSOR_ASSET_PATH),
+    ));
+}
+
+fn update_rts_cursor(
+    mut commands: Commands,
+    cursor_handle: Option<Res<RtsCursorAssetHandle>>,
+    static_cursors: Res<Assets<StaticCursor>>,
+    command_mode: Option<Res<CommandMode>>,
+    hovered_resource: Option<Res<HoveredResource>>,
+    window_q: Query<(Entity, Option<&AppliedRtsCursor>, &Window), With<PrimaryWindow>>,
+) {
+    let Some(cursor_handle) = cursor_handle else {
+        return;
+    };
+    let Some(cursor_asset) = static_cursors.get(&cursor_handle.0) else {
+        return;
+    };
+    let Ok((window_entity, applied, window)) = window_q.single() else {
+        return;
+    };
+    let index =
+        desired_rts_cursor_kind(command_mode.as_deref(), hovered_resource.as_deref(), window)
+            .atlas_index();
+    if applied.is_some_and(|applied| applied.index == index) {
+        return;
+    }
+    commands.entity(window_entity).insert((
+        CursorIcon::Custom(
+            CustomCursorImageBuilder::from_static_cursor(cursor_asset, Some(index)).build(),
+        ),
+        AppliedRtsCursor { index },
+    ));
+}
+
+fn desired_rts_cursor_kind(
+    command_mode: Option<&CommandMode>,
+    hovered_resource: Option<&HoveredResource>,
+    window: &Window,
+) -> RtsCursorKind {
+    if cursor_is_over_hud(window) {
+        return RtsCursorKind::Default;
+    }
+    let Some(command_mode) = command_mode else {
+        return RtsCursorKind::Default;
+    };
+    if command_mode.pending_structure_placement.is_some() {
+        RtsCursorKind::Build
+    } else if command_mode.attack_move || command_mode.support_power.is_some() {
+        RtsCursorKind::Attack
+    } else if command_mode.patrol || command_mode.rally_point {
+        RtsCursorKind::Move
+    } else if hovered_resource.is_some_and(|hovered| hovered.0.is_some()) {
+        RtsCursorKind::Build
+    } else {
+        RtsCursorKind::Default
+    }
 }
 
 /// Gizmo group for thick world-space HUD lines (health bars, tracers).
@@ -4531,6 +4634,216 @@ pub fn build_capture_app(width: u32, height: u32) -> App {
     app.finish();
     app.cleanup();
     app
+}
+
+/// Build a render-capable offscreen app dedicated to isolated model gallery
+/// captures. This intentionally does not register the menu/match scene, so the
+/// screenshots contain only the registry model under review.
+pub fn build_model_harness_capture_app(width: u32, height: u32) -> App {
+    let mut app = App::new();
+    app.add_plugins(
+        DefaultPlugins
+            .set(WindowPlugin {
+                primary_window: None,
+                exit_condition: bevy::window::ExitCondition::DontExit,
+                ..default()
+            })
+            .set(AssetPlugin {
+                meta_check: AssetMetaCheck::Never,
+                ..default()
+            })
+            .disable::<bevy::log::LogPlugin>()
+            .disable::<bevy::winit::WinitPlugin>(),
+    )
+    .add_plugins(bevy::app::ScheduleRunnerPlugin::run_loop(
+        std::time::Duration::ZERO,
+    ))
+    .insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
+    ))
+    .insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
+    .insert_resource(RenderErrorHandler(handle_render_error));
+
+    let image = Image::new_target_texture(
+        width,
+        height,
+        bevy::render::render_resource::TextureFormat::Rgba8UnormSrgb,
+        None,
+    );
+    let handle = app.world_mut().resource_mut::<Assets<Image>>().add(image);
+    app.insert_resource(CaptureTarget(handle));
+    app.finish();
+    app.cleanup();
+    app
+}
+
+#[derive(Clone, Debug)]
+pub struct ModelHarnessSlot {
+    pub index: usize,
+    pub page: usize,
+    pub row: usize,
+    pub column: usize,
+    pub id: &'static str,
+    pub label: &'static str,
+    pub role: &'static str,
+    pub render_parts: usize,
+    pub model_assets: usize,
+}
+
+pub fn capture_model_harness_entity_count() -> usize {
+    registry::ENTITY_DEFS.len()
+}
+
+pub fn capture_model_harness_page_count(per_page: usize) -> usize {
+    let per_page = per_page.max(1);
+    capture_model_harness_entity_count().div_ceil(per_page)
+}
+
+pub fn capture_model_harness_manifest(per_page: usize) -> Vec<ModelHarnessSlot> {
+    let per_page = per_page.max(1);
+    registry::ENTITY_DEFS
+        .iter()
+        .enumerate()
+        .map(|(index, def)| {
+            let page = index / per_page;
+            let local = index % per_page;
+            let columns = model_harness_columns(per_page);
+            ModelHarnessSlot {
+                index,
+                page,
+                row: local / columns,
+                column: local % columns,
+                id: def.id,
+                label: def.label,
+                role: model_harness_role(def.role),
+                render_parts: def.render_parts.len(),
+                model_assets: def.model_assets.len(),
+            }
+        })
+        .collect()
+}
+
+pub fn capture_spawn_model_harness_page(
+    app: &mut App,
+    page: usize,
+    per_page: usize,
+) -> Vec<ModelHarnessSlot> {
+    let per_page = per_page.max(1);
+    let start = page.saturating_mul(per_page);
+    let end = (start + per_page).min(registry::ENTITY_DEFS.len());
+    let page_defs = if start < end {
+        &registry::ENTITY_DEFS[start..end]
+    } else {
+        &[]
+    };
+    let columns = model_harness_columns(per_page);
+    let rows = page_defs.len().div_ceil(columns).max(1);
+    let spacing_x = 8.6;
+    let spacing_z = 7.2;
+    let width = (columns.saturating_sub(1)) as f32 * spacing_x;
+    let depth = (rows.saturating_sub(1)) as f32 * spacing_z;
+    let focus = Vec3::new(0.0, 0.0, 0.0);
+    let camera_height = 28.0;
+    let camera_depth = 22.0;
+    let ortho_width = (width + 12.0)
+        .max((depth + 13.0) * (MODEL_HARNESS_ASPECT_RATIO))
+        .max(24.0);
+
+    {
+        let world = app.world_mut();
+        world.insert_resource(GlobalAmbientLight {
+            color: Color::WHITE,
+            brightness: 260.0,
+            affects_lightmapped_meshes: true,
+        });
+        let target = world.resource::<CaptureTarget>().0.clone();
+        let mut meshes = world.resource_mut::<Assets<Mesh>>();
+        let ground_mesh = meshes.add(Plane3d::default().mesh().size(width + 10.0, depth + 10.0));
+        drop(meshes);
+        let mut materials = world.resource_mut::<Assets<StandardMaterial>>();
+        let ground_material = materials.add(StandardMaterial {
+            base_color: Color::srgb(0.18, 0.22, 0.2),
+            perceptual_roughness: 0.92,
+            ..default()
+        });
+        drop(materials);
+
+        world.spawn((
+            Name::new("Model Harness Camera"),
+            Camera3d::default(),
+            Camera {
+                clear_color: ClearColorConfig::Custom(Color::srgb(0.028, 0.034, 0.045)),
+                ..default()
+            },
+            Projection::from(OrthographicProjection {
+                scaling_mode: ScalingMode::FixedHorizontal {
+                    viewport_width: ortho_width,
+                },
+                far: 1000.0,
+                ..OrthographicProjection::default_3d()
+            }),
+            RenderTarget::Image(target.into()),
+            Transform::from_xyz(0.0, camera_height, camera_depth).looking_at(focus, Vec3::Y),
+        ));
+        world.spawn((
+            Name::new("Model Harness Key Light"),
+            DirectionalLight {
+                shadow_maps_enabled: true,
+                illuminance: 16_000.0,
+                ..default()
+            },
+            Transform::from_xyz(-6.0, 14.0, 7.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ));
+        world.spawn((
+            Name::new("Model Harness Ground"),
+            Mesh3d(ground_mesh),
+            MeshMaterial3d(ground_material),
+            Transform::IDENTITY,
+        ));
+    }
+
+    let mut slots = Vec::new();
+    for (local, def) in page_defs.iter().enumerate() {
+        let row = local / columns;
+        let column = local % columns;
+        let x = column as f32 * spacing_x - width * 0.5;
+        let z = row as f32 * spacing_z - depth * 0.5;
+        let root = app
+            .world_mut()
+            .spawn((
+                Name::new(format!("Model Harness {}", def.id)),
+                Transform::from_translation(Vec3::new(x, def.height, z))
+                    .with_scale(Vec3::splat(def.scale)),
+                Visibility::default(),
+            ))
+            .id();
+        spawn_entity_models_in_world(app.world_mut(), root, None, def);
+        slots.push(ModelHarnessSlot {
+            index: start + local,
+            page,
+            row,
+            column,
+            id: def.id,
+            label: def.label,
+            role: model_harness_role(def.role),
+            render_parts: def.render_parts.len(),
+            model_assets: def.model_assets.len(),
+        });
+    }
+    slots
+}
+
+fn model_harness_columns(per_page: usize) -> usize {
+    per_page.clamp(1, 3)
+}
+
+const MODEL_HARNESS_ASPECT_RATIO: f32 = 1600.0 / 1000.0;
+
+fn model_harness_role(role: registry::EntityRole) -> &'static str {
+    match role {
+        registry::EntityRole::Unit => "Unit",
+        registry::EntityRole::Structure => "Structure",
+    }
 }
 
 /// Capture/dev helper: orders every player unit to attack-move toward the
@@ -11283,30 +11596,74 @@ fn spawn_entity_models(
         }
     } else {
         for part in def.render_parts {
-            let rotation = Quat::from_xyzw(
-                part.rotation[0],
-                part.rotation[1],
-                part.rotation[2],
-                part.rotation[3],
-            );
             commands.spawn((
                 ChildOf(root),
                 WorldAssetRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(part.model))),
-                Transform::from_translation(Vec3::new(
-                    part.translation[0],
-                    part.translation[1],
-                    part.translation[2],
-                ))
-                .with_rotation(rotation)
-                .with_scale(Vec3::new(
-                    part.scale[0],
-                    part.scale[1],
-                    part.scale[2],
-                )),
+                render_part_transform(part),
             ));
         }
     }
     spawn_faction_identity_marker(commands, root, visual_faction, def);
+}
+
+fn spawn_entity_models_in_world(
+    world: &mut World,
+    root: Entity,
+    visual_faction: Option<SkirmishFaction>,
+    def: &registry::EntityDef,
+) {
+    let asset_server = world.resource::<AssetServer>().clone();
+    if def.render_parts.is_empty() {
+        if let Some(model) = ProceduralEntityModel::for_entity_id(def.id) {
+            match model {
+                ProceduralEntityModel::LandMine => spawn_land_mine_procedural_model(world, root),
+                ProceduralEntityModel::TeslaFenceSegment => {
+                    spawn_tesla_fence_segment_procedural_model(world, root)
+                }
+            }
+        } else {
+            world.spawn((
+                ChildOf(root),
+                WorldAssetRoot(
+                    asset_server.load(GltfAssetLabel::Scene(0).from_asset(DEFAULT_MODEL_FALLBACK)),
+                ),
+                Transform::IDENTITY,
+            ));
+        }
+    } else {
+        for part in def.render_parts {
+            world.spawn((
+                ChildOf(root),
+                WorldAssetRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(part.model))),
+                render_part_transform(part),
+            ));
+        }
+    }
+    if let Some(marker) = visual_faction.map(FactionIdentityMarker::for_faction) {
+        let inv_scale = 1.0 / def.scale.max(0.1);
+        let world_size = match def.role {
+            registry::EntityRole::Structure => (def.radius * 0.26).clamp(0.28, 0.68),
+            registry::EntityRole::Unit => (def.radius * 0.22).clamp(0.12, 0.26),
+        };
+        let local_size = world_size * inv_scale;
+        let local_offset = Vec3::new(0.0, 0.12 * inv_scale, -def.radius * 0.72 * inv_scale);
+        spawn_faction_identity_marker_model(world, root, marker, local_offset, local_size);
+    }
+}
+
+fn render_part_transform(part: &registry::RenderPart) -> Transform {
+    Transform::from_translation(Vec3::new(
+        part.translation[0],
+        part.translation[1],
+        part.translation[2],
+    ))
+    .with_rotation(Quat::from_xyzw(
+        part.rotation[0],
+        part.rotation[1],
+        part.rotation[2],
+        part.rotation[3],
+    ))
+    .with_scale(Vec3::new(part.scale[0], part.scale[1], part.scale[2]))
 }
 
 fn spawn_faction_identity_marker(
@@ -29349,6 +29706,41 @@ fn free_position_in_bounds(origin: Vec3, seed: u32, radius: f32, bounds: MapBoun
 #[cfg(test)]
 mod current_tests {
     use super::*;
+
+    #[test]
+    fn rts_cursor_tracks_command_mode_and_hud() {
+        let mut window = Window {
+            resolution: WindowResolution::new(1280, 720),
+            ..default()
+        };
+        window.set_cursor_position(None);
+
+        let mut command_mode = CommandMode::default();
+        assert_eq!(
+            desired_rts_cursor_kind(Some(&command_mode), None, &window),
+            RtsCursorKind::Default
+        );
+
+        command_mode.attack_move = true;
+        assert_eq!(
+            desired_rts_cursor_kind(Some(&command_mode), None, &window),
+            RtsCursorKind::Attack
+        );
+
+        command_mode.attack_move = false;
+        command_mode.pending_structure_placement =
+            Some(PendingStructurePlacement::new("CommandCenter"));
+        assert_eq!(
+            desired_rts_cursor_kind(Some(&command_mode), None, &window),
+            RtsCursorKind::Build
+        );
+
+        window.set_cursor_position(Some(Vec2::new(640.0, 10.0)));
+        assert_eq!(
+            desired_rts_cursor_kind(Some(&command_mode), None, &window),
+            RtsCursorKind::Default
+        );
+    }
 
     // Allies share vision: an enemy unit standing next to an ally's unit (but far
     // from the viewing player's own units) must be revealed through the ally, and

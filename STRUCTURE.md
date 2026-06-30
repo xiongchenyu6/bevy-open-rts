@@ -4,6 +4,7 @@
 
 - `src/main.rs` calls `bevy_open_rts::run_game_app()`.
 - `run_game_app()` builds `build_game_app(GameAppMode::Interactive)`, which registers the Godot-style front menu, options/credits screens, setup menu, and the shared match scene from `src/lib.rs`.
+- Native desktop builds are configured for Wayland through Bevy's `wayland` feature and `scripts/native_runner.sh`; the project does not require X11 runtime libraries.
 
 ## Shared Match Scene
 
@@ -21,6 +22,7 @@
 - Lobby team buttons remain an 8-row setup UI concern, but runtime team IDs are stored and derived as unbounded `usize` values. The battle core no longer clamps alliances to three teams or to the current lobby button count.
 - Runtime spawning is not capped to the map's authored spawn-point count. Players beyond the map rows receive clamped virtual fallback base positions instead of being skipped.
 - AI/runtime fallback helpers are not capped to the lobby slot count: active AI iteration, opponent helpers, late-slot resources, cooldowns, fallback home positions, virtual spawn positions, runtime team relation IDs, and battle AI participation are verified beyond eight players.
+- `bevy_fluent::FluentPlugin` is registered in the shared game scene so future `.ftl` localization bundles can load through Bevy assets. The existing `Locale` / `t()` path remains the active text source until screens are migrated incrementally.
 - AI drones have an active scouting controller: idle AI `Drone` units pick living enemy units, move to their positions, avoid repeating the previous target when possible, and retarget after a short 0.5-1.0s delay.
 - AI defense profiles follow the godot difficulty targets: Beginner/Easy do not inherit Normal advanced-defense construction, Normal targets one standard defense layer plus 2 Tesla fence segments where the faction supports them, and Hard scales standard defenses to 2 plus 4 Tesla fence segments.
 - Easy AI is tuned as a build-up opponent: it trains a small defensive force but does not launch active attack waves, giving default human starts enough time to build a Barracks and form an army. Normal/Hard keep active offense.
@@ -28,6 +30,7 @@
 - Godot render-part mapping is audited separately from gameplay generation. `assets/data/godot_model_map.model_map.ron` is a Bevy-loadable baseline asset generated from Godot `*.tscn` scenes, and `scripts/audit_model_mapping.py` compares it against `src/generated_registry.rs` without regenerating or overwriting the hand-expanded registry. The baseline is reference data, not permission to keep poor Bevy silhouettes.
 - `Worker` now uses a distinct field-engineer model composition (`astronautB` plus equipment) instead of sharing `ScoutRover`'s `rover.glb`. Critical unit silhouettes are protected by tests and by `scripts/audit_model_quality.py`.
 - Worker harvesting now has runtime VFX parity for the important Godot cues: collecting emits front sparkles and resource-to-worker pulses, carried ore/crystal draws visible cargo dots on the rover, and dropoff clears the cargo through the existing `ResourceCargo` flow.
+- The OS cursor is owned by the shared game scene through `bevy_cursor_kit`. `assets/ui/cursors/rts_cursor.cur.ron` maps the dedicated atlas to default, move/patrol/rally, attack/support targeting, and build/resource targeting cursor states.
 
 ## Capture And Proofs
 
@@ -54,3 +57,4 @@
 
 - Use `cargo fmt`, `cargo check`, targeted `cargo test`, full `cargo test`, `cargo build`, and a short `cargo run` smoke.
 - `timeout` exit code `124` is acceptable for the interactive smoke once the window opens and no runtime warnings indicate a game bug.
+- Dependency direction notes live in `docs/dependency-decisions.md`; currently `bevy_egui 0.40.1` is reserved for optional debug tooling, not shipped RTS menu/lobby UI.
