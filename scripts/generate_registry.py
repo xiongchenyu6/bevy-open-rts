@@ -169,6 +169,28 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             }
         ],
     },
+    "LongbowMissileCrawler": {
+        "model_assets": ["models/hunyuan3d/LongbowMissileCrawler.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/LongbowMissileCrawler.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
+    "FlameAssaultBuggy": {
+        "model_assets": ["models/hunyuan3d/FlameAssaultBuggy.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/FlameAssaultBuggy.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
 }
 
 
