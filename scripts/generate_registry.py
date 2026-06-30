@@ -152,11 +152,11 @@ PRODUCTION_ORDER_OVERRIDES = {
 
 REMOVED_ENTITY_IDS = {"OreHarvester", "MobileConstructionVehicle"}
 
-# Per-entity render overrides. The worker MUST use godot's rover.glb (Worker.tscn);
-# overriding it to a humanoid (astronautA) was the swap that diverged the port from
-# the original. NOTE: the registry has since been hand-expanded well beyond godot
-# (extra factions/units), so a full regen is destructive — fixes are applied
-# surgically in src/generated_registry.rs, not by re-running this script.
+# Per-entity render overrides. NOTE: the registry has since been hand-expanded
+# well beyond godot (extra factions/units), so a full regen is destructive —
+# fixes are applied surgically in src/generated_registry.rs, not by re-running
+# this script. Worker intentionally diverges from godot's rover mesh so it does
+# not visually duplicate ScoutRover in the Bevy port.
 ENTITY_RENDER_OVERRIDES: dict[str, dict] = {}
 
 

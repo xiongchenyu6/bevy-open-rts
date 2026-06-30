@@ -30,13 +30,7 @@
           desktopRuntimeLibraries = with pkgs; [
             alsa-lib
             libglvnd
-            libxcb
             libxkbcommon
-            libx11
-            libxcursor
-            libxext
-            libxi
-            libxrandr
             udev
             vulkan-loader
             wayland
