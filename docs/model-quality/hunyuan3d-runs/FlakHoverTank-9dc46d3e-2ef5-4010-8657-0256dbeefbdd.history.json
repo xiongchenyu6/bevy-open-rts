@@ -1,0 +1,180 @@
+{
+  "prompt": [
+    507,
+    "9dc46d3e-2ef5-4010-8657-0256dbeefbdd",
+    {
+      "1": {
+        "class_type": "ImageOnlyCheckpointLoader",
+        "inputs": {
+          "ckpt_name": "hunyuan3d-dit-v2.safetensors"
+        }
+      },
+      "2": {
+        "class_type": "LoadImage",
+        "inputs": {
+          "image": "bevy-open-rts/FlakHoverTank.png"
+        }
+      },
+      "3": {
+        "class_type": "CLIPVisionEncode",
+        "inputs": {
+          "clip_vision": [
+            "1",
+            1
+          ],
+          "image": [
+            "2",
+            0
+          ],
+          "crop": "center"
+        }
+      },
+      "4": {
+        "class_type": "Hunyuan3Dv2Conditioning",
+        "inputs": {
+          "clip_vision_output": [
+            "3",
+            0
+          ]
+        }
+      },
+      "5": {
+        "class_type": "EmptyLatentHunyuan3Dv2",
+        "inputs": {
+          "resolution": 2048,
+          "batch_size": 1
+        }
+      },
+      "6": {
+        "class_type": "ModelSamplingAuraFlow",
+        "inputs": {
+          "model": [
+            "1",
+            0
+          ],
+          "shift": 1.0
+        }
+      },
+      "7": {
+        "class_type": "KSampler",
+        "inputs": {
+          "model": [
+            "6",
+            0
+          ],
+          "positive": [
+            "4",
+            0
+          ],
+          "negative": [
+            "4",
+            1
+          ],
+          "latent_image": [
+            "5",
+            0
+          ],
+          "seed": 3320,
+          "steps": 22,
+          "cfg": 5.0,
+          "sampler_name": "euler",
+          "scheduler": "normal",
+          "denoise": 1.0
+        }
+      },
+      "8": {
+        "class_type": "VAEDecodeHunyuan3D",
+        "inputs": {
+          "samples": [
+            "7",
+            0
+          ],
+          "vae": [
+            "1",
+            2
+          ],
+          "num_chunks": 8000,
+          "octree_resolution": 256
+        }
+      },
+      "9": {
+        "class_type": "VoxelToMesh",
+        "inputs": {
+          "voxel": [
+            "8",
+            0
+          ],
+          "algorithm": "surface net",
+          "threshold": 0.6
+        }
+      },
+      "10": {
+        "class_type": "SaveGLB",
+        "inputs": {
+          "mesh": [
+            "9",
+            0
+          ],
+          "filename_prefix": "bevy-open-rts/FlakHoverTank"
+        }
+      }
+    },
+    {
+      "create_time": 1782821299888
+    },
+    [
+      "10"
+    ]
+  ],
+  "outputs": {
+    "10": {
+      "3d": [
+        {
+          "filename": "FlakHoverTank_00001_.glb",
+          "subfolder": "bevy-open-rts",
+          "type": "output"
+        }
+      ]
+    }
+  },
+  "status": {
+    "status_str": "success",
+    "completed": true,
+    "messages": [
+      [
+        "execution_start",
+        {
+          "prompt_id": "9dc46d3e-2ef5-4010-8657-0256dbeefbdd",
+          "timestamp": 1782821299891
+        }
+      ],
+      [
+        "execution_cached",
+        {
+          "nodes": [
+            "1",
+            "5",
+            "6"
+          ],
+          "prompt_id": "9dc46d3e-2ef5-4010-8657-0256dbeefbdd",
+          "timestamp": 1782821299920
+        }
+      ],
+      [
+        "execution_success",
+        {
+          "prompt_id": "9dc46d3e-2ef5-4010-8657-0256dbeefbdd",
+          "timestamp": 1782821340115
+        }
+      ]
+    ]
+  },
+  "meta": {
+    "10": {
+      "node_id": "10",
+      "display_node": "10",
+      "parent_node": null,
+      "real_node_id": "10"
+    }
+  }
+}

@@ -224,6 +224,39 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             }
         ],
     },
+    "FlakHoverTank": {
+        "model_assets": ["models/hunyuan3d/FlakHoverTank.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/FlakHoverTank.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
+    "LanceBeamTank": {
+        "model_assets": ["models/hunyuan3d/LanceBeamTank.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/LanceBeamTank.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
+    "RailgunTank": {
+        "model_assets": ["models/hunyuan3d/RailgunTank.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/RailgunTank.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
 }
 
 

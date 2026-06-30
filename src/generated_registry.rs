@@ -479,37 +479,13 @@ const PARTS_FIELDMEDIC: &[RenderPart] = &[
         scale: [0.24, 0.24, 0.24],
     },
 ];
-const MODELS_FLAKHOVERTANK: &[&str] = &[
-    "models/kenney-spacekit/craft_speederB.glb",
-    "models/kenney-spacekit/rocket_finsB.glb",
-    "models/kenney-spacekit/turret_double.glb",
-];
-const PARTS_FLAKHOVERTANK: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_speederB.glb",
-        translation: [-1.4, 0.05, -1.05],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.7, 0.7, 0.7],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/turret_double.glb",
-        translation: [-0.35, 0.42, -0.4],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.7, 0.7, 0.7],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/rocket_finsB.glb",
-        translation: [-0.55, 0.45, -0.75],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.28, 0.28, 0.28],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/rocket_finsB.glb",
-        translation: [0.55, 0.45, -0.75],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.28, 0.28, 0.28],
-    },
-];
+const MODELS_FLAKHOVERTANK: &[&str] = &["models/hunyuan3d/FlakHoverTank.glb"];
+const PARTS_FLAKHOVERTANK: &[RenderPart] = &[RenderPart {
+    model: "models/hunyuan3d/FlakHoverTank.glb",
+    translation: [0.0, 0.0, 0.0],
+    rotation: [0.0, 0.0, 0.0, 1.0],
+    scale: [1.0, 1.0, 1.0],
+}];
 const MODELS_FLAKROCKETTEAM: &[&str] = &[
     "models/kenney-spacekit/astronautA.glb",
     "models/kenney-spacekit/weapon_gun.glb",
@@ -718,45 +694,13 @@ const PARTS_LANCEBEAMDEFENSETOWER: &[RenderPart] = &[
         scale: [0.4608, 0.4608, 0.4608],
     },
 ];
-const MODELS_LANCEBEAMTANK: &[&str] = &[
-    "models/kenney-spacekit/craft_cargoB.glb",
-    "models/kenney-spacekit/machine_barrelLarge.glb",
-    "models/kenney-spacekit/machine_generatorLarge.glb",
-    "models/kenney-spacekit/turret_single.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_LANCEBEAMTANK: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_cargoB.glb",
-        translation: [-1.6416, -0.0608, -1.2312],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.8208, 0.8208, 0.8208],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/turret_single.glb",
-        translation: [-0.5472, 0.4256, -0.3952],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.6232, 0.6232, 0.6232],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.57, 0.5928, -1.406],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.76, 0.76, 1.71],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-0.5624, 0.4712, 0.2128],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.1976, 0.1976, 0.1976],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_barrelLarge.glb",
-        translation: [-0.266, 0.4712, 0.2128],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.1672, 0.1672, 0.1672],
-    },
-];
+const MODELS_LANCEBEAMTANK: &[&str] = &["models/hunyuan3d/LanceBeamTank.glb"];
+const PARTS_LANCEBEAMTANK: &[RenderPart] = &[RenderPart {
+    model: "models/hunyuan3d/LanceBeamTank.glb",
+    translation: [0.0, 0.0, 0.0],
+    rotation: [0.0, 0.0, 0.0, 1.0],
+    scale: [1.0, 1.0, 1.0],
+}];
 const MODELS_LANDMINE: &[&str] = &[];
 const PARTS_LANDMINE: &[RenderPart] = &[];
 const MODELS_LIGHTRIFLEINFANTRY: &[&str] = &[
@@ -1189,44 +1133,13 @@ const PARTS_RAILSNIPERTEAM: &[RenderPart] = &[
         scale: [0.95, 0.52, 1.25],
     },
 ];
-const MODELS_RAILGUNTANK: &[&str] = &[
-    "models/kenney-spacekit/craft_cargoB.glb",
-    "models/kenney-spacekit/machine_generator.glb",
-    "models/kenney-spacekit/turret_single.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_RAILGUNTANK: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_cargoB.glb",
-        translation: [-1.716, -0.0624, -1.287],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.858, 0.858, 0.858],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/turret_single.glb",
-        translation: [-0.5616, 0.4524, -0.4056],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.663, 0.663, 0.663],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.585, 0.6084, -1.482],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.014, 1.014, 1.95],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generator.glb",
-        translation: [-0.741, 0.429, 0.273],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2496, 0.2496, 0.2496],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generator.glb",
-        translation: [-0.273, 0.429, 0.273],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2496, 0.2496, 0.2496],
-    },
-];
+const MODELS_RAILGUNTANK: &[&str] = &["models/hunyuan3d/RailgunTank.glb"];
+const PARTS_RAILGUNTANK: &[RenderPart] = &[RenderPart {
+    model: "models/hunyuan3d/RailgunTank.glb",
+    translation: [0.0, 0.0, 0.0],
+    rotation: [0.0, 0.0, 0.0, 1.0],
+    scale: [1.0, 1.0, 1.0],
+}];
 const MODELS_REFINERY: &[&str] = &[
     "models/kenney-spacekit/barrels.glb",
     "models/kenney-spacekit/chimney_detailed.glb",
