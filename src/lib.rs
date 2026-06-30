@@ -1,7 +1,7 @@
 #[cfg(feature = "audio")]
 use bevy::audio::Volume;
 use bevy::{
-    asset::{AssetMetaCheck, AssetPlugin},
+    asset::{AssetMetaCheck, AssetPlugin, UntypedHandle},
     camera::primitives::Aabb,
     camera::{ClearColorConfig, RenderTarget, ScalingMode},
     ecs::query::Or,
@@ -19,6 +19,8 @@ use bevy_fluent::FluentPlugin;
 use bevy_rts_camera::{
     RtsCamera as RtsCam, RtsCameraControls, RtsCameraPlugin, RtsCameraSystemSet,
 };
+use iyes_progress::prelude::*;
+use moonshine_kind::prelude::Instance;
 use serde::Deserialize;
 use std::collections::{BTreeMap, VecDeque};
 
@@ -349,6 +351,7 @@ enum SimulationPhase {
 #[derive(States, Default, Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub(crate) enum AppScreen {
     #[default]
+    AssetLoading,
     MainMenu,
     SkirmishSetup,
     OptionsMenu,
@@ -359,6 +362,113 @@ pub(crate) enum AppScreen {
 
 #[derive(Component)]
 struct MatchScopedEntity;
+
+#[derive(Resource, Default)]
+struct StartupLoadingAssets {
+    handles: Vec<UntypedHandle>,
+}
+
+#[derive(Resource, Clone, Copy)]
+struct StartupLoadingPolicy {
+    preload_assets: bool,
+}
+
+impl Default for StartupLoadingPolicy {
+    fn default() -> Self {
+        Self {
+            preload_assets: true,
+        }
+    }
+}
+
+#[derive(Component)]
+struct StartupLoadingFill;
+
+#[derive(Component)]
+struct StartupLoadingText;
+
+#[derive(Component, Clone, Copy, Debug)]
+#[allow(dead_code)]
+struct ModelHarnessRoot {
+    index: usize,
+    id: &'static str,
+}
+
+const MODEL_HARNESS_ENTITY_IDS: [&str; registry::ENTITY_DEFS.len()] = [
+    "AdvancedReactorPlant",
+    "AircraftFactory",
+    "AntiAirTurret",
+    "AntiAirWalker",
+    "AntiGroundTurret",
+    "ArcCoilDefenseTower",
+    "Barracks",
+    "BomberVTOL",
+    "CommandCenter",
+    "CryoSprayer",
+    "Drone",
+    "DroneMineLayer",
+    "EngineerDrone",
+    "FieldMedic",
+    "FlakHoverTank",
+    "FlakRocketTeam",
+    "FlakRocketTeamMk2",
+    "FlameAssaultBuggy",
+    "GrenadierTrooper",
+    "HammerSiegeTank",
+    "HeavyBombardmentAirship",
+    "HeavyMachinegunTrooper",
+    "HeavySiegeWalker",
+    "Helicopter",
+    "InterceptorVTOL",
+    "JammerVehicle",
+    "LanceBeamDefenseTower",
+    "LanceBeamTank",
+    "LandMine",
+    "LightRifleInfantry",
+    "LongbowMissileCrawler",
+    "MirageScoutTank",
+    "MobileRepairCrawler",
+    "MobileShieldProjector",
+    "ModularMissileCarrier",
+    "MortarTeam",
+    "OrePurifier",
+    "PhaseSaboteur",
+    "PowerReactor",
+    "PrismDefenseObelisk",
+    "PulseRifleCommando",
+    "RadarUplink",
+    "RailArtilleryWalker",
+    "RailCannonBunker",
+    "RailSniperTeam",
+    "RailgunTank",
+    "Refinery",
+    "RepairPad",
+    "RoboticsBay",
+    "RocketGunship",
+    "RocketInfantry",
+    "RocketTrooperRobot",
+    "SaboteurInfiltrator",
+    "ScoutRover",
+    "ShieldTrooper",
+    "ShockTrooper",
+    "SiegeAirship",
+    "SiegeArtilleryVehicle",
+    "SiegeDrillTank",
+    "SniperScout",
+    "TacticalOfficer",
+    "Tank",
+    "TechAirport",
+    "TechBunker",
+    "TechHospital",
+    "TechLab",
+    "TechOilDerrick",
+    "TechRepairDepot",
+    "TeslaCrawlerMk2",
+    "TeslaFenceSegment",
+    "VehicleFactory",
+    "WeatherControlSpire",
+    "Worker",
+];
 
 impl SupportPowerKind {
     const ALL: [Self; 9] = [
@@ -4233,43 +4343,51 @@ fn add_shared_match_resources(app: &mut App) -> &mut App {
 }
 
 fn add_main_menu_scene(app: &mut App) -> &mut App {
-    app.add_systems(OnEnter(AppScreen::MainMenu), setup_front_menu)
-        .add_systems(
-            Update,
-            (front_menu_buttons, resize_front_menu_roster_preview)
-                .run_if(in_state(AppScreen::MainMenu)),
+    app.add_systems(
+        OnEnter(AppScreen::AssetLoading),
+        (queue_startup_loading_assets, setup_asset_loading_screen).chain(),
+    )
+    .add_systems(
+        Update,
+        update_asset_loading_screen.run_if(in_state(AppScreen::AssetLoading)),
+    )
+    .add_systems(OnEnter(AppScreen::MainMenu), setup_front_menu)
+    .add_systems(
+        Update,
+        (front_menu_buttons, resize_front_menu_roster_preview)
+            .run_if(in_state(AppScreen::MainMenu)),
+    )
+    .add_systems(OnEnter(AppScreen::OptionsMenu), setup_options_menu)
+    .add_systems(
+        Update,
+        options_menu_buttons.run_if(in_state(AppScreen::OptionsMenu)),
+    )
+    .add_systems(OnEnter(AppScreen::CreditsMenu), setup_credits_menu)
+    .add_systems(
+        Update,
+        credits_menu_buttons.run_if(in_state(AppScreen::CreditsMenu)),
+    )
+    .add_systems(
+        OnEnter(AppScreen::SkirmishSetup),
+        (
+            restore_main_menu_selection_from_match_setup,
+            setup_main_menu,
         )
-        .add_systems(OnEnter(AppScreen::OptionsMenu), setup_options_menu)
-        .add_systems(
-            Update,
-            options_menu_buttons.run_if(in_state(AppScreen::OptionsMenu)),
+            .chain(),
+    )
+    .add_systems(
+        Update,
+        (
+            main_menu_scroll,
+            main_menu_buttons,
+            update_main_menu_summary,
+            update_main_menu_map_resource_controls,
+            update_skirmish_map_preview,
+            update_main_menu_lobby_slots,
         )
-        .add_systems(OnEnter(AppScreen::CreditsMenu), setup_credits_menu)
-        .add_systems(
-            Update,
-            credits_menu_buttons.run_if(in_state(AppScreen::CreditsMenu)),
-        )
-        .add_systems(
-            OnEnter(AppScreen::SkirmishSetup),
-            (
-                restore_main_menu_selection_from_match_setup,
-                setup_main_menu,
-            )
-                .chain(),
-        )
-        .add_systems(
-            Update,
-            (
-                main_menu_scroll,
-                main_menu_buttons,
-                update_main_menu_summary,
-                update_main_menu_map_resource_controls,
-                update_skirmish_map_preview,
-                update_main_menu_lobby_slots,
-            )
-                .chain()
-                .run_if(in_state(AppScreen::SkirmishSetup)),
-        )
+            .chain()
+            .run_if(in_state(AppScreen::SkirmishSetup)),
+    )
 }
 
 /// Registers the live match scene shared by `cargo run`, capture, and gameplay tests.
@@ -4310,8 +4428,14 @@ pub fn add_game_scenes(app: &mut App) -> &mut App {
     if !app.is_plugin_added::<FluentPlugin>() {
         app.add_plugins(FluentPlugin);
     }
+    app.add_plugins(
+        ProgressPlugin::<AppScreen>::new()
+            .with_asset_tracking()
+            .with_state_transition(AppScreen::AssetLoading, AppScreen::MainMenu),
+    );
     app.add_plugins(SharedMatchScenePlugin);
     add_main_menu_scene(app);
+    app.init_resource::<StartupLoadingAssets>();
     app.init_resource::<Locale>();
     app.add_systems(Startup, (load_godot_model_map, load_rts_cursor));
     app.add_systems(
@@ -4333,6 +4457,185 @@ pub fn add_game_scenes(app: &mut App) -> &mut App {
         store.config_mut::<HudGizmos>().0.line.width = HUD_GIZMO_LINE_WIDTH;
     }
     app
+}
+
+fn queue_startup_loading_assets(
+    mut loading: ResMut<AssetsLoading<AppScreen>>,
+    mut retained: ResMut<StartupLoadingAssets>,
+    policy: Res<StartupLoadingPolicy>,
+    asset_server: Res<AssetServer>,
+) {
+    loading.allow_failures = false;
+    loading.track_dependencies = true;
+    retained.handles.clear();
+    if !policy.preload_assets {
+        return;
+    }
+
+    retain_loading_asset(
+        &mut loading,
+        &mut retained,
+        asset_server.load::<Font>(UI_FONT_PATH),
+    );
+    retain_loading_asset(
+        &mut loading,
+        &mut retained,
+        asset_server.load::<Image>("ui/background.png"),
+    );
+    retain_loading_asset(
+        &mut loading,
+        &mut retained,
+        asset_server.load::<Image>("ui/icons/RosterPreview.png"),
+    );
+    for faction in [
+        SkirmishFaction::Alliance,
+        SkirmishFaction::Demon,
+        SkirmishFaction::Chaos,
+    ] {
+        retain_loading_asset(
+            &mut loading,
+            &mut retained,
+            asset_server.load::<Image>(faction.emblem_path()),
+        );
+    }
+    retain_loading_asset(
+        &mut loading,
+        &mut retained,
+        asset_server.load::<StaticCursor>(RTS_CURSOR_ASSET_PATH),
+    );
+    retain_loading_asset(
+        &mut loading,
+        &mut retained,
+        asset_server.load::<GodotModelMapAsset>(GODOT_MODEL_MAP_ASSET_PATH),
+    );
+
+    for entity in registry::ENTITY_DEFS {
+        if let Some(icon) = entity.icon {
+            retain_loading_asset(
+                &mut loading,
+                &mut retained,
+                asset_server.load::<Image>(icon),
+            );
+        }
+        if entity.render_parts.is_empty()
+            && ProceduralEntityModel::for_entity_id(entity.id).is_none()
+        {
+            retain_loading_asset(
+                &mut loading,
+                &mut retained,
+                asset_server.load::<WorldAsset>(
+                    GltfAssetLabel::Scene(0).from_asset(DEFAULT_MODEL_FALLBACK),
+                ),
+            );
+        }
+        for part in entity.render_parts {
+            retain_loading_asset(
+                &mut loading,
+                &mut retained,
+                asset_server.load::<WorldAsset>(GltfAssetLabel::Scene(0).from_asset(part.model)),
+            );
+        }
+    }
+}
+
+fn retain_loading_asset<A: Asset>(
+    loading: &mut AssetsLoading<AppScreen>,
+    retained: &mut StartupLoadingAssets,
+    handle: Handle<A>,
+) {
+    loading.add(&handle);
+    retained.handles.push(handle.untyped());
+}
+
+fn setup_asset_loading_screen(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let font = asset_server.load(UI_FONT_PATH);
+    commands.spawn((
+        Name::new("Loading Camera"),
+        Camera2d,
+        DespawnOnExit(AppScreen::AssetLoading),
+    ));
+    commands
+        .spawn((
+            Name::new("Startup Loading Screen"),
+            DespawnOnExit(AppScreen::AssetLoading),
+            Node {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                flex_direction: FlexDirection::Column,
+                row_gap: Val::Px(18.0),
+                ..default()
+            },
+            BackgroundColor(Color::srgb(0.006, 0.01, 0.01)),
+        ))
+        .with_children(|root| {
+            root.spawn((
+                Text::new(t("部署指挥系统", "Deploying command systems")),
+                TextFont {
+                    font: FontSource::Handle(font.clone()),
+                    font_size: FontSize::Px(34.0),
+                    ..default()
+                },
+                TextColor(Color::srgb(0.74, 1.0, 0.92)),
+            ));
+            root.spawn((
+                Text::new(t("正在加载资产 0/0", "Loading assets 0/0")),
+                TextFont {
+                    font: FontSource::Handle(font.clone()),
+                    font_size: FontSize::Px(16.0),
+                    ..default()
+                },
+                TextColor(Color::srgb(0.62, 0.78, 0.74)),
+                StartupLoadingText,
+            ));
+            root.spawn((
+                Node {
+                    width: Val::Px(480.0),
+                    height: Val::Px(18.0),
+                    border: UiRect::all(Val::Px(1.0)),
+                    padding: UiRect::all(Val::Px(2.0)),
+                    ..default()
+                },
+                BorderColor::all(Color::srgb(0.16, 0.56, 0.5)),
+                BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.55)),
+            ))
+            .with_children(|bar| {
+                bar.spawn((
+                    Node {
+                        width: Val::Percent(0.0),
+                        height: Val::Percent(100.0),
+                        ..default()
+                    },
+                    BackgroundColor(Color::srgb(0.17, 0.82, 0.58)),
+                    StartupLoadingFill,
+                ));
+            });
+        });
+}
+
+fn update_asset_loading_screen(
+    tracker: Res<ProgressTracker<AppScreen>>,
+    mut fill_q: Query<&mut Node, With<StartupLoadingFill>>,
+    mut text_q: Query<&mut Text, With<StartupLoadingText>>,
+) {
+    let progress = tracker.get_global_progress();
+    let ratio = if progress.total == 0 {
+        1.0
+    } else {
+        (progress.done as f32 / progress.total as f32).clamp(0.0, 1.0)
+    };
+    for mut node in &mut fill_q {
+        node.width = Val::Percent(ratio * 100.0);
+    }
+    let label = if current_language() == Language::Zh {
+        format!("正在加载资产 {}/{}", progress.done, progress.total)
+    } else {
+        format!("Loading assets {}/{}", progress.done, progress.total)
+    };
+    for mut text in &mut text_q {
+        **text = label.clone();
+    }
 }
 
 fn load_godot_model_map(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -4554,6 +4857,9 @@ pub fn build_game_app(mode: GameAppMode) -> App {
         }
     };
     app.insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
+        .insert_resource(StartupLoadingPolicy {
+            preload_assets: matches!(mode, GameAppMode::Interactive),
+        })
         .add_plugins((
             JsonAssetPlugin::<RtsDataManifest>::new(&["rts.json"]),
             RonAssetPlugin::<RtsDataManifest>::new(&["rts.ron"]),
@@ -4609,6 +4915,9 @@ pub fn build_capture_app(width: u32, height: u32) -> App {
     ));
 
     app.insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
+        .insert_resource(StartupLoadingPolicy {
+            preload_assets: true,
+        })
         .add_plugins((
             JsonAssetPlugin::<RtsDataManifest>::new(&["rts.json"]),
             RonAssetPlugin::<RtsDataManifest>::new(&["rts.ron"]),
@@ -4691,7 +5000,7 @@ pub struct ModelHarnessSlot {
 }
 
 pub fn capture_model_harness_entity_count() -> usize {
-    registry::ENTITY_DEFS.len()
+    MODEL_HARNESS_ENTITY_IDS.len()
 }
 
 pub fn capture_model_harness_page_count(per_page: usize) -> usize {
@@ -4701,10 +5010,11 @@ pub fn capture_model_harness_page_count(per_page: usize) -> usize {
 
 pub fn capture_model_harness_manifest(per_page: usize) -> Vec<ModelHarnessSlot> {
     let per_page = per_page.max(1);
-    registry::ENTITY_DEFS
+    MODEL_HARNESS_ENTITY_IDS
         .iter()
         .enumerate()
-        .map(|(index, def)| {
+        .map(|(index, id)| {
+            let def = model_harness_entity_def(*id);
             let page = index / per_page;
             let local = index % per_page;
             let columns = model_harness_columns(per_page);
@@ -4730,12 +5040,14 @@ pub fn capture_spawn_model_harness_page(
 ) -> Vec<ModelHarnessSlot> {
     let per_page = per_page.max(1);
     let start = page.saturating_mul(per_page);
-    let end = (start + per_page).min(registry::ENTITY_DEFS.len());
-    let page_defs = if start < end {
-        &registry::ENTITY_DEFS[start..end]
-    } else {
-        &[]
-    };
+    let end = (start + per_page).min(MODEL_HARNESS_ENTITY_IDS.len());
+    let page_defs: Vec<(usize, &'static registry::EntityDef)> = MODEL_HARNESS_ENTITY_IDS
+        .iter()
+        .enumerate()
+        .skip(start)
+        .take(end.saturating_sub(start))
+        .map(|(index, id)| (index, model_harness_entity_def(*id)))
+        .collect();
     let columns = model_harness_columns(per_page);
     let rows = page_defs.len().div_ceil(columns).max(1);
     let spacing_x = 8.6;
@@ -4803,23 +5115,16 @@ pub fn capture_spawn_model_harness_page(
     }
 
     let mut slots = Vec::new();
-    for (local, def) in page_defs.iter().enumerate() {
+    for (local, (index, def)) in page_defs.iter().enumerate() {
         let row = local / columns;
         let column = local % columns;
         let x = column as f32 * spacing_x - width * 0.5;
         let z = row as f32 * spacing_z - depth * 0.5;
-        let root = app
-            .world_mut()
-            .spawn((
-                Name::new(format!("Model Harness {}", def.id)),
-                Transform::from_translation(Vec3::new(x, def.height, z))
-                    .with_scale(Vec3::splat(def.scale)),
-                Visibility::default(),
-            ))
-            .id();
-        spawn_entity_models_in_world(app.world_mut(), root, None, def);
+        let root =
+            spawn_model_harness_root(app.world_mut(), *index, def, Vec3::new(x, def.height, z));
+        spawn_entity_models_for_harness(app.world_mut(), root, None, def);
         slots.push(ModelHarnessSlot {
-            index: start + local,
+            index: *index,
             page,
             row,
             column,
@@ -4831,6 +5136,27 @@ pub fn capture_spawn_model_harness_page(
         });
     }
     slots
+}
+
+fn model_harness_entity_def(id: &'static str) -> &'static registry::EntityDef {
+    registry::entity(id).unwrap_or_else(|| panic!("model harness id `{id}` is not in ENTITY_DEFS"))
+}
+
+fn spawn_model_harness_root(
+    world: &mut World,
+    index: usize,
+    def: &'static registry::EntityDef,
+    translation: Vec3,
+) -> Instance<ModelHarnessRoot> {
+    let entity = world.spawn((
+        Name::new(format!("Model Harness {}", def.id)),
+        ModelHarnessRoot { index, id: def.id },
+        Transform::from_translation(translation).with_scale(Vec3::splat(def.scale)),
+        Visibility::default(),
+    ));
+    // The marker is inserted in the same bundle, so this entity now satisfies
+    // `Instance<ModelHarnessRoot>` before it can be passed to harness-only code.
+    unsafe { Instance::from_entity_unchecked(entity.id()) }
 }
 
 fn model_harness_columns(per_page: usize) -> usize {
@@ -11606,12 +11932,13 @@ fn spawn_entity_models(
     spawn_faction_identity_marker(commands, root, visual_faction, def);
 }
 
-fn spawn_entity_models_in_world(
+fn spawn_entity_models_for_harness(
     world: &mut World,
-    root: Entity,
+    root: Instance<ModelHarnessRoot>,
     visual_faction: Option<SkirmishFaction>,
     def: &registry::EntityDef,
 ) {
+    let root = root.entity();
     let asset_server = world.resource::<AssetServer>().clone();
     if def.render_parts.is_empty() {
         if let Some(model) = ProceduralEntityModel::for_entity_id(def.id) {
@@ -30001,6 +30328,61 @@ mod current_tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn model_harness_ids_cover_registry_with_compiler_checked_length() {
+        assert_eq!(
+            MODEL_HARNESS_ENTITY_IDS.len(),
+            registry::ENTITY_DEFS.len(),
+            "MODEL_HARNESS_ENTITY_IDS has a const length check against ENTITY_DEFS; this runtime assertion keeps the failure message clear"
+        );
+        let mut seen = std::collections::BTreeSet::new();
+        for id in MODEL_HARNESS_ENTITY_IDS {
+            assert!(seen.insert(id), "duplicate model harness id {id}");
+            assert!(
+                registry::entity(id).is_some(),
+                "model harness id {id} must resolve to an EntityDef"
+            );
+        }
+    }
+
+    #[test]
+    fn model_harness_roots_are_kind_typed_instances() {
+        let mut app = App::new();
+        let def = model_harness_entity_def(MODEL_HARNESS_ENTITY_IDS[0]);
+        let root = spawn_model_harness_root(app.world_mut(), 0, def, Vec3::ZERO);
+
+        let mut query = app.world_mut().query::<Instance<ModelHarnessRoot>>();
+        let roots = query.iter(app.world()).collect::<Vec<_>>();
+
+        assert_eq!(roots, vec![root]);
+        let marker = app
+            .world()
+            .get::<ModelHarnessRoot>(root.entity())
+            .expect("typed harness root marker");
+        assert_eq!(marker.index, 0);
+        assert_eq!(marker.id, def.id);
+    }
+
+    #[test]
+    fn headless_loading_state_skips_render_asset_preload() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        for _ in 0..4 {
+            app.update();
+        }
+
+        assert_eq!(
+            *app.world().resource::<State<AppScreen>>().get(),
+            AppScreen::MainMenu
+        );
+        assert!(
+            app.world()
+                .resource::<StartupLoadingAssets>()
+                .handles
+                .is_empty(),
+            "headless tests should not preload the full render asset set"
+        );
     }
 
     #[test]

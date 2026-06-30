@@ -456,6 +456,8 @@ dependencies = [
  "bevy_fluent",
  "bevy_rts_camera",
  "icu_provider",
+ "iyes_progress",
+ "moonshine-kind",
  "png 0.18.1",
  "serde",
 ]
@@ -3408,6 +3410,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 
 [[package]]
+name = "iyes_progress"
+version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbf754ab5c0ffc9bc6802ceff90dc5a2f96a83d2ff54af7968543113effc4d69"
+dependencies = [
+ "bevy_app",
+ "bevy_asset",
+ "bevy_ecs",
+ "bevy_platform",
+ "bevy_state",
+ "derive_more",
+ "parking_lot",
+]
+
+[[package]]
 name = "jni"
 version = "0.21.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3683,6 +3700,19 @@ checksum = "1fa76a2c86f704bdb222d66965fb3d63269ce38518b83cb0575fca855ebb6316"
 dependencies = [
  "adler2",
  "simd-adler32",
+]
+
+[[package]]
+name = "moonshine-kind"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d21723b8005fc7d7e52d149b500f183cb721d51e18fc7f407ad6067a7d2f0e25"
+dependencies = [
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_reflect",
+ "bevy_utils",
+ "disqualified",
 ]
 
 [[package]]

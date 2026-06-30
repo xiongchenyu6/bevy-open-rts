@@ -108,6 +108,12 @@ Generated outputs:
 - Uses Bevy `0.19.0`.
 - Registers `bevy_fluent 0.15.0` for future Fluent localization assets while
   preserving the current lightweight `Locale`/`t()` text path during migration.
+- Uses `iyes_progress 0.17.0` for the startup loading state, tracking UI,
+  cursor, icon, model-map, and migrated GLB assets before entering the command
+  menu.
+- Uses `moonshine-kind 0.5.1` at the model harness boundary so harness roots are
+  typed `Instance<ModelHarnessRoot>` values and registry coverage is backed by a
+  harness-owned, compiler-checked ID table.
 - Mirrors the non-`.import` Godot asset tree and generates 73 playable
   unit/structure definitions across the three Godot factions.
 - Loads all referenced GLB assets for migrated entities; Godot procedural-only

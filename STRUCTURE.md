@@ -5,6 +5,8 @@
 - `src/main.rs` calls `bevy_open_rts::run_game_app()`.
 - `run_game_app()` builds `build_game_app(GameAppMode::Interactive)`, which registers the Godot-style front menu, options/credits screens, setup menu, and the shared match scene from `src/lib.rs`.
 - Native desktop builds are configured for Wayland through Bevy's `wayland` feature and `scripts/native_runner.sh`; the project does not require X11 runtime libraries.
+- `AppScreen::AssetLoading` is the default startup state. `iyes_progress::ProgressPlugin<AppScreen>` tracks startup assets and transitions to `AppScreen::MainMenu` once UI, cursor, icon, model-map, and migrated GLB scene assets are ready.
+- `StartupLoadingPolicy` keeps interactive/capture apps on the real preload path while headless tests can skip render asset preloading and exercise logic without waiting on graphics assets.
 
 ## Shared Match Scene
 
@@ -51,10 +53,14 @@
   - `capture assault <dir> [max-seconds]`: uses real input to build a Barracks, train Heavy Machinegun Troopers, retarget attack-move orders onto living enemy anchors, and requires `HumanVictory`.
   - `capture factions <dir>`: starts each playable faction and verifies train/build through the human command panel using default resources.
   - `capture match [max-seconds]`: runs a headless AI-vs-AI shared match and requires economy, production, combat, and elimination to resolve.
+  - `capture model-harness` uses the harness-owned `MODEL_HARNESS_ENTITY_IDS` and
+    `moonshine-kind::Instance<ModelHarnessRoot>` roots so registry coverage and
+    harness spawn boundaries are checked by Rust types instead of loose entity
+    plumbing.
 - The old `real-*-proof` CLI surfaces were removed; do not use them as completion gates.
 
 ## Verification
 
 - Use `cargo fmt`, `cargo check`, targeted `cargo test`, full `cargo test`, `cargo build`, and a short `cargo run` smoke.
 - `timeout` exit code `124` is acceptable for the interactive smoke once the window opens and no runtime warnings indicate a game bug.
-- Dependency direction notes live in `docs/dependency-decisions.md`; currently `bevy_egui 0.40.1` is reserved for optional debug tooling, not shipped RTS menu/lobby UI.
+- Dependency direction notes live in `docs/dependency-decisions.md`; currently `iyes_progress 0.17.0` owns startup progress loading, `moonshine-kind 0.5.1` is used for typed harness roots, and `bevy_egui 0.40.1` is reserved for optional debug tooling, not shipped RTS menu/lobby UI.
