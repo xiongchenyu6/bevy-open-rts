@@ -53,15 +53,24 @@ mkdir -p web/pkg
 
 if command -v wasm-opt >/dev/null 2>&1; then
   BG="web/pkg/bevy_open_rts_bg.wasm"
-  # --all-features keeps reference-types (the externref table that
-  # __wbindgen_init_externref_table grows by 4 at boot) AND every other post-MVP op
-  # modern rustc emits (bulk-memory, sign-ext, nontrapping-fptoint, ...), so wasm-opt
-  # never strips the growable table or rejects the input. Retry a few times (wasm-opt
-  # occasionally fails transiently) and ship un-optimized rather than abort.
+  # Enable exactly the STABLE, browser-shipped post-MVP features rustc emits — most
+  # importantly reference-types (the externref table __wbindgen_init_externref_table
+  # grows by 4 at boot). Do NOT use --all-features: it turns on experimental
+  # proposals (GC, typed-function-refs, ...) and wasm-opt then re-encodes types the
+  # browser can't parse ("CompileError: invalid value type 0x0" at instantiate).
+  # Retry a few times (wasm-opt occasionally fails transiently) and ship the
+  # un-optimized (still valid) wasm rather than abort.
   opt_ok=0
   for attempt in 1 2 3; do
     rm -f "$BG.opt"
-    if wasm-opt -Oz --all-features -o "$BG.opt" "$BG" && [ -f "$BG.opt" ]; then
+    if wasm-opt -Oz \
+      --enable-reference-types \
+      --enable-bulk-memory \
+      --enable-nontrapping-float-to-int \
+      --enable-sign-ext \
+      --enable-mutable-globals \
+      --enable-multivalue \
+      -o "$BG.opt" "$BG" && [ -f "$BG.opt" ]; then
       mv "$BG.opt" "$BG"
       opt_ok=1
       break
