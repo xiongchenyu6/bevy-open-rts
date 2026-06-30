@@ -411,38 +411,13 @@ const PARTS_COMMANDCENTER: &[RenderPart] = &[
         scale: [0.7, 0.7, 0.7],
     },
 ];
-const MODELS_CRYOSPRAYER: &[&str] = &[
-    "models/kenney-spacekit/astronautB.glb",
-    "models/kenney-spacekit/barrel.glb",
-    "models/kenney-spacekit/machine_barrel.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_CRYOSPRAYER: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/astronautB.glb",
-        translation: [-0.31, 0.0, -0.31],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.62, 0.62, 0.62],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.28, 0.58, -0.75],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.7, 0.55, 1.45],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/barrel.glb",
-        translation: [0.15, 0.56, 0.16],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.23, 0.23, 0.23],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_barrel.glb",
-        translation: [-0.16, 0.57, 0.17],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2, 0.2, 0.2],
-    },
-];
+const MODELS_CRYOSPRAYER: &[&str] = &["models/hunyuan3d/CryoSprayer.glb"];
+const PARTS_CRYOSPRAYER: &[RenderPart] = &[RenderPart {
+    model: "models/hunyuan3d/CryoSprayer.glb",
+    translation: [0.0, 0.0, 0.0],
+    rotation: [0.0, 0.0, 0.0, 1.0],
+    scale: [1.0, 1.0, 1.0],
+}];
 const MODELS_DRONE: &[&str] = &["models/kenney-spacekit/craft_speederA.glb"];
 const PARTS_DRONE: &[RenderPart] = &[RenderPart {
     model: "models/kenney-spacekit/craft_speederA.glb",

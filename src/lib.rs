@@ -6440,6 +6440,12 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
     )
     .add_systems(
         Update,
+        update_impact_bursts
+            .in_set(SimulationPhase::PostCombat)
+            .run_if(match_in_progress),
+    )
+    .add_systems(
+        Update,
         update_objective_tracker_hud
             .in_set(SimulationPhase::PostCombat)
             .run_if(match_in_progress),
@@ -7472,6 +7478,15 @@ struct ShotPulse {
     from: Vec3,
     to: Vec3,
     ttl: f32,
+    team: Team,
+}
+
+#[derive(Component, Clone, Copy)]
+struct ImpactBurst {
+    remaining: f32,
+    total: f32,
+    radius: f32,
+    power: f32,
     team: Team,
 }
 
@@ -15833,6 +15848,42 @@ fn spawn_structure_destruction_vfx(
             MatchScopedEntity,
         ));
     }
+}
+
+fn impact_burst_power(damage: f32, target_radius: f32, target_is_structure: bool) -> f32 {
+    let structure_bonus = if target_is_structure { 0.35 } else { 0.0 };
+    ((damage.max(0.0) / 9.0).sqrt() + target_radius * 0.18 + structure_bonus).clamp(0.45, 2.2)
+}
+
+fn impact_burst_lifetime(power: f32) -> f32 {
+    0.18 + power.clamp(0.45, 2.2) * 0.06
+}
+
+fn spawn_impact_burst(
+    commands: &mut Commands,
+    position: Vec3,
+    target_radius: f32,
+    damage: f32,
+    target_is_structure: bool,
+    team: Team,
+) {
+    if damage <= 0.0 {
+        return;
+    }
+    let power = impact_burst_power(damage, target_radius, target_is_structure);
+    let total = impact_burst_lifetime(power);
+    commands.spawn((
+        Name::new("Impact burst"),
+        Transform::from_translation(Vec3::new(position.x, 0.08, position.z)),
+        ImpactBurst {
+            remaining: total,
+            total,
+            radius: (target_radius * 0.55 + power * 0.22).clamp(0.32, 1.45),
+            power,
+            team,
+        },
+        MatchScopedEntity,
+    ));
 }
 
 fn command_button(index: usize) -> impl Bundle {
@@ -27900,6 +27951,14 @@ fn combat(
                 },
                 MatchScopedEntity,
             ));
+            spawn_impact_burst(
+                &mut commands,
+                to,
+                target_radius,
+                applied_damage,
+                target_is_structure,
+                team,
+            );
             latest_battle_event.focus = Some(to);
             if health.current <= 0.0 {
                 if relations.are_allied(target_team, player_team) {
@@ -28094,6 +28153,19 @@ fn update_pulses(
     for (entity, mut pulse) in &mut pulses {
         pulse.ttl -= time.delta_secs();
         if pulse.ttl <= 0.0 {
+            commands.entity(entity).try_despawn();
+        }
+    }
+}
+
+fn update_impact_bursts(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut bursts: Query<(Entity, &mut ImpactBurst)>,
+) {
+    for (entity, mut burst) in &mut bursts {
+        burst.remaining -= time.delta_secs();
+        if burst.remaining <= 0.0 {
             commands.entity(entity).try_despawn();
         }
     }
@@ -28911,6 +28983,7 @@ fn update_resource_hover(
 struct OverlayVfxQueries<'w, 's> {
     destruction: Query<'w, 's, (&'static Transform, &'static StructureDestructionVfx)>,
     promotion: Query<'w, 's, (&'static Transform, &'static VeterancyPromotionEffect)>,
+    impacts: Query<'w, 's, (&'static Transform, &'static ImpactBurst)>,
     camera: Query<'w, 's, &'static GlobalTransform, With<MainCamera>>,
     time: Res<'w, Time>,
 }
@@ -29135,6 +29208,15 @@ fn draw_world_overlays(
             (base.blue * 0.4 + 0.30).min(1.0),
         );
         hud.line(pulse.from, pulse.to, tracer);
+    }
+    for (transform, burst) in &vfx.impacts {
+        draw_impact_burst(
+            &mut gizmos,
+            &mut hud,
+            transform.translation,
+            burst,
+            &player_colors,
+        );
     }
     for (transform, marker) in &click_markers {
         match marker.kind {
@@ -29713,6 +29795,63 @@ fn draw_structure_destruction_vfx(
                 color,
             );
         }
+    }
+}
+
+fn draw_impact_burst(
+    gizmos: &mut Gizmos,
+    hud: &mut Gizmos<HudGizmos>,
+    position: Vec3,
+    burst: &ImpactBurst,
+    player_colors: &PlayerColorSlots,
+) {
+    let life_ratio = if burst.total > 0.0 {
+        (burst.remaining / burst.total).clamp(0.0, 1.0)
+    } else {
+        0.0
+    };
+    let progress = 1.0 - life_ratio;
+    let [team_r, team_g, team_b] = player_colors.color_rgb(burst.team);
+    let hot = Color::srgba(
+        (0.72 + team_r * 0.28).min(1.0),
+        (0.46 + team_g * 0.30).min(1.0),
+        (0.20 + team_b * 0.24).min(1.0),
+        0.36 + life_ratio * 0.48,
+    );
+    let core = Color::srgba(1.0, 0.88, 0.48, 0.42 + life_ratio * 0.48);
+    let smoke = Color::srgba(
+        0.22 + team_r * 0.08,
+        0.20 + team_g * 0.07,
+        0.18 + team_b * 0.06,
+        0.20 * life_ratio,
+    );
+    let center = Vec3::new(position.x, 0.12 + burst.power * 0.04, position.z);
+    let ground_radius = burst.radius * (0.35 + progress * 1.15);
+    gizmos.circle(
+        Isometry3d::new(center, Quat::from_rotation_arc(Vec3::Z, Vec3::Y)),
+        ground_radius,
+        hot,
+    );
+    gizmos.circle(
+        Isometry3d::new(
+            center + Vec3::Y * 0.08,
+            Quat::from_rotation_arc(Vec3::Z, Vec3::Y),
+        ),
+        burst.radius * (0.22 + progress * 0.65),
+        smoke,
+    );
+    hud.line(
+        center,
+        center + Vec3::Y * (0.32 + burst.power * 0.28) * life_ratio.max(0.2),
+        core,
+    );
+    for i in 0..7 {
+        let angle = i as f32 * std::f32::consts::TAU / 7.0 + burst.power * 0.41;
+        let outward = Vec3::new(angle.cos(), 0.16 + progress * 0.18, angle.sin()).normalize();
+        let start = center + outward * (burst.radius * 0.14);
+        let end = center + outward * (burst.radius * (0.46 + burst.power * 0.18) * life_ratio);
+        let color = if i % 2 == 0 { core } else { hot };
+        hud.line(start, end, color);
     }
 }
 
@@ -30407,6 +30546,30 @@ mod current_tests {
         assert!(
             loading.track_dependencies,
             "startup loading should wait for GLB scene dependencies, not only top-level handles"
+        );
+    }
+
+    #[test]
+    fn impact_burst_scales_with_damage_and_structures() {
+        let infantry_hit = impact_burst_power(4.0, 0.45, false);
+        let heavy_vehicle_hit = impact_burst_power(18.0, 0.8, false);
+        let structure_hit = impact_burst_power(18.0, 1.4, true);
+
+        assert!(
+            infantry_hit >= 0.45,
+            "small hits should still generate a readable impact burst"
+        );
+        assert!(
+            heavy_vehicle_hit > infantry_hit,
+            "higher damage should produce a larger impact burst"
+        );
+        assert!(
+            structure_hit > heavy_vehicle_hit,
+            "structure impacts should read heavier than same-damage unit impacts"
+        );
+        assert!(
+            impact_burst_lifetime(structure_hit) > impact_burst_lifetime(infantry_hit),
+            "larger bursts should stay visible for more frames"
         );
     }
 

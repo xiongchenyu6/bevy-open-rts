@@ -157,7 +157,19 @@ REMOVED_ENTITY_IDS = {"OreHarvester", "MobileConstructionVehicle"}
 # fixes are applied surgically in src/generated_registry.rs, not by re-running
 # this script. Worker intentionally diverges from godot's rover mesh so it does
 # not visually duplicate ScoutRover in the Bevy port.
-ENTITY_RENDER_OVERRIDES: dict[str, dict] = {}
+ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
+    "CryoSprayer": {
+        "model_assets": ["models/hunyuan3d/CryoSprayer.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/CryoSprayer.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
+}
 
 
 def read_balanced(text: str, start: int) -> tuple[str, int]:

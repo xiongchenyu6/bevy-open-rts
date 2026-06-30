@@ -118,6 +118,9 @@ Generated outputs:
   distinct unit signatures, model-harness screenshot coverage, and writes
   `docs/model-quality/hunyuan3d-queue.json` for multipart units that should be
   replaced by cohesive Hunyuan3D GLB assets.
+- Uses `scripts/comfy_hunyuan3d_queue.py` to stage and submit those replacements
+  to ComfyUI/Hunyuan3D. The current first replacement is `CryoSprayer`, which is
+  registered as a single generated GLB at `assets/models/hunyuan3d/CryoSprayer.glb`.
 - Mirrors the non-`.import` Godot asset tree and generates 73 playable
   unit/structure definitions across the three Godot factions.
 - Loads all referenced GLB assets for migrated entities; Godot procedural-only
@@ -143,6 +146,7 @@ Generated outputs:
 ```sh
 RUST_LOG=warn cargo run --bin capture -- model-harness screenshots/model-harness 6
 python3 scripts/audit_model_quality.py --fail-critical --require-screenshots
+python3 scripts/comfy_hunyuan3d_queue.py --ssh root@101.78.126.6 --entity CryoSprayer --workflow-mode local-image --use-existing-reference --submit --poll
 ```
 
 The screenshot directory is ignored by git. The Hunyuan3D replacement queue is
