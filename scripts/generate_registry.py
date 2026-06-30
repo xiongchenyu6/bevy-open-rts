@@ -257,6 +257,61 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             }
         ],
     },
+    "FlakRocketTeam": {
+        "model_assets": ["models/hunyuan3d/FlakRocketTeam.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/FlakRocketTeam.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
+    "FlakRocketTeamMk2": {
+        "model_assets": ["models/hunyuan3d/FlakRocketTeamMk2.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/FlakRocketTeamMk2.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
+    "MobileShieldProjector": {
+        "model_assets": ["models/hunyuan3d/MobileShieldProjector.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/MobileShieldProjector.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
+    "ModularMissileCarrier": {
+        "model_assets": ["models/hunyuan3d/ModularMissileCarrier.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/ModularMissileCarrier.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
+    "TeslaCrawlerMk2": {
+        "model_assets": ["models/hunyuan3d/TeslaCrawlerMk2.glb"],
+        "render_parts": [
+            {
+                "model": "models/hunyuan3d/TeslaCrawlerMk2.glb",
+                "translation": [0.0, 0.0, 0.0],
+                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "scale": [1.0, 1.0, 1.0],
+            }
+        ],
+    },
 }
 
 

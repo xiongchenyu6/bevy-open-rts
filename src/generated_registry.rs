@@ -486,66 +486,20 @@ const PARTS_FLAKHOVERTANK: &[RenderPart] = &[RenderPart {
     rotation: [0.0, 0.0, 0.0, 1.0],
     scale: [1.0, 1.0, 1.0],
 }];
-const MODELS_FLAKROCKETTEAM: &[&str] = &[
-    "models/kenney-spacekit/astronautA.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_FLAKROCKETTEAM: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/astronautA.glb",
-        translation: [-0.34, 0.0, -0.26],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.58, 0.58, 0.58],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/astronautA.glb",
-        translation: [0.22, 0.0, 0.2],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.54, 0.54, 0.54],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.36, 0.66, -0.78],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.46, 0.46, 1.25],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [0.18, 0.62, -0.5],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.4, 0.4, 1.1],
-    },
-];
-const MODELS_FLAKROCKETTEAMMK2: &[&str] = &[
-    "models/kenney-spacekit/astronautA.glb",
-    "models/kenney-spacekit/weapon_rifle.glb",
-];
-const PARTS_FLAKROCKETTEAMMK2: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/astronautA.glb",
-        translation: [-0.44, 0.0, -0.24],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.6, 0.6, 0.6],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/astronautA.glb",
-        translation: [0.26, 0.0, 0.22],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.57, 0.57, 0.57],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_rifle.glb",
-        translation: [-0.48, 0.62, -0.82],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.64, 0.64, 1.05],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_rifle.glb",
-        translation: [0.22, 0.58, -0.58],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.58, 0.58, 0.92],
-    },
-];
+const MODELS_FLAKROCKETTEAM: &[&str] = &["models/hunyuan3d/FlakRocketTeam.glb"];
+const PARTS_FLAKROCKETTEAM: &[RenderPart] = &[RenderPart {
+    model: "models/hunyuan3d/FlakRocketTeam.glb",
+    translation: [0.0, 0.0, 0.0],
+    rotation: [0.0, 0.0, 0.0, 1.0],
+    scale: [1.0, 1.0, 1.0],
+}];
+const MODELS_FLAKROCKETTEAMMK2: &[&str] = &["models/hunyuan3d/FlakRocketTeamMk2.glb"];
+const PARTS_FLAKROCKETTEAMMK2: &[RenderPart] = &[RenderPart {
+    model: "models/hunyuan3d/FlakRocketTeamMk2.glb",
+    translation: [0.0, 0.0, 0.0],
+    rotation: [0.0, 0.0, 0.0, 1.0],
+    scale: [1.0, 1.0, 1.0],
+}];
 const MODELS_FLAMEASSAULTBUGGY: &[&str] = &["models/hunyuan3d/FlameAssaultBuggy.glb"];
 const PARTS_FLAMEASSAULTBUGGY: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/FlameAssaultBuggy.glb",
@@ -778,70 +732,20 @@ const PARTS_MOBILEREPAIRCRAWLER: &[RenderPart] = &[
         scale: [0.42, 0.42, 0.42],
     },
 ];
-const MODELS_MOBILESHIELDPROJECTOR: &[&str] = &[
-    "models/kenney-spacekit/machine_generatorLarge.glb",
-    "models/kenney-spacekit/machine_wirelessCable.glb",
-    "models/kenney-spacekit/rover.glb",
-    "models/kenney-spacekit/satelliteDish_large.glb",
-];
-const PARTS_MOBILESHIELDPROJECTOR: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/rover.glb",
-        translation: [-3.8, 0.0, -2.85],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.9, 1.9, 1.9],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/satelliteDish_large.glb",
-        translation: [-0.15, 0.72, -0.05],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.32, 0.32, 0.32],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [0.42, 0.38, 0.32],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.36, 0.36, 0.36],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_wirelessCable.glb",
-        translation: [-0.48, 0.3, 0.32],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.28, 0.28, 0.28],
-    },
-];
-const MODELS_MODULARMISSILECARRIER: &[&str] = &[
-    "models/kenney-spacekit/craft_cargoA.glb",
-    "models/kenney-spacekit/machine_barrelLarge.glb",
-    "models/kenney-spacekit/rocket_topA.glb",
-    "models/kenney-spacekit/rocket_topB.glb",
-];
-const PARTS_MODULARMISSILECARRIER: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_cargoA.glb",
-        translation: [-1.7472, -0.0468, -1.3104],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.8736, 0.8736, 0.8736],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/rocket_topA.glb",
-        translation: [-0.897, 0.5616, -0.975],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2964, 0.2964, 0.546],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/rocket_topB.glb",
-        translation: [-0.273, 0.5616, -0.975],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2964, 0.2964, 0.546],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_barrelLarge.glb",
-        translation: [-0.585, 0.546, -0.351],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.1716, 0.1716, 0.1716],
-    },
-];
+const MODELS_MOBILESHIELDPROJECTOR: &[&str] = &["models/hunyuan3d/MobileShieldProjector.glb"];
+const PARTS_MOBILESHIELDPROJECTOR: &[RenderPart] = &[RenderPart {
+    model: "models/hunyuan3d/MobileShieldProjector.glb",
+    translation: [0.0, 0.0, 0.0],
+    rotation: [0.0, 0.0, 0.0, 1.0],
+    scale: [1.0, 1.0, 1.0],
+}];
+const MODELS_MODULARMISSILECARRIER: &[&str] = &["models/hunyuan3d/ModularMissileCarrier.glb"];
+const PARTS_MODULARMISSILECARRIER: &[RenderPart] = &[RenderPart {
+    model: "models/hunyuan3d/ModularMissileCarrier.glb",
+    translation: [0.0, 0.0, 0.0],
+    rotation: [0.0, 0.0, 0.0, 1.0],
+    scale: [1.0, 1.0, 1.0],
+}];
 const MODELS_MORTARTEAM: &[&str] = &[
     "models/kenney-spacekit/astronautA.glb",
     "models/kenney-spacekit/barrels.glb",
@@ -1804,37 +1708,13 @@ const PARTS_TECHREPAIRDEPOT: &[RenderPart] = &[
         scale: [0.2448, 0.2448, 0.2448],
     },
 ];
-const MODELS_TESLACRAWLERMK2: &[&str] = &[
-    "models/kenney-spacekit/machine_generator.glb",
-    "models/kenney-spacekit/rover.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_TESLACRAWLERMK2: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/rover.glb",
-        translation: [-3.9, 0.0, -2.92],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.95, 1.95, 1.95],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generator.glb",
-        translation: [0.0, 0.52, -0.08],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.34, 0.34, 0.34],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.34, 0.46, -0.74],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.55, 0.55, 1.15],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [0.34, 0.46, -0.74],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.55, 0.55, 1.15],
-    },
-];
+const MODELS_TESLACRAWLERMK2: &[&str] = &["models/hunyuan3d/TeslaCrawlerMk2.glb"];
+const PARTS_TESLACRAWLERMK2: &[RenderPart] = &[RenderPart {
+    model: "models/hunyuan3d/TeslaCrawlerMk2.glb",
+    translation: [0.0, 0.0, 0.0],
+    rotation: [0.0, 0.0, 0.0, 1.0],
+    scale: [1.0, 1.0, 1.0],
+}];
 const MODELS_TESLAFENCESEGMENT: &[&str] = &[];
 const PARTS_TESLAFENCESEGMENT: &[RenderPart] = &[];
 const MODELS_VEHICLEFACTORY: &[&str] = &["models/kenney-spacekit/hangar_smallA.glb"];
