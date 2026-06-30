@@ -4,6 +4,18 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# Guard: WebGPU has no rgba16unorm. bevy loads 16-bit PNGs as TextureFormat::Rgba16Unorm
+# and the web build then panics at boot ("Format Rgba16Unorm has no WebGPU equivalent").
+# Fail early if any 16-bit PNG snuck into assets so it never reaches a deploy.
+sixteen_bit_pngs="$(find assets -name '*.png' -type f -print0 2>/dev/null |
+  xargs -0 -r file | grep -i '16-bit' | cut -d: -f1)"
+if [ -n "$sixteen_bit_pngs" ]; then
+  echo "ERROR: 16-bit PNG(s) found — WebGPU has no Rgba16Unorm. Downconvert to 8-bit:" >&2
+  echo "$sixteen_bit_pngs" | sed 's/^/  /' >&2
+  echo "  fix: magick FILE -depth 8 PNG32:FILE" >&2
+  exit 1
+fi
+
 # The wasm-bindgen CLI MUST match the wasm-bindgen crate version, or the generated
 # JS glue and the wasm disagree and boot dies with
 #   "WebAssembly.Table.grow(): failed to grow table by 4"
