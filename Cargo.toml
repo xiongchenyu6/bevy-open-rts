@@ -8,19 +8,20 @@ description = "A Bevy 0.19/WebGPU porting foundation for godot-open-rts."
 default-run = "bevy-open-rts"
 
 [features]
-default = []
-audio = ["bevy/bevy_audio", "bevy/wav", "bevy/vorbis"]
-webgpu = ["bevy/webgpu"]
+default = ["audio"]
+audio = ["bevy/audio", "bevy/wav"]
+webgpu = ["bevy/web", "bevy/webgpu", "bevy/web_asset_cache"]
 
 [dependencies]
 bevy = { version = "0.19.0", default-features = false, features = [
   "default_app",
   "bevy_winit",
-  "x11",
+  "wayland",
   "3d_bevy_render",
   "ui_bevy_render",
   "scene",
   "picking",
+  "bevy_ui_widgets",
   "keyboard",
   "mouse",
   "png",

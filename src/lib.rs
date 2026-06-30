@@ -29545,27 +29545,56 @@ mod current_tests {
     }
 
     #[test]
-    fn worker_and_scout_rover_keep_godot_rover_mapping() {
+    fn critical_units_do_not_share_model_signatures() {
+        fn model_signature(id: &str) -> Vec<&'static str> {
+            registry::entity(id)
+                .unwrap_or_else(|| panic!("{id} must stay in the registry"))
+                .render_parts
+                .iter()
+                .map(|part| part.model)
+                .collect()
+        }
+
         let worker = registry::entity("Worker").expect("Worker must stay in the registry");
         let scout = registry::entity("ScoutRover").expect("ScoutRover must stay in the registry");
-        assert_eq!(worker.render_parts.len(), 1);
+        assert_eq!(worker.render_parts.len(), 2);
         assert_eq!(scout.render_parts.len(), 1);
-        assert_eq!(
-            worker.render_parts[0].model,
-            "models/kenney-spacekit/rover.glb"
+        assert!(
+            worker
+                .render_parts
+                .iter()
+                .any(|part| part.model == "models/kenney-spacekit/astronautB.glb"),
+            "Worker should read as an engineer/infantry unit, not another rover"
+        );
+        assert!(
+            !worker
+                .render_parts
+                .iter()
+                .any(|part| part.model == "models/kenney-spacekit/rover.glb"),
+            "Worker must not share ScoutRover's rover mesh"
         );
         assert_eq!(
             scout.render_parts[0].model,
             "models/kenney-spacekit/rover.glb"
         );
-        assert_eq!(worker.render_parts[0].translation, [-4.0, -0.02, -3.0]);
-        assert_eq!(worker.render_parts[0].scale, [2.0, 2.0, 2.0]);
         assert_eq!(scout.render_parts[0].translation, [-3.3, 0.0, -2.475]);
         assert_eq!(scout.render_parts[0].scale, [1.65, 1.65, 1.65]);
-        assert_ne!(
-            worker.render_parts[0].scale, scout.render_parts[0].scale,
-            "Godot uses one rover mesh here, but Worker and ScoutRover must keep separate scene transforms"
-        );
+
+        for (left, right) in [
+            ("Worker", "ScoutRover"),
+            ("ScoutRover", "RocketInfantry"),
+            ("ScoutRover", "ShieldTrooper"),
+            ("RocketInfantry", "ShieldTrooper"),
+            ("GrenadierTrooper", "RocketInfantry"),
+            ("GrenadierTrooper", "RocketTrooperRobot"),
+            ("RocketInfantry", "RocketTrooperRobot"),
+        ] {
+            assert_ne!(
+                model_signature(left),
+                model_signature(right),
+                "{left} and {right} must have distinct model signatures"
+            );
+        }
     }
 
     #[test]

@@ -634,7 +634,8 @@ const PARTS_FLAMEASSAULTBUGGY: &[RenderPart] = &[
 ];
 const MODELS_GRENADIERTROOPER: &[&str] = &[
     "models/kenney-spacekit/astronautA.glb",
-    "models/kenney-spacekit/weapon_rifle.glb",
+    "models/kenney-spacekit/barrel.glb",
+    "models/kenney-spacekit/weapon_gun.glb",
 ];
 const PARTS_GRENADIERTROOPER: &[RenderPart] = &[
     RenderPart {
@@ -644,10 +645,16 @@ const PARTS_GRENADIERTROOPER: &[RenderPart] = &[
         scale: [0.6, 0.6, 0.6],
     },
     RenderPart {
-        model: "models/kenney-spacekit/weapon_rifle.glb",
-        translation: [-0.28, 0.56, -0.58],
+        model: "models/kenney-spacekit/barrel.glb",
+        translation: [0.26, 0.54, -0.18],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.45, 0.45, 0.45],
+        scale: [0.18, 0.18, 0.18],
+    },
+    RenderPart {
+        model: "models/kenney-spacekit/weapon_gun.glb",
+        translation: [-0.3, 0.54, -0.58],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [0.36, 0.36, 0.42],
     },
 ];
 const MODELS_HAMMERSIEGETANK: &[&str] = &[
@@ -1604,7 +1611,8 @@ const PARTS_ROCKETGUNSHIP: &[RenderPart] = &[
 ];
 const MODELS_ROCKETINFANTRY: &[&str] = &[
     "models/kenney-spacekit/astronautA.glb",
-    "models/kenney-spacekit/weapon_rifle.glb",
+    "models/kenney-spacekit/rocket_topA.glb",
+    "models/kenney-spacekit/rocket_fuelA.glb",
 ];
 const PARTS_ROCKETINFANTRY: &[RenderPart] = &[
     RenderPart {
@@ -1614,28 +1622,41 @@ const PARTS_ROCKETINFANTRY: &[RenderPart] = &[
         scale: [0.62, 0.62, 0.62],
     },
     RenderPart {
-        model: "models/kenney-spacekit/weapon_rifle.glb",
-        translation: [-0.35, 0.58, -0.74],
+        model: "models/kenney-spacekit/rocket_fuelA.glb",
+        translation: [-0.42, 0.62, -0.64],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.6, 0.6, 0.6],
+        scale: [0.24, 0.24, 0.3],
+    },
+    RenderPart {
+        model: "models/kenney-spacekit/rocket_topA.glb",
+        translation: [-0.44, 0.65, -0.84],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [0.22, 0.22, 0.22],
     },
 ];
 const MODELS_ROCKETTROOPERROBOT: &[&str] = &[
-    "models/kenney-spacekit/astronautA.glb",
-    "models/kenney-spacekit/weapon_rifle.glb",
+    "models/kenney-spacekit/alien.glb",
+    "models/kenney-spacekit/machine_generator.glb",
+    "models/kenney-spacekit/rocket_topB.glb",
 ];
 const PARTS_ROCKETTROOPERROBOT: &[RenderPart] = &[
     RenderPart {
-        model: "models/kenney-spacekit/astronautA.glb",
-        translation: [-0.31, 0.0, -0.31],
+        model: "models/kenney-spacekit/alien.glb",
+        translation: [-0.28, 0.0, -0.28],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.62, 0.62, 0.62],
+        scale: [0.56, 0.56, 0.56],
     },
     RenderPart {
-        model: "models/kenney-spacekit/weapon_rifle.glb",
-        translation: [-0.34, 0.55, -0.7],
+        model: "models/kenney-spacekit/machine_generator.glb",
+        translation: [0.14, 0.48, -0.22],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.52, 0.52, 0.52],
+        scale: [0.16, 0.16, 0.16],
+    },
+    RenderPart {
+        model: "models/kenney-spacekit/rocket_topB.glb",
+        translation: [-0.35, 0.58, -0.66],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [0.2, 0.2, 0.2],
     },
 ];
 const MODELS_SABOTEURINFILTRATOR: &[&str] = &[
@@ -2190,16 +2211,27 @@ const PARTS_WEATHERCONTROLSPIRE: &[RenderPart] = &[
         scale: [0.3772, 0.3772, 0.3772],
     },
 ];
-const MODELS_WORKER: &[&str] = &["models/kenney-spacekit/rover.glb"];
-// Worker uses godot's rover.glb (Worker.tscn), not a humanoid — transform copied
-// from the godot scene (rover instance scaled 2, offset -4,-3; the off-origin bake
-// is corrected at runtime by recenter_entity_models).
-const PARTS_WORKER: &[RenderPart] = &[RenderPart {
-    model: "models/kenney-spacekit/rover.glb",
-    translation: [-4.0, -0.02, -3.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
-    scale: [2.0, 2.0, 2.0],
-}];
+const MODELS_WORKER: &[&str] = &[
+    "models/kenney-spacekit/astronautB.glb",
+    "models/kenney-spacekit/machine_wireless.glb",
+];
+// Worker is rendered as a distinct field engineer instead of sharing ScoutRover's
+// rover mesh. Godot's unit function is preserved, but the Bevy visual must remain
+// uniquely identifiable at RTS zoom.
+const PARTS_WORKER: &[RenderPart] = &[
+    RenderPart {
+        model: "models/kenney-spacekit/astronautB.glb",
+        translation: [-0.32, 0.0, -0.32],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [0.64, 0.64, 0.64],
+    },
+    RenderPart {
+        model: "models/kenney-spacekit/machine_wireless.glb",
+        translation: [0.22, 0.48, -0.28],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [0.2, 0.2, 0.2],
+    },
+];
 
 pub const ENTITY_DEFS: &[EntityDef] = &[
     EntityDef {
