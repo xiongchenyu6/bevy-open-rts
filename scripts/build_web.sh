@@ -7,8 +7,10 @@ cd "$ROOT"
 # Guard: WebGPU has no rgba16unorm. bevy loads 16-bit PNGs as TextureFormat::Rgba16Unorm
 # and the web build then panics at boot ("Format Rgba16Unorm has no WebGPU equivalent").
 # Fail early if any 16-bit PNG snuck into assets so it never reaches a deploy.
+# `|| true`: grep exits 1 when there are no 16-bit PNGs (the normal case); without
+# it, set -o pipefail + set -e would kill the build on a clean asset tree.
 sixteen_bit_pngs="$(find assets -name '*.png' -type f -print0 2>/dev/null |
-  xargs -0 -r file | grep -i '16-bit' | cut -d: -f1)"
+  xargs -0 -r file | grep -i '16-bit' | cut -d: -f1 || true)"
 if [ -n "$sixteen_bit_pngs" ]; then
   echo "ERROR: 16-bit PNG(s) found — WebGPU has no Rgba16Unorm. Downconvert to 8-bit:" >&2
   echo "$sixteen_bit_pngs" | sed 's/^/  /' >&2
