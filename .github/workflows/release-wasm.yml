@@ -1,0 +1,110 @@
+name: Release WebAssembly bundle
+
+# Build the WebGPU/wasm bundle once in CI and publish it to a GitHub Release,
+# then pin {url, sha256} into packages/web-release.json on main. Every Nix deploy
+# target (packages/web.nix) just downloads the tarball — no Rust toolchain, no
+# multi-minute compile per host.
+#
+# Trigger by pushing a tag:   git tag v0.1.1 && git push origin v0.1.1
+# or run manually from the Actions tab (workflow_dispatch) with a tag name.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to build (e.g. v0.1.1). Created at main HEAD if missing.'
+        required: true
+
+concurrency:
+  group: bevy-open-rts-release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, release and pin wasm bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Resolve tag
+        id: tag
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout (full history so we can push the pin to main)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: false
+
+      - name: Build web bundle
+        # build_web.sh pins the wasm-bindgen CLI to the Cargo.lock version and
+        # downloads binaryen 130 itself, so no extra tool install is needed.
+        run: bash scripts/build_web.sh
+
+      - name: Package tarball
+        id: pkg
+        run: |
+          set -euo pipefail
+          # Match packages/web.nix: members at archive root, no wrapping dir.
+          tar -C web --sort=name --owner=0 --group=0 --numeric-owner \
+            -czf bevy-open-rts-web.tar.gz .
+          sha256="sha256-$(openssl dgst -sha256 -binary bevy-open-rts-web.tar.gz | openssl base64 -A)"
+          echo "sha256=$sha256" >> "$GITHUB_OUTPUT"
+          ls -la bevy-open-rts-web.tar.gz
+
+      - name: Create / update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          name: ${{ steps.tag.outputs.name }}
+          files: bevy-open-rts-web.tar.gz
+          fail_on_unmatched_files: true
+
+      - name: Pin release into web-release.json on main
+        run: |
+          set -euo pipefail
+          tag="${{ steps.tag.outputs.name }}"
+          sha="${{ steps.pkg.outputs.sha256 }}"
+          url="https://github.com/${{ github.repository }}/releases/download/${tag}/bevy-open-rts-web.tar.gz"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout -B main origin/main
+
+          cat > packages/web-release.json <<EOF
+          {
+            "tag": "${tag}",
+            "url": "${url}",
+            "sha256": "${sha}"
+          }
+          EOF
+
+          git add packages/web-release.json
+          if git diff --cached --quiet; then
+            echo "web-release.json already up to date"
+          else
+            git commit -m "chore: pin web bundle ${tag}"
+            git push origin main
+          fi

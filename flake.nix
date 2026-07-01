@@ -16,6 +16,15 @@
         "aarch64-darwin"
         "x86_64-darwin"
       ];
+
+      # NixOS module for easy deployment (serves the prebuilt web bundle).
+      flake.nixosModules.default = ./nixos/nginx-module.nix;
+
+      # Overlay so the NixOS module can reference pkgs.bevy-open-rts-web.
+      flake.overlays.default = final: prev: {
+        bevy-open-rts-web = final.callPackage ./packages/web.nix { };
+      };
+
       perSystem =
         {
           config,
@@ -50,6 +59,16 @@
           };
         in
         {
+          # Prebuilt wasm bundle fetched from GitHub Releases (fast, no Rust
+          # toolchain). See packages/web.nix + packages/web-release.json.
+          packages.web = pkgs.callPackage ./packages/web.nix { };
+
+          # Source build: compile the game to wasm locally (used by CI to
+          # produce the bundle, and for local iteration without a release).
+          packages.web-source = pkgs.callPackage ./packages/web-source.nix { };
+
+          packages.default = config.packages.web;
+
           devShells.default =
             with pkgs;
             mkShell.override { stdenv = pkgs.clangStdenv; } {
