@@ -6837,7 +6837,10 @@ impl Default for Locale {
 }
 
 static CURRENT_LANGUAGE: std::sync::atomic::AtomicU8 = std::sync::atomic::AtomicU8::new(0);
-const UI_FONT_PATH: &str = "fonts/wqy-microhei-ui.full.ttf";
+// The SUBSET font (~128 KB, tracked + deployed). NOT the full 3.2 MB face, which is
+// gitignored and 404s on GitHub Pages. Re-run scripts/subset_font.sh after adding new
+// Chinese UI text so the subset covers it (else tofu).
+const UI_FONT_PATH: &str = "fonts/wqy-microhei-ui.ttf";
 
 fn set_current_language(language: Language) {
     let value = match language {
