@@ -4313,6 +4313,7 @@ fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<Economies>()
         .init_resource::<TeamRelations>()
         .init_resource::<BuildQueue>()
+        .init_resource::<BuildStructureTab>()
         .init_resource::<NextSpawnId>()
         .init_resource::<AiDirector>()
         .init_resource::<AiDifficultySettings>()
@@ -4821,6 +4822,7 @@ fn add_headless_game_plugins(app: &mut App) -> &mut App {
     .init_resource::<Assets<Mesh>>()
     .init_resource::<Assets<StandardMaterial>>()
     .init_asset::<Image>()
+    .init_asset::<bevy::image::TextureAtlasLayout>()
     .init_asset::<bevy::mesh::skinning::SkinnedMeshInverseBindposes>()
     .init_asset::<WorldAsset>()
     .init_asset::<Font>();
@@ -7677,11 +7679,33 @@ fn production_speed_multiplier(economy: &TeamEconomy) -> f32 {
     }
 }
 
+#[derive(Resource, Clone, Copy, Debug, PartialEq, Eq)]
+enum BuildStructureTab {
+    Production,
+    Defense,
+}
+
+impl Default for BuildStructureTab {
+    fn default() -> Self {
+        Self::Production
+    }
+}
+
+impl BuildStructureTab {
+    fn label(self) -> &'static str {
+        match self {
+            Self::Production => t("生产", "Production"),
+            Self::Defense => t("防御", "Defense"),
+        }
+    }
+}
+
 #[derive(Component, Clone, Copy, PartialEq, Eq)]
 enum BuildAction {
     None,
     Train(&'static str),
     Build(&'static str),
+    SelectBuildTab(BuildStructureTab),
     SellStructure,
     RepairStructure,
     ToggleDeployMode,
@@ -7717,6 +7741,7 @@ impl BuildAction {
             Self::None
             | Self::Train(_)
             | Self::Build(_)
+            | Self::SelectBuildTab(_)
             | Self::SellStructure
             | Self::RepairStructure
             | Self::SetRallyPoint
@@ -7937,6 +7962,7 @@ struct OrderResources<'w> {
 #[derive(SystemParam)]
 struct CommandActionResources<'w> {
     build_queue: ResMut<'w, BuildQueue>,
+    build_structure_tab: ResMut<'w, BuildStructureTab>,
     command_mode: ResMut<'w, CommandMode>,
     economies: ResMut<'w, Economies>,
     player_factions: Res<'w, PlayerFactions>,
@@ -15676,6 +15702,7 @@ fn record_build_action_audio_feedback(
             record_sound_audio_feedback(feedback, SoundEffectKind::StructureSold);
         }
         BuildAction::None
+        | BuildAction::SelectBuildTab(_)
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
         | BuildAction::HoldPosition
@@ -20039,6 +20066,7 @@ fn has_active_order_state(order_state: CommandOrderStateItem<'_>) -> bool {
 
 fn refresh_command_panel(
     build_queue: Res<BuildQueue>,
+    build_structure_tab: Res<BuildStructureTab>,
     visible_player: Res<VisiblePlayer>,
     player_factions: Res<PlayerFactions>,
     selected_units: Query<CommandPanelUnitItem<'_>, With<Selected>>,
@@ -20111,6 +20139,7 @@ fn refresh_command_panel(
         &selected_units,
         &selected_structures,
         &structures,
+        *build_structure_tab,
     );
     for (slot, mut action, mut availability, interaction, mut background, mut border, mut node) in
         &mut slot_q
@@ -20135,7 +20164,11 @@ fn refresh_command_panel(
         } else {
             Display::Flex
         };
-        let (bg, border_color) = command_button_colors(next_action, enabled, *interaction);
+        let (mut bg, mut border_color) = command_button_colors(next_action, enabled, *interaction);
+        if matches!(next_action, BuildAction::SelectBuildTab(tab) if tab == *build_structure_tab) {
+            bg = Color::srgba(0.18, 0.13, 0.05, 0.96);
+            border_color = Color::srgb(0.82, 0.58, 0.18);
+        }
         *background = BackgroundColor(bg);
         *border = BorderColor::all(border_color);
     }
@@ -20253,6 +20286,7 @@ fn current_command_actions(
         selected_units,
         selected_structures,
         structures,
+        BuildStructureTab::Production,
     )
 }
 
@@ -20262,6 +20296,7 @@ fn current_command_actions_for_faction(
     selected_units: &Query<CommandPanelUnitItem<'_>, With<Selected>>,
     selected_structures: &Query<SelectedRepairStructureItem<'_>, With<Selected>>,
     _structures: &Query<StructurePrereqItem<'_>>,
+    build_structure_tab: BuildStructureTab,
 ) -> Vec<BuildAction> {
     let Some(faction) = faction_def(faction) else {
         return Vec::new();
@@ -20372,7 +20407,18 @@ fn current_command_actions_for_faction(
             push_action_unique(&mut actions, BuildAction::SellStructure);
         }
         if show_worker_construction_menu {
-            for structure in sorted_worker_build_structures(faction) {
+            push_action_unique(
+                &mut actions,
+                BuildAction::SelectBuildTab(BuildStructureTab::Production),
+            );
+            push_action_unique(
+                &mut actions,
+                BuildAction::SelectBuildTab(BuildStructureTab::Defense),
+            );
+            for structure in sorted_worker_build_structures(faction)
+                .into_iter()
+                .filter(|structure| build_structure_tab_for(structure) == build_structure_tab)
+            {
                 push_action_unique(&mut actions, BuildAction::Build(structure));
             }
         }
@@ -20393,6 +20439,7 @@ fn command_action_enabled_for_panel(
 ) -> bool {
     match action {
         BuildAction::None => false,
+        BuildAction::SelectBuildTab(_) => true,
         BuildAction::Train(product_id) => {
             let Some(def) = registry::entity(product_id) else {
                 return false;
@@ -20535,6 +20582,19 @@ fn sorted_worker_build_structures(faction: &'static registry::FactionDef) -> Vec
     structures
 }
 
+fn build_structure_tab_for(id: &str) -> BuildStructureTab {
+    match id {
+        "AntiGroundTurret"
+        | "AntiAirTurret"
+        | "TeslaFenceSegment"
+        | "ArcCoilDefenseTower"
+        | "LanceBeamDefenseTower"
+        | "PrismDefenseObelisk"
+        | "RailCannonBunker" => BuildStructureTab::Defense,
+        _ => BuildStructureTab::Production,
+    }
+}
+
 fn build_structure_order_compare(left: &&'static str, right: &&'static str) -> std::cmp::Ordering {
     build_structure_order_stage(left)
         .cmp(&build_structure_order_stage(right))
@@ -20593,7 +20653,7 @@ fn command_action_icon_path(action: BuildAction) -> Option<&'static str> {
         BuildAction::GuardArea => Some("ui/icons/GuardArea.png"),
         BuildAction::StopSelected => Some("ui/icons/StopCommand.png"),
         BuildAction::ScatterSelected => Some("ui/icons/Scatter.png"),
-        BuildAction::None => None,
+        BuildAction::SelectBuildTab(_) | BuildAction::None => None,
     }
 }
 
@@ -20659,6 +20719,7 @@ fn command_label_with_queue(
         BuildAction::GuardArea => format!("{key} {}", t("守卫区域", "Guard")),
         BuildAction::StopSelected => format!("{key} {}", t("停止", "Stop")),
         BuildAction::ScatterSelected => format!("{key} {}", t("散开", "Scatter")),
+        BuildAction::SelectBuildTab(tab) => format!("{key} {}", tab.label()),
         BuildAction::None => String::new(),
     }
 }
@@ -20861,6 +20922,22 @@ fn command_action_tooltip(
                 .to_string(),
             );
         }
+        BuildAction::SelectBuildTab(tab) => {
+            lines.push(format!("{key} {}", tab.label()));
+            lines.push(
+                match tab {
+                    BuildStructureTab::Production => t(
+                        "显示电力、经济、生产、科技和后期建筑。",
+                        "Shows power, economy, production, tech, and late-game structures.",
+                    ),
+                    BuildStructureTab::Defense => t(
+                        "显示炮塔、围栏、方尖塔和地堡等防御建筑。",
+                        "Shows turrets, fences, obelisks, bunkers, and other defenses.",
+                    ),
+                }
+                .to_string(),
+            );
+        }
         BuildAction::None => {}
     }
     if !enabled {
@@ -20960,6 +21037,7 @@ fn command_action_unavailable_reason(
             t("暂不可用", "Unavailable").to_string()
         }
         BuildAction::None => t("无命令", "No command").to_string(),
+        BuildAction::SelectBuildTab(_) => t("可用", "Available").to_string(),
         _ => t("当前选择不支持", "Not supported by current selection").to_string(),
     }
 }
@@ -21635,6 +21713,7 @@ fn command_shortcuts(
             visible_team,
             action_resources.player_factions.slot_faction(visible_team),
             *action,
+            &mut action_resources.build_structure_tab,
             &mut action_resources.command_mode,
             &mut action_resources.economies,
             &selected_units,
@@ -21703,6 +21782,7 @@ fn command_buttons(
                             visible_team,
                             action_resources.player_factions.slot_faction(visible_team),
                             *action,
+                            &mut action_resources.build_structure_tab,
                             &mut action_resources.command_mode,
                             &mut action_resources.economies,
                             &selected_units,
@@ -21726,8 +21806,13 @@ fn command_buttons(
         } else {
             Interaction::None
         };
-        let (bg, border_color) =
+        let (mut bg, mut border_color) =
             command_button_colors(*action, availability.enabled, effective_interaction);
+        if matches!(*action, BuildAction::SelectBuildTab(tab) if tab == *action_resources.build_structure_tab)
+        {
+            bg = Color::srgba(0.18, 0.13, 0.05, 0.96);
+            border_color = Color::srgb(0.82, 0.58, 0.18);
+        }
         *background = BackgroundColor(bg);
         *border = BorderColor::all(border_color);
     }
@@ -21790,6 +21875,7 @@ fn execute_command_action(
     team: Team,
     faction: SkirmishFaction,
     action: BuildAction,
+    build_structure_tab: &mut BuildStructureTab,
     command_mode: &mut CommandMode,
     economies: &mut Economies,
     selected_units: &Query<SelectedCommandUnitItem<'_>, SelectedCommandUnitFilter>,
@@ -21924,6 +22010,11 @@ fn execute_command_action(
         BuildAction::Build(id) => {
             begin_structure_placement_mode_for_faction(team, faction, id, command_mode, structures)
         }
+        BuildAction::SelectBuildTab(tab) => {
+            *build_structure_tab = tab;
+            clear_targeting_modes(command_mode);
+            true
+        }
         BuildAction::None => false,
     };
     if handled
@@ -21938,7 +22029,12 @@ fn execute_command_action(
     }
     if handled && canceling_construction {
         record_sound_audio_feedback(audio_feedback, SoundEffectKind::ConstructionCanceled);
-    } else if handled && !matches!(action, BuildAction::Build(_)) {
+    } else if handled
+        && !matches!(
+            action,
+            BuildAction::Build(_) | BuildAction::SelectBuildTab(_)
+        )
+    {
         record_build_action_audio_feedback(audio_feedback, team, team, action);
     }
     handled
@@ -22123,6 +22219,7 @@ fn cancellation_producers_for_action(
         | BuildAction::GuardArea
         | BuildAction::StopSelected
         | BuildAction::ScatterSelected
+        | BuildAction::SelectBuildTab(_)
         | BuildAction::None => Vec::new(),
     }
 }
@@ -22267,6 +22364,7 @@ fn command_queue_producers_for_action(
         | BuildAction::GuardArea
         | BuildAction::StopSelected
         | BuildAction::ScatterSelected
+        | BuildAction::SelectBuildTab(_)
         | BuildAction::None => Vec::new(),
     }
 }
@@ -22712,7 +22810,8 @@ fn process_build_queue(
             | BuildAction::Patrol
             | BuildAction::GuardArea
             | BuildAction::StopSelected
-            | BuildAction::ScatterSelected => {
+            | BuildAction::ScatterSelected
+            | BuildAction::SelectBuildTab(_) => {
                 build_queue.0.remove(index);
                 continue;
             }
@@ -22949,6 +23048,7 @@ fn process_build_queue(
             | BuildAction::GuardArea
             | BuildAction::StopSelected
             | BuildAction::ScatterSelected
+            | BuildAction::SelectBuildTab(_)
             | BuildAction::None => {}
         }
     }
@@ -23150,6 +23250,7 @@ fn enqueue_build_action_for_faction(
         | BuildAction::GuardArea
         | BuildAction::StopSelected
         | BuildAction::ScatterSelected
+        | BuildAction::SelectBuildTab(_)
         | BuildAction::None => return EnqueueBuildActionResult::Unavailable,
     };
     if !requirements_met(def, team, structures) {
@@ -23214,6 +23315,7 @@ fn enqueue_build_action_for_faction(
         | BuildAction::GuardArea
         | BuildAction::StopSelected
         | BuildAction::ScatterSelected
+        | BuildAction::SelectBuildTab(_)
         | BuildAction::None => EnqueueBuildActionResult::Unavailable,
     }
 }
@@ -23442,6 +23544,7 @@ fn has_producer_for_job(
         | BuildAction::GuardArea
         | BuildAction::StopSelected
         | BuildAction::ScatterSelected
+        | BuildAction::SelectBuildTab(_)
         | BuildAction::None => false,
     }
 }
@@ -23459,6 +23562,7 @@ fn build_target_product(action: BuildAction) -> &'static str {
         | BuildAction::GuardArea
         | BuildAction::StopSelected
         | BuildAction::ScatterSelected
+        | BuildAction::SelectBuildTab(_)
         | BuildAction::None => "",
     }
 }
@@ -31571,6 +31675,46 @@ mod current_tests {
         assert!(position("Barracks") < position("VehicleFactory"));
         assert!(position("VehicleFactory") < position("TechLab"));
         assert!(position("TechLab") < position("WeatherControlSpire"));
+    }
+
+    #[test]
+    fn worker_build_menu_splits_production_and_defense_tabs() {
+        assert_eq!(
+            build_structure_tab_for("PowerReactor"),
+            BuildStructureTab::Production
+        );
+        assert_eq!(
+            build_structure_tab_for("Refinery"),
+            BuildStructureTab::Production
+        );
+        assert_eq!(
+            build_structure_tab_for("Barracks"),
+            BuildStructureTab::Production
+        );
+        assert_eq!(
+            build_structure_tab_for("VehicleFactory"),
+            BuildStructureTab::Production
+        );
+        assert_eq!(
+            build_structure_tab_for("WeatherControlSpire"),
+            BuildStructureTab::Production
+        );
+        assert_eq!(
+            build_structure_tab_for("AntiGroundTurret"),
+            BuildStructureTab::Defense
+        );
+        assert_eq!(
+            build_structure_tab_for("AntiAirTurret"),
+            BuildStructureTab::Defense
+        );
+        assert_eq!(
+            build_structure_tab_for("TeslaFenceSegment"),
+            BuildStructureTab::Defense
+        );
+        assert_eq!(
+            build_structure_tab_for("RailCannonBunker"),
+            BuildStructureTab::Defense
+        );
     }
 
     #[test]
