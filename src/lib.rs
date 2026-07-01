@@ -16176,10 +16176,10 @@ fn apply_camera_settings(
 fn effective_camera_edge_pan_width(
     options: &MenuOptionsState,
     match_menu: &MatchMenuState,
-    briefing: &MatchBriefingState,
+    _briefing: &MatchBriefingState,
     interactive_ui_active: bool,
 ) -> f32 {
-    if !options.camera_edge_pan || match_menu.visible || briefing.visible || interactive_ui_active {
+    if !options.camera_edge_pan || match_menu.visible || interactive_ui_active {
         return 0.0;
     }
     CAMERA_EDGE_PAN_WIDTH
@@ -30512,7 +30512,8 @@ mod current_tests {
                 },
                 false,
             ),
-            0.0
+            CAMERA_EDGE_PAN_WIDTH,
+            "the opening battle briefing is passive; it must not block edge pan"
         );
         assert_eq!(
             effective_camera_edge_pan_width(
