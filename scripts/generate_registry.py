@@ -164,7 +164,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/CryoSprayer.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -175,7 +175,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/LongbowMissileCrawler.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -186,7 +186,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/FlameAssaultBuggy.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -197,7 +197,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/HammerSiegeTank.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -208,7 +208,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/HeavySiegeWalker.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -219,7 +219,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/RailArtilleryWalker.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -230,7 +230,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/FlakHoverTank.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -241,7 +241,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/LanceBeamTank.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -252,7 +252,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/RailgunTank.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -263,7 +263,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/FlakRocketTeam.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -274,7 +274,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/FlakRocketTeamMk2.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -285,7 +285,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/MobileShieldProjector.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -296,7 +296,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/ModularMissileCarrier.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],
@@ -307,7 +307,7 @@ ENTITY_RENDER_OVERRIDES: dict[str, dict] = {
             {
                 "model": "models/hunyuan3d/TeslaCrawlerMk2.glb",
                 "translation": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0, 1.0],
+                "rotation": [0.0, 1.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
             }
         ],

@@ -4321,6 +4321,7 @@ fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<MapBounds>()
         .init_resource::<CommandMode>()
         .init_resource::<HoveredResource>()
+        .init_resource::<HunyuanModelMaterialCache>()
         .init_resource::<StructurePlacementFeedback>()
         .init_resource::<MatchMenuState>()
         .init_resource::<MatchSpeed>()
@@ -4971,7 +4972,9 @@ pub fn build_model_harness_capture_app(width: u32, height: u32) -> App {
         std::time::Duration::from_secs_f32(1.0 / 30.0),
     ))
     .insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
-    .insert_resource(RenderErrorHandler(handle_render_error));
+    .insert_resource(RenderErrorHandler(handle_render_error))
+    .init_resource::<HunyuanModelMaterialCache>()
+    .add_systems(Update, apply_hunyuan_model_materials);
 
     let image = Image::new_target_texture(
         width,
@@ -6437,6 +6440,12 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
         ),
+    )
+    .add_systems(
+        Update,
+        apply_hunyuan_model_materials
+            .in_set(SimulationPhase::PostCombat)
+            .run_if(match_in_progress),
     )
     .add_systems(
         Update,
@@ -11917,6 +11926,72 @@ fn default_visual_faction(team: Team) -> Option<SkirmishFaction> {
         .map(|_| SkirmishFaction::from_team(team))
 }
 
+#[derive(Component, Clone, Copy, Debug)]
+struct HunyuanModelPart {
+    entity_id: &'static str,
+}
+
+impl HunyuanModelPart {
+    fn for_render_part(entity_id: &'static str, part: &registry::RenderPart) -> Option<Self> {
+        is_hunyuan_model_path(part.model).then_some(Self { entity_id })
+    }
+}
+
+#[derive(Component)]
+struct HunyuanModelMaterialized;
+
+#[derive(Resource, Default)]
+struct HunyuanModelMaterialCache {
+    by_entity: BTreeMap<&'static str, Handle<StandardMaterial>>,
+}
+
+impl HunyuanModelMaterialCache {
+    fn handle_for(
+        &mut self,
+        entity_id: &'static str,
+        materials: &mut Assets<StandardMaterial>,
+    ) -> Handle<StandardMaterial> {
+        if let Some(handle) = self.by_entity.get(entity_id) {
+            return handle.clone();
+        }
+        let handle = materials.add(hunyuan_model_material(entity_id));
+        self.by_entity.insert(entity_id, handle.clone());
+        handle
+    }
+}
+
+fn is_hunyuan_model_path(model: &str) -> bool {
+    model.starts_with("models/hunyuan3d/")
+}
+
+fn hunyuan_model_material(entity_id: &str) -> StandardMaterial {
+    let (base, metallic, roughness, glow) = match entity_id {
+        "CryoSprayer" => (Color::srgb(0.70, 0.92, 1.0), 0.72, 0.28, 0.30),
+        "LongbowMissileCrawler" => (Color::srgb(0.26, 0.29, 0.32), 0.90, 0.34, 0.10),
+        "FlameAssaultBuggy" => (Color::srgb(0.92, 0.28, 0.10), 0.62, 0.36, 0.45),
+        "HammerSiegeTank" => (Color::srgb(0.54, 0.55, 0.50), 0.88, 0.32, 0.08),
+        "HeavySiegeWalker" => (Color::srgb(0.46, 0.49, 0.52), 0.88, 0.30, 0.08),
+        "RailArtilleryWalker" => (Color::srgb(0.58, 0.53, 0.44), 0.84, 0.34, 0.10),
+        "FlakHoverTank" => (Color::srgb(0.40, 0.48, 0.38), 0.82, 0.38, 0.08),
+        "LanceBeamTank" => (Color::srgb(0.22, 0.50, 0.92), 0.78, 0.30, 0.32),
+        "RailgunTank" => (Color::srgb(0.50, 0.55, 0.58), 0.90, 0.28, 0.16),
+        "FlakRocketTeam" => (Color::srgb(0.45, 0.42, 0.38), 0.72, 0.44, 0.10),
+        "FlakRocketTeamMk2" => (Color::srgb(0.58, 0.44, 0.34), 0.76, 0.40, 0.12),
+        "MobileShieldProjector" => (Color::srgb(0.48, 0.32, 0.86), 0.74, 0.30, 0.35),
+        "ModularMissileCarrier" => (Color::srgb(0.34, 0.35, 0.36), 0.90, 0.35, 0.14),
+        "TeslaCrawlerMk2" => (Color::srgb(0.16, 0.42, 0.90), 0.80, 0.26, 0.55),
+        _ => (Color::srgb(0.58, 0.56, 0.50), 0.78, 0.36, 0.10),
+    };
+    let lin = base.to_linear();
+    StandardMaterial {
+        base_color: base,
+        metallic,
+        perceptual_roughness: roughness,
+        emissive: LinearRgba::new(lin.red * glow, lin.green * glow, lin.blue * glow, 1.0),
+        ..default()
+    }
+}
+
 fn spawn_entity_models(
     commands: &mut Commands,
     asset_server: &AssetServer,
@@ -11937,11 +12012,14 @@ fn spawn_entity_models(
         }
     } else {
         for part in def.render_parts {
-            commands.spawn((
+            let mut spawned = commands.spawn((
                 ChildOf(root),
                 WorldAssetRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(part.model))),
                 render_part_transform(part),
             ));
+            if let Some(marker) = HunyuanModelPart::for_render_part(def.id, part) {
+                spawned.insert(marker);
+            }
         }
     }
     spawn_faction_identity_marker(commands, root, visual_faction, def);
@@ -11974,11 +12052,14 @@ fn spawn_entity_models_for_harness(
         }
     } else {
         for part in def.render_parts {
-            world.spawn((
+            let mut spawned = world.spawn((
                 ChildOf(root),
                 WorldAssetRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(part.model))),
                 render_part_transform(part),
             ));
+            if let Some(marker) = HunyuanModelPart::for_render_part(def.id, part) {
+                spawned.insert(marker);
+            }
         }
     }
     if let Some(marker) = visual_faction.map(FactionIdentityMarker::for_faction) {
@@ -28855,6 +28936,36 @@ fn recenter_entity_models(
     }
 }
 
+fn apply_hunyuan_model_materials(
+    mut commands: Commands,
+    mut cache: ResMut<HunyuanModelMaterialCache>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    roots: Query<(Entity, &HunyuanModelPart), Without<HunyuanModelMaterialized>>,
+    children_q: Query<&Children>,
+    mut material_q: Query<&mut MeshMaterial3d<StandardMaterial>>,
+) {
+    for (root, part) in &roots {
+        let handle = cache.handle_for(part.entity_id, &mut materials);
+        let mut applied = false;
+        let mut stack: Vec<Entity> = children_q
+            .get(root)
+            .map(|c| c.iter().collect())
+            .unwrap_or_default();
+        while let Some(entity) = stack.pop() {
+            if let Ok(children) = children_q.get(entity) {
+                stack.extend(children.iter());
+            }
+            if let Ok(mut material) = material_q.get_mut(entity) {
+                material.0 = handle.clone();
+                applied = true;
+            }
+        }
+        if applied {
+            commands.entity(root).insert(HunyuanModelMaterialized);
+        }
+    }
+}
+
 /// Per-kind tint materials applied to resource models so ore (red) and crystal
 /// (green) read as distinct minerals (mirrors godot's resource_a/_b albedo tints).
 #[derive(Resource)]
@@ -30467,6 +30578,82 @@ mod current_tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn hunyuan_render_parts_have_forward_rotation_and_material_fallback() {
+        let mut count = 0;
+        for entity in registry::ENTITY_DEFS {
+            for part in entity.render_parts {
+                if !is_hunyuan_model_path(part.model) {
+                    continue;
+                }
+                count += 1;
+                assert_eq!(
+                    part.rotation,
+                    [0.0, 1.0, 0.0, 0.0],
+                    "{} must rotate its Hunyuan mesh 180 degrees around Y so the generated front faces the RTS forward axis",
+                    entity.id
+                );
+                let material = hunyuan_model_material(entity.id);
+                assert!(
+                    material.metallic > 0.5,
+                    "{} must use the runtime material fallback for mesh-only Hunyuan GLBs",
+                    entity.id
+                );
+            }
+        }
+        assert_eq!(
+            count, 14,
+            "expected every Hunyuan replacement to be guarded"
+        );
+    }
+
+    #[test]
+    fn hunyuan_material_system_applies_to_loaded_scene_children() {
+        let mut app = App::new();
+        app.init_resource::<Assets<StandardMaterial>>();
+        app.init_resource::<HunyuanModelMaterialCache>();
+        app.add_systems(Update, apply_hunyuan_model_materials);
+
+        let initial = app
+            .world_mut()
+            .resource_mut::<Assets<StandardMaterial>>()
+            .add(StandardMaterial {
+                base_color: Color::srgb(0.02, 0.02, 0.02),
+                ..default()
+            });
+        let root = app
+            .world_mut()
+            .spawn(HunyuanModelPart {
+                entity_id: "FlameAssaultBuggy",
+            })
+            .id();
+        let child = app
+            .world_mut()
+            .spawn((ChildOf(root), MeshMaterial3d(initial.clone())))
+            .id();
+
+        app.update();
+
+        let assigned = app
+            .world()
+            .get::<MeshMaterial3d<StandardMaterial>>(child)
+            .expect("child mesh material")
+            .0
+            .clone();
+        assert_ne!(assigned, initial);
+        assert!(app.world().get::<HunyuanModelMaterialized>(root).is_some());
+        let material = app
+            .world()
+            .resource::<Assets<StandardMaterial>>()
+            .get(&assigned)
+            .expect("assigned Hunyuan material");
+        let color = material.base_color.to_srgba();
+        assert!(
+            color.red > color.green && color.red > color.blue,
+            "FlameAssaultBuggy fallback should visibly read as a flame vehicle"
+        );
     }
 
     #[test]

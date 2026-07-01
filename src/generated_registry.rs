@@ -415,7 +415,7 @@ const MODELS_CRYOSPRAYER: &[&str] = &["models/hunyuan3d/CryoSprayer.glb"];
 const PARTS_CRYOSPRAYER: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/CryoSprayer.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_DRONE: &[&str] = &["models/kenney-spacekit/craft_speederA.glb"];
@@ -483,28 +483,28 @@ const MODELS_FLAKHOVERTANK: &[&str] = &["models/hunyuan3d/FlakHoverTank.glb"];
 const PARTS_FLAKHOVERTANK: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/FlakHoverTank.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_FLAKROCKETTEAM: &[&str] = &["models/hunyuan3d/FlakRocketTeam.glb"];
 const PARTS_FLAKROCKETTEAM: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/FlakRocketTeam.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_FLAKROCKETTEAMMK2: &[&str] = &["models/hunyuan3d/FlakRocketTeamMk2.glb"];
 const PARTS_FLAKROCKETTEAMMK2: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/FlakRocketTeamMk2.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_FLAMEASSAULTBUGGY: &[&str] = &["models/hunyuan3d/FlameAssaultBuggy.glb"];
 const PARTS_FLAMEASSAULTBUGGY: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/FlameAssaultBuggy.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_GRENADIERTROOPER: &[&str] = &[
@@ -536,7 +536,7 @@ const MODELS_HAMMERSIEGETANK: &[&str] = &["models/hunyuan3d/HammerSiegeTank.glb"
 const PARTS_HAMMERSIEGETANK: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/HammerSiegeTank.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_HEAVYBOMBARDMENTAIRSHIP: &[&str] = &["models/kenney-spacekit/craft_cargoB.glb"];
@@ -568,7 +568,7 @@ const MODELS_HEAVYSIEGEWALKER: &[&str] = &["models/hunyuan3d/HeavySiegeWalker.gl
 const PARTS_HEAVYSIEGEWALKER: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/HeavySiegeWalker.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_HELICOPTER: &[&str] = &["models/kenney-spacekit/craft_racer.glb"];
@@ -652,7 +652,7 @@ const MODELS_LANCEBEAMTANK: &[&str] = &["models/hunyuan3d/LanceBeamTank.glb"];
 const PARTS_LANCEBEAMTANK: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/LanceBeamTank.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_LANDMINE: &[&str] = &[];
@@ -679,7 +679,7 @@ const MODELS_LONGBOWMISSILECRAWLER: &[&str] = &["models/hunyuan3d/LongbowMissile
 const PARTS_LONGBOWMISSILECRAWLER: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/LongbowMissileCrawler.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_MIRAGESCOUTTANK: &[&str] = &[
@@ -736,14 +736,14 @@ const MODELS_MOBILESHIELDPROJECTOR: &[&str] = &["models/hunyuan3d/MobileShieldPr
 const PARTS_MOBILESHIELDPROJECTOR: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/MobileShieldProjector.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_MODULARMISSILECARRIER: &[&str] = &["models/hunyuan3d/ModularMissileCarrier.glb"];
 const PARTS_MODULARMISSILECARRIER: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/ModularMissileCarrier.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_MORTARTEAM: &[&str] = &[
@@ -972,7 +972,7 @@ const MODELS_RAILARTILLERYWALKER: &[&str] = &["models/hunyuan3d/RailArtilleryWal
 const PARTS_RAILARTILLERYWALKER: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/RailArtilleryWalker.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_RAILCANNONBUNKER: &[&str] = &[
@@ -1041,7 +1041,7 @@ const MODELS_RAILGUNTANK: &[&str] = &["models/hunyuan3d/RailgunTank.glb"];
 const PARTS_RAILGUNTANK: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/RailgunTank.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_REFINERY: &[&str] = &[
@@ -1712,7 +1712,7 @@ const MODELS_TESLACRAWLERMK2: &[&str] = &["models/hunyuan3d/TeslaCrawlerMk2.glb"
 const PARTS_TESLACRAWLERMK2: &[RenderPart] = &[RenderPart {
     model: "models/hunyuan3d/TeslaCrawlerMk2.glb",
     translation: [0.0, 0.0, 0.0],
-    rotation: [0.0, 0.0, 0.0, 1.0],
+    rotation: [0.0, 1.0, 0.0, 0.0],
     scale: [1.0, 1.0, 1.0],
 }];
 const MODELS_TESLAFENCESEGMENT: &[&str] = &[];
