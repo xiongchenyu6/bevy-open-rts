@@ -55,6 +55,45 @@ resolve_wasm_bindgen() {
 
 WASM_BINDGEN_BIN="$(resolve_wasm_bindgen)"
 
+# Pin binaryen (wasm-opt): the version Ubuntu/apt ships MISASSIGNS the
+# __wbindgen_externrefs export to the (sealed) funcref table, so the JS glue's
+# `wasm.__wbindgen_externrefs.grow(4)` grows the wrong, un-growable table and the web
+# build boot-fails with "WebAssembly.Table.grow(): failed to grow table by 4". Use a
+# pinned recent release (the release binary is self-contained per ldd; copy it into
+# $CARGO_HOME/bin so CI's tool cache keeps it). If the download fails, ship
+# un-optimized (but valid) wasm rather than abort.
+BINARYEN_VERSION="${BINARYEN_VERSION:-version_130}"
+BINARYEN_MIN_NUM="${BINARYEN_VERSION#version_}"
+wasm_opt_num() { "$1" --version 2>/dev/null | sed -nE 's/.*wasm-opt version ([0-9]+).*/\1/p'; }
+resolve_wasm_opt() {
+  local cargo_home="${CARGO_HOME:-$HOME/.cargo}"
+  local pin_bin="$cargo_home/bin/wasm-opt"
+  local cand n
+  for cand in "$pin_bin" "$(command -v wasm-opt 2>/dev/null || true)"; do
+    [ -n "$cand" ] && [ -x "$cand" ] || continue
+    n="$(wasm_opt_num "$cand")"
+    if [ -n "$n" ] && [ "$n" -ge "$BINARYEN_MIN_NUM" ]; then
+      printf '%s\n' "$cand"
+      return 0
+    fi
+  done
+  echo ">> downloading binaryen ${BINARYEN_VERSION} (system wasm-opt missing/too old)" >&2
+  local tmp
+  tmp="$(mktemp -d)"
+  if curl -fsSL "https://github.com/WebAssembly/binaryen/releases/download/${BINARYEN_VERSION}/binaryen-${BINARYEN_VERSION}-x86_64-linux.tar.gz" -o "$tmp/b.tgz" &&
+    tar xzf "$tmp/b.tgz" -C "$tmp"; then
+    mkdir -p "$cargo_home/bin"
+    cp "$tmp/binaryen-${BINARYEN_VERSION}/bin/wasm-opt" "$pin_bin"
+    rm -rf "$tmp"
+    printf '%s\n' "$pin_bin"
+    return 0
+  fi
+  rm -rf "$tmp"
+  return 1
+}
+WASM_OPT_BIN="$(resolve_wasm_opt || true)"
+[ -n "$WASM_OPT_BIN" ] && echo ">> wasm-opt: $("$WASM_OPT_BIN" --version)"
+
 cargo build --release --target wasm32-unknown-unknown --features webgpu
 
 rm -rf web/pkg web/assets
@@ -65,7 +104,7 @@ mkdir -p web/pkg
   --out-name bevy_open_rts \
   target/wasm32-unknown-unknown/release/bevy-open-rts.wasm
 
-if command -v wasm-opt >/dev/null 2>&1; then
+if [ -n "$WASM_OPT_BIN" ]; then
   BG="web/pkg/bevy_open_rts_bg.wasm"
   # Enable exactly the STABLE, browser-shipped post-MVP features rustc emits — most
   # importantly reference-types (the externref table __wbindgen_init_externref_table
@@ -77,7 +116,7 @@ if command -v wasm-opt >/dev/null 2>&1; then
   opt_ok=0
   for attempt in 1 2 3; do
     rm -f "$BG.opt"
-    if wasm-opt -Oz \
+    if "$WASM_OPT_BIN" -Oz \
       --enable-reference-types \
       --enable-bulk-memory \
       --enable-nontrapping-float-to-int \
