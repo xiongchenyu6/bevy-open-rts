@@ -1371,6 +1371,9 @@ struct MatchMenuOverlay;
 struct MatchMenuStatusText;
 
 #[derive(Component)]
+struct MatchMenuFullscreenText;
+
+#[derive(Component)]
 struct MatchBriefingPanel;
 
 #[derive(Component)]
@@ -1401,6 +1404,7 @@ enum MatchMenuAction {
     SetSpeed(MatchSpeedPreset),
     PreviousPerspective,
     NextPerspective,
+    ToggleFullscreen,
     Restart,
     ReturnToSetup,
 }
@@ -8379,6 +8383,7 @@ fn resize_front_menu_roster_preview(
 
 fn front_menu_buttons(
     mouse: Res<ButtonInput<MouseButton>>,
+    mut options: ResMut<MenuOptionsState>,
     mut next_state: ResMut<NextState<AppScreen>>,
     mut windows: Query<&mut Window, With<PrimaryWindow>>,
     mut buttons: Query<(&Interaction, &FrontMenuButton, &mut BackgroundColor)>,
@@ -8392,11 +8397,7 @@ fn front_menu_buttons(
                 FrontMenuAction::Credits => next_state.set(AppScreen::CreditsMenu),
                 FrontMenuAction::QuitOrFullscreen => {
                     if let Ok(mut window) = windows.single_mut() {
-                        window.mode = if matches!(window.mode, WindowMode::Windowed) {
-                            WindowMode::BorderlessFullscreen(MonitorSelection::Current)
-                        } else {
-                            WindowMode::Windowed
-                        };
+                        options.fullscreen = toggle_window_fullscreen(&mut window);
                     }
                 }
             }
@@ -8406,6 +8407,32 @@ fn front_menu_buttons(
             Interaction::Hovered => Color::srgba(0.105, 0.13, 0.125, 0.94),
             Interaction::None => Color::srgba(0.08, 0.082, 0.082, 0.92),
         });
+    }
+}
+
+fn window_is_fullscreen(window: &Window) -> bool {
+    !matches!(window.mode, WindowMode::Windowed)
+}
+
+fn set_window_fullscreen(window: &mut Window, fullscreen: bool) {
+    window.mode = if fullscreen {
+        WindowMode::BorderlessFullscreen(MonitorSelection::Current)
+    } else {
+        WindowMode::Windowed
+    };
+}
+
+fn toggle_window_fullscreen(window: &mut Window) -> bool {
+    let fullscreen = !window_is_fullscreen(window);
+    set_window_fullscreen(window, fullscreen);
+    fullscreen
+}
+
+fn match_menu_fullscreen_button_text(fullscreen: bool) -> &'static str {
+    if fullscreen {
+        t("窗口模式", "Windowed")
+    } else {
+        t("全屏", "Fullscreen")
     }
 }
 
@@ -8832,11 +8859,7 @@ fn options_menu_buttons(
                 OptionsMenuAction::ToggleFullscreen => {
                     options.fullscreen = !options.fullscreen;
                     if let Ok(mut window) = windows.single_mut() {
-                        window.mode = if options.fullscreen {
-                            WindowMode::BorderlessFullscreen(MonitorSelection::Current)
-                        } else {
-                            WindowMode::Windowed
-                        };
+                        set_window_fullscreen(&mut window, options.fullscreen);
                     }
                     rebuild = true;
                 }
@@ -12681,7 +12704,7 @@ fn setup_match_menu_overlay(commands: &mut Commands, font: Handle<Font>) {
                 .spawn((
                     Node {
                         width: px(430),
-                        min_height: px(320),
+                        min_height: px(370),
                         padding: UiRect::all(px(22)),
                         flex_direction: FlexDirection::Column,
                         row_gap: px(12),
@@ -12747,6 +12770,20 @@ fn setup_match_menu_overlay(commands: &mut Commands, font: Handle<Font>) {
                                         font.clone(),
                                     ));
                                 });
+                        });
+                    panel
+                        .spawn(match_menu_button(MatchMenuAction::ToggleFullscreen))
+                        .with_children(|button| {
+                            button.spawn((
+                                Text::new(""),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(17.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.92, 0.96, 0.98)),
+                                MatchMenuFullscreenText,
+                            ));
                         });
                     panel
                         .spawn(match_menu_button(MatchMenuAction::Restart))
@@ -16105,9 +16142,9 @@ fn camera_control(
 /// Applies camera options and gates edge-pan while UI overlays own the cursor.
 fn apply_camera_settings(
     options: Res<MenuOptionsState>,
-    window_q: Query<&Window, With<PrimaryWindow>>,
     match_menu: Res<MatchMenuState>,
     briefing: Res<MatchBriefingState>,
+    ui_interactions: Query<&Interaction, With<Button>>,
     mut camera_q: Query<(&mut RtsCam, &mut RtsCameraControls), With<MainCamera>>,
 ) {
     let Ok((mut cam, mut controls)) = camera_q.single_mut() else {
@@ -16117,23 +16154,30 @@ fn apply_camera_settings(
     cam.target_angle = options.camera_tilt;
     cam.min_angle = options.camera_tilt;
     controls.pan_speed = options.camera_pan_speed;
-    controls.edge_pan_width =
-        effective_camera_edge_pan_width(&options, window_q.single().ok(), &match_menu, &briefing);
+    controls.edge_pan_width = effective_camera_edge_pan_width(
+        &options,
+        &match_menu,
+        &briefing,
+        interactive_ui_owns_cursor(&ui_interactions),
+    );
 }
 
 fn effective_camera_edge_pan_width(
     options: &MenuOptionsState,
-    window: Option<&Window>,
     match_menu: &MatchMenuState,
     briefing: &MatchBriefingState,
+    interactive_ui_active: bool,
 ) -> f32 {
-    if !options.camera_edge_pan || match_menu.visible || briefing.visible {
-        return 0.0;
-    }
-    if window.is_some_and(cursor_is_over_hud) {
+    if !options.camera_edge_pan || match_menu.visible || briefing.visible || interactive_ui_active {
         return 0.0;
     }
     CAMERA_EDGE_PAN_WIDTH
+}
+
+fn interactive_ui_owns_cursor(interactions: &Query<&Interaction, With<Button>>) -> bool {
+    interactions
+        .iter()
+        .any(|interaction| matches!(*interaction, Interaction::Hovered | Interaction::Pressed))
 }
 
 fn safe_camera_distance(distance: f32) -> f32 {
@@ -18916,10 +18960,12 @@ fn match_menu_input(
 
 fn match_menu_buttons(
     mouse: Res<ButtonInput<MouseButton>>,
+    mut options: ResMut<MenuOptionsState>,
     mut match_menu: ResMut<MatchMenuState>,
     mut match_speed: ResMut<MatchSpeed>,
     mut virtual_time: ResMut<Time<Virtual>>,
     mut next_state: ResMut<NextState<AppScreen>>,
+    mut windows: Query<&mut Window, With<PrimaryWindow>>,
     mut visible_player: ResMut<VisiblePlayer>,
     active_teams: Res<ActiveTeams>,
     selected_map: Res<SelectedSkirmishMap>,
@@ -18967,6 +19013,11 @@ fn match_menu_buttons(
                         ));
                     }
                 }
+                MatchMenuAction::ToggleFullscreen => {
+                    if let Ok(mut window) = windows.single_mut() {
+                        options.fullscreen = toggle_window_fullscreen(&mut window);
+                    }
+                }
                 MatchMenuAction::Restart => {
                     match_menu.visible = false;
                     next_state.set(AppScreen::RestartingMatch);
@@ -18999,6 +19050,7 @@ fn match_menu_action_enabled(
         }
         MatchMenuAction::Resume
         | MatchMenuAction::SetSpeed(_)
+        | MatchMenuAction::ToggleFullscreen
         | MatchMenuAction::Restart
         | MatchMenuAction::ReturnToSetup => true,
     }
@@ -19054,8 +19106,13 @@ fn update_match_menu_overlay(
     match_state: Res<MatchState>,
     economies: Res<Economies>,
     visible_player: Res<VisiblePlayer>,
+    window_q: Query<&Window, With<PrimaryWindow>>,
     mut overlay_q: Query<&mut Visibility, With<MatchMenuOverlay>>,
-    mut status_q: Query<&mut Text, With<MatchMenuStatusText>>,
+    mut status_q: Query<&mut Text, (With<MatchMenuStatusText>, Without<MatchMenuFullscreenText>)>,
+    mut fullscreen_text_q: Query<
+        &mut Text,
+        (With<MatchMenuFullscreenText>, Without<MatchMenuStatusText>),
+    >,
 ) {
     for mut visibility in &mut overlay_q {
         *visibility = if match_menu.visible {
@@ -19067,6 +19124,11 @@ fn update_match_menu_overlay(
 
     if !match_menu.visible {
         return;
+    }
+
+    let fullscreen = window_q.single().ok().is_some_and(window_is_fullscreen);
+    for mut text in &mut fullscreen_text_q {
+        **text = match_menu_fullscreen_button_text(fullscreen).to_string();
     }
 
     let minutes = (match_state.start_time_sec.max(0.0) / 60.0).floor() as u32;
@@ -30381,14 +30443,14 @@ mod current_tests {
     }
 
     #[test]
-    fn edge_pan_is_disabled_by_options_and_match_overlays() {
+    fn edge_pan_is_disabled_by_options_overlays_and_interactive_ui_only() {
         let options = MenuOptionsState::default();
         assert_eq!(
             effective_camera_edge_pan_width(
                 &options,
-                None,
                 &MatchMenuState::default(),
                 &MatchBriefingState::default(),
+                false,
             ),
             CAMERA_EDGE_PAN_WIDTH
         );
@@ -30398,9 +30460,9 @@ mod current_tests {
         assert_eq!(
             effective_camera_edge_pan_width(
                 &edge_pan_disabled,
-                None,
                 &MatchMenuState::default(),
                 &MatchBriefingState::default(),
+                false,
             ),
             0.0
         );
@@ -30408,23 +30470,49 @@ mod current_tests {
         assert_eq!(
             effective_camera_edge_pan_width(
                 &options,
-                None,
                 &MatchMenuState { visible: true },
                 &MatchBriefingState::default(),
+                false,
             ),
             0.0
         );
         assert_eq!(
             effective_camera_edge_pan_width(
                 &options,
-                None,
                 &MatchMenuState::default(),
                 &MatchBriefingState {
                     visible: true,
                     ..default()
                 },
+                false,
             ),
             0.0
+        );
+        assert_eq!(
+            effective_camera_edge_pan_width(
+                &options,
+                &MatchMenuState::default(),
+                &MatchBriefingState::default(),
+                true,
+            ),
+            0.0
+        );
+
+        let mut window = Window {
+            resolution: WindowResolution::new(1280, 720),
+            ..default()
+        };
+        window.set_cursor_position(Some(Vec2::new(640.0, 10.0)));
+        assert!(cursor_is_over_hud(&window));
+        assert_eq!(
+            effective_camera_edge_pan_width(
+                &options,
+                &MatchMenuState::default(),
+                &MatchBriefingState::default(),
+                false,
+            ),
+            CAMERA_EDGE_PAN_WIDTH,
+            "passive HUD strips must not block top/bottom edge pan"
         );
     }
 
