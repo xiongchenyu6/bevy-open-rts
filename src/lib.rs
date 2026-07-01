@@ -109,6 +109,9 @@ const ENEMY_ORDER_SCREEN_PICK_MAX_RADIUS_PX: f32 = 96.0;
 const DEFAULT_MODEL_FALLBACK: &str = "models/kenney-spacekit/rover.glb";
 const GODOT_MODEL_MAP_ASSET_PATH: &str = "data/godot_model_map.model_map.ron";
 const COMMAND_SLOT_COUNT: usize = 24;
+const COMMAND_TOOLTIP_WIDTH_PX: f32 = 330.0;
+const COMMAND_TOOLTIP_OFFSET_X_PX: f32 = 18.0;
+const COMMAND_TOOLTIP_OFFSET_Y_PX: f32 = 92.0;
 const COMMAND_KEY_CANCEL: &str = "cancel";
 const COMMAND_KEY_GUARD_AREA: &str = "guard_area";
 const COMMAND_KEY_SCATTER: &str = "scatter";
@@ -6224,6 +6227,13 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
     )
     .add_systems(
         Update,
+        update_command_tooltip
+            .after(refresh_command_panel)
+            .in_set(SimulationPhase::UiAndManagement)
+            .run_if(match_in_progress),
+    )
+    .add_systems(
+        Update,
         update_ai_drone_scouting
             .in_set(SimulationPhase::UiAndManagement)
             .run_if(match_in_progress),
@@ -7497,6 +7507,16 @@ struct ShotPulse {
     team: Team,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ImpactBurstKind {
+    Ballistic,
+    Explosive,
+    Energy,
+    Electric,
+    Fire,
+    Heavy,
+}
+
 #[derive(Component, Clone, Copy)]
 struct ImpactBurst {
     remaining: f32,
@@ -7504,6 +7524,7 @@ struct ImpactBurst {
     radius: f32,
     power: f32,
     team: Team,
+    kind: ImpactBurstKind,
 }
 
 #[derive(Resource, Default)]
@@ -8004,6 +8025,12 @@ struct CommandSlotIcon(usize);
 struct CommandSlotAvailability {
     enabled: bool,
 }
+
+#[derive(Component)]
+struct CommandTooltip;
+
+#[derive(Component)]
+struct CommandTooltipText;
 
 impl Default for CommandSlotAvailability {
     fn default() -> Self {
@@ -14193,6 +14220,7 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
                     }
                 });
         });
+    setup_command_tooltip(commands, font);
 }
 
 fn setup_selection_drag_box(commands: &mut Commands) {
@@ -15980,6 +16008,62 @@ fn impact_burst_lifetime(power: f32) -> f32 {
     0.18 + power.clamp(0.45, 2.2) * 0.06
 }
 
+fn impact_burst_kind_for_attacker(
+    weapon: &Weapon,
+    unit: Option<&Unit>,
+    structure: Option<&Structure>,
+    target_is_structure: bool,
+) -> ImpactBurstKind {
+    let id = unit
+        .map(|unit| unit.id)
+        .or_else(|| structure.map(|structure| structure.id))
+        .unwrap_or("");
+    impact_burst_kind_for_entity_id(id, weapon, target_is_structure)
+}
+
+fn impact_burst_kind_for_entity_id(
+    id: &str,
+    weapon: &Weapon,
+    target_is_structure: bool,
+) -> ImpactBurstKind {
+    match id {
+        "FlameAssaultBuggy" => ImpactBurstKind::Fire,
+        "TeslaCrawlerMk2" | "TeslaFenceSegment" | "ArcCoilDefenseTower" | "ShockTrooper" => {
+            ImpactBurstKind::Electric
+        }
+        "PrismDefenseObelisk"
+        | "LanceBeamDefenseTower"
+        | "LanceBeamTank"
+        | "PulseRifleCommando"
+        | "ShieldTrooper"
+        | "CryoSprayer" => ImpactBurstKind::Energy,
+        "RocketInfantry"
+        | "RocketTrooperRobot"
+        | "FlakRocketTeam"
+        | "FlakRocketTeamMk2"
+        | "GrenadierTrooper"
+        | "MortarTeam"
+        | "LongbowMissileCrawler"
+        | "ModularMissileCarrier"
+        | "RocketGunship"
+        | "BomberVTOL"
+        | "HeavyBombardmentAirship"
+        | "SiegeArtilleryVehicle"
+        | "HammerSiegeTank"
+        | "SiegeAirship" => ImpactBurstKind::Explosive,
+        "RailgunTank"
+        | "RailSniperTeam"
+        | "RailArtilleryWalker"
+        | "RailCannonBunker"
+        | "HeavySiegeWalker"
+        | "SiegeDrillTank" => ImpactBurstKind::Heavy,
+        _ if weapon.splash_radius > 0.0 => ImpactBurstKind::Explosive,
+        _ if weapon.damage >= 16.0 || target_is_structure => ImpactBurstKind::Heavy,
+        _ if weapon.can_attack_air && !weapon.can_attack_ground => ImpactBurstKind::Energy,
+        _ => ImpactBurstKind::Ballistic,
+    }
+}
+
 fn spawn_impact_burst(
     commands: &mut Commands,
     position: Vec3,
@@ -15987,6 +16071,7 @@ fn spawn_impact_burst(
     damage: f32,
     target_is_structure: bool,
     team: Team,
+    kind: ImpactBurstKind,
 ) {
     if damage <= 0.0 {
         return;
@@ -16002,6 +16087,7 @@ fn spawn_impact_burst(
             radius: (target_radius * 0.55 + power * 0.22).clamp(0.32, 1.45),
             power,
             team,
+            kind,
         },
         MatchScopedEntity,
     ));
@@ -16054,6 +16140,40 @@ fn command_button_label(index: usize, font: Handle<Font>) -> impl Bundle {
         CommandSlotLabel(index),
         ButtonLabel,
     )
+}
+
+fn setup_command_tooltip(commands: &mut Commands, font: Handle<Font>) {
+    commands
+        .spawn((
+            CommandTooltip,
+            Visibility::Hidden,
+            GlobalZIndex(55),
+            Node {
+                position_type: PositionType::Absolute,
+                left: px(0),
+                top: px(0),
+                width: px(COMMAND_TOOLTIP_WIDTH_PX),
+                border: UiRect::all(px(1)),
+                padding: UiRect::all(px(10)),
+                ..default()
+            },
+            BorderColor::all(Color::srgb(0.34, 0.46, 0.50)),
+            BackgroundColor(Color::srgba(0.02, 0.035, 0.045, 0.94)),
+            MatchScopedEntity,
+        ))
+        .with_children(|tooltip| {
+            tooltip.spawn((
+                Text::new(""),
+                TextFont {
+                    font: font.into(),
+                    font_size: FontSize::Px(14.0),
+                    ..default()
+                },
+                TextColor(Color::srgb(0.88, 0.95, 0.94)),
+                TextLayout::justify(Justify::Left),
+                CommandTooltipText,
+            ));
+        });
 }
 
 fn production_queue_slot(index: usize) -> impl Bundle {
@@ -20049,6 +20169,77 @@ fn refresh_command_panel(
     }
 }
 
+fn update_command_tooltip(
+    build_queue: Res<BuildQueue>,
+    visible_player: Res<VisiblePlayer>,
+    player_factions: Res<PlayerFactions>,
+    window_q: Query<&Window, With<PrimaryWindow>>,
+    selected_structures: Query<SelectedRepairStructureItem<'_>, With<Selected>>,
+    producer_structures: Query<StructureEntityItem<'_>>,
+    structures: Query<StructurePrereqItem<'_>>,
+    slot_q: Query<(
+        &CommandSlot,
+        &BuildAction,
+        &CommandSlotAvailability,
+        &Interaction,
+    )>,
+    mut tooltip_q: Query<(&mut Node, &mut Visibility), With<CommandTooltip>>,
+    mut text_q: Query<&mut Text, With<CommandTooltipText>>,
+) {
+    let Ok((mut tooltip_node, mut tooltip_visibility)) = tooltip_q.single_mut() else {
+        return;
+    };
+    let Ok(mut tooltip_text) = text_q.single_mut() else {
+        return;
+    };
+    let Some(visible_team) = controlled_player_team(Some(&*visible_player)) else {
+        *tooltip_visibility = Visibility::Hidden;
+        return;
+    };
+    let Ok(window) = window_q.single() else {
+        *tooltip_visibility = Visibility::Hidden;
+        return;
+    };
+    let Some(cursor) = window.cursor_position() else {
+        *tooltip_visibility = Visibility::Hidden;
+        return;
+    };
+    let Some((slot, action, availability, _)) = slot_q
+        .iter()
+        .filter(|(_, action, _, interaction)| {
+            !matches!(action, BuildAction::None)
+                && matches!(interaction, Interaction::Hovered | Interaction::Pressed)
+        })
+        .min_by_key(|(slot, ..)| slot.0)
+    else {
+        *tooltip_visibility = Visibility::Hidden;
+        return;
+    };
+
+    let faction = player_factions.slot_faction(visible_team);
+    **tooltip_text = command_action_tooltip(
+        slot.0,
+        *action,
+        availability.enabled,
+        visible_team,
+        faction,
+        &selected_structures,
+        &producer_structures,
+        &structures,
+        &build_queue,
+    );
+    let max_left = (window.width() - COMMAND_TOOLTIP_WIDTH_PX - 8.0).max(8.0);
+    let left = (cursor.x + COMMAND_TOOLTIP_OFFSET_X_PX).clamp(8.0, max_left);
+    let raw_top = if cursor.y > COMMAND_TOOLTIP_OFFSET_Y_PX + 12.0 {
+        cursor.y - COMMAND_TOOLTIP_OFFSET_Y_PX
+    } else {
+        cursor.y + 24.0
+    };
+    tooltip_node.left = px(left);
+    tooltip_node.top = px(raw_top.clamp(8.0, (window.height() - 120.0).max(8.0)));
+    *tooltip_visibility = Visibility::Inherited;
+}
+
 #[allow(dead_code)]
 fn current_command_actions(
     team: Team,
@@ -20181,10 +20372,8 @@ fn current_command_actions_for_faction(
             push_action_unique(&mut actions, BuildAction::SellStructure);
         }
         if show_worker_construction_menu {
-            for structure in faction.structures {
-                if registry::entity(structure).is_some() {
-                    push_action_unique(&mut actions, BuildAction::Build(structure));
-                }
+            for structure in sorted_worker_build_structures(faction) {
+                push_action_unique(&mut actions, BuildAction::Build(structure));
             }
         }
     }
@@ -20335,6 +20524,52 @@ fn push_action_unique(actions: &mut Vec<BuildAction>, action: BuildAction) {
     }
 }
 
+fn sorted_worker_build_structures(faction: &'static registry::FactionDef) -> Vec<&'static str> {
+    let mut structures = faction
+        .structures
+        .iter()
+        .copied()
+        .filter(|id| registry::entity(id).is_some())
+        .collect::<Vec<_>>();
+    structures.sort_by(build_structure_order_compare);
+    structures
+}
+
+fn build_structure_order_compare(left: &&'static str, right: &&'static str) -> std::cmp::Ordering {
+    build_structure_order_stage(left)
+        .cmp(&build_structure_order_stage(right))
+        .then_with(|| left.cmp(right))
+}
+
+fn build_structure_order_stage(id: &str) -> u8 {
+    match id {
+        // Opening: power first, then economy and core production.
+        "PowerReactor" => 0,
+        "Refinery" => 5,
+        "Barracks" => 10,
+        "RepairPad" => 14,
+        // Early defense before tech expansion.
+        "AntiGroundTurret" => 18,
+        "AntiAirTurret" => 20,
+        "TeslaFenceSegment" => 22,
+        // Scouting/tech unlocks and mid-game production.
+        "RadarUplink" => 26,
+        "VehicleFactory" => 30,
+        "OrePurifier" => 34,
+        "AdvancedReactorPlant" => 36,
+        "TechLab" => 40,
+        "AircraftFactory" => 44,
+        "RoboticsBay" => 48,
+        // Late defenses and super-weapons stay at the end of the grid.
+        "ArcCoilDefenseTower" => 56,
+        "LanceBeamDefenseTower" => 58,
+        "PrismDefenseObelisk" => 60,
+        "RailCannonBunker" => 62,
+        "WeatherControlSpire" => 70,
+        _ => 90,
+    }
+}
+
 #[cfg(test)]
 fn command_label(index: usize, action: Option<BuildAction>) -> String {
     command_label_with_queue(index, action, None)
@@ -20425,6 +20660,307 @@ fn command_label_with_queue(
         BuildAction::StopSelected => format!("{key} {}", t("停止", "Stop")),
         BuildAction::ScatterSelected => format!("{key} {}", t("散开", "Scatter")),
         BuildAction::None => String::new(),
+    }
+}
+
+fn command_action_tooltip(
+    index: usize,
+    action: BuildAction,
+    enabled: bool,
+    team: Team,
+    faction: SkirmishFaction,
+    selected_structures: &Query<SelectedRepairStructureItem<'_>, With<Selected>>,
+    producer_structures: &Query<StructureEntityItem<'_>>,
+    structures: &Query<StructurePrereqItem<'_>>,
+    build_queue: &BuildQueue,
+) -> String {
+    let key = command_action_display_key(index, action);
+    let mut lines = Vec::new();
+    match action {
+        BuildAction::Train(id) | BuildAction::Build(id) => {
+            let verb = match action {
+                BuildAction::Train(_) => t("训练", "Train"),
+                BuildAction::Build(_) => t("建造", "Build"),
+                _ => "",
+            };
+            lines.push(format!("{key} {verb} {}", localized_entity_label(id)));
+            if let Some(def) = registry::entity(id) {
+                lines.push(format!(
+                    "{}: {} {} / {} {}   {}: {:.0}s",
+                    t("成本", "Cost"),
+                    t("矿石", "Ore"),
+                    def.cost.ore,
+                    t("水晶", "Crystal"),
+                    def.cost.crystal,
+                    t("用时", "Time"),
+                    def.build_seconds
+                ));
+                if def.power_delta != 0 {
+                    lines.push(format!(
+                        "{}: {}",
+                        t("电力", "Power"),
+                        signed_number(def.power_delta)
+                    ));
+                }
+                if let Some(weapon) = def.weapon {
+                    lines.push(format!(
+                        "{}: {:.0}   {}: {:.1}   {}: {:.1}s",
+                        t("攻击", "Damage"),
+                        weapon.damage,
+                        t("射程", "Range"),
+                        weapon.range,
+                        t("冷却", "Cooldown"),
+                        weapon.cooldown
+                    ));
+                } else if def.resource_capacity > 0 {
+                    lines.push(format!(
+                        "{}: {}",
+                        t("采集载货", "Cargo"),
+                        def.resource_capacity
+                    ));
+                } else if def.is_resource_producer {
+                    lines.push(format!(
+                        "{}: +{}/+{}",
+                        t("资源收入", "Income"),
+                        def.resource_income_ore,
+                        def.resource_income_crystal
+                    ));
+                }
+                if !def.requirements.is_empty() {
+                    let requirements = def
+                        .requirements
+                        .iter()
+                        .map(|requirement| localized_compact_entity_label(requirement))
+                        .collect::<Vec<_>>()
+                        .join(", ");
+                    lines.push(format!("{}: {requirements}", t("需求", "Requires")));
+                }
+                let missing = missing_requirement_labels(def, team, structures);
+                if !missing.is_empty() {
+                    lines.push(format!("{}: {}", t("缺少", "Missing"), missing.join(", ")));
+                }
+                if let Some(queue_state) = command_queue_button_state_for_action(
+                    team,
+                    faction,
+                    action,
+                    selected_structures,
+                    producer_structures,
+                    build_queue,
+                ) {
+                    lines.push(format!(
+                        "{}: {}/{}{}",
+                        t("队列", "Queue"),
+                        queue_state.count,
+                        PRODUCTION_QUEUE_LIMIT,
+                        if queue_state.full {
+                            t(" 已满", " full")
+                        } else {
+                            ""
+                        }
+                    ));
+                }
+            }
+        }
+        BuildAction::SellStructure => {
+            lines.push(format!("{key} {}", t("出售建筑", "Sell structure")));
+            lines.push(
+                t(
+                    "返还部分资源并移除当前选中建筑。",
+                    "Refunds part of the cost and removes the selected structure.",
+                )
+                .to_string(),
+            );
+        }
+        BuildAction::RepairStructure => {
+            lines.push(format!("{key} {}", t("维修建筑", "Repair structure")));
+            lines.push(
+                t(
+                    "消耗资源修复当前受损建筑。",
+                    "Spends resources to repair damaged selected structures.",
+                )
+                .to_string(),
+            );
+        }
+        BuildAction::ToggleDeployMode => {
+            lines.push(format!("{key} {}", t("切换部署", "Toggle deploy")));
+            lines.push(
+                t(
+                    "在机动和架设火力模式之间切换。",
+                    "Switches between mobile and deployed fire mode.",
+                )
+                .to_string(),
+            );
+        }
+        BuildAction::SetRallyPoint => {
+            lines.push(format!("{key} {}", t("设置集结点", "Set rally point")));
+            lines.push(
+                t(
+                    "下一次点地面或目标会设置生产建筑集结点。",
+                    "The next terrain or target click sets the production rally point.",
+                )
+                .to_string(),
+            );
+        }
+        BuildAction::HoldPosition => {
+            lines.push(format!("{key} {}", t("坚守", "Hold position")));
+            lines.push(
+                t(
+                    "单位保持阵位，只攻击进入射程的敌人。",
+                    "Units hold position and only fire at enemies in range.",
+                )
+                .to_string(),
+            );
+        }
+        BuildAction::AttackMove => {
+            lines.push(format!("{key} {}", t("攻击移动", "Attack move")));
+            lines.push(
+                t(
+                    "移动途中主动搜索并攻击敌人。",
+                    "Move while automatically engaging enemies.",
+                )
+                .to_string(),
+            );
+        }
+        BuildAction::Patrol => {
+            lines.push(format!("{key} {}", t("巡逻", "Patrol")));
+            lines.push(
+                t(
+                    "在当前位置和指定地点之间巡逻。",
+                    "Patrol between current position and target point.",
+                )
+                .to_string(),
+            );
+        }
+        BuildAction::GuardArea => {
+            lines.push(format!("{key} {}", t("守卫区域", "Guard area")));
+            lines.push(
+                t(
+                    "守卫附近区域并响应敌人。",
+                    "Guard the nearby area and react to enemies.",
+                )
+                .to_string(),
+            );
+        }
+        BuildAction::StopSelected => {
+            lines.push(format!("{key} {}", t("停止", "Stop")));
+            lines.push(
+                t(
+                    "取消当前命令和未完成动作。",
+                    "Cancels active orders and pending actions.",
+                )
+                .to_string(),
+            );
+        }
+        BuildAction::ScatterSelected => {
+            lines.push(format!("{key} {}", t("散开", "Scatter")));
+            lines.push(
+                t(
+                    "让选中单位短距离分散，减少溅射伤害。",
+                    "Spreads selected units to reduce splash damage.",
+                )
+                .to_string(),
+            );
+        }
+        BuildAction::None => {}
+    }
+    if !enabled {
+        lines.push(format!(
+            "{}: {}",
+            t("状态", "Status"),
+            command_action_unavailable_reason(
+                action,
+                team,
+                faction,
+                selected_structures,
+                producer_structures,
+                structures,
+                build_queue,
+            )
+        ));
+    }
+    lines.join("\n")
+}
+
+fn signed_number(value: i32) -> String {
+    if value > 0 {
+        format!("+{value}")
+    } else {
+        value.to_string()
+    }
+}
+
+fn missing_requirement_labels(
+    entity: &registry::EntityDef,
+    team: Team,
+    structures: &Query<StructurePrereqItem<'_>>,
+) -> Vec<String> {
+    entity
+        .requirements
+        .iter()
+        .filter(|requirement| !team_has_constructed_structure(team, requirement, structures))
+        .map(|requirement| localized_compact_entity_label(requirement))
+        .collect()
+}
+
+fn team_has_constructed_structure(
+    team: Team,
+    requirement: &str,
+    structures: &Query<StructurePrereqItem<'_>>,
+) -> bool {
+    structures
+        .iter()
+        .any(|(structure, structure_team, _, under_construction)| {
+            structure_is_constructed(under_construction)
+                && *structure_team == team
+                && structure.id == requirement
+        })
+}
+
+fn command_action_unavailable_reason(
+    action: BuildAction,
+    team: Team,
+    faction: SkirmishFaction,
+    selected_structures: &Query<SelectedRepairStructureItem<'_>, With<Selected>>,
+    producer_structures: &Query<StructureEntityItem<'_>>,
+    structures: &Query<StructurePrereqItem<'_>>,
+    build_queue: &BuildQueue,
+) -> String {
+    match action {
+        BuildAction::Train(id) | BuildAction::Build(id) => {
+            let Some(def) = registry::entity(id) else {
+                return t("目标不存在", "Missing target").to_string();
+            };
+            let missing = missing_requirement_labels(def, team, structures);
+            if !missing.is_empty() {
+                return format!("{} {}", t("缺少", "Missing"), missing.join(", "));
+            }
+            if matches!(action, BuildAction::Build(_))
+                && faction_def(faction).is_none_or(|faction| !faction.can_construct(id))
+            {
+                return t("当前阵营无法建造", "Faction cannot build this").to_string();
+            }
+            if matches!(action, BuildAction::Train(_)) {
+                let producers = command_queue_producers_for_action(
+                    team,
+                    faction,
+                    action,
+                    selected_structures,
+                    producer_structures,
+                );
+                if producers.is_empty() {
+                    return t("没有可用生产建筑", "No available producer").to_string();
+                }
+                if producers
+                    .iter()
+                    .all(|producer| !build_queue_has_capacity(build_queue, *producer))
+                {
+                    return t("生产队列已满", "Production queue full").to_string();
+                }
+            }
+            t("暂不可用", "Unavailable").to_string()
+        }
+        BuildAction::None => t("无命令", "No command").to_string(),
+        _ => t("当前选择不支持", "Not supported by current selection").to_string(),
     }
 }
 
@@ -26520,6 +27056,15 @@ fn update_mines(
                 },
                 MatchScopedEntity,
             ));
+            spawn_impact_burst(
+                &mut commands,
+                to,
+                target_radius,
+                applied_damage,
+                false,
+                team,
+                ImpactBurstKind::Explosive,
+            );
             if health.current <= 0.0 {
                 if relations.are_allied(target_team, player_team) {
                     match_state.units_lost += 1;
@@ -27953,6 +28498,8 @@ fn combat(
             }
             weapon.cooldown_left = weapon_cooldown_for_faction(attacker_faction, weapon.cooldown);
             for target in zap_targets {
+                let impact_kind =
+                    impact_burst_kind_for_attacker(&weapon, unit, structure, target.is_structure);
                 damage_events.push((
                     target.entity,
                     attack_damage,
@@ -27964,6 +28511,7 @@ fn combat(
                     target.is_structure,
                     target.team,
                     player_factions.faction(target.team),
+                    impact_kind,
                     entity,
                 ));
             }
@@ -28016,6 +28564,8 @@ fn combat(
         }
         weapon.cooldown_left = weapon_cooldown_for_faction(attacker_faction, weapon.cooldown);
         let damage = weapon_damage_against_target(&weapon, attack_damage, target.is_structure);
+        let impact_kind =
+            impact_burst_kind_for_attacker(&weapon, unit, structure, target.is_structure);
         damage_events.push((
             target.entity,
             damage,
@@ -28027,6 +28577,7 @@ fn combat(
             target.is_structure,
             target.team,
             player_factions.faction(target.team),
+            impact_kind,
             entity,
         ));
         if weapon.splash_radius > 0.0 && weapon.splash_damage_multiplier > 0.0 {
@@ -28043,6 +28594,12 @@ fn combat(
                     attack_damage,
                     splash_target.is_structure,
                 ) * weapon.splash_damage_multiplier;
+                let splash_impact_kind = impact_burst_kind_for_attacker(
+                    &weapon,
+                    unit,
+                    structure,
+                    splash_target.is_structure,
+                );
                 damage_events.push((
                     splash_target.entity,
                     splash_damage,
@@ -28054,6 +28611,7 @@ fn combat(
                     splash_target.is_structure,
                     splash_target.team,
                     player_factions.faction(splash_target.team),
+                    splash_impact_kind,
                     entity,
                 ));
             }
@@ -28071,6 +28629,7 @@ fn combat(
         target_is_structure,
         target_team,
         target_faction,
+        impact_kind,
         source,
     ) in damage_events
     {
@@ -28130,6 +28689,7 @@ fn combat(
                 applied_damage,
                 target_is_structure,
                 team,
+                impact_kind,
             );
             latest_battle_event.focus = Some(to);
             if health.current <= 0.0 {
@@ -30014,21 +30574,62 @@ fn draw_impact_burst(
     };
     let progress = 1.0 - life_ratio;
     let [team_r, team_g, team_b] = player_colors.color_rgb(burst.team);
-    let hot = Color::srgba(
-        (0.72 + team_r * 0.28).min(1.0),
-        (0.46 + team_g * 0.30).min(1.0),
-        (0.20 + team_b * 0.24).min(1.0),
-        0.36 + life_ratio * 0.48,
-    );
-    let core = Color::srgba(1.0, 0.88, 0.48, 0.42 + life_ratio * 0.48);
-    let smoke = Color::srgba(
-        0.22 + team_r * 0.08,
-        0.20 + team_g * 0.07,
-        0.18 + team_b * 0.06,
-        0.20 * life_ratio,
-    );
+    let (hot, core, smoke, spark_count, ground_scale) = match burst.kind {
+        ImpactBurstKind::Ballistic => (
+            Color::srgba(
+                (0.76 + team_r * 0.18).min(1.0),
+                (0.72 + team_g * 0.18).min(1.0),
+                (0.56 + team_b * 0.18).min(1.0),
+                0.32 + life_ratio * 0.44,
+            ),
+            Color::srgba(1.0, 0.92, 0.66, 0.48 + life_ratio * 0.4),
+            Color::srgba(0.18, 0.17, 0.15, 0.12 * life_ratio),
+            5,
+            0.82,
+        ),
+        ImpactBurstKind::Explosive => (
+            Color::srgba(1.0, 0.48, 0.12, 0.42 + life_ratio * 0.46),
+            Color::srgba(1.0, 0.88, 0.34, 0.50 + life_ratio * 0.48),
+            Color::srgba(0.28 + team_r * 0.05, 0.24, 0.20, 0.28 * life_ratio),
+            10,
+            1.22,
+        ),
+        ImpactBurstKind::Energy => (
+            Color::srgba(0.30, 0.88, 1.0, 0.36 + life_ratio * 0.46),
+            Color::srgba(0.82, 1.0, 1.0, 0.56 + life_ratio * 0.42),
+            Color::srgba(0.08, 0.22, 0.28, 0.18 * life_ratio),
+            8,
+            1.0,
+        ),
+        ImpactBurstKind::Electric => (
+            Color::srgba(0.38, 0.64, 1.0, 0.40 + life_ratio * 0.50),
+            Color::srgba(0.72, 0.98, 1.0, 0.62 + life_ratio * 0.38),
+            Color::srgba(0.13, 0.08, 0.28, 0.18 * life_ratio),
+            9,
+            1.06,
+        ),
+        ImpactBurstKind::Fire => (
+            Color::srgba(1.0, 0.24, 0.08, 0.42 + life_ratio * 0.46),
+            Color::srgba(1.0, 0.70, 0.20, 0.54 + life_ratio * 0.44),
+            Color::srgba(0.24, 0.10, 0.05, 0.26 * life_ratio),
+            11,
+            1.12,
+        ),
+        ImpactBurstKind::Heavy => (
+            Color::srgba(1.0, 0.64, 0.20, 0.40 + life_ratio * 0.46),
+            Color::srgba(1.0, 0.92, 0.44, 0.48 + life_ratio * 0.46),
+            Color::srgba(
+                0.16 + team_r * 0.06,
+                0.16 + team_g * 0.06,
+                0.15,
+                0.34 * life_ratio,
+            ),
+            12,
+            1.36,
+        ),
+    };
     let center = Vec3::new(position.x, 0.12 + burst.power * 0.04, position.z);
-    let ground_radius = burst.radius * (0.35 + progress * 1.15);
+    let ground_radius = burst.radius * ground_scale * (0.35 + progress * 1.15);
     gizmos.circle(
         Isometry3d::new(center, Quat::from_rotation_arc(Vec3::Z, Vec3::Y)),
         ground_radius,
@@ -30047,13 +30648,61 @@ fn draw_impact_burst(
         center + Vec3::Y * (0.32 + burst.power * 0.28) * life_ratio.max(0.2),
         core,
     );
-    for i in 0..7 {
-        let angle = i as f32 * std::f32::consts::TAU / 7.0 + burst.power * 0.41;
+    for i in 0..spark_count {
+        let angle = i as f32 * std::f32::consts::TAU / spark_count as f32 + burst.power * 0.41;
         let outward = Vec3::new(angle.cos(), 0.16 + progress * 0.18, angle.sin()).normalize();
         let start = center + outward * (burst.radius * 0.14);
         let end = center + outward * (burst.radius * (0.46 + burst.power * 0.18) * life_ratio);
         let color = if i % 2 == 0 { core } else { hot };
         hud.line(start, end, color);
+    }
+    match burst.kind {
+        ImpactBurstKind::Electric => {
+            for i in 0..4 {
+                let angle = i as f32 * std::f32::consts::FRAC_PI_2 + progress * 2.4;
+                let side = Vec3::new(angle.cos(), 0.0, angle.sin());
+                let start = center + side * burst.radius * 0.2 + Vec3::Y * 0.12;
+                let mid = center
+                    + Vec3::new(-side.z, 0.0, side.x) * burst.radius * 0.22
+                    + side * burst.radius * 0.5
+                    + Vec3::Y * (0.32 + burst.power * 0.12);
+                let end = center + side * burst.radius * 0.88 + Vec3::Y * 0.16;
+                hud.line(start, mid, core);
+                hud.line(mid, end, hot);
+            }
+        }
+        ImpactBurstKind::Energy => {
+            gizmos.circle(
+                Isometry3d::new(
+                    center + Vec3::Y * (0.15 + burst.power * 0.08),
+                    Quat::from_rotation_arc(Vec3::Z, Vec3::Y),
+                ),
+                burst.radius * (0.34 + progress * 0.78),
+                core,
+            );
+        }
+        ImpactBurstKind::Fire => {
+            for i in 0..5 {
+                let angle = i as f32 * std::f32::consts::TAU / 5.0 + progress;
+                let base = center + Vec3::new(angle.cos(), 0.0, angle.sin()) * burst.radius * 0.24;
+                hud.line(
+                    base,
+                    base + Vec3::Y * (0.34 + burst.power * 0.20) * life_ratio.max(0.25),
+                    if i % 2 == 0 { hot } else { core },
+                );
+            }
+        }
+        ImpactBurstKind::Explosive | ImpactBurstKind::Heavy => {
+            gizmos.circle(
+                Isometry3d::new(
+                    center + Vec3::Y * 0.03,
+                    Quat::from_rotation_arc(Vec3::Z, Vec3::Y),
+                ),
+                burst.radius * (0.55 + progress * 0.95),
+                smoke,
+            );
+        }
+        ImpactBurstKind::Ballistic => {}
     }
 }
 
@@ -30876,6 +31525,52 @@ mod current_tests {
             impact_burst_lifetime(structure_hit) > impact_burst_lifetime(infantry_hit),
             "larger bursts should stay visible for more frames"
         );
+    }
+
+    #[test]
+    fn impact_burst_kind_tracks_weapon_family() {
+        let rifle = Weapon::new(4.0, 4.0, 0.8, 0.0, 0.0, 1.0, false, true);
+        let rocket = Weapon::new(6.0, 10.0, 1.4, 1.0, 0.45, 1.2, true, true);
+
+        assert_eq!(
+            impact_burst_kind_for_entity_id("HeavyMachinegunTrooper", &rifle, false),
+            ImpactBurstKind::Ballistic
+        );
+        assert_eq!(
+            impact_burst_kind_for_entity_id("RocketInfantry", &rocket, false),
+            ImpactBurstKind::Explosive
+        );
+        assert_eq!(
+            impact_burst_kind_for_entity_id("TeslaCrawlerMk2", &rifle, false),
+            ImpactBurstKind::Electric
+        );
+        assert_eq!(
+            impact_burst_kind_for_entity_id("FlameAssaultBuggy", &rifle, false),
+            ImpactBurstKind::Fire
+        );
+        assert_eq!(
+            impact_burst_kind_for_entity_id("RailCannonBunker", &rifle, true),
+            ImpactBurstKind::Heavy
+        );
+    }
+
+    #[test]
+    fn worker_build_menu_orders_opening_before_late_tech() {
+        let faction = faction_def(SkirmishFaction::Alliance).expect("alliance faction");
+        let ordered = sorted_worker_build_structures(faction);
+        let position = |id: &str| {
+            ordered
+                .iter()
+                .position(|candidate| *candidate == id)
+                .unwrap_or_else(|| panic!("missing build structure {id}"))
+        };
+
+        assert_eq!(ordered.first(), Some(&"PowerReactor"));
+        assert!(position("PowerReactor") < position("Refinery"));
+        assert!(position("Refinery") < position("Barracks"));
+        assert!(position("Barracks") < position("VehicleFactory"));
+        assert!(position("VehicleFactory") < position("TechLab"));
+        assert!(position("TechLab") < position("WeatherControlSpire"));
     }
 
     #[test]
