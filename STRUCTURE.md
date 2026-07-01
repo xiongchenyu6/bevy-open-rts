@@ -19,6 +19,7 @@
 - Resource nodes are left-click selectable for target confirmation, and selected Workers use a wider resource-specific right-click snap so clicking the visible ore/crystal model edge still issues `HarvestOrder`.
 - Manual structure placement assigns selected construction-capable Workers to the foundation, with a nearest-owned-Worker fallback so a valid player placement enters real construction instead of remaining an idle foundation.
 - World overlays keep selected rings, resource/supply rings, active command markers, and the current placement footprint. Unselected structures and construction-range anchors no longer draw permanent rings.
+- Support powers render as a Godot-style top-right nine-button strip with F1-F9 hotkeys, icon badges for locked/cooldown states, shared command tooltip text, and tight HUD hit testing so arming a support power is not canceled by clicking the strip.
 - Runtime player state is data-driven from `ActiveTeams` / `MatchSetupSettings`: economies, team relations, AI timers, support cooldowns, HUD counts, and match-end checks grow by player index instead of assuming three hard-coded teams.
 - `Team` is runtime identity only (`Player(index)` / `Neutral`). Playable faction identity comes from `PlayerFactions`, so 人族/魔族/混沌族 rules follow the configured player slot instead of being tied to Player0/1/2.
 - Lobby team buttons remain an 8-row setup UI concern, but runtime team IDs are stored and derived as unbounded `usize` values. The battle core no longer clamps alliances to three teams or to the current lobby button count.

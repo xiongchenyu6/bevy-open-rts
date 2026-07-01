@@ -112,6 +112,18 @@ const COMMAND_SLOT_COUNT: usize = 24;
 const COMMAND_TOOLTIP_WIDTH_PX: f32 = 330.0;
 const COMMAND_TOOLTIP_OFFSET_X_PX: f32 = 18.0;
 const COMMAND_TOOLTIP_OFFSET_Y_PX: f32 = 92.0;
+const SUPPORT_POWER_BUTTON_SIZE_PX: f32 = 64.0;
+const SUPPORT_POWER_BUTTON_GAP_PX: f32 = 5.0;
+const SUPPORT_POWER_PANEL_PADDING_PX: f32 = 5.0;
+const SUPPORT_POWER_PANEL_TOP_PX: f32 = 8.0;
+const SUPPORT_POWER_PANEL_RIGHT_PX: f32 = 12.0;
+const SUPPORT_POWER_PANEL_WIDTH_PX: f32 = SUPPORT_POWER_PANEL_PADDING_PX * 2.0
+    + SUPPORT_POWER_BUTTON_SIZE_PX * 9.0
+    + SUPPORT_POWER_BUTTON_GAP_PX * 8.0;
+const SUPPORT_POWER_PANEL_HEIGHT_PX: f32 =
+    SUPPORT_POWER_PANEL_PADDING_PX * 2.0 + SUPPORT_POWER_BUTTON_SIZE_PX;
+const OBJECTIVE_TRACKER_TOP_PX: f32 =
+    SUPPORT_POWER_PANEL_TOP_PX + SUPPORT_POWER_PANEL_HEIGHT_PX + 8.0;
 const COMMAND_KEY_CANCEL: &str = "cancel";
 const COMMAND_KEY_GUARD_AREA: &str = "guard_area";
 const COMMAND_KEY_SCATTER: &str = "scatter";
@@ -529,6 +541,34 @@ impl SupportPowerKind {
             Self::WeatherStorm => KeyCode::F7,
             Self::StrategicMissile => KeyCode::F8,
             Self::Paradrop => KeyCode::F9,
+        }
+    }
+
+    fn hotkey_label(self) -> &'static str {
+        match self {
+            Self::RadarSweep => "F1",
+            Self::OrbitalStrike => "F2",
+            Self::EmpPulse => "F3",
+            Self::ChronoRelay => "F4",
+            Self::ShieldOverdrive => "F5",
+            Self::NaniteRepairSwarm => "F6",
+            Self::WeatherStorm => "F7",
+            Self::StrategicMissile => "F8",
+            Self::Paradrop => "F9",
+        }
+    }
+
+    fn icon_path(self) -> &'static str {
+        match self {
+            Self::RadarSweep => "ui/icons/RadarSweep.png",
+            Self::OrbitalStrike => "ui/icons/OrbitalStrike.png",
+            Self::EmpPulse => "ui/icons/EmpPulse.png",
+            Self::ChronoRelay => "ui/icons/ChronoRelay.png",
+            Self::ShieldOverdrive => "ui/icons/ShieldOverdrive.png",
+            Self::NaniteRepairSwarm => "ui/icons/NaniteRepairSwarm.png",
+            Self::WeatherStorm => "ui/icons/WeatherStorm.png",
+            Self::StrategicMissile => "ui/icons/StrategicMissile.png",
+            Self::Paradrop => "ui/icons/Paradrop.png",
         }
     }
 
@@ -6229,8 +6269,25 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
     )
     .add_systems(
         Update,
+        support_power_buttons
+            .after(issue_orders)
+            .after(select_entities)
+            .in_set(SimulationPhase::UiAndManagement)
+            .run_if(match_in_progress),
+    )
+    .add_systems(
+        Update,
+        refresh_support_power_panel
+            .after(update_support_cooldowns)
+            .after(support_power_buttons)
+            .in_set(SimulationPhase::UiAndManagement)
+            .run_if(match_in_progress),
+    )
+    .add_systems(
+        Update,
         update_command_tooltip
             .after(refresh_command_panel)
+            .after(refresh_support_power_panel)
             .in_set(SimulationPhase::UiAndManagement)
             .run_if(match_in_progress),
     )
@@ -8058,10 +8115,56 @@ struct CommandTooltip;
 #[derive(Component)]
 struct CommandTooltipText;
 
+#[derive(Component)]
+struct SupportPowersPanel;
+
+#[derive(Component, Clone, Copy)]
+struct SupportPowerButton {
+    kind: SupportPowerKind,
+}
+
+#[derive(Component, Clone, Copy)]
+struct SupportPowerCooldownLabel {
+    kind: SupportPowerKind,
+}
+
+#[derive(Component, Clone, Copy)]
+struct SupportPowerHotkeyLabel {
+    kind: SupportPowerKind,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct SupportPowerButtonSpec {
+    kind: SupportPowerKind,
+    icon_path: &'static str,
+    hotkey_label: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct SupportPowerButtonState {
+    enabled: bool,
+    unlocked: bool,
+    active: bool,
+    low_power: bool,
+    cooldown_seconds: Option<u32>,
+    badge_text: String,
+}
+
 impl Default for CommandSlotAvailability {
     fn default() -> Self {
         Self { enabled: false }
     }
+}
+
+fn support_power_button_specs() -> Vec<SupportPowerButtonSpec> {
+    SupportPowerKind::ALL
+        .into_iter()
+        .map(|kind| SupportPowerButtonSpec {
+            kind,
+            icon_path: kind.icon_path(),
+            hotkey_label: kind.hotkey_label(),
+        })
+        .collect()
 }
 
 fn apply_match_setup_settings(
@@ -14114,7 +14217,7 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
         .spawn((
             Node {
                 position_type: PositionType::Absolute,
-                top: px(12),
+                top: px(OBJECTIVE_TRACKER_TOP_PX),
                 left: px(0),
                 right: px(0),
                 flex_direction: FlexDirection::Column,
@@ -14185,6 +14288,7 @@ fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
     setup_match_end_overlay(commands, font.clone());
     setup_match_menu_overlay(commands, font.clone());
     setup_match_briefing(commands, font.clone());
+    setup_support_power_panel(commands, font.clone(), asset_server);
 
     // godot: production queue stacked directly above the command grid, both pinned to
     // the bottom-right corner. A column container so the queue always hugs the top of
@@ -16203,6 +16307,104 @@ fn setup_command_tooltip(commands: &mut Commands, font: Handle<Font>) {
         });
 }
 
+fn setup_support_power_panel(
+    commands: &mut Commands,
+    font: Handle<Font>,
+    asset_server: &AssetServer,
+) {
+    commands
+        .spawn((
+            Name::new("Support Powers"),
+            SupportPowersPanel,
+            GlobalZIndex(18),
+            Node {
+                position_type: PositionType::Absolute,
+                top: px(SUPPORT_POWER_PANEL_TOP_PX),
+                right: px(SUPPORT_POWER_PANEL_RIGHT_PX),
+                flex_direction: FlexDirection::Row,
+                align_items: AlignItems::Center,
+                column_gap: px(SUPPORT_POWER_BUTTON_GAP_PX),
+                padding: UiRect::all(px(SUPPORT_POWER_PANEL_PADDING_PX)),
+                border: UiRect::all(px(1)),
+                ..default()
+            },
+            BorderColor::all(Color::srgb(0.25, 0.38, 0.38)),
+            BackgroundColor(Color::srgba(0.02, 0.035, 0.04, 0.82)),
+            MatchScopedEntity,
+        ))
+        .with_children(|panel| {
+            for spec in support_power_button_specs() {
+                panel
+                    .spawn(support_power_button(spec.kind))
+                    .with_children(|button| {
+                        button.spawn((
+                            ImageNode::new(asset_server.load(spec.icon_path)),
+                            Node {
+                                width: px(58),
+                                height: px(58),
+                                ..default()
+                            },
+                        ));
+                        button.spawn((
+                            Text::new(spec.hotkey_label),
+                            TextFont {
+                                font: font.clone().into(),
+                                font_size: FontSize::Px(11.0),
+                                ..default()
+                            },
+                            TextColor(Color::srgb(0.78, 0.96, 0.92)),
+                            TextLayout::justify(Justify::Center),
+                            Node {
+                                position_type: PositionType::Absolute,
+                                left: px(3),
+                                top: px(2),
+                                width: px(28),
+                                ..default()
+                            },
+                            SupportPowerHotkeyLabel { kind: spec.kind },
+                        ));
+                        button.spawn((
+                            Text::new(""),
+                            TextFont {
+                                font: font.clone().into(),
+                                font_size: FontSize::Px(13.0),
+                                ..default()
+                            },
+                            TextColor(Color::srgb(0.98, 0.84, 0.42)),
+                            TextLayout::justify(Justify::Center),
+                            Node {
+                                position_type: PositionType::Absolute,
+                                left: px(0),
+                                right: px(0),
+                                bottom: px(2),
+                                ..default()
+                            },
+                            SupportPowerCooldownLabel { kind: spec.kind },
+                        ));
+                    });
+            }
+        });
+}
+
+fn support_power_button(kind: SupportPowerKind) -> impl Bundle {
+    (
+        Button,
+        SupportPowerButton { kind },
+        Node {
+            position_type: PositionType::Relative,
+            width: px(SUPPORT_POWER_BUTTON_SIZE_PX),
+            height: px(SUPPORT_POWER_BUTTON_SIZE_PX),
+            border: UiRect::all(px(1)),
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            padding: UiRect::all(px(0)),
+            ..default()
+        },
+        BorderColor::all(Color::srgb(0.32, 0.42, 0.46)),
+        BackgroundColor(Color::srgba(0.035, 0.045, 0.055, 0.9)),
+    )
+}
+
 fn production_queue_slot(index: usize) -> impl Bundle {
     (
         Button,
@@ -16863,7 +17065,7 @@ fn minimap_input(
     let Some(local) = cursor_minimap_local(window) else {
         return;
     };
-    disarm_support_power_on_left_click(&mut order_resources.command_mode, &mouse);
+    disarm_support_power_on_left_click(&mut order_resources.command_mode, &mouse, false);
 
     let visible_team = visible_player.team;
     if radar_state_for_team(visible_team, &economies, &world_q) != MinimapRadarState::Online {
@@ -17144,7 +17346,7 @@ fn select_entities(
         return;
     };
 
-    disarm_support_power_on_left_click(&mut command_mode, &mouse);
+    disarm_support_power_on_left_click(&mut command_mode, &mouse, cursor_is_over_hud(window));
 
     if mouse.just_pressed(MouseButton::Left) {
         drag_state.active = true;
@@ -17394,8 +17596,12 @@ fn cancel_selection_drag(drag_state: &mut SelectionDragState) {
 fn disarm_support_power_on_left_click(
     command_mode: &mut CommandMode,
     mouse: &ButtonInput<MouseButton>,
+    cursor_over_hud: bool,
 ) -> bool {
-    if mouse.just_pressed(MouseButton::Left) && command_mode.support_power.is_some() {
+    if mouse.just_pressed(MouseButton::Left)
+        && command_mode.support_power.is_some()
+        && !cursor_over_hud
+    {
         command_mode.support_power = None;
         return true;
     }
@@ -19398,6 +19604,297 @@ fn player_support_power_available(
         && support_requirements_met(team, def.requirements, structures)
 }
 
+fn support_power_button_state(
+    power: SupportPowerKind,
+    unlocked: bool,
+    low_power: bool,
+    cooldown_remaining: f32,
+    active: bool,
+) -> SupportPowerButtonState {
+    let cooldown_seconds = (cooldown_remaining > 0.0).then_some(cooldown_remaining.ceil() as u32);
+    let enabled = unlocked
+        && (!power.definition().requires_power || !low_power)
+        && cooldown_seconds.is_none();
+    let badge_text = if !unlocked {
+        t("锁", "LOCK").to_string()
+    } else {
+        cooldown_seconds.map_or_else(String::new, |seconds| seconds.to_string())
+    };
+    SupportPowerButtonState {
+        enabled,
+        unlocked,
+        active: active && enabled,
+        low_power,
+        cooldown_seconds,
+        badge_text,
+    }
+}
+
+fn support_power_missing_requirement_labels(
+    team: Team,
+    requirements: &[&'static str],
+    structures: &Query<StructurePrereqItem<'_>>,
+) -> Vec<String> {
+    requirements
+        .iter()
+        .filter(|requirement| !team_has_constructed_structure(team, requirement, structures))
+        .map(|requirement| localized_compact_entity_label(requirement))
+        .collect()
+}
+
+fn support_power_requirement_text(requirements: &[&'static str]) -> String {
+    if requirements.is_empty() {
+        return t("无", "None").to_string();
+    }
+    requirements
+        .iter()
+        .map(|requirement| localized_compact_entity_label(requirement))
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
+fn support_power_tooltip(
+    power: SupportPowerKind,
+    state: &SupportPowerButtonState,
+    missing_requirements: &[String],
+) -> String {
+    let def = power.definition();
+    let mut lines = vec![
+        format!("{}  {}", power.hotkey_label(), power.label()),
+        format!("{}: {:.0}s", t("冷却", "Cooldown"), def.cooldown),
+        format!(
+            "{}: {}",
+            t("需求", "Requires"),
+            support_power_requirement_text(def.requirements)
+        ),
+        format!("{}: {:.1}", t("半径", "Radius"), def.radius),
+    ];
+    if def.damage > 0.0 {
+        lines.push(format!("{}: {:.0}", t("伤害", "Damage"), def.damage));
+    }
+    if def.healing > 0.0 {
+        lines.push(format!("{}: {:.0}", t("治疗", "Healing"), def.healing));
+    }
+    if def.duration > 0.0 {
+        lines.push(format!("{}: {:.0}s", t("持续", "Duration"), def.duration));
+    }
+    if def.impact_delay > 0.0 {
+        lines.push(format!(
+            "{}: {:.1}s",
+            t("落点延迟", "Impact Delay"),
+            def.impact_delay
+        ));
+    }
+    if !missing_requirements.is_empty() {
+        lines.push(format!(
+            "{}: {}",
+            t("缺少科技", "Missing tech"),
+            missing_requirements.join(", ")
+        ));
+    } else if state.low_power && def.requires_power {
+        lines.push(t("低电力: 支援离线", "Low power: support offline").to_string());
+    } else if let Some(seconds) = state.cooldown_seconds {
+        lines.push(format!("{}: {seconds}s", t("冷却中", "Cooling down")));
+    } else if state.active {
+        lines.push(t("选择目标位置", "Choose a target position").to_string());
+    } else if state.enabled {
+        lines.push(t("就绪: 点击后选择目标", "Ready: click then choose a target").to_string());
+    } else {
+        lines.push(t("不可用", "Unavailable").to_string());
+    }
+    lines.join("\n")
+}
+
+fn support_power_button_colors(
+    state: &SupportPowerButtonState,
+    interaction: Interaction,
+) -> (Color, Color) {
+    if state.active {
+        return (
+            Color::srgba(0.18, 0.14, 0.04, 0.97),
+            Color::srgb(0.96, 0.72, 0.24),
+        );
+    }
+    if !state.unlocked {
+        return (
+            Color::srgba(0.045, 0.052, 0.056, 0.72),
+            Color::srgb(0.58, 0.34, 0.18),
+        );
+    }
+    if !state.enabled {
+        return (
+            Color::srgba(0.045, 0.052, 0.06, 0.74),
+            Color::srgb(0.22, 0.28, 0.31),
+        );
+    }
+    match interaction {
+        Interaction::Pressed => (
+            Color::srgba(0.14, 0.24, 0.28, 0.97),
+            Color::srgb(0.42, 0.72, 0.76),
+        ),
+        Interaction::Hovered => (
+            Color::srgba(0.08, 0.12, 0.14, 0.94),
+            Color::srgb(0.34, 0.58, 0.60),
+        ),
+        Interaction::None => (
+            Color::srgba(0.035, 0.045, 0.055, 0.9),
+            Color::srgb(0.32, 0.42, 0.46),
+        ),
+    }
+}
+
+fn support_power_badge_color(state: &SupportPowerButtonState) -> TextColor {
+    if !state.unlocked {
+        TextColor(Color::srgb(1.0, 0.56, 0.24))
+    } else if state.cooldown_seconds.is_some() {
+        TextColor(Color::srgb(0.98, 0.84, 0.42))
+    } else if state.low_power {
+        TextColor(Color::srgb(1.0, 0.42, 0.32))
+    } else {
+        TextColor(Color::srgb(0.98, 0.84, 0.42))
+    }
+}
+
+fn support_power_hotkey_color(state: &SupportPowerButtonState) -> TextColor {
+    if state.enabled || state.active {
+        TextColor(Color::srgb(0.78, 0.96, 0.92))
+    } else {
+        TextColor(Color::srgba(0.56, 0.68, 0.68, 0.78))
+    }
+}
+
+fn refresh_support_power_panel(
+    visible_player: Res<VisiblePlayer>,
+    economies: Res<Economies>,
+    support_cooldowns: Res<SupportCooldowns>,
+    command_mode: Res<CommandMode>,
+    structures: Query<StructurePrereqItem<'_>>,
+    mut panel_q: Query<
+        &mut Visibility,
+        (
+            With<SupportPowersPanel>,
+            Without<SupportPowerButton>,
+            Without<SupportPowerCooldownLabel>,
+            Without<SupportPowerHotkeyLabel>,
+        ),
+    >,
+    mut buttons: Query<
+        (
+            &SupportPowerButton,
+            &Interaction,
+            &mut BackgroundColor,
+            &mut BorderColor,
+        ),
+        (
+            Without<SupportPowersPanel>,
+            Without<SupportPowerCooldownLabel>,
+            Without<SupportPowerHotkeyLabel>,
+        ),
+    >,
+    mut cooldown_labels: Query<
+        (&SupportPowerCooldownLabel, &mut Text, &mut TextColor),
+        (
+            Without<SupportPowersPanel>,
+            Without<SupportPowerButton>,
+            Without<SupportPowerHotkeyLabel>,
+        ),
+    >,
+    mut hotkey_labels: Query<
+        (&SupportPowerHotkeyLabel, &mut TextColor),
+        (
+            Without<SupportPowersPanel>,
+            Without<SupportPowerButton>,
+            Without<SupportPowerCooldownLabel>,
+        ),
+    >,
+) {
+    let Some(team) = controlled_player_team(Some(&*visible_player)) else {
+        for mut visibility in &mut panel_q {
+            *visibility = Visibility::Hidden;
+        }
+        return;
+    };
+    for mut visibility in &mut panel_q {
+        *visibility = Visibility::Inherited;
+    }
+    let low_power = economies.get(team).low_power();
+    for (button, interaction, mut background, mut border) in &mut buttons {
+        let unlocked =
+            support_requirements_met(team, button.kind.definition().requirements, &structures);
+        let state = support_power_button_state(
+            button.kind,
+            unlocked,
+            low_power,
+            support_cooldowns.remaining_for(team, button.kind),
+            command_mode.support_power == Some(button.kind),
+        );
+        let (bg, border_color) = support_power_button_colors(&state, *interaction);
+        *background = BackgroundColor(bg);
+        *border = BorderColor::all(border_color);
+    }
+    for (label, mut text, mut text_color) in &mut cooldown_labels {
+        let unlocked =
+            support_requirements_met(team, label.kind.definition().requirements, &structures);
+        let state = support_power_button_state(
+            label.kind,
+            unlocked,
+            low_power,
+            support_cooldowns.remaining_for(team, label.kind),
+            command_mode.support_power == Some(label.kind),
+        );
+        **text = state.badge_text.clone();
+        *text_color = support_power_badge_color(&state);
+    }
+    for (label, mut text_color) in &mut hotkey_labels {
+        let unlocked =
+            support_requirements_met(team, label.kind.definition().requirements, &structures);
+        let state = support_power_button_state(
+            label.kind,
+            unlocked,
+            low_power,
+            support_cooldowns.remaining_for(team, label.kind),
+            command_mode.support_power == Some(label.kind),
+        );
+        *text_color = support_power_hotkey_color(&state);
+    }
+}
+
+fn support_power_buttons(
+    mouse: Res<ButtonInput<MouseButton>>,
+    visible_player: Res<VisiblePlayer>,
+    economies: Res<Economies>,
+    support_cooldowns: Res<SupportCooldowns>,
+    structures: Query<StructurePrereqItem<'_>>,
+    mut command_mode: ResMut<CommandMode>,
+    buttons: Query<(&Interaction, &SupportPowerButton)>,
+) {
+    if !mouse.just_pressed(MouseButton::Left) {
+        return;
+    }
+    let Some(team) = controlled_player_team(Some(&*visible_player)) else {
+        command_mode.support_power = None;
+        return;
+    };
+    let Some((_, button)) = buttons
+        .iter()
+        .filter(|(interaction, _)| **interaction == Interaction::Pressed)
+        .min_by_key(|(_, button)| button.kind.idx())
+    else {
+        return;
+    };
+    if player_support_power_available(
+        team,
+        button.kind,
+        &economies,
+        &support_cooldowns,
+        &structures,
+    ) {
+        toggle_support_power_mode(&mut command_mode, button.kind);
+    } else if command_mode.support_power == Some(button.kind) {
+        command_mode.support_power = None;
+    }
+}
+
 fn command_queue_controls(
     mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
@@ -20206,6 +20703,9 @@ fn update_command_tooltip(
     build_queue: Res<BuildQueue>,
     visible_player: Res<VisiblePlayer>,
     player_factions: Res<PlayerFactions>,
+    economies: Res<Economies>,
+    support_cooldowns: Res<SupportCooldowns>,
+    command_mode: Res<CommandMode>,
     window_q: Query<&Window, With<PrimaryWindow>>,
     selected_structures: Query<SelectedRepairStructureItem<'_>, With<Selected>>,
     producer_structures: Query<StructureEntityItem<'_>>,
@@ -20216,6 +20716,7 @@ fn update_command_tooltip(
         &CommandSlotAvailability,
         &Interaction,
     )>,
+    support_button_q: Query<(&SupportPowerButton, &Interaction)>,
     mut tooltip_q: Query<(&mut Node, &mut Visibility), With<CommandTooltip>>,
     mut text_q: Query<&mut Text, With<CommandTooltipText>>,
 ) {
@@ -20237,6 +20738,31 @@ fn update_command_tooltip(
         *tooltip_visibility = Visibility::Hidden;
         return;
     };
+    if let Some((button, _)) = support_button_q
+        .iter()
+        .filter(|(_, interaction)| {
+            matches!(interaction, Interaction::Hovered | Interaction::Pressed)
+        })
+        .min_by_key(|(button, _)| button.kind.idx())
+    {
+        let missing_requirements = support_power_missing_requirement_labels(
+            visible_team,
+            button.kind.definition().requirements,
+            &structures,
+        );
+        let low_power = economies.get(visible_team).low_power();
+        let state = support_power_button_state(
+            button.kind,
+            missing_requirements.is_empty(),
+            low_power,
+            support_cooldowns.remaining_for(visible_team, button.kind),
+            command_mode.support_power == Some(button.kind),
+        );
+        **tooltip_text = support_power_tooltip(button.kind, &state, &missing_requirements);
+        position_command_tooltip(&mut tooltip_node, window, cursor);
+        *tooltip_visibility = Visibility::Inherited;
+        return;
+    }
     let Some((slot, action, availability, _)) = slot_q
         .iter()
         .filter(|(_, action, _, interaction)| {
@@ -20261,6 +20787,11 @@ fn update_command_tooltip(
         &structures,
         &build_queue,
     );
+    position_command_tooltip(&mut tooltip_node, window, cursor);
+    *tooltip_visibility = Visibility::Inherited;
+}
+
+fn position_command_tooltip(tooltip_node: &mut Node, window: &Window, cursor: Vec2) {
     let max_left = (window.width() - COMMAND_TOOLTIP_WIDTH_PX - 8.0).max(8.0);
     let left = (cursor.x + COMMAND_TOOLTIP_OFFSET_X_PX).clamp(8.0, max_left);
     let raw_top = if cursor.y > COMMAND_TOOLTIP_OFFSET_Y_PX + 12.0 {
@@ -20270,7 +20801,6 @@ fn update_command_tooltip(
     };
     tooltip_node.left = px(left);
     tooltip_node.top = px(raw_top.clamp(8.0, (window.height() - 120.0).max(8.0)));
-    *tooltip_visibility = Visibility::Inherited;
 }
 
 #[allow(dead_code)]
@@ -29134,9 +29664,7 @@ fn update_hud(
         } else {
             String::new()
         };
-        let support_status =
-            support_hud_status_text(visible_team, &support_cooldowns, command_mode.support_power);
-        **text = format!("{mode_text}{support_status}").trim().to_string();
+        **text = mode_text.trim().to_string();
     }
 
     if let Ok(mut text) = selection_text.single_mut() {
@@ -29350,41 +29878,6 @@ fn exact_control_group_slot(
         .iter()
         .position(|slot| is_exact_current_selection(selected_entities, slot))
         .map(|index| index + 1)
-}
-
-fn support_hud_status_text(
-    team: Team,
-    support_cooldowns: &SupportCooldowns,
-    active_power: Option<SupportPowerKind>,
-) -> String {
-    if let Some(power) = active_power {
-        return format!(" {}:{}", t("支援", "Support"), power.label());
-    }
-    let cooling = SupportPowerKind::ALL
-        .into_iter()
-        .filter_map(|power| {
-            let remaining = support_cooldowns.remaining_for(team, power);
-            (remaining > 0.0).then_some((power.label(), remaining.ceil() as u32))
-        })
-        .collect::<Vec<_>>();
-    if cooling.is_empty() {
-        return String::new();
-    }
-    let preview = cooling
-        .iter()
-        .take(2)
-        .map(|(label, remaining)| format!("{label} {remaining}s"))
-        .collect::<Vec<_>>()
-        .join("/");
-    if cooling.len() > 2 {
-        format!(
-            " {}:{preview}+{}",
-            t("支援CD", "Support CD"),
-            cooling.len() - 2
-        )
-    } else {
-        format!(" {}:{preview}", t("支援CD", "Support CD"))
-    }
 }
 
 #[derive(Clone, Copy)]
@@ -30956,6 +31449,7 @@ fn cursor_is_over_hud(window: &Window) -> bool {
     };
     cursor_is_over_top_status_hud(cursor)
         || cursor.y > window.height() - 148.0
+        || support_power_panel_contains_cursor(window, cursor)
         || battle_log_contains_cursor(window, cursor)
         || minimap_contains_cursor(window, cursor)
 }
@@ -30966,6 +31460,7 @@ fn cursor_is_over_top_status_hud(cursor: Vec2) -> bool {
 
 fn cursor_blocks_world_order_controls(window: &Window, cursor: Vec2) -> bool {
     cursor.y > window.height() - 148.0
+        || support_power_panel_contains_cursor(window, cursor)
         || battle_log_contains_cursor(window, cursor)
         || minimap_contains_cursor(window, cursor)
 }
@@ -30978,6 +31473,16 @@ fn battle_log_contains_cursor(window: &Window, cursor: Vec2) -> bool {
         && cursor.x <= min_x + BATTLE_LOG_WIDTH_PX
         && cursor.y >= BATTLE_LOG_TOP_PX
         && cursor.y <= BATTLE_LOG_TOP_PX + BATTLE_LOG_HIT_HEIGHT_PX
+}
+
+fn support_power_panel_contains_cursor(window: &Window, cursor: Vec2) -> bool {
+    let left =
+        (window.width() - SUPPORT_POWER_PANEL_RIGHT_PX - SUPPORT_POWER_PANEL_WIDTH_PX).max(0.0);
+    let right = window.width() - SUPPORT_POWER_PANEL_RIGHT_PX;
+    cursor.x >= left
+        && cursor.x <= right
+        && cursor.y >= SUPPORT_POWER_PANEL_TOP_PX
+        && cursor.y <= SUPPORT_POWER_PANEL_TOP_PX + SUPPORT_POWER_PANEL_HEIGHT_PX
 }
 
 fn minimap_contains_cursor(window: &Window, cursor: Vec2) -> bool {
@@ -31293,6 +31798,112 @@ mod current_tests {
             ),
             CAMERA_EDGE_PAN_WIDTH,
             "passive HUD strips must not block top/bottom edge pan"
+        );
+    }
+
+    #[test]
+    fn support_power_hud_specs_match_godot_strip() {
+        let specs = support_power_button_specs();
+        assert_eq!(
+            specs.iter().map(|spec| spec.kind).collect::<Vec<_>>(),
+            vec![
+                SupportPowerKind::RadarSweep,
+                SupportPowerKind::OrbitalStrike,
+                SupportPowerKind::EmpPulse,
+                SupportPowerKind::ChronoRelay,
+                SupportPowerKind::ShieldOverdrive,
+                SupportPowerKind::NaniteRepairSwarm,
+                SupportPowerKind::WeatherStorm,
+                SupportPowerKind::StrategicMissile,
+                SupportPowerKind::Paradrop,
+            ]
+        );
+        assert_eq!(
+            specs
+                .iter()
+                .map(|spec| spec.hotkey_label)
+                .collect::<Vec<_>>(),
+            vec!["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9"]
+        );
+        for spec in specs {
+            let path = std::path::Path::new("assets").join(spec.icon_path);
+            assert!(
+                path.exists(),
+                "support power icon must exist for {:?}: {}",
+                spec.kind,
+                path.display()
+            );
+        }
+    }
+
+    #[test]
+    fn support_power_button_state_matches_lock_cooldown_and_low_power_rules() {
+        let ready =
+            support_power_button_state(SupportPowerKind::RadarSweep, true, false, 0.0, false);
+        assert!(ready.enabled);
+        assert!(ready.unlocked);
+        assert!(!ready.active);
+        assert_eq!(ready.cooldown_seconds, None);
+        assert_eq!(ready.badge_text, "");
+
+        let active =
+            support_power_button_state(SupportPowerKind::RadarSweep, true, false, 0.0, true);
+        assert!(active.enabled);
+        assert!(active.active);
+
+        let locked =
+            support_power_button_state(SupportPowerKind::RadarSweep, false, false, 0.0, false);
+        assert!(!locked.enabled);
+        assert!(!locked.unlocked);
+        assert_eq!(locked.badge_text, t("锁", "LOCK"));
+
+        let cooling =
+            support_power_button_state(SupportPowerKind::RadarSweep, true, false, 12.2, false);
+        assert!(!cooling.enabled);
+        assert_eq!(cooling.cooldown_seconds, Some(13));
+        assert_eq!(cooling.badge_text, "13");
+
+        let low_power =
+            support_power_button_state(SupportPowerKind::RadarSweep, true, true, 0.0, false);
+        assert!(!low_power.enabled);
+        assert!(low_power.low_power);
+        assert_eq!(low_power.badge_text, "");
+    }
+
+    #[test]
+    fn support_power_panel_hit_rect_is_tight() {
+        let mut window = Window {
+            resolution: WindowResolution::new(1280, 720),
+            ..default()
+        };
+        let inside = Vec2::new(1278.0 - SUPPORT_POWER_PANEL_RIGHT_PX, 16.0);
+        assert!(support_power_panel_contains_cursor(&window, inside));
+        window.set_cursor_position(Some(inside));
+        assert!(cursor_is_over_hud(&window));
+
+        let left_of_panel = Vec2::new(
+            1280.0 - SUPPORT_POWER_PANEL_RIGHT_PX - SUPPORT_POWER_PANEL_WIDTH_PX - 8.0,
+            SUPPORT_POWER_PANEL_TOP_PX + 20.0,
+        );
+        assert!(!support_power_panel_contains_cursor(&window, left_of_panel));
+        assert!(
+            !cursor_blocks_world_order_controls(&window, left_of_panel),
+            "support panel hit rect should not consume the whole top strip"
+        );
+
+        let below_panel = Vec2::new(
+            1280.0 - SUPPORT_POWER_PANEL_RIGHT_PX - 12.0,
+            SUPPORT_POWER_PANEL_TOP_PX + SUPPORT_POWER_PANEL_HEIGHT_PX + 4.0,
+        );
+        assert!(!support_power_panel_contains_cursor(&window, below_panel));
+    }
+
+    #[test]
+    fn objective_tracker_sits_below_support_power_strip() {
+        assert!(
+            OBJECTIVE_TRACKER_TOP_PX
+                >= SUPPORT_POWER_PANEL_TOP_PX + SUPPORT_POWER_PANEL_HEIGHT_PX + 6.0,
+            "the top-center objective HUD must not overlap the Godot-style support power strip"
         );
     }
 
