@@ -16142,9 +16142,17 @@ fn camera_control(
 /// Applies camera options and gates edge-pan while UI overlays own the cursor.
 fn apply_camera_settings(
     options: Res<MenuOptionsState>,
+    window_q: Query<&Window, With<PrimaryWindow>>,
     match_menu: Res<MatchMenuState>,
     briefing: Res<MatchBriefingState>,
-    ui_interactions: Query<&Interaction, With<Button>>,
+    ui_buttons: Query<
+        (
+            &ComputedNode,
+            &UiGlobalTransform,
+            Option<&InheritedVisibility>,
+        ),
+        With<Button>,
+    >,
     mut camera_q: Query<(&mut RtsCam, &mut RtsCameraControls), With<MainCamera>>,
 ) {
     let Ok((mut cam, mut controls)) = camera_q.single_mut() else {
@@ -16158,7 +16166,10 @@ fn apply_camera_settings(
         &options,
         &match_menu,
         &briefing,
-        interactive_ui_owns_cursor(&ui_interactions),
+        window_q
+            .single()
+            .ok()
+            .is_some_and(|window| cursor_is_over_interactive_button(window, &ui_buttons)),
     );
 }
 
@@ -16174,10 +16185,25 @@ fn effective_camera_edge_pan_width(
     CAMERA_EDGE_PAN_WIDTH
 }
 
-fn interactive_ui_owns_cursor(interactions: &Query<&Interaction, With<Button>>) -> bool {
-    interactions
-        .iter()
-        .any(|interaction| matches!(*interaction, Interaction::Hovered | Interaction::Pressed))
+fn cursor_is_over_interactive_button(
+    window: &Window,
+    buttons: &Query<
+        (
+            &ComputedNode,
+            &UiGlobalTransform,
+            Option<&InheritedVisibility>,
+        ),
+        With<Button>,
+    >,
+) -> bool {
+    let Some(cursor) = window.physical_cursor_position() else {
+        return false;
+    };
+    buttons.iter().any(|(node, transform, visibility)| {
+        visibility.is_none_or(|visibility| visibility.get())
+            && !node.is_empty()
+            && node.contains_point(*transform, cursor)
+    })
 }
 
 fn safe_camera_distance(distance: f32) -> f32 {
