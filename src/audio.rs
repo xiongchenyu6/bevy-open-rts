@@ -53,13 +53,13 @@ pub(crate) enum SoundEffectKind {
 
 #[derive(Resource)]
 pub(crate) struct AudioFeedback {
-    pending_voice: Option<UnitVoiceEvent>,
-    pending_sound: Option<SoundEffectKind>,
-    last_voice: Option<UnitVoiceEvent>,
-    last_sound: Option<SoundEffectKind>,
-    last_command_key: Option<&'static str>,
-    last_low_power: Option<bool>,
-    next_ack_is_first: bool,
+    pub(crate) pending_voice: Option<UnitVoiceEvent>,
+    pub(crate) pending_sound: Option<SoundEffectKind>,
+    pub(crate) last_voice: Option<UnitVoiceEvent>,
+    pub(crate) last_sound: Option<SoundEffectKind>,
+    pub(crate) last_command_key: Option<&'static str>,
+    pub(crate) last_low_power: Option<bool>,
+    pub(crate) next_ack_is_first: bool,
 }
 
 impl Default for AudioFeedback {
@@ -112,7 +112,7 @@ pub(crate) fn play_pending_audio_feedback(mut feedback: ResMut<AudioFeedback>) {
 
 impl SoundEffectKind {
     #[allow(dead_code)]
-    fn audio_path(self) -> &'static str {
+    pub(crate) fn audio_path(self) -> &'static str {
         match self {
             Self::Select => "sfx/ui_select.wav",
             Self::Command => "sfx/command_confirm.wav",
@@ -137,7 +137,7 @@ impl SoundEffectKind {
     }
 
     #[allow(dead_code)]
-    fn volume(self) -> f32 {
+    pub(crate) fn volume(self) -> f32 {
         match self {
             Self::Select => 0.72,
             Self::Command => 0.66,
@@ -164,7 +164,7 @@ impl SoundEffectKind {
 
 impl UnitVoiceEvent {
     #[allow(dead_code)]
-    fn audio_path(self) -> &'static str {
+    pub(crate) fn audio_path(self) -> &'static str {
         match self {
             Self::Hello => "voice/english/ttsmaker-com-2704-jackson-us/sir.ogg",
             Self::Ack1 => "voice/english/ttsmaker-com-2704-jackson-us/yes_sir.ogg",

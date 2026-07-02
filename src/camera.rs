@@ -135,7 +135,7 @@ pub(crate) fn camera_bounds_aabb(bounds: MapBounds) -> bevy::math::bounding::Aab
 
 #[derive(Resource)]
 pub(crate) struct CameraBookmarks {
-    slots: [Option<CameraBookmark>; 4],
+    pub(crate) slots: [Option<CameraBookmark>; 4],
 }
 
 impl Default for CameraBookmarks {
@@ -148,14 +148,14 @@ impl Default for CameraBookmarks {
 
 #[derive(Clone, Copy)]
 pub(crate) struct CameraBookmark {
-    focus: Vec3,
-    distance: f32,
-    yaw: f32,
-    pitch: f32,
+    pub(crate) focus: Vec3,
+    pub(crate) distance: f32,
+    pub(crate) yaw: f32,
+    pub(crate) pitch: f32,
 }
 
 impl CameraBookmark {
-    fn capture(camera: &RtsCamera) -> Self {
+    pub(crate) fn capture(camera: &RtsCamera) -> Self {
         Self {
             focus: camera.focus,
             distance: camera.distance,
@@ -164,7 +164,7 @@ impl CameraBookmark {
         }
     }
 
-    fn restore(self, camera: &mut RtsCamera) {
+    pub(crate) fn restore(self, camera: &mut RtsCamera) {
         camera.focus = self.focus;
         camera.distance = self.distance;
         camera.yaw = self.yaw;
@@ -172,7 +172,7 @@ impl CameraBookmark {
         camera.pending_jump = true;
     }
 
-    fn restore_safely(self, camera: &mut RtsCamera, bounds: MapBounds) {
+    pub(crate) fn restore_safely(self, camera: &mut RtsCamera, bounds: MapBounds) {
         self.restore(camera);
         clamp_camera_view_safely(camera, bounds);
     }

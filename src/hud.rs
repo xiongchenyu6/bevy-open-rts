@@ -9,7 +9,7 @@ use bevy::prelude::*;
 use crate::*;
 
 #[derive(Resource)]
-pub(crate) struct RtsCursorAssetHandle(Handle<StaticCursor>);
+pub(crate) struct RtsCursorAssetHandle(pub(crate) Handle<StaticCursor>);
 
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct AppliedRtsCursor {
@@ -25,7 +25,7 @@ pub(crate) enum RtsCursorKind {
 }
 
 impl RtsCursorKind {
-    fn atlas_index(self) -> usize {
+    pub(crate) fn atlas_index(self) -> usize {
         match self {
             Self::Default => 0,
             Self::Move => 1,
@@ -225,7 +225,7 @@ pub(crate) struct StatsText;
 
 /// Top-left resource/power bar (godot ResourcesBar): per-resource count label.
 #[derive(Component)]
-pub(crate) struct HudResourceCount(ResourceKind);
+pub(crate) struct HudResourceCount(pub(crate) ResourceKind);
 
 /// The "used/supply" power readout in the resource bar (color-coded).
 #[derive(Component)]

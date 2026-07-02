@@ -152,16 +152,16 @@ pub(crate) fn separate_units(
 /// gets the same from NavigationServer's navmesh.
 #[derive(Resource, Default)]
 pub(crate) struct NavGrid {
-    version: u64,
-    origin_x: f32,
-    origin_z: f32,
-    width: i32,
-    height: i32,
-    blocked: Vec<bool>,
+    pub(crate) version: u64,
+    pub(crate) origin_x: f32,
+    pub(crate) origin_z: f32,
+    pub(crate) width: i32,
+    pub(crate) height: i32,
+    pub(crate) blocked: Vec<bool>,
 }
 
 impl NavGrid {
-    fn rebuild(&mut self, bounds: MapBounds, obstacles: &[(Vec3, f32)]) {
+    pub(crate) fn rebuild(&mut self, bounds: MapBounds, obstacles: &[(Vec3, f32)]) {
         self.origin_x = -bounds.half_width;
         self.origin_z = -bounds.half_depth;
         self.width = ((bounds.half_width * 2.0) / NAV_GRID_CELL_M).ceil() as i32;
@@ -187,14 +187,14 @@ impl NavGrid {
         self.version += 1;
     }
 
-    fn cell_of(&self, position: Vec3) -> (i32, i32) {
+    pub(crate) fn cell_of(&self, position: Vec3) -> (i32, i32) {
         (
             (((position.x - self.origin_x) / NAV_GRID_CELL_M) as i32).clamp(0, self.width - 1),
             (((position.z - self.origin_z) / NAV_GRID_CELL_M) as i32).clamp(0, self.height - 1),
         )
     }
 
-    fn cell_center(&self, cx: i32, cz: i32) -> Vec3 {
+    pub(crate) fn cell_center(&self, cx: i32, cz: i32) -> Vec3 {
         Vec3::new(
             self.origin_x + (cx as f32 + 0.5) * NAV_GRID_CELL_M,
             0.0,
@@ -202,7 +202,7 @@ impl NavGrid {
         )
     }
 
-    fn is_blocked(&self, cx: i32, cz: i32) -> bool {
+    pub(crate) fn is_blocked(&self, cx: i32, cz: i32) -> bool {
         if cx < 0 || cz < 0 || cx >= self.width || cz >= self.height {
             return true;
         }
@@ -210,7 +210,7 @@ impl NavGrid {
     }
 
     /// Supercover walk of the segment: true when no blocked cell is crossed.
-    fn line_clear(&self, from: Vec3, to: Vec3) -> bool {
+    pub(crate) fn line_clear(&self, from: Vec3, to: Vec3) -> bool {
         if self.blocked.is_empty() {
             return true;
         }
@@ -230,7 +230,7 @@ impl NavGrid {
 
     /// Nearest walkable cell to `cell`, spiralling outward (targets inside a base
     /// footprint resolve to its edge instead of failing).
-    fn nearest_open_cell(&self, cell: (i32, i32)) -> Option<(i32, i32)> {
+    pub(crate) fn nearest_open_cell(&self, cell: (i32, i32)) -> Option<(i32, i32)> {
         if !self.is_blocked(cell.0, cell.1) {
             return Some(cell);
         }
@@ -259,7 +259,7 @@ impl NavGrid {
 
     /// A* over the grid (8-directional, no corner cutting), then string-pulled into
     /// a short waypoint list (world positions). `None` when unreachable.
-    fn find_path(&self, from: Vec3, to: Vec3) -> Option<Vec<Vec3>> {
+    pub(crate) fn find_path(&self, from: Vec3, to: Vec3) -> Option<Vec<Vec3>> {
         if self.blocked.is_empty() {
             return None;
         }

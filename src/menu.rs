@@ -106,7 +106,7 @@ impl Default for MenuOptionsState {
 }
 
 impl MainMenuAction {
-    fn is_selected(self, selection: SkirmishMenuSelection) -> bool {
+    pub(crate) fn is_selected(self, selection: SkirmishMenuSelection) -> bool {
         match self {
             MainMenuAction::SelectMap(index) => index == selection.map_index,
             MainMenuAction::SelectStartingResources(index) => {

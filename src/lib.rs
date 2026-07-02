@@ -25,6 +25,8 @@ mod capture_api;
 pub use capture_api::*;
 mod audio;
 pub(crate) use audio::*;
+mod ai;
+pub(crate) use ai::*;
 mod economy;
 pub(crate) use economy::*;
 mod hud;
@@ -42,37 +44,37 @@ use generated_registry as registry;
 #[derive(Asset, TypePath, Deserialize)]
 #[allow(dead_code)]
 pub(crate) struct RtsDataManifest {
-    name: String,
+    pub(crate) name: String,
 }
 
 #[derive(Asset, TypePath, Deserialize)]
 #[allow(dead_code)]
 pub(crate) struct GodotModelMapAsset {
-    source: String,
-    generated_by: String,
-    entities: Vec<GodotModelMapEntity>,
+    pub(crate) source: String,
+    pub(crate) generated_by: String,
+    pub(crate) entities: Vec<GodotModelMapEntity>,
 }
 
 #[derive(Deserialize)]
 #[allow(dead_code)]
 pub(crate) struct GodotModelMapEntity {
-    id: String,
-    scene_path: String,
-    parts: Vec<GodotModelMapPart>,
+    pub(crate) id: String,
+    pub(crate) scene_path: String,
+    pub(crate) parts: Vec<GodotModelMapPart>,
 }
 
 #[derive(Deserialize)]
 #[allow(dead_code)]
 pub(crate) struct GodotModelMapPart {
-    model: String,
-    translation: Vec<f32>,
-    rotation: Vec<f32>,
-    scale: Vec<f32>,
+    pub(crate) model: String,
+    pub(crate) translation: Vec<f32>,
+    pub(crate) rotation: Vec<f32>,
+    pub(crate) scale: Vec<f32>,
 }
 
 #[derive(Resource, Clone)]
 #[allow(dead_code)]
-pub(crate) struct GodotModelMapHandle(Handle<GodotModelMapAsset>);
+pub(crate) struct GodotModelMapHandle(pub(crate) Handle<GodotModelMapAsset>);
 
 pub(crate) fn handle_render_error(
     error: &RenderError,
@@ -140,34 +142,14 @@ pub(crate) const CAPTURE_ENTRY_MARGIN_M: f32 = 1.3;
 pub(crate) const FOLLOW_TARGET_DISTANCE_MARGIN_M: f32 = UNIT_ADHERENCE_MARGIN_M;
 pub(crate) const REPAIR_ADHERENCE_MARGIN_M: f32 = UNIT_ADHERENCE_MARGIN_M;
 pub(crate) const REPAIR_ENTRY_MARGIN_M: f32 = 1.0;
-pub(crate) const AI_SUPPLY_CRATE_COLLECTION_LIMIT: usize = 2;
 pub(crate) const PRODUCTION_QUEUE_LIMIT: usize = 5;
 pub(crate) const PRODUCTION_QUEUE_HUD_SLOT_COUNT: usize = 24;
 pub(crate) const STRUCTURE_SELL_REFUND_RATIO: f32 = 0.5;
 pub(crate) const STRUCTURE_MANUAL_REPAIR_COST_RATIO: f32 = 0.5;
 pub(crate) const STRUCTURE_MANUAL_REPAIR_HP_PER_SECOND: f32 = 3.0;
-pub(crate) const AI_REPAIR_MIN_MISSING_HITPOINT_RATIO: f32 = 0.25;
-pub(crate) const AI_REPAIR_MAX_STARTS_PER_REFRESH: usize = 2;
-pub(crate) const AI_REPAIR_REFRESH_INTERVAL_SECONDS: f32 = 0.5;
-pub(crate) const AI_OPENING_ATTACK_GRACE_SECONDS: f32 = 45.0;
-pub(crate) const AI_TECH_BUNKER_GARRISON_REFRESH_INTERVAL_SECONDS: f32 = 1.0;
-pub(crate) const AI_TECH_BUNKER_GARRISON_SEARCH_RADIUS: f32 = 16.0;
-pub(crate) const AI_SUPPORT_MIN_CLUSTER_TARGETS: usize = 2;
-pub(crate) const AI_SUPPORT_ORBITAL_STRIKE_MIN_SCORE: f32 = 3.0;
-pub(crate) const AI_SUPPORT_WEATHER_STORM_MIN_SCORE: f32 = 5.0;
-pub(crate) const AI_SUPPORT_STRATEGIC_MISSILE_MIN_SCORE: f32 = 5.0;
-pub(crate) const AI_SUPPORT_NANITE_REPAIR_MIN_MISSING_HP: f32 = 4.0;
-pub(crate) const AI_SUPPORT_CHRONO_RELAY_MIN_MOBILE_UNITS: usize = 2;
-pub(crate) const AI_SUPPORT_SHIELD_OVERDRIVE_MIN_SCORE: f32 = 2.0;
-pub(crate) const AI_SUPPORT_SHIELD_OVERDRIVE_MOBILE_PRESSURE_BONUS: f32 = 12.0;
-pub(crate) const AI_SUPPORT_SHIELD_PRESSURE_EXTRA_RADIUS: f32 = 4.0;
-pub(crate) const AI_SUPPORT_SHIELD_PRESSURE_DISTANCE_WEIGHT: f32 = 0.3;
-pub(crate) const AI_DRONE_SCOUT_SWITCH_MIN_SECONDS: f32 = 0.5;
-pub(crate) const AI_DRONE_SCOUT_SWITCH_MAX_SECONDS: f32 = 1.0;
 pub(crate) const STRUCTURE_CONSTRUCTION_PROGRESS_PER_SECOND: f32 = 0.3;
 pub(crate) const CONSTRUCTION_ENTRY_MARGIN_M: f32 = UNIT_ADHERENCE_MARGIN_M;
 pub(crate) const BASE_CONSTRUCTION_RADIUS_M: f32 = 9.0;
-pub(crate) const AI_CONSTRUCTION_REFRESH_INTERVAL_SECONDS: f32 = 0.5;
 pub(crate) const SHIELD_TROOPER_PASSIVE_DAMAGE_SCALE: f32 = 0.65;
 pub(crate) const SIEGE_DRILL_DEPLOYED_ATTACK_RANGE: f32 = 6.5;
 pub(crate) const SIEGE_DRILL_DEPLOYED_ATTACK_INTERVAL: f32 = 1.0;
@@ -272,12 +254,6 @@ pub(crate) const MINE_DEPLOY_OFFSETS: [(f32, f32); 8] = [
     (0.0, 1.0),
     (-1.0, 0.0),
 ];
-pub(crate) const AI_CAPTURE_INTERVAL_SECONDS: f32 = 4.5;
-pub(crate) const AI_CAPTURE_ENGINEER_LIMIT: usize = 1;
-pub(crate) const AI_CAPTURE_NEUTRAL_TECH_TARGET_BONUS: f32 = 18.0;
-pub(crate) const AI_SABOTEUR_INTERVAL_SECONDS: f32 = 5.0;
-pub(crate) const AI_SABOTEUR_LIMIT: usize = 1;
-pub(crate) const AI_SABOTEUR_ID: &str = "SaboteurInfiltrator";
 pub(crate) const STRUCTURE_PLACEMENT_ROTATION_STEP_RADIANS: f32 = std::f32::consts::FRAC_PI_4;
 pub(crate) const STRUCTURE_PLACEMENT_ROTATION_DEAD_ZONE_M: f32 = 0.1;
 pub(crate) const COMMAND_SLOT_HOTKEYS: [CommandHotkey; COMMAND_SLOT_COUNT] = [
@@ -356,12 +332,12 @@ pub(crate) struct MatchScopedEntity;
 
 #[derive(Resource, Default)]
 pub(crate) struct StartupLoadingAssets {
-    handles: Vec<UntypedHandle>,
+    pub(crate) handles: Vec<UntypedHandle>,
 }
 
 #[derive(Resource, Clone, Copy)]
 pub(crate) struct StartupLoadingPolicy {
-    preload_assets: bool,
+    pub(crate) preload_assets: bool,
 }
 
 impl Default for StartupLoadingPolicy {
@@ -381,8 +357,8 @@ pub(crate) struct StartupLoadingText;
 #[derive(Component, Clone, Copy, Debug)]
 #[allow(dead_code)]
 pub(crate) struct ModelHarnessRoot {
-    index: usize,
-    id: &'static str,
+    pub(crate) index: usize,
+    pub(crate) id: &'static str,
 }
 
 pub(crate) const MODEL_HARNESS_ENTITY_IDS: [&str; registry::ENTITY_DEFS.len()] = [
@@ -474,7 +450,7 @@ impl SupportPowerKind {
         Self::Paradrop,
     ];
 
-    fn idx(self) -> usize {
+    pub(crate) fn idx(self) -> usize {
         match self {
             Self::RadarSweep => 0,
             Self::OrbitalStrike => 1,
@@ -488,7 +464,7 @@ impl SupportPowerKind {
         }
     }
 
-    fn label(self) -> &'static str {
+    pub(crate) fn label(self) -> &'static str {
         match self {
             Self::RadarSweep => t("雷达扫描", "Radar Sweep"),
             Self::OrbitalStrike => t("轨道打击", "Orbital Strike"),
@@ -502,11 +478,11 @@ impl SupportPowerKind {
         }
     }
 
-    fn is_superweapon(self) -> bool {
+    pub(crate) fn is_superweapon(self) -> bool {
         matches!(self, Self::WeatherStorm | Self::StrategicMissile)
     }
 
-    fn hotkey(self) -> KeyCode {
+    pub(crate) fn hotkey(self) -> KeyCode {
         match self {
             Self::RadarSweep => KeyCode::F1,
             Self::OrbitalStrike => KeyCode::F2,
@@ -520,7 +496,7 @@ impl SupportPowerKind {
         }
     }
 
-    fn hotkey_label(self) -> &'static str {
+    pub(crate) fn hotkey_label(self) -> &'static str {
         match self {
             Self::RadarSweep => "F1",
             Self::OrbitalStrike => "F2",
@@ -534,7 +510,7 @@ impl SupportPowerKind {
         }
     }
 
-    fn icon_path(self) -> &'static str {
+    pub(crate) fn icon_path(self) -> &'static str {
         match self {
             Self::RadarSweep => "ui/icons/RadarSweep.png",
             Self::OrbitalStrike => "ui/icons/OrbitalStrike.png",
@@ -548,7 +524,7 @@ impl SupportPowerKind {
         }
     }
 
-    fn definition(self) -> SupportPowerDef {
+    pub(crate) fn definition(self) -> SupportPowerDef {
         match self {
             Self::RadarSweep => SupportPowerDef {
                 requirements: &["RadarUplink"],
@@ -671,44 +647,17 @@ impl SupportPowerKind {
     }
 }
 
-pub(crate) const AI_SUPPORT_POWER_PRIORITY: [SupportPowerKind; 9] = [
-    SupportPowerKind::EmpPulse,
-    SupportPowerKind::NaniteRepairSwarm,
-    SupportPowerKind::ShieldOverdrive,
-    SupportPowerKind::ChronoRelay,
-    SupportPowerKind::WeatherStorm,
-    SupportPowerKind::StrategicMissile,
-    SupportPowerKind::OrbitalStrike,
-    SupportPowerKind::Paradrop,
-    SupportPowerKind::RadarSweep,
-];
-
-#[derive(Clone, Copy)]
-pub(crate) struct SupportPowerDef {
-    requirements: &'static [&'static str],
-    cooldown: f32,
-    radius: f32,
-    duration: f32,
-    impact_delay: f32,
-    requires_power: bool,
-    damage: f32,
-    damage_scale: f32,
-    healing: f32,
-    unit_paths: &'static [&'static str],
-    initial_cooldown: f32,
-}
-
 #[derive(Resource)]
 pub(crate) struct CommandMode {
-    attack_move: bool,
-    patrol: bool,
-    rally_point: bool,
-    support_power: Option<SupportPowerKind>,
-    pending_structure_placement: Option<PendingStructurePlacement>,
+    pub(crate) attack_move: bool,
+    pub(crate) patrol: bool,
+    pub(crate) rally_point: bool,
+    pub(crate) support_power: Option<SupportPowerKind>,
+    pub(crate) pending_structure_placement: Option<PendingStructurePlacement>,
 }
 
 impl CommandMode {
-    fn has_pending_interaction(&self) -> bool {
+    pub(crate) fn has_pending_interaction(&self) -> bool {
         self.attack_move
             || self.patrol
             || self.rally_point
@@ -721,14 +670,14 @@ pub(crate) const RTS_CURSOR_ASSET_PATH: &str = "ui/cursors/rts_cursor.cur.ron";
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) struct PendingStructurePlacement {
-    id: &'static str,
-    rotation_y_radians: f32,
-    position: Option<Vec3>,
-    drag_rotation_origin: Option<Vec3>,
+    pub(crate) id: &'static str,
+    pub(crate) rotation_y_radians: f32,
+    pub(crate) position: Option<Vec3>,
+    pub(crate) drag_rotation_origin: Option<Vec3>,
 }
 
 impl PendingStructurePlacement {
-    fn new(id: &'static str) -> Self {
+    pub(crate) fn new(id: &'static str) -> Self {
         Self {
             id,
             rotation_y_radians: 0.0,
@@ -737,14 +686,14 @@ impl PendingStructurePlacement {
         }
     }
 
-    fn rotation_y_radians(self) -> f32 {
+    pub(crate) fn rotation_y_radians(self) -> f32 {
         self.rotation_y_radians
     }
 }
 
 #[derive(Resource, Default, Clone, Copy)]
 pub(crate) struct StructurePlacementFeedback {
-    validity: Option<StructurePlacementValidity>,
+    pub(crate) validity: Option<StructurePlacementValidity>,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -766,7 +715,7 @@ impl MatchSpeedPreset {
         Self::Max,
     ];
 
-    fn label(self) -> &'static str {
+    pub(crate) fn label(self) -> &'static str {
         match self {
             Self::Slow => "0.75x",
             Self::Normal => "1x",
@@ -776,7 +725,7 @@ impl MatchSpeedPreset {
         }
     }
 
-    fn scale(self) -> f32 {
+    pub(crate) fn scale(self) -> f32 {
         match self {
             Self::Slow => 0.75,
             Self::Normal => 1.0,
@@ -789,20 +738,20 @@ impl MatchSpeedPreset {
 
 #[derive(Resource, Default, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct MatchSpeed {
-    preset: MatchSpeedPreset,
+    pub(crate) preset: MatchSpeedPreset,
 }
 
 pub(crate) const MATCH_BRIEFING_AUTO_HIDE_SECONDS: f32 = 14.0;
 
 #[derive(Component)]
 pub(crate) struct EmpDisabled {
-    remaining: f32,
+    pub(crate) remaining: f32,
 }
 
 #[derive(Component)]
 pub(crate) struct SupportShield {
-    remaining: f32,
-    damage_scale: f32,
+    pub(crate) remaining: f32,
+    pub(crate) damage_scale: f32,
 }
 
 pub(crate) fn queue_apply_emp_disabled(commands: &mut Commands, entity: Entity, duration: f32) {
@@ -880,15 +829,15 @@ pub(crate) fn queue_apply_support_shield(
 
 #[derive(Component)]
 pub(crate) struct PassiveSupportShield {
-    damage_scale: f32,
+    pub(crate) damage_scale: f32,
 }
 
 #[derive(Component)]
 pub(crate) struct MobileShieldProjector {
-    refresh_remaining: f32,
-    radius: f32,
-    duration: f32,
-    damage_scale: f32,
+    pub(crate) refresh_remaining: f32,
+    pub(crate) radius: f32,
+    pub(crate) duration: f32,
+    pub(crate) damage_scale: f32,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -899,16 +848,16 @@ pub(crate) enum RallyMode {
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct RallyPoint {
-    target: Option<Vec3>,
-    target_unit: Option<Entity>,
-    mode: RallyMode,
+    pub(crate) target: Option<Vec3>,
+    pub(crate) target_unit: Option<Entity>,
+    pub(crate) mode: RallyMode,
 }
 
 #[derive(Component)]
 pub(crate) struct RepairAura {
-    rate: f32,
-    radius: f32,
-    mode: RepairAuraMode,
+    pub(crate) rate: f32,
+    pub(crate) radius: f32,
+    pub(crate) mode: RepairAuraMode,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -919,21 +868,21 @@ pub(crate) enum RepairAuraMode {
 
 #[derive(Component)]
 pub(crate) struct HealingAura {
-    rate: f32,
-    radius: f32,
+    pub(crate) rate: f32,
+    pub(crate) radius: f32,
 }
 
 #[derive(Component)]
 pub(crate) struct ManualStructureRepair {
-    points_remaining: f32,
+    pub(crate) points_remaining: f32,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct UnderConstruction {
-    remaining: f32,
-    total: f32,
-    cost: registry::Cost,
-    free_worker_origin: Option<Vec3>,
+    pub(crate) remaining: f32,
+    pub(crate) total: f32,
+    pub(crate) cost: registry::Cost,
+    pub(crate) free_worker_origin: Option<Vec3>,
 }
 
 pub(crate) type StructurePrereqItem<'a> = (
@@ -1092,67 +1041,64 @@ pub(crate) type AiGarrisonUnitItem<'a> = (
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct DeployedSiegeMode {
-    previous_hold_position: bool,
-    base_speed: f32,
-    base_attack_range: f32,
-    base_attack_interval: f32,
-    base_structure_damage_multiplier: f32,
-    base_sight_range: f32,
+    pub(crate) previous_hold_position: bool,
+    pub(crate) base_speed: f32,
+    pub(crate) base_attack_range: f32,
+    pub(crate) base_attack_interval: f32,
+    pub(crate) base_structure_damage_multiplier: f32,
+    pub(crate) base_sight_range: f32,
 }
 
 #[derive(Component)]
 pub(crate) struct DeployModeToggleRequest;
 
 #[derive(Component)]
-pub(crate) struct AiAttackWaveMember;
-
-#[derive(Component)]
 pub(crate) struct SupportWarning {
-    remaining: f32,
-    radius: f32,
-    color: Color,
+    pub(crate) remaining: f32,
+    pub(crate) radius: f32,
+    pub(crate) color: Color,
 }
 
 #[derive(Component)]
 pub(crate) struct TemporarySupportReveal {
-    remaining: f32,
-    radius: f32,
+    pub(crate) remaining: f32,
+    pub(crate) radius: f32,
 }
 
 #[derive(Component)]
 pub(crate) struct PendingOrbitalStrike {
-    remaining: f32,
-    radius: f32,
-    damage: f32,
-    impact_scale: f32,
-    team: Team,
+    pub(crate) remaining: f32,
+    pub(crate) radius: f32,
+    pub(crate) damage: f32,
+    pub(crate) impact_scale: f32,
+    pub(crate) team: Team,
 }
 
 #[derive(Component)]
 pub(crate) struct PendingParadrop {
-    remaining: f32,
-    team: Team,
-    target: Vec3,
-    unit_paths: &'static [&'static str],
+    pub(crate) remaining: f32,
+    pub(crate) team: Team,
+    pub(crate) target: Vec3,
+    pub(crate) unit_paths: &'static [&'static str],
 }
 
 #[derive(Clone, Copy)]
 pub(crate) struct SupportPowerTargetSnapshot {
-    entity: Entity,
-    team: Team,
-    position: Vec3,
-    health: Health,
-    mobile: bool,
+    pub(crate) entity: Entity,
+    pub(crate) team: Team,
+    pub(crate) position: Vec3,
+    pub(crate) health: Health,
+    pub(crate) mobile: bool,
 }
 
 #[derive(Resource)]
 pub(crate) struct SupportCooldowns {
-    remaining: Vec<[f32; SupportPowerKind::ALL.len()]>,
-    initial_charge_started: Vec<[bool; SupportPowerKind::ALL.len()]>,
+    pub(crate) remaining: Vec<[f32; SupportPowerKind::ALL.len()]>,
+    pub(crate) initial_charge_started: Vec<[bool; SupportPowerKind::ALL.len()]>,
 }
 
 impl SupportCooldowns {
-    fn ensure_team(&mut self, team: Team) -> Option<usize> {
+    pub(crate) fn ensure_team(&mut self, team: Team) -> Option<usize> {
         let index = team.economy_index()?;
         if self.remaining.len() <= index {
             self.remaining
@@ -1163,17 +1109,17 @@ impl SupportCooldowns {
         Some(index)
     }
 
-    fn ready(&self, team: Team, power: SupportPowerKind) -> bool {
+    pub(crate) fn ready(&self, team: Team, power: SupportPowerKind) -> bool {
         self.remaining_for(team, power) <= 0.0
     }
 
-    fn remaining_for(&self, team: Team, power: SupportPowerKind) -> f32 {
+    pub(crate) fn remaining_for(&self, team: Team, power: SupportPowerKind) -> f32 {
         team.economy_index()
             .and_then(|index| self.remaining.get(index))
             .map_or(0.0, |remaining| remaining[power.idx()])
     }
 
-    fn set(&mut self, team: Team, power: SupportPowerKind, base: f32) {
+    pub(crate) fn set(&mut self, team: Team, power: SupportPowerKind, base: f32) {
         if let Some(index) = self.ensure_team(team) {
             self.remaining[index][power.idx()] = base;
         }
@@ -1191,23 +1137,23 @@ impl Default for SupportCooldowns {
 
 #[derive(Resource)]
 pub(crate) struct MatchState {
-    phase: MatchPhase,
-    result_reason: &'static str,
-    start_time_sec: f32,
-    remaining_teams: u32,
-    remaining_anchors: u32,
-    enemy_units_destroyed: u32,
-    enemy_structures_destroyed: u32,
-    units_lost: u32,
-    structures_lost: u32,
+    pub(crate) phase: MatchPhase,
+    pub(crate) result_reason: &'static str,
+    pub(crate) start_time_sec: f32,
+    pub(crate) remaining_teams: u32,
+    pub(crate) remaining_anchors: u32,
+    pub(crate) enemy_units_destroyed: u32,
+    pub(crate) enemy_structures_destroyed: u32,
+    pub(crate) units_lost: u32,
+    pub(crate) structures_lost: u32,
 }
 
 impl MatchState {
-    fn is_running(&self) -> bool {
+    pub(crate) fn is_running(&self) -> bool {
         matches!(self.phase, MatchPhase::Running)
     }
 
-    fn finish_if_not_set(&mut self, reason: MatchPhase, reason_text: &'static str) {
+    pub(crate) fn finish_if_not_set(&mut self, reason: MatchPhase, reason_text: &'static str) {
         if !self.is_running() {
             return;
         }
@@ -1256,11 +1202,11 @@ impl Default for MatchState {
 
 #[derive(Resource)]
 pub(crate) struct MatchFlow {
-    active: bool,
+    pub(crate) active: bool,
 }
 
 impl MatchFlow {
-    fn is_active(&self) -> bool {
+    pub(crate) fn is_active(&self) -> bool {
         self.active
     }
 }
@@ -1282,7 +1228,7 @@ pub(crate) enum MatchPhase {
 
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct VisibilityState {
-    visible: bool,
+    pub(crate) visible: bool,
 }
 
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
@@ -1290,11 +1236,11 @@ pub(crate) struct FogMemoryVisible;
 
 #[derive(Component, Clone, Copy, Debug, PartialEq)]
 pub(crate) struct FogMemoryStructureRemnant {
-    radius: f32,
+    pub(crate) radius: f32,
 }
 
 #[derive(Component)]
-pub(crate) struct VisionRadius(f32);
+pub(crate) struct VisionRadius(pub(crate) f32);
 
 /// Fog-of-war shroud texture resolution (pixels per side) drawn over the map.
 pub(crate) const FOG_OVERLAY_RES: usize = 192;
@@ -1312,8 +1258,8 @@ pub(crate) struct FogOverlayPlane;
 /// was explored before, and black where never seen (godot's shroud+fog layers).
 #[derive(Resource)]
 pub(crate) struct FogOverlay {
-    handle: Handle<Image>,
-    explored: Vec<bool>,
+    pub(crate) handle: Handle<Image>,
+    pub(crate) explored: Vec<bool>,
 }
 
 #[derive(Component)]
@@ -1330,7 +1276,7 @@ pub(crate) struct MatchEndStats;
 
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct MatchEndButton {
-    action: MatchEndAction,
+    pub(crate) action: MatchEndAction,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -1342,9 +1288,9 @@ pub(crate) enum MatchEndAction {
 
 #[derive(Component)]
 pub(crate) struct ClickMarker {
-    ttl: f32,
-    radius: f32,
-    kind: ClickMarkerKind,
+    pub(crate) ttl: f32,
+    pub(crate) radius: f32,
+    pub(crate) kind: ClickMarkerKind,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -1356,7 +1302,7 @@ pub(crate) enum ClickMarkerKind {
 
 #[derive(Component)]
 pub(crate) struct CombatWreckage {
-    remaining: f32,
+    pub(crate) remaining: f32,
 }
 
 #[derive(Component)]
@@ -1370,20 +1316,20 @@ pub(crate) enum StructureDestructionVfxKind {
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct StructureDestructionVfx {
-    kind: StructureDestructionVfxKind,
-    remaining: f32,
-    total: f32,
-    radius: f32,
-    team: Team,
+    pub(crate) kind: StructureDestructionVfxKind,
+    pub(crate) remaining: f32,
+    pub(crate) total: f32,
+    pub(crate) radius: f32,
+    pub(crate) team: Team,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct VeterancyPromotionEffect {
-    rank: u8,
-    remaining: f32,
-    total: f32,
-    radius: f32,
-    team: Team,
+    pub(crate) rank: u8,
+    pub(crate) remaining: f32,
+    pub(crate) total: f32,
+    pub(crate) radius: f32,
+    pub(crate) team: Team,
 }
 
 impl Default for CommandMode {
@@ -1400,37 +1346,37 @@ impl Default for CommandMode {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) struct SpawnSpec {
-    id: &'static str,
-    offset: (f32, f32),
+    pub(crate) id: &'static str,
+    pub(crate) offset: (f32, f32),
 }
 
 #[derive(Clone, Copy)]
 pub(crate) struct NeutralTechSpec {
-    name: &'static str,
-    id: &'static str,
-    position: (f32, f32),
+    pub(crate) name: &'static str,
+    pub(crate) id: &'static str,
+    pub(crate) position: (f32, f32),
 }
 
 #[derive(Clone, Copy)]
 pub(crate) struct SkirmishMapDef {
-    id: &'static str,
-    godot_path: &'static str,
-    name: &'static str,
-    name_key: &'static str,
-    players: usize,
-    size: (f32, f32),
-    spawn_points: &'static [(f32, f32)],
-    resources: &'static [ResourceSpec],
-    neutral_tech: &'static [NeutralTechSpec],
-    supply_crates: &'static [NamedSupplyCrateSpec],
+    pub(crate) id: &'static str,
+    pub(crate) godot_path: &'static str,
+    pub(crate) name: &'static str,
+    pub(crate) name_key: &'static str,
+    pub(crate) players: usize,
+    pub(crate) size: (f32, f32),
+    pub(crate) spawn_points: &'static [(f32, f32)],
+    pub(crate) resources: &'static [ResourceSpec],
+    pub(crate) neutral_tech: &'static [NeutralTechSpec],
+    pub(crate) supply_crates: &'static [NamedSupplyCrateSpec],
 }
 
 impl SkirmishMapDef {
-    fn contains_point(self, point: (f32, f32)) -> bool {
+    pub(crate) fn contains_point(self, point: (f32, f32)) -> bool {
         point.0 >= 0.0 && point.1 >= 0.0 && point.0 <= self.size.0 && point.1 <= self.size.1
     }
 
-    fn is_catalog_consistent(self) -> bool {
+    pub(crate) fn is_catalog_consistent(self) -> bool {
         !self.id.is_empty()
             && !self.godot_path.is_empty()
             && !self.name.is_empty()
@@ -1467,7 +1413,7 @@ impl SkirmishMapDef {
 
 #[derive(Resource, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct SelectedSkirmishMap {
-    godot_path: &'static str,
+    pub(crate) godot_path: &'static str,
 }
 
 impl Default for SelectedSkirmishMap {
@@ -1479,15 +1425,15 @@ impl Default for SelectedSkirmishMap {
 }
 
 impl SelectedSkirmishMap {
-    fn definition(self) -> &'static SkirmishMapDef {
+    pub(crate) fn definition(self) -> &'static SkirmishMapDef {
         skirmish_map_by_path(self.godot_path).unwrap_or(&SKIRMISH_MAPS[0])
     }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct StartingResources {
-    ore: i32,
-    crystal: i32,
+    pub(crate) ore: i32,
+    pub(crate) crystal: i32,
 }
 
 impl StartingResources {
@@ -1502,8 +1448,8 @@ impl StartingResources {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct StartingResourceOption {
-    key: &'static str,
-    resources: StartingResources,
+    pub(crate) key: &'static str,
+    pub(crate) resources: StartingResources,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -1516,7 +1462,7 @@ pub(crate) enum SkirmishFaction {
 impl SkirmishFaction {
     const ALL: [Self; 3] = [Self::Alliance, Self::Demon, Self::Chaos];
 
-    fn registry_id(self) -> &'static str {
+    pub(crate) fn registry_id(self) -> &'static str {
         match self {
             Self::Alliance => "alliance",
             Self::Demon => "demon",
@@ -1524,7 +1470,7 @@ impl SkirmishFaction {
         }
     }
 
-    fn index(self) -> usize {
+    pub(crate) fn index(self) -> usize {
         match self {
             Self::Alliance => 0,
             Self::Demon => 1,
@@ -1532,7 +1478,7 @@ impl SkirmishFaction {
         }
     }
 
-    fn emblem_path(self) -> &'static str {
+    pub(crate) fn emblem_path(self) -> &'static str {
         match self {
             Self::Alliance => "ui/factions/alliance_emblem.png",
             Self::Demon => "ui/factions/demon_emblem.png",
@@ -1540,7 +1486,7 @@ impl SkirmishFaction {
         }
     }
 
-    fn label(self) -> &'static str {
+    pub(crate) fn label(self) -> &'static str {
         match self {
             Self::Alliance => t("苍穹联盟", "Alliance"),
             Self::Demon => t("炽炎魔军", "Demon"),
@@ -1548,7 +1494,7 @@ impl SkirmishFaction {
         }
     }
 
-    fn from_team(team: Team) -> Self {
+    pub(crate) fn from_team(team: Team) -> Self {
         match team {
             Team::Player(index) => DEFAULT_LOBBY_FACTIONS
                 .get(index)
@@ -1558,7 +1504,7 @@ impl SkirmishFaction {
         }
     }
 
-    fn next(self) -> Self {
+    pub(crate) fn next(self) -> Self {
         let index = Self::ALL
             .iter()
             .position(|faction| *faction == self)
@@ -1616,17 +1562,17 @@ pub(crate) const GODOT_STARTING_RESOURCE_OPTIONS: &[StartingResourceOption] = &[
 
 #[derive(Resource, Clone, Debug, PartialEq, Eq)]
 pub(crate) struct MatchSetupSettings {
-    map_path: &'static str,
-    starting_resources: StartingResources,
-    visible_player: VisiblePlayer,
-    ai_difficulties: AiDifficultySettings,
-    team_relations: TeamRelations,
-    startup_loadout: StartupLoadoutMode,
-    active_teams: Vec<bool>,
-    player_factions: Vec<SkirmishFaction>,
-    player_color_slots: Vec<usize>,
-    player_controllers: Vec<SkirmishPlayerController>,
-    player_spawn_slots: Vec<usize>,
+    pub(crate) map_path: &'static str,
+    pub(crate) starting_resources: StartingResources,
+    pub(crate) visible_player: VisiblePlayer,
+    pub(crate) ai_difficulties: AiDifficultySettings,
+    pub(crate) team_relations: TeamRelations,
+    pub(crate) startup_loadout: StartupLoadoutMode,
+    pub(crate) active_teams: Vec<bool>,
+    pub(crate) player_factions: Vec<SkirmishFaction>,
+    pub(crate) player_color_slots: Vec<usize>,
+    pub(crate) player_controllers: Vec<SkirmishPlayerController>,
+    pub(crate) player_spawn_slots: Vec<usize>,
 }
 
 impl Default for MatchSetupSettings {
@@ -1653,48 +1599,48 @@ impl Default for MatchSetupSettings {
 
 impl MatchSetupSettings {
     #[cfg(test)]
-    fn with_map(mut self, map_path: &'static str) -> Self {
+    pub(crate) fn with_map(mut self, map_path: &'static str) -> Self {
         self.map_path = map_path;
         self
     }
 
     #[cfg(test)]
-    fn with_starting_resources(mut self, starting_resources: StartingResources) -> Self {
+    pub(crate) fn with_starting_resources(mut self, starting_resources: StartingResources) -> Self {
         self.starting_resources = starting_resources;
         self
     }
 
     #[cfg(test)]
-    fn with_visible_player(mut self, visible_player: VisiblePlayer) -> Self {
+    pub(crate) fn with_visible_player(mut self, visible_player: VisiblePlayer) -> Self {
         self.visible_player = visible_player;
         self
     }
 
     #[cfg(test)]
-    fn with_ai_difficulties(mut self, ai_difficulties: AiDifficultySettings) -> Self {
+    pub(crate) fn with_ai_difficulties(mut self, ai_difficulties: AiDifficultySettings) -> Self {
         self.ai_difficulties = ai_difficulties;
         self
     }
 
     #[cfg(test)]
-    fn with_startup_loadout(mut self, startup_loadout: StartupLoadoutMode) -> Self {
+    pub(crate) fn with_startup_loadout(mut self, startup_loadout: StartupLoadoutMode) -> Self {
         self.startup_loadout = startup_loadout;
         self
     }
 
-    fn team_active(&self, team: Team) -> bool {
+    pub(crate) fn team_active(&self, team: Team) -> bool {
         team.economy_index()
             .and_then(|index| self.active_teams.get(index).copied())
             .unwrap_or(false)
     }
 
-    fn player_faction(&self, team: Team) -> SkirmishFaction {
+    pub(crate) fn player_faction(&self, team: Team) -> SkirmishFaction {
         team.economy_index()
             .and_then(|index| self.player_factions.get(index).copied())
             .unwrap_or_else(|| SkirmishFaction::from_team(team))
     }
 
-    fn player_spawn_slot(&self, team: Team) -> usize {
+    pub(crate) fn player_spawn_slot(&self, team: Team) -> usize {
         team.economy_index()
             .and_then(|index| self.player_spawn_slots.get(index).copied())
             .unwrap_or_else(|| team.economy_index().unwrap_or(0))
@@ -1702,7 +1648,7 @@ impl MatchSetupSettings {
 }
 
 #[derive(Resource, Clone, Debug, PartialEq, Eq)]
-pub(crate) struct ActiveTeams(Vec<bool>);
+pub(crate) struct ActiveTeams(pub(crate) Vec<bool>);
 
 impl Default for ActiveTeams {
     fn default() -> Self {
@@ -1711,7 +1657,7 @@ impl Default for ActiveTeams {
 }
 
 #[derive(Resource, Clone, Debug, PartialEq, Eq)]
-pub(crate) struct PlayerFactions(Vec<SkirmishFaction>);
+pub(crate) struct PlayerFactions(pub(crate) Vec<SkirmishFaction>);
 
 impl Default for PlayerFactions {
     fn default() -> Self {
@@ -1720,12 +1666,12 @@ impl Default for PlayerFactions {
 }
 
 impl PlayerFactions {
-    fn faction(&self, team: Team) -> Option<SkirmishFaction> {
+    pub(crate) fn faction(&self, team: Team) -> Option<SkirmishFaction> {
         team.economy_index()
             .and_then(|index| self.0.get(index).copied())
     }
 
-    fn slot_faction(&self, team: Team) -> SkirmishFaction {
+    pub(crate) fn slot_faction(&self, team: Team) -> SkirmishFaction {
         self.faction(team)
             .unwrap_or_else(|| SkirmishFaction::from_team(team))
     }
@@ -1746,7 +1692,7 @@ pub(crate) fn slot_faction_from_option(
 }
 
 #[derive(Resource, Clone, Debug, PartialEq, Eq)]
-pub(crate) struct PlayerColorSlots(Vec<usize>);
+pub(crate) struct PlayerColorSlots(pub(crate) Vec<usize>);
 
 impl Default for PlayerColorSlots {
     fn default() -> Self {
@@ -1755,25 +1701,25 @@ impl Default for PlayerColorSlots {
 }
 
 impl PlayerColorSlots {
-    fn slot(&self, team: Team) -> Option<usize> {
+    pub(crate) fn slot(&self, team: Team) -> Option<usize> {
         team.economy_index()
             .and_then(|index| self.0.get(index).copied())
             .map(|slot| slot % PLAYER_COLOR_PALETTE.len())
     }
 
-    fn color(&self, team: Team) -> Color {
+    pub(crate) fn color(&self, team: Team) -> Color {
         self.slot(team)
             .map(player_color)
             .unwrap_or_else(|| Color::srgb(0.74, 0.77, 0.72))
     }
 
-    fn color_rgb(&self, team: Team) -> [f32; 3] {
+    pub(crate) fn color_rgb(&self, team: Team) -> [f32; 3] {
         self.slot(team)
             .map(player_color_rgb)
             .unwrap_or([0.74, 0.77, 0.72])
     }
 
-    fn minimap_color(&self, team: Team) -> Color {
+    pub(crate) fn minimap_color(&self, team: Team) -> Color {
         self.slot(team)
             .map(|slot| player_color_with_alpha(slot, 0.95))
             .unwrap_or_else(|| Color::srgba(0.78, 0.78, 0.68, 0.86))
@@ -1788,22 +1734,22 @@ pub(crate) enum SkirmishPlayerController {
 }
 
 impl SkirmishPlayerController {
-    fn is_active(self) -> bool {
+    pub(crate) fn is_active(self) -> bool {
         self != Self::None
     }
 
-    fn is_human(self) -> bool {
+    pub(crate) fn is_human(self) -> bool {
         self == Self::Human
     }
 
-    fn ai_difficulty(self) -> Option<AiDifficulty> {
+    pub(crate) fn ai_difficulty(self) -> Option<AiDifficulty> {
         match self {
             Self::Ai(difficulty) => Some(difficulty),
             Self::None | Self::Human => None,
         }
     }
 
-    fn short_label(self) -> &'static str {
+    pub(crate) fn short_label(self) -> &'static str {
         match self {
             Self::None => t("无", "None"),
             Self::Human => t("人族玩家", "Human"),
@@ -1825,7 +1771,7 @@ pub(crate) enum SkirmishMatchMode {
 }
 
 impl SkirmishMatchMode {
-    fn label(self) -> &'static str {
+    pub(crate) fn label(self) -> &'static str {
         match self {
             Self::OneVsOne => "1v1",
             Self::FreeForAll => t("自由混战", "Free-for-All"),
@@ -1837,20 +1783,20 @@ impl SkirmishMatchMode {
 
 #[derive(Resource, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct SkirmishMenuSelection {
-    map_index: usize,
-    starting_resource_index: usize,
-    match_mode: SkirmishMatchMode,
-    ai_difficulty: AiDifficulty,
-    lobby_controllers: [SkirmishPlayerController; MAX_SKIRMISH_LOBBY_SLOTS],
-    lobby_factions: [SkirmishFaction; MAX_SKIRMISH_LOBBY_SLOTS],
-    lobby_team_ids: [u8; MAX_SKIRMISH_LOBBY_SLOTS],
-    lobby_color_slots: [usize; MAX_SKIRMISH_LOBBY_SLOTS],
-    controller_dropdown_open: Option<usize>,
-    faction_dropdown_open: Option<usize>,
-    team_dropdown_open: Option<usize>,
-    color_dropdown_open: Option<usize>,
-    map_dropdown_open: bool,
-    resources_dropdown_open: bool,
+    pub(crate) map_index: usize,
+    pub(crate) starting_resource_index: usize,
+    pub(crate) match_mode: SkirmishMatchMode,
+    pub(crate) ai_difficulty: AiDifficulty,
+    pub(crate) lobby_controllers: [SkirmishPlayerController; MAX_SKIRMISH_LOBBY_SLOTS],
+    pub(crate) lobby_factions: [SkirmishFaction; MAX_SKIRMISH_LOBBY_SLOTS],
+    pub(crate) lobby_team_ids: [u8; MAX_SKIRMISH_LOBBY_SLOTS],
+    pub(crate) lobby_color_slots: [usize; MAX_SKIRMISH_LOBBY_SLOTS],
+    pub(crate) controller_dropdown_open: Option<usize>,
+    pub(crate) faction_dropdown_open: Option<usize>,
+    pub(crate) team_dropdown_open: Option<usize>,
+    pub(crate) color_dropdown_open: Option<usize>,
+    pub(crate) map_dropdown_open: bool,
+    pub(crate) resources_dropdown_open: bool,
 }
 
 impl Default for SkirmishMenuSelection {
@@ -1875,18 +1821,18 @@ impl Default for SkirmishMenuSelection {
 }
 
 impl SkirmishMenuSelection {
-    fn map(self) -> &'static SkirmishMapDef {
+    pub(crate) fn map(self) -> &'static SkirmishMapDef {
         if self.map_choice_is_random() {
             return largest_skirmish_map();
         }
         &SKIRMISH_MAPS[self.map_index.min(SKIRMISH_MAPS.len().saturating_sub(1))]
     }
 
-    fn map_choice_is_random(self) -> bool {
+    pub(crate) fn map_choice_is_random(self) -> bool {
         is_random_map_index(self.map_index)
     }
 
-    fn map_label(self) -> &'static str {
+    pub(crate) fn map_label(self) -> &'static str {
         if self.map_choice_is_random() {
             random_map_label()
         } else {
@@ -1894,7 +1840,7 @@ impl SkirmishMenuSelection {
         }
     }
 
-    fn from_match_setup(settings: MatchSetupSettings) -> Self {
+    pub(crate) fn from_match_setup(settings: MatchSetupSettings) -> Self {
         let map_index = SKIRMISH_MAPS
             .iter()
             .position(|map| map.godot_path == settings.map_path)
@@ -1930,22 +1876,22 @@ impl SkirmishMenuSelection {
         }
     }
 
-    fn starting_resources(self) -> StartingResources {
+    pub(crate) fn starting_resources(self) -> StartingResources {
         GODOT_STARTING_RESOURCE_OPTIONS
             .get(self.starting_resource_index)
             .unwrap_or(&GODOT_STARTING_RESOURCE_OPTIONS[GODOT_STANDARD_STARTING_RESOURCE_INDEX])
             .resources
     }
 
-    fn active_teams(self) -> Vec<bool> {
+    pub(crate) fn active_teams(self) -> Vec<bool> {
         skirmish_active_teams_from_controllers(&self.runtime_player_controllers())
     }
 
-    fn active_team_count(self) -> usize {
+    pub(crate) fn active_team_count(self) -> usize {
         self.active_lobby_slot_count()
     }
 
-    fn lobby_slot_limit(self) -> usize {
+    pub(crate) fn lobby_slot_limit(self) -> usize {
         if self.map_choice_is_random() {
             largest_skirmish_map().players.min(MAX_SKIRMISH_LOBBY_SLOTS)
         } else {
@@ -1953,56 +1899,56 @@ impl SkirmishMenuSelection {
         }
     }
 
-    fn active_lobby_slot_count(self) -> usize {
+    pub(crate) fn active_lobby_slot_count(self) -> usize {
         (0..self.lobby_slot_limit())
             .filter(|slot| self.lobby_controllers[*slot].is_active())
             .count()
     }
 
-    fn active_lobby_slots(self) -> Vec<usize> {
+    pub(crate) fn active_lobby_slots(self) -> Vec<usize> {
         (0..self.lobby_slot_limit())
             .filter(|slot| self.lobby_controllers[*slot].is_active())
             .collect()
     }
 
-    fn runtime_slot_for_team(self, team: Team) -> Option<usize> {
+    pub(crate) fn runtime_slot_for_team(self, team: Team) -> Option<usize> {
         let index = team.economy_index()?;
         self.active_lobby_slots().get(index).copied()
     }
 
-    fn runtime_player_controllers(self) -> Vec<SkirmishPlayerController> {
+    pub(crate) fn runtime_player_controllers(self) -> Vec<SkirmishPlayerController> {
         self.active_lobby_slots()
             .into_iter()
             .map(|slot| self.lobby_controllers[slot])
             .collect()
     }
 
-    fn runtime_player_factions(self) -> Vec<SkirmishFaction> {
+    pub(crate) fn runtime_player_factions(self) -> Vec<SkirmishFaction> {
         self.active_lobby_slots()
             .into_iter()
             .map(|slot| self.lobby_factions[slot])
             .collect()
     }
 
-    fn runtime_team_ids(self) -> Vec<usize> {
+    pub(crate) fn runtime_team_ids(self) -> Vec<usize> {
         self.active_lobby_slots()
             .into_iter()
             .map(|slot| (self.lobby_team_ids[slot] % SKIRMISH_TEAM_OPTION_COUNT) as usize)
             .collect()
     }
 
-    fn runtime_color_slots(self) -> Vec<usize> {
+    pub(crate) fn runtime_color_slots(self) -> Vec<usize> {
         self.active_lobby_slots()
             .into_iter()
             .map(|slot| self.lobby_color_slots[slot] % PLAYER_COLOR_PALETTE.len())
             .collect()
     }
 
-    fn runtime_spawn_slots(self) -> Vec<usize> {
+    pub(crate) fn runtime_spawn_slots(self) -> Vec<usize> {
         self.active_lobby_slots()
     }
 
-    fn resolved_map(self, seed: u32) -> &'static SkirmishMapDef {
+    pub(crate) fn resolved_map(self, seed: u32) -> &'static SkirmishMapDef {
         if self.map_choice_is_random() {
             random_map_for_required_slots(self.required_player_slots(), seed)
         } else {
@@ -2010,11 +1956,11 @@ impl SkirmishMenuSelection {
         }
     }
 
-    fn required_player_slots(self) -> usize {
+    pub(crate) fn required_player_slots(self) -> usize {
         self.active_lobby_slot_count().max(2)
     }
 
-    fn selected_map_player_slots(self) -> usize {
+    pub(crate) fn selected_map_player_slots(self) -> usize {
         if self.map_choice_is_random() {
             random_map_for_required_slots(self.required_player_slots(), 0).players
         } else {
@@ -2022,7 +1968,7 @@ impl SkirmishMenuSelection {
         }
     }
 
-    fn start_status(self) -> SkirmishStartStatus {
+    pub(crate) fn start_status(self) -> SkirmishStartStatus {
         skirmish_start_status_for_setup(
             self.required_player_slots(),
             self.selected_map_player_slots(),
@@ -2031,11 +1977,11 @@ impl SkirmishMenuSelection {
         )
     }
 
-    fn can_start(self) -> bool {
+    pub(crate) fn can_start(self) -> bool {
         self.start_status().can_start()
     }
 
-    fn match_setup_with_map_seed(self, seed: u32) -> MatchSetupSettings {
+    pub(crate) fn match_setup_with_map_seed(self, seed: u32) -> MatchSetupSettings {
         let active_teams = self.active_teams();
         let player_controllers = self.runtime_player_controllers();
         let player_factions = self.runtime_player_factions();
@@ -2063,19 +2009,19 @@ impl SkirmishMenuSelection {
     }
 
     #[cfg(test)]
-    fn match_setup(self) -> MatchSetupSettings {
+    pub(crate) fn match_setup(self) -> MatchSetupSettings {
         self.match_setup_with_map_seed(0)
     }
 
-    fn set_match_mode(&mut self, mode: SkirmishMatchMode) {
+    pub(crate) fn set_match_mode(&mut self, mode: SkirmishMatchMode) {
         self.match_mode = mode;
     }
 
-    fn lobby_slot_in_selected_map(self, slot: usize) -> bool {
+    pub(crate) fn lobby_slot_in_selected_map(self, slot: usize) -> bool {
         slot < self.lobby_slot_limit()
     }
 
-    fn select_lobby_slot(&mut self, slot: usize) {
+    pub(crate) fn select_lobby_slot(&mut self, slot: usize) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
@@ -2087,7 +2033,11 @@ impl SkirmishMenuSelection {
         self.lobby_controllers[slot] = SkirmishPlayerController::Human;
     }
 
-    fn set_lobby_slot_controller(&mut self, slot: usize, controller: SkirmishPlayerController) {
+    pub(crate) fn set_lobby_slot_controller(
+        &mut self,
+        slot: usize,
+        controller: SkirmishPlayerController,
+    ) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
@@ -2098,7 +2048,7 @@ impl SkirmishMenuSelection {
         }
     }
 
-    fn cycle_lobby_slot_controller(&mut self, slot: usize) {
+    pub(crate) fn cycle_lobby_slot_controller(&mut self, slot: usize) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
@@ -2113,7 +2063,7 @@ impl SkirmishMenuSelection {
         self.set_lobby_slot_controller(slot, next);
     }
 
-    fn close_all_lobby_dropdowns(&mut self) {
+    pub(crate) fn close_all_lobby_dropdowns(&mut self) {
         self.controller_dropdown_open = None;
         self.faction_dropdown_open = None;
         self.team_dropdown_open = None;
@@ -2122,33 +2072,33 @@ impl SkirmishMenuSelection {
         self.resources_dropdown_open = false;
     }
 
-    fn toggle_map_dropdown(&mut self) {
+    pub(crate) fn toggle_map_dropdown(&mut self) {
         let was_open = self.map_dropdown_open;
         self.close_all_lobby_dropdowns();
         self.map_dropdown_open = !was_open;
     }
 
-    fn toggle_resources_dropdown(&mut self) {
+    pub(crate) fn toggle_resources_dropdown(&mut self) {
         let was_open = self.resources_dropdown_open;
         self.close_all_lobby_dropdowns();
         self.resources_dropdown_open = !was_open;
     }
 
-    fn set_map_choice(&mut self, index: usize) {
+    pub(crate) fn set_map_choice(&mut self, index: usize) {
         if index < SKIRMISH_MAPS.len() || is_random_map_index(index) {
             self.map_index = index;
         }
         self.close_all_lobby_dropdowns();
     }
 
-    fn set_starting_resource_choice(&mut self, index: usize) {
+    pub(crate) fn set_starting_resource_choice(&mut self, index: usize) {
         if index < GODOT_STARTING_RESOURCE_OPTIONS.len() {
             self.starting_resource_index = index;
         }
         self.close_all_lobby_dropdowns();
     }
 
-    fn toggle_controller_dropdown(&mut self, slot: usize) {
+    pub(crate) fn toggle_controller_dropdown(&mut self, slot: usize) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
@@ -2157,7 +2107,7 @@ impl SkirmishMenuSelection {
         self.controller_dropdown_open = (!was_open).then_some(slot);
     }
 
-    fn toggle_faction_dropdown(&mut self, slot: usize) {
+    pub(crate) fn toggle_faction_dropdown(&mut self, slot: usize) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
@@ -2166,7 +2116,7 @@ impl SkirmishMenuSelection {
         self.faction_dropdown_open = (!was_open).then_some(slot);
     }
 
-    fn toggle_team_dropdown(&mut self, slot: usize) {
+    pub(crate) fn toggle_team_dropdown(&mut self, slot: usize) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
@@ -2175,7 +2125,7 @@ impl SkirmishMenuSelection {
         self.team_dropdown_open = (!was_open).then_some(slot);
     }
 
-    fn toggle_color_dropdown(&mut self, slot: usize) {
+    pub(crate) fn toggle_color_dropdown(&mut self, slot: usize) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
@@ -2184,14 +2134,14 @@ impl SkirmishMenuSelection {
         self.color_dropdown_open = (!was_open).then_some(slot);
     }
 
-    fn set_lobby_slot_faction_choice(&mut self, slot: usize, faction: SkirmishFaction) {
+    pub(crate) fn set_lobby_slot_faction_choice(&mut self, slot: usize, faction: SkirmishFaction) {
         if self.lobby_slot_in_selected_map(slot) {
             self.lobby_factions[slot] = faction;
         }
         self.close_all_lobby_dropdowns();
     }
 
-    fn set_lobby_slot_controller_choice(
+    pub(crate) fn set_lobby_slot_controller_choice(
         &mut self,
         slot: usize,
         controller: SkirmishPlayerController,
@@ -2200,35 +2150,35 @@ impl SkirmishMenuSelection {
         self.close_all_lobby_dropdowns();
     }
 
-    fn set_lobby_slot_team_choice(&mut self, slot: usize, team_index: usize) {
+    pub(crate) fn set_lobby_slot_team_choice(&mut self, slot: usize, team_index: usize) {
         if self.lobby_slot_in_selected_map(slot) {
             self.lobby_team_ids[slot] = (team_index as u8) % SKIRMISH_TEAM_OPTION_COUNT;
         }
         self.close_all_lobby_dropdowns();
     }
 
-    fn set_lobby_slot_color_choice(&mut self, slot: usize, color_index: usize) {
+    pub(crate) fn set_lobby_slot_color_choice(&mut self, slot: usize, color_index: usize) {
         if self.lobby_slot_in_selected_map(slot) {
             self.lobby_color_slots[slot] = color_index % PLAYER_COLOR_PALETTE.len();
         }
         self.close_all_lobby_dropdowns();
     }
 
-    fn cycle_lobby_slot_faction(&mut self, slot: usize) {
+    pub(crate) fn cycle_lobby_slot_faction(&mut self, slot: usize) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
         self.lobby_factions[slot] = self.lobby_factions[slot].next();
     }
 
-    fn cycle_lobby_slot_team_id(&mut self, slot: usize) {
+    pub(crate) fn cycle_lobby_slot_team_id(&mut self, slot: usize) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
         self.lobby_team_ids[slot] = (self.lobby_team_ids[slot] + 1) % SKIRMISH_TEAM_OPTION_COUNT;
     }
 
-    fn cycle_lobby_slot_color(&mut self, slot: usize) {
+    pub(crate) fn cycle_lobby_slot_color(&mut self, slot: usize) {
         if !self.lobby_slot_in_selected_map(slot) {
             return;
         }
@@ -2236,27 +2186,27 @@ impl SkirmishMenuSelection {
             (self.lobby_color_slots[slot] + 1) % PLAYER_COLOR_PALETTE.len();
     }
 
-    fn team_id(self, team: Team) -> Option<usize> {
+    pub(crate) fn team_id(self, team: Team) -> Option<usize> {
         self.runtime_slot_for_team(team)
             .map(|slot| (self.lobby_team_ids[slot] % SKIRMISH_TEAM_OPTION_COUNT) as usize)
     }
 
-    fn player_faction(self, team: Team) -> Option<SkirmishFaction> {
+    pub(crate) fn player_faction(self, team: Team) -> Option<SkirmishFaction> {
         self.runtime_slot_for_team(team)
             .map(|slot| self.lobby_factions[slot])
     }
 
-    fn focus_faction(self) -> SkirmishFaction {
+    pub(crate) fn focus_faction(self) -> SkirmishFaction {
         self.player_faction(self.focus_team())
             .unwrap_or_else(|| SkirmishFaction::from_team(self.focus_team()))
     }
 
-    fn player_color_slot(self, team: Team) -> Option<usize> {
+    pub(crate) fn player_color_slot(self, team: Team) -> Option<usize> {
         self.runtime_slot_for_team(team)
             .map(|slot| self.lobby_color_slots[slot] % PLAYER_COLOR_PALETTE.len())
     }
 
-    fn set_ai_difficulty(&mut self, difficulty: AiDifficulty) {
+    pub(crate) fn set_ai_difficulty(&mut self, difficulty: AiDifficulty) {
         self.ai_difficulty = difficulty;
         for controller in &mut self.lobby_controllers {
             if matches!(controller, SkirmishPlayerController::Ai(_)) {
@@ -2265,23 +2215,23 @@ impl SkirmishMenuSelection {
         }
     }
 
-    fn player_controller(self, team: Team) -> Option<SkirmishPlayerController> {
+    pub(crate) fn player_controller(self, team: Team) -> Option<SkirmishPlayerController> {
         self.runtime_slot_for_team(team)
             .map(|slot| self.lobby_controllers[slot])
     }
 
-    fn human_lobby_slot(self) -> Option<usize> {
+    pub(crate) fn human_lobby_slot(self) -> Option<usize> {
         (0..self.lobby_slot_limit()).find(|slot| self.lobby_controllers[*slot].is_human())
     }
 
-    fn human_team(self) -> Option<Team> {
+    pub(crate) fn human_team(self) -> Option<Team> {
         player_teams(self.active_lobby_slot_count()).find(|team| {
             self.player_controller(*team)
                 .is_some_and(|controller| controller.is_human())
         })
     }
 
-    fn focus_team(self) -> Team {
+    pub(crate) fn focus_team(self) -> Team {
         self.human_team()
             .or_else(|| {
                 player_teams(self.active_lobby_slot_count()).find(|team| {
@@ -2292,12 +2242,12 @@ impl SkirmishMenuSelection {
             .unwrap_or(Team::Player(0))
     }
 
-    fn focus_lobby_slot(self) -> Option<usize> {
+    pub(crate) fn focus_lobby_slot(self) -> Option<usize> {
         self.human_lobby_slot()
             .or_else(|| self.active_lobby_slots().into_iter().next())
     }
 
-    fn team_relations(self) -> TeamRelations {
+    pub(crate) fn team_relations(self) -> TeamRelations {
         let active_teams = self.active_teams();
         let team_ids = self.runtime_team_ids();
         skirmish_team_relations_from_team_ids(&active_teams, &team_ids)
@@ -2395,11 +2345,11 @@ pub(crate) fn skirmish_start_status_for_setup(
 }
 
 impl SkirmishStartStatus {
-    fn can_start(self) -> bool {
+    pub(crate) fn can_start(self) -> bool {
         matches!(self, Self::Ready)
     }
 
-    fn summary_label(self) -> String {
+    pub(crate) fn summary_label(self) -> String {
         match self {
             Self::Ready => t("状态: 可开始", "Status: Ready").to_string(),
             Self::MapTooSmall {
@@ -2444,7 +2394,7 @@ pub(crate) fn localized_skirmish_map_name(map: &SkirmishMapDef) -> &'static str 
 
 #[derive(Clone, Debug)]
 pub(crate) struct RouletteWheel<T> {
-    values_w_accumulated_shares: Vec<(T, f32)>,
+    pub(crate) values_w_accumulated_shares: Vec<(T, f32)>,
 }
 
 impl<T> RouletteWheel<T> {
@@ -2549,7 +2499,7 @@ pub(crate) fn skirmish_map_area(map: &SkirmishMapDef) -> f32 {
 }
 
 #[derive(Resource, Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct RandomMapCursor(u32);
+pub(crate) struct RandomMapCursor(pub(crate) u32);
 
 impl Default for RandomMapCursor {
     fn default() -> Self {
@@ -2558,7 +2508,7 @@ impl Default for RandomMapCursor {
 }
 
 impl RandomMapCursor {
-    fn next_seed(&mut self) -> u32 {
+    pub(crate) fn next_seed(&mut self) -> u32 {
         self.0 = self.0.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
         self.0
     }
@@ -2811,8 +2761,8 @@ pub(crate) fn default_skirmish_opponent(
 
 #[derive(Resource, Clone, Copy, Debug, PartialEq)]
 pub(crate) struct MapBounds {
-    half_width: f32,
-    half_depth: f32,
+    pub(crate) half_width: f32,
+    pub(crate) half_depth: f32,
 }
 
 impl Default for MapBounds {
@@ -2825,25 +2775,25 @@ impl Default for MapBounds {
 }
 
 impl MapBounds {
-    fn from_size(size: (f32, f32)) -> Self {
+    pub(crate) fn from_size(size: (f32, f32)) -> Self {
         Self {
             half_width: size.0 * 0.5,
             half_depth: size.1 * 0.5,
         }
     }
 
-    fn from_map(map: &SkirmishMapDef) -> Self {
+    pub(crate) fn from_map(map: &SkirmishMapDef) -> Self {
         Self::from_size(map.size)
     }
 
-    fn contains_ground_point(self, point: Vec3) -> bool {
+    pub(crate) fn contains_ground_point(self, point: Vec3) -> bool {
         point.x >= -self.half_width
             && point.x <= self.half_width
             && point.z >= -self.half_depth
             && point.z <= self.half_depth
     }
 
-    fn clamp_ground_point(self, point: Vec3, margin: f32) -> Vec3 {
+    pub(crate) fn clamp_ground_point(self, point: Vec3, margin: f32) -> Vec3 {
         let half_width = (self.half_width - margin).max(0.0);
         let half_depth = (self.half_depth - margin).max(0.0);
         Vec3::new(
@@ -2853,7 +2803,7 @@ impl MapBounds {
         )
     }
 
-    fn minimap_local_position(self, world: Vec3) -> Vec2 {
+    pub(crate) fn minimap_local_position(self, world: Vec3) -> Vec2 {
         let rect = self.minimap_content_rect();
         let x = ((world.x + self.half_width) / (self.half_width * 2.0)).clamp(0.0, 1.0);
         let z = ((world.z + self.half_depth) / (self.half_depth * 2.0)).clamp(0.0, 1.0);
@@ -2863,7 +2813,7 @@ impl MapBounds {
         Vec2::new(rect.left + x * rect.width, rect.top + z * rect.height)
     }
 
-    fn minimap_world_position(self, local: Vec2) -> Vec3 {
+    pub(crate) fn minimap_world_position(self, local: Vec2) -> Vec3 {
         let rect = self.minimap_content_rect();
         let x = ((local.x - rect.left) / rect.width).clamp(0.0, 1.0);
         let z = ((local.y - rect.top) / rect.height).clamp(0.0, 1.0);
@@ -2874,7 +2824,7 @@ impl MapBounds {
         )
     }
 
-    fn minimap_world_position_checked(self, local: Vec2) -> Option<Vec3> {
+    pub(crate) fn minimap_world_position_checked(self, local: Vec2) -> Option<Vec3> {
         let rect = self.minimap_content_rect();
         (local.x >= rect.left
             && local.x <= rect.left + rect.width
@@ -2883,7 +2833,7 @@ impl MapBounds {
             .then(|| self.minimap_world_position(local))
     }
 
-    fn minimap_content_rect(self) -> MinimapContentRect {
+    pub(crate) fn minimap_content_rect(self) -> MinimapContentRect {
         let map_width = (self.half_width * 2.0).max(1.0);
         let map_height = (self.half_depth * 2.0).max(1.0);
         let scale = (MINIMAP_SIZE_PX / map_width).min(MINIMAP_SIZE_PX / map_height);
@@ -2900,8 +2850,8 @@ impl MapBounds {
 
 #[derive(Clone, Copy)]
 pub(crate) struct TeamStartup {
-    structures: &'static [SpawnSpec],
-    units: &'static [SpawnSpec],
+    pub(crate) structures: &'static [SpawnSpec],
+    pub(crate) units: &'static [SpawnSpec],
 }
 
 #[allow(dead_code)]
@@ -2913,61 +2863,27 @@ pub(crate) enum StartupLoadoutMode {
 
 #[derive(Clone, Copy)]
 pub(crate) struct TeamAiProfile {
-    production_priority: &'static [&'static str],
-    defense_priority: &'static [&'static str],
-    defense_limits: &'static [(&'static str, usize)],
-    expected_command_centers: usize,
-    expected_workers: usize,
-    expected_refineries: usize,
-    expected_battlegroups: usize,
-    expected_units_in_battlegroup: usize,
-    active_offense_enabled: bool,
-    opening_attack_grace: f32,
-    capture_enabled: bool,
-    saboteur_enabled: bool,
-    support_powers_enabled: bool,
-    production_interval: f32,
-    attack_interval: f32,
-    build_interval: f32,
-    capture_interval: f32,
-    saboteur_interval: f32,
-    support_interval: f32,
-    defense_limit_bonus: usize,
-    tesla_fence_limit_bonus: usize,
-}
-
-#[derive(Clone, Copy, Default)]
-pub(crate) struct AiProductionCounts {
-    workers: usize,
-    battle_units: usize,
-}
-
-#[derive(Clone, Copy)]
-pub(crate) enum AiStructureBuildKind {
-    Economy,
-    Defense,
-    Offense,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum AiDifficulty {
-    Beginner,
-    Easy,
-    Normal,
-    Hard,
-}
-
-impl AiDifficulty {
-    const ALL: [Self; 4] = [Self::Beginner, Self::Easy, Self::Normal, Self::Hard];
-
-    fn short_label(self) -> &'static str {
-        match self {
-            Self::Beginner => t("新手", "Beginner"),
-            Self::Easy => t("简单", "Easy"),
-            Self::Normal => t("普通", "Normal"),
-            Self::Hard => t("困难", "Hard"),
-        }
-    }
+    pub(crate) production_priority: &'static [&'static str],
+    pub(crate) defense_priority: &'static [&'static str],
+    pub(crate) defense_limits: &'static [(&'static str, usize)],
+    pub(crate) expected_command_centers: usize,
+    pub(crate) expected_workers: usize,
+    pub(crate) expected_refineries: usize,
+    pub(crate) expected_battlegroups: usize,
+    pub(crate) expected_units_in_battlegroup: usize,
+    pub(crate) active_offense_enabled: bool,
+    pub(crate) opening_attack_grace: f32,
+    pub(crate) capture_enabled: bool,
+    pub(crate) saboteur_enabled: bool,
+    pub(crate) support_powers_enabled: bool,
+    pub(crate) production_interval: f32,
+    pub(crate) attack_interval: f32,
+    pub(crate) build_interval: f32,
+    pub(crate) capture_interval: f32,
+    pub(crate) saboteur_interval: f32,
+    pub(crate) support_interval: f32,
+    pub(crate) defense_limit_bonus: usize,
+    pub(crate) tesla_fence_limit_bonus: usize,
 }
 
 pub(crate) const HUMAN_STARTUP: TeamStartup = TeamStartup {
@@ -3893,134 +3809,6 @@ pub(crate) const CHAOS_AI_PRODUCTION_PRIORITY: &[&str] = &[
     "RailArtilleryWalker",
 ];
 
-pub(crate) const AI_OFFENSE_STRUCTURE_PRIORITY: &[&str] =
-    &["VehicleFactory", "Barracks", "AircraftFactory"];
-
-pub(crate) const HUMAN_AI_DEFENSE_PRIORITY: &[&str] = &[
-    "AntiGroundTurret",
-    "AntiAirTurret",
-    "TeslaFenceSegment",
-    "ArcCoilDefenseTower",
-    "LanceBeamDefenseTower",
-    "PrismDefenseObelisk",
-    "RailCannonBunker",
-];
-pub(crate) const HUMAN_AI_DEFENSE_LIMITS: &[(&str, usize)] = &[
-    ("AntiGroundTurret", 1),
-    ("AntiAirTurret", 1),
-    ("TeslaFenceSegment", 2),
-    ("ArcCoilDefenseTower", 1),
-    ("LanceBeamDefenseTower", 1),
-    ("PrismDefenseObelisk", 1),
-    ("RailCannonBunker", 1),
-];
-pub(crate) const DEMON_AI_DEFENSE_PRIORITY: &[&str] = &[
-    "AntiAirTurret",
-    "AntiGroundTurret",
-    "ArcCoilDefenseTower",
-    "LanceBeamDefenseTower",
-];
-pub(crate) const DEMON_AI_DEFENSE_LIMITS: &[(&str, usize)] = &[
-    ("AntiAirTurret", 2),
-    ("AntiGroundTurret", 2),
-    ("ArcCoilDefenseTower", 1),
-    ("LanceBeamDefenseTower", 1),
-];
-pub(crate) const CHAOS_AI_DEFENSE_PRIORITY: &[&str] = &[
-    "TeslaFenceSegment",
-    "ArcCoilDefenseTower",
-    "PrismDefenseObelisk",
-    "RailCannonBunker",
-];
-pub(crate) const CHAOS_AI_DEFENSE_LIMITS: &[(&str, usize)] = &[
-    ("TeslaFenceSegment", 2),
-    ("ArcCoilDefenseTower", 1),
-    ("PrismDefenseObelisk", 1),
-    ("RailCannonBunker", 1),
-];
-
-pub(crate) const HUMAN_AI_PROFILE: TeamAiProfile = TeamAiProfile {
-    production_priority: HUMAN_AI_PRODUCTION_PRIORITY,
-    defense_priority: HUMAN_AI_DEFENSE_PRIORITY,
-    defense_limits: HUMAN_AI_DEFENSE_LIMITS,
-    expected_command_centers: 1,
-    expected_workers: 3,
-    expected_refineries: 1,
-    expected_battlegroups: 2,
-    expected_units_in_battlegroup: 4,
-    active_offense_enabled: true,
-    opening_attack_grace: AI_OPENING_ATTACK_GRACE_SECONDS,
-    capture_enabled: true,
-    saboteur_enabled: true,
-    support_powers_enabled: true,
-    production_interval: 4.0,
-    attack_interval: 6.5,
-    build_interval: 11.0,
-    capture_interval: AI_CAPTURE_INTERVAL_SECONDS,
-    saboteur_interval: AI_SABOTEUR_INTERVAL_SECONDS,
-    support_interval: 3.5,
-    defense_limit_bonus: 0,
-    tesla_fence_limit_bonus: 0,
-};
-
-pub(crate) const DEMON_AI_PROFILE: TeamAiProfile = TeamAiProfile {
-    production_priority: DEMON_AI_PRODUCTION_PRIORITY,
-    defense_priority: DEMON_AI_DEFENSE_PRIORITY,
-    defense_limits: DEMON_AI_DEFENSE_LIMITS,
-    expected_command_centers: 1,
-    expected_workers: 3,
-    expected_refineries: 1,
-    expected_battlegroups: 2,
-    expected_units_in_battlegroup: 4,
-    active_offense_enabled: true,
-    opening_attack_grace: AI_OPENING_ATTACK_GRACE_SECONDS,
-    capture_enabled: true,
-    saboteur_enabled: true,
-    support_powers_enabled: true,
-    production_interval: 4.0,
-    attack_interval: 6.5,
-    build_interval: 11.0,
-    capture_interval: AI_CAPTURE_INTERVAL_SECONDS,
-    saboteur_interval: AI_SABOTEUR_INTERVAL_SECONDS,
-    support_interval: 3.5,
-    defense_limit_bonus: 0,
-    tesla_fence_limit_bonus: 0,
-};
-
-pub(crate) const CHAOS_AI_PROFILE: TeamAiProfile = TeamAiProfile {
-    production_priority: CHAOS_AI_PRODUCTION_PRIORITY,
-    defense_priority: CHAOS_AI_DEFENSE_PRIORITY,
-    defense_limits: CHAOS_AI_DEFENSE_LIMITS,
-    expected_command_centers: 1,
-    expected_workers: 3,
-    expected_refineries: 1,
-    expected_battlegroups: 2,
-    expected_units_in_battlegroup: 4,
-    active_offense_enabled: true,
-    opening_attack_grace: AI_OPENING_ATTACK_GRACE_SECONDS,
-    capture_enabled: true,
-    saboteur_enabled: true,
-    support_powers_enabled: true,
-    production_interval: 4.0,
-    attack_interval: 6.5,
-    build_interval: 11.0,
-    capture_interval: AI_CAPTURE_INTERVAL_SECONDS,
-    saboteur_interval: AI_SABOTEUR_INTERVAL_SECONDS,
-    support_interval: 3.5,
-    defense_limit_bonus: 0,
-    tesla_fence_limit_bonus: 0,
-};
-
-pub(crate) const BEGINNER_AI_PRODUCTION_PRIORITY: &[&str] = &[];
-pub(crate) const BEGINNER_AI_DEFENSE_PRIORITY: &[&str] = &[];
-pub(crate) const BEGINNER_AI_DEFENSE_LIMITS: &[(&str, usize)] = &[];
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum GameAppMode {
-    Interactive,
-    Headless,
-}
-
 #[derive(Default)]
 pub struct SharedMatchScenePlugin;
 
@@ -4917,16 +4705,16 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) struct ScreenRect {
-    left: f32,
-    top: f32,
-    width: f32,
-    height: f32,
+    pub(crate) left: f32,
+    pub(crate) top: f32,
+    pub(crate) width: f32,
+    pub(crate) height: f32,
 }
 
 #[derive(Resource)]
 pub(crate) struct UnitGroups {
-    slots: [Vec<Entity>; 9],
-    last_accessed: Option<usize>,
+    pub(crate) slots: [Vec<Entity>; 9],
+    pub(crate) last_accessed: Option<usize>,
 }
 
 impl Default for UnitGroups {
@@ -4940,14 +4728,14 @@ impl Default for UnitGroups {
 
 #[derive(Resource, Debug)]
 pub(crate) struct DoubleClickState {
-    last_click_time: f32,
-    last_unit: Option<Entity>,
-    last_unit_type: Option<&'static str>,
+    pub(crate) last_click_time: f32,
+    pub(crate) last_unit: Option<Entity>,
+    pub(crate) last_unit_type: Option<&'static str>,
 }
 
 #[derive(Resource, Default)]
 pub(crate) struct LatestBattleEvent {
-    focus: Option<Vec3>,
+    pub(crate) focus: Option<Vec3>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -4960,12 +4748,12 @@ pub(crate) enum BattleEventPingKind {
 
 #[derive(Resource, Default)]
 pub(crate) struct IdleWorkerCycleState {
-    request_for: Option<Team>,
-    last_selected: Option<Entity>,
+    pub(crate) request_for: Option<Team>,
+    pub(crate) last_selected: Option<Entity>,
 }
 
 #[derive(Resource, Default)]
-pub(crate) struct KillCredits(Vec<Entity>);
+pub(crate) struct KillCredits(pub(crate) Vec<Entity>);
 
 impl Default for DoubleClickState {
     fn default() -> Self {
@@ -4985,35 +4773,35 @@ pub(crate) enum Team {
 
 impl Team {
     #[allow(dead_code)]
-    fn faction_id(self) -> &'static str {
+    pub(crate) fn faction_id(self) -> &'static str {
         match self {
             Team::Player(_) => "player",
             Team::Neutral => "neutral",
         }
     }
 
-    fn index(self) -> usize {
+    pub(crate) fn index(self) -> usize {
         match self {
             Team::Player(index) => index,
             Team::Neutral => usize::MAX,
         }
     }
 
-    fn economy_index(self) -> Option<usize> {
+    pub(crate) fn economy_index(self) -> Option<usize> {
         match self {
             Team::Player(index) => Some(index),
             Team::Neutral => None,
         }
     }
 
-    fn label(self) -> String {
+    pub(crate) fn label(self) -> String {
         match self {
             Team::Player(index) => format!("{}{}", t("玩家", "Player "), index + 1),
             Team::Neutral => t("中立", "Neutral").to_string(),
         }
     }
 
-    fn from_playable_index(index: usize) -> Option<Self> {
+    pub(crate) fn from_playable_index(index: usize) -> Option<Self> {
         Some(Team::Player(index))
     }
 }
@@ -5047,14 +4835,14 @@ pub(crate) enum Language {
 }
 
 impl Language {
-    fn toggled(self) -> Self {
+    pub(crate) fn toggled(self) -> Self {
         match self {
             Language::Zh => Language::En,
             Language::En => Language::Zh,
         }
     }
 
-    fn short_label(self) -> &'static str {
+    pub(crate) fn short_label(self) -> &'static str {
         match self {
             Language::Zh => "中文",
             Language::En => "EN",
@@ -5063,7 +4851,7 @@ impl Language {
 }
 
 #[derive(Resource, Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct Locale(Language);
+pub(crate) struct Locale(pub(crate) Language);
 
 impl Default for Locale {
     fn default() -> Self {
@@ -5221,13 +5009,13 @@ pub(crate) fn localized_text(zh: &'static str, en: &'static str) -> impl Bundle 
 
 #[derive(Resource, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct VisiblePlayer {
-    team: Team,
-    visibility: PlayerVisibilityMode,
-    control: PlayerControlMode,
+    pub(crate) team: Team,
+    pub(crate) visibility: PlayerVisibilityMode,
+    pub(crate) control: PlayerControlMode,
 }
 
 impl VisiblePlayer {
-    fn per_player(team: Team) -> Self {
+    pub(crate) fn per_player(team: Team) -> Self {
         Self {
             team,
             visibility: PlayerVisibilityMode::PerPlayer,
@@ -5235,7 +5023,7 @@ impl VisiblePlayer {
         }
     }
 
-    fn all_players(team: Team) -> Self {
+    pub(crate) fn all_players(team: Team) -> Self {
         Self {
             team,
             visibility: PlayerVisibilityMode::AllPlayers,
@@ -5244,7 +5032,7 @@ impl VisiblePlayer {
     }
 
     #[cfg(test)]
-    fn spectator_per_player(team: Team) -> Self {
+    pub(crate) fn spectator_per_player(team: Team) -> Self {
         Self {
             team,
             visibility: PlayerVisibilityMode::PerPlayer,
@@ -5252,11 +5040,11 @@ impl VisiblePlayer {
         }
     }
 
-    fn all_players_visible(self) -> bool {
+    pub(crate) fn all_players_visible(self) -> bool {
         self.visibility == PlayerVisibilityMode::AllPlayers
     }
 
-    fn is_spectator(self) -> bool {
+    pub(crate) fn is_spectator(self) -> bool {
         self.control == PlayerControlMode::Spectator
     }
 }
@@ -5273,7 +5061,7 @@ impl Default for VisiblePlayer {
 
 #[derive(Resource, Clone, Debug, PartialEq, Eq)]
 pub(crate) struct TeamRelations {
-    allied: Vec<Vec<bool>>,
+    pub(crate) allied: Vec<Vec<bool>>,
 }
 
 impl Default for TeamRelations {
@@ -5283,7 +5071,7 @@ impl Default for TeamRelations {
 }
 
 impl TeamRelations {
-    fn ensure_player_count(&mut self, count: usize) {
+    pub(crate) fn ensure_player_count(&mut self, count: usize) {
         if self.allied.len() < count {
             let old_len = self.allied.len();
             for row in &mut self.allied {
@@ -5296,7 +5084,7 @@ impl TeamRelations {
         }
     }
 
-    fn set_allied(&mut self, a: Team, b: Team, allied: bool) {
+    pub(crate) fn set_allied(&mut self, a: Team, b: Team, allied: bool) {
         let (Some(a), Some(b)) = (a.economy_index(), b.economy_index()) else {
             return;
         };
@@ -5305,7 +5093,7 @@ impl TeamRelations {
         self.allied[b][a] = allied;
     }
 
-    fn are_allied(&self, a: Team, b: Team) -> bool {
+    pub(crate) fn are_allied(&self, a: Team, b: Team) -> bool {
         if a == b {
             return true;
         }
@@ -5319,7 +5107,7 @@ impl TeamRelations {
             .unwrap_or(false)
     }
 
-    fn are_enemies(&self, a: Team, b: Team) -> bool {
+    pub(crate) fn are_enemies(&self, a: Team, b: Team) -> bool {
         a.economy_index().is_some() && b.economy_index().is_some() && !self.are_allied(a, b)
     }
 }
@@ -5340,7 +5128,7 @@ pub(crate) fn player_color_rgb(slot: usize) -> [f32; 3] {
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct Selectable {
-    radius: f32,
+    pub(crate) radius: f32,
 }
 
 #[derive(Component)]
@@ -5348,80 +5136,80 @@ pub(crate) struct Selected;
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct Health {
-    current: f32,
-    max: f32,
+    pub(crate) current: f32,
+    pub(crate) max: f32,
 }
 
 impl Health {
-    fn new(max: f32) -> Self {
+    pub(crate) fn new(max: f32) -> Self {
         Self { current: max, max }
     }
 
-    fn ratio(self) -> f32 {
+    pub(crate) fn ratio(self) -> f32 {
         (self.current / self.max).clamp(0.0, 1.0)
     }
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct Unit {
-    id: &'static str,
-    speed: f32,
-    can_crush: bool,
-    can_be_crushed: bool,
+    pub(crate) id: &'static str,
+    pub(crate) speed: f32,
+    pub(crate) can_crush: bool,
+    pub(crate) can_be_crushed: bool,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct Structure {
-    id: &'static str,
+    pub(crate) id: &'static str,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct Veterancy {
-    rank: u8,
-    experience_points: u32,
-    base_health: f32,
-    base_damage: f32,
-    base_range: f32,
-    base_vision: f32,
+    pub(crate) rank: u8,
+    pub(crate) experience_points: u32,
+    pub(crate) base_health: f32,
+    pub(crate) base_damage: f32,
+    pub(crate) base_range: f32,
+    pub(crate) base_vision: f32,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct Mine {
-    damage: f32,
-    trigger_radius: f32,
-    blast_radius: f32,
-    arming_remaining: f32,
-    source: Option<Entity>,
+    pub(crate) damage: f32,
+    pub(crate) trigger_radius: f32,
+    pub(crate) blast_radius: f32,
+    pub(crate) arming_remaining: f32,
+    pub(crate) source: Option<Entity>,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct MineLayer {
-    damage: f32,
-    deploy_interval: f32,
-    deploy_radius: f32,
-    spacing: f32,
-    limit: usize,
-    cooldown: f32,
-    deploy_index: usize,
+    pub(crate) damage: f32,
+    pub(crate) deploy_interval: f32,
+    pub(crate) deploy_radius: f32,
+    pub(crate) spacing: f32,
+    pub(crate) limit: usize,
+    pub(crate) cooldown: f32,
+    pub(crate) deploy_index: usize,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct Garrison {
-    capacity: usize,
-    damage_per_unit: f32,
-    count: usize,
+    pub(crate) capacity: usize,
+    pub(crate) damage_per_unit: f32,
+    pub(crate) count: usize,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct MoveOrder {
-    target: Vec3,
+    pub(crate) target: Vec3,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct FollowOrder {
-    target: Entity,
-    allow_enemy: bool,
-    offset: Vec3,
+    pub(crate) target: Entity,
+    pub(crate) allow_enemy: bool,
+    pub(crate) offset: Vec3,
 }
 
 #[derive(Clone)]
@@ -5441,18 +5229,18 @@ pub(crate) enum UnitQueuedOrder {
 
 #[derive(Clone, Copy)]
 pub(crate) struct OrderTargetChoices {
-    supply_crate_position: Option<Vec3>,
-    resource_target: Option<Entity>,
-    resource_dropoff_target: Option<Entity>,
-    enemy_target: Option<Entity>,
-    repair_target: Option<Entity>,
-    construct_target: Option<Entity>,
-    garrison_target: Option<Entity>,
-    follow_target: Option<Entity>,
+    pub(crate) supply_crate_position: Option<Vec3>,
+    pub(crate) resource_target: Option<Entity>,
+    pub(crate) resource_dropoff_target: Option<Entity>,
+    pub(crate) enemy_target: Option<Entity>,
+    pub(crate) repair_target: Option<Entity>,
+    pub(crate) construct_target: Option<Entity>,
+    pub(crate) garrison_target: Option<Entity>,
+    pub(crate) follow_target: Option<Entity>,
 }
 
 impl OrderTargetChoices {
-    fn force_follow_target(self) -> Option<Entity> {
+    pub(crate) fn force_follow_target(self) -> Option<Entity> {
         self.enemy_target
             .or(self.resource_target)
             .or(self.resource_dropoff_target)
@@ -5465,67 +5253,61 @@ impl OrderTargetChoices {
 
 #[derive(Clone, Copy)]
 pub(crate) struct UnitOrderContext {
-    force_move: bool,
-    enemy_target_capturable: bool,
-    attack_move: bool,
-    patrol: bool,
-    origin: Vec3,
-    point: Vec3,
-    offset: Vec3,
+    pub(crate) force_move: bool,
+    pub(crate) enemy_target_capturable: bool,
+    pub(crate) attack_move: bool,
+    pub(crate) patrol: bool,
+    pub(crate) origin: Vec3,
+    pub(crate) point: Vec3,
+    pub(crate) offset: Vec3,
 }
 
 #[derive(Component)]
 pub(crate) struct OrderQueue {
-    orders: VecDeque<UnitQueuedOrder>,
+    pub(crate) orders: VecDeque<UnitQueuedOrder>,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct HoldPosition {
-    enabled: bool,
+    pub(crate) enabled: bool,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct AttackOrder {
-    target: Entity,
+    pub(crate) target: Entity,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct CaptureOrder {
-    target: Entity,
-    elapsed: f32,
+    pub(crate) target: Entity,
+    pub(crate) elapsed: f32,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct GarrisonOrder {
-    target: Entity,
+    pub(crate) target: Entity,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct RepairOrder {
-    target: Entity,
+    pub(crate) target: Entity,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct ConstructOrder {
-    target: Entity,
+    pub(crate) target: Entity,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct AttackMoveOrder {
-    destination: Vec3,
+    pub(crate) destination: Vec3,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct PatrolOrder {
-    origin: Vec3,
-    destination: Vec3,
-    moving_to_destination: bool,
-}
-
-#[derive(Component, Clone, Copy, Debug)]
-pub(crate) struct AiDroneScout {
-    last_target: Option<Entity>,
-    cooldown_remaining: f32,
+    pub(crate) origin: Vec3,
+    pub(crate) destination: Vec3,
+    pub(crate) moving_to_destination: bool,
 }
 
 pub(crate) type ActiveUnitOrderFilter = Or<(
@@ -5561,7 +5343,7 @@ pub(crate) enum MovementDomain {
 }
 
 impl MovementDomain {
-    fn from_registry(domain: registry::MoveDomain) -> Self {
+    pub(crate) fn from_registry(domain: registry::MoveDomain) -> Self {
         match domain {
             registry::MoveDomain::Terrain => Self::Terrain,
             registry::MoveDomain::Air => Self::Air,
@@ -5571,23 +5353,23 @@ impl MovementDomain {
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct Weapon {
-    range: f32,
-    damage: f32,
-    cooldown: f32,
-    splash_radius: f32,
-    splash_damage_multiplier: f32,
-    structure_damage_multiplier: f32,
-    cooldown_left: f32,
-    can_attack_air: bool,
-    can_attack_ground: bool,
+    pub(crate) range: f32,
+    pub(crate) damage: f32,
+    pub(crate) cooldown: f32,
+    pub(crate) splash_radius: f32,
+    pub(crate) splash_damage_multiplier: f32,
+    pub(crate) structure_damage_multiplier: f32,
+    pub(crate) cooldown_left: f32,
+    pub(crate) can_attack_air: bool,
+    pub(crate) can_attack_ground: bool,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct ShotPulse {
-    from: Vec3,
-    to: Vec3,
-    ttl: f32,
-    team: Team,
+    pub(crate) from: Vec3,
+    pub(crate) to: Vec3,
+    pub(crate) ttl: f32,
+    pub(crate) team: Team,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -5602,19 +5384,19 @@ pub(crate) enum ImpactBurstKind {
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct ImpactBurst {
-    remaining: f32,
-    total: f32,
-    radius: f32,
-    power: f32,
-    team: Team,
-    kind: ImpactBurstKind,
+    pub(crate) remaining: f32,
+    pub(crate) total: f32,
+    pub(crate) radius: f32,
+    pub(crate) power: f32,
+    pub(crate) team: Team,
+    pub(crate) kind: ImpactBurstKind,
 }
 
 #[derive(Resource, Default)]
-pub(crate) struct NextSpawnId(u32);
+pub(crate) struct NextSpawnId(pub(crate) u32);
 
 impl Weapon {
-    fn new(
+    pub(crate) fn new(
         range: f32,
         damage: f32,
         cooldown: f32,
@@ -5668,7 +5450,7 @@ impl Default for BuildStructureTab {
 }
 
 impl BuildStructureTab {
-    fn label(self) -> &'static str {
+    pub(crate) fn label(self) -> &'static str {
         match self {
             Self::Production => t("生产", "Production"),
             Self::Defense => t("防御", "Defense"),
@@ -5697,8 +5479,8 @@ pub(crate) enum BuildAction {
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(crate) struct CommandHotkey {
-    display: &'static str,
-    key_code: KeyCode,
+    pub(crate) display: &'static str,
+    pub(crate) key_code: KeyCode,
 }
 
 impl CommandHotkey {
@@ -5708,7 +5490,7 @@ impl CommandHotkey {
 }
 
 impl BuildAction {
-    fn audio_command_key(self) -> Option<&'static str> {
+    pub(crate) fn audio_command_key(self) -> Option<&'static str> {
         match self {
             Self::ToggleDeployMode => Some(COMMAND_KEY_TOGGLE_DEPLOY),
             Self::HoldPosition => Some(COMMAND_KEY_HOLD_POSITION),
@@ -5731,21 +5513,21 @@ impl BuildAction {
 
 #[derive(Clone, Copy)]
 pub(crate) struct BuildJob {
-    team: Team,
-    action: BuildAction,
-    producer_entity: Entity,
-    producer_id: &'static str,
-    timer: f32,
-    origin: Vec3,
+    pub(crate) team: Team,
+    pub(crate) action: BuildAction,
+    pub(crate) producer_entity: Entity,
+    pub(crate) producer_id: &'static str,
+    pub(crate) timer: f32,
+    pub(crate) origin: Vec3,
 }
 
 #[derive(Resource, Default)]
-pub(crate) struct BuildQueue(Vec<BuildJob>);
+pub(crate) struct BuildQueue(pub(crate) Vec<BuildJob>);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct QueueButtonState {
-    count: usize,
-    full: bool,
+    pub(crate) count: usize,
+    pub(crate) full: bool,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -5766,155 +5548,51 @@ pub(crate) enum StructurePlacementValidity {
     OutOfBaseRadius,
 }
 
-#[derive(Resource)]
-pub(crate) struct AiDirector {
-    production_timer: Vec<f32>,
-    production_cursor: Vec<usize>,
-    attack_timer: Vec<f32>,
-    opening_attack_grace_applied: Vec<bool>,
-    build_timer: Vec<f32>,
-    construction_timer: Vec<f32>,
-    capture_timer: Vec<f32>,
-    saboteur_timer: Vec<f32>,
-    support_timer: Vec<f32>,
-    repair_timer: Vec<f32>,
-}
-
-impl AiDirector {
-    fn ensure_team(&mut self, team: Team) -> Option<usize> {
-        let index = team.economy_index()?;
-        if self.production_timer.len() <= index {
-            self.production_timer.resize(index + 1, 2.5);
-            self.production_cursor.resize(index + 1, 0);
-            self.attack_timer
-                .resize(index + 1, AI_OPENING_ATTACK_GRACE_SECONDS);
-            self.opening_attack_grace_applied.resize(index + 1, false);
-            self.build_timer.resize(index + 1, 8.0);
-            self.construction_timer.resize(index + 1, 0.0);
-            self.capture_timer.resize(index + 1, 3.0);
-            self.saboteur_timer.resize(index + 1, 4.0);
-            self.support_timer.resize(index + 1, 6.0);
-            self.repair_timer.resize(index + 1, 0.0);
-        }
-        Some(index)
-    }
-}
-
-impl Default for AiDirector {
-    fn default() -> Self {
-        Self {
-            production_timer: Vec::new(),
-            production_cursor: Vec::new(),
-            attack_timer: Vec::new(),
-            opening_attack_grace_applied: Vec::new(),
-            build_timer: Vec::new(),
-            construction_timer: Vec::new(),
-            capture_timer: Vec::new(),
-            saboteur_timer: Vec::new(),
-            support_timer: Vec::new(),
-            repair_timer: Vec::new(),
-        }
-    }
-}
-
-#[derive(Resource, Clone, Debug, PartialEq, Eq)]
-pub(crate) struct AiDifficultySettings {
-    players: Vec<AiDifficulty>,
-}
-
-impl AiDifficultySettings {
-    fn difficulty(&self, team: Team) -> AiDifficulty {
-        team.economy_index()
-            .and_then(|index| self.players.get(index).copied())
-            .unwrap_or(AiDifficulty::Normal)
-    }
-
-    fn set_difficulty(&mut self, team: Team, difficulty: AiDifficulty) {
-        if let Some(index) = team.economy_index() {
-            if self.players.len() <= index {
-                self.players.resize(index + 1, AiDifficulty::Normal);
-            }
-            self.players[index] = difficulty;
-        }
-    }
-
-    fn default_ai_difficulty(&self, player_team: Team) -> AiDifficulty {
-        active_ai_teams(Some(player_team), None)
-            .next()
-            .map(|team| self.difficulty(team))
-            .unwrap_or(AiDifficulty::Normal)
-    }
-}
-
-impl Default for AiDifficultySettings {
-    fn default() -> Self {
-        let _available_difficulties = AiDifficulty::ALL;
-        Self {
-            players: Vec::new(),
-        }
-    }
-}
-
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct VisualFaction(SkirmishFaction);
+pub(crate) struct VisualFaction(pub(crate) SkirmishFaction);
 
 #[derive(SystemParam)]
 pub(crate) struct OrderResources<'w> {
-    map_bounds: Res<'w, MapBounds>,
-    relations: Res<'w, TeamRelations>,
-    command_mode: ResMut<'w, CommandMode>,
-    support_cooldowns: ResMut<'w, SupportCooldowns>,
-    battle_log: ResMut<'w, BattleLog>,
-    audio_feedback: ResMut<'w, AudioFeedback>,
+    pub(crate) map_bounds: Res<'w, MapBounds>,
+    pub(crate) relations: Res<'w, TeamRelations>,
+    pub(crate) command_mode: ResMut<'w, CommandMode>,
+    pub(crate) support_cooldowns: ResMut<'w, SupportCooldowns>,
+    pub(crate) battle_log: ResMut<'w, BattleLog>,
+    pub(crate) audio_feedback: ResMut<'w, AudioFeedback>,
 }
 
 #[derive(SystemParam)]
 pub(crate) struct CommandActionResources<'w> {
-    build_queue: ResMut<'w, BuildQueue>,
-    build_structure_tab: ResMut<'w, BuildStructureTab>,
-    command_mode: ResMut<'w, CommandMode>,
-    economies: ResMut<'w, Economies>,
-    player_factions: Res<'w, PlayerFactions>,
-    audio_feedback: ResMut<'w, AudioFeedback>,
-    battle_log: ResMut<'w, BattleLog>,
-    idle_worker_cycle: ResMut<'w, IdleWorkerCycleState>,
-}
-
-#[derive(SystemParam)]
-pub(crate) struct AiDirectorResources<'w> {
-    map_bounds: Res<'w, MapBounds>,
-    economies: ResMut<'w, Economies>,
-    next_id: ResMut<'w, NextSpawnId>,
-    director: ResMut<'w, AiDirector>,
-    ai_settings: Res<'w, AiDifficultySettings>,
-    player_factions: Res<'w, PlayerFactions>,
-    active_teams: Option<Res<'w, ActiveTeams>>,
-    relations: Res<'w, TeamRelations>,
-    support_cooldowns: ResMut<'w, SupportCooldowns>,
-    battle_log: ResMut<'w, BattleLog>,
-    audio_feedback: ResMut<'w, AudioFeedback>,
+    pub(crate) build_queue: ResMut<'w, BuildQueue>,
+    pub(crate) build_structure_tab: ResMut<'w, BuildStructureTab>,
+    pub(crate) command_mode: ResMut<'w, CommandMode>,
+    pub(crate) economies: ResMut<'w, Economies>,
+    pub(crate) player_factions: Res<'w, PlayerFactions>,
+    pub(crate) audio_feedback: ResMut<'w, AudioFeedback>,
+    pub(crate) battle_log: ResMut<'w, BattleLog>,
+    pub(crate) idle_worker_cycle: ResMut<'w, IdleWorkerCycleState>,
 }
 
 #[derive(SystemParam)]
 pub(crate) struct StructurePlacementInputResources<'w, 's> {
-    visible_player: Res<'w, VisiblePlayer>,
-    player_factions: Res<'w, PlayerFactions>,
-    asset_server: Res<'w, AssetServer>,
-    map_bounds: Res<'w, MapBounds>,
-    next_id: ResMut<'w, NextSpawnId>,
-    economies: ResMut<'w, Economies>,
-    command_mode: ResMut<'w, CommandMode>,
-    hud_zones: Res<'w, HudHitZones>,
-    placement_feedback: ResMut<'w, StructurePlacementFeedback>,
-    audio_feedback: ResMut<'w, AudioFeedback>,
-    battle_log: ResMut<'w, BattleLog>,
-    selected_constructors: Query<
+    pub(crate) visible_player: Res<'w, VisiblePlayer>,
+    pub(crate) player_factions: Res<'w, PlayerFactions>,
+    pub(crate) asset_server: Res<'w, AssetServer>,
+    pub(crate) map_bounds: Res<'w, MapBounds>,
+    pub(crate) next_id: ResMut<'w, NextSpawnId>,
+    pub(crate) economies: ResMut<'w, Economies>,
+    pub(crate) command_mode: ResMut<'w, CommandMode>,
+    pub(crate) hud_zones: Res<'w, HudHitZones>,
+    pub(crate) placement_feedback: ResMut<'w, StructurePlacementFeedback>,
+    pub(crate) audio_feedback: ResMut<'w, AudioFeedback>,
+    pub(crate) battle_log: ResMut<'w, BattleLog>,
+    pub(crate) selected_constructors: Query<
         'w,
         's,
         (Entity, &'static Unit, &'static Team, &'static Health),
         (With<Selected>, With<Unit>, Without<Structure>),
     >,
-    constructors: Query<
+    pub(crate) constructors: Query<
         'w,
         's,
         (
@@ -5930,16 +5608,17 @@ pub(crate) struct StructurePlacementInputResources<'w, 's> {
 
 #[derive(SystemParam)]
 pub(crate) struct StructurePlacementPreviewParams<'w, 's> {
-    command_mode: Res<'w, CommandMode>,
-    hud_zones: Res<'w, HudHitZones>,
-    visible_player: Res<'w, VisiblePlayer>,
-    player_factions: Res<'w, PlayerFactions>,
-    economies: Res<'w, Economies>,
-    map_bounds: Res<'w, MapBounds>,
-    window_q: Query<'w, 's, &'static Window, With<PrimaryWindow>>,
-    camera_q: Query<'w, 's, (&'static Camera, &'static GlobalTransform), With<MainCamera>>,
-    structures: Query<'w, 's, StructurePrereqItem<'static>>,
-    occupiers: Query<
+    pub(crate) command_mode: Res<'w, CommandMode>,
+    pub(crate) hud_zones: Res<'w, HudHitZones>,
+    pub(crate) visible_player: Res<'w, VisiblePlayer>,
+    pub(crate) player_factions: Res<'w, PlayerFactions>,
+    pub(crate) economies: Res<'w, Economies>,
+    pub(crate) map_bounds: Res<'w, MapBounds>,
+    pub(crate) window_q: Query<'w, 's, &'static Window, With<PrimaryWindow>>,
+    pub(crate) camera_q:
+        Query<'w, 's, (&'static Camera, &'static GlobalTransform), With<MainCamera>>,
+    pub(crate) structures: Query<'w, 's, StructurePrereqItem<'static>>,
+    pub(crate) occupiers: Query<
         'w,
         's,
         PlacementOccupierItem<'static>,
@@ -5961,34 +5640,34 @@ pub(crate) struct SupportPowersPanel;
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct SupportPowerButton {
-    kind: SupportPowerKind,
+    pub(crate) kind: SupportPowerKind,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct SupportPowerCooldownLabel {
-    kind: SupportPowerKind,
+    pub(crate) kind: SupportPowerKind,
 }
 
 #[derive(Component, Clone, Copy)]
 pub(crate) struct SupportPowerHotkeyLabel {
-    kind: SupportPowerKind,
+    pub(crate) kind: SupportPowerKind,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct SupportPowerButtonSpec {
-    kind: SupportPowerKind,
-    icon_path: &'static str,
-    hotkey_label: &'static str,
+    pub(crate) kind: SupportPowerKind,
+    pub(crate) icon_path: &'static str,
+    pub(crate) hotkey_label: &'static str,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct SupportPowerButtonState {
-    enabled: bool,
-    unlocked: bool,
-    active: bool,
-    low_power: bool,
-    cooldown_seconds: Option<u32>,
-    badge_text: String,
+    pub(crate) enabled: bool,
+    pub(crate) unlocked: bool,
+    pub(crate) active: bool,
+    pub(crate) low_power: bool,
+    pub(crate) cooldown_seconds: Option<u32>,
+    pub(crate) badge_text: String,
 }
 
 pub(crate) fn support_power_button_specs() -> Vec<SupportPowerButtonSpec> {
@@ -6858,14 +6537,6 @@ pub(crate) fn faction_ai_profile_for_difficulty(
     profile
 }
 
-pub(crate) fn ai_profile_requests_offensive_combat_units(profile: &TeamAiProfile) -> bool {
-    profile.production_priority.iter().any(|id| {
-        registry::entity(id).is_some_and(|def| {
-            def.weapon.is_some() && def.speed > 0.0 && !matches!(def.id, "Worker")
-        })
-    })
-}
-
 pub(crate) fn setup_team(
     commands: &mut Commands,
     asset_server: &AssetServer,
@@ -7541,8 +7212,8 @@ pub(crate) fn can_receive_repair_aura(
 
 #[derive(Clone, Copy)]
 pub(crate) struct RepairCapability {
-    rate: f32,
-    radius: f32,
+    pub(crate) rate: f32,
+    pub(crate) radius: f32,
 }
 
 pub(crate) fn repair_capability(unit: &Unit) -> Option<RepairCapability> {
@@ -7669,7 +7340,7 @@ pub(crate) enum ProceduralEntityModel {
 }
 
 impl ProceduralEntityModel {
-    fn for_entity_id(id: &str) -> Option<Self> {
+    pub(crate) fn for_entity_id(id: &str) -> Option<Self> {
         match id {
             "LandMine" => Some(Self::LandMine),
             "TeslaFenceSegment" => Some(Self::TeslaFenceSegment),
@@ -7678,7 +7349,7 @@ impl ProceduralEntityModel {
     }
 
     #[cfg(test)]
-    fn part_count(self) -> usize {
+    pub(crate) fn part_count(self) -> usize {
         match self {
             Self::LandMine => 2,
             Self::TeslaFenceSegment => 7,
@@ -7694,7 +7365,7 @@ pub(crate) enum FactionIdentityMarker {
 }
 
 impl FactionIdentityMarker {
-    fn for_faction(faction: SkirmishFaction) -> Self {
+    pub(crate) fn for_faction(faction: SkirmishFaction) -> Self {
         match faction {
             SkirmishFaction::Alliance => Self::Human,
             SkirmishFaction::Demon => Self::Demon,
@@ -7703,13 +7374,13 @@ impl FactionIdentityMarker {
     }
 
     #[allow(dead_code)]
-    fn for_team(team: Team) -> Option<Self> {
+    pub(crate) fn for_team(team: Team) -> Option<Self> {
         team.economy_index()
             .map(|_| Self::for_faction(SkirmishFaction::from_team(team)))
     }
 
     #[cfg(test)]
-    fn part_count(self) -> usize {
+    pub(crate) fn part_count(self) -> usize {
         match self {
             Self::Human => 2,
             Self::Demon => 3,
@@ -7725,11 +7396,14 @@ pub(crate) fn default_visual_faction(team: Team) -> Option<SkirmishFaction> {
 
 #[derive(Component, Clone, Copy, Debug)]
 pub(crate) struct HunyuanModelPart {
-    entity_id: &'static str,
+    pub(crate) entity_id: &'static str,
 }
 
 impl HunyuanModelPart {
-    fn for_render_part(entity_id: &'static str, part: &registry::RenderPart) -> Option<Self> {
+    pub(crate) fn for_render_part(
+        entity_id: &'static str,
+        part: &registry::RenderPart,
+    ) -> Option<Self> {
         is_hunyuan_model_path(part.model).then_some(Self { entity_id })
     }
 }
@@ -7739,11 +7413,11 @@ pub(crate) struct HunyuanModelMaterialized;
 
 #[derive(Resource, Default)]
 pub(crate) struct HunyuanModelMaterialCache {
-    by_entity: BTreeMap<&'static str, Handle<StandardMaterial>>,
+    pub(crate) by_entity: BTreeMap<&'static str, Handle<StandardMaterial>>,
 }
 
 impl HunyuanModelMaterialCache {
-    fn handle_for(
+    pub(crate) fn handle_for(
         &mut self,
         entity_id: &'static str,
         materials: &mut Assets<StandardMaterial>,
@@ -16388,51 +16062,6 @@ pub(crate) fn update_ai_siege_drill_deploy_mode(
     }
 }
 
-pub(crate) fn ai_siege_drill_should_deploy(
-    team: Team,
-    position: Vec3,
-    weapon: &Weapon,
-    health: &Health,
-    emp: Option<&EmpDisabled>,
-    attack_order: Option<&AttackOrder>,
-    targets: &Query<
-        (
-            &Structure,
-            &Team,
-            &Transform,
-            &Selectable,
-            &MovementDomain,
-            &Health,
-        ),
-        (With<Structure>, Without<Unit>),
-    >,
-) -> bool {
-    if health.current <= 0.0 || emp.is_some_and(|emp| emp.remaining > 0.0) {
-        return false;
-    }
-    let Some(order) = attack_order else {
-        return false;
-    };
-    let Ok((
-        _structure,
-        target_team,
-        target_transform,
-        _target_selectable,
-        target_domain,
-        target_health,
-    )) = targets.get(order.target)
-    else {
-        return false;
-    };
-    if target_health.current <= 0.0 || *target_team == team || *target_team == Team::Neutral {
-        return false;
-    }
-    if !can_attack_domain(weapon, *target_domain) {
-        return false;
-    }
-    xz_distance(position, target_transform.translation) <= SIEGE_DRILL_DEPLOYED_ATTACK_RANGE
-}
-
 pub(crate) fn apply_siege_drill_deploy_mode(
     commands: &mut Commands,
     entity: Entity,
@@ -17608,12 +17237,6 @@ pub(crate) fn choose_ai_drone_scout_target(
     best_new_target.or(best_any_target)
 }
 
-pub(crate) fn ai_drone_scout_delay(drone: Entity, target: Entity) -> f32 {
-    let range = AI_DRONE_SCOUT_SWITCH_MAX_SECONDS - AI_DRONE_SCOUT_SWITCH_MIN_SECONDS;
-    let fraction = (entity_pair_hash(drone, target) % 1_000) as f32 / 1_000.0;
-    AI_DRONE_SCOUT_SWITCH_MIN_SECONDS + range * fraction
-}
-
 pub(crate) fn entity_pair_hash(a: Entity, b: Entity) -> u64 {
     let mut x = a.to_bits().wrapping_mul(0x9E37_79B1_85EB_CA87)
         ^ b.to_bits().wrapping_mul(0xC2B2_AE3D_27D4_EB4F);
@@ -17621,21 +17244,6 @@ pub(crate) fn entity_pair_hash(a: Entity, b: Entity) -> u64 {
     x = x.wrapping_mul(0xFF51_AFD7_ED55_8CCD);
     x ^= x >> 33;
     x
-}
-
-pub(crate) fn ai_supply_crate_distance_to_team_units(
-    team: Team,
-    crate_position: Vec3,
-    team_anchors: &Query<(&Team, &Transform), Or<(With<Unit>, With<Structure>)>>,
-) -> f32 {
-    let mut closest_distance = f32::INFINITY;
-    for (anchor_team, transform) in team_anchors {
-        if *anchor_team == team {
-            closest_distance =
-                closest_distance.min(xz_distance(crate_position, transform.translation));
-        }
-    }
-    closest_distance
 }
 
 pub(crate) fn update_ai_tech_bunker_garrisons(
@@ -17776,49 +17384,6 @@ pub(crate) fn try_activate_ai_support_power(
     false
 }
 
-pub(crate) fn ai_support_power_available(
-    team: Team,
-    power: SupportPowerKind,
-    economies: &Economies,
-    support_cooldowns: &SupportCooldowns,
-    structures: &Query<StructurePrereqItem<'_>>,
-) -> bool {
-    let def = power.definition();
-    support_cooldowns.ready(team, power)
-        && (!def.requires_power || !economies.get(team).low_power())
-        && support_requirements_met(team, def.requirements, structures)
-}
-
-pub(crate) fn ai_support_power_targets(
-    units: &Query<(Entity, &Team, &Transform, &Selectable, &Health, &Unit), With<Unit>>,
-    structures: &Query<CaptureStructureTargetItem<'_>, With<Structure>>,
-) -> Vec<SupportPowerTargetSnapshot> {
-    let mut targets = units
-        .iter()
-        .map(
-            |(entity, team, transform, _selectable, health, unit)| SupportPowerTargetSnapshot {
-                entity,
-                team: *team,
-                position: transform.translation,
-                health: *health,
-                mobile: unit.speed > 0.0,
-            },
-        )
-        .collect::<Vec<_>>();
-    targets.extend(structures.iter().map(
-        |(entity, _structure, team, transform, health, _under_construction)| {
-            SupportPowerTargetSnapshot {
-                entity,
-                team: *team,
-                position: transform.translation,
-                health: *health,
-                mobile: false,
-            }
-        },
-    ));
-    targets
-}
-
 pub(crate) fn support_power_available_for_audio(
     team: Team,
     power: SupportPowerKind,
@@ -17828,75 +17393,6 @@ pub(crate) fn support_power_available_for_audio(
     let def = power.definition();
     (!def.requires_power || !economies.get(team).low_power())
         && support_requirements_met(team, def.requirements, structures)
-}
-
-pub(crate) fn ai_support_power_target(
-    team: Team,
-    power: SupportPowerKind,
-    relations: &TeamRelations,
-    units: &Query<(Entity, &Team, &Transform, &Selectable, &Health, &Unit), With<Unit>>,
-    structures: &Query<CaptureStructureTargetItem<'_>, With<Structure>>,
-) -> Option<Vec3> {
-    let def = power.definition();
-    match power {
-        SupportPowerKind::NaniteRepairSwarm => best_repair_swarm_position(
-            team,
-            units,
-            def.radius,
-            def.healing,
-            AI_SUPPORT_NANITE_REPAIR_MIN_MISSING_HP,
-        ),
-        SupportPowerKind::EmpPulse => best_mobile_unit_cluster_position(
-            team,
-            units,
-            def.radius,
-            false,
-            relations,
-            AI_SUPPORT_MIN_CLUSTER_TARGETS,
-        ),
-        SupportPowerKind::ShieldOverdrive => best_shield_overdrive_position(
-            team,
-            units,
-            def.radius,
-            relations,
-            AI_SUPPORT_SHIELD_OVERDRIVE_MIN_SCORE,
-        ),
-        SupportPowerKind::ChronoRelay => best_mobile_unit_cluster_position(
-            team,
-            units,
-            def.radius,
-            true,
-            relations,
-            AI_SUPPORT_CHRONO_RELAY_MIN_MOBILE_UNITS,
-        ),
-        SupportPowerKind::WeatherStorm => best_scored_strike_position(
-            team,
-            units,
-            structures,
-            relations,
-            def.radius,
-            AI_SUPPORT_WEATHER_STORM_MIN_SCORE,
-        ),
-        SupportPowerKind::StrategicMissile => best_scored_strike_position(
-            team,
-            units,
-            structures,
-            relations,
-            def.radius,
-            AI_SUPPORT_STRATEGIC_MISSILE_MIN_SCORE,
-        ),
-        SupportPowerKind::OrbitalStrike => best_scored_strike_position(
-            team,
-            units,
-            structures,
-            relations,
-            def.radius,
-            AI_SUPPORT_ORBITAL_STRIKE_MIN_SCORE,
-        ),
-        SupportPowerKind::RadarSweep | SupportPowerKind::Paradrop => {
-            any_enemy_support_target_position(team, relations, units, structures)
-        }
-    }
 }
 
 pub(crate) fn best_repair_swarm_position(
@@ -18138,32 +17634,6 @@ pub(crate) fn strike_score_at_position(
     unit_score + structure_score
 }
 
-pub(crate) fn ai_strike_unit_score(unit: &Unit) -> f32 {
-    let mut score = 1.0;
-    if let Some(def) = registry::entity(unit.id) {
-        if def.weapon.is_some() {
-            score += 1.0;
-        }
-        score += ai_resource_score(def.cost) * 0.5;
-    }
-    score
-}
-
-pub(crate) fn ai_strike_structure_score(structure: &Structure) -> f32 {
-    let mut score = 3.5;
-    if let Some(def) = registry::entity(structure.id) {
-        if def.weapon.is_some() {
-            score += 1.0;
-        }
-        score += ai_resource_score(def.cost);
-    }
-    score
-}
-
-pub(crate) fn ai_resource_score(cost: registry::Cost) -> f32 {
-    ((cost.ore + cost.crystal) as f32 / 8.0).min(2.0)
-}
-
 pub(crate) fn any_enemy_support_target_position(
     team: Team,
     relations: &TeamRelations,
@@ -18186,123 +17656,6 @@ pub(crate) fn any_enemy_support_target_position(
                 },
             )
         })
-}
-
-pub(crate) fn ai_support_unit_side_matches(
-    team: Team,
-    unit_team: Team,
-    friendly: bool,
-    relations: &TeamRelations,
-) -> bool {
-    if friendly {
-        unit_team == team
-    } else {
-        relations.are_enemies(team, unit_team)
-    }
-}
-
-pub(crate) fn ai_needs_more_anti_air_units(
-    team: Team,
-    units: impl IntoIterator<Item = (&'static str, Team)>,
-) -> bool {
-    let mut enemy_air_units = 0usize;
-    let mut anti_air_responses = 0usize;
-    for (unit_id, unit_team) in units {
-        if unit_team == Team::Neutral {
-            continue;
-        }
-        if unit_team == team {
-            if ai_unit_can_attack_air(unit_id) {
-                anti_air_responses += 1;
-            }
-        } else if ai_unit_is_air(unit_id) {
-            enemy_air_units += 1;
-        }
-    }
-    enemy_air_units > 0 && anti_air_responses < enemy_air_units
-}
-
-pub(crate) fn ai_unit_is_air(unit_id: &str) -> bool {
-    registry::entity(unit_id).is_some_and(|def| matches!(def.domain, registry::MoveDomain::Air))
-}
-
-pub(crate) fn ai_unit_can_attack_air(unit_id: &str) -> bool {
-    registry::entity(unit_id)
-        .and_then(|def| def.weapon)
-        .is_some_and(|weapon| weapon.can_attack_air)
-}
-
-pub(crate) fn ai_battle_unit_id(unit_id: &str) -> bool {
-    if matches!(unit_id, "Worker" | AI_SABOTEUR_ID) {
-        return false;
-    }
-    registry::entity(unit_id).is_some_and(|def| {
-        def.speed > 0.0
-            && (def.weapon.is_some()
-                || def.repair_rate > 0.0
-                || def.healing_rate > 0.0
-                || def.support_shield_radius > 0.0
-                || def.mine_deploy_radius > 0.0)
-    })
-}
-
-pub(crate) fn ai_battlegroup_target_units(profile: &TeamAiProfile) -> usize {
-    profile.expected_battlegroups * profile.expected_units_in_battlegroup
-}
-
-pub(crate) fn ai_battlegroup_candidate_allowed(
-    candidate: &'static str,
-    profile: &TeamAiProfile,
-    counts: AiProductionCounts,
-) -> bool {
-    if ai_training_is_economy_request(candidate) || !ai_battle_unit_id(candidate) {
-        return true;
-    }
-    let target_units = ai_battlegroup_target_units(profile);
-    target_units > 0 && counts.battle_units < target_units
-}
-
-pub(crate) fn ai_battlegroup_repair_target(
-    team: Team,
-    repairer: Entity,
-    units: &Query<(Entity, &Team, &Transform, &Selectable, &Health, &Unit), With<Unit>>,
-) -> Option<Entity> {
-    let repairer_position = units
-        .get(repairer)
-        .ok()
-        .map(|(_, _, transform, _, _, _)| transform.translation);
-    let mut best = None;
-    let mut best_missing_ratio = 0.0;
-    let mut best_distance = f32::MAX;
-
-    for (entity, unit_team, transform, _selectable, health, unit) in units {
-        if entity == repairer
-            || *unit_team != team
-            || health.current <= 0.0
-            || health.current >= health.max
-            || !ai_battle_unit_id(unit.id)
-        {
-            continue;
-        }
-
-        let missing_ratio = if health.max > 0.0 {
-            1.0 - (health.current / health.max).clamp(0.0, 1.0)
-        } else {
-            0.0
-        };
-        let distance = repairer_position
-            .map(|position| xz_distance(position, transform.translation))
-            .unwrap_or(0.0);
-        if missing_ratio > best_missing_ratio
-            || (missing_ratio == best_missing_ratio && distance < best_distance)
-        {
-            best = Some(entity);
-            best_missing_ratio = missing_ratio;
-            best_distance = distance;
-        }
-    }
-
-    best
 }
 
 pub(crate) fn assign_ai_attack_wave_order(
@@ -18415,306 +17768,6 @@ pub(crate) fn restore_ai_attack_wave_orders(
             assign_ai_attack_wave_order(&mut commands, team, entity, unit, target, &support_units);
         }
     }
-}
-
-pub(crate) fn ai_director(
-    time: Res<Time>,
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    visible_player: Option<Res<VisiblePlayer>>,
-    mut resources: AiDirectorResources,
-    structures: Query<StructurePrereqItem<'_>>,
-    units: Query<
-        (
-            Entity,
-            &Unit,
-            &Team,
-            &Transform,
-            Option<&OrderQueue>,
-            Option<&MoveOrder>,
-            Option<&FollowOrder>,
-            Option<&AttackOrder>,
-            Option<&CaptureOrder>,
-            Option<&GarrisonOrder>,
-            Option<&HarvestOrder>,
-            Option<&RepairOrder>,
-            Option<&ConstructOrder>,
-            Option<&AttackMoveOrder>,
-            Option<&PatrolOrder>,
-        ),
-        Without<Selected>,
-    >,
-    support_units: Query<(Entity, &Team, &Transform, &Selectable, &Health, &Unit), With<Unit>>,
-    capture_structures: Query<CaptureStructureTargetItem<'_>, With<Structure>>,
-    ai_repair_structures: Query<AiRepairStructureItem<'_>, With<Structure>>,
-    targets: Query<(Entity, &Team, &Transform), With<Health>>,
-) {
-    let delta = time.delta_secs();
-    let player_team = visible_player_team(visible_player.as_deref());
-    let controlled_team = controlled_player_team(visible_player.as_deref());
-    for team in active_ai_teams(controlled_team, resources.active_teams.as_deref()) {
-        let Some(idx) = resources.director.ensure_team(team) else {
-            continue;
-        };
-        let faction = resources.player_factions.slot_faction(team);
-        let profile =
-            faction_ai_profile_for_difficulty(faction, resources.ai_settings.difficulty(team));
-        if !resources.director.opening_attack_grace_applied[idx] {
-            resources.director.attack_timer[idx] = profile.opening_attack_grace;
-            resources.director.opening_attack_grace_applied[idx] = true;
-        }
-
-        resources.director.support_timer[idx] -= delta;
-        if profile.support_powers_enabled && resources.director.support_timer[idx] <= 0.0 {
-            resources.director.support_timer[idx] = profile.support_interval;
-            let _ = try_activate_ai_support_power(
-                team,
-                player_team,
-                &mut commands,
-                &resources.economies,
-                &mut resources.support_cooldowns,
-                &mut resources.battle_log,
-                &mut resources.audio_feedback,
-                &resources.relations,
-                &structures,
-                &support_units,
-                &capture_structures,
-            );
-        } else if !profile.support_powers_enabled {
-            resources.director.support_timer[idx] = profile.support_interval;
-        }
-
-        resources.director.repair_timer[idx] -= delta;
-        if resources.director.repair_timer[idx] <= 0.0 {
-            resources.director.repair_timer[idx] = AI_REPAIR_REFRESH_INTERVAL_SECONDS;
-            let _ = repair_ai_damaged_structures(
-                &mut commands,
-                team,
-                &ai_repair_structures,
-                &mut resources.economies,
-            );
-        }
-
-        resources.director.production_timer[idx] -= delta;
-        let mut production_refresh_due = false;
-        let mut trained_during_priority_refresh = false;
-        if resources.director.production_timer[idx] <= 0.0 {
-            production_refresh_due = true;
-            resources.director.production_timer[idx] = profile.production_interval;
-            let production_counts =
-                ai_production_counts(team, units.iter().map(|item| (item.1, item.2)));
-            let economy_snapshot = resources.economies.get(team).clone();
-            if let Some(id) = next_ai_economy_train(
-                team,
-                faction,
-                &profile,
-                &structures,
-                &economy_snapshot,
-                production_counts,
-            ) {
-                trained_during_priority_refresh = try_spawn_ai_trained_unit(
-                    &mut commands,
-                    &asset_server,
-                    &mut resources.economies,
-                    &mut resources.next_id,
-                    team,
-                    faction,
-                    id,
-                    &structures,
-                    *resources.map_bounds,
-                    player_team,
-                );
-            }
-        }
-
-        resources.director.build_timer[idx] -= delta;
-        if resources.director.build_timer[idx] <= 0.0 {
-            resources.director.build_timer[idx] = profile.build_interval;
-            let production_counts =
-                ai_production_counts(team, units.iter().map(|item| (item.1, item.2)));
-            let next_structure = next_ai_economy_structure_for_faction(
-                team,
-                faction,
-                &profile,
-                &structures,
-                production_counts,
-            )
-            .map(|id| (id, AiStructureBuildKind::Economy))
-            // Build production (offense) structures before defense, so the AI
-            // always has a Barracks/VehicleFactory to train an army from instead
-            // of spending its whole economy on turrets.
-            .or_else(|| {
-                profile
-                    .active_offense_enabled
-                    .then(|| next_ai_offense_structure_for_faction(team, faction, &structures))
-                    .flatten()
-                    .map(|id| (id, AiStructureBuildKind::Offense))
-            })
-            .or_else(|| {
-                next_ai_defense_for_faction(team, faction, &profile, &structures)
-                    .map(|id| (id, AiStructureBuildKind::Defense))
-            });
-            if let Some((id, build_kind)) = next_structure
-                && let Some(def) = registry::entity(id)
-                && requirements_met(def, team, &structures)
-                && let Some(origin) =
-                    ai_structure_build_origin(team, build_kind, &structures, &targets)
-                && resources.economies.get_mut(team).spend(def.cost)
-            {
-                let spawn_at = ai_structure_build_position(
-                    team,
-                    origin,
-                    id,
-                    build_kind,
-                    resources.next_id.0,
-                    &targets,
-                    *resources.map_bounds,
-                );
-                spawn_structure_under_construction_for_faction(
-                    &mut commands,
-                    &asset_server,
-                    &mut resources.next_id,
-                    id,
-                    team,
-                    spawn_at,
-                    (id == "Refinery").then_some(origin),
-                    0.0,
-                    player_team,
-                    faction,
-                );
-            }
-        }
-
-        if production_refresh_due && !trained_during_priority_refresh {
-            let needs_anti_air =
-                ai_needs_more_anti_air_units(team, units.iter().map(|item| (item.1.id, *item.2)));
-            let production_counts =
-                ai_production_counts(team, units.iter().map(|item| (item.1, item.2)));
-            let economy_snapshot = resources.economies.get(team).clone();
-            let next_training = next_ai_train(
-                team,
-                faction,
-                &profile,
-                &structures,
-                &economy_snapshot,
-                &mut resources.director.production_cursor[idx],
-                production_counts,
-                needs_anti_air,
-            );
-            if let Some(id) = next_training
-                && !ai_training_is_economy_request(id)
-            {
-                let _ = try_spawn_ai_trained_unit(
-                    &mut commands,
-                    &asset_server,
-                    &mut resources.economies,
-                    &mut resources.next_id,
-                    team,
-                    faction,
-                    id,
-                    &structures,
-                    *resources.map_bounds,
-                    player_team,
-                );
-            }
-        }
-
-        resources.director.attack_timer[idx] -= delta;
-        if profile.active_offense_enabled && resources.director.attack_timer[idx] <= 0.0 {
-            resources.director.attack_timer[idx] = profile.attack_interval;
-            if let Some(target) = nearest_enemy_entity(team, team_home(team), &targets) {
-                for (
-                    entity,
-                    unit,
-                    unit_team,
-                    _transform,
-                    order_queue,
-                    move_order,
-                    follow_order,
-                    attack_order,
-                    capture_order,
-                    garrison_order,
-                    harvest_order,
-                    repair_order,
-                    construct_order,
-                    attack_move_order,
-                    patrol_order,
-                ) in &units
-                {
-                    if *unit_team != team
-                        || !ai_battle_unit_id(unit.id)
-                        || order_queue.is_some_and(|queue| !queue.orders.is_empty())
-                        || has_active_orders_in_query(
-                            move_order,
-                            follow_order,
-                            attack_order,
-                            capture_order,
-                            garrison_order,
-                            harvest_order,
-                            repair_order,
-                            construct_order,
-                            attack_move_order,
-                            patrol_order,
-                        )
-                    {
-                        continue;
-                    }
-                    assign_ai_attack_wave_order(
-                        &mut commands,
-                        team,
-                        entity,
-                        unit,
-                        target,
-                        &support_units,
-                    );
-                }
-            }
-        } else if !profile.active_offense_enabled {
-            resources.director.attack_timer[idx] = profile.attack_interval;
-        }
-
-        resources.director.capture_timer[idx] -= delta;
-        if profile.capture_enabled && resources.director.capture_timer[idx] <= 0.0 {
-            resources.director.capture_timer[idx] = profile.capture_interval;
-            run_ai_capture_logic(
-                team,
-                faction,
-                &mut commands,
-                &asset_server,
-                &mut resources.economies,
-                &mut resources.next_id,
-                player_team,
-                &structures,
-                &units,
-                &capture_structures,
-            );
-        } else if !profile.capture_enabled {
-            resources.director.capture_timer[idx] = profile.capture_interval;
-        }
-
-        resources.director.saboteur_timer[idx] -= delta;
-        if profile.saboteur_enabled && resources.director.saboteur_timer[idx] <= 0.0 {
-            resources.director.saboteur_timer[idx] = profile.saboteur_interval;
-            run_ai_saboteur_logic(
-                team,
-                faction,
-                &mut commands,
-                &asset_server,
-                &mut resources.economies,
-                &mut resources.next_id,
-                player_team,
-                &structures,
-                &units,
-                &capture_structures,
-            );
-        } else if !profile.saboteur_enabled {
-            resources.director.saboteur_timer[idx] = profile.saboteur_interval;
-        }
-    }
-}
-
-pub(crate) fn ai_training_is_economy_request(id: &str) -> bool {
-    id == "Worker"
 }
 
 pub(crate) fn next_ai_economy_train(
@@ -19067,63 +18120,6 @@ pub(crate) fn best_ai_saboteur_target(
     best
 }
 
-pub(crate) fn ai_saboteur_target_has_value(
-    team: Team,
-    victim_team: Team,
-    saboteur_def: &registry::EntityDef,
-    target_def: &registry::EntityDef,
-    economies: &Economies,
-) -> bool {
-    if let Some(producer_id) = target_def.infiltration_production_veterancy_producer
-        && saboteur_def.infiltration_production_veterancy_rank > 0
-        && economies.get(team).production_veterancy_rank(producer_id)
-            < saboteur_def.infiltration_production_veterancy_rank
-    {
-        return true;
-    }
-    if target_def.is_infiltration_resource_target {
-        let victim = economies.get(victim_team);
-        if victim.ore > 0 || victim.crystal > 0 {
-            return true;
-        }
-    }
-    if target_def.is_infiltration_power_sabotage_target
-        && economies.get(victim_team).power_sabotage_remaining <= 0.0
-    {
-        return true;
-    }
-    false
-}
-
-pub(crate) fn ai_saboteur_target_score(
-    victim_team: Team,
-    target_def: &registry::EntityDef,
-    target_position: Vec3,
-    origin: Vec3,
-    economies: &Economies,
-) -> f32 {
-    let mut score = match target_def.id {
-        "Barracks" => 120.0,
-        "VehicleFactory" => 116.0,
-        "AircraftFactory" => 112.0,
-        "AdvancedReactorPlant" => 106.0,
-        "PowerReactor" => 104.0,
-        "OrePurifier" => 96.0,
-        "Refinery" => 88.0,
-        "CommandCenter" => 82.0,
-        _ => 30.0,
-    };
-    score += (target_def.cost.ore + target_def.cost.crystal) as f32;
-    if target_def.is_infiltration_resource_target {
-        let victim = economies.get(victim_team);
-        score += (victim.ore + victim.crystal) as f32 * 0.5;
-    }
-    if target_def.is_infiltration_power_sabotage_target {
-        score += target_def.power_delta.max(0) as f32 * 0.5;
-    }
-    score - xz_distance(origin, target_position) * 0.06
-}
-
 pub(crate) fn best_ai_capture_target(
     team: Team,
     origin: Vec3,
@@ -19159,30 +18155,6 @@ pub(crate) fn best_ai_capture_target(
         }
     }
     best
-}
-
-pub(crate) fn ai_capture_priority(structure_id: &str) -> Option<f32> {
-    match structure_id {
-        "CommandCenter" => Some(120.0),
-        "TechLab" => Some(105.0),
-        "RoboticsBay" => Some(95.0),
-        "VehicleFactory" => Some(90.0),
-        "AircraftFactory" => Some(88.0),
-        "TechAirport" => Some(87.0),
-        "TechOilDerrick" => Some(86.0),
-        "TechHospital" => Some(85.0),
-        "TechBunker" => Some(84.75),
-        "TechRepairDepot" => Some(84.5),
-        "Barracks" => Some(84.0),
-        "Refinery" => Some(78.0),
-        "PowerReactor" => Some(72.0),
-        "RadarUplink" => Some(70.0),
-        "LanceBeamDefenseTower" => Some(62.0),
-        "ArcCoilDefenseTower" => Some(58.0),
-        "AntiGroundTurret" => Some(48.0),
-        "AntiAirTurret" => Some(44.0),
-        _ => None,
-    }
 }
 
 pub(crate) fn active_ai_teams(
@@ -19347,36 +18319,6 @@ pub(crate) fn next_ai_train_matching(
     None
 }
 
-pub(crate) fn ai_production_counts<'a>(
-    team: Team,
-    units: impl IntoIterator<Item = (&'a Unit, &'a Team)>,
-) -> AiProductionCounts {
-    let mut counts = AiProductionCounts::default();
-    for (unit, unit_team) in units {
-        if *unit_team != team {
-            continue;
-        }
-        if can_unit_construct_structures(unit) {
-            counts.workers += 1;
-        }
-        if ai_battle_unit_id(unit.id) {
-            counts.battle_units += 1;
-        }
-    }
-    counts
-}
-
-pub(crate) fn ai_economy_candidate_allowed(
-    candidate: &'static str,
-    profile: &TeamAiProfile,
-    counts: AiProductionCounts,
-) -> bool {
-    match candidate {
-        "Worker" => counts.workers < profile.expected_workers,
-        _ => true,
-    }
-}
-
 pub(crate) fn has_constructed_structure(
     team: Team,
     structure_id: &'static str,
@@ -19389,22 +18331,6 @@ pub(crate) fn has_constructed_structure(
                 && structure.id == structure_id
                 && structure_is_constructed(under_construction)
         })
-}
-
-pub(crate) fn ai_structure_count(
-    team: Team,
-    structure_id: &'static str,
-    structures: &Query<StructurePrereqItem<'_>>,
-    constructed_only: bool,
-) -> usize {
-    structures
-        .iter()
-        .filter(|(structure, structure_team, _, under_construction)| {
-            **structure_team == team
-                && structure.id == structure_id
-                && (!constructed_only || structure_is_constructed(*under_construction))
-        })
-        .count()
 }
 
 #[allow(dead_code)]
@@ -19454,35 +18380,6 @@ pub(crate) fn next_ai_economy_structure_for_faction(
 }
 
 #[allow(dead_code)]
-pub(crate) fn ai_economy_structure_allowed(
-    team: Team,
-    structure_id: &'static str,
-    structures: &Query<StructurePrereqItem<'_>>,
-) -> bool {
-    ai_economy_structure_allowed_for_faction(
-        team,
-        SkirmishFaction::from_team(team),
-        structure_id,
-        structures,
-    )
-}
-
-pub(crate) fn ai_economy_structure_allowed_for_faction(
-    team: Team,
-    faction: SkirmishFaction,
-    structure_id: &'static str,
-    structures: &Query<StructurePrereqItem<'_>>,
-) -> bool {
-    let Some(faction) = faction_def(faction) else {
-        return false;
-    };
-    let Some(def) = registry::entity(structure_id) else {
-        return false;
-    };
-    faction.can_construct(structure_id) && requirements_met(def, team, structures)
-}
-
-#[allow(dead_code)]
 pub(crate) fn next_ai_offense_structure(
     team: Team,
     structures: &Query<StructurePrereqItem<'_>>,
@@ -19508,53 +18405,6 @@ pub(crate) fn next_ai_offense_structure_for_faction(
         }
     }
     None
-}
-
-pub(crate) fn ai_structure_build_origin(
-    team: Team,
-    build_kind: AiStructureBuildKind,
-    structures: &Query<StructurePrereqItem<'_>>,
-    targets: &Query<(Entity, &Team, &Transform), With<Health>>,
-) -> Option<Vec3> {
-    match build_kind {
-        AiStructureBuildKind::Economy => ai_economy_structure_origin(team, structures),
-        AiStructureBuildKind::Defense => ai_frontline_command_origin(team, structures, targets),
-        AiStructureBuildKind::Offense => ai_frontline_command_origin(team, structures, targets),
-    }
-}
-
-pub(crate) fn ai_economy_structure_origin(
-    team: Team,
-    structures: &Query<StructurePrereqItem<'_>>,
-) -> Option<Vec3> {
-    structures.iter().find_map(
-        |(structure, structure_team, transform, under_construction)| {
-            (*structure_team == team
-                && structure.id == "CommandCenter"
-                && structure_is_constructed(under_construction))
-            .then_some(transform.translation)
-        },
-    )
-}
-
-pub(crate) fn ai_structure_build_position(
-    team: Team,
-    origin: Vec3,
-    structure_id: &'static str,
-    build_kind: AiStructureBuildKind,
-    seed: u32,
-    targets: &Query<(Entity, &Team, &Transform), With<Health>>,
-    bounds: MapBounds,
-) -> Vec3 {
-    match build_kind {
-        AiStructureBuildKind::Economy => free_position_in_bounds(origin, seed + 19, 5.0, bounds),
-        AiStructureBuildKind::Defense => {
-            ai_defense_position(team, origin, structure_id, seed + 7, targets, bounds)
-        }
-        AiStructureBuildKind::Offense => {
-            ai_defense_position(team, origin, structure_id, seed + 13, targets, bounds)
-        }
-    }
 }
 
 #[allow(dead_code)]
@@ -19586,104 +18436,6 @@ pub(crate) fn next_ai_defense_for_faction(
     None
 }
 
-pub(crate) fn ai_defense_position(
-    team: Team,
-    origin: Vec3,
-    structure_id: &'static str,
-    seed: u32,
-    targets: &Query<(Entity, &Team, &Transform), With<Health>>,
-    bounds: MapBounds,
-) -> Vec3 {
-    let Some(enemy_position) = nearest_enemy_position(team, origin, targets) else {
-        return free_position_in_bounds(origin, seed, 5.0, bounds);
-    };
-    let direction = Vec3::new(
-        enemy_position.x - origin.x,
-        0.0,
-        enemy_position.z - origin.z,
-    )
-    .try_normalize()
-    .unwrap_or(Vec3::Z);
-    ai_defense_position_in_direction_in_bounds(origin, direction, structure_id, seed, bounds)
-}
-
-pub(crate) fn ai_defense_position_in_direction_in_bounds(
-    origin: Vec3,
-    direction: Vec3,
-    structure_id: &'static str,
-    seed: u32,
-    bounds: MapBounds,
-) -> Vec3 {
-    let direction = Vec3::new(direction.x, 0.0, direction.z)
-        .try_normalize()
-        .unwrap_or(Vec3::Z);
-    let lateral = Vec3::new(-direction.z, 0.0, direction.x);
-    let structure_radius = registry::entity(structure_id).map_or(0.75, |def| def.radius);
-    let command_radius = registry::entity("CommandCenter").map_or(1.8, |def| def.radius);
-    let forward = command_radius + structure_radius * 3.0 + 1.5;
-    let side_step = (structure_radius * 2.6).max(1.6);
-    let side_slot = match seed % 5 {
-        0 => 0.0,
-        1 => side_step,
-        2 => -side_step,
-        3 => side_step * 2.0,
-        _ => -side_step * 2.0,
-    };
-    let candidate = origin + direction * forward + lateral * side_slot;
-    bounds.clamp_ground_point(candidate, 1.0)
-}
-
-pub(crate) fn ai_structure_under_profile_limit(
-    team: Team,
-    structure_id: &str,
-    structures: &Query<StructurePrereqItem<'_>>,
-    profile: &TeamAiProfile,
-) -> bool {
-    ai_structure_under_max(
-        team,
-        structure_id,
-        structures,
-        ai_structure_profile_limit(structure_id, profile),
-    )
-}
-
-pub(crate) fn ai_structure_profile_limit(structure_id: &str, profile: &TeamAiProfile) -> usize {
-    let base = profile
-        .defense_limits
-        .iter()
-        .find_map(|(id, max)| (*id == structure_id).then_some(*max))
-        .unwrap_or(0);
-    if base == 0 {
-        return 0;
-    }
-    let bonus = if structure_id == "TeslaFenceSegment" {
-        profile.tesla_fence_limit_bonus
-    } else {
-        profile.defense_limit_bonus
-    };
-    base.saturating_add(bonus)
-}
-
-pub(crate) fn ai_structure_under_max(
-    team: Team,
-    structure_id: &str,
-    structures: &Query<StructurePrereqItem<'_>>,
-    max: usize,
-) -> bool {
-    if max == 0 {
-        return false;
-    }
-    let count = structures
-        .iter()
-        .filter(|(structure, structure_team, _, under_construction)| {
-            structure_is_constructed(*under_construction)
-                && **structure_team == team
-                && structure.id == structure_id
-        })
-        .count();
-    count < max
-}
-
 pub(crate) fn team_home(team: Team) -> Vec3 {
     match team {
         Team::Player(index) => {
@@ -19694,35 +18446,6 @@ pub(crate) fn team_home(team: Team) -> Vec3 {
         }
         Team::Neutral => Vec3::ZERO,
     }
-}
-
-pub(crate) fn ai_frontline_command_origin(
-    team: Team,
-    structures: &Query<StructurePrereqItem<'_>>,
-    targets: &Query<(Entity, &Team, &Transform), With<Health>>,
-) -> Option<Vec3> {
-    let mut fallback = None;
-    let mut best = None;
-    let mut best_distance = f32::MAX;
-    for (structure, structure_team, transform, under_construction) in structures {
-        if *structure_team != team
-            || !structure_is_constructed(under_construction)
-            || structure.id != "CommandCenter"
-        {
-            continue;
-        }
-        fallback.get_or_insert(transform.translation);
-        let Some(enemy_position) = nearest_enemy_position(team, transform.translation, targets)
-        else {
-            continue;
-        };
-        let distance = xz_distance(transform.translation, enemy_position);
-        if distance < best_distance {
-            best_distance = distance;
-            best = Some(transform.translation);
-        }
-    }
-    best.or(fallback)
 }
 
 pub(crate) fn nearest_enemy_position(
@@ -19763,38 +18486,6 @@ pub(crate) fn nearest_enemy_entity(
         }
     }
     nearest
-}
-
-#[allow(dead_code)]
-pub(crate) fn ai_production_origin(
-    team: Team,
-    product_id: &'static str,
-    structures: &Query<StructurePrereqItem<'_>>,
-) -> Option<(&'static str, Vec3)> {
-    ai_production_origin_for_faction(
-        team,
-        SkirmishFaction::from_team(team),
-        product_id,
-        structures,
-    )
-}
-
-pub(crate) fn ai_production_origin_for_faction(
-    team: Team,
-    faction: SkirmishFaction,
-    product_id: &'static str,
-    structures: &Query<StructurePrereqItem<'_>>,
-) -> Option<(&'static str, Vec3)> {
-    let faction = faction_def(faction)?;
-    for (structure, structure_team, transform, under_construction) in structures {
-        if *structure_team == team
-            && structure_is_constructed(under_construction)
-            && faction.can_produce(structure.id, product_id)
-        {
-            return Some((structure.id, transform.translation));
-        }
-    }
-    None
 }
 
 pub(crate) fn update_capture_orders(
@@ -20142,10 +18833,10 @@ pub(crate) fn next_mine_deploy_position_in_bounds(
 
 #[derive(Clone, Copy)]
 pub(crate) struct MineTargetSnapshot {
-    entity: Entity,
-    team: Team,
-    position: Vec3,
-    radius: f32,
+    pub(crate) entity: Entity,
+    pub(crate) team: Team,
+    pub(crate) position: Vec3,
+    pub(crate) radius: f32,
 }
 
 pub(crate) fn update_mines(
@@ -20466,15 +19157,15 @@ pub(crate) fn follow_order_desired_distance(
 
 #[derive(Clone, Copy)]
 pub(crate) struct RepairerSnapshot {
-    entity: Entity,
-    team: Team,
-    position: Vec3,
-    radius: f32,
-    target: Entity,
-    capability: RepairCapability,
-    can_move: bool,
-    disabled: bool,
-    alive: bool,
+    pub(crate) entity: Entity,
+    pub(crate) team: Team,
+    pub(crate) position: Vec3,
+    pub(crate) radius: f32,
+    pub(crate) target: Entity,
+    pub(crate) capability: RepairCapability,
+    pub(crate) can_move: bool,
+    pub(crate) disabled: bool,
+    pub(crate) alive: bool,
 }
 
 pub(crate) fn update_repair_orders(
@@ -21371,16 +20062,16 @@ pub(crate) fn move_units(
 
 #[derive(Clone, Copy)]
 pub(crate) struct CrushTargetSnapshot {
-    entity: Entity,
-    team: Team,
-    position: Vec3,
-    radius: f32,
+    pub(crate) entity: Entity,
+    pub(crate) team: Team,
+    pub(crate) position: Vec3,
+    pub(crate) radius: f32,
 }
 
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct MovementObstacleSnapshot {
-    position: Vec3,
-    radius: f32,
+    pub(crate) position: Vec3,
+    pub(crate) radius: f32,
 }
 
 pub(crate) fn movement_direction_around_static_obstacles(
@@ -21462,13 +20153,13 @@ pub(crate) fn can_crush_target(
 
 #[derive(Clone, Copy)]
 pub(crate) struct TargetSnapshot {
-    entity: Entity,
-    team: Team,
-    position: Vec3,
-    radius: f32,
-    visible: bool,
-    is_structure: bool,
-    movement_domain: MovementDomain,
+    pub(crate) entity: Entity,
+    pub(crate) team: Team,
+    pub(crate) position: Vec3,
+    pub(crate) radius: f32,
+    pub(crate) visible: bool,
+    pub(crate) is_structure: bool,
+    pub(crate) movement_domain: MovementDomain,
 }
 
 /// Degrees/second a defense tower slowly sweeps while scanning for targets.
@@ -22017,14 +20708,14 @@ pub(crate) fn update_impact_bursts(
 
 #[derive(Clone)]
 pub(crate) struct SelectionHudItem {
-    label: String,
-    team: Team,
-    health_current: f32,
-    health_max: f32,
-    attack: Option<(f32, f32)>,
-    rank: u8,
-    garrison: Option<(usize, usize)>,
-    cargo: Option<(i32, i32, i32, i32)>,
+    pub(crate) label: String,
+    pub(crate) team: Team,
+    pub(crate) health_current: f32,
+    pub(crate) health_max: f32,
+    pub(crate) attack: Option<(f32, f32)>,
+    pub(crate) rank: u8,
+    pub(crate) garrison: Option<(usize, usize)>,
+    pub(crate) cargo: Option<(i32, i32, i32, i32)>,
 }
 
 pub(crate) fn veterancy_rank_label(rank: u8) -> &'static str {
@@ -22128,7 +20819,7 @@ pub(crate) struct ModelRecentered;
 /// "stabilize".
 #[derive(Component)]
 pub(crate) struct ModelRecenterTracking {
-    frames: u8,
+    pub(crate) frames: u8,
 }
 
 /// Frames a model must have meshes present before we recenter it (≈0.2s @30fps) —
@@ -22271,11 +20962,11 @@ pub(crate) fn apply_hunyuan_model_materials(
 
 #[derive(SystemParam)]
 pub(crate) struct OverlayVfxQueries<'w, 's> {
-    destruction: Query<'w, 's, (&'static Transform, &'static StructureDestructionVfx)>,
-    promotion: Query<'w, 's, (&'static Transform, &'static VeterancyPromotionEffect)>,
-    impacts: Query<'w, 's, (&'static Transform, &'static ImpactBurst)>,
-    camera: Query<'w, 's, &'static GlobalTransform, With<MainCamera>>,
-    time: Res<'w, Time>,
+    pub(crate) destruction: Query<'w, 's, (&'static Transform, &'static StructureDestructionVfx)>,
+    pub(crate) promotion: Query<'w, 's, (&'static Transform, &'static VeterancyPromotionEffect)>,
+    pub(crate) impacts: Query<'w, 's, (&'static Transform, &'static ImpactBurst)>,
+    pub(crate) camera: Query<'w, 's, &'static GlobalTransform, With<MainCamera>>,
+    pub(crate) time: Res<'w, Time>,
 }
 
 pub(crate) fn draw_world_overlays(
