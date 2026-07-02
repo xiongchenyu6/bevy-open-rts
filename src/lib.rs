@@ -132,6 +132,10 @@ const COMMAND_KEY_MINIMAP_MOVE: &str = "minimap_move";
 const COMMAND_KEY_TOGGLE_DEPLOY: &str = "toggle_deploy";
 const MOVE_ORDER_REACHED_DISTANCE_M: f32 = 0.22;
 const CONTACT_ACTION_REACHED_TOLERANCE_M: f32 = MOVE_ORDER_REACHED_DISTANCE_M;
+// Unit-vs-unit separation (boids-lite): extra clearance kept between allied unit
+// circles, and the max speed at which overlapping units get pushed apart.
+const UNIT_SEPARATION_GAP_M: f32 = 0.05;
+const UNIT_SEPARATION_MAX_SPEED: f32 = 1.8;
 const ATTACK_MOVE_REACHED_DISTANCE: f32 = 2.0;
 const PATROL_TURN_DISTANCE: f32 = 2.0;
 const SCATTER_DISTANCE: f32 = 4.0;
@@ -6418,6 +6422,10 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
                 .in_set(SimulationPhase::Combat)
                 .run_if(match_in_progress),
             move_units
+                .in_set(SimulationPhase::Combat)
+                .run_if(match_in_progress),
+            separate_units
+                .after(move_units)
                 .in_set(SimulationPhase::Combat)
                 .run_if(match_in_progress),
             update_mines
@@ -29026,6 +29034,130 @@ fn movement_direction_around_static_obstacles(
     }
 }
 
+/// Pure geometry for one overlapping unit pair: the push applied to `a` (`b` gets
+/// the negation) so both end just clear of each other, split evenly. `None` when
+/// the circles (plus the separation gap) don't overlap.
+fn pair_separation_push(a_pos: Vec3, a_radius: f32, b_pos: Vec3, b_radius: f32) -> Option<Vec3> {
+    let mut delta = b_pos - a_pos;
+    delta.y = 0.0;
+    let min_dist = a_radius + b_radius + UNIT_SEPARATION_GAP_M;
+    let dist_sq = delta.length_squared();
+    if dist_sq >= min_dist * min_dist {
+        return None;
+    }
+    let dist = dist_sq.sqrt();
+    // Coincident units get a deterministic axis; the chain of pushes over the next
+    // frames fans a stack out.
+    let axis = if dist > 1e-4 { delta / dist } else { Vec3::X };
+    Some(-axis * (min_dist - dist) * 0.5)
+}
+
+/// Boids-lite unit separation: allied terrain units that overlap get pushed apart
+/// after movement, so armies spread out instead of stacking into one point (godot
+/// gets this from NavigationServer avoidance; the port previously had no
+/// unit-vs-unit collision at all). Enemies are exempt so crushing still works, and
+/// a unit is never pushed into a structure/resource node or off the map.
+fn separate_units(
+    time: Res<Time>,
+    relations: Res<TeamRelations>,
+    map_bounds: Res<MapBounds>,
+    mut units: Query<
+        (
+            &Team,
+            &Unit,
+            &MovementDomain,
+            &Selectable,
+            &mut Transform,
+            &Health,
+        ),
+        With<Unit>,
+    >,
+    obstacles: Query<
+        (&Transform, &Selectable, Option<&Health>),
+        (Or<(With<Structure>, With<ResourceNode>)>, Without<Unit>),
+    >,
+) {
+    let max_step = UNIT_SEPARATION_MAX_SPEED * time.delta_secs();
+    if max_step <= 0.0 {
+        return;
+    }
+    struct SeparationSnapshot {
+        team: Team,
+        radius: f32,
+        position: Vec3,
+        movable: bool,
+        active: bool,
+    }
+    // Two passes over the same (unmutated) query iterate in the same order, so the
+    // snapshot indexes line up with the apply pass below.
+    let snapshot: Vec<SeparationSnapshot> = units
+        .iter()
+        .map(
+            |(team, unit, domain, selectable, transform, health)| SeparationSnapshot {
+                team: *team,
+                radius: selectable.radius,
+                position: transform.translation,
+                movable: unit.speed > 0.0,
+                active: *domain == MovementDomain::Terrain && health.current > 0.0,
+            },
+        )
+        .collect();
+    let mut pushes = vec![Vec3::ZERO; snapshot.len()];
+    for i in 0..snapshot.len() {
+        if !snapshot[i].active {
+            continue;
+        }
+        for j in (i + 1)..snapshot.len() {
+            if !snapshot[j].active
+                || relations.are_enemies(snapshot[i].team, snapshot[j].team)
+                || (!snapshot[i].movable && !snapshot[j].movable)
+            {
+                continue;
+            }
+            let Some(push) = pair_separation_push(
+                snapshot[i].position,
+                snapshot[i].radius,
+                snapshot[j].position,
+                snapshot[j].radius,
+            ) else {
+                continue;
+            };
+            // An immovable unit (deployed/zero-speed) passes its share to the other.
+            match (snapshot[i].movable, snapshot[j].movable) {
+                (true, true) => {
+                    pushes[i] += push;
+                    pushes[j] -= push;
+                }
+                (true, false) => pushes[i] += push * 2.0,
+                (false, true) => pushes[j] -= push * 2.0,
+                (false, false) => unreachable!(),
+            }
+        }
+    }
+    let blocked_by_obstacle = |position: Vec3, radius: f32| {
+        obstacles
+            .iter()
+            .filter(|(_, _, health)| !health.is_some_and(|health| health.current <= 0.0))
+            .any(|(transform, selectable, _)| {
+                xz_distance(position, transform.translation) < radius + selectable.radius
+            })
+    };
+    for (index, (_, _, _, selectable, mut transform, _)) in units.iter_mut().enumerate() {
+        let push = pushes[index];
+        if push == Vec3::ZERO {
+            continue;
+        }
+        let push = push.clamp_length_max(max_step);
+        let mut candidate = transform.translation + push;
+        candidate.y = transform.translation.y;
+        candidate = map_bounds.clamp_ground_point(candidate, selectable.radius);
+        if blocked_by_obstacle(candidate, selectable.radius) {
+            continue;
+        }
+        transform.translation = candidate;
+    }
+}
+
 fn can_crush_target(
     from_position: Vec3,
     actual_position: Vec3,
@@ -33391,5 +33523,28 @@ mod current_tests {
             sel.faction_dropdown_open, None,
             "picking closes the dropdown"
         );
+    }
+
+    #[test]
+    fn separation_pushes_overlapping_units_apart_evenly() {
+        let a = Vec3::new(0.0, 0.0, 0.0);
+        let b = Vec3::new(0.5, 0.0, 0.0);
+        let push = pair_separation_push(a, 0.4, b, 0.4).expect("overlapping pair must push");
+        // min distance = 0.4 + 0.4 + gap; each side moves half the shortfall, away from the other.
+        let min_dist = 0.8 + UNIT_SEPARATION_GAP_M;
+        assert!(push.x < 0.0, "a is pushed away from b (negative x)");
+        assert!((push.length() - (min_dist - 0.5) * 0.5).abs() < 1e-5);
+        assert_eq!(push.y, 0.0, "separation never changes height");
+    }
+
+    #[test]
+    fn separation_ignores_clear_pairs_and_handles_coincident_units() {
+        assert!(
+            pair_separation_push(Vec3::ZERO, 0.3, Vec3::new(1.0, 0.0, 0.0), 0.3).is_none(),
+            "non-overlapping circles must not push"
+        );
+        let push = pair_separation_push(Vec3::ZERO, 0.3, Vec3::ZERO, 0.3)
+            .expect("coincident units must still separate");
+        assert!(push.length() > 0.0, "coincident pair gets a deterministic push");
     }
 }
