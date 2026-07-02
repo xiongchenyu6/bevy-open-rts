@@ -3627,6 +3627,7 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<StructurePlacementFeedback>()
         .init_resource::<MatchMenuState>()
         .init_resource::<MatchSpeed>()
+        .init_resource::<TacticalPause>()
         .init_resource::<MatchBriefingState>()
         .init_resource::<SelectionDragState>()
         .init_resource::<UnitGroups>()
@@ -4082,9 +4083,11 @@ pub(crate) fn stop_match_flow_on_exit(
 
 pub(crate) fn reset_match_speed_on_exit(
     mut match_speed: ResMut<MatchSpeed>,
+    mut pause: ResMut<TacticalPause>,
     mut virtual_time: ResMut<Time<Virtual>>,
 ) {
     *match_speed = MatchSpeed::default();
+    pause.0 = false;
     virtual_time.set_relative_speed(MatchSpeedPreset::Normal.scale());
 }
 
@@ -4151,6 +4154,8 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 quickload_hotkey,
                 record_replay_keyframes,
                 replay_jump_hotkeys,
+                tactical_pause_hotkey,
+                clear_tactical_pause_on_speed_change,
             )
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),

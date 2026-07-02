@@ -3235,3 +3235,115 @@ pub(crate) fn update_match_end_charts(
         });
     }
 }
+
+/// Tactical pause (F10): the simulation freezes (virtual time scale 0) while
+/// selection and order input keep working — orders are event-driven, so you can
+/// line up commands and they execute on resume. The camera plugin also runs on
+/// virtual time, so use the minimap to jump the view while paused.
+#[derive(Resource, Default)]
+pub(crate) struct TacticalPause(pub(crate) bool);
+
+pub(crate) fn tactical_pause_hotkey(
+    keyboard: Res<ButtonInput<KeyCode>>,
+    match_speed: Res<MatchSpeed>,
+    mut pause: ResMut<TacticalPause>,
+    mut virtual_time: ResMut<Time<Virtual>>,
+    mut battle_log: ResMut<BattleLog>,
+) {
+    if !keyboard.just_pressed(KeyCode::F10) && !keyboard.just_pressed(KeyCode::Pause) {
+        return;
+    }
+    pause.0 = !pause.0;
+    if pause.0 {
+        virtual_time.set_relative_speed(0.0);
+        push_battle_log(
+            &mut battle_log,
+            t(
+                "战术暂停 — 可继续下达指令 (F10 恢复)",
+                "Tactical pause — orders still accepted (F10 resumes)",
+            ),
+            None,
+        );
+    } else {
+        virtual_time.set_relative_speed(match_speed.preset.scale());
+        push_battle_log(&mut battle_log, t("已恢复", "Resumed"), None);
+    }
+}
+
+/// Any explicit speed selection from the match menu clears a tactical pause.
+pub(crate) fn clear_tactical_pause_on_speed_change(
+    match_speed: Res<MatchSpeed>,
+    mut pause: ResMut<TacticalPause>,
+) {
+    if match_speed.is_changed() && pause.0 {
+        pause.0 = false;
+    }
+}
+
+#[cfg(test)]
+mod tactical_pause_tests {
+    use super::*;
+
+    #[test]
+    fn f10_freezes_the_clock_but_orders_still_land() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            std::time::Duration::from_secs_f32(1.0 / 30.0),
+        ));
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::InMatch);
+        for _ in 0..40 {
+            app.update();
+        }
+        // Headless apps run MinimalPlugins (no InputPlugin), so drive
+        // ButtonInput directly and clear just_pressed by hand.
+        let tap_f10 = |app: &mut App| {
+            app.world_mut()
+                .resource_mut::<ButtonInput<KeyCode>>()
+                .press(KeyCode::F10);
+            app.update();
+            let mut input = app.world_mut().resource_mut::<ButtonInput<KeyCode>>();
+            input.clear_just_pressed(KeyCode::F10);
+            input.release(KeyCode::F10);
+            input.clear_just_released(KeyCode::F10);
+        };
+        tap_f10(&mut app);
+        assert!(app.world().resource::<TacticalPause>().0, "F10 pauses");
+        let clock_before = app.world().resource::<MatchState>().start_time_sec;
+        // While paused, issue a move order to a unit; the component must stick.
+        let unit = {
+            let world = app.world_mut();
+            let mut q = world.query_filtered::<(Entity, &Team), With<Unit>>();
+            q.iter(world)
+                .find(|(_, team)| **team == Team::Player(0))
+                .map(|(entity, _)| entity)
+                .expect("player unit exists")
+        };
+        app.world_mut().entity_mut(unit).insert(MoveOrder {
+            target: Vec3::new(3.0, 0.0, 3.0),
+        });
+        for _ in 0..30 {
+            app.update();
+        }
+        let clock_after = app.world().resource::<MatchState>().start_time_sec;
+        assert!(
+            (clock_after - clock_before).abs() < f32::EPSILON,
+            "match clock frozen while paused"
+        );
+        assert!(
+            app.world().get::<MoveOrder>(unit).is_some(),
+            "order accepted during pause (executes on resume)"
+        );
+
+        tap_f10(&mut app);
+        for _ in 0..30 {
+            app.update();
+        }
+        assert!(!app.world().resource::<TacticalPause>().0, "F10 resumes");
+        assert!(
+            app.world().resource::<MatchState>().start_time_sec > clock_after,
+            "clock runs again after resume"
+        );
+    }
+}
