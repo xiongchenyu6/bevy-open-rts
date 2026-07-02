@@ -387,6 +387,35 @@ pub(crate) fn setup_match_end_overlay(commands: &mut Commands, font: Handle<Font
                         TextColor(Color::srgba(0.9, 0.96, 0.97, 0.95)),
                         MatchEndStats,
                     ));
+                    for (chart, zh, en) in [
+                        (MatchEndChart::Army, "兵力曲线", "Army over time"),
+                        (MatchEndChart::Economy, "经济曲线", "Economy over time"),
+                    ] {
+                        panel.spawn((
+                            localized_text(zh, en),
+                            TextFont {
+                                font: font.clone().into(),
+                                font_size: FontSize::Px(13.0),
+                                ..default()
+                            },
+                            TextColor(Color::srgba(0.62, 0.72, 0.7, 0.95)),
+                        ));
+                        panel.spawn((
+                            Node {
+                                width: Val::Percent(100.0),
+                                height: px(46),
+                                flex_direction: FlexDirection::Row,
+                                column_gap: px(2),
+                                align_items: AlignItems::FlexEnd,
+                                padding: UiRect::all(px(3)),
+                                border: UiRect::all(px(1)),
+                                ..default()
+                            },
+                            BorderColor::all(Color::srgba(0.2, 0.24, 0.26, 0.9)),
+                            BackgroundColor(Color::srgba(0.02, 0.03, 0.035, 0.85)),
+                            chart,
+                        ));
+                    }
                     panel
                         .spawn(Node {
                             flex_direction: FlexDirection::Row,
@@ -3100,4 +3129,109 @@ pub(crate) fn minimap_world_position_from_local_in_bounds(
 #[cfg(test)]
 pub(crate) fn minimap_world_position_in_bounds(local: Vec2, bounds: MapBounds) -> Vec3 {
     bounds.minimap_world_position(local)
+}
+
+/// Fills the match-end sparklines from the replay keyframes (plus a live final
+/// point), one colored bar per team per keyframe; cleared while the match runs
+/// so restarts rebuild fresh.
+pub(crate) fn update_match_end_charts(
+    mut commands: Commands,
+    match_state: Res<MatchState>,
+    timeline: Res<ReplayTimeline>,
+    economies: Res<Economies>,
+    live_units: Query<(&Team, &Health), With<Unit>>,
+    charts: Query<(Entity, &MatchEndChart, Option<&Children>)>,
+) {
+    if match_state.is_running() {
+        for (entity, _, children) in &charts {
+            if children.is_some_and(|children| !children.is_empty()) {
+                commands.entity(entity).despawn_children();
+            }
+        }
+        return;
+    }
+    let team_count = economies.players.len();
+    if team_count == 0 {
+        return;
+    }
+    for (entity, chart, children) in &charts {
+        if children.is_some_and(|children| !children.is_empty()) {
+            continue;
+        }
+        // Series: per keyframe, one value per team; append the live end state.
+        let mut points: Vec<Vec<f32>> = Vec::new();
+        for frame in &timeline.frames {
+            let mut row = vec![0.0f32; team_count];
+            match chart {
+                MatchEndChart::Army => {
+                    for unit in &frame.units {
+                        if let Some(value) = row.get_mut(unit.team) {
+                            *value += 1.0;
+                        }
+                    }
+                }
+                MatchEndChart::Economy => {
+                    for (index, economy) in frame.economies.iter().enumerate().take(team_count) {
+                        row[index] = (economy.ore + economy.crystal).max(0) as f32;
+                    }
+                }
+            }
+            points.push(row);
+        }
+        let mut live_row = vec![0.0f32; team_count];
+        match chart {
+            MatchEndChart::Army => {
+                for (team, health) in &live_units {
+                    if health.current <= 0.0 {
+                        continue;
+                    }
+                    if let Team::Player(index) = team
+                        && let Some(value) = live_row.get_mut(*index)
+                    {
+                        *value += 1.0;
+                    }
+                }
+            }
+            MatchEndChart::Economy => {
+                for (index, economy) in economies.players.iter().enumerate().take(team_count) {
+                    live_row[index] = (economy.ore + economy.crystal).max(0) as f32;
+                }
+            }
+        }
+        points.push(live_row);
+        // Keep the most recent keyframes if the match ran very long.
+        const MAX_POINTS: usize = 40;
+        if points.len() > MAX_POINTS {
+            let skip = points.len() - MAX_POINTS;
+            points.drain(0..skip);
+        }
+        let max_value = points
+            .iter()
+            .flatten()
+            .fold(1.0f32, |max, value| max.max(*value));
+        commands.entity(entity).with_children(|parent| {
+            for row in &points {
+                parent
+                    .spawn(Node {
+                        flex_direction: FlexDirection::Row,
+                        column_gap: px(1),
+                        align_items: AlignItems::FlexEnd,
+                        ..default()
+                    })
+                    .with_children(|group| {
+                        for (team_index, value) in row.iter().enumerate() {
+                            let height = (value / max_value * 38.0).max(2.0);
+                            group.spawn((
+                                Node {
+                                    width: px(3),
+                                    height: px(height),
+                                    ..default()
+                                },
+                                BackgroundColor(player_color(team_index)),
+                            ));
+                        }
+                    });
+            }
+        });
+    }
 }

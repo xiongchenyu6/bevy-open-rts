@@ -1099,6 +1099,13 @@ pub(crate) struct MatchEndReason;
 #[derive(Component)]
 pub(crate) struct MatchEndStats;
 
+/// Match-end sparkline container: one bar per replay keyframe per team.
+#[derive(Component, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum MatchEndChart {
+    Army,
+    Economy,
+}
+
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct MatchEndButton {
     pub(crate) action: MatchEndAction,
@@ -4479,7 +4486,11 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
     )
     .add_systems(
         Update,
-        (match_end_buttons, update_match_end_overlay)
+        (
+            match_end_buttons,
+            update_match_end_overlay,
+            update_match_end_charts,
+        )
             .chain()
             .run_if(in_state(AppScreen::InMatch)),
     )
