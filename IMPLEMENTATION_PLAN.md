@@ -31,7 +31,7 @@ API unchanged) so items can move between modules without dependency untangling.
 ## Stage 5: hud.rs
 **Goal**: in-match HUD (setup_ui, minimap, battle log, command card, selection,
 HudHitZones), and the HUD update systems.
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 6: capture_api.rs
 **Goal**: the `pub fn capture_*` harness surface.
