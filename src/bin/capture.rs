@@ -33,9 +33,9 @@ use bevy_open_rts::{
     capture_enabled_build_hotkey_for, capture_enabled_train_hotkey_for,
     capture_enemy_structure_position, capture_entity_is_selected,
     capture_first_enabled_attack_move_hotkey, capture_first_enabled_build_hotkey,
-    capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_key,
-    capture_match_phase_label, capture_model_harness_manifest, capture_model_harness_page_count,
-    capture_mouse_button, capture_nearest_enemy_anchor_position,
+    capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_frame_whole_map,
+    capture_key, capture_match_phase_label, capture_model_harness_manifest,
+    capture_model_harness_page_count, capture_mouse_button, capture_nearest_enemy_anchor_position,
     capture_nearest_visible_resource_click_position_to, capture_nearest_visible_resource_position,
     capture_onscreen_resource_model_center, capture_placement_is_valid,
     capture_player_army_unit_count, capture_player_attack_move_all, capture_player_build_queue_len,
@@ -46,7 +46,7 @@ use bevy_open_rts::{
     capture_player_onscreen_worker_position, capture_player_producer_position,
     capture_player_resources, capture_player_structure_count, capture_player_unit_count,
     capture_player_worker_position, capture_run_ai_duel, capture_run_ai_match_until_resolved,
-    capture_run_arena, capture_selected_player_unit_average_position,
+    capture_run_arena, capture_select_map, capture_selected_player_unit_average_position,
     capture_selected_player_unit_count, capture_selected_player_unit_ids, capture_set_all_factions,
     capture_set_cursor, capture_set_structure_rally, capture_show_credits_menu,
     capture_show_main_menu, capture_show_options_menu, capture_show_skirmish_setup_menu,
@@ -172,6 +172,16 @@ fn main() {
             let max_seconds = args.next().and_then(|s| s.parse().ok()).unwrap_or(240);
             run_match_proof(max_seconds)
         }
+        Some("map") => match args.next() {
+            Some(map_id) => {
+                let path = args
+                    .next()
+                    .map(PathBuf::from)
+                    .unwrap_or_else(|| PathBuf::from(format!("screenshots/maps/{map_id}.png")));
+                render_map_overview(&map_id, &path)
+            }
+            None => Err("map needs <map-id> [path]".into()),
+        },
         Some("arena") => match (args.next(), args.next()) {
             (Some(a), Some(bu)) => {
                 let count = args.next().and_then(|s| s.parse().ok()).unwrap_or(5);
@@ -296,6 +306,29 @@ fn verify_click_alignment() -> Result<(), String> {
     }
 
     println!("[verify] OK: models aligned to origin; the visible resource is clickable");
+    Ok(())
+}
+
+fn render_map_overview(map_id: &str, path: &Path) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|error| error.to_string())?;
+    }
+    let mut app = build_capture_app(WIDTH, HEIGHT);
+    for _ in 0..WARMUP_TICKS {
+        app.update();
+    }
+    capture_select_map(&mut app, map_id)?;
+    start_shared_match_scene_with_current_setup(&mut app);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    capture_frame_whole_map(&mut app);
+    for _ in 0..12 {
+        app.update();
+    }
+    let handle = capture_handle(&app);
+    shoot(&mut app, &handle, path.to_path_buf());
+    println!("[capture] wrote map overview to {}", path.display());
     Ok(())
 }
 

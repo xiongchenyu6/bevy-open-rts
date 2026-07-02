@@ -63,7 +63,10 @@ pub(crate) fn separate_units(
     >,
     obstacles: Query<
         (&Transform, &Selectable, Option<&Health>),
-        (Or<(With<Structure>, With<ResourceNode>)>, Without<Unit>),
+        (
+            Or<(With<Structure>, With<ResourceNode>, With<TerrainWall>)>,
+            Without<Unit>,
+        ),
     >,
 ) {
     let max_step = UNIT_SEPARATION_MAX_SPEED * time.delta_secs();
@@ -361,7 +364,10 @@ pub(crate) fn rebuild_nav_grid(
     mut grid: ResMut<NavGrid>,
     obstacles: Query<
         (&Transform, &Selectable, Option<&Health>),
-        (Or<(With<Structure>, With<ResourceNode>)>, Without<Unit>),
+        (
+            Or<(With<Structure>, With<ResourceNode>, With<TerrainWall>)>,
+            Without<Unit>,
+        ),
     >,
     added: Query<(), Or<(Added<Structure>, Added<ResourceNode>)>>,
     mut removed_structures: RemovedComponents<Structure>,
@@ -485,6 +491,32 @@ mod tests {
                 grid.line_clear(cursor, *waypoint),
                 "leg must not cross the wall"
             );
+            cursor = *waypoint;
+        }
+    }
+
+    #[test]
+    fn terrain_wall_rocks_block_the_nav_grid() {
+        // A wall of rock obstacles across the middle must force A* detours,
+        // exactly like structures do.
+        let mut grid = NavGrid::default();
+        let bounds = MapBounds::from_size((20.0, 20.0));
+        let rocks: Vec<(Vec3, f32)> = (0..9)
+            .map(|i| (Vec3::new(-6.0 + i as f32 * 1.5, 0.0, 0.0), 0.8))
+            .collect();
+        grid.rebuild(bounds, &rocks);
+        let from = Vec3::new(0.0, 0.0, -6.0);
+        let to = Vec3::new(0.0, 0.0, 6.0);
+        assert!(
+            !grid.line_clear(from, to),
+            "rock wall blocks the straight line"
+        );
+        let path = grid
+            .find_path(from, to)
+            .expect("gap around the wall must exist");
+        let mut cursor = from;
+        for waypoint in &path {
+            assert!(grid.line_clear(cursor, *waypoint));
             cursor = *waypoint;
         }
     }

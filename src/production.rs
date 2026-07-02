@@ -195,7 +195,12 @@ pub(crate) fn structure_placement_input(
     structures: Query<StructurePrereqItem<'_>>,
     occupiers: Query<
         PlacementOccupierItem<'_>,
-        Or<(With<Unit>, With<Structure>, With<ResourceNode>)>,
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
     >,
 ) {
     if controlled_player_team(Some(&*placement.visible_player)).is_none() {
@@ -1089,7 +1094,12 @@ pub(crate) fn draw_structure_placement_preview(
     structures: &Query<StructurePrereqItem<'_>>,
     occupiers: &Query<
         PlacementOccupierItem<'_>,
-        Or<(With<Unit>, With<Structure>, With<ResourceNode>)>,
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
     >,
 ) {
     let Some(def) = registry::entity(pending.id) else {
@@ -1288,7 +1298,12 @@ pub(crate) fn structure_placement_validity(
     structures: &Query<StructurePrereqItem<'_>>,
     occupiers: &Query<
         PlacementOccupierItem<'_>,
-        Or<(With<Unit>, With<Structure>, With<ResourceNode>)>,
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
     >,
 ) -> StructurePlacementValidity {
     structure_placement_validity_for_faction(
@@ -1313,7 +1328,12 @@ pub(crate) fn structure_placement_validity_for_faction(
     structures: &Query<StructurePrereqItem<'_>>,
     occupiers: &Query<
         PlacementOccupierItem<'_>,
-        Or<(With<Unit>, With<Structure>, With<ResourceNode>)>,
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
     >,
 ) -> StructurePlacementValidity {
     let Some(def) = registry::entity(id) else {
@@ -1379,7 +1399,12 @@ pub(crate) fn process_build_queue(
     rally_points: Query<&RallyPoint>,
     rally_targets: Query<
         (Option<&Health>, Option<&ResourceNode>),
-        Or<(With<Unit>, With<Structure>, With<ResourceNode>)>,
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
     >,
     structures: Query<StructureEntityItem<'_>>,
     occupiers: Query<(Entity, &Transform, &Selectable, &Health), Or<(With<Unit>, With<Structure>)>>,

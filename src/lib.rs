@@ -1143,6 +1143,7 @@ pub(crate) struct SkirmishMapDef {
     pub(crate) resources: &'static [ResourceSpec],
     pub(crate) neutral_tech: &'static [NeutralTechSpec],
     pub(crate) supply_crates: &'static [NamedSupplyCrateSpec],
+    pub(crate) terrain_walls: &'static [TerrainWallSpec],
 }
 
 impl SkirmishMapDef {
@@ -2191,6 +2192,9 @@ pub(crate) fn localized_skirmish_map_name(map: &SkirmishMapDef) -> &'static str 
         "MAP_NAME_FOUR_CORNERS" => t("四角战场", "Four Corners"),
         "MAP_NAME_TECH_DIVIDE" => t("科技分界线", "Tech Divide"),
         "MAP_NAME_BIG_ARENA" => t("大型竞技场", "Big Arena"),
+        "MAP_NAME_CANYON_PASS" => t("峡谷通道", "Canyon Pass"),
+        "MAP_NAME_CROSSFIRE" => t("交叉火线", "Crossfire"),
+        "MAP_NAME_RING_VALLEY" => t("环形谷地", "Ring Valley"),
         _ => map.name,
     }
 }
@@ -3368,6 +3372,164 @@ pub(crate) const BIG_ARENA_CRATES: &[NamedSupplyCrateSpec] = &[
 pub(crate) const EMPTY_NEUTRAL_TECH: &[NeutralTechSpec] = &[];
 pub(crate) const EMPTY_NAMED_CRATES: &[NamedSupplyCrateSpec] = &[];
 
+/// A run of impassable rocks along a map-local segment: ground units and
+/// structure placement are blocked, air flies over (the gameplay value of
+/// cliffs without leaving godot's flat-terrain model).
+#[derive(Clone, Copy)]
+pub(crate) struct TerrainWallSpec {
+    pub(crate) start: (f32, f32),
+    pub(crate) end: (f32, f32),
+    pub(crate) width: f32,
+}
+
+#[derive(Component)]
+pub(crate) struct TerrainWall;
+
+pub(crate) const EMPTY_TERRAIN_WALLS: &[TerrainWallSpec] = &[];
+
+// ---- bevy-original tier-3 maps (terrain-wall showcases) ----
+
+pub(crate) const CANYON_PASS_SPAWNS: &[(f32, f32)] = &[(10.0, 28.0), (46.0, 28.0)];
+pub(crate) const CANYON_PASS_RESOURCES: &[ResourceSpec] = &[
+    map_ore!(8.0, 18.0),
+    map_ore!(9.6, 19.4),
+    map_ore!(7.2, 20.6),
+    map_crystal!(12.0, 38.0),
+    map_ore!(48.0, 18.0),
+    map_ore!(46.4, 19.4),
+    map_ore!(48.8, 20.6),
+    map_crystal!(44.0, 38.0),
+    map_ore!(28.0, 8.0),
+    map_ore!(28.0, 48.0),
+];
+/// Two long walls leave a north and a south pass through the canyon.
+pub(crate) const CANYON_PASS_WALLS: &[TerrainWallSpec] = &[
+    TerrainWallSpec {
+        start: (24.0, 0.0),
+        end: (24.0, 20.0),
+        width: 2.4,
+    },
+    TerrainWallSpec {
+        start: (24.0, 36.0),
+        end: (24.0, 56.0),
+        width: 2.4,
+    },
+    TerrainWallSpec {
+        start: (32.0, 0.0),
+        end: (32.0, 20.0),
+        width: 2.4,
+    },
+    TerrainWallSpec {
+        start: (32.0, 36.0),
+        end: (32.0, 56.0),
+        width: 2.4,
+    },
+];
+
+pub(crate) const CROSSFIRE_SPAWNS: &[(f32, f32)] =
+    &[(10.0, 10.0), (54.0, 10.0), (54.0, 54.0), (10.0, 54.0)];
+pub(crate) const CROSSFIRE_RESOURCES: &[ResourceSpec] = &[
+    map_ore!(16.0, 8.0),
+    map_ore!(17.6, 9.4),
+    map_crystal!(8.0, 16.0),
+    map_ore!(48.0, 8.0),
+    map_ore!(46.4, 9.4),
+    map_crystal!(56.0, 16.0),
+    map_ore!(48.0, 56.0),
+    map_ore!(46.4, 54.6),
+    map_crystal!(56.0, 48.0),
+    map_ore!(16.0, 56.0),
+    map_ore!(17.6, 54.6),
+    map_crystal!(8.0, 48.0),
+    map_ore!(32.0, 30.0),
+    map_ore!(32.0, 34.0),
+];
+/// A cross of walls splits the map into quadrants with four gaps near the rim.
+pub(crate) const CROSSFIRE_WALLS: &[TerrainWallSpec] = &[
+    TerrainWallSpec {
+        start: (32.0, 10.0),
+        end: (32.0, 26.0),
+        width: 2.2,
+    },
+    TerrainWallSpec {
+        start: (32.0, 38.0),
+        end: (32.0, 54.0),
+        width: 2.2,
+    },
+    TerrainWallSpec {
+        start: (10.0, 32.0),
+        end: (26.0, 32.0),
+        width: 2.2,
+    },
+    TerrainWallSpec {
+        start: (38.0, 32.0),
+        end: (54.0, 32.0),
+        width: 2.2,
+    },
+];
+
+pub(crate) const RING_VALLEY_SPAWNS: &[(f32, f32)] =
+    &[(8.0, 8.0), (52.0, 8.0), (52.0, 52.0), (8.0, 52.0)];
+pub(crate) const RING_VALLEY_RESOURCES: &[ResourceSpec] = &[
+    map_ore!(6.0, 14.0),
+    map_ore!(7.4, 15.6),
+    map_ore!(54.0, 14.0),
+    map_ore!(52.6, 15.6),
+    map_ore!(54.0, 46.0),
+    map_ore!(52.6, 44.4),
+    map_ore!(6.0, 46.0),
+    map_ore!(7.4, 44.4),
+    map_crystal!(28.0, 28.0),
+    map_crystal!(32.0, 28.0),
+    map_crystal!(28.0, 32.0),
+    map_crystal!(32.0, 32.0),
+    map_ore!(30.0, 24.0),
+    map_ore!(30.0, 36.0),
+];
+/// A ring of rock with four gates guarding the rich centre.
+pub(crate) const RING_VALLEY_WALLS: &[TerrainWallSpec] = &[
+    TerrainWallSpec {
+        start: (20.0, 20.0),
+        end: (26.0, 20.0),
+        width: 2.2,
+    },
+    TerrainWallSpec {
+        start: (34.0, 20.0),
+        end: (40.0, 20.0),
+        width: 2.2,
+    },
+    TerrainWallSpec {
+        start: (40.0, 20.0),
+        end: (40.0, 26.0),
+        width: 2.2,
+    },
+    TerrainWallSpec {
+        start: (40.0, 34.0),
+        end: (40.0, 40.0),
+        width: 2.2,
+    },
+    TerrainWallSpec {
+        start: (34.0, 40.0),
+        end: (40.0, 40.0),
+        width: 2.2,
+    },
+    TerrainWallSpec {
+        start: (20.0, 40.0),
+        end: (26.0, 40.0),
+        width: 2.2,
+    },
+    TerrainWallSpec {
+        start: (20.0, 34.0),
+        end: (20.0, 40.0),
+        width: 2.2,
+    },
+    TerrainWallSpec {
+        start: (20.0, 20.0),
+        end: (20.0, 26.0),
+        width: 2.2,
+    },
+];
+
 pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
     SkirmishMapDef {
         id: "plain_and_simple",
@@ -3380,6 +3542,7 @@ pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
         resources: PLAIN_AND_SIMPLE_RESOURCES,
         neutral_tech: EMPTY_NEUTRAL_TECH,
         supply_crates: EMPTY_NAMED_CRATES,
+        terrain_walls: EMPTY_TERRAIN_WALLS,
     },
     SkirmishMapDef {
         id: "four_corners",
@@ -3392,6 +3555,7 @@ pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
         resources: FOUR_CORNERS_RESOURCES,
         neutral_tech: FOUR_CORNERS_NEUTRAL_TECH,
         supply_crates: FOUR_CORNERS_CRATES,
+        terrain_walls: EMPTY_TERRAIN_WALLS,
     },
     SkirmishMapDef {
         id: "tech_divide",
@@ -3404,6 +3568,7 @@ pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
         resources: TECH_DIVIDE_RESOURCES,
         neutral_tech: TECH_DIVIDE_NEUTRAL_TECH,
         supply_crates: TECH_DIVIDE_CRATES,
+        terrain_walls: EMPTY_TERRAIN_WALLS,
     },
     SkirmishMapDef {
         id: "big_arena",
@@ -3416,6 +3581,46 @@ pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
         resources: BIG_ARENA_RESOURCES,
         neutral_tech: BIG_ARENA_NEUTRAL_TECH,
         supply_crates: BIG_ARENA_CRATES,
+        terrain_walls: EMPTY_TERRAIN_WALLS,
+    },
+    SkirmishMapDef {
+        id: "canyon_pass",
+        godot_path: "bevy://maps/CanyonPass",
+        name: "Canyon Pass",
+        name_key: "MAP_NAME_CANYON_PASS",
+        players: 2,
+        size: (56.0, 56.0),
+        spawn_points: CANYON_PASS_SPAWNS,
+        resources: CANYON_PASS_RESOURCES,
+        neutral_tech: EMPTY_NEUTRAL_TECH,
+        supply_crates: EMPTY_NAMED_CRATES,
+        terrain_walls: CANYON_PASS_WALLS,
+    },
+    SkirmishMapDef {
+        id: "crossfire",
+        godot_path: "bevy://maps/Crossfire",
+        name: "Crossfire",
+        name_key: "MAP_NAME_CROSSFIRE",
+        players: 4,
+        size: (64.0, 64.0),
+        spawn_points: CROSSFIRE_SPAWNS,
+        resources: CROSSFIRE_RESOURCES,
+        neutral_tech: EMPTY_NEUTRAL_TECH,
+        supply_crates: EMPTY_NAMED_CRATES,
+        terrain_walls: CROSSFIRE_WALLS,
+    },
+    SkirmishMapDef {
+        id: "ring_valley",
+        godot_path: "bevy://maps/RingValley",
+        name: "Ring Valley",
+        name_key: "MAP_NAME_RING_VALLEY",
+        players: 4,
+        size: (60.0, 60.0),
+        spawn_points: RING_VALLEY_SPAWNS,
+        resources: RING_VALLEY_RESOURCES,
+        neutral_tech: EMPTY_NEUTRAL_TECH,
+        supply_crates: EMPTY_NAMED_CRATES,
+        terrain_walls: RING_VALLEY_WALLS,
     },
 ];
 
@@ -5085,7 +5290,12 @@ pub(crate) struct StructurePlacementPreviewParams<'w, 's> {
         'w,
         's,
         PlacementOccupierItem<'static>,
-        Or<(With<Unit>, With<Structure>, With<ResourceNode>)>,
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
     >,
 }
 
@@ -5856,6 +6066,7 @@ pub(crate) fn setup(
         );
     }
     setup_resource_nodes(&mut commands, &asset_server, skirmish_map);
+    spawn_terrain_walls(&mut commands, &asset_server, skirmish_map);
     setup_supply_crates(&mut commands, &asset_server, skirmish_map);
     setup_neutral_tech(
         &mut commands,
@@ -6049,6 +6260,49 @@ pub(crate) fn setup_neutral_tech(
             visible_team,
             map_local_to_world(map, spawn.position),
         );
+    }
+}
+
+/// Spawns the rock line for every terrain wall on the map. Each rock is an
+/// obstacle entity (TerrainWall + Selectable radius) so the nav grid, unit
+/// steering and structure placement all treat it as solid; air ignores it.
+pub(crate) fn spawn_terrain_walls(
+    commands: &mut Commands,
+    asset_server: &AssetServer,
+    map: &SkirmishMapDef,
+) {
+    const ROCK_MODELS: [(&str, f32); 3] = [
+        ("models/kenney-spacekit/rock_largeA.glb", 1.15),
+        ("models/kenney-spacekit/rock_largeB.glb", 1.3),
+        ("models/kenney-spacekit/rock_largeA.glb", 0.95),
+    ];
+    for (wall_index, wall) in map.terrain_walls.iter().enumerate() {
+        let start = map_local_to_world(map, wall.start);
+        let end = map_local_to_world(map, wall.end);
+        let length = xz_distance(start, end).max(0.1);
+        let steps = (length / 1.5).ceil().max(1.0) as usize;
+        let direction = (end - start) / length;
+        let perpendicular = Vec3::new(-direction.z, 0.0, direction.x);
+        for step in 0..=steps {
+            let t = step as f32 / steps as f32;
+            // Deterministic jitter/rotation so maps look identical every load.
+            let seed = (wall_index * 131 + step * 7919) as f32;
+            let jitter = (seed.sin() * 43758.547).fract() - 0.5;
+            let position = start.lerp(end, t) + perpendicular * jitter * wall.width * 0.4;
+            let (model, scale) = ROCK_MODELS[(wall_index + step) % ROCK_MODELS.len()];
+            commands.spawn((
+                Name::new("Terrain Wall Rock"),
+                WorldAssetRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(model))),
+                Transform::from_translation(position)
+                    .with_scale(Vec3::splat(scale))
+                    .with_rotation(Quat::from_rotation_y(seed)),
+                TerrainWall,
+                Selectable {
+                    radius: (wall.width * 0.5).max(0.7),
+                },
+                MatchScopedEntity,
+            ));
+        }
     }
 }
 
@@ -8296,7 +8550,12 @@ pub(crate) fn place_structure_at(
     structures: &Query<StructurePrereqItem<'_>>,
     occupiers: &Query<
         PlacementOccupierItem<'_>,
-        Or<(With<Unit>, With<Structure>, With<ResourceNode>)>,
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
     >,
 ) -> Result<(Entity, &'static str), StructurePlacementValidity> {
     place_structure_at_for_faction(
@@ -8331,7 +8590,12 @@ pub(crate) fn place_structure_at_for_faction(
     structures: &Query<StructurePrereqItem<'_>>,
     occupiers: &Query<
         PlacementOccupierItem<'_>,
-        Or<(With<Unit>, With<Structure>, With<ResourceNode>)>,
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
     >,
 ) -> Result<(Entity, &'static str), StructurePlacementValidity> {
     let def = registry::entity(id).ok_or(StructurePlacementValidity::MissingTech)?;
@@ -8448,7 +8712,12 @@ pub(crate) fn structure_placement_collides(
     radius: f32,
     occupiers: &Query<
         PlacementOccupierItem<'_>,
-        Or<(With<Unit>, With<Structure>, With<ResourceNode>)>,
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
     >,
 ) -> bool {
     occupiers

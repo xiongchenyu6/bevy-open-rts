@@ -2202,7 +2202,10 @@ pub(crate) fn move_units(
         )>,
         Query<
             (&Transform, &Selectable, Option<&Health>),
-            (Or<(With<Structure>, With<ResourceNode>)>, Without<Unit>),
+            (
+                Or<(With<Structure>, With<ResourceNode>, With<TerrainWall>)>,
+                Without<Unit>,
+            ),
         >,
     )>,
 ) {

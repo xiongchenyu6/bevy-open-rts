@@ -6,6 +6,7 @@
 
 use bevy::camera::{ClearColorConfig, RenderTarget, ScalingMode};
 use bevy::prelude::*;
+use bevy_rts_camera::RtsCamera as RtsCam;
 
 use crate::*;
 
@@ -1572,4 +1573,50 @@ pub fn capture_run_arena(
     }
     let (alive_a, alive_b, hp_a, hp_b) = survivors(app.world_mut());
     Ok((elapsed, alive_a, alive_b, hp_a, hp_b))
+}
+
+/// Selects a skirmish map by id for the NEXT match started in this app (used by
+/// `capture map` to screenshot map layouts).
+pub fn capture_select_map(app: &mut App, map_id: &str) -> Result<(), String> {
+    let map = SKIRMISH_MAPS
+        .iter()
+        .find(|map| map.id == map_id)
+        .ok_or_else(|| {
+            format!(
+                "unknown map '{map_id}' (known: {})",
+                SKIRMISH_MAPS
+                    .iter()
+                    .map(|map| map.id)
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )
+        })?;
+    app.world_mut()
+        .resource_mut::<MatchSetupSettings>()
+        .map_path = map.godot_path;
+    app.world_mut()
+        .resource_mut::<SelectedSkirmishMap>()
+        .godot_path = map.godot_path;
+    Ok(())
+}
+
+/// Frames the whole map: spectator visibility (no fog), camera over the origin
+/// raised far beyond the gameplay zoom cap so the full layout fits.
+pub fn capture_frame_whole_map(app: &mut App) {
+    app.world_mut()
+        .insert_resource(VisiblePlayer::all_players(Team::Player(0)));
+    let map_extent = {
+        let selected = app.world().resource::<SelectedSkirmishMap>();
+        let map = selected.definition();
+        map.size.0.max(map.size.1)
+    };
+    let world = app.world_mut();
+    let mut cameras = world.query_filtered::<&mut RtsCam, With<MainCamera>>();
+    for mut camera in cameras.iter_mut(world) {
+        camera.height_max = map_extent * 1.05;
+        camera.height_min = map_extent * 1.05;
+        camera.target_focus.translation = Vec3::ZERO;
+        camera.target_zoom = 0.0;
+        camera.snap = true;
+    }
 }
