@@ -80,8 +80,10 @@ impl Default for AudioFeedback {
 pub(crate) fn play_pending_audio_feedback(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    locale: Option<Res<Locale>>,
     mut feedback: ResMut<AudioFeedback>,
 ) {
+    let language = locale.map(|locale| locale.0).unwrap_or(Language::Zh);
     if let Some(sound) = feedback.pending_sound.take() {
         commands.spawn((
             AudioPlayer::new(asset_server.load(sound.audio_path())),
@@ -92,7 +94,7 @@ pub(crate) fn play_pending_audio_feedback(
     }
     if let Some(voice) = feedback.pending_voice.take() {
         commands.spawn((
-            AudioPlayer::new(asset_server.load(voice.audio_path())),
+            AudioPlayer::new(asset_server.load(voice.audio_path(language))),
             PlaybackSettings::DESPAWN.with_volume(Volume::Linear(0.92)),
             MatchScopedEntity,
         ));
@@ -164,7 +166,42 @@ impl SoundEffectKind {
 
 impl UnitVoiceEvent {
     #[allow(dead_code)]
-    pub(crate) fn audio_path(self) -> &'static str {
+    pub(crate) fn audio_path(self, language: Language) -> &'static str {
+        match language {
+            Language::Zh => self.audio_path_zh(),
+            Language::En => self.audio_path_en(),
+        }
+    }
+
+    /// Chinese pack: edge-tts 云希 (unit acks) + 晓晓 (announcer); see
+    /// scripts/gen_zh_voice.sh.
+    pub(crate) fn audio_path_zh(self) -> &'static str {
+        match self {
+            Self::Hello => "voice/chinese/edge-yunxi/sir.ogg",
+            Self::Ack1 => "voice/chinese/edge-yunxi/yes_sir.ogg",
+            Self::Ack2 => "voice/chinese/edge-yunxi/acknowledged.ogg",
+            Self::Training => "voice/chinese/edge-xiaoxiao/training.ogg",
+            Self::UnitReady => "voice/chinese/edge-xiaoxiao/unit_ready.ogg",
+            Self::ConstructionComplete => "voice/chinese/edge-xiaoxiao/construction_complete.ogg",
+            Self::NotEnoughResources => "voice/chinese/edge-xiaoxiao/not_enough_resources.ogg",
+            Self::SupportPowerReady => "voice/chinese/edge-xiaoxiao/support_power_ready.ogg",
+            Self::SupportPowerFired => "voice/chinese/edge-yunxi/acknowledged.ogg",
+            Self::EnemySupportPowerFired => "voice/chinese/edge-xiaoxiao/enemy_support_power.ogg",
+            Self::EnemySuperweaponReady => {
+                "voice/chinese/edge-xiaoxiao/enemy_superweapon_ready.ogg"
+            }
+            Self::EnemySuperweaponLaunched => {
+                "voice/chinese/edge-xiaoxiao/enemy_superweapon_launched.ogg"
+            }
+            Self::Victory => "voice/chinese/edge-xiaoxiao/victory.ogg",
+            Self::Defeat => "voice/chinese/edge-xiaoxiao/defeat.ogg",
+            Self::BaseUnderAttack => "voice/chinese/edge-xiaoxiao/base_under_attack.ogg",
+            Self::UnitUnderAttack => "voice/chinese/edge-xiaoxiao/unit_under_attack.ogg",
+            Self::UnitLost => "voice/chinese/edge-xiaoxiao/unit_lost.ogg",
+        }
+    }
+
+    pub(crate) fn audio_path_en(self) -> &'static str {
         match self {
             Self::Hello => "voice/english/ttsmaker-com-2704-jackson-us/sir.ogg",
             Self::Ack1 => "voice/english/ttsmaker-com-2704-jackson-us/yes_sir.ogg",
@@ -350,5 +387,46 @@ mod tests {
             ))
             .exists()
         );
+    }
+}
+
+#[cfg(test)]
+mod voice_tests {
+    use super::*;
+
+    #[test]
+    fn every_voice_line_has_a_real_file_in_both_languages() {
+        let events = [
+            UnitVoiceEvent::Hello,
+            UnitVoiceEvent::Ack1,
+            UnitVoiceEvent::Ack2,
+            UnitVoiceEvent::Training,
+            UnitVoiceEvent::UnitReady,
+            UnitVoiceEvent::ConstructionComplete,
+            UnitVoiceEvent::NotEnoughResources,
+            UnitVoiceEvent::SupportPowerReady,
+            UnitVoiceEvent::SupportPowerFired,
+            UnitVoiceEvent::EnemySupportPowerFired,
+            UnitVoiceEvent::EnemySuperweaponReady,
+            UnitVoiceEvent::EnemySuperweaponLaunched,
+            UnitVoiceEvent::Victory,
+            UnitVoiceEvent::Defeat,
+            UnitVoiceEvent::BaseUnderAttack,
+            UnitVoiceEvent::UnitUnderAttack,
+            UnitVoiceEvent::UnitLost,
+        ];
+        for event in events {
+            for language in [Language::Zh, Language::En] {
+                let path = format!(
+                    "{}/assets/{}",
+                    env!("CARGO_MANIFEST_DIR"),
+                    event.audio_path(language)
+                );
+                assert!(
+                    std::path::Path::new(&path).exists(),
+                    "missing voice file: {path}"
+                );
+            }
+        }
     }
 }
