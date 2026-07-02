@@ -1,5 +1,32 @@
 # Bevy Open RTS Structure
 
+## Source Modules
+
+`src/lib.rs` is the crate root: app composition/plugin registration, the match
+setup/flow (maps, factions, spawn, fog/visibility) and shared core types. The
+domains live in modules, each re-exported into the crate root
+(`pub(crate) use module::*;`), so items are referenced unqualified:
+
+- `src/nav.rs` — A* nav grid + PlannedPath, unit-vs-unit separation.
+- `src/camera.rs` — RtsCamera state, bevy_rts_camera bridge, settings, bookmarks.
+- `src/audio.rs` — unit/announcer voices, sfx kinds, AudioFeedback queue + playback.
+- `src/menu.rs` — front menu, options, credits, skirmish lobby + widgets.
+- `src/hud.rs` — in-match HUD: resource bar, minimap, battle log, objectives,
+  selection panel, command card + queue, support strip, HudHitZones, RTS cursor.
+- `src/economy.rs` — Economies/income/power, harvesting + dropoff, resource nodes,
+  supply crates.
+- `src/ai.rs` — difficulty tiers, AI director (economy/training/waves/support),
+  target scoring, support-power defs.
+- `src/production.rs` — build queue/training, construction, manual placement.
+- `src/orders.rs` — selection, command-card action logic, unit orders + queue,
+  rally points, control groups, idle-worker cycling.
+- `src/combat.rs` — combat/chase/movement systems, weapons/health, crushing,
+  mines, wreckage, veterancy, auras/shields/EMP, combat VFX.
+- `src/capture_api.rs` — the `pub fn capture_*` harness surface + offscreen
+  render-target plumbing (used by `src/bin/capture.rs` and tests).
+- `src/generated_registry.rs` — entity registry (hand-extended; do NOT regenerate
+  via scripts/generate_registry.py — it would delete the extensions).
+
 ## Runtime Entry
 
 - `src/main.rs` calls `bevy_open_rts::run_game_app()`.
