@@ -35,7 +35,7 @@ HudHitZones), and the HUD update systems.
 
 ## Stage 6: capture_api.rs
 **Goal**: the `pub fn capture_*` harness surface.
-**Status**: Not Started
+**Status**: Complete
 
 ## Later stages (same pattern)
 combat.rs, economy.rs, orders.rs, ai.rs — carve once the above land.
