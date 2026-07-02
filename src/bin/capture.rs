@@ -555,7 +555,14 @@ fn render_harvest(dir: &Path) -> Result<(), String> {
     }
     let (ore_before, crystal_before) = capture_player_resources(&mut app);
 
-    // Right-click the ore node to harvest.
+    // Right-click the ore node to harvest. Center the camera on the ore first: the
+    // selected worker's multi-row build card (bottom-right) can genuinely cover the
+    // ore's previous screen position, and clicks on real HUD are (correctly)
+    // swallowed. Selection survives the camera move.
+    capture_focus_camera_on(&mut app, Vec3::new(ore.x, 0.0, ore.z));
+    for _ in 0..12 {
+        app.update();
+    }
     let ore_screen = capture_world_to_screen(&mut app, ore).ok_or("ore offscreen")?;
     capture_set_cursor(&mut app, ore_screen);
     capture_mouse_button(&mut app, MouseButton::Right, true);

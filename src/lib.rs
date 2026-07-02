@@ -236,6 +236,10 @@ const BATTLE_LOG_WIDTH_PX: f32 = 390.0;
 // the number of visible entries so an EMPTY log never swallows world clicks (it
 // used to be a fixed 168px band across the top-center of the screen).
 const BATTLE_LOG_ROW_HIT_PX: f32 = 34.0;
+// Bottom-right command card hit geometry (146x46 buttons + 8px gap, 4 per row) and
+// the production-queue rows that stack above it (92px slots, 6 per row).
+const COMMAND_CARD_WIDTH_PX: f32 = 612.0;
+const COMMAND_CARD_ROW_HIT_PX: f32 = 54.0;
 const MINIMAP_SIZE_PX: f32 = 158.0;
 // godot anchors the minimap/radar in the bottom-LEFT corner.
 const MINIMAP_LEFT_PX: f32 = 12.0;
@@ -4367,6 +4371,7 @@ fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<Economies>()
         .init_resource::<TeamRelations>()
         .init_resource::<NavGrid>()
+        .init_resource::<HudHitZones>()
         .init_resource::<BuildQueue>()
         .init_resource::<BuildStructureTab>()
         .init_resource::<NextSpawnId>()
@@ -4721,8 +4726,7 @@ fn update_rts_cursor(
     static_cursors: Res<Assets<StaticCursor>>,
     command_mode: Option<Res<CommandMode>>,
     hovered_resource: Option<Res<HoveredResource>>,
-    support_panel: Res<SupportPowerPanelState>,
-    battle_log: Option<Res<BattleLog>>,
+    hud_zones: Res<HudHitZones>,
     window_q: Query<(Entity, Option<&AppliedRtsCursor>, &Window), With<PrimaryWindow>>,
 ) {
     let Some(cursor_handle) = cursor_handle else {
@@ -4738,8 +4742,7 @@ fn update_rts_cursor(
         command_mode.as_deref(),
         hovered_resource.as_deref(),
         window,
-        &support_panel,
-        battle_log.as_deref().map_or(0, |log| log.entries.len()),
+        &hud_zones,
     )
     .atlas_index();
     if applied.is_some_and(|applied| applied.index == index) {
@@ -4757,10 +4760,9 @@ fn desired_rts_cursor_kind(
     command_mode: Option<&CommandMode>,
     hovered_resource: Option<&HoveredResource>,
     window: &Window,
-    support_panel: &SupportPowerPanelState,
-    battle_log_rows: usize,
+    hud_zones: &HudHitZones,
 ) -> RtsCursorKind {
-    if cursor_is_over_hud(window, support_panel, battle_log_rows) {
+    if cursor_is_over_hud(window, hud_zones) {
         return RtsCursorKind::Default;
     }
     let Some(command_mode) = command_mode else {
@@ -6242,7 +6244,10 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
             update_command_mode
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
-            select_entities
+            (
+                refresh_hud_hit_zones.before(select_entities),
+                select_entities,
+            )
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
             selection_hotkeys
@@ -8086,7 +8091,7 @@ struct StructurePlacementInputResources<'w, 's> {
     next_id: ResMut<'w, NextSpawnId>,
     economies: ResMut<'w, Economies>,
     command_mode: ResMut<'w, CommandMode>,
-    support_power_panel: Res<'w, SupportPowerPanelState>,
+    hud_zones: Res<'w, HudHitZones>,
     placement_feedback: ResMut<'w, StructurePlacementFeedback>,
     audio_feedback: ResMut<'w, AudioFeedback>,
     battle_log: ResMut<'w, BattleLog>,
@@ -8113,12 +8118,11 @@ struct StructurePlacementInputResources<'w, 's> {
 #[derive(SystemParam)]
 struct StructurePlacementPreviewParams<'w, 's> {
     command_mode: Res<'w, CommandMode>,
-    battle_log: Res<'w, BattleLog>,
+    hud_zones: Res<'w, HudHitZones>,
     visible_player: Res<'w, VisiblePlayer>,
     player_factions: Res<'w, PlayerFactions>,
     economies: Res<'w, Economies>,
     map_bounds: Res<'w, MapBounds>,
-    support_power_panel: Res<'w, SupportPowerPanelState>,
     window_q: Query<'w, 's, &'static Window, With<PrimaryWindow>>,
     camera_q: Query<'w, 's, (&'static Camera, &'static GlobalTransform), With<MainCamera>>,
     structures: Query<'w, 's, StructurePrereqItem<'static>>,
@@ -16661,13 +16665,9 @@ fn structure_placement_input(
         return;
     }
     let pointer = window_q.single().ok().and_then(|window| {
-        (!cursor_is_over_hud(
-            window,
-            &placement.support_power_panel,
-            placement.battle_log.entries.len(),
-        ))
-        .then(|| pointer_ground(window, &camera_q))
-        .flatten()
+        (!cursor_is_over_hud(window, &placement.hud_zones))
+            .then(|| pointer_ground(window, &camera_q))
+            .flatten()
     });
     let team = placement.visible_player.team;
     let faction = placement.player_factions.slot_faction(team);
@@ -17359,8 +17359,7 @@ fn select_entities(
     time: Res<Time>,
     visible_player: Res<VisiblePlayer>,
     mut command_mode: ResMut<CommandMode>,
-    support_panel: Res<SupportPowerPanelState>,
-    battle_log: Res<BattleLog>,
+    hud_zones: Res<HudHitZones>,
     window_q: Query<&Window, With<PrimaryWindow>>,
     camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     mut drag_state: ResMut<SelectionDragState>,
@@ -17402,15 +17401,14 @@ fn select_entities(
     disarm_support_power_on_left_click(
         &mut command_mode,
         &mouse,
-        cursor_is_over_hud(window, &support_panel, battle_log.entries.len()),
+        cursor_is_over_hud(window, &hud_zones),
     );
 
     if mouse.just_pressed(MouseButton::Left) {
         drag_state.active = true;
         drag_state.dragging = false;
         drag_state.start = cursor;
-        drag_state.started_in_hud =
-            cursor_is_over_hud(window, &support_panel, battle_log.entries.len());
+        drag_state.started_in_hud = cursor_is_over_hud(window, &hud_zones);
         if selection_drag_should_interrupt(&drag_state, cursor, window_size(window)) {
             cancel_selection_drag(&mut drag_state);
         }
@@ -17776,7 +17774,7 @@ fn issue_orders(
     keyboard: Res<ButtonInput<KeyCode>>,
     economies: Res<Economies>,
     visible_player: Res<VisiblePlayer>,
-    support_panel: Res<SupportPowerPanelState>,
+    hud_zones: Res<HudHitZones>,
     window_q: Query<&Window, With<PrimaryWindow>>,
     camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     mut order_resources: OrderResources,
@@ -17834,17 +17832,9 @@ fn issue_orders(
     let Some(cursor) = window.cursor_position() else {
         return;
     };
-    if cursor_blocks_world_order_controls(
-        window,
-        cursor,
-        &support_panel,
-        order_resources.battle_log.entries.len(),
-    ) {
+    if cursor_blocks_world_order_controls(cursor, &hud_zones) {
         if std::env::var_os("RTS_SELECT_DIAG").is_some() {
-            eprintln!(
-                "[select-diag] right-click swallowed by HUD at {cursor:?} (log_rows={})",
-                order_resources.battle_log.entries.len()
-            );
+            eprintln!("[select-diag] right-click swallowed by HUD at {cursor:?}");
         }
         return;
     }
@@ -31231,13 +31221,9 @@ fn draw_world_overlays(
     if let Some(pending) = placement_preview.command_mode.pending_structure_placement
         && let Ok(window) = placement_preview.window_q.single()
         && let Some(point) = pending.position.or_else(|| {
-            (!cursor_is_over_hud(
-                window,
-                &placement_preview.support_power_panel,
-                placement_preview.battle_log.entries.len(),
-            ))
-            .then(|| pointer_ground(window, &placement_preview.camera_q))
-            .flatten()
+            (!cursor_is_over_hud(window, &placement_preview.hud_zones))
+                .then(|| pointer_ground(window, &placement_preview.camera_q))
+                .flatten()
         })
     {
         draw_structure_placement_preview(
@@ -32010,52 +31996,131 @@ fn validated_terrain_target_in_bounds(point: Vec3, bounds: MapBounds) -> Option<
     Some(bounds.clamp_ground_point(Vec3::new(point.x, 0.0, point.z), 0.0))
 }
 
-fn cursor_is_over_hud(
-    window: &Window,
-    support_panel: &SupportPowerPanelState,
+/// Screen rects (min..max, window px) of HUD panels that consume world input,
+/// rebuilt every frame from what is ACTUALLY rendered. The old scheme dead-zoned a
+/// fixed full-width bottom band, so once the command card stopped being full-width
+/// a right-click on ore in the lower half of the screen silently did nothing.
+#[derive(Resource, Default)]
+struct HudHitZones {
+    world_rects: Vec<(Vec2, Vec2)>,
+}
+
+impl HudHitZones {
+    fn blocks_world(&self, cursor: Vec2) -> bool {
+        self.world_rects.iter().any(|(min, max)| {
+            cursor.x >= min.x && cursor.x <= max.x && cursor.y >= min.y && cursor.y <= max.y
+        })
+    }
+}
+
+/// Pure geometry for the HUD input rects (testable without a world).
+fn hud_world_input_rects(
+    width: f32,
+    height: f32,
+    support_visible_count: usize,
     battle_log_rows: usize,
-) -> bool {
+    command_slots: usize,
+    queue_slots: usize,
+    selection_panel_visible: bool,
+) -> Vec<(Vec2, Vec2)> {
+    let mut rects = Vec::new();
+    // Minimap (bottom-left).
+    rects.push((
+        Vec2::new(0.0, height - MINIMAP_BOTTOM_PX - MINIMAP_SIZE_PX - 2.0),
+        Vec2::new(MINIMAP_LEFT_PX + MINIMAP_SIZE_PX + 2.0, height),
+    ));
+    // Battle log (top-center), scaled to visible rows.
+    if battle_log_rows > 0 {
+        let min_x = (width - BATTLE_LOG_WIDTH_PX) * 0.5;
+        let rows_height =
+            battle_log_rows.min(BATTLE_LOG_MAX_ENTRIES) as f32 * BATTLE_LOG_ROW_HIT_PX;
+        rects.push((
+            Vec2::new(min_x, BATTLE_LOG_TOP_PX),
+            Vec2::new(min_x + BATTLE_LOG_WIDTH_PX, BATTLE_LOG_TOP_PX + rows_height),
+        ));
+    }
+    // Support power strip (top-right), scaled to unlocked powers.
+    let support_width = support_power_panel_width_for_visible_count(support_visible_count);
+    if support_width > 0.0 {
+        let right = width - SUPPORT_POWER_PANEL_RIGHT_PX;
+        rects.push((
+            Vec2::new(
+                (right - support_width).max(0.0),
+                SUPPORT_POWER_PANEL_TOP_PX,
+            ),
+            Vec2::new(right, SUPPORT_POWER_PANEL_TOP_PX + SUPPORT_POWER_PANEL_HEIGHT_PX),
+        ));
+    }
+    // Command card (bottom-right): visible command rows + queue rows above them.
+    if command_slots > 0 || queue_slots > 0 {
+        let rows = command_slots.div_ceil(4) + queue_slots.div_ceil(6);
+        let card_height = rows as f32 * COMMAND_CARD_ROW_HIT_PX + 8.0;
+        rects.push((
+            Vec2::new(
+                width - 12.0 - COMMAND_CARD_WIDTH_PX - 2.0,
+                height - 12.0 - card_height,
+            ),
+            Vec2::new(width, height),
+        ));
+    }
+    // Selection panel (bottom-center portrait + text) while something is selected.
+    if selection_panel_visible {
+        rects.push((Vec2::new(196.0, height - 88.0), Vec2::new(652.0, height)));
+    }
+    rects
+}
+
+/// Rebuilds [`HudHitZones`] from live HUD state. Consumers read last frame's rects
+/// (a one-frame lag on panel growth is imperceptible for input hit-testing).
+fn refresh_hud_hit_zones(
+    mut zones: ResMut<HudHitZones>,
+    window_q: Query<&Window, With<PrimaryWindow>>,
+    support_panel: Res<SupportPowerPanelState>,
+    battle_log: Res<BattleLog>,
+    command_slots_q: Query<&Node, With<CommandSlot>>,
+    queue_slots_q: Query<&Node, (With<ProductionQueueSlot>, Without<CommandSlot>)>,
+    selection_text_q: Query<&Visibility, With<SelectionText>>,
+) {
+    let Ok(window) = window_q.single() else {
+        return;
+    };
+    let command_slots = command_slots_q
+        .iter()
+        .filter(|node| node.display != Display::None)
+        .count();
+    let queue_slots = queue_slots_q
+        .iter()
+        .filter(|node| node.display != Display::None)
+        .count();
+    let selection_visible = selection_text_q
+        .iter()
+        .any(|visibility| *visibility != Visibility::Hidden);
+    zones.world_rects = hud_world_input_rects(
+        window.width(),
+        window.height(),
+        support_panel.visible_count,
+        battle_log.entries.len(),
+        command_slots,
+        queue_slots,
+        selection_visible,
+    );
+}
+
+fn cursor_is_over_hud(window: &Window, zones: &HudHitZones) -> bool {
     let Some(cursor) = window.cursor_position() else {
         return false;
     };
-    cursor_is_over_top_status_hud(cursor)
-        || cursor.y > window.height() - 148.0
-        || support_power_panel_contains_cursor(window, cursor, support_panel.visible_count)
-        || battle_log_contains_cursor(window, cursor, battle_log_rows)
-        || minimap_contains_cursor(window, cursor)
+    cursor_is_over_top_status_hud(cursor) || zones.blocks_world(cursor)
 }
 
 fn cursor_is_over_top_status_hud(cursor: Vec2) -> bool {
     cursor.y < 76.0
 }
 
-fn cursor_blocks_world_order_controls(
-    window: &Window,
-    cursor: Vec2,
-    support_panel: &SupportPowerPanelState,
-    battle_log_rows: usize,
-) -> bool {
-    cursor.y > window.height() - 148.0
-        || support_power_panel_contains_cursor(window, cursor, support_panel.visible_count)
-        || battle_log_contains_cursor(window, cursor, battle_log_rows)
-        || minimap_contains_cursor(window, cursor)
+fn cursor_blocks_world_order_controls(cursor: Vec2, zones: &HudHitZones) -> bool {
+    zones.blocks_world(cursor)
 }
 
-/// Hit rect helpers for HUD areas that should consume world and camera input.
-/// The battle log rect scales with the visible entry count — an empty log must
-/// never swallow clicks in the top-center of the world.
-fn battle_log_contains_cursor(window: &Window, cursor: Vec2, visible_rows: usize) -> bool {
-    if visible_rows == 0 {
-        return false;
-    }
-    // Battle log is centered along the top (see setup_ui), so the hit rect is too.
-    let min_x = (window.width() - BATTLE_LOG_WIDTH_PX) * 0.5;
-    let height = visible_rows.min(BATTLE_LOG_MAX_ENTRIES) as f32 * BATTLE_LOG_ROW_HIT_PX;
-    cursor.x >= min_x
-        && cursor.x <= min_x + BATTLE_LOG_WIDTH_PX
-        && cursor.y >= BATTLE_LOG_TOP_PX
-        && cursor.y <= BATTLE_LOG_TOP_PX + height
-}
 
 fn support_power_panel_width_for_visible_count(visible_count: usize) -> f32 {
     let visible_count = visible_count.min(SupportPowerKind::ALL.len());
@@ -32070,6 +32135,7 @@ fn support_power_panel_width_for_visible_count(visible_count: usize) -> f32 {
         + SUPPORT_POWER_BUTTON_GAP_PX * visible_count.saturating_sub(1) as f32
 }
 
+#[cfg(test)]
 fn support_power_panel_contains_cursor(
     window: &Window,
     cursor: Vec2,
@@ -32244,15 +32310,15 @@ mod current_tests {
         window.set_cursor_position(None);
 
         let mut command_mode = CommandMode::default();
-        let support_panel = SupportPowerPanelState::default();
+        let hud_zones = HudHitZones::default();
         assert_eq!(
-            desired_rts_cursor_kind(Some(&command_mode), None, &window, &support_panel, 0),
+            desired_rts_cursor_kind(Some(&command_mode), None, &window, &hud_zones),
             RtsCursorKind::Default
         );
 
         command_mode.attack_move = true;
         assert_eq!(
-            desired_rts_cursor_kind(Some(&command_mode), None, &window, &support_panel, 0),
+            desired_rts_cursor_kind(Some(&command_mode), None, &window, &hud_zones),
             RtsCursorKind::Attack
         );
 
@@ -32260,13 +32326,13 @@ mod current_tests {
         command_mode.pending_structure_placement =
             Some(PendingStructurePlacement::new("CommandCenter"));
         assert_eq!(
-            desired_rts_cursor_kind(Some(&command_mode), None, &window, &support_panel, 0),
+            desired_rts_cursor_kind(Some(&command_mode), None, &window, &hud_zones),
             RtsCursorKind::Build
         );
 
         window.set_cursor_position(Some(Vec2::new(640.0, 10.0)));
         assert_eq!(
-            desired_rts_cursor_kind(Some(&command_mode), None, &window, &support_panel, 0),
+            desired_rts_cursor_kind(Some(&command_mode), None, &window, &hud_zones),
             RtsCursorKind::Default
         );
     }
@@ -32391,11 +32457,7 @@ mod current_tests {
             ..default()
         };
         window.set_cursor_position(Some(Vec2::new(640.0, 10.0)));
-        assert!(cursor_is_over_hud(
-            &window,
-            &SupportPowerPanelState::default(),
-            0
-        ));
+        assert!(cursor_is_over_hud(&window, &HudHitZones::default()));
         assert_eq!(
             effective_camera_edge_pan_width(
                 &options,
@@ -32591,11 +32653,10 @@ mod current_tests {
         assert!(!support_power_panel_contains_cursor(&window, inside, 0));
         assert!(support_power_panel_contains_cursor(&window, inside, 3));
         window.set_cursor_position(Some(inside));
-        assert!(cursor_is_over_hud(
-            &window,
-            &SupportPowerPanelState { visible_count: 3 },
-            0
-        ));
+        let zones = HudHitZones {
+            world_rects: hud_world_input_rects(1280.0, 720.0, 3, 0, 0, 0, false),
+        };
+        assert!(cursor_is_over_hud(&window, &zones));
 
         let left_of_panel = Vec2::new(
             1280.0
@@ -32610,12 +32671,7 @@ mod current_tests {
             3
         ));
         assert!(
-            !cursor_blocks_world_order_controls(
-                &window,
-                left_of_panel,
-                &SupportPowerPanelState { visible_count: 3 },
-                0
-            ),
+            !cursor_blocks_world_order_controls(left_of_panel, &zones),
             "support panel hit rect should not consume the whole top strip"
         );
 
@@ -33960,18 +34016,38 @@ mod current_tests {
 
     #[test]
     fn empty_battle_log_does_not_swallow_world_clicks() {
-        let window = Window {
-            resolution: WindowResolution::new(1280, 720),
-            ..default()
-        };
         // Mid-screen point inside the old fixed battle-log band (the harvest
         // harness clicked (619, 170) and lost the worker selection to it).
         let point = Vec2::new(619.0, 170.0);
-        assert!(!battle_log_contains_cursor(&window, point, 0));
-        assert!(battle_log_contains_cursor(&window, point, 2));
+        let empty = HudHitZones {
+            world_rects: hud_world_input_rects(1280.0, 720.0, 0, 0, 0, 0, false),
+        };
+        assert!(!empty.blocks_world(point));
+        let with_log = HudHitZones {
+            world_rects: hud_world_input_rects(1280.0, 720.0, 0, 2, 0, 0, false),
+        };
+        assert!(with_log.blocks_world(point));
         assert!(
-            !battle_log_contains_cursor(&window, Vec2::new(619.0, 300.0), BATTLE_LOG_MAX_ENTRIES),
+            !with_log.blocks_world(Vec2::new(619.0, 300.0)),
             "hit rect must stay proportional to visible rows"
         );
+    }
+
+    #[test]
+    fn bottom_world_clicks_pass_outside_actual_hud_panels() {
+        // The harvest harness right-clicked ore at (671.5, 584.6); the old
+        // full-width bottom band swallowed it. With one command row + selection
+        // panel visible, that point is open world and must NOT be blocked.
+        let zones = HudHitZones {
+            world_rects: hud_world_input_rects(1280.0, 720.0, 0, 0, 4, 0, true),
+        };
+        let ore_click = Vec2::new(671.5, 584.6);
+        assert!(!zones.blocks_world(ore_click));
+        // Inside the actual command card (bottom-right) it must block.
+        assert!(zones.blocks_world(Vec2::new(1000.0, 700.0)));
+        // Inside the minimap (bottom-left) it must block.
+        assert!(zones.blocks_world(Vec2::new(80.0, 650.0)));
+        // Inside the selection panel (bottom-center) it must block.
+        assert!(zones.blocks_world(Vec2::new(400.0, 700.0)));
     }
 }
