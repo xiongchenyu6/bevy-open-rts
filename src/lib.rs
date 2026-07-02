@@ -3695,6 +3695,7 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
                 begin_match_from_setup,
                 setup_support_cooldowns,
                 setup,
+                start_battle_music,
             )
                 .chain(),
         )
@@ -4406,7 +4407,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             update_veterancy_promotion_effects
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
-            update_battle_log
+            (update_battle_log, update_battle_music_volume)
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
             update_minimap

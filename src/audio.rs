@@ -272,3 +272,83 @@ pub(crate) fn record_command_audio_feedback(
 pub(crate) fn is_voice_unit(unit: &Unit) -> bool {
     unit.speed > 0.0
 }
+
+/// Marks the looping in-match battle music entity (godot `MusicController`).
+#[derive(Component)]
+pub(crate) struct BattleMusic;
+
+/// godot MusicController plays assets/music/rts_battle_loop.ogg at -19 dB.
+pub(crate) const BATTLE_MUSIC_BASE_VOLUME: f32 = 0.112;
+
+pub(crate) fn battle_music_volume(options: &MenuOptionsState) -> f32 {
+    BATTLE_MUSIC_BASE_VOLUME * options.music_volume * options.master_volume
+}
+
+/// Starts the battle-music loop when a match begins (despawned with the match
+/// via `MatchScopedEntity`, mirroring godot's per-match `MusicController`).
+#[cfg(feature = "audio")]
+pub(crate) fn start_battle_music(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    options: Res<MenuOptionsState>,
+) {
+    commands.spawn((
+        AudioPlayer::new(asset_server.load("music/rts_battle_loop.ogg")),
+        PlaybackSettings::LOOP.with_volume(Volume::Linear(battle_music_volume(&options))),
+        BattleMusic,
+        MatchScopedEntity,
+    ));
+}
+
+#[cfg(not(feature = "audio"))]
+pub(crate) fn start_battle_music() {}
+
+/// Applies the 音乐/主音量 sliders to the live battle music.
+#[cfg(feature = "audio")]
+pub(crate) fn update_battle_music_volume(
+    options: Res<MenuOptionsState>,
+    mut sinks: Query<&mut bevy::audio::AudioSink, With<BattleMusic>>,
+) {
+    if !options.is_changed() {
+        return;
+    }
+    for mut sink in &mut sinks {
+        sink.set_volume(Volume::Linear(battle_music_volume(&options)));
+    }
+}
+
+#[cfg(not(feature = "audio"))]
+pub(crate) fn update_battle_music_volume() {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn battle_music_volume_tracks_music_and_master_sliders() {
+        let mut options = MenuOptionsState::default();
+        assert!((battle_music_volume(&options) - BATTLE_MUSIC_BASE_VOLUME).abs() < 1e-6);
+        options.music_volume = 0.5;
+        options.master_volume = 0.5;
+        assert!((battle_music_volume(&options) - BATTLE_MUSIC_BASE_VOLUME * 0.25).abs() < 1e-6);
+        options.music_volume = 0.0;
+        assert_eq!(
+            battle_music_volume(&options),
+            0.0,
+            "music slider at 0 silences the loop"
+        );
+    }
+
+    #[test]
+    fn battle_music_asset_exists() {
+        // start_battle_music loads this path at match start; a silent 404 on the web
+        // build would be invisible, so pin the file's presence.
+        assert!(
+            std::path::Path::new(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/assets/music/rts_battle_loop.ogg"
+            ))
+            .exists()
+        );
+    }
+}
