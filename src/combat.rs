@@ -2784,6 +2784,15 @@ pub(crate) fn combat(
                 passive_shield,
             );
             health.current -= applied_damage;
+            if applied_damage > 0.0 {
+                commands.spawn((
+                    PendingDamageNumber {
+                        position: to,
+                        amount: applied_damage,
+                    },
+                    MatchScopedEntity,
+                ));
+            }
             if relations.are_allied(target_team, player_team) && applied_damage > 0.0 {
                 record_sound_audio_feedback(&mut audio_feedback, SoundEffectKind::WeaponHit);
                 if push_under_attack_log(&mut battle_log, to, target_is_structure) {

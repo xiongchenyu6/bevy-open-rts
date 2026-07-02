@@ -65,6 +65,7 @@ pub(crate) enum OptionsMenuAction {
     CameraPanSpeedUp,
     CameraPanSpeedDown,
     ToggleEdgePan,
+    ToggleDamageNumbers,
     Back,
 }
 
@@ -88,6 +89,8 @@ pub(crate) struct MenuOptionsState {
     pub(crate) camera_pan_speed: f32,
     /// Whether moving the cursor to the screen edge pans the camera.
     pub(crate) camera_edge_pan: bool,
+    /// Show floating damage numbers over hit units/structures.
+    pub(crate) damage_numbers: bool,
 }
 
 impl Default for MenuOptionsState {
@@ -103,6 +106,7 @@ impl Default for MenuOptionsState {
             camera_tilt: CAMERA_RTS_ANGLE,
             camera_pan_speed: CAMERA_RTS_PAN_SPEED,
             camera_edge_pan: true,
+            damage_numbers: false,
         }
     }
 }
@@ -762,6 +766,30 @@ pub(crate) fn setup_options_menu(
                                 TextColor(Color::srgb(0.88, 0.88, 0.86)),
                             ));
                         });
+                    group
+                        .spawn(options_button(OptionsMenuAction::ToggleDamageNumbers, 32.0))
+                        .with_children(|button| {
+                            button.spawn((
+                                localized_text(
+                                    if options.damage_numbers {
+                                        "伤害数字 开启"
+                                    } else {
+                                        "伤害数字 关闭"
+                                    },
+                                    if options.damage_numbers {
+                                        "Damage Numbers On"
+                                    } else {
+                                        "Damage Numbers Off"
+                                    },
+                                ),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(16.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                            ));
+                        });
                 });
                 spawn_options_group(
                     panel,
@@ -1016,6 +1044,10 @@ pub(crate) fn options_menu_buttons(
                 }
                 OptionsMenuAction::ToggleEdgePan => {
                     options.camera_edge_pan = !options.camera_edge_pan;
+                    rebuild = true;
+                }
+                OptionsMenuAction::ToggleDamageNumbers => {
+                    options.damage_numbers = !options.damage_numbers;
                     rebuild = true;
                 }
                 OptionsMenuAction::Back => next_state.set(AppScreen::MainMenu),

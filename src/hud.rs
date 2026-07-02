@@ -3347,3 +3347,150 @@ mod tactical_pause_tests {
         );
     }
 }
+
+/// Data marker spawned at every damage application; consumed by the floater
+/// system (rendered only when the 伤害数字 option is on).
+#[derive(Component)]
+pub(crate) struct PendingDamageNumber {
+    pub(crate) position: Vec3,
+    pub(crate) amount: f32,
+}
+
+/// A live on-screen damage floater rising above its world anchor.
+#[derive(Component)]
+pub(crate) struct DamageNumber {
+    pub(crate) world: Vec3,
+    pub(crate) remaining: f32,
+}
+
+pub(crate) const DAMAGE_NUMBER_LIFETIME_SEC: f32 = 0.8;
+
+pub(crate) fn update_damage_numbers(
+    mut commands: Commands,
+    time: Res<Time>,
+    options: Res<MenuOptionsState>,
+    asset_server: Res<AssetServer>,
+    camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    pending: Query<(Entity, &PendingDamageNumber)>,
+    mut floaters: Query<(Entity, &mut DamageNumber, &mut Node, &mut TextColor)>,
+) {
+    for (entity, request) in &pending {
+        if options.damage_numbers {
+            commands.spawn((
+                Text::new(format!("-{:.0}", request.amount.max(1.0))),
+                TextFont {
+                    font: asset_server.load(UI_FONT_PATH).into(),
+                    font_size: FontSize::Px(13.0),
+                    ..default()
+                },
+                TextColor(Color::srgba(1.0, 0.42, 0.3, 1.0)),
+                Node {
+                    position_type: PositionType::Absolute,
+                    ..default()
+                },
+                GlobalZIndex(40),
+                DamageNumber {
+                    world: request.position,
+                    remaining: DAMAGE_NUMBER_LIFETIME_SEC,
+                },
+                MatchScopedEntity,
+            ));
+        }
+        commands.entity(entity).despawn();
+    }
+    if floaters.is_empty() {
+        return;
+    }
+    let Ok((camera, camera_transform)) = camera_q.single() else {
+        return;
+    };
+    for (entity, mut floater, mut node, mut color) in &mut floaters {
+        floater.remaining -= time.delta_secs();
+        if floater.remaining <= 0.0 {
+            commands.entity(entity).despawn();
+            continue;
+        }
+        let progress = 1.0 - floater.remaining / DAMAGE_NUMBER_LIFETIME_SEC;
+        let anchor = floater.world + Vec3::Y * (0.8 + progress * 0.9);
+        match camera.world_to_viewport(camera_transform, anchor) {
+            Ok(screen) => {
+                node.left = px(screen.x - 8.0);
+                node.top = px(screen.y);
+                color.0.set_alpha(1.0 - progress);
+            }
+            Err(_) => {
+                commands.entity(entity).despawn();
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod damage_number_tests {
+    use super::*;
+
+    #[test]
+    fn combat_damage_spawns_floaters_when_enabled() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            std::time::Duration::from_secs_f32(1.0 / 30.0),
+        ));
+        app.world_mut()
+            .resource_mut::<MenuOptionsState>()
+            .damage_numbers = true;
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::InMatch);
+        for _ in 0..30 {
+            app.update();
+        }
+        // Two enemies face to face; the auto-acquire + combat loop does the rest.
+        let asset_server = app.world().resource::<AssetServer>().clone();
+        let mut next_id = NextSpawnId(app.world().resource::<NextSpawnId>().0);
+        let mut queue = bevy::ecs::world::CommandQueue::default();
+        {
+            let mut commands = Commands::new(&mut queue, app.world());
+            for (team, x) in [(Team::Player(0), -1.0f32), (Team::Player(1), 1.0f32)] {
+                spawn_unit(
+                    &mut commands,
+                    &asset_server,
+                    &mut next_id,
+                    "HeavyMachinegunTrooper",
+                    team,
+                    Vec3::new(x, 0.0, 10.0),
+                    0,
+                    Team::Player(0),
+                );
+            }
+        }
+        queue.apply(app.world_mut());
+        let mut saw_floater = false;
+        for _ in 0..90 {
+            app.update();
+            let world = app.world_mut();
+            if world
+                .query_filtered::<(), With<DamageNumber>>()
+                .iter(world)
+                .next()
+                .is_some()
+            {
+                saw_floater = true;
+                break;
+            }
+        }
+        assert!(
+            saw_floater,
+            "combat with the option on must spawn damage floaters"
+        );
+        // Markers must not leak.
+        for _ in 0..60 {
+            app.update();
+        }
+        let world = app.world_mut();
+        let pending = world
+            .query_filtered::<(), With<PendingDamageNumber>>()
+            .iter(world)
+            .count();
+        assert_eq!(pending, 0, "markers are consumed every frame");
+    }
+}
