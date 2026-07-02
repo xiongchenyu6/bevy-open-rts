@@ -714,6 +714,62 @@ mod tests {
     }
 
     #[test]
+    fn replay_jump_picks_neighbouring_keyframes() {
+        let clocks = [0.0, 30.0, 60.0];
+        // Mid-match: back goes to the last frame safely before now.
+        assert_eq!(replay_jump_target(&clocks, 45.0, true), Some(1));
+        assert_eq!(replay_jump_target(&clocks, 45.0, false), Some(2));
+        // Right after a keyframe, back skips to the PREVIOUS one (epsilon).
+        assert_eq!(replay_jump_target(&clocks, 30.5, true), Some(0));
+        // Edges.
+        assert_eq!(replay_jump_target(&clocks, 0.5, true), None);
+        assert_eq!(replay_jump_target(&clocks, 61.0, false), None);
+        assert_eq!(replay_jump_target(&[], 10.0, true), None);
+    }
+
+    #[test]
+    fn replay_records_keyframe_zero_and_jumps_back_to_it() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            std::time::Duration::from_secs_f32(1.0 / 30.0),
+        ));
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::InMatch);
+        for _ in 0..60 {
+            app.update();
+        }
+        let frames = app.world().resource::<ReplayTimeline>().frames.len();
+        assert_eq!(frames, 1, "keyframe 0 recorded at match start");
+        let frame = app.world().resource::<ReplayTimeline>().frames[0].clone();
+        assert!(frame.clock_sec < 1.0);
+
+        // Jump back through the same pipeline the PageUp hotkey uses.
+        *app.world_mut().resource_mut::<MatchSetupSettings>() =
+            match_settings_from_save(&frame.settings).expect("map resolves");
+        app.world_mut().resource_mut::<PendingLoadedSave>().0 = Some(frame.clone());
+        app.world_mut()
+            .resource_mut::<ReplayTimeline>()
+            .next_record_at = f32::MAX;
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::RestartingMatch);
+        for _ in 0..40 {
+            app.update();
+        }
+        let state = app.world().resource::<MatchState>();
+        assert_eq!(state.phase, MatchPhase::Running);
+        assert!(
+            state.start_time_sec < frame.clock_sec + 5.0,
+            "clock rewound to the keyframe"
+        );
+        assert!(
+            !app.world().resource::<ReplayTimeline>().frames.is_empty(),
+            "timeline survives the jump for forward navigation"
+        );
+    }
+
+    #[test]
     fn save_game_roundtrips_through_ron() {
         let save = sample_save();
         let text = ron::ser::to_string_pretty(&save, ron::ser::PrettyConfig::default()).unwrap();
@@ -732,5 +788,143 @@ mod tests {
         );
         assert_eq!(settings.visible_player.team, Team::Player(0));
         assert!(settings.team_relations.allied[0][0]);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Replay: an in-memory keyframe timeline (works on web too). Every
+// REPLAY_KEYFRAME_INTERVAL_SEC of match clock a full snapshot is recorded;
+// PageUp jumps back a keyframe, PageDown forward, both through the same
+// restart+apply pipeline as quickload. Playing past a stale future keyframe
+// truncates it (the timeline diverged).
+// ---------------------------------------------------------------------------
+
+pub(crate) const REPLAY_KEYFRAME_INTERVAL_SEC: f32 = 30.0;
+/// Pressing "back" within this window of a keyframe skips to the one before it.
+pub(crate) const REPLAY_JUMP_EPSILON_SEC: f32 = 1.5;
+
+#[derive(Resource, Default)]
+pub(crate) struct ReplayTimeline {
+    pub(crate) frames: Vec<SaveGame>,
+    pub(crate) next_record_at: f32,
+}
+
+/// Index of the keyframe a back/forward jump should land on, given the frame
+/// clocks and the current match clock. `None` when there is nothing to jump to.
+pub(crate) fn replay_jump_target(clocks: &[f32], now: f32, back: bool) -> Option<usize> {
+    if back {
+        clocks
+            .iter()
+            .rposition(|clock| *clock < now - REPLAY_JUMP_EPSILON_SEC)
+    } else {
+        clocks
+            .iter()
+            .position(|clock| *clock > now + REPLAY_JUMP_EPSILON_SEC)
+    }
+}
+
+/// Records a keyframe whenever the match clock crosses the next interval; a
+/// diverged future (frames recorded after the current clock, i.e. the player
+/// rewound and kept playing) is truncated first.
+pub(crate) fn record_replay_keyframes(world: &mut World) {
+    if world.resource::<MatchState>().phase != MatchPhase::Running {
+        return;
+    }
+    let clock = world.resource::<MatchState>().start_time_sec;
+    {
+        let timeline = world.resource::<ReplayTimeline>();
+        if clock < timeline.next_record_at {
+            return;
+        }
+    }
+    let Some(save) = collect_save_game(world) else {
+        return;
+    };
+    let mut timeline = world.resource_mut::<ReplayTimeline>();
+    timeline
+        .frames
+        .retain(|frame| frame.clock_sec < clock - REPLAY_JUMP_EPSILON_SEC);
+    timeline.frames.push(save);
+    timeline.next_record_at = clock + REPLAY_KEYFRAME_INTERVAL_SEC;
+}
+
+/// Fresh matches (not loads) start a fresh timeline; a load keeps the timeline
+/// so PageDown can still walk forward through it.
+pub(crate) fn reset_replay_timeline_for_new_match(world: &mut World) {
+    if world.resource::<PendingLoadedSave>().0.is_some() {
+        return;
+    }
+    let mut timeline = world.resource_mut::<ReplayTimeline>();
+    timeline.frames.clear();
+    timeline.next_record_at = 0.0;
+}
+
+fn format_clock(seconds: f32) -> String {
+    format!(
+        "{}:{:02}",
+        (seconds.max(0.0) / 60.0) as u32,
+        (seconds.max(0.0) as u32) % 60
+    )
+}
+
+/// PageUp / PageDown: jump one keyframe back / forward through the timeline.
+pub(crate) fn replay_jump_hotkeys(world: &mut World) {
+    let keyboard = world.resource::<ButtonInput<KeyCode>>();
+    let back = keyboard.just_pressed(KeyCode::PageUp);
+    let forward = keyboard.just_pressed(KeyCode::PageDown);
+    if !back && !forward {
+        return;
+    }
+    let now = world.resource::<MatchState>().start_time_sec;
+    let target = {
+        let timeline = world.resource::<ReplayTimeline>();
+        let clocks: Vec<f32> = timeline
+            .frames
+            .iter()
+            .map(|frame| frame.clock_sec)
+            .collect();
+        replay_jump_target(&clocks, now, back).map(|index| timeline.frames[index].clone())
+    };
+    match target {
+        Some(frame) => {
+            let message = format!(
+                "{} {}",
+                t("回放: 跳转到", "Replay: jumping to"),
+                format_clock(frame.clock_sec)
+            );
+            if let Some(settings) = match_settings_from_save(&frame.settings) {
+                *world.resource_mut::<MatchSetupSettings>() = settings;
+                world.resource_mut::<PendingLoadedSave>().0 = Some(frame);
+                // Recording resumes from the jump target on the next interval.
+                world.resource_mut::<ReplayTimeline>().next_record_at = f32::MAX;
+                world
+                    .resource_mut::<NextState<AppScreen>>()
+                    .set(AppScreen::RestartingMatch);
+                let mut battle_log = world.resource_mut::<BattleLog>();
+                push_battle_log(&mut battle_log, message, None);
+            }
+        }
+        None => {
+            let message = if back {
+                t(
+                    "回放: 已是最早的关键帧",
+                    "Replay: already at the earliest keyframe",
+                )
+            } else {
+                t("回放: 没有更晚的关键帧", "Replay: no later keyframe")
+            };
+            let mut battle_log = world.resource_mut::<BattleLog>();
+            push_battle_log(&mut battle_log, message.to_string(), None);
+        }
+    }
+}
+
+/// After a replay jump (or quickload) lands, resume recording from the restored
+/// clock so the next keyframe falls on the next interval.
+pub(crate) fn resume_replay_recording_after_load(world: &mut World) {
+    let clock = world.resource::<MatchState>().start_time_sec;
+    let mut timeline = world.resource_mut::<ReplayTimeline>();
+    if timeline.next_record_at == f32::MAX || timeline.next_record_at < clock {
+        timeline.next_record_at = clock + REPLAY_KEYFRAME_INTERVAL_SEC;
     }
 }

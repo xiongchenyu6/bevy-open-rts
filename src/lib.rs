@@ -3597,6 +3597,7 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<HudHitZones>()
         .init_resource::<TabSubgroupState>()
         .init_resource::<PendingLoadedSave>()
+        .init_resource::<ReplayTimeline>()
         .init_resource::<BuildQueue>()
         .init_resource::<BuildStructureTab>()
         .init_resource::<NextSpawnId>()
@@ -3700,7 +3701,9 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
                 setup_support_cooldowns,
                 setup,
                 start_battle_music,
+                reset_replay_timeline_for_new_match,
                 apply_loaded_save,
+                resume_replay_recording_after_load,
             )
                 .chain(),
         )
@@ -4136,7 +4139,12 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             (selection_hotkeys, cycle_selection_subgroup)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
-            (quicksave_hotkey, quickload_hotkey)
+            (
+                quicksave_hotkey,
+                quickload_hotkey,
+                record_replay_keyframes,
+                replay_jump_hotkeys,
+            )
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
             focus_latest_battle_event
