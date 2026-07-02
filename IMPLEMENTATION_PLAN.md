@@ -18,7 +18,7 @@ API unchanged) so items can move between modules without dependency untangling.
 
 ## Stage 2: camera.rs
 **Goal**: RtsCamera resource + bevy_rts_camera bridge + camera settings/bookmarks.
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 3: audio.rs
 **Goal**: AudioFeedback, SoundEffectKind, UnitVoiceEvent, play systems.
