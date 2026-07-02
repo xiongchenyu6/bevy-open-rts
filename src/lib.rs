@@ -26,7 +26,9 @@ pub use capture_api::*;
 mod audio;
 pub(crate) use audio::*;
 mod ai;
+mod save;
 pub(crate) use ai::*;
+pub(crate) use save::*;
 mod combat;
 pub(crate) use combat::*;
 mod orders;
@@ -3594,6 +3596,7 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<NavGrid>()
         .init_resource::<HudHitZones>()
         .init_resource::<TabSubgroupState>()
+        .init_resource::<PendingLoadedSave>()
         .init_resource::<BuildQueue>()
         .init_resource::<BuildStructureTab>()
         .init_resource::<NextSpawnId>()
@@ -3697,6 +3700,7 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
                 setup_support_cooldowns,
                 setup,
                 start_battle_music,
+                apply_loaded_save,
             )
                 .chain(),
         )
@@ -4130,6 +4134,9 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
             (selection_hotkeys, cycle_selection_subgroup)
+                .in_set(SimulationPhase::UiAndManagement)
+                .run_if(match_in_progress),
+            (quicksave_hotkey, quickload_hotkey)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
             focus_latest_battle_event

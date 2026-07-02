@@ -1660,7 +1660,9 @@ pub(crate) fn command_queue_controls(
         .iter()
         .any(|(_, unit, team, ..)| **team == visible_team && is_voice_unit(unit));
 
-    if keyboard.just_pressed(KeyCode::KeyS) {
+    let ctrl = keyboard.pressed(KeyCode::ControlLeft) || keyboard.pressed(KeyCode::ControlRight);
+    // Plain S stops; Ctrl+S is the quicksave hotkey.
+    if keyboard.just_pressed(KeyCode::KeyS) && !ctrl {
         if stop_selected_entities(
             &mut commands,
             selected

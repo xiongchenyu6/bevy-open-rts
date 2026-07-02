@@ -8,3 +8,4 @@ target
 web/pkg
 web/assets
 assets/fonts/wqy-microhei-ui.full.ttf
+/saves/
