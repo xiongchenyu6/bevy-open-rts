@@ -34,6 +34,9 @@ pub(crate) struct SavedSettings {
     pub(crate) allied: Vec<Vec<bool>>,
     /// StartupLoadoutMode ordinal.
     pub(crate) startup_loadout: u8,
+    /// VictoryCondition ordinal (serde-default so v1 saves still load).
+    #[serde(default)]
+    pub(crate) victory_condition: u8,
     pub(crate) visible_team: usize,
 }
 
@@ -154,6 +157,10 @@ pub(crate) fn collect_save_game(world: &mut World) -> Option<SaveGame> {
             .collect(),
         allied: settings.team_relations.allied.clone(),
         startup_loadout: settings.startup_loadout as u8,
+        victory_condition: VictoryCondition::ALL
+            .iter()
+            .position(|mode| *mode == settings.victory_condition)
+            .unwrap_or(0) as u8,
         visible_team: settings
             .visible_player
             .team
@@ -287,6 +294,10 @@ pub(crate) fn match_settings_from_save(save: &SavedSettings) -> Option<MatchSetu
     let map = skirmish_map_by_path(&save.map_path)?;
     Some(MatchSetupSettings {
         map_path: map.godot_path,
+        victory_condition: VictoryCondition::ALL
+            .get(save.victory_condition as usize)
+            .copied()
+            .unwrap_or_default(),
         starting_resources: StartingResources {
             ore: save.starting_ore,
             crystal: save.starting_crystal,
@@ -623,6 +634,7 @@ mod tests {
                 ai_difficulties: vec![2, 2],
                 allied: vec![vec![true, false], vec![false, true]],
                 startup_loadout: StartupLoadoutMode::GodotSkirmish as u8,
+                victory_condition: 0,
                 visible_team: 0,
             },
             clock_sec: 123.5,

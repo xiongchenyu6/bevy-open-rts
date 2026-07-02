@@ -15,6 +15,7 @@ pub(crate) fn random_map_index() -> usize {
 pub(crate) enum MainMenuAction {
     SelectMap(usize),
     SelectStartingResources(usize),
+    SelectVictoryCondition(usize),
     ToggleLobbySlotController(usize),
     SetLobbySlotController(usize, SkirmishPlayerController),
     ToggleLobbySlotFaction(usize),
@@ -25,6 +26,7 @@ pub(crate) enum MainMenuAction {
     SetLobbySlotColor(usize, usize),
     ToggleMapDropdown,
     ToggleResourcesDropdown,
+    ToggleVictoryDropdown,
     BackToMainMenu,
     StartMatch,
 }
@@ -112,6 +114,9 @@ impl MainMenuAction {
             MainMenuAction::SelectStartingResources(index) => {
                 index == selection.starting_resource_index
             }
+            MainMenuAction::SelectVictoryCondition(index) => {
+                index == selection.victory_condition_index
+            }
             MainMenuAction::ToggleLobbySlotController(slot) => {
                 selection.controller_dropdown_open == Some(slot)
             }
@@ -136,6 +141,7 @@ impl MainMenuAction {
             }
             MainMenuAction::ToggleMapDropdown => selection.map_dropdown_open,
             MainMenuAction::ToggleResourcesDropdown => selection.resources_dropdown_open,
+            MainMenuAction::ToggleVictoryDropdown => selection.victory_dropdown_open,
             MainMenuAction::BackToMainMenu => false,
             MainMenuAction::StartMatch => false,
         }
@@ -1386,6 +1392,20 @@ pub(crate) fn spawn_menu_map_resource_controls(
         selection.resources_dropdown_open,
         &res_options,
         selection,
+        font.clone(),
+    );
+
+    let victory_options: Vec<MainMenuAction> = (0..VictoryCondition::ALL.len())
+        .map(MainMenuAction::SelectVictoryCondition)
+        .collect();
+    spawn_menu_inline_dropdown(
+        parent,
+        "胜利条件",
+        "Victory condition",
+        MainMenuAction::ToggleVictoryDropdown,
+        selection.victory_dropdown_open,
+        &victory_options,
+        selection,
         font,
     );
 }
@@ -1592,6 +1612,10 @@ pub(crate) fn main_menu_button_label_text(
             .get(index)
             .map(|option| format!("{} {}", index + 5, starting_resource_option_label(option)))
             .unwrap_or_else(|| t("资源", "Resources").to_string()),
+        MainMenuAction::SelectVictoryCondition(index) => VictoryCondition::ALL
+            .get(index)
+            .map(|mode| mode.label().to_string())
+            .unwrap_or_else(|| t("歼灭", "Annihilation").to_string()),
         MainMenuAction::ToggleLobbySlotController(slot) => format!(
             "{}",
             selection
@@ -1646,6 +1670,10 @@ pub(crate) fn main_menu_button_label_text(
                 .map(|option| starting_resource_option_label(option).to_string())
                 .unwrap_or_else(|| t("标准", "Standard").to_string())
         ),
+        MainMenuAction::ToggleVictoryDropdown => VictoryCondition::ALL
+            .get(selection.victory_condition_index)
+            .map(|mode| mode.label().to_string())
+            .unwrap_or_else(|| t("歼灭", "Annihilation").to_string()),
         MainMenuAction::BackToMainMenu => t("返回", "Back").to_string(),
         MainMenuAction::StartMatch => t("开始对战  Enter", "Start Match  Enter").to_string(),
     }
@@ -2148,13 +2176,23 @@ pub(crate) fn main_menu_buttons(
                 MainMenuAction::ToggleResourcesDropdown => {
                     selection.toggle_resources_dropdown();
                 }
+                MainMenuAction::ToggleVictoryDropdown => {
+                    selection.toggle_victory_dropdown();
+                }
+                MainMenuAction::SelectVictoryCondition(index)
+                    if index < VictoryCondition::ALL.len() =>
+                {
+                    selection.set_victory_condition_choice(index);
+                }
                 MainMenuAction::BackToMainMenu => {
                     back_requested = true;
                 }
                 MainMenuAction::StartMatch => {
                     start_requested = true;
                 }
-                MainMenuAction::SelectMap(_) | MainMenuAction::SelectStartingResources(_) => {}
+                MainMenuAction::SelectMap(_)
+                | MainMenuAction::SelectStartingResources(_)
+                | MainMenuAction::SelectVictoryCondition(_) => {}
             }
         }
 

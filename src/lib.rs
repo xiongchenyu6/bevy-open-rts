@@ -1342,6 +1342,7 @@ pub(crate) struct MatchSetupSettings {
     pub(crate) ai_difficulties: AiDifficultySettings,
     pub(crate) team_relations: TeamRelations,
     pub(crate) startup_loadout: StartupLoadoutMode,
+    pub(crate) victory_condition: VictoryCondition,
     pub(crate) active_teams: Vec<bool>,
     pub(crate) player_factions: Vec<SkirmishFaction>,
     pub(crate) player_color_slots: Vec<usize>,
@@ -1353,6 +1354,7 @@ impl Default for MatchSetupSettings {
     fn default() -> Self {
         Self {
             map_path: SKIRMISH_MAPS[0].godot_path,
+            victory_condition: VictoryCondition::default(),
             starting_resources: StartingResources::new(32, 16),
             visible_player: VisiblePlayer::default(),
             ai_difficulties: skirmish_ai_difficulties_from_controllers(
@@ -1559,6 +1561,7 @@ impl SkirmishMatchMode {
 pub(crate) struct SkirmishMenuSelection {
     pub(crate) map_index: usize,
     pub(crate) starting_resource_index: usize,
+    pub(crate) victory_condition_index: usize,
     pub(crate) match_mode: SkirmishMatchMode,
     pub(crate) ai_difficulty: AiDifficulty,
     pub(crate) lobby_controllers: [SkirmishPlayerController; MAX_SKIRMISH_LOBBY_SLOTS],
@@ -1571,6 +1574,7 @@ pub(crate) struct SkirmishMenuSelection {
     pub(crate) color_dropdown_open: Option<usize>,
     pub(crate) map_dropdown_open: bool,
     pub(crate) resources_dropdown_open: bool,
+    pub(crate) victory_dropdown_open: bool,
 }
 
 impl Default for SkirmishMenuSelection {
@@ -1578,6 +1582,7 @@ impl Default for SkirmishMenuSelection {
         Self {
             map_index: 0,
             starting_resource_index: DEFAULT_STARTING_RESOURCE_INDEX,
+            victory_condition_index: 0,
             match_mode: SkirmishMatchMode::OneVsOne,
             ai_difficulty: AiDifficulty::Easy,
             lobby_controllers: DEFAULT_LOBBY_CONTROLLERS,
@@ -1587,6 +1592,7 @@ impl Default for SkirmishMenuSelection {
             color_dropdown_open: None,
             map_dropdown_open: false,
             resources_dropdown_open: false,
+            victory_dropdown_open: false,
             lobby_factions: DEFAULT_LOBBY_FACTIONS,
             lobby_team_ids: DEFAULT_LOBBY_TEAM_IDS,
             lobby_color_slots: DEFAULT_LOBBY_COLOR_SLOTS,
@@ -1631,6 +1637,11 @@ impl SkirmishMenuSelection {
         Self {
             map_index,
             starting_resource_index,
+            victory_condition_index: VictoryCondition::ALL
+                .iter()
+                .position(|mode| *mode == settings.victory_condition)
+                .unwrap_or(0),
+            victory_dropdown_open: false,
             match_mode: if settings.visible_player.is_spectator() {
                 SkirmishMatchMode::AiVsAi
             } else {
@@ -1778,6 +1789,10 @@ impl SkirmishMenuSelection {
             player_color_slots,
             player_controllers,
             player_spawn_slots: self.runtime_spawn_slots(),
+            victory_condition: VictoryCondition::ALL
+                .get(self.victory_condition_index % VictoryCondition::ALL.len())
+                .copied()
+                .unwrap_or_default(),
             ..MatchSetupSettings::default()
         }
     }
@@ -1844,6 +1859,7 @@ impl SkirmishMenuSelection {
         self.color_dropdown_open = None;
         self.map_dropdown_open = false;
         self.resources_dropdown_open = false;
+        self.victory_dropdown_open = false;
     }
 
     pub(crate) fn toggle_map_dropdown(&mut self) {
@@ -1856,6 +1872,19 @@ impl SkirmishMenuSelection {
         let was_open = self.resources_dropdown_open;
         self.close_all_lobby_dropdowns();
         self.resources_dropdown_open = !was_open;
+    }
+
+    pub(crate) fn toggle_victory_dropdown(&mut self) {
+        let was_open = self.victory_dropdown_open;
+        self.close_all_lobby_dropdowns();
+        self.victory_dropdown_open = !was_open;
+    }
+
+    pub(crate) fn set_victory_condition_choice(&mut self, index: usize) {
+        if index < VictoryCondition::ALL.len() {
+            self.victory_condition_index = index;
+        }
+        self.close_all_lobby_dropdowns();
     }
 
     pub(crate) fn set_map_choice(&mut self, index: usize) {
@@ -2626,6 +2655,26 @@ impl MapBounds {
 pub(crate) struct TeamStartup {
     pub(crate) structures: &'static [SpawnSpec],
     pub(crate) units: &'static [SpawnSpec],
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub(crate) enum VictoryCondition {
+    /// godot default: a team stays alive while any command center OR worker lives.
+    #[default]
+    Annihilation,
+    /// Headquarters mode: lose every command center and you are out.
+    Headquarters,
+}
+
+impl VictoryCondition {
+    pub(crate) const ALL: [Self; 2] = [Self::Annihilation, Self::Headquarters];
+
+    pub(crate) fn label(self) -> &'static str {
+        match self {
+            Self::Annihilation => t("歼灭", "Annihilation"),
+            Self::Headquarters => t("斩首(摧毁指挥中心)", "Headquarters"),
+        }
+    }
 }
 
 #[allow(dead_code)]
@@ -7413,6 +7462,7 @@ pub(crate) fn evaluate_match_end(
     mut audio_feedback: ResMut<AudioFeedback>,
     relations: Res<TeamRelations>,
     visible_player: Option<Res<VisiblePlayer>>,
+    setup_settings: Res<MatchSetupSettings>,
     structures: Query<(&Structure, &Team, &Health)>,
     units: Query<(&Unit, &Team, &Health)>,
 ) {
@@ -7429,13 +7479,17 @@ pub(crate) fn evaluate_match_end(
         }
     }
 
-    for (unit, team, health) in &units {
-        if is_worker_elimination_anchor(unit) && health.current > 0.0 {
-            record_active_elimination_anchor(
-                *team,
-                &mut active_anchor_team,
-                &mut active_anchor_count,
-            );
+    // Headquarters mode: only command centers keep a team alive; surviving
+    // workers cannot rebuild you back into the game.
+    if setup_settings.victory_condition == VictoryCondition::Annihilation {
+        for (unit, team, health) in &units {
+            if is_worker_elimination_anchor(unit) && health.current > 0.0 {
+                record_active_elimination_anchor(
+                    *team,
+                    &mut active_anchor_team,
+                    &mut active_anchor_count,
+                );
+            }
         }
     }
 
@@ -14101,5 +14155,50 @@ mod current_tests {
         assert!(zones.blocks_world(Vec2::new(80.0, 650.0)));
         // Inside the selection panel (bottom-center) it must block.
         assert!(zones.blocks_world(Vec2::new(400.0, 700.0)));
+    }
+
+    #[test]
+    fn headquarters_mode_falls_when_command_centers_fall() {
+        for (condition, expect_running) in [
+            (VictoryCondition::Headquarters, false),
+            (VictoryCondition::Annihilation, true),
+        ] {
+            let mut app = build_game_app(GameAppMode::Headless);
+            app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+                std::time::Duration::from_secs_f32(1.0 / 30.0),
+            ));
+            app.world_mut()
+                .resource_mut::<MatchSetupSettings>()
+                .victory_condition = condition;
+            app.world_mut()
+                .resource_mut::<NextState<AppScreen>>()
+                .set(AppScreen::InMatch);
+            for _ in 0..40 {
+                app.update();
+            }
+            // Kill the player's command centers; workers stay alive.
+            let doomed: Vec<Entity> = {
+                let world = app.world_mut();
+                let mut q = world.query::<(Entity, &Structure, &Team)>();
+                q.iter(world)
+                    .filter(|(_, structure, team)| {
+                        **team == Team::Player(0) && structure.id == "CommandCenter"
+                    })
+                    .map(|(entity, _, _)| entity)
+                    .collect()
+            };
+            assert!(!doomed.is_empty());
+            for entity in doomed {
+                app.world_mut().entity_mut(entity).despawn();
+            }
+            for _ in 0..10 {
+                app.update();
+            }
+            let running = app.world().resource::<MatchState>().is_running();
+            assert_eq!(
+                running, expect_running,
+                "victory condition {condition:?}: running={running}"
+            );
+        }
     }
 }
