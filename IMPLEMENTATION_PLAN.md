@@ -9,7 +9,7 @@ stay unchanged.
 **Goal**: all top-level items in lib.rs become `pub(crate)` (already-`pub` capture
 API unchanged) so items can move between modules without dependency untangling.
 **Success**: bin builds warning-free; `cargo test --lib` passes; zero behavior diff.
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 1: nav.rs (pilot)
 **Goal**: NavGrid + A* + PlannedPath + unit separation + their consts/tests.
