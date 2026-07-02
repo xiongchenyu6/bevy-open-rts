@@ -14,7 +14,7 @@ API unchanged) so items can move between modules without dependency untangling.
 ## Stage 1: nav.rs (pilot)
 **Goal**: NavGrid + A* + PlannedPath + unit separation + their consts/tests.
 **Success**: same as Stage 0; nav tests live in nav.rs.
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 2: camera.rs
 **Goal**: RtsCamera resource + bevy_rts_camera bridge + camera settings/bookmarks.
