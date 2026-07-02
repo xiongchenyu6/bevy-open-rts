@@ -4786,3 +4786,137 @@ pub(crate) fn point_in_polygon(point: Vec2, polygon: &[Vec2]) -> bool {
     }
     inside
 }
+
+/// Remembers the full mixed selection while Tab cycles its unit-type subgroups
+/// (Tab: full selection -> type A only -> type B only -> ... -> full selection).
+#[derive(Resource, Default)]
+pub(crate) struct TabSubgroupState {
+    pub(crate) full: Vec<Entity>,
+    pub(crate) cursor: Option<usize>,
+}
+
+/// Cursor sequence: None (full selection) -> 0 -> 1 -> ... -> count-1 -> None.
+pub(crate) fn next_subgroup_cursor(cursor: Option<usize>, type_count: usize) -> Option<usize> {
+    match cursor {
+        None if type_count > 0 => Some(0),
+        Some(index) if index + 1 < type_count => Some(index + 1),
+        _ => None,
+    }
+}
+
+/// Stable (alphabetical) distinct unit-type order for subgroup cycling.
+pub(crate) fn distinct_subgroup_types(ids: &[&str]) -> Vec<String> {
+    let mut types: Vec<String> = ids.iter().map(|id| id.to_string()).collect();
+    types.sort();
+    types.dedup();
+    types
+}
+
+pub(crate) fn cycle_selection_subgroup(
+    mut commands: Commands,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    visible_player: Res<VisiblePlayer>,
+    mut state: ResMut<TabSubgroupState>,
+    selected_units: Query<(Entity, &Team, &Unit), With<Selected>>,
+    all_units: Query<(&Team, &Unit, &Health), With<Selectable>>,
+) {
+    if !keyboard.just_pressed(KeyCode::Tab) {
+        return;
+    }
+    let Some(team) = controlled_player_team(Some(&*visible_player)) else {
+        return;
+    };
+    let current: Vec<Entity> = selected_units
+        .iter()
+        .filter(|(_, unit_team, _)| **unit_team == team)
+        .map(|(entity, _, _)| entity)
+        .collect();
+
+    // The remembered full set, dropping anything dead/despawned since last Tab.
+    let full_alive: Vec<(Entity, &'static str)> = state
+        .full
+        .iter()
+        .filter_map(|&entity| {
+            all_units
+                .get(entity)
+                .ok()
+                .filter(|(unit_team, _, health)| **unit_team == team && health.current > 0.0)
+                .map(|(_, unit, _)| (entity, unit.id))
+        })
+        .collect();
+
+    // Continue cycling only while the selection is still a subset of the
+    // remembered set; any fresh player selection restarts the cycle from it.
+    let continuing = !current.is_empty()
+        && !full_alive.is_empty()
+        && current.iter().all(|entity| {
+            full_alive
+                .iter()
+                .any(|(full_entity, _)| full_entity == entity)
+        });
+    let (full_pairs, cursor) = if continuing {
+        (full_alive, state.cursor)
+    } else {
+        let fresh: Vec<(Entity, &'static str)> = selected_units
+            .iter()
+            .filter(|(_, unit_team, _)| **unit_team == team)
+            .map(|(entity, _, unit)| (entity, unit.id))
+            .collect();
+        (fresh, None)
+    };
+    if full_pairs.is_empty() {
+        return;
+    }
+
+    let ids: Vec<&str> = full_pairs.iter().map(|(_, id)| *id).collect();
+    let types = distinct_subgroup_types(&ids);
+    let next = next_subgroup_cursor(cursor, types.len());
+
+    for (entity, id) in &full_pairs {
+        let keep = match next {
+            None => true,
+            Some(index) => *id == types[index],
+        };
+        if keep {
+            commands.entity(*entity).try_insert(Selected);
+        } else {
+            commands.entity(*entity).try_remove::<Selected>();
+        }
+    }
+    state.full = full_pairs.iter().map(|(entity, _)| *entity).collect();
+    state.cursor = next;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn tab_cursor_cycles_full_then_each_type_then_full() {
+        assert_eq!(next_subgroup_cursor(None, 3), Some(0));
+        assert_eq!(next_subgroup_cursor(Some(0), 3), Some(1));
+        assert_eq!(
+            next_subgroup_cursor(Some(2), 3),
+            None,
+            "wraps back to the full selection"
+        );
+        assert_eq!(
+            next_subgroup_cursor(None, 0),
+            None,
+            "empty selection never enters a subgroup"
+        );
+    }
+
+    #[test]
+    fn subgroup_type_order_is_stable_and_deduped() {
+        let types = distinct_subgroup_types(&["Tank", "Worker", "Tank", "Drone"]);
+        assert_eq!(
+            types,
+            vec![
+                "Drone".to_string(),
+                "Tank".to_string(),
+                "Worker".to_string()
+            ]
+        );
+    }
+}

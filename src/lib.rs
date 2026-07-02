@@ -3593,6 +3593,7 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<TeamRelations>()
         .init_resource::<NavGrid>()
         .init_resource::<HudHitZones>()
+        .init_resource::<TabSubgroupState>()
         .init_resource::<BuildQueue>()
         .init_resource::<BuildStructureTab>()
         .init_resource::<NextSpawnId>()
@@ -4128,7 +4129,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             )
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
-            selection_hotkeys
+            (selection_hotkeys, cycle_selection_subgroup)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
             focus_latest_battle_event
