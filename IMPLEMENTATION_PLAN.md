@@ -22,7 +22,7 @@ API unchanged) so items can move between modules without dependency untangling.
 
 ## Stage 3: audio.rs
 **Goal**: AudioFeedback, SoundEffectKind, UnitVoiceEvent, play systems.
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 4: menu.rs
 **Goal**: front menu, options, credits, skirmish lobby (setup_main_menu + helpers).
