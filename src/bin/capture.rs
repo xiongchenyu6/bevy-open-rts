@@ -15,6 +15,7 @@
 //!   capture assault <dir> [max-seconds]  real input smoke: select army/attack-move/win
 //!   capture match [max-seconds]          headless AI-vs-AI match must resolve
 //!   capture ai-duel <a> <b> [max-seconds] AI difficulty duel (beginner|easy|normal|hard)
+//!   capture arena <unitA> <unitB> [count] [max-seconds]  N-vs-N unit balance bout
 //!   capture menu [path]                  command menu screenshot
 //!   capture menu-wide [path]             command menu screenshot at 2048x1224
 //!   capture menu-return [path]           setup -> back -> command menu screenshot
@@ -45,10 +46,10 @@ use bevy_open_rts::{
     capture_player_onscreen_worker_position, capture_player_producer_position,
     capture_player_resources, capture_player_structure_count, capture_player_unit_count,
     capture_player_worker_position, capture_run_ai_duel, capture_run_ai_match_until_resolved,
-    capture_selected_player_unit_average_position, capture_selected_player_unit_count,
-    capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
-    capture_set_structure_rally, capture_show_credits_menu, capture_show_main_menu,
-    capture_show_options_menu, capture_show_skirmish_setup_menu,
+    capture_run_arena, capture_selected_player_unit_average_position,
+    capture_selected_player_unit_count, capture_selected_player_unit_ids, capture_set_all_factions,
+    capture_set_cursor, capture_set_structure_rally, capture_show_credits_menu,
+    capture_show_main_menu, capture_show_options_menu, capture_show_skirmish_setup_menu,
     capture_show_skirmish_setup_with_dropdown, capture_spawn_model_harness_page,
     capture_world_to_screen, capture_worst_model_alignment_offset, capture_zoom_camera_closest,
     start_shared_match_scene_with_current_setup,
@@ -171,6 +172,29 @@ fn main() {
             let max_seconds = args.next().and_then(|s| s.parse().ok()).unwrap_or(240);
             run_match_proof(max_seconds)
         }
+        Some("arena") => match (args.next(), args.next()) {
+            (Some(a), Some(bu)) => {
+                let count = args.next().and_then(|s| s.parse().ok()).unwrap_or(5);
+                let max_seconds = args.next().and_then(|s| s.parse().ok()).unwrap_or(90);
+                match capture_run_arena(&a, &bu, count, max_seconds) {
+                    Ok((seconds, alive_a, alive_b, hp_a, hp_b)) => {
+                        let verdict = if alive_a == alive_b {
+                            "draw".to_string()
+                        } else if alive_a > alive_b {
+                            format!("{a} wins")
+                        } else {
+                            format!("{bu} wins")
+                        };
+                        println!(
+                            "[capture] arena {count}x {a} vs {count}x {bu}: {verdict} at ~{seconds}s | {a}: {alive_a} alive ({hp_a:.0} hp) | {bu}: {alive_b} alive ({hp_b:.0} hp)"
+                        );
+                        Ok(())
+                    }
+                    Err(error) => Err(error),
+                }
+            }
+            _ => Err("arena needs <unitA> <unitB> [count] [max-seconds]".into()),
+        },
         Some("ai-duel") => match (args.next(), args.next()) {
             (Some(a), Some(b)) => {
                 let max_seconds = args.next().and_then(|s| s.parse().ok()).unwrap_or(600);

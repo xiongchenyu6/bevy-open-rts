@@ -1388,3 +1388,188 @@ pub fn capture_run_ai_duel(
         .collect();
     Ok((elapsed, label, counts))
 }
+
+/// Outcome of a unit-vs-unit arena bout: (elapsed sim seconds, survivors A,
+/// survivors B, remaining total HP A, remaining HP B).
+pub type ArenaOutcome = (u32, usize, usize, f32, f32);
+
+/// Headless N-vs-N unit arena for balance auditing: clears the default match
+/// world down to the two command centers (kept so the match stays Running),
+/// spawns `count` of each unit facing off mid-map, attack-moves them into each
+/// other and reports who is left. Both slots use Human controllers so no AI
+/// director interferes.
+pub fn capture_run_arena(
+    unit_a: &str,
+    unit_b: &str,
+    count: usize,
+    max_seconds: u32,
+) -> Result<ArenaOutcome, String> {
+    let def_a = registry::entity(unit_a)
+        .filter(|def| def.role == registry::EntityRole::Unit)
+        .ok_or_else(|| format!("unknown unit '{unit_a}'"))?;
+    let def_b = registry::entity(unit_b)
+        .filter(|def| def.role == registry::EntityRole::Unit)
+        .ok_or_else(|| format!("unknown unit '{unit_b}'"))?;
+
+    let mut app = build_game_app(GameAppMode::Headless);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
+    ));
+    {
+        let mut settings = app.world_mut().resource_mut::<MatchSetupSettings>();
+        if settings.player_controllers.len() < 2 {
+            settings
+                .player_controllers
+                .resize(2, SkirmishPlayerController::None);
+        }
+        settings.player_controllers[0] = SkirmishPlayerController::Human;
+        settings.player_controllers[1] = SkirmishPlayerController::Human;
+        // Identical factions on both sides: faction damage/armor multipliers
+        // would otherwise bias every bout.
+        if settings.player_factions.len() >= 2 {
+            settings.player_factions[1] = settings.player_factions[0];
+        }
+    }
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::InMatch);
+    for _ in 0..20 {
+        app.update();
+    }
+
+    // Clear the default world down to the elimination anchors.
+    let world = app.world_mut();
+    let doomed: Vec<Entity> = world
+        .query::<(Entity, Option<&Unit>, Option<&Structure>)>()
+        .iter(world)
+        .filter_map(|(entity, unit, structure)| {
+            if unit.is_some() {
+                Some(entity)
+            } else if structure.is_some_and(|structure| structure.id != "CommandCenter") {
+                Some(entity)
+            } else {
+                None
+            }
+        })
+        .collect();
+    for entity in doomed {
+        world.entity_mut(entity).despawn();
+    }
+    // The non-controlled side is AI-directed regardless of its controller
+    // (active_ai_teams keys off the visible team); an empty economy keeps its
+    // command center from training reinforcements into the bout.
+    for economy in &mut world.resource_mut::<Economies>().players {
+        economy.ore = 0;
+        economy.crystal = 0;
+    }
+
+    // Face-off lines around the map centre.
+    let asset_server = world.resource::<AssetServer>().clone();
+    let mut next_id = NextSpawnId(world.resource::<NextSpawnId>().0);
+    let spacing = 1.2f32;
+    let mut spawned: Vec<(Entity, Team, Vec3)> = Vec::new();
+    let mut queue = bevy::ecs::world::CommandQueue::default();
+    {
+        let mut commands = Commands::new(&mut queue, world);
+        for index in 0..count {
+            let offset = (index as f32 - (count as f32 - 1.0) * 0.5) * spacing;
+            let position_a = Vec3::new(-6.0, 0.0, offset);
+            let position_b = Vec3::new(6.0, 0.0, offset);
+            let entity_a = spawn_unit(
+                &mut commands,
+                &asset_server,
+                &mut next_id,
+                def_a.id,
+                Team::Player(0),
+                position_a,
+                0,
+                Team::Player(0),
+            );
+            let entity_b = spawn_unit(
+                &mut commands,
+                &asset_server,
+                &mut next_id,
+                def_b.id,
+                Team::Player(1),
+                position_b,
+                0,
+                Team::Player(0),
+            );
+            spawned.push((entity_a, Team::Player(0), position_b));
+            spawned.push((entity_b, Team::Player(1), position_a));
+        }
+    }
+    queue.apply(world);
+    world.resource_mut::<NextSpawnId>().0 = next_id.0;
+    for (entity, _, toward) in &spawned {
+        world.entity_mut(*entity).insert(AttackMoveOrder {
+            destination: *toward,
+        });
+    }
+
+    let survivors = |world: &mut World| -> (usize, usize, f32, f32) {
+        let mut a = (0usize, 0.0f32);
+        let mut b = (0usize, 0.0f32);
+        let mut q = world.query_filtered::<(&Team, &Health), With<Unit>>();
+        for (team, health) in q.iter(world) {
+            if health.current <= 0.0 {
+                continue;
+            }
+            match team {
+                Team::Player(0) => {
+                    a.0 += 1;
+                    a.1 += health.current;
+                }
+                Team::Player(1) => {
+                    b.0 += 1;
+                    b.1 += health.current;
+                }
+                _ => {}
+            }
+        }
+        (a.0, b.0, a.1, b.1)
+    };
+
+    let steps = (max_seconds * 30).max(30);
+    let mut elapsed = max_seconds;
+    for step in 1..=steps {
+        app.update();
+        // Re-stick the bout orders once a second: the enemy-side AI director
+        // keeps trying to recall its units into a rally wave, which would turn
+        // the fight into a one-sided rout.
+        if step % 30 == 0 {
+            let world = app.world_mut();
+            for (entity, _, toward) in &spawned {
+                let alive = world
+                    .get::<Health>(*entity)
+                    .is_some_and(|health| health.current > 0.0);
+                if alive {
+                    world.entity_mut(*entity).insert(AttackMoveOrder {
+                        destination: *toward,
+                    });
+                }
+            }
+        }
+        if step % 30 == 0 {
+            let (alive_a, alive_b, _, _) = survivors(app.world_mut());
+            if alive_a == 0 || alive_b == 0 {
+                elapsed = step / 30;
+                break;
+            }
+        }
+    }
+    if std::env::var_os("RTS_ARENA_DIAG").is_some() {
+        let world = app.world_mut();
+        let mut q = world.query_filtered::<(&Team, &Unit, &Health), ()>();
+        for (team, unit, health) in q.iter(world) {
+            if health.current > 0.0 {
+                eprintln!(
+                    "[arena-diag] {:?} {} hp={:.1}",
+                    team, unit.id, health.current
+                );
+            }
+        }
+    }
+    let (alive_a, alive_b, hp_a, hp_b) = survivors(app.world_mut());
+    Ok((elapsed, alive_a, alive_b, hp_a, hp_b))
+}
