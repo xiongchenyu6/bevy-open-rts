@@ -45,6 +45,15 @@ pub fn capture_show_skirmish_setup_with_dropdown(app: &mut App) {
     }
 }
 
+pub fn capture_show_campaign_menu(app: &mut App) {
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::CampaignMenu);
+    for _ in 0..8 {
+        app.update();
+    }
+}
+
 pub fn capture_show_options_menu(app: &mut App) {
     app.world_mut()
         .resource_mut::<NextState<AppScreen>>()

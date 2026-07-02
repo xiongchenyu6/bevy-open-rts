@@ -34,6 +34,7 @@ pub(crate) enum MainMenuAction {
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum FrontMenuAction {
     Play,
+    Campaign,
     Options,
     Credits,
     QuitOrFullscreen,
@@ -383,6 +384,7 @@ pub(crate) fn setup_front_menu(mut commands: Commands, asset_server: Res<AssetSe
                     panel.spawn(front_divider_node());
                     for (action, zh, en, height) in [
                         (FrontMenuAction::Play, "开始游戏", "Play", 62.0),
+                        (FrontMenuAction::Campaign, "战役", "Campaign", 58.0),
                         (FrontMenuAction::Options, "设置", "Options", 58.0),
                         (FrontMenuAction::Credits, "制作人员", "Credits", 58.0),
                         (
@@ -532,6 +534,7 @@ pub(crate) fn front_menu_buttons(
         if clicked {
             match button.action {
                 FrontMenuAction::Play => next_state.set(AppScreen::SkirmishSetup),
+                FrontMenuAction::Campaign => next_state.set(AppScreen::CampaignMenu),
                 FrontMenuAction::Options => next_state.set(AppScreen::OptionsMenu),
                 FrontMenuAction::Credits => next_state.set(AppScreen::CreditsMenu),
                 FrontMenuAction::QuitOrFullscreen => {
@@ -2400,4 +2403,144 @@ pub(crate) fn main_menu_faction_info_text(selection: SkirmishMenuSelection) -> S
         skirmish_faction_roster_summary(faction),
         skirmish_faction_playstyle_summary(faction)
     )
+}
+
+// ---- campaign menu (tier-3 C) ----
+
+#[derive(Component, Clone, Copy)]
+pub(crate) enum CampaignMenuAction {
+    Start(usize),
+    Back,
+}
+
+pub(crate) fn setup_campaign_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let font = asset_server.load(UI_FONT_PATH);
+    commands.spawn((
+        Name::new("Campaign Menu Camera"),
+        Camera2d,
+        DespawnOnExit(AppScreen::CampaignMenu),
+    ));
+    setup_menu_backdrop(
+        &mut commands,
+        &asset_server,
+        AppScreen::CampaignMenu,
+        Color::srgba(0.05, 0.04, 0.035, 0.58),
+    );
+    commands
+        .spawn((
+            Name::new("Campaign Menu"),
+            DespawnOnExit(AppScreen::CampaignMenu),
+            Node {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                ..default()
+            },
+        ))
+        .with_children(|root| {
+            root.spawn(options_panel_node()).with_children(|panel| {
+                panel.spawn(options_group_header("战役", "Campaign", font.clone()));
+                for (index, mission) in CAMPAIGN_MISSIONS.iter().enumerate() {
+                    panel
+                        .spawn((
+                            Button,
+                            CampaignMenuAction::Start(index),
+                            Node {
+                                width: Val::Percent(100.0),
+                                flex_direction: FlexDirection::Column,
+                                row_gap: px(4),
+                                padding: UiRect::all(px(10)),
+                                border: UiRect::all(px(1)),
+                                border_radius: BorderRadius::all(px(6)),
+                                ..default()
+                            },
+                            BorderColor::all(Color::srgb(0.26, 0.32, 0.32)),
+                            BackgroundColor(Color::srgba(0.05, 0.05, 0.048, 0.92)),
+                        ))
+                        .with_children(|card| {
+                            card.spawn((
+                                localized_text(mission.name_zh, mission.name_en),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(18.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.96, 0.72, 0.38)),
+                            ));
+                            card.spawn((
+                                localized_text(mission.briefing_zh, mission.briefing_en),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(13.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.78, 0.86, 0.84)),
+                            ));
+                        });
+                }
+                panel
+                    .spawn((
+                        Button,
+                        CampaignMenuAction::Back,
+                        Node {
+                            width: Val::Percent(100.0),
+                            height: px(44),
+                            align_items: AlignItems::Center,
+                            justify_content: JustifyContent::Center,
+                            border: UiRect::all(px(1)),
+                            border_radius: BorderRadius::all(px(6)),
+                            ..default()
+                        },
+                        BorderColor::all(Color::srgb(0.26, 0.32, 0.32)),
+                        BackgroundColor(Color::srgba(0.05, 0.05, 0.048, 0.92)),
+                    ))
+                    .with_children(|button| {
+                        button.spawn((
+                            localized_text("返回", "Back"),
+                            TextFont {
+                                font: font.clone().into(),
+                                font_size: FontSize::Px(20.0),
+                                ..default()
+                            },
+                            TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                        ));
+                    });
+            });
+        });
+}
+
+pub(crate) fn campaign_menu_buttons(
+    mouse: Res<ButtonInput<MouseButton>>,
+    mut setup_settings: ResMut<MatchSetupSettings>,
+    mut selected_map: ResMut<SelectedSkirmishMap>,
+    mut active_mission: ResMut<ActiveMission>,
+    mut trigger_state: ResMut<MissionTriggerState>,
+    mut next_state: ResMut<NextState<AppScreen>>,
+    mut buttons: Query<(&Interaction, &CampaignMenuAction, &mut BackgroundColor)>,
+) {
+    for (interaction, action, mut background) in &mut buttons {
+        let clicked = *interaction == Interaction::Pressed && mouse.just_pressed(MouseButton::Left);
+        if clicked {
+            match action {
+                CampaignMenuAction::Start(index) => {
+                    if let Some(mission) = mission_by_index(*index)
+                        && let Some(settings) = match_settings_for_mission(mission)
+                    {
+                        selected_map.godot_path = settings.map_path;
+                        *setup_settings = settings;
+                        active_mission.0 = Some(*index);
+                        *trigger_state = MissionTriggerState::default();
+                        next_state.set(AppScreen::InMatch);
+                    }
+                }
+                CampaignMenuAction::Back => next_state.set(AppScreen::MainMenu),
+            }
+        }
+        *background = BackgroundColor(match interaction {
+            Interaction::Pressed => Color::srgba(0.12, 0.13, 0.125, 0.96),
+            Interaction::Hovered => Color::srgba(0.08, 0.085, 0.082, 0.94),
+            Interaction::None => Color::srgba(0.05, 0.05, 0.048, 0.92),
+        });
+    }
 }

@@ -26,6 +26,8 @@ pub use capture_api::*;
 mod audio;
 pub(crate) use audio::*;
 mod ai;
+mod campaign;
+pub(crate) use campaign::*;
 mod save;
 pub(crate) use ai::*;
 pub(crate) use save::*;
@@ -325,6 +327,7 @@ pub(crate) enum AppScreen {
     AssetLoading,
     MainMenu,
     SkirmishSetup,
+    CampaignMenu,
     OptionsMenu,
     CreditsMenu,
     InMatch,
@@ -2080,6 +2083,10 @@ pub(crate) fn request_shared_match_scene_start(
 ) {
     *setup_settings = settings;
     next_state.set(AppScreen::InMatch);
+}
+
+pub(crate) fn clear_active_mission(mut active: ResMut<ActiveMission>) {
+    active.0 = None;
 }
 
 pub(crate) fn start_shared_match_from_menu_selection(
@@ -3859,6 +3866,8 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<TabSubgroupState>()
         .init_resource::<PendingLoadedSave>()
         .init_resource::<ReplayTimeline>()
+        .init_resource::<ActiveMission>()
+        .init_resource::<MissionTriggerState>()
         .init_resource::<BuildQueue>()
         .init_resource::<BuildStructureTab>()
         .init_resource::<NextSpawnId>()
@@ -3915,6 +3924,12 @@ pub(crate) fn add_main_menu_scene(app: &mut App) -> &mut App {
         Update,
         (front_menu_buttons, resize_front_menu_roster_preview)
             .run_if(in_state(AppScreen::MainMenu)),
+    )
+    .add_systems(OnEnter(AppScreen::SkirmishSetup), clear_active_mission)
+    .add_systems(OnEnter(AppScreen::CampaignMenu), setup_campaign_menu)
+    .add_systems(
+        Update,
+        campaign_menu_buttons.run_if(in_state(AppScreen::CampaignMenu)),
     )
     .add_systems(OnEnter(AppScreen::OptionsMenu), setup_options_menu)
     .add_systems(
@@ -4410,6 +4425,8 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 replay_jump_hotkeys,
                 tactical_pause_hotkey,
                 clear_tactical_pause_on_speed_change,
+                run_mission_triggers,
+                check_mission_victory,
             )
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),

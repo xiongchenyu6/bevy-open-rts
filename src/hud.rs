@@ -2511,6 +2511,8 @@ pub(crate) fn production_queue_slot_buttons(
 pub(crate) fn update_objective_tracker_hud(
     visible_player: Res<VisiblePlayer>,
     relations: Res<TeamRelations>,
+    active_mission: Res<ActiveMission>,
+    match_state: Res<MatchState>,
     mut objective_tracker: ResMut<ObjectiveTrackerState>,
     structures: Query<(&Structure, &Team, &Health)>,
     units: Query<(&Unit, &Team, &Health)>,
@@ -2531,6 +2533,15 @@ pub(crate) fn update_objective_tracker_hud(
         fill.width = Val::Percent(snapshot.completion_percent as f32);
     }
     **text = objective_tracker_text(snapshot);
+    // Survive missions show the countdown instead of the anchor objective.
+    if let Some(remaining) = mission_survive_remaining(&active_mission, &match_state) {
+        **text = format!(
+            "{}: {}:{:02}",
+            t("目标: 坚守", "Objective: hold out"),
+            (remaining / 60.0) as u32,
+            remaining as u32 % 60
+        );
+    }
 }
 
 pub(crate) fn update_hud(
