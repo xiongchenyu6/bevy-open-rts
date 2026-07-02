@@ -1286,3 +1286,105 @@ pub(crate) fn retarget_capture_camera(
         ));
     }
 }
+
+/// Parses a CLI difficulty name (beginner|easy|normal|hard).
+pub(crate) fn capture_parse_ai_difficulty(name: &str) -> Result<AiDifficulty, String> {
+    match name {
+        "beginner" => Ok(AiDifficulty::Beginner),
+        "easy" => Ok(AiDifficulty::Easy),
+        "normal" => Ok(AiDifficulty::Normal),
+        "hard" => Ok(AiDifficulty::Hard),
+        other => Err(format!(
+            "unknown difficulty '{other}' (use beginner|easy|normal|hard)"
+        )),
+    }
+}
+
+/// Final per-team survivors of a duel: (team index, units, structures).
+pub type AiDuelCounts = Vec<(usize, usize, usize)>;
+
+/// Runs a headless AI-vs-AI duel — Player0 uses `difficulty_a`, Player1 uses
+/// `difficulty_b` on the default 1v1 setup — until the match resolves or
+/// `max_seconds` of simulated time pass. Returns the elapsed simulated seconds,
+/// the final phase label (Victory = Player0 won, Defeat = Player1 won, from
+/// Player0's perspective) and the surviving unit/structure counts per team.
+/// Powers AI-difficulty balance regression checks.
+pub fn capture_run_ai_duel(
+    difficulty_a: &str,
+    difficulty_b: &str,
+    max_seconds: u32,
+) -> Result<(u32, &'static str, AiDuelCounts), String> {
+    let difficulty_a = capture_parse_ai_difficulty(difficulty_a)?;
+    let difficulty_b = capture_parse_ai_difficulty(difficulty_b)?;
+    let mut app = build_game_app(GameAppMode::Headless);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
+    ));
+    {
+        let mut settings = app.world_mut().resource_mut::<MatchSetupSettings>();
+        if settings.player_controllers.len() < 2 {
+            settings
+                .player_controllers
+                .resize(2, SkirmishPlayerController::None);
+        }
+        settings.player_controllers[0] = SkirmishPlayerController::Ai(difficulty_a);
+        settings.player_controllers[1] = SkirmishPlayerController::Ai(difficulty_b);
+        settings
+            .ai_difficulties
+            .set_difficulty(Team::Player(0), difficulty_a);
+        settings
+            .ai_difficulties
+            .set_difficulty(Team::Player(1), difficulty_b);
+    }
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::InMatch);
+    for _ in 0..20 {
+        app.update();
+    }
+    app.world_mut()
+        .insert_resource(VisiblePlayer::all_players(Team::Player(0)));
+
+    let mut elapsed = max_seconds;
+    let mut label = "Running";
+    let steps = max_seconds.div_ceil(5).max(1);
+    for step in 1..=steps {
+        for _ in 0..150 {
+            app.update();
+        }
+        let phase = app.world().resource::<MatchState>().phase;
+        if !matches!(phase, MatchPhase::Running) {
+            elapsed = step * 5;
+            label = match_phase_label(phase);
+            break;
+        }
+    }
+
+    let world = app.world_mut();
+    let mut counts: std::collections::BTreeMap<usize, (usize, usize)> =
+        std::collections::BTreeMap::new();
+    // Both duelists always appear, even when fully eliminated (0/0).
+    counts.insert(0, (0, 0));
+    counts.insert(1, (0, 0));
+    let mut units = world.query_filtered::<(&Team, &Health), With<Unit>>();
+    for (team, health) in units.iter(world) {
+        if let Team::Player(index) = team
+            && health.current > 0.0
+        {
+            counts.entry(*index).or_default().0 += 1;
+        }
+    }
+    let mut structures = world.query_filtered::<(&Team, &Health), With<Structure>>();
+    for (team, health) in structures.iter(world) {
+        if let Team::Player(index) = team
+            && health.current > 0.0
+        {
+            counts.entry(*index).or_default().1 += 1;
+        }
+    }
+    let counts = counts
+        .into_iter()
+        .map(|(team, (units, structures))| (team, units, structures))
+        .collect();
+    Ok((elapsed, label, counts))
+}

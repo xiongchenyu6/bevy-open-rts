@@ -14,6 +14,7 @@
 //!   capture harvest <dir>                real input smoke: Worker right-clicks ore
 //!   capture assault <dir> [max-seconds]  real input smoke: select army/attack-move/win
 //!   capture match [max-seconds]          headless AI-vs-AI match must resolve
+//!   capture ai-duel <a> <b> [max-seconds] AI difficulty duel (beginner|easy|normal|hard)
 //!   capture menu [path]                  command menu screenshot
 //!   capture menu-wide [path]             command menu screenshot at 2048x1224
 //!   capture menu-return [path]           setup -> back -> command menu screenshot
@@ -43,7 +44,7 @@ use bevy_open_rts::{
     capture_player_in_placement_mode, capture_player_onscreen_unit_position,
     capture_player_onscreen_worker_position, capture_player_producer_position,
     capture_player_resources, capture_player_structure_count, capture_player_unit_count,
-    capture_player_worker_position, capture_run_ai_match_until_resolved,
+    capture_player_worker_position, capture_run_ai_duel, capture_run_ai_match_until_resolved,
     capture_selected_player_unit_average_position, capture_selected_player_unit_count,
     capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
     capture_set_structure_rally, capture_show_credits_menu, capture_show_main_menu,
@@ -170,6 +171,13 @@ fn main() {
             let max_seconds = args.next().and_then(|s| s.parse().ok()).unwrap_or(240);
             run_match_proof(max_seconds)
         }
+        Some("ai-duel") => match (args.next(), args.next()) {
+            (Some(a), Some(b)) => {
+                let max_seconds = args.next().and_then(|s| s.parse().ok()).unwrap_or(600);
+                run_ai_duel(&a, &b, max_seconds)
+            }
+            _ => Err("ai-duel needs <difficultyA> <difficultyB> [max-seconds]".into()),
+        },
         Some("verify") => verify_click_alignment(),
         Some("base") => {
             let path = args
@@ -264,6 +272,29 @@ fn verify_click_alignment() -> Result<(), String> {
     }
 
     println!("[verify] OK: models aligned to origin; the visible resource is clickable");
+    Ok(())
+}
+
+fn run_ai_duel(a: &str, b: &str, max_seconds: u32) -> Result<(), String> {
+    let (seconds, label, counts) = capture_run_ai_duel(a, b, max_seconds)?;
+    // AI-vs-AI ends as MatchFinished (no human perspective), so infer the winner
+    // from who is left standing: most structures, units as the tie-break.
+    let winner = if label == "Running" {
+        "unresolved (time limit)".to_string()
+    } else {
+        counts
+            .iter()
+            .max_by_key(|(_, units, structures)| (*structures, *units))
+            .map(|(team, _, _)| {
+                let name = if *team == 0 { a } else { b };
+                format!("player{team} ({name})")
+            })
+            .unwrap_or_else(|| "unresolved".to_string())
+    };
+    println!("[capture] ai-duel {a} vs {b}: {label} at ~{seconds}s -> winner: {winner}");
+    for (team, units, structures) in &counts {
+        println!("[capture]   player{team}: {units} units, {structures} structures alive");
+    }
     Ok(())
 }
 
