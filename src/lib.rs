@@ -1000,10 +1000,17 @@ struct MobileShieldProjector {
     damage_scale: f32,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum RallyMode {
+    Move,
+    AttackMove,
+}
+
 #[derive(Component, Clone, Copy)]
 struct RallyPoint {
     target: Option<Vec3>,
     target_unit: Option<Entity>,
+    mode: RallyMode,
 }
 
 #[derive(Component)]
@@ -1109,6 +1116,23 @@ type CommandPanelUnitItem<'a> = (
     Option<&'a AttackMoveOrder>,
     Option<&'a PatrolOrder>,
     Option<&'a OrderQueue>,
+);
+type IdleWorkerSelectionItem<'a> = (
+    Entity,
+    &'a Team,
+    &'a Unit,
+    Option<&'a OrderQueue>,
+    Option<&'a MoveOrder>,
+    Option<&'a FollowOrder>,
+    Option<&'a AttackOrder>,
+    Option<&'a CaptureOrder>,
+    Option<&'a GarrisonOrder>,
+    Option<&'a HarvestOrder>,
+    Option<&'a RepairOrder>,
+    Option<&'a ConstructOrder>,
+    Option<&'a AttackMoveOrder>,
+    Option<&'a PatrolOrder>,
+    &'a VisibilityState,
 );
 type SelectedOrderUnitItem<'a> = (
     Entity,
@@ -4397,6 +4421,7 @@ fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<MatchBriefingState>()
         .init_resource::<SelectionDragState>()
         .init_resource::<UnitGroups>()
+        .init_resource::<IdleWorkerCycleState>()
         .init_resource::<CameraBookmarks>()
         .init_resource::<DoubleClickState>()
         .init_resource::<ButtonInput<KeyCode>>()
@@ -5669,6 +5694,7 @@ pub fn capture_set_structure_rally(app: &mut App, structure: Entity, target: Vec
     if let Some(mut rally) = app.world_mut().get_mut::<RallyPoint>(structure) {
         rally.target = Some(target);
         rally.target_unit = None;
+        rally.mode = RallyMode::Move;
     }
 }
 
@@ -6271,6 +6297,12 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
             command_buttons
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
+            process_idle_worker_selection_requests
+                .after(selection_hotkeys)
+                .after(command_shortcuts)
+                .after(command_buttons)
+                .in_set(SimulationPhase::UiAndManagement)
+                .run_if(match_in_progress),
             production_queue_slot_buttons
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
@@ -6289,6 +6321,11 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
             auto_assign_ai_construction_workers
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
+        ),
+    );
+    app.add_systems(
+        Update,
+        (
             auto_assign_idle_resource_collectors
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
@@ -6826,6 +6863,12 @@ struct AudioFeedback {
     last_command_key: Option<&'static str>,
     last_low_power: Option<bool>,
     next_ack_is_first: bool,
+}
+
+#[derive(Resource, Default)]
+struct IdleWorkerCycleState {
+    request_for: Option<Team>,
+    last_selected: Option<Entity>,
 }
 
 impl Default for AudioFeedback {
@@ -7813,6 +7856,7 @@ enum BuildAction {
     GuardArea,
     StopSelected,
     ScatterSelected,
+    SelectIdleWorker,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -7839,6 +7883,7 @@ impl BuildAction {
             | Self::Train(_)
             | Self::Build(_)
             | Self::SelectBuildTab(_)
+            | Self::SelectIdleWorker
             | Self::SellStructure
             | Self::RepairStructure
             | Self::SetRallyPoint
@@ -8065,6 +8110,7 @@ struct CommandActionResources<'w> {
     player_factions: Res<'w, PlayerFactions>,
     audio_feedback: ResMut<'w, AudioFeedback>,
     battle_log: ResMut<'w, BattleLog>,
+    idle_worker_cycle: ResMut<'w, IdleWorkerCycleState>,
 }
 
 #[derive(SystemParam)]
@@ -8257,6 +8303,7 @@ fn begin_match_from_setup(
     mut support_power_panel: ResMut<SupportPowerPanelState>,
     mut selection_drag: ResMut<SelectionDragState>,
     mut unit_groups: ResMut<UnitGroups>,
+    mut idle_worker_cycle: ResMut<IdleWorkerCycleState>,
     mut camera_bookmarks: ResMut<CameraBookmarks>,
     mut match_menu: ResMut<MatchMenuState>,
     mut briefing: ResMut<MatchBriefingState>,
@@ -8277,6 +8324,7 @@ fn begin_match_from_setup(
     *support_power_panel = SupportPowerPanelState::default();
     *selection_drag = SelectionDragState::default();
     *unit_groups = UnitGroups::default();
+    *idle_worker_cycle = IdleWorkerCycleState::default();
     *camera_bookmarks = CameraBookmarks::default();
     match_menu.visible = false;
     *briefing = MatchBriefingState::default();
@@ -11670,6 +11718,7 @@ fn spawn_structure_for_visual_faction(
         commands.entity(entity_id).try_insert(RallyPoint {
             target: None,
             target_unit: None,
+            mode: RallyMode::Move,
         });
     }
     attach_support_effects(commands, entity_id, def);
@@ -15858,6 +15907,7 @@ fn record_build_action_audio_feedback(
         | BuildAction::SelectBuildTab(_)
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
+        | BuildAction::SelectIdleWorker
         | BuildAction::HoldPosition
         | BuildAction::AttackMove
         | BuildAction::Patrol
@@ -17169,6 +17219,7 @@ fn minimap_input(
                         &mut rally_point,
                         target,
                         None,
+                        RallyMode::Move,
                         *order_resources.map_bounds,
                     )
                 {
@@ -17503,7 +17554,10 @@ fn select_entities(
         return;
     };
     if std::env::var_os("RTS_SELECT_DIAG").is_some() {
-        eprintln!("[select-diag] click at {cursor:?} ground=({:.2},{:.2})", point.x, point.z);
+        eprintln!(
+            "[select-diag] click at {cursor:?} ground=({:.2},{:.2})",
+            point.x, point.z
+        );
     }
     let Ok((camera, camera_transform)) = camera_q.single() else {
         drag_state.active = false;
@@ -17560,9 +17614,7 @@ fn select_entities(
         // Ground-proximity fallback only for non-resource units (resources rely on
         // the model-capsule test; their ground raycast lands behind the crystal).
         let ground_pick = resource_node.is_none() && ground_distance <= selectable.radius + 0.35;
-        if std::env::var_os("RTS_SELECT_DIAG").is_some()
-            && unit.is_some()
-            && ground_distance < 3.0
+        if std::env::var_os("RTS_SELECT_DIAG").is_some() && unit.is_some() && ground_distance < 3.0
         {
             eprintln!(
                 "[select-diag] cand unit={:?} vis={} gdist={ground_distance:.2} sdist={screen_distance:?} gpick={ground_pick} spick={screen_pick}",
@@ -17879,6 +17931,7 @@ fn issue_orders(
             visible_team,
             point,
             rally_unit_target,
+            RallyMode::Move,
             *order_resources.map_bounds,
             &mut selected_params.p1(),
         );
@@ -17908,6 +17961,7 @@ fn issue_orders(
         .iter()
         .filter(|(_, _, _, team, ..)| **team == visible_team)
         .collect();
+    let selected_unit_count = selected.len();
     let has_owned_voice_unit = selected.iter().any(|selection| is_voice_unit(selection.2));
     let has_selected_resource_collector = selected
         .iter()
@@ -18019,7 +18073,7 @@ fn issue_orders(
             entity,
             desired,
             queue_mode,
-            false,
+            true,
             has_active,
             queue,
         );
@@ -18027,6 +18081,22 @@ fn issue_orders(
             .entity(entity)
             .try_insert(HoldPosition { enabled: false });
     }
+
+    let set_attack_rally_any = if selected_unit_count == 0
+        && order_resources.command_mode.attack_move
+        && terrain_target_only
+    {
+        apply_selected_rally_points(
+            visible_team,
+            point,
+            None,
+            RallyMode::AttackMove,
+            *order_resources.map_bounds,
+            &mut selected_params.p1(),
+        )
+    } else {
+        false
+    };
 
     let should_set_plain_rally = should_set_terrain_rally_points(
         queue_mode,
@@ -18039,6 +18109,7 @@ fn issue_orders(
                 visible_team,
                 point,
                 Some(rally_unit_target),
+                RallyMode::Move,
                 *order_resources.map_bounds,
                 &mut selected_params.p1(),
             )
@@ -18065,7 +18136,7 @@ fn issue_orders(
             None,
         );
     }
-    if issued_any || set_rally_any {
+    if issued_any || set_rally_any || set_attack_rally_any {
         // A harvest order plants its "deploy-to-mine" flag ON the targeted ore,
         // not on the empty click point; everything else gets the white move ring.
         let harvest_pos = if has_selected_resource_collector && enemy_target.is_none() {
@@ -18080,7 +18151,9 @@ fn issue_orders(
         let enemy_pos = enemy_target
             .and_then(|entity| selectable_q.get(entity).ok())
             .map(|item| item.1.translation);
-        let (marker_pos, marker_kind) = if let Some(enemy) = enemy_pos {
+        let (marker_pos, marker_kind) = if set_attack_rally_any {
+            (point, ClickMarkerKind::Attack)
+        } else if let Some(enemy) = enemy_pos {
             (enemy, ClickMarkerKind::Attack)
         } else if let Some(ore) = harvest_pos {
             (ore, ClickMarkerKind::Harvest)
@@ -18141,13 +18214,21 @@ fn apply_selected_terrain_rally_points(
     bounds: MapBounds,
     rally_points: &mut Query<(&Team, &mut RallyPoint), SelectedRallyPointFilter>,
 ) -> bool {
-    apply_selected_rally_points(visible_team, target, None, bounds, rally_points)
+    apply_selected_rally_points(
+        visible_team,
+        target,
+        None,
+        RallyMode::Move,
+        bounds,
+        rally_points,
+    )
 }
 
 fn apply_selected_rally_points(
     visible_team: Team,
     target: Vec3,
     rally_unit_target: Option<(Entity, Vec3)>,
+    mode: RallyMode,
     bounds: MapBounds,
     rally_points: &mut Query<(&Team, &mut RallyPoint), SelectedRallyPointFilter>,
 ) -> bool {
@@ -18158,6 +18239,7 @@ fn apply_selected_rally_points(
                 &mut rally_point,
                 target,
                 rally_unit_target,
+                mode,
                 bounds,
             )
         {
@@ -18253,13 +18335,20 @@ fn apply_rally_point_command(
     point: Vec3,
     rally_unit_target: Option<(Entity, Vec3)>,
 ) -> bool {
-    apply_rally_point_command_in_bounds(rally_point, point, rally_unit_target, MapBounds::default())
+    apply_rally_point_command_in_bounds(
+        rally_point,
+        point,
+        rally_unit_target,
+        RallyMode::Move,
+        MapBounds::default(),
+    )
 }
 
 fn apply_rally_point_command_in_bounds(
     rally_point: &mut RallyPoint,
     point: Vec3,
     rally_unit_target: Option<(Entity, Vec3)>,
+    mode: RallyMode,
     bounds: MapBounds,
 ) -> bool {
     let target = if let Some((_, position)) = rally_unit_target {
@@ -18272,6 +18361,7 @@ fn apply_rally_point_command_in_bounds(
     };
     rally_point.target = Some(target);
     rally_point.target_unit = rally_unit_target.map(|(entity, _)| entity);
+    rally_point.mode = mode;
     true
 }
 
@@ -20692,6 +20782,7 @@ fn refresh_command_panel(
     player_factions: Res<PlayerFactions>,
     selected_units: Query<CommandPanelUnitItem<'_>, With<Selected>>,
     selected_structures: Query<SelectedRepairStructureItem<'_>, With<Selected>>,
+    idle_workers: Query<IdleWorkerSelectionItem<'_>, With<Unit>>,
     producer_structures: Query<StructureEntityItem<'_>>,
     structures: Query<StructurePrereqItem<'_>>,
     mut slot_q: Query<(
@@ -20761,6 +20852,7 @@ fn refresh_command_panel(
         &selected_structures,
         &structures,
         *build_structure_tab,
+        has_idle_worker_for_team(visible_team, &idle_workers),
     );
     for (slot, mut action, mut availability, interaction, mut background, mut border, mut node) in
         &mut slot_q
@@ -20941,6 +21033,7 @@ fn current_command_actions(
         selected_structures,
         structures,
         BuildStructureTab::Production,
+        false,
     )
 }
 
@@ -20951,6 +21044,7 @@ fn current_command_actions_for_faction(
     selected_structures: &Query<SelectedRepairStructureItem<'_>, With<Selected>>,
     _structures: &Query<StructurePrereqItem<'_>>,
     build_structure_tab: BuildStructureTab,
+    has_idle_worker: bool,
 ) -> Vec<BuildAction> {
     let Some(faction) = faction_def(faction) else {
         return Vec::new();
@@ -21003,6 +21097,10 @@ fn current_command_actions_for_faction(
     );
     let mut actions = Vec::new();
 
+    if has_idle_worker {
+        push_action_unique(&mut actions, BuildAction::SelectIdleWorker);
+    }
+
     if selected_units
         .iter()
         .any(|(unit, unit_team, ..)| *unit_team == team && unit_supports_hold_position(unit))
@@ -21052,6 +21150,7 @@ fn current_command_actions_for_faction(
             }
         }
         push_action_unique(&mut actions, BuildAction::SetRallyPoint);
+        push_action_unique(&mut actions, BuildAction::AttackMove);
         push_action_unique(&mut actions, BuildAction::SellStructure);
         if has_repairable_structure {
             push_action_unique(&mut actions, BuildAction::RepairStructure);
@@ -21168,6 +21267,7 @@ fn command_action_enabled_for_panel(
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
+        | BuildAction::SelectIdleWorker
         | BuildAction::HoldPosition
         | BuildAction::AttackMove
         | BuildAction::Patrol
@@ -21301,6 +21401,7 @@ fn command_action_icon_path(action: BuildAction) -> Option<&'static str> {
         BuildAction::RepairStructure => Some("ui/icons/Repair.png"),
         BuildAction::ToggleDeployMode => Some("ui/icons/DeployMode.png"),
         BuildAction::SetRallyPoint => Some("ui/icons/RallyPoint.png"),
+        BuildAction::SelectIdleWorker => registry::entity("Worker").and_then(|def| def.icon),
         BuildAction::HoldPosition => Some("ui/icons/HoldPosition.png"),
         BuildAction::AttackMove => Some("ui/icons/AttackMove.png"),
         BuildAction::Patrol => Some("ui/icons/Patrol.png"),
@@ -21318,6 +21419,7 @@ fn command_grid_hotkey(index: usize) -> Option<CommandHotkey> {
 fn command_action_hotkey(index: usize, action: BuildAction) -> Option<CommandHotkey> {
     match action {
         BuildAction::None => None,
+        BuildAction::SelectIdleWorker => Some(CommandHotkey::new("I", KeyCode::KeyI)),
         BuildAction::GuardArea => Some(CommandHotkey::new("G", KeyCode::KeyG)),
         BuildAction::StopSelected => Some(CommandHotkey::new("S", KeyCode::KeyS)),
         BuildAction::ScatterSelected => Some(CommandHotkey::new("X", KeyCode::KeyX)),
@@ -21367,6 +21469,7 @@ fn command_label_with_queue(
         BuildAction::RepairStructure => format!("{key} {}", t("维修建筑", "Repair")),
         BuildAction::ToggleDeployMode => format!("{key} {}", t("切换部署", "Toggle Deploy")),
         BuildAction::SetRallyPoint => format!("{key} {}", t("设置集结", "Rally Point")),
+        BuildAction::SelectIdleWorker => format!("{key} {}", t("闲置工人", "Idle Worker")),
         BuildAction::HoldPosition => format!("{key} {}", t("坚守", "Hold")),
         BuildAction::AttackMove => format!("{key} {}", t("攻击移动", "Attack-Move")),
         BuildAction::Patrol => format!("{key} {}", t("巡逻", "Patrol")),
@@ -21516,6 +21619,16 @@ fn command_action_tooltip(
                 .to_string(),
             );
         }
+        BuildAction::SelectIdleWorker => {
+            lines.push(format!("{key} {}", t("闲置工人", "Idle worker")));
+            lines.push(
+                t(
+                    "选择并跳转到下一个没有命令的工人。",
+                    "Selects and jumps to the next worker with no active order.",
+                )
+                .to_string(),
+            );
+        }
         BuildAction::HoldPosition => {
             lines.push(format!("{key} {}", t("坚守", "Hold position")));
             lines.push(
@@ -21530,8 +21643,8 @@ fn command_action_tooltip(
             lines.push(format!("{key} {}", t("攻击移动", "Attack move")));
             lines.push(
                 t(
-                    "移动途中主动搜索并攻击敌人。",
-                    "Move while automatically engaging enemies.",
+                    "单位移动途中主动攻击；生产建筑选中时，下一次点地面会设置攻击集结点。",
+                    "Units engage while moving; with a production structure selected, the next terrain click sets an attack rally point.",
                 )
                 .to_string(),
             );
@@ -21739,30 +21852,11 @@ fn selection_hotkeys(
         With<Selectable>,
     >,
     production_structure_q: Query<ProductionHotkeyStructureItem<'_>, With<Selectable>>,
-    unit_q: Query<
-        (
-            Entity,
-            &Team,
-            &Unit,
-            Option<&OrderQueue>,
-            Option<&MoveOrder>,
-            Option<&FollowOrder>,
-            Option<&AttackOrder>,
-            Option<&CaptureOrder>,
-            Option<&GarrisonOrder>,
-            Option<&HarvestOrder>,
-            Option<&RepairOrder>,
-            Option<&ConstructOrder>,
-            Option<&AttackMoveOrder>,
-            Option<&PatrolOrder>,
-            &VisibilityState,
-        ),
-        With<Unit>,
-    >,
     mut unit_groups: ResMut<UnitGroups>,
     mut bookmarks: ResMut<CameraBookmarks>,
     mut camera_state: ResMut<RtsCamera>,
     mut battle_log: ResMut<BattleLog>,
+    mut idle_worker_cycle: ResMut<IdleWorkerCycleState>,
 ) {
     let shift = keyboard.pressed(KeyCode::ShiftLeft) || keyboard.pressed(KeyCode::ShiftRight);
     let ctrl = keyboard.pressed(KeyCode::ControlLeft) || keyboard.pressed(KeyCode::ControlRight);
@@ -21958,53 +22052,7 @@ fn selection_hotkeys(
     }
 
     if alt && keyboard.just_pressed(KeyCode::KeyI) {
-        let ids = unit_q
-            .iter()
-            .filter_map(
-                |(
-                    entity,
-                    team,
-                    unit,
-                    order_queue,
-                    move_order,
-                    follow_order,
-                    attack_order,
-                    capture_order,
-                    garrison_order,
-                    harvest_order,
-                    repair_order,
-                    construct_order,
-                    attack_move_order,
-                    patrol_order,
-                    visibility,
-                )| {
-                    if *team != visible_team
-                        || !visibility.visible
-                        || !is_builder_worker_selection_unit(unit)
-                    {
-                        return None;
-                    }
-                    if is_unit_idle(
-                        order_queue,
-                        move_order,
-                        follow_order,
-                        attack_order,
-                        capture_order,
-                        garrison_order,
-                        harvest_order,
-                        repair_order,
-                        construct_order,
-                        attack_move_order,
-                        patrol_order,
-                    ) {
-                        Some(entity)
-                    } else {
-                        None
-                    }
-                },
-            )
-            .collect::<Vec<_>>();
-        apply_selected_from_ids(&mut commands, &selectable_q, &ids, false, visible_team);
+        idle_worker_cycle.request_for = Some(visible_team);
     }
 }
 
@@ -22028,6 +22076,76 @@ fn handle_camera_bookmark_hotkeys(
             bookmark.restore_safely(camera_state, map_bounds);
         }
     }
+}
+
+fn process_idle_worker_selection_requests(
+    mut commands: Commands,
+    visible_player: Res<VisiblePlayer>,
+    map_bounds: Res<MapBounds>,
+    mut idle_worker_cycle: ResMut<IdleWorkerCycleState>,
+    mut camera_state: ResMut<RtsCamera>,
+    selectable_q: Query<
+        (Entity, &Transform, &Team, Option<&Unit>, Option<&Structure>),
+        With<Selectable>,
+    >,
+    idle_workers: Query<IdleWorkerSelectionItem<'_>, With<Unit>>,
+    unit_transforms: Query<&Transform, With<Unit>>,
+    mut audio_feedback: ResMut<AudioFeedback>,
+    mut battle_log: ResMut<BattleLog>,
+) {
+    let Some(requested_team) = idle_worker_cycle.request_for.take() else {
+        return;
+    };
+    if controlled_player_team(Some(&*visible_player)) != Some(requested_team) {
+        return;
+    }
+
+    let mut candidates = idle_workers
+        .iter()
+        .filter_map(|item| {
+            if !is_idle_worker_item(requested_team, item) {
+                return None;
+            }
+            let (entity, ..) = item;
+            unit_transforms
+                .get(entity)
+                .ok()
+                .map(|transform| (entity, transform.translation))
+        })
+        .collect::<Vec<_>>();
+    candidates.sort_by_key(|(entity, _)| entity.index());
+    if candidates.is_empty() {
+        idle_worker_cycle.last_selected = None;
+        record_sound_audio_feedback(&mut audio_feedback, SoundEffectKind::Error);
+        push_battle_log(
+            &mut battle_log,
+            t("没有闲置工人", "No idle workers").to_string(),
+            None,
+        );
+        return;
+    }
+
+    let next_index = idle_worker_cycle
+        .last_selected
+        .and_then(|last| candidates.iter().position(|(entity, _)| *entity == last))
+        .map(|index| (index + 1) % candidates.len())
+        .unwrap_or(0);
+    let (target, position) = candidates[next_index];
+    idle_worker_cycle.last_selected = Some(target);
+    apply_selected_from_ids(
+        &mut commands,
+        &selectable_q,
+        &[target],
+        false,
+        requested_team,
+    );
+    set_camera_focus_safely(&mut camera_state, position, *map_bounds);
+    record_selection_audio_feedback(&mut audio_feedback, true, true);
+    push_battle_log(
+        &mut battle_log,
+        t("闲置工人", "Idle worker").to_string(),
+        Some(position),
+    );
 }
 
 fn production_structure_hotkey_select_all(
@@ -22296,6 +22414,51 @@ fn is_unit_idle(
         && patrol_order.is_none()
 }
 
+fn is_idle_worker_item(team: Team, item: IdleWorkerSelectionItem<'_>) -> bool {
+    let (
+        _entity,
+        unit_team,
+        unit,
+        order_queue,
+        move_order,
+        follow_order,
+        attack_order,
+        capture_order,
+        garrison_order,
+        harvest_order,
+        repair_order,
+        construct_order,
+        attack_move_order,
+        patrol_order,
+        visibility,
+    ) = item;
+    *unit_team == team
+        && visibility.visible
+        && is_builder_worker_selection_unit(unit)
+        && is_unit_idle(
+            order_queue,
+            move_order,
+            follow_order,
+            attack_order,
+            capture_order,
+            garrison_order,
+            harvest_order,
+            repair_order,
+            construct_order,
+            attack_move_order,
+            patrol_order,
+        )
+}
+
+fn has_idle_worker_for_team(
+    team: Team,
+    idle_workers: &Query<IdleWorkerSelectionItem<'_>, With<Unit>>,
+) -> bool {
+    idle_workers
+        .iter()
+        .any(|item| is_idle_worker_item(team, item))
+}
+
 fn apply_selected_from_ids(
     commands: &mut Commands,
     selectable_q: &Query<
@@ -22379,6 +22542,7 @@ fn command_shortcuts(
             &mut action_resources.build_queue,
             &mut action_resources.audio_feedback,
             &mut action_resources.battle_log,
+            &mut action_resources.idle_worker_cycle,
             production_batch_modifier_pressed(&keyboard),
         );
         return;
@@ -22448,6 +22612,7 @@ fn command_buttons(
                             &mut action_resources.build_queue,
                             &mut action_resources.audio_feedback,
                             &mut action_resources.battle_log,
+                            &mut action_resources.idle_worker_cycle,
                             production_batch_modifier_pressed(&keyboard),
                         );
                     }
@@ -22541,6 +22706,7 @@ fn execute_command_action(
     build_queue: &mut BuildQueue,
     audio_feedback: &mut AudioFeedback,
     battle_log: &mut BattleLog,
+    idle_worker_cycle: &mut IdleWorkerCycleState,
     batch_to_limit: bool,
 ) -> bool {
     let canceling_construction = action == BuildAction::SellStructure
@@ -22578,6 +22744,11 @@ fn execute_command_action(
             request_selected_deploy_toggle(commands, team, selected_units)
         }
         BuildAction::SetRallyPoint => begin_rally_point_mode(command_mode, true),
+        BuildAction::SelectIdleWorker => {
+            clear_targeting_modes(command_mode);
+            idle_worker_cycle.request_for = Some(team);
+            true
+        }
         BuildAction::HoldPosition => {
             let handled = toggle_selected_hold_position(
                 commands,
@@ -22595,7 +22766,13 @@ fn execute_command_action(
             command_mode,
             selected_units.iter().any(|(_, unit, unit_team, ..)| {
                 *unit_team == team && unit_supports_attack_move(unit)
-            }),
+            }) || selected_structures.iter().any(
+                |(_, structure, structure_team, _, under_construction)| {
+                    *structure_team == team
+                        && structure_is_constructed(under_construction)
+                        && is_rally_point_structure(structure.id)
+                },
+            ),
         ),
         BuildAction::Patrol => begin_patrol_mode(
             command_mode,
@@ -22686,7 +22863,7 @@ fn execute_command_action(
     } else if handled
         && !matches!(
             action,
-            BuildAction::Build(_) | BuildAction::SelectBuildTab(_)
+            BuildAction::Build(_) | BuildAction::SelectBuildTab(_) | BuildAction::SelectIdleWorker
         )
     {
         record_build_action_audio_feedback(audio_feedback, team, team, action);
@@ -22867,6 +23044,7 @@ fn cancellation_producers_for_action(
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
+        | BuildAction::SelectIdleWorker
         | BuildAction::HoldPosition
         | BuildAction::AttackMove
         | BuildAction::Patrol
@@ -23012,6 +23190,7 @@ fn command_queue_producers_for_action(
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
+        | BuildAction::SelectIdleWorker
         | BuildAction::HoldPosition
         | BuildAction::AttackMove
         | BuildAction::Patrol
@@ -23459,6 +23638,7 @@ fn process_build_queue(
             | BuildAction::RepairStructure
             | BuildAction::ToggleDeployMode
             | BuildAction::SetRallyPoint
+            | BuildAction::SelectIdleWorker
             | BuildAction::HoldPosition
             | BuildAction::AttackMove
             | BuildAction::Patrol
@@ -23602,16 +23782,24 @@ fn process_build_queue(
                     } else if let Some(rally_target) =
                         rally_point.and_then(|rally_point| rally_point.target)
                     {
-                        commands.entity(spawned).try_insert(MoveOrder {
-                            target: rally_target,
-                        });
+                        issue_spawned_unit_rally_order(
+                            &mut commands,
+                            spawned,
+                            def,
+                            rally_target,
+                            rally_point,
+                        );
                     }
                 } else if let Some(rally_target) =
                     rally_point.and_then(|rally_point| rally_point.target)
                 {
-                    commands.entity(spawned).try_insert(MoveOrder {
-                        target: rally_target,
-                    });
+                    issue_spawned_unit_rally_order(
+                        &mut commands,
+                        spawned,
+                        def,
+                        rally_target,
+                        rally_point,
+                    );
                 }
                 if team == player_team {
                     record_sound_audio_feedback(
@@ -23696,6 +23884,7 @@ fn process_build_queue(
             | BuildAction::RepairStructure
             | BuildAction::ToggleDeployMode
             | BuildAction::SetRallyPoint
+            | BuildAction::SelectIdleWorker
             | BuildAction::HoldPosition
             | BuildAction::AttackMove
             | BuildAction::Patrol
@@ -23705,6 +23894,41 @@ fn process_build_queue(
             | BuildAction::SelectBuildTab(_)
             | BuildAction::None => {}
         }
+    }
+}
+
+fn issue_spawned_unit_rally_order(
+    commands: &mut Commands,
+    spawned: Entity,
+    def: &registry::EntityDef,
+    rally_target: Vec3,
+    rally_point: Option<RallyPoint>,
+) {
+    match spawned_unit_rally_order(def, rally_target, rally_point) {
+        UnitQueuedOrder::AttackMove(destination) => {
+            commands
+                .entity(spawned)
+                .try_insert(AttackMoveOrder { destination });
+        }
+        UnitQueuedOrder::Move(target) => {
+            commands.entity(spawned).try_insert(MoveOrder { target });
+        }
+        _ => {}
+    }
+}
+
+fn spawned_unit_rally_order(
+    def: &registry::EntityDef,
+    rally_target: Vec3,
+    rally_point: Option<RallyPoint>,
+) -> UnitQueuedOrder {
+    if rally_point.is_some_and(|rally| rally.mode == RallyMode::AttackMove)
+        && def.weapon.is_some()
+        && def.speed > 0.0
+    {
+        UnitQueuedOrder::AttackMove(rally_target)
+    } else {
+        UnitQueuedOrder::Move(rally_target)
     }
 }
 
@@ -23898,6 +24122,7 @@ fn enqueue_build_action_for_faction(
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
+        | BuildAction::SelectIdleWorker
         | BuildAction::HoldPosition
         | BuildAction::AttackMove
         | BuildAction::Patrol
@@ -23963,6 +24188,7 @@ fn enqueue_build_action_for_faction(
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
+        | BuildAction::SelectIdleWorker
         | BuildAction::HoldPosition
         | BuildAction::AttackMove
         | BuildAction::Patrol
@@ -24192,6 +24418,7 @@ fn has_producer_for_job(
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
+        | BuildAction::SelectIdleWorker
         | BuildAction::HoldPosition
         | BuildAction::AttackMove
         | BuildAction::Patrol
@@ -24210,6 +24437,7 @@ fn build_target_product(action: BuildAction) -> &'static str {
         | BuildAction::RepairStructure
         | BuildAction::ToggleDeployMode
         | BuildAction::SetRallyPoint
+        | BuildAction::SelectIdleWorker
         | BuildAction::HoldPosition
         | BuildAction::AttackMove
         | BuildAction::Patrol
@@ -29299,7 +29527,9 @@ impl NavGrid {
         if self.blocked.is_empty() {
             return true;
         }
-        let steps = (xz_distance(from, to) / (NAV_GRID_CELL_M * 0.5)).ceil().max(1.0) as i32;
+        let steps = (xz_distance(from, to) / (NAV_GRID_CELL_M * 0.5))
+            .ceil()
+            .max(1.0) as i32;
         for i in 0..=steps {
             let t = i as f32 / steps as f32;
             let point = from.lerp(to, t);
@@ -29386,7 +29616,11 @@ impl NavGrid {
                     continue;
                 }
                 // No cutting corners diagonally past a blocked cell.
-                if dx != 0 && dz != 0 && (self.is_blocked(cell.0 + dx, cell.1) || self.is_blocked(cell.0, cell.1 + dz)) {
+                if dx != 0
+                    && dz != 0
+                    && (self.is_blocked(cell.0 + dx, cell.1)
+                        || self.is_blocked(cell.0, cell.1 + dz))
+                {
                     continue;
                 }
                 let tentative = cell_g + step_cost;
@@ -29446,8 +29680,7 @@ fn rebuild_nav_grid(
     mut removed_structures: RemovedComponents<Structure>,
     mut removed_resources: RemovedComponents<ResourceNode>,
 ) {
-    let removed =
-        removed_structures.read().count() + removed_resources.read().count();
+    let removed = removed_structures.read().count() + removed_resources.read().count();
     if grid.version > 0 && added.is_empty() && removed == 0 {
         return;
     }
@@ -32044,11 +32277,11 @@ fn hud_world_input_rects(
     if support_width > 0.0 {
         let right = width - SUPPORT_POWER_PANEL_RIGHT_PX;
         rects.push((
+            Vec2::new((right - support_width).max(0.0), SUPPORT_POWER_PANEL_TOP_PX),
             Vec2::new(
-                (right - support_width).max(0.0),
-                SUPPORT_POWER_PANEL_TOP_PX,
+                right,
+                SUPPORT_POWER_PANEL_TOP_PX + SUPPORT_POWER_PANEL_HEIGHT_PX,
             ),
-            Vec2::new(right, SUPPORT_POWER_PANEL_TOP_PX + SUPPORT_POWER_PANEL_HEIGHT_PX),
         ));
     }
     // Command card (bottom-right): visible command rows + queue rows above them.
@@ -32120,7 +32353,6 @@ fn cursor_is_over_top_status_hud(cursor: Vec2) -> bool {
 fn cursor_blocks_world_order_controls(cursor: Vec2, zones: &HudHitZones) -> bool {
     zones.blocks_world(cursor)
 }
-
 
 fn support_power_panel_width_for_visible_count(visible_count: usize) -> f32 {
     let visible_count = visible_count.min(SupportPowerKind::ALL.len());
@@ -32335,6 +32567,80 @@ mod current_tests {
             desired_rts_cursor_kind(Some(&command_mode), None, &window, &hud_zones),
             RtsCursorKind::Default
         );
+    }
+
+    #[test]
+    fn shift_right_click_queues_unit_waypoints_only_when_allowed() {
+        let existing = OrderQueue {
+            orders: VecDeque::from([UnitQueuedOrder::Move(Vec3::new(1.0, 0.0, 1.0))]),
+        };
+        assert!(
+            should_queue_selected_order(true, true, true, None),
+            "shift + active order should append a waypoint"
+        );
+        assert!(
+            should_queue_selected_order(true, true, false, Some(&existing)),
+            "shift + existing queued orders should append another waypoint"
+        );
+        assert!(
+            !should_queue_selected_order(true, false, true, Some(&existing)),
+            "callers must explicitly allow queueing"
+        );
+        assert!(
+            !should_queue_selected_order(false, true, true, Some(&existing)),
+            "plain right-click should replace the current order"
+        );
+    }
+
+    #[test]
+    fn rally_point_tracks_move_and_attack_move_modes() {
+        let mut rally = RallyPoint {
+            target: None,
+            target_unit: None,
+            mode: RallyMode::Move,
+        };
+        let move_target = Vec3::new(3.0, 0.0, 4.0);
+        assert!(apply_rally_point_command_in_bounds(
+            &mut rally,
+            move_target,
+            None,
+            RallyMode::Move,
+            MapBounds::default(),
+        ));
+        assert_eq!(rally.target, Some(move_target));
+        assert_eq!(rally.mode, RallyMode::Move);
+
+        let attack_target = Vec3::new(8.0, 0.0, -2.0);
+        assert!(apply_rally_point_command_in_bounds(
+            &mut rally,
+            attack_target,
+            None,
+            RallyMode::AttackMove,
+            MapBounds::default(),
+        ));
+        assert_eq!(rally.target, Some(attack_target));
+        assert_eq!(rally.mode, RallyMode::AttackMove);
+    }
+
+    #[test]
+    fn attack_rally_spawns_combat_units_with_attack_move_only() {
+        let target = Vec3::new(6.0, 0.0, -3.0);
+        let rally = RallyPoint {
+            target: Some(target),
+            target_unit: None,
+            mode: RallyMode::AttackMove,
+        };
+        let tank = registry::entity("Tank").expect("tank definition should exist");
+        assert!(matches!(
+            spawned_unit_rally_order(tank, target, Some(rally)),
+            UnitQueuedOrder::AttackMove(destination) if destination == target
+        ));
+
+        let worker = registry::entity("Worker").expect("worker definition should exist");
+        assert!(matches!(
+            spawned_unit_rally_order(worker, target, Some(rally)),
+            UnitQueuedOrder::Move(destination) if destination == target
+        ));
     }
 
     // Allies share vision: an enemy unit standing next to an ally's unit (but far
@@ -33981,7 +34287,10 @@ mod current_tests {
         );
         let push = pair_separation_push(Vec3::ZERO, 0.3, Vec3::ZERO, 0.3)
             .expect("coincident units must still separate");
-        assert!(push.length() > 0.0, "coincident pair gets a deterministic push");
+        assert!(
+            push.length() > 0.0,
+            "coincident pair gets a deterministic push"
+        );
     }
 
     #[test]
@@ -33994,7 +34303,10 @@ mod current_tests {
         grid.rebuild(bounds, &wall);
         let from = Vec3::new(-4.0, 0.0, 0.0);
         let to = Vec3::new(4.0, 0.0, 0.0);
-        assert!(!grid.line_clear(from, to), "wall must block the straight line");
+        assert!(
+            !grid.line_clear(from, to),
+            "wall must block the straight line"
+        );
         let path = grid.find_path(from, to).expect("detour must exist");
         assert!(!path.is_empty());
         let last = *path.last().unwrap();
@@ -34002,7 +34314,10 @@ mod current_tests {
         // Every leg of the pulled path must itself be clear.
         let mut cursor = from;
         for waypoint in &path {
-            assert!(grid.line_clear(cursor, *waypoint), "leg must not cross the wall");
+            assert!(
+                grid.line_clear(cursor, *waypoint),
+                "leg must not cross the wall"
+            );
             cursor = *waypoint;
         }
     }

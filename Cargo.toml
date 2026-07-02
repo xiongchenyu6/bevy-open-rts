@@ -9,7 +9,9 @@ default-run = "bevy-open-rts"
 
 [features]
 default = ["audio"]
-audio = ["bevy/audio", "bevy/wav"]
+# wav for the UI/sfx samples, vorbis for the .ogg unit/announcer voice lines —
+# without vorbis the .ogg voices fail to decode and acknowledgments stay silent.
+audio = ["bevy/audio", "bevy/wav", "bevy/vorbis"]
 webgpu = ["bevy/web", "bevy/webgpu", "bevy/web_asset_cache"]
 
 [dependencies]
