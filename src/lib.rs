@@ -136,6 +136,13 @@ const CONTACT_ACTION_REACHED_TOLERANCE_M: f32 = MOVE_ORDER_REACHED_DISTANCE_M;
 // circles, and the max speed at which overlapping units get pushed apart.
 const UNIT_SEPARATION_GAP_M: f32 = 0.05;
 const UNIT_SEPARATION_MAX_SPEED: f32 = 1.8;
+// A* nav grid: cell size, how much obstacle circles are inflated (typical small
+// unit radius), how close a follower must get to consume a path waypoint, and how
+// far a goal may drift (chasers re-insert MoveOrder every frame) before replanning.
+const NAV_GRID_CELL_M: f32 = 0.5;
+const NAV_OBSTACLE_INFLATE_M: f32 = 0.3;
+const NAV_WAYPOINT_REACHED_M: f32 = 0.35;
+const NAV_REPLAN_GOAL_TOLERANCE_M: f32 = 0.5;
 const ATTACK_MOVE_REACHED_DISTANCE: f32 = 2.0;
 const PATROL_TURN_DISTANCE: f32 = 2.0;
 const SCATTER_DISTANCE: f32 = 4.0;
@@ -225,7 +232,10 @@ const BATTLE_LOG_MAX_ENTRIES: usize = 5;
 const BATTLE_LOG_UNDER_ATTACK_COOLDOWN_SECONDS: f32 = 7.0;
 const BATTLE_LOG_TOP_PX: f32 = 104.0;
 const BATTLE_LOG_WIDTH_PX: f32 = 390.0;
-const BATTLE_LOG_HIT_HEIGHT_PX: f32 = 168.0;
+// Per-row height of the battle-log click/hover hit area; the hit rect scales with
+// the number of visible entries so an EMPTY log never swallows world clicks (it
+// used to be a fixed 168px band across the top-center of the screen).
+const BATTLE_LOG_ROW_HIT_PX: f32 = 34.0;
 const MINIMAP_SIZE_PX: f32 = 158.0;
 // godot anchors the minimap/radar in the bottom-LEFT corner.
 const MINIMAP_LEFT_PX: f32 = 12.0;
@@ -4356,6 +4366,7 @@ fn add_shared_match_resources(app: &mut App) -> &mut App {
     app.init_state::<AppScreen>()
         .init_resource::<Economies>()
         .init_resource::<TeamRelations>()
+        .init_resource::<NavGrid>()
         .init_resource::<BuildQueue>()
         .init_resource::<BuildStructureTab>()
         .init_resource::<NextSpawnId>()
@@ -4711,6 +4722,7 @@ fn update_rts_cursor(
     command_mode: Option<Res<CommandMode>>,
     hovered_resource: Option<Res<HoveredResource>>,
     support_panel: Res<SupportPowerPanelState>,
+    battle_log: Option<Res<BattleLog>>,
     window_q: Query<(Entity, Option<&AppliedRtsCursor>, &Window), With<PrimaryWindow>>,
 ) {
     let Some(cursor_handle) = cursor_handle else {
@@ -4727,6 +4739,7 @@ fn update_rts_cursor(
         hovered_resource.as_deref(),
         window,
         &support_panel,
+        battle_log.as_deref().map_or(0, |log| log.entries.len()),
     )
     .atlas_index();
     if applied.is_some_and(|applied| applied.index == index) {
@@ -4745,8 +4758,9 @@ fn desired_rts_cursor_kind(
     hovered_resource: Option<&HoveredResource>,
     window: &Window,
     support_panel: &SupportPowerPanelState,
+    battle_log_rows: usize,
 ) -> RtsCursorKind {
-    if cursor_is_over_hud(window, support_panel) {
+    if cursor_is_over_hud(window, support_panel, battle_log_rows) {
         return RtsCursorKind::Default;
     }
     let Some(command_mode) = command_mode else {
@@ -6421,6 +6435,12 @@ fn add_runtime_systems(app: &mut App) -> &mut App {
             update_construct_orders
                 .in_set(SimulationPhase::Combat)
                 .run_if(match_in_progress),
+            (
+                rebuild_nav_grid.before(plan_unit_paths),
+                plan_unit_paths.before(move_units),
+            )
+                .in_set(SimulationPhase::Combat)
+                .run_if(match_in_progress),
             move_units
                 .in_set(SimulationPhase::Combat)
                 .run_if(match_in_progress),
@@ -8093,6 +8113,7 @@ struct StructurePlacementInputResources<'w, 's> {
 #[derive(SystemParam)]
 struct StructurePlacementPreviewParams<'w, 's> {
     command_mode: Res<'w, CommandMode>,
+    battle_log: Res<'w, BattleLog>,
     visible_player: Res<'w, VisiblePlayer>,
     player_factions: Res<'w, PlayerFactions>,
     economies: Res<'w, Economies>,
@@ -16640,9 +16661,13 @@ fn structure_placement_input(
         return;
     }
     let pointer = window_q.single().ok().and_then(|window| {
-        (!cursor_is_over_hud(window, &placement.support_power_panel))
-            .then(|| pointer_ground(window, &camera_q))
-            .flatten()
+        (!cursor_is_over_hud(
+            window,
+            &placement.support_power_panel,
+            placement.battle_log.entries.len(),
+        ))
+        .then(|| pointer_ground(window, &camera_q))
+        .flatten()
     });
     let team = placement.visible_player.team;
     let faction = placement.player_factions.slot_faction(team);
@@ -17335,6 +17360,7 @@ fn select_entities(
     visible_player: Res<VisiblePlayer>,
     mut command_mode: ResMut<CommandMode>,
     support_panel: Res<SupportPowerPanelState>,
+    battle_log: Res<BattleLog>,
     window_q: Query<&Window, With<PrimaryWindow>>,
     camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     mut drag_state: ResMut<SelectionDragState>,
@@ -17376,14 +17402,15 @@ fn select_entities(
     disarm_support_power_on_left_click(
         &mut command_mode,
         &mouse,
-        cursor_is_over_hud(window, &support_panel),
+        cursor_is_over_hud(window, &support_panel, battle_log.entries.len()),
     );
 
     if mouse.just_pressed(MouseButton::Left) {
         drag_state.active = true;
         drag_state.dragging = false;
         drag_state.start = cursor;
-        drag_state.started_in_hud = cursor_is_over_hud(window, &support_panel);
+        drag_state.started_in_hud =
+            cursor_is_over_hud(window, &support_panel, battle_log.entries.len());
         if selection_drag_should_interrupt(&drag_state, cursor, window_size(window)) {
             cancel_selection_drag(&mut drag_state);
         }
@@ -17408,6 +17435,9 @@ fn select_entities(
     }
 
     if drag_state.started_in_hud {
+        if std::env::var_os("RTS_SELECT_DIAG").is_some() {
+            eprintln!("[select-diag] click swallowed: started_in_hud at {cursor:?}");
+        }
         drag_state.active = false;
         drag_state.dragging = false;
         return;
@@ -17467,10 +17497,16 @@ fn select_entities(
     }
 
     let Some(point) = pointer_ground(window, &camera_q) else {
+        if std::env::var_os("RTS_SELECT_DIAG").is_some() {
+            eprintln!("[select-diag] pointer_ground=None at {cursor:?}");
+        }
         drag_state.active = false;
         drag_state.dragging = false;
         return;
     };
+    if std::env::var_os("RTS_SELECT_DIAG").is_some() {
+        eprintln!("[select-diag] click at {cursor:?} ground=({:.2},{:.2})", point.x, point.z);
+    }
     let Ok((camera, camera_transform)) = camera_q.single() else {
         drag_state.active = false;
         drag_state.dragging = false;
@@ -17526,6 +17562,16 @@ fn select_entities(
         // Ground-proximity fallback only for non-resource units (resources rely on
         // the model-capsule test; their ground raycast lands behind the crystal).
         let ground_pick = resource_node.is_none() && ground_distance <= selectable.radius + 0.35;
+        if std::env::var_os("RTS_SELECT_DIAG").is_some()
+            && unit.is_some()
+            && ground_distance < 3.0
+        {
+            eprintln!(
+                "[select-diag] cand unit={:?} vis={} gdist={ground_distance:.2} sdist={screen_distance:?} gpick={ground_pick} spick={screen_pick}",
+                unit.map(|u| u.id),
+                visibility.visible
+            );
+        }
         let distance = screen_distance.unwrap_or(ground_distance * 64.0);
         if (ground_pick || screen_pick) && distance < nearest_distance {
             nearest = Some((
@@ -17788,7 +17834,18 @@ fn issue_orders(
     let Some(cursor) = window.cursor_position() else {
         return;
     };
-    if cursor_blocks_world_order_controls(window, cursor, &support_panel) {
+    if cursor_blocks_world_order_controls(
+        window,
+        cursor,
+        &support_panel,
+        order_resources.battle_log.entries.len(),
+    ) {
+        if std::env::var_os("RTS_SELECT_DIAG").is_some() {
+            eprintln!(
+                "[select-diag] right-click swallowed by HUD at {cursor:?} (log_rows={})",
+                order_resources.battle_log.entries.len()
+            );
+        }
         return;
     }
     let Some(raw_point) = pointer_ground(window, &camera_q) else {
@@ -28781,6 +28838,7 @@ fn move_units(
             &Selectable,
             &mut Transform,
             &MoveOrder,
+            Option<&mut PlannedPath>,
             Option<&ChronoRelay>,
             Option<&EmpDisabled>,
             &Health,
@@ -28848,8 +28906,19 @@ fn move_units(
     let mut crush_events = Vec::new();
     {
         let mut movers = unit_queries.p0();
-        for (entity, team, unit, domain, selectable, mut transform, order, chrono, emp, health) in
-            &mut movers
+        for (
+            entity,
+            team,
+            unit,
+            domain,
+            selectable,
+            mut transform,
+            order,
+            mut planned_path,
+            chrono,
+            emp,
+            health,
+        ) in &mut movers
         {
             if health.current <= 0.0 || emp.is_some_and(|emp| emp.remaining > 0.0) {
                 continue;
@@ -28859,6 +28928,21 @@ fn move_units(
                 continue;
             }
             let mut target = order.target;
+            // Follow the A* waypoints while any remain; the final leg goes straight
+            // to the order target.
+            if let Some(path) = planned_path.as_mut() {
+                while path.next < path.waypoints.len()
+                    && xz_distance(transform.translation, path.waypoints[path.next])
+                        < NAV_WAYPOINT_REACHED_M
+                {
+                    path.next += 1;
+                }
+                if path.next < path.waypoints.len() {
+                    target = path.waypoints[path.next];
+                } else {
+                    commands.entity(entity).try_remove::<PlannedPath>();
+                }
+            }
             target.y = transform.translation.y;
             let delta = target - transform.translation;
             let distance = delta.length();
@@ -29155,6 +29239,284 @@ fn separate_units(
             continue;
         }
         transform.translation = candidate;
+    }
+}
+
+/// Coarse walkability grid over the map, rebuilt when structures/resource nodes
+/// change. Powers A* paths for terrain units whose straight line is blocked; godot
+/// gets the same from NavigationServer's navmesh.
+#[derive(Resource, Default)]
+struct NavGrid {
+    version: u64,
+    origin_x: f32,
+    origin_z: f32,
+    width: i32,
+    height: i32,
+    blocked: Vec<bool>,
+}
+
+impl NavGrid {
+    fn rebuild(&mut self, bounds: MapBounds, obstacles: &[(Vec3, f32)]) {
+        self.origin_x = -bounds.half_width;
+        self.origin_z = -bounds.half_depth;
+        self.width = ((bounds.half_width * 2.0) / NAV_GRID_CELL_M).ceil() as i32;
+        self.height = ((bounds.half_depth * 2.0) / NAV_GRID_CELL_M).ceil() as i32;
+        self.blocked = vec![false; (self.width * self.height).max(0) as usize];
+        for &(position, radius) in obstacles {
+            let reach = radius + NAV_OBSTACLE_INFLATE_M;
+            let min_x = (((position.x - reach) - self.origin_x) / NAV_GRID_CELL_M).floor() as i32;
+            let max_x = (((position.x + reach) - self.origin_x) / NAV_GRID_CELL_M).ceil() as i32;
+            let min_z = (((position.z - reach) - self.origin_z) / NAV_GRID_CELL_M).floor() as i32;
+            let max_z = (((position.z + reach) - self.origin_z) / NAV_GRID_CELL_M).ceil() as i32;
+            for cz in min_z.max(0)..=max_z.min(self.height - 1) {
+                for cx in min_x.max(0)..=max_x.min(self.width - 1) {
+                    let center = self.cell_center(cx, cz);
+                    let dx = center.x - position.x;
+                    let dz = center.z - position.z;
+                    if dx * dx + dz * dz < reach * reach {
+                        self.blocked[(cz * self.width + cx) as usize] = true;
+                    }
+                }
+            }
+        }
+        self.version += 1;
+    }
+
+    fn cell_of(&self, position: Vec3) -> (i32, i32) {
+        (
+            (((position.x - self.origin_x) / NAV_GRID_CELL_M) as i32).clamp(0, self.width - 1),
+            (((position.z - self.origin_z) / NAV_GRID_CELL_M) as i32).clamp(0, self.height - 1),
+        )
+    }
+
+    fn cell_center(&self, cx: i32, cz: i32) -> Vec3 {
+        Vec3::new(
+            self.origin_x + (cx as f32 + 0.5) * NAV_GRID_CELL_M,
+            0.0,
+            self.origin_z + (cz as f32 + 0.5) * NAV_GRID_CELL_M,
+        )
+    }
+
+    fn is_blocked(&self, cx: i32, cz: i32) -> bool {
+        if cx < 0 || cz < 0 || cx >= self.width || cz >= self.height {
+            return true;
+        }
+        self.blocked[(cz * self.width + cx) as usize]
+    }
+
+    /// Supercover walk of the segment: true when no blocked cell is crossed.
+    fn line_clear(&self, from: Vec3, to: Vec3) -> bool {
+        if self.blocked.is_empty() {
+            return true;
+        }
+        let steps = (xz_distance(from, to) / (NAV_GRID_CELL_M * 0.5)).ceil().max(1.0) as i32;
+        for i in 0..=steps {
+            let t = i as f32 / steps as f32;
+            let point = from.lerp(to, t);
+            let (cx, cz) = self.cell_of(point);
+            if self.is_blocked(cx, cz) {
+                return false;
+            }
+        }
+        true
+    }
+
+    /// Nearest walkable cell to `cell`, spiralling outward (targets inside a base
+    /// footprint resolve to its edge instead of failing).
+    fn nearest_open_cell(&self, cell: (i32, i32)) -> Option<(i32, i32)> {
+        if !self.is_blocked(cell.0, cell.1) {
+            return Some(cell);
+        }
+        for ring in 1i32..=12 {
+            let mut best: Option<((i32, i32), i32)> = None;
+            for dz in -ring..=ring {
+                for dx in -ring..=ring {
+                    if dx.abs() != ring && dz.abs() != ring {
+                        continue;
+                    }
+                    let candidate = (cell.0 + dx, cell.1 + dz);
+                    if !self.is_blocked(candidate.0, candidate.1) {
+                        let dist = dx * dx + dz * dz;
+                        if best.is_none_or(|(_, d)| dist < d) {
+                            best = Some((candidate, dist));
+                        }
+                    }
+                }
+            }
+            if let Some((found, _)) = best {
+                return Some(found);
+            }
+        }
+        None
+    }
+
+    /// A* over the grid (8-directional, no corner cutting), then string-pulled into
+    /// a short waypoint list (world positions). `None` when unreachable.
+    fn find_path(&self, from: Vec3, to: Vec3) -> Option<Vec<Vec3>> {
+        if self.blocked.is_empty() {
+            return None;
+        }
+        let start = self.nearest_open_cell(self.cell_of(from))?;
+        let goal = self.nearest_open_cell(self.cell_of(to))?;
+        if start == goal {
+            return Some(vec![self.cell_center(goal.0, goal.1)]);
+        }
+        let index = |c: (i32, i32)| (c.1 * self.width + c.0) as usize;
+        let octile = |a: (i32, i32), b: (i32, i32)| {
+            let dx = (a.0 - b.0).abs() as f32;
+            let dz = (a.1 - b.1).abs() as f32;
+            dx.max(dz) + 0.414 * dx.min(dz)
+        };
+        let mut open = std::collections::BinaryHeap::new();
+        let mut g_cost = vec![f32::INFINITY; self.blocked.len()];
+        let mut came_from = vec![u32::MAX; self.blocked.len()];
+        g_cost[index(start)] = 0.0;
+        // BinaryHeap is a max-heap: store negated f-cost scaled to an integer key.
+        let key = |f: f32| -((f * 1024.0) as i64);
+        open.push((key(octile(start, goal)), start));
+        let mut reached = false;
+        while let Some((_, cell)) = open.pop() {
+            if cell == goal {
+                reached = true;
+                break;
+            }
+            let cell_g = g_cost[index(cell)];
+            for (dx, dz, step_cost) in [
+                (1i32, 0i32, 1.0f32),
+                (-1, 0, 1.0),
+                (0, 1, 1.0),
+                (0, -1, 1.0),
+                (1, 1, 1.414),
+                (1, -1, 1.414),
+                (-1, 1, 1.414),
+                (-1, -1, 1.414),
+            ] {
+                let next = (cell.0 + dx, cell.1 + dz);
+                if self.is_blocked(next.0, next.1) {
+                    continue;
+                }
+                // No cutting corners diagonally past a blocked cell.
+                if dx != 0 && dz != 0 && (self.is_blocked(cell.0 + dx, cell.1) || self.is_blocked(cell.0, cell.1 + dz)) {
+                    continue;
+                }
+                let tentative = cell_g + step_cost;
+                if tentative < g_cost[index(next)] {
+                    g_cost[index(next)] = tentative;
+                    came_from[index(next)] = index(cell) as u32;
+                    open.push((key(tentative + octile(next, goal)), next));
+                }
+            }
+        }
+        if !reached {
+            return None;
+        }
+        let mut cells = vec![goal];
+        let mut cursor = index(goal);
+        while came_from[cursor] != u32::MAX {
+            cursor = came_from[cursor] as usize;
+            cells.push((cursor as i32 % self.width, cursor as i32 / self.width));
+        }
+        cells.reverse();
+        // String pull: keep only waypoints that break line of sight.
+        let world: Vec<Vec3> = cells.iter().map(|&(x, z)| self.cell_center(x, z)).collect();
+        let mut waypoints = Vec::new();
+        let mut anchor = 0usize;
+        while anchor + 1 < world.len() {
+            let mut furthest = anchor + 1;
+            for probe in (anchor + 1..world.len()).rev() {
+                if self.line_clear(world[anchor], world[probe]) {
+                    furthest = probe;
+                    break;
+                }
+            }
+            waypoints.push(world[furthest]);
+            anchor = furthest;
+        }
+        Some(waypoints)
+    }
+}
+
+/// The A* waypoints a terrain unit is currently following toward `goal`.
+#[derive(Component)]
+struct PlannedPath {
+    goal: Vec3,
+    waypoints: Vec<Vec3>,
+    next: usize,
+}
+
+/// Rebuilds the nav grid when structures/resource nodes appear or disappear.
+fn rebuild_nav_grid(
+    map_bounds: Res<MapBounds>,
+    mut grid: ResMut<NavGrid>,
+    obstacles: Query<
+        (&Transform, &Selectable, Option<&Health>),
+        (Or<(With<Structure>, With<ResourceNode>)>, Without<Unit>),
+    >,
+    added: Query<(), Or<(Added<Structure>, Added<ResourceNode>)>>,
+    mut removed_structures: RemovedComponents<Structure>,
+    mut removed_resources: RemovedComponents<ResourceNode>,
+) {
+    let removed =
+        removed_structures.read().count() + removed_resources.read().count();
+    if grid.version > 0 && added.is_empty() && removed == 0 {
+        return;
+    }
+    let snapshot: Vec<(Vec3, f32)> = obstacles
+        .iter()
+        .filter(|(_, _, health)| !health.is_some_and(|health| health.current <= 0.0))
+        .map(|(transform, selectable, _)| (transform.translation, selectable.radius))
+        .collect();
+    grid.rebuild(*map_bounds, &snapshot);
+}
+
+/// Gives terrain units whose straight line to the MoveOrder target is blocked an
+/// A* path; direct movers keep no path. Chasers re-insert MoveOrder every frame,
+/// so an existing path whose goal barely moved is kept as-is.
+fn plan_unit_paths(
+    mut commands: Commands,
+    grid: Res<NavGrid>,
+    changed: Query<
+        (
+            Entity,
+            &Transform,
+            &MoveOrder,
+            &MovementDomain,
+            Option<&PlannedPath>,
+        ),
+        Changed<MoveOrder>,
+    >,
+    stale: Query<Entity, (With<PlannedPath>, Without<MoveOrder>)>,
+) {
+    for entity in &stale {
+        commands.entity(entity).try_remove::<PlannedPath>();
+    }
+    for (entity, transform, order, domain, existing) in &changed {
+        if *domain != MovementDomain::Terrain {
+            continue;
+        }
+        if let Some(path) = existing {
+            if xz_distance(path.goal, order.target) < NAV_REPLAN_GOAL_TOLERANCE_M {
+                continue;
+            }
+        }
+        if grid.line_clear(transform.translation, order.target) {
+            if existing.is_some() {
+                commands.entity(entity).try_remove::<PlannedPath>();
+            }
+            continue;
+        }
+        match grid.find_path(transform.translation, order.target) {
+            Some(waypoints) if !waypoints.is_empty() => {
+                commands.entity(entity).insert(PlannedPath {
+                    goal: order.target,
+                    waypoints,
+                    next: 0,
+                });
+            }
+            _ => {
+                commands.entity(entity).try_remove::<PlannedPath>();
+            }
+        }
     }
 }
 
@@ -30869,9 +31231,13 @@ fn draw_world_overlays(
     if let Some(pending) = placement_preview.command_mode.pending_structure_placement
         && let Ok(window) = placement_preview.window_q.single()
         && let Some(point) = pending.position.or_else(|| {
-            (!cursor_is_over_hud(window, &placement_preview.support_power_panel))
-                .then(|| pointer_ground(window, &placement_preview.camera_q))
-                .flatten()
+            (!cursor_is_over_hud(
+                window,
+                &placement_preview.support_power_panel,
+                placement_preview.battle_log.entries.len(),
+            ))
+            .then(|| pointer_ground(window, &placement_preview.camera_q))
+            .flatten()
         })
     {
         draw_structure_placement_preview(
@@ -31644,14 +32010,18 @@ fn validated_terrain_target_in_bounds(point: Vec3, bounds: MapBounds) -> Option<
     Some(bounds.clamp_ground_point(Vec3::new(point.x, 0.0, point.z), 0.0))
 }
 
-fn cursor_is_over_hud(window: &Window, support_panel: &SupportPowerPanelState) -> bool {
+fn cursor_is_over_hud(
+    window: &Window,
+    support_panel: &SupportPowerPanelState,
+    battle_log_rows: usize,
+) -> bool {
     let Some(cursor) = window.cursor_position() else {
         return false;
     };
     cursor_is_over_top_status_hud(cursor)
         || cursor.y > window.height() - 148.0
         || support_power_panel_contains_cursor(window, cursor, support_panel.visible_count)
-        || battle_log_contains_cursor(window, cursor)
+        || battle_log_contains_cursor(window, cursor, battle_log_rows)
         || minimap_contains_cursor(window, cursor)
 }
 
@@ -31663,21 +32033,28 @@ fn cursor_blocks_world_order_controls(
     window: &Window,
     cursor: Vec2,
     support_panel: &SupportPowerPanelState,
+    battle_log_rows: usize,
 ) -> bool {
     cursor.y > window.height() - 148.0
         || support_power_panel_contains_cursor(window, cursor, support_panel.visible_count)
-        || battle_log_contains_cursor(window, cursor)
+        || battle_log_contains_cursor(window, cursor, battle_log_rows)
         || minimap_contains_cursor(window, cursor)
 }
 
 /// Hit rect helpers for HUD areas that should consume world and camera input.
-fn battle_log_contains_cursor(window: &Window, cursor: Vec2) -> bool {
+/// The battle log rect scales with the visible entry count — an empty log must
+/// never swallow clicks in the top-center of the world.
+fn battle_log_contains_cursor(window: &Window, cursor: Vec2, visible_rows: usize) -> bool {
+    if visible_rows == 0 {
+        return false;
+    }
     // Battle log is centered along the top (see setup_ui), so the hit rect is too.
     let min_x = (window.width() - BATTLE_LOG_WIDTH_PX) * 0.5;
+    let height = visible_rows.min(BATTLE_LOG_MAX_ENTRIES) as f32 * BATTLE_LOG_ROW_HIT_PX;
     cursor.x >= min_x
         && cursor.x <= min_x + BATTLE_LOG_WIDTH_PX
         && cursor.y >= BATTLE_LOG_TOP_PX
-        && cursor.y <= BATTLE_LOG_TOP_PX + BATTLE_LOG_HIT_HEIGHT_PX
+        && cursor.y <= BATTLE_LOG_TOP_PX + height
 }
 
 fn support_power_panel_width_for_visible_count(visible_count: usize) -> f32 {
@@ -31869,13 +32246,13 @@ mod current_tests {
         let mut command_mode = CommandMode::default();
         let support_panel = SupportPowerPanelState::default();
         assert_eq!(
-            desired_rts_cursor_kind(Some(&command_mode), None, &window, &support_panel),
+            desired_rts_cursor_kind(Some(&command_mode), None, &window, &support_panel, 0),
             RtsCursorKind::Default
         );
 
         command_mode.attack_move = true;
         assert_eq!(
-            desired_rts_cursor_kind(Some(&command_mode), None, &window, &support_panel),
+            desired_rts_cursor_kind(Some(&command_mode), None, &window, &support_panel, 0),
             RtsCursorKind::Attack
         );
 
@@ -31883,13 +32260,13 @@ mod current_tests {
         command_mode.pending_structure_placement =
             Some(PendingStructurePlacement::new("CommandCenter"));
         assert_eq!(
-            desired_rts_cursor_kind(Some(&command_mode), None, &window, &support_panel),
+            desired_rts_cursor_kind(Some(&command_mode), None, &window, &support_panel, 0),
             RtsCursorKind::Build
         );
 
         window.set_cursor_position(Some(Vec2::new(640.0, 10.0)));
         assert_eq!(
-            desired_rts_cursor_kind(Some(&command_mode), None, &window, &support_panel),
+            desired_rts_cursor_kind(Some(&command_mode), None, &window, &support_panel, 0),
             RtsCursorKind::Default
         );
     }
@@ -32016,7 +32393,8 @@ mod current_tests {
         window.set_cursor_position(Some(Vec2::new(640.0, 10.0)));
         assert!(cursor_is_over_hud(
             &window,
-            &SupportPowerPanelState::default()
+            &SupportPowerPanelState::default(),
+            0
         ));
         assert_eq!(
             effective_camera_edge_pan_width(
@@ -32215,7 +32593,8 @@ mod current_tests {
         window.set_cursor_position(Some(inside));
         assert!(cursor_is_over_hud(
             &window,
-            &SupportPowerPanelState { visible_count: 3 }
+            &SupportPowerPanelState { visible_count: 3 },
+            0
         ));
 
         let left_of_panel = Vec2::new(
@@ -32234,7 +32613,8 @@ mod current_tests {
             !cursor_blocks_world_order_controls(
                 &window,
                 left_of_panel,
-                &SupportPowerPanelState { visible_count: 3 }
+                &SupportPowerPanelState { visible_count: 3 },
+                0
             ),
             "support panel hit rect should not consume the whole top strip"
         );
@@ -33546,5 +33926,52 @@ mod current_tests {
         let push = pair_separation_push(Vec3::ZERO, 0.3, Vec3::ZERO, 0.3)
             .expect("coincident units must still separate");
         assert!(push.length() > 0.0, "coincident pair gets a deterministic push");
+    }
+
+    #[test]
+    fn nav_grid_routes_around_a_wall() {
+        let mut grid = NavGrid::default();
+        // 10x10m map with a 3m-radius blocker in the middle: a straight crossing is
+        // blocked, A* must find a detour and string-pull it into few waypoints.
+        let bounds = MapBounds::from_size((10.0, 10.0));
+        let wall = vec![(Vec3::ZERO, 1.5)];
+        grid.rebuild(bounds, &wall);
+        let from = Vec3::new(-4.0, 0.0, 0.0);
+        let to = Vec3::new(4.0, 0.0, 0.0);
+        assert!(!grid.line_clear(from, to), "wall must block the straight line");
+        let path = grid.find_path(from, to).expect("detour must exist");
+        assert!(!path.is_empty());
+        let last = *path.last().unwrap();
+        assert!(xz_distance(last, to) < 1.0, "path must end near the goal");
+        // Every leg of the pulled path must itself be clear.
+        let mut cursor = from;
+        for waypoint in &path {
+            assert!(grid.line_clear(cursor, *waypoint), "leg must not cross the wall");
+            cursor = *waypoint;
+        }
+    }
+
+    #[test]
+    fn nav_grid_open_map_needs_no_path() {
+        let mut grid = NavGrid::default();
+        grid.rebuild(MapBounds::from_size((10.0, 10.0)), &[]);
+        assert!(grid.line_clear(Vec3::new(-4.0, 0.0, -4.0), Vec3::new(4.0, 0.0, 4.0)));
+    }
+
+    #[test]
+    fn empty_battle_log_does_not_swallow_world_clicks() {
+        let window = Window {
+            resolution: WindowResolution::new(1280, 720),
+            ..default()
+        };
+        // Mid-screen point inside the old fixed battle-log band (the harvest
+        // harness clicked (619, 170) and lost the worker selection to it).
+        let point = Vec2::new(619.0, 170.0);
+        assert!(!battle_log_contains_cursor(&window, point, 0));
+        assert!(battle_log_contains_cursor(&window, point, 2));
+        assert!(
+            !battle_log_contains_cursor(&window, Vec2::new(619.0, 300.0), BATTLE_LOG_MAX_ENTRIES),
+            "hit rect must stay proportional to visible rows"
+        );
     }
 }

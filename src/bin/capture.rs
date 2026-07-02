@@ -530,6 +530,16 @@ fn render_harvest(dir: &Path) -> Result<(), String> {
     for _ in 0..3 {
         app.update();
     }
+    if let Some(now) = capture_player_worker_position(&mut app) {
+        eprintln!(
+            "[capture][diag] worker drift since click target: {:.3}m (was {:.2},{:.2} now {:.2},{:.2})",
+            ((now.x - worker.x).powi(2) + (now.z - worker.z).powi(2)).sqrt(),
+            worker.x,
+            worker.z,
+            now.x,
+            now.z
+        );
+    }
     let selected_ids = capture_selected_player_unit_ids(&mut app);
     println!(
         "[capture] selected {} player unit(s): {}",
