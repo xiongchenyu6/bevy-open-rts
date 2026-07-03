@@ -51,7 +51,7 @@ use bevy_open_rts::{
     capture_set_cursor, capture_set_structure_rally, capture_show_campaign_menu,
     capture_show_credits_menu, capture_show_main_menu, capture_show_options_menu,
     capture_show_skirmish_setup_menu, capture_show_skirmish_setup_with_dropdown,
-    capture_spawn_model_harness_page, capture_world_to_screen,
+    capture_spawn_construction_showcase, capture_spawn_model_harness_page, capture_world_to_screen,
     capture_worst_model_alignment_offset, capture_zoom_camera_closest,
     start_shared_match_scene_with_current_setup,
 };
@@ -227,6 +227,13 @@ fn main() {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("screenshots/base/base.png"));
             render_base_selection(&path)
+        }
+        Some("construction") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/construction/construction.png"));
+            render_construction_showcase(&path)
         }
         Some("resources") => {
             let path = args
@@ -1296,6 +1303,34 @@ fn render_still(path: &Path) -> Result<(), String> {
 /// it framed, so the selection brackets can be eyeballed against the building.
 /// Also asserts the brackets' anchor (entity origin) sits on the building's
 /// visible center — the bug the user reported was an offset between the two.
+fn render_construction_showcase(path: &Path) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let mut app = start_match_app();
+    if let Some(mut briefing) = app.world_mut().get_resource_mut::<MatchBriefingState>() {
+        briefing.dismiss();
+    }
+    let (_, origin, _) =
+        capture_player_command_center(&mut app).ok_or("no player command center found")?;
+    capture_spawn_construction_showcase(&mut app, origin);
+    let focus = origin + bevy::prelude::Vec3::new(0.0, 0.0, 13.0);
+    capture_focus_camera_on(&mut app, focus);
+    capture_zoom_camera_closest(&mut app);
+    for _ in 0..30 {
+        app.update();
+    }
+    let handle = capture_handle(&app);
+    app.world_mut()
+        .spawn(Screenshot::image(handle))
+        .observe(save_to_disk(path.to_path_buf()));
+    for _ in 0..FLUSH_TICKS {
+        app.update();
+    }
+    println!("[capture] wrote {}", path.display());
+    Ok(())
+}
+
 fn render_base_selection(path: &Path) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;

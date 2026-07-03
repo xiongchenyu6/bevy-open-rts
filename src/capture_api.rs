@@ -767,6 +767,45 @@ pub fn capture_onscreen_resource_model_center(app: &mut App) -> Option<(Entity, 
 /// The player's command-center entity, its origin (where selection brackets are
 /// drawn) and its GLB visual center (where the building is actually drawn). Used
 /// by the `base` capture to confirm the brackets overlay the building.
+/// Spawns a row of same-type structures frozen at increasing construction
+/// progress next to the player base, so a capture can show the emergence
+/// animation stages side by side.
+pub fn capture_spawn_construction_showcase(app: &mut App, origin: Vec3) {
+    let world = app.world_mut();
+    let team = Team::Player(0);
+    let mut spawned = Vec::new();
+    {
+        let asset_server = world.resource::<AssetServer>().clone();
+        let mut next_id = std::mem::take(world.resource_mut::<NextSpawnId>().as_mut());
+        let mut commands = world.commands();
+        for (index, progress) in [0.1f32, 0.45, 0.8].into_iter().enumerate() {
+            let position = origin + Vec3::new(-7.0 + index as f32 * 7.0, 0.0, 13.0);
+            let entity = spawn_structure_under_construction_with_visual_faction(
+                &mut commands,
+                &asset_server,
+                &mut next_id,
+                "Barracks",
+                team,
+                position,
+                None,
+                0.0,
+                team,
+                Some(SkirmishFaction::from_team(team)),
+            );
+            spawned.push((entity, progress));
+        }
+        *world.resource_mut::<NextSpawnId>() = next_id;
+    }
+    world.flush();
+    for (entity, progress) in spawned {
+        if let Some(mut under) = world.entity_mut(entity).get_mut::<UnderConstruction>() {
+            let total = 10.0;
+            under.total = total;
+            under.remaining = total * (1.0 - progress);
+        }
+    }
+}
+
 pub fn capture_player_command_center(app: &mut App) -> Option<(Entity, Vec3, Vec3)> {
     let (children_map, aabb_map, model_roots) = capture_world_geometry_maps(app);
     let player = Team::Player(0);

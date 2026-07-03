@@ -19,6 +19,10 @@ domains live in modules, each re-exported into the crate root
   idle-worker cycling, pointer→terrain helpers.
 - `src/command_card.rs` — command-card action grid: labels/icons/hotkeys/
   tooltips/availability, shortcuts, action execution, queue buttons.
+- `src/fog.rs` — fog of war: visibility state, shroud overlay, fog memory.
+- `src/match_screens.rs` — match briefing card + match-end overlay.
+- `src/combat_vfx.rs` — shot pulses, impact bursts, wreckage, structure
+  destruction, veterancy promotion effects.
 - `src/camera.rs` — RtsCamera state, bevy_rts_camera bridge, settings, bookmarks.
 - `src/audio.rs` — unit/announcer voices, sfx kinds, AudioFeedback queue + playback.
 - `src/menu.rs` — front menu, options, credits, skirmish lobby + widgets.
