@@ -13,6 +13,12 @@ domains live in modules, each re-exported into the crate root
 - `src/support_powers.rs` — support powers (F1–F9): kinds/cooldowns, activation
   + targeting, HUD panel/buttons/tooltips, AI power usage.
 - `src/match_tests.rs` — headless match-flow integration tests (cfg(test)).
+- `src/spawn.rs` — entity spawning: team startup, unit/structure spawn entry
+  points, model assembly, placement wrappers, paradrop spawning.
+- `src/selection.rs` — click/box select, control groups, Tab subgroups,
+  idle-worker cycling, pointer→terrain helpers.
+- `src/command_card.rs` — command-card action grid: labels/icons/hotkeys/
+  tooltips/availability, shortcuts, action execution, queue buttons.
 - `src/camera.rs` — RtsCamera state, bevy_rts_camera bridge, settings, bookmarks.
 - `src/audio.rs` — unit/announcer voices, sfx kinds, AudioFeedback queue + playback.
 - `src/menu.rs` — front menu, options, credits, skirmish lobby + widgets.
@@ -24,8 +30,8 @@ domains live in modules, each re-exported into the crate root
   in-match AI systems (repair/scouting/garrisons/capture/saboteur), profiles,
   target scoring, support-power defs.
 - `src/production.rs` — build queue/training, construction, manual placement.
-- `src/orders.rs` — selection, command-card action logic, unit orders + queue,
-  rally points, control groups, idle-worker cycling.
+- `src/orders.rs` — unit orders + order queue, rally points, targeting modes,
+  per-order-type update systems.
 - `src/combat.rs` — combat/chase/movement systems, weapons/health, crushing,
   mines, wreckage, veterancy, auras/shields/EMP, combat VFX.
 - `src/terrain.rs` — real elevation: per-map plateau/ramp specs sampled into a
