@@ -43,6 +43,8 @@ mod fog;
 pub(crate) use fog::*;
 mod match_screens;
 pub(crate) use match_screens::*;
+mod placement_ghost;
+pub(crate) use placement_ghost::*;
 mod combat_vfx;
 pub(crate) use combat_vfx::*;
 mod save;
@@ -2339,6 +2341,7 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<ActiveMission>()
         .init_resource::<TerrainHeightField>()
         .init_resource::<TeamColorMaterials>()
+        .init_resource::<PlacementGhost>()
         .init_resource::<MissionTriggerState>()
         .init_resource::<BuildQueue>()
         .init_resource::<BuildStructureTab>()
@@ -2866,7 +2869,12 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
     );
     app.add_systems(
         Update,
-        structure_placement_input
+        (
+            structure_placement_input,
+            compute_placement_ghost.after(structure_placement_input),
+            apply_placement_ghost_transform.after(compute_placement_ghost),
+            tint_placement_ghost.after(apply_placement_ghost_transform),
+        )
             .in_set(SimulationPhase::UiAndManagement)
             .run_if(match_in_progress),
     );

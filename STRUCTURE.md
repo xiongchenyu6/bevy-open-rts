@@ -21,6 +21,8 @@ domains live in modules, each re-exported into the crate root
   tooltips/availability, shortcuts, action execution, queue buttons.
 - `src/fog.rs` — fog of war: visibility state, shroud overlay, fog memory.
 - `src/match_screens.rs` — match briefing card + match-end overlay.
+- `src/placement_ghost.rs` — structure placement preview: a translucent green/
+  red ghost of the actual building follows the cursor before you commit.
 - `src/combat_vfx.rs` — shot pulses, impact bursts, wreckage, structure
   destruction, veterancy promotion effects.
 - `src/camera.rs` — RtsCamera state, bevy_rts_camera bridge, settings, bookmarks.

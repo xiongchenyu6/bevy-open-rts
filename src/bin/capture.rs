@@ -221,6 +221,13 @@ fn main() {
             _ => Err("ai-duel needs <difficultyA> <difficultyB> [max-seconds]".into()),
         },
         Some("verify") => verify_click_alignment(),
+        Some("placement") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/placement/placement.png"));
+            render_placement_ghost(&path)
+        }
         Some("base") => {
             let path = args
                 .next()
@@ -1318,6 +1325,87 @@ fn render_construction_showcase(path: &Path) -> Result<(), String> {
     for _ in 0..30 {
         app.update();
     }
+    let handle = capture_handle(&app);
+    app.world_mut()
+        .spawn(Screenshot::image(handle))
+        .observe(save_to_disk(path.to_path_buf()));
+    for _ in 0..FLUSH_TICKS {
+        app.update();
+    }
+    println!("[capture] wrote {}", path.display());
+    Ok(())
+}
+
+fn render_placement_ghost(path: &Path) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let mut app = start_match_app();
+    let Some(worker_anchor) = capture_player_worker_position(&mut app) else {
+        return Err("no player worker to build from".into());
+    };
+    capture_focus_camera_on(&mut app, worker_anchor);
+    for _ in 0..14 {
+        app.update();
+    }
+    let Some(worker_pos) = capture_player_onscreen_worker_position(&mut app) else {
+        return Err("worker is not on screen".into());
+    };
+    // Select the worker via a real left-click.
+    let Some(screen) = capture_world_to_screen(&mut app, worker_pos) else {
+        return Err("worker has no screen position".into());
+    };
+    capture_set_cursor(&mut app, screen);
+    capture_mouse_button(&mut app, MouseButton::Left, true);
+    app.update();
+    capture_mouse_button(&mut app, MouseButton::Left, false);
+    for _ in 0..5 {
+        app.update();
+    }
+    let Some(key) = capture_first_enabled_build_hotkey(&mut app) else {
+        return Err("no enabled build option for the worker".into());
+    };
+    capture_key(&mut app, key, true);
+    app.update();
+    capture_key(&mut app, key, false);
+    for _ in 0..4 {
+        app.update();
+    }
+    if !capture_player_in_placement_mode(&mut app) {
+        return Err("failed to enter structure placement mode".into());
+    }
+    // Frame open ground beside the worker, then scan for a VALID spot so the
+    // ghost renders green (camera stays put after this so the cursor ray holds).
+    let ghost_spot = worker_pos + bevy::prelude::Vec3::new(4.5, 0.0, 3.0);
+    capture_focus_camera_on(&mut app, ghost_spot);
+    for _ in 0..16 {
+        app.update();
+    }
+    let mut parked = false;
+    'scan: for radius in [3.0_f32, 4.0, 5.0, 2.0, 6.0] {
+        for step in 0..16 {
+            let angle = step as f32 * std::f32::consts::TAU / 16.0;
+            let candidate = worker_pos
+                + bevy::prelude::Vec3::new(angle.cos() * radius, 0.0, angle.sin() * radius);
+            let Some(screen) = capture_world_to_screen(&mut app, candidate) else {
+                continue;
+            };
+            capture_set_cursor(&mut app, screen);
+            app.update();
+            if capture_placement_is_valid(&mut app) {
+                parked = true;
+                break 'scan;
+            }
+        }
+    }
+    for _ in 0..20 {
+        app.update();
+    }
+    println!(
+        "[placement] in_placement={} valid={} parked={parked}",
+        capture_player_in_placement_mode(&mut app),
+        capture_placement_is_valid(&mut app),
+    );
     let handle = capture_handle(&app);
     app.world_mut()
         .spawn(Screenshot::image(handle))
