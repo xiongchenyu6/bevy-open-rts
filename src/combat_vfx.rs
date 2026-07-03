@@ -105,6 +105,116 @@ pub(crate) fn combat_wreckage_expired(wreckage: &mut CombatWreckage, delta_secs:
     wreckage.remaining <= 0.0
 }
 
+/// Cached unit sphere so every emissive flash shares one mesh.
+#[derive(Resource, Default)]
+pub(crate) struct CombatFlashMesh(pub(crate) Option<Handle<Mesh>>);
+
+/// A short-lived emissive blob that expands and fades — a solid, readable
+/// muzzle/impact/death flash (the gizmo rings alone are hairline-thin and read
+/// as dead in motion). Each flash owns its material so it can fade alone.
+#[derive(Component)]
+pub(crate) struct CombatFlash {
+    pub(crate) remaining: f32,
+    pub(crate) total: f32,
+    pub(crate) start_scale: f32,
+    pub(crate) end_scale: f32,
+    pub(crate) material: Handle<StandardMaterial>,
+    pub(crate) emissive: LinearRgba,
+}
+
+/// Spawns an expanding emissive flash at `position`. No-op in headless logic
+/// tests (no render-asset stores).
+pub(crate) fn spawn_combat_flash(
+    commands: &mut Commands,
+    position: Vec3,
+    start_scale: f32,
+    end_scale: f32,
+    lifetime: f32,
+    color: LinearRgba,
+) {
+    commands.queue(move |world: &mut World| {
+        if !world.contains_resource::<Assets<Mesh>>()
+            || !world.contains_resource::<Assets<StandardMaterial>>()
+        {
+            return;
+        }
+        let mesh = match world.get_resource::<CombatFlashMesh>().and_then(|m| m.0.clone()) {
+            Some(handle) => handle,
+            None => {
+                let handle = world
+                    .resource_mut::<Assets<Mesh>>()
+                    .add(Sphere::new(1.0).mesh().ico(2).unwrap_or_else(|_| Sphere::new(1.0).mesh().build()));
+                if let Some(mut res) = world.get_resource_mut::<CombatFlashMesh>() {
+                    res.0 = Some(handle.clone());
+                }
+                handle
+            }
+        };
+        let material = world.resource_mut::<Assets<StandardMaterial>>().add(StandardMaterial {
+            base_color: Color::srgba(color.red, color.green, color.blue, 0.85),
+            emissive: color,
+            alpha_mode: AlphaMode::Blend,
+            unlit: true,
+            ..default()
+        });
+        world.spawn((
+            Name::new("Combat flash"),
+            Mesh3d(mesh),
+            MeshMaterial3d(material.clone()),
+            Transform::from_translation(position + Vec3::Y * (end_scale * 0.4))
+                .with_scale(Vec3::splat(start_scale)),
+            CombatFlash {
+                remaining: lifetime,
+                total: lifetime,
+                start_scale,
+                end_scale,
+                material,
+                emissive: color,
+            },
+            MatchScopedEntity,
+        ));
+    });
+}
+
+/// Expands each flash toward `end_scale` while fading its emissive + alpha.
+pub(crate) fn update_combat_flashes(
+    time: Res<Time>,
+    mut commands: Commands,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut flashes: Query<(Entity, &mut Transform, &mut CombatFlash)>,
+) {
+    let Some(mut materials) = materials else {
+        return;
+    };
+    let dt = time.delta_secs();
+    for (entity, mut transform, mut flash) in &mut flashes {
+        flash.remaining -= dt;
+        if flash.remaining <= 0.0 {
+            commands.entity(entity).despawn();
+            continue;
+        }
+        let life = (flash.remaining / flash.total).clamp(0.0, 1.0);
+        let progress = 1.0 - life;
+        let scale = flash.start_scale + (flash.end_scale - flash.start_scale) * progress;
+        transform.scale = Vec3::splat(scale);
+        if let Some(mut material) = materials.get_mut(&flash.material) {
+            material.emissive = flash.emissive * life;
+            material.base_color.set_alpha(life * 0.85);
+        }
+    }
+}
+
+/// Hot core color for an impact flash, matched to the burst kind.
+pub(crate) fn impact_flash_color(kind: ImpactBurstKind) -> LinearRgba {
+    match kind {
+        ImpactBurstKind::Ballistic => LinearRgba::new(1.0, 0.86, 0.5, 1.0),
+        ImpactBurstKind::Explosive | ImpactBurstKind::Heavy => LinearRgba::new(1.0, 0.55, 0.16, 1.0),
+        ImpactBurstKind::Energy => LinearRgba::new(0.5, 0.95, 1.0, 1.0),
+        ImpactBurstKind::Electric => LinearRgba::new(0.55, 0.8, 1.0, 1.0),
+        ImpactBurstKind::Fire => LinearRgba::new(1.0, 0.42, 0.12, 1.0),
+    }
+}
+
 pub(crate) fn spawn_destruction_effects(
     commands: &mut Commands,
     asset_server: &AssetServer,
@@ -119,6 +229,16 @@ pub(crate) fn spawn_destruction_effects(
         return;
     }
     spawn_combat_wreckage(commands, asset_server, position, radius);
+    // A bright expanding fireball so a kill visibly booms (bigger for buildings).
+    let boom = if is_structure { radius * 1.35 } else { radius * 0.95 };
+    spawn_combat_flash(
+        commands,
+        position + Vec3::Y * 0.3,
+        (boom * 0.35).max(0.3),
+        (boom + 0.7).clamp(0.8, 3.2),
+        if is_structure { 0.55 } else { 0.38 },
+        LinearRgba::new(1.0, 0.52, 0.16, 1.0),
+    );
     if is_structure {
         spawn_structure_destruction_vfx(commands, position, radius, team);
     }
@@ -316,6 +436,15 @@ pub(crate) fn spawn_impact_burst(
         },
         MatchScopedEntity,
     ));
+    // Solid emissive pop at the point of impact.
+    spawn_combat_flash(
+        commands,
+        Vec3::new(position.x, 0.25, position.z),
+        (0.1 + power * 0.05).min(0.35),
+        (0.32 + power * 0.2).clamp(0.35, 1.4),
+        0.2,
+        impact_flash_color(kind),
+    );
 }
 
 pub(crate) fn spawn_veterancy_promotion_effect(

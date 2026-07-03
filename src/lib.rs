@@ -2341,6 +2341,7 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<ActiveMission>()
         .init_resource::<TerrainHeightField>()
         .init_resource::<TeamColorMaterials>()
+        .init_resource::<CombatFlashMesh>()
         .init_resource::<PlacementGhost>()
         .init_resource::<MissionTriggerState>()
         .init_resource::<BuildQueue>()
@@ -3245,9 +3246,14 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
     )
     .add_systems(
         Update,
-        update_impact_bursts
-            .in_set(SimulationPhase::PostCombat)
-            .run_if(match_in_progress),
+        (
+            update_combat_flashes
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
+            update_impact_bursts
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
+        ),
     )
     .add_systems(
         Update,

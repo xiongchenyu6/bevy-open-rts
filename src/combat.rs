@@ -2483,6 +2483,15 @@ pub(crate) fn combat(
                     );
                 }
             }
+            // Muzzle flash at the barrel so shots read as fired, not conjured.
+            spawn_combat_flash(
+                &mut commands,
+                from + Vec3::Y * 0.6,
+                0.22,
+                0.34,
+                0.1,
+                LinearRgba::new(1.0, 0.9, 0.55, 1.0),
+            );
             // Tracer from shooter to target (longer-lived so it's noticeable)…
             commands.spawn((
                 ShotPulse {
