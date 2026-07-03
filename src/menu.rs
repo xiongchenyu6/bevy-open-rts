@@ -1186,9 +1186,12 @@ pub(crate) fn setup_main_menu(
                 height: Val::Percent(100.0),
                 flex_direction: FlexDirection::Column,
                 align_items: AlignItems::Center,
-                justify_content: JustifyContent::Center,
-                row_gap: px(12),
-                padding: UiRect::new(px(12), px(12), px(14), px(16)),
+                // Anchor to the top (not centered) so a tall dialog never clips
+                // the player rows off the top edge; scroll if it exceeds height.
+                justify_content: JustifyContent::FlexStart,
+                overflow: Overflow::scroll_y(),
+                row_gap: px(8),
+                padding: UiRect::new(px(12), px(12), px(8), px(8)),
                 ..default()
             },
             BackgroundColor(Color::NONE),
@@ -1202,8 +1205,8 @@ pub(crate) fn setup_main_menu(
                     min_width: px(680),
                     flex_direction: FlexDirection::Column,
                     align_items: AlignItems::Stretch,
-                    row_gap: px(12),
-                    padding: UiRect::all(px(18)),
+                    row_gap: px(8),
+                    padding: UiRect::all(px(14)),
                     border: UiRect::all(px(1)),
                     ..default()
                 },

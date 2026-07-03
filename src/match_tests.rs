@@ -2021,9 +2021,9 @@ fn lobby_faction_dropdown_opens_and_sets() {
 
 #[test]
 fn empty_battle_log_does_not_swallow_world_clicks() {
-    // Mid-screen point inside the old fixed battle-log band (the harvest
-    // harness clicked (619, 170) and lost the worker selection to it).
-    let point = Vec2::new(619.0, 170.0);
+    // A point inside the battle-log band (starts at BATTLE_LOG_TOP_PX = 198,
+    // rows are BATTLE_LOG_ROW_HIT_PX tall).
+    let point = Vec2::new(619.0, 210.0);
     let empty = HudHitZones {
         world_rects: hud_world_input_rects(1280.0, 720.0, 0, 0, 0, 0, false),
     };
@@ -2032,8 +2032,11 @@ fn empty_battle_log_does_not_swallow_world_clicks() {
         world_rects: hud_world_input_rects(1280.0, 720.0, 0, 2, 0, 0, false),
     };
     assert!(with_log.blocks_world(point));
+    // Above the band (where the objective tracker sits) stays free…
+    assert!(!with_log.blocks_world(Vec2::new(619.0, 150.0)));
+    // …and so does everything below the visible rows.
     assert!(
-        !with_log.blocks_world(Vec2::new(619.0, 300.0)),
+        !with_log.blocks_world(Vec2::new(619.0, 400.0)),
         "hit rect must stay proportional to visible rows"
     );
 }

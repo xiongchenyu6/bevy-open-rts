@@ -186,7 +186,7 @@ pub(crate) const BATTLE_LOG_ENTRY_TTL_SECONDS: f32 = 6.5;
 pub(crate) const BATTLE_EVENT_PING_LIFETIME_SECONDS: f32 = 4.0;
 pub(crate) const BATTLE_LOG_MAX_ENTRIES: usize = 5;
 pub(crate) const BATTLE_LOG_UNDER_ATTACK_COOLDOWN_SECONDS: f32 = 7.0;
-pub(crate) const BATTLE_LOG_TOP_PX: f32 = 104.0;
+pub(crate) const BATTLE_LOG_TOP_PX: f32 = 198.0;
 pub(crate) const BATTLE_LOG_WIDTH_PX: f32 = 390.0;
 // Per-row height of the battle-log click/hover hit area; the hit rect scales with
 // the number of visible entries so an EMPTY log never swallows world clicks (it
