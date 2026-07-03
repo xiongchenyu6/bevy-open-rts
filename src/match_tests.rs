@@ -654,9 +654,13 @@ fn hunyuan_render_parts_have_forward_rotation_and_material_fallback() {
             );
         }
     }
+    // 2026-07: the 14 Hunyuan stand-ins were retired in favor of the original
+    // godot kenney part collages. The per-part guards above still protect any
+    // future Hunyuan part; today none should exist in the registry.
     assert_eq!(
-        count, 14,
-        "expected every Hunyuan replacement to be guarded"
+        count, 0,
+        "unexpected Hunyuan render part in the registry — restore the godot \
+         kenney composition or update the guards"
     );
 }
 
