@@ -22,6 +22,13 @@ domains live in modules, each re-exported into the crate root
   rally points, control groups, idle-worker cycling.
 - `src/combat.rs` — combat/chase/movement systems, weapons/health, crushing,
   mines, wreckage, veterancy, auras/shields/EMP, combat VFX.
+- `src/terrain.rs` — real elevation: per-map plateau/ramp specs sampled into a
+  TerrainHeightField (bilinear heights, cliff step legality, cursor ray-march,
+  generated ground mesh, spawn settling).
+- `src/save.rs` — RON save/load (quicksave Ctrl+S / quickload Ctrl+L), replay
+  timeline keyframes + PageUp/PageDown jumps.
+- `src/campaign.rs` — mission table (victory conditions, timed triggers),
+  campaign menu state, mission victory/trigger systems.
 - `src/capture_api.rs` — the `pub fn capture_*` harness surface + offscreen
   render-target plumbing (used by `src/bin/capture.rs` and tests).
 - `src/generated_registry.rs` — entity registry (hand-extended; do NOT regenerate
