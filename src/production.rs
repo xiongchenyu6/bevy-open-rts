@@ -13,6 +13,8 @@ pub(crate) const PRODUCTION_QUEUE_HUD_SLOT_COUNT: usize = 24;
 
 pub(crate) const CONSTRUCTION_ENTRY_MARGIN_M: f32 = UNIT_ADHERENCE_MARGIN_M;
 pub(crate) const CONSTRUCTION_WORK_PULSE_SECONDS: f32 = 0.18;
+/// Fraction of full height a fresh foundation starts at.
+pub(crate) const CONSTRUCTION_EMERGENCE_MIN_HEIGHT: f32 = 0.12;
 
 pub(crate) const PRODUCTION_VETERANCY_PRODUCER_COUNT: usize = 3;
 
@@ -1078,6 +1080,33 @@ pub(crate) fn update_construction_work_pulses(
             commands
                 .entity(entity)
                 .try_remove::<ConstructionWorkPulse>();
+        }
+    }
+}
+
+/// Structures grow out of the ground while under construction instead of
+/// standing at full height from the first frame. Godot shows a translucent
+/// shell instead; a vertical emergence tied to build progress reads better
+/// with our GLB models and needs no per-part material swap. Finished (or
+/// pre-built) structures snap back to their registry scale.
+pub(crate) fn animate_structure_construction(
+    mut structures: Query<(&Structure, &mut Transform, Option<&UnderConstruction>)>,
+) {
+    for (structure, mut transform, construction) in &mut structures {
+        let base_scale = registry::entity(structure.id).map_or(1.0, |def| def.scale);
+        match construction {
+            Some(under) => {
+                let progress = structure_construction_progress(*under);
+                let eased = progress * progress * (3.0 - 2.0 * progress);
+                let rise = CONSTRUCTION_EMERGENCE_MIN_HEIGHT
+                    + (1.0 - CONSTRUCTION_EMERGENCE_MIN_HEIGHT) * eased;
+                transform.scale = Vec3::new(base_scale, base_scale * rise, base_scale);
+            }
+            None => {
+                if (transform.scale.y - base_scale).abs() > 0.0001 {
+                    transform.scale = Vec3::splat(base_scale);
+                }
+            }
         }
     }
 }

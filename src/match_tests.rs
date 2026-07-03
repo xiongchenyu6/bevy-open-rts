@@ -1012,6 +1012,61 @@ fn construction_worker_model_scale_animates_and_resets() {
 }
 
 #[test]
+fn structure_emerges_from_ground_with_construction_progress() {
+    let mut app = App::new();
+    app.add_systems(Update, animate_structure_construction);
+    let base_scale = registry::entity("Barracks").unwrap().scale;
+
+    let structure = app
+        .world_mut()
+        .spawn((
+            Structure { id: "Barracks" },
+            Transform::from_scale(Vec3::splat(base_scale)),
+            UnderConstruction {
+                remaining: 8.0,
+                total: 8.0,
+                cost: registry::Cost::default(),
+                free_worker_origin: None,
+            },
+        ))
+        .id();
+
+    app.update();
+    let fresh = app.world().get::<Transform>(structure).unwrap().scale;
+    assert!(
+        fresh.y < base_scale * 0.2,
+        "a fresh foundation starts near the ground, got y={}",
+        fresh.y
+    );
+    assert!(
+        (fresh.x - base_scale).abs() < 0.001,
+        "footprint width stays constant while building"
+    );
+
+    app.world_mut()
+        .entity_mut(structure)
+        .get_mut::<UnderConstruction>()
+        .unwrap()
+        .remaining = 4.0;
+    app.update();
+    let halfway = app.world().get::<Transform>(structure).unwrap().scale;
+    assert!(
+        halfway.y > fresh.y && halfway.y < base_scale,
+        "half-built structures sit between foundation and full height"
+    );
+
+    app.world_mut()
+        .entity_mut(structure)
+        .remove::<UnderConstruction>();
+    app.update();
+    assert_eq!(
+        app.world().get::<Transform>(structure).unwrap().scale,
+        Vec3::splat(base_scale),
+        "finished structures snap back to their registry scale"
+    );
+}
+
+#[test]
 fn right_click_resource_orders_only_workers_to_harvest() {
     let resource = Entity::from_raw_u32(7).unwrap();
     let choices = OrderTargetChoices {
