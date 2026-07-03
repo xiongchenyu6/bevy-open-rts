@@ -343,11 +343,12 @@ pub(crate) fn setup_front_menu(mut commands: Commands, asset_server: Res<AssetSe
                             panel
                                 .spawn(Node {
                                     width: Val::Percent(100.0),
-                                    min_height: px(326),
+                                    min_height: px(232),
                                     flex_grow: 1.0,
                                     align_self: AlignSelf::Stretch,
                                     justify_content: JustifyContent::Center,
                                     align_items: AlignItems::Center,
+                                    overflow: Overflow::clip(),
                                     ..default()
                                 })
                                 .with_children(|preview| {
@@ -357,8 +358,10 @@ pub(crate) fn setup_front_menu(mut commands: Commands, asset_server: Res<AssetSe
                                         ),
                                         FrontMenuRosterPreview,
                                         Node {
-                                            width: px(326),
-                                            height: px(326),
+                                            // Fits the briefing column without the
+                                            // bottom row clipping off-screen.
+                                            width: px(260),
+                                            height: px(260),
                                             ..default()
                                         },
                                     ));
