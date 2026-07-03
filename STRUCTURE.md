@@ -8,6 +8,11 @@ domains live in modules, each re-exported into the crate root
 (`pub(crate) use module::*;`), so items are referenced unqualified:
 
 - `src/nav.rs` — A* nav grid + PlannedPath, unit-vs-unit separation.
+- `src/maps.rs` — skirmish map catalog: SkirmishMapDef + per-map data tables,
+  MapBounds, random-map selection, terrain-wall specs + spawning.
+- `src/support_powers.rs` — support powers (F1–F9): kinds/cooldowns, activation
+  + targeting, HUD panel/buttons/tooltips, AI power usage.
+- `src/match_tests.rs` — headless match-flow integration tests (cfg(test)).
 - `src/camera.rs` — RtsCamera state, bevy_rts_camera bridge, settings, bookmarks.
 - `src/audio.rs` — unit/announcer voices, sfx kinds, AudioFeedback queue + playback.
 - `src/menu.rs` — front menu, options, credits, skirmish lobby + widgets.
@@ -16,6 +21,7 @@ domains live in modules, each re-exported into the crate root
 - `src/economy.rs` — Economies/income/power, harvesting + dropoff, resource nodes,
   supply crates.
 - `src/ai.rs` — difficulty tiers, AI director (economy/training/waves/support),
+  in-match AI systems (repair/scouting/garrisons/capture/saboteur), profiles,
   target scoring, support-power defs.
 - `src/production.rs` — build queue/training, construction, manual placement.
 - `src/orders.rs` — selection, command-card action logic, unit orders + queue,
