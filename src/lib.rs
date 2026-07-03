@@ -191,7 +191,6 @@ pub(crate) const BATTLE_LOG_WIDTH_PX: f32 = 390.0;
 // Per-row height of the battle-log click/hover hit area; the hit rect scales with
 // the number of visible entries so an EMPTY log never swallows world clicks (it
 // used to be a fixed 168px band across the top-center of the screen).
-pub(crate) const BATTLE_LOG_ROW_HIT_PX: f32 = 34.0;
 // Bottom-right command card hit geometry (146x46 buttons + 8px gap, 4 per row) and
 // the production-queue rows that stack above it (92px slots, 6 per row).
 pub(crate) const COMMAND_CARD_WIDTH_PX: f32 = 612.0;

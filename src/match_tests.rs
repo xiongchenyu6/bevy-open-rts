@@ -2021,8 +2021,9 @@ fn lobby_faction_dropdown_opens_and_sets() {
 
 #[test]
 fn empty_battle_log_does_not_swallow_world_clicks() {
-    // A point inside the battle-log band (starts at BATTLE_LOG_TOP_PX = 198,
-    // rows are BATTLE_LOG_ROW_HIT_PX tall).
+    // The passive battle-log toasts must never block world clicks — an
+    // upper-center point stays free whether or not the log has entries, so the
+    // player can always issue orders there.
     let point = Vec2::new(619.0, 210.0);
     let empty = HudHitZones {
         world_rects: hud_world_input_rects(1280.0, 720.0, 0, 0, 0, 0, false),
@@ -2031,13 +2032,9 @@ fn empty_battle_log_does_not_swallow_world_clicks() {
     let with_log = HudHitZones {
         world_rects: hud_world_input_rects(1280.0, 720.0, 0, 2, 0, 0, false),
     };
-    assert!(with_log.blocks_world(point));
-    // Above the band (where the objective tracker sits) stays free…
-    assert!(!with_log.blocks_world(Vec2::new(619.0, 150.0)));
-    // …and so does everything below the visible rows.
     assert!(
-        !with_log.blocks_world(Vec2::new(619.0, 400.0)),
-        "hit rect must stay proportional to visible rows"
+        !with_log.blocks_world(point),
+        "battle-log toasts must not carve a dead zone out of the playfield"
     );
 }
 

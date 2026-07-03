@@ -2978,16 +2978,11 @@ pub(crate) fn hud_world_input_rects(
         Vec2::new(0.0, height - MINIMAP_BOTTOM_PX - MINIMAP_SIZE_PX - 2.0),
         Vec2::new(MINIMAP_LEFT_PX + MINIMAP_SIZE_PX + 2.0, height),
     ));
-    // Battle log (top-center), scaled to visible rows.
-    if battle_log_rows > 0 {
-        let min_x = (width - BATTLE_LOG_WIDTH_PX) * 0.5;
-        let rows_height =
-            battle_log_rows.min(BATTLE_LOG_MAX_ENTRIES) as f32 * BATTLE_LOG_ROW_HIT_PX;
-        rects.push((
-            Vec2::new(min_x, BATTLE_LOG_TOP_PX),
-            Vec2::new(min_x + BATTLE_LOG_WIDTH_PX, BATTLE_LOG_TOP_PX + rows_height),
-        ));
-    }
+    // Battle log is passive toast text (top-center) — it must NOT block world
+    // clicks, or it carves a dead zone out of the upper playfield where the
+    // player can't issue orders. `battle_log_rows` is kept for call-site
+    // compatibility but no longer contributes a hit rect.
+    let _ = battle_log_rows;
     // Support power strip (top-right), scaled to unlocked powers.
     let support_width = support_power_panel_width_for_visible_count(support_visible_count);
     if support_width > 0.0 {
