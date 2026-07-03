@@ -37,6 +37,8 @@ mod spawn;
 pub(crate) use spawn::*;
 mod selection;
 pub(crate) use selection::*;
+mod command_card;
+pub(crate) use command_card::*;
 mod save;
 pub(crate) use ai::*;
 pub(crate) use save::*;
@@ -3243,7 +3245,12 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             update_click_markers
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
-            update_combat_wreckage
+            (
+                update_construction_work_pulses,
+                animate_construction_workers,
+                update_combat_wreckage,
+            )
+                .chain()
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
             update_structure_destruction_vfx
@@ -7022,6 +7029,29 @@ pub(crate) struct OverlayVfxQueries<'w, 's> {
     pub(crate) destruction: Query<'w, 's, (&'static Transform, &'static StructureDestructionVfx)>,
     pub(crate) promotion: Query<'w, 's, (&'static Transform, &'static VeterancyPromotionEffect)>,
     pub(crate) impacts: Query<'w, 's, (&'static Transform, &'static ImpactBurst)>,
+    pub(crate) construction: Query<
+        'w,
+        's,
+        (
+            &'static Transform,
+            &'static Selectable,
+            &'static Team,
+            &'static ConstructionWorkPulse,
+            Option<&'static VisibilityState>,
+        ),
+        With<Unit>,
+    >,
+    pub(crate) construction_targets: Query<
+        'w,
+        's,
+        (
+            &'static Transform,
+            &'static Selectable,
+            Option<&'static UnderConstruction>,
+            Option<&'static VisibilityState>,
+        ),
+        With<Structure>,
+    >,
     pub(crate) camera: Query<'w, 's, &'static GlobalTransform, With<MainCamera>>,
     pub(crate) time: Res<'w, Time>,
 }
@@ -7236,6 +7266,33 @@ pub(crate) fn draw_world_overlays(
             );
         }
     }
+    for (transform, selectable, team, pulse, visibility) in &vfx.construction {
+        if !visibility.is_none_or(|visibility| visibility.visible) {
+            continue;
+        }
+        let Ok((target_transform, target_selectable, under_construction, target_visibility)) =
+            vfx.construction_targets.get(pulse.target)
+        else {
+            continue;
+        };
+        if under_construction.is_none()
+            || !target_visibility.is_none_or(|visibility| visibility.visible)
+        {
+            continue;
+        }
+        draw_construction_work_visuals(
+            &mut gizmos,
+            &mut hud,
+            transform.translation,
+            selectable.radius,
+            target_transform.translation,
+            target_selectable.radius,
+            *team,
+            pulse,
+            &player_colors,
+            vfx.time.elapsed_secs(),
+        );
+    }
     for pulse in &pulses {
         // Brighten the team color toward a hot muzzle/tracer hue so shots read as
         // attacks, and draw it thick so a brief tracer is actually noticeable.
@@ -7373,6 +7430,81 @@ pub(crate) fn draw_world_overlays(
             &placement_preview.occupiers,
         );
     }
+}
+
+pub(crate) fn draw_construction_work_visuals(
+    gizmos: &mut Gizmos,
+    hud: &mut Gizmos<HudGizmos>,
+    worker_position: Vec3,
+    worker_radius: f32,
+    target_position: Vec3,
+    target_radius: f32,
+    team: Team,
+    pulse: &ConstructionWorkPulse,
+    player_colors: &PlayerColorSlots,
+    elapsed_secs: f32,
+) {
+    let mut to_target = Vec3::new(
+        target_position.x - worker_position.x,
+        0.0,
+        target_position.z - worker_position.z,
+    );
+    if to_target.length_squared() <= f32::EPSILON {
+        to_target = Vec3::Z;
+    } else {
+        to_target = to_target.normalize();
+    }
+    let side = Vec3::new(-to_target.z, 0.0, to_target.x).normalize_or(Vec3::X);
+    let active = if pulse.total > 0.0 {
+        (pulse.remaining / pulse.total).clamp(0.0, 1.0)
+    } else {
+        1.0
+    };
+    let team_color = player_colors.color(team).to_srgba();
+    let core = Color::srgba(
+        (0.58 + team_color.red * 0.30).min(1.0),
+        (0.88 + team_color.green * 0.10).min(1.0),
+        (0.95 + team_color.blue * 0.05).min(1.0),
+        0.32 + active * 0.52,
+    );
+    let hot = Color::srgba(1.0, 0.88, 0.30, 0.36 + active * 0.54);
+    let smoke = Color::srgba(0.15, 0.22, 0.20, 0.12 + active * 0.18);
+    let source = worker_position + to_target * (worker_radius + 0.16) + Vec3::Y * 0.42;
+    let contact = target_position - to_target * (target_radius * 0.68) + Vec3::Y * 0.34;
+    hud.line(source, contact, core);
+    hud.line(
+        source + side * 0.07 + Vec3::Y * 0.05,
+        contact + side * 0.04 + Vec3::Y * 0.03,
+        hot,
+    );
+    let phase = elapsed_secs * 13.0 + pulse.seed;
+    for i in 0..7 {
+        let seed = i as f32 * 2.27 + pulse.seed;
+        let burst = (phase + seed).sin() * 0.5 + 0.5;
+        let travel = 0.22 + 0.55 * ((phase * 0.53 + seed).cos() * 0.5 + 0.5);
+        let center = source.lerp(contact, travel)
+            + side * ((phase + seed).cos() * 0.10)
+            + Vec3::Y * (0.05 + burst * 0.18);
+        let spark_color = if i % 2 == 0 { hot } else { core };
+        hud.line(
+            center - side * (0.04 + burst * 0.04),
+            center + side * (0.08 + burst * 0.05) + Vec3::Y * (0.03 + burst * 0.05),
+            spark_color,
+        );
+        gizmos.circle(
+            Isometry3d::new(center, Quat::from_rotation_arc(Vec3::Z, Vec3::Y)),
+            0.025 + burst * 0.035,
+            spark_color,
+        );
+    }
+    gizmos.circle(
+        Isometry3d::new(
+            contact - Vec3::Y * 0.27,
+            Quat::from_rotation_arc(Vec3::Z, Vec3::Y),
+        ),
+        (0.28 + 0.10 * (phase * 0.8).sin().abs()).min(target_radius * 0.8),
+        smoke,
+    );
 }
 
 pub(crate) fn should_draw_team_marker_for_entity(

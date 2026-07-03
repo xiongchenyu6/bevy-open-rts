@@ -12,6 +12,7 @@ pub(crate) const PRODUCTION_QUEUE_LIMIT: usize = 5;
 pub(crate) const PRODUCTION_QUEUE_HUD_SLOT_COUNT: usize = 24;
 
 pub(crate) const CONSTRUCTION_ENTRY_MARGIN_M: f32 = UNIT_ADHERENCE_MARGIN_M;
+pub(crate) const CONSTRUCTION_WORK_PULSE_SECONDS: f32 = 0.18;
 
 pub(crate) const PRODUCTION_VETERANCY_PRODUCER_COUNT: usize = 3;
 
@@ -36,6 +37,31 @@ pub(crate) struct RepairOrder {
 #[derive(Component, Clone, Copy)]
 pub(crate) struct ConstructOrder {
     pub(crate) target: Entity,
+}
+
+#[derive(Component, Clone, Copy)]
+pub(crate) struct ConstructionWorkPulse {
+    pub(crate) target: Entity,
+    pub(crate) remaining: f32,
+    pub(crate) total: f32,
+    pub(crate) seed: f32,
+}
+
+impl ConstructionWorkPulse {
+    pub(crate) fn new(worker: Entity, target: Entity) -> Self {
+        Self {
+            target,
+            remaining: CONSTRUCTION_WORK_PULSE_SECONDS,
+            total: CONSTRUCTION_WORK_PULSE_SECONDS,
+            seed: construction_work_seed(worker, target),
+        }
+    }
+}
+
+pub(crate) fn construction_work_seed(worker: Entity, target: Entity) -> f32 {
+    let mixed =
+        worker.to_bits().wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ target.to_bits().rotate_left(17);
+    (mixed % 10_000) as f32 * 0.001
 }
 
 pub(crate) fn production_veterancy_slot(producer_id: &str) -> Option<usize> {
@@ -907,11 +933,11 @@ pub(crate) fn build_target_product(action: BuildAction) -> &'static str {
 pub(crate) fn update_construct_orders(
     mut commands: Commands,
     time: Res<Time>,
-    constructors: Query<
+    mut constructors: Query<
         (
             Entity,
             &Team,
-            &Transform,
+            &mut Transform,
             &Selectable,
             &Unit,
             &ConstructOrder,
@@ -935,14 +961,14 @@ pub(crate) fn update_construct_orders(
     for (
         constructor_entity,
         constructor_team,
-        constructor_transform,
+        mut constructor_transform,
         constructor_selectable,
         constructor_unit,
         order,
         move_order,
         emp,
         constructor_health,
-    ) in &constructors
+    ) in &mut constructors
     {
         if constructor_health.current <= 0.0
             || emp.is_some_and(|emp| emp.remaining > 0.0)
@@ -1016,6 +1042,17 @@ pub(crate) fn update_construct_orders(
         commands
             .entity(constructor_entity)
             .try_remove::<MoveOrder>();
+        let look_at = Vec3::new(
+            target_transform.translation.x,
+            constructor_transform.translation.y,
+            target_transform.translation.z,
+        );
+        if xz_distance(constructor_transform.translation, look_at) > 0.05 {
+            constructor_transform.look_at(look_at, Vec3::Y);
+        }
+        commands
+            .entity(constructor_entity)
+            .try_insert(ConstructionWorkPulse::new(constructor_entity, order.target));
         apply_structure_construction_progress(
             &mut construction,
             &mut target_health,
@@ -1025,6 +1062,45 @@ pub(crate) fn update_construct_orders(
             commands
                 .entity(constructor_entity)
                 .try_remove::<ConstructOrder>();
+        }
+    }
+}
+
+pub(crate) fn update_construction_work_pulses(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut pulses: Query<(Entity, &mut ConstructionWorkPulse, Option<&ConstructOrder>)>,
+) {
+    for (entity, mut pulse, order) in &mut pulses {
+        pulse.remaining -= time.delta_secs();
+        let still_constructing_target = order.is_some_and(|order| order.target == pulse.target);
+        if pulse.remaining <= 0.0 || !still_constructing_target {
+            commands
+                .entity(entity)
+                .try_remove::<ConstructionWorkPulse>();
+        }
+    }
+}
+
+pub(crate) fn animate_construction_workers(
+    time: Res<Time>,
+    mut workers: Query<(&Unit, &mut Transform, Option<&ConstructionWorkPulse>), With<Unit>>,
+) {
+    for (unit, mut transform, pulse) in &mut workers {
+        if !can_unit_construct_structures(unit) {
+            continue;
+        }
+        let base_scale = registry::entity(unit.id).map_or(1.0, |def| def.scale);
+        if let Some(pulse) = pulse {
+            let phase = time.elapsed_secs() * 18.0 + pulse.seed;
+            let beat = phase.sin() * 0.5 + 0.5;
+            transform.scale = Vec3::new(
+                base_scale * (1.0 + 0.035 * beat),
+                base_scale * (1.0 - 0.045 * beat),
+                base_scale * (1.0 + 0.025 * beat),
+            );
+        } else if (transform.scale - Vec3::splat(base_scale)).length_squared() > 0.0001 {
+            transform.scale = Vec3::splat(base_scale);
         }
     }
 }

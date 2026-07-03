@@ -926,6 +926,92 @@ fn worker_cargo_visual_slots_show_loaded_resources() {
 }
 
 #[test]
+fn construction_work_pulse_only_lives_while_worker_is_actively_building_same_target() {
+    let mut app = App::new();
+    app.insert_resource(Time::<()>::default());
+    app.add_systems(Update, update_construction_work_pulses);
+
+    let target = app.world_mut().spawn_empty().id();
+    let other_target = app.world_mut().spawn_empty().id();
+    let worker = app
+        .world_mut()
+        .spawn((
+            ConstructOrder { target },
+            ConstructionWorkPulse {
+                target,
+                remaining: 0.5,
+                total: 0.5,
+                seed: 0.0,
+            },
+        ))
+        .id();
+
+    {
+        let mut time = app.world_mut().resource_mut::<Time<()>>();
+        time.advance_by(std::time::Duration::from_secs_f32(0.1));
+    }
+    app.update();
+    assert!(
+        app.world().get::<ConstructionWorkPulse>(worker).is_some(),
+        "pulse should remain while the worker is still constructing the same target"
+    );
+
+    app.world_mut().entity_mut(worker).insert(ConstructOrder {
+        target: other_target,
+    });
+    app.update();
+    assert!(
+        app.world().get::<ConstructionWorkPulse>(worker).is_none(),
+        "pulse must clear when the construction order switches target"
+    );
+}
+
+#[test]
+fn construction_worker_model_scale_animates_and_resets() {
+    let mut app = App::new();
+    app.insert_resource(Time::<()>::default());
+    app.add_systems(Update, animate_construction_workers);
+
+    let target = app.world_mut().spawn_empty().id();
+    let worker = app
+        .world_mut()
+        .spawn((
+            Unit {
+                id: "Worker",
+                speed: 2.5,
+                can_crush: false,
+                can_be_crushed: false,
+            },
+            Transform::from_scale(Vec3::splat(1.0)),
+            ConstructionWorkPulse {
+                target,
+                remaining: 0.5,
+                total: 0.5,
+                seed: 0.0,
+            },
+        ))
+        .id();
+
+    app.update();
+    let animated_scale = app.world().get::<Transform>(worker).unwrap().scale;
+    assert_ne!(
+        animated_scale,
+        Vec3::splat(1.0),
+        "active construction should make the worker visibly move"
+    );
+
+    app.world_mut()
+        .entity_mut(worker)
+        .remove::<ConstructionWorkPulse>();
+    app.update();
+    assert_eq!(
+        app.world().get::<Transform>(worker).unwrap().scale,
+        Vec3::splat(1.0),
+        "worker scale should reset once construction animation stops"
+    );
+}
+
+#[test]
 fn right_click_resource_orders_only_workers_to_harvest() {
     let resource = Entity::from_raw_u32(7).unwrap();
     let choices = OrderTargetChoices {

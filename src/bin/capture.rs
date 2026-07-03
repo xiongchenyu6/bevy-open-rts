@@ -1000,6 +1000,13 @@ fn render_play(dir: &Path) -> Result<(), String> {
                     "[capture] build: player structures {structures_before} -> {structures_after}, constructors active {constructing_after}"
                 );
                 if structures_after > structures_before {
+                    if let Some(at) = placed_at {
+                        capture_focus_camera_on(&mut app, at);
+                        for _ in 0..30 {
+                            app.update();
+                        }
+                        shoot(&mut app, &handle, dir.join("04_constructing.png"));
+                    }
                     built = wait_until(&mut app, BUILD_COMPLETION_WAIT_TICKS, |app| {
                         capture_player_completed_structure_count(app) > completed_before
                     });
@@ -1012,7 +1019,7 @@ fn render_play(dir: &Path) -> Result<(), String> {
             None => println!("[capture] no enabled build hotkey on the command panel"),
         }
     }
-    shoot(&mut app, &handle, dir.join("04_built.png"));
+    shoot(&mut app, &handle, dir.join("05_built.png"));
     if !built {
         return Err("build hotkey did not complete a player structure".into());
     }
