@@ -35,6 +35,8 @@ mod support_powers;
 pub(crate) use support_powers::*;
 mod spawn;
 pub(crate) use spawn::*;
+mod selection;
+pub(crate) use selection::*;
 mod save;
 pub(crate) use ai::*;
 pub(crate) use save::*;
