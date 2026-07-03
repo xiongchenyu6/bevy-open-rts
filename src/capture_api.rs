@@ -478,6 +478,14 @@ pub fn capture_zoom_camera_closest(app: &mut App) {
     camera.pending_jump = true;
 }
 
+/// Hides the opening briefing so focused proof screenshots can show the world
+/// objects being inspected.
+pub fn capture_dismiss_match_briefing(app: &mut App) {
+    if let Some(mut briefing) = app.world_mut().get_resource_mut::<MatchBriefingState>() {
+        briefing.dismiss();
+    }
+}
+
 /// Diagnostic: prints every distinct mesh-material base color under each resource
 /// node, so we can see the real crystal-facet albedo to match for recoloring.
 pub fn capture_dump_resource_materials(app: &mut App) {

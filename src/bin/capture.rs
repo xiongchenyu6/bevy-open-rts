@@ -30,8 +30,8 @@ use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 
 use bevy_open_rts::{
     CaptureTarget, build_capture_app, build_model_harness_capture_app, capture_build_options_count,
-    capture_enabled_build_hotkey_for, capture_enabled_train_hotkey_for,
-    capture_enemy_structure_position, capture_entity_is_selected,
+    capture_dismiss_match_briefing, capture_enabled_build_hotkey_for,
+    capture_enabled_train_hotkey_for, capture_enemy_structure_position, capture_entity_is_selected,
     capture_first_enabled_attack_move_hotkey, capture_first_enabled_build_hotkey,
     capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_frame_whole_map,
     capture_key, capture_match_phase_label, capture_model_harness_manifest,
@@ -1308,9 +1308,7 @@ fn render_construction_showcase(path: &Path) -> Result<(), String> {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
     let mut app = start_match_app();
-    if let Some(mut briefing) = app.world_mut().get_resource_mut::<MatchBriefingState>() {
-        briefing.dismiss();
-    }
+    capture_dismiss_match_briefing(&mut app);
     let (_, origin, _) =
         capture_player_command_center(&mut app).ok_or("no player command center found")?;
     capture_spawn_construction_showcase(&mut app, origin);
