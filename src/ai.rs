@@ -348,6 +348,7 @@ impl Default for AiDifficultySettings {
 
 #[derive(SystemParam)]
 pub(crate) struct AiDirectorResources<'w> {
+    pub(crate) terrain: Res<'w, TerrainHeightField>,
     pub(crate) map_bounds: Res<'w, MapBounds>,
     pub(crate) economies: ResMut<'w, Economies>,
     pub(crate) next_id: ResMut<'w, NextSpawnId>,
@@ -842,6 +843,7 @@ pub(crate) fn ai_director(
                     resources.next_id.0,
                     &targets,
                     *resources.map_bounds,
+                    &resources.terrain,
                 );
                 spawn_structure_under_construction_for_faction(
                     &mut commands,
@@ -1174,6 +1176,36 @@ pub(crate) fn ai_economy_structure_origin(
 }
 
 pub(crate) fn ai_structure_build_position(
+    team: Team,
+    origin: Vec3,
+    structure_id: &'static str,
+    build_kind: AiStructureBuildKind,
+    seed: u32,
+    targets: &Query<(Entity, &Team, &Transform), With<Health>>,
+    bounds: MapBounds,
+    terrain: &TerrainHeightField,
+) -> Vec3 {
+    // Retry with shifted seeds when a pick lands on a cliff edge or ramp; the
+    // AI base plateau is flat, so a nearby legal spot always exists.
+    let radius = registry::entity(structure_id).map_or(2.0, |def| def.radius);
+    for attempt in 0..6u32 {
+        let candidate = ai_structure_build_position_unchecked(
+            team,
+            origin,
+            structure_id,
+            build_kind,
+            seed + attempt * 101,
+            targets,
+            bounds,
+        );
+        if terrain_site_is_buildable(terrain, candidate, radius) {
+            return candidate;
+        }
+    }
+    origin
+}
+
+pub(crate) fn ai_structure_build_position_unchecked(
     team: Team,
     origin: Vec3,
     structure_id: &'static str,

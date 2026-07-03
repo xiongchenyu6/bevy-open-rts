@@ -146,6 +146,7 @@ pub(crate) enum StructurePlacementValidity {
     OutOfMap,
     MissingTech,
     OutOfBaseRadius,
+    UnevenTerrain,
 }
 
 pub(crate) fn repair_order_range(
@@ -182,11 +183,15 @@ pub(crate) fn structure_placement_feedback_text(
         StructurePlacementValidity::OutOfBaseRadius => {
             Some(t("无法摆放: 离基地太远", "Can't place: too far from base"))
         }
+        StructurePlacementValidity::UnevenTerrain => {
+            Some(t("无法摆放: 地形不平整", "Can't place: uneven terrain"))
+        }
     }
 }
 
 pub(crate) fn structure_placement_input(
     mut commands: Commands,
+    terrain: Res<TerrainHeightField>,
     mouse: Res<ButtonInput<MouseButton>>,
     keyboard: Res<ButtonInput<KeyCode>>,
     window_q: Query<&Window, With<PrimaryWindow>>,
@@ -222,7 +227,7 @@ pub(crate) fn structure_placement_input(
     }
     let pointer = window_q.single().ok().and_then(|window| {
         (!cursor_is_over_hud(window, &placement.hud_zones))
-            .then(|| pointer_ground(window, &camera_q))
+            .then(|| pointer_ground(window, &camera_q, &terrain))
             .flatten()
     });
     let team = placement.visible_player.team;
@@ -238,6 +243,7 @@ pub(crate) fn structure_placement_input(
                 pending.id,
                 point,
                 map_bounds,
+                &terrain,
                 &placement.economies,
                 &structures,
                 &occupiers,
@@ -265,6 +271,7 @@ pub(crate) fn structure_placement_input(
         point,
         rotation_y_radians,
         map_bounds,
+        &terrain,
         &mut placement.economies,
         &structures,
         &occupiers,
@@ -1090,6 +1097,7 @@ pub(crate) fn draw_structure_placement_preview(
     faction: SkirmishFaction,
     point: Vec3,
     bounds: MapBounds,
+    terrain: &TerrainHeightField,
     economies: &Economies,
     structures: &Query<StructurePrereqItem<'_>>,
     occupiers: &Query<
@@ -1106,7 +1114,7 @@ pub(crate) fn draw_structure_placement_preview(
         return;
     };
     let validity = structure_placement_validity_for_faction(
-        team, faction, pending.id, point, bounds, economies, structures, occupiers,
+        team, faction, pending.id, point, bounds, terrain, economies, structures, occupiers,
     );
     let color = structure_placement_preview_color(validity);
     draw_structure_placement_footprint(
@@ -1294,6 +1302,7 @@ pub(crate) fn structure_placement_validity(
     id: &'static str,
     point: Vec3,
     bounds: MapBounds,
+    terrain: &TerrainHeightField,
     economies: &Economies,
     structures: &Query<StructurePrereqItem<'_>>,
     occupiers: &Query<
@@ -1312,6 +1321,7 @@ pub(crate) fn structure_placement_validity(
         id,
         point,
         bounds,
+        terrain,
         economies,
         structures,
         occupiers,
@@ -1324,6 +1334,7 @@ pub(crate) fn structure_placement_validity_for_faction(
     id: &'static str,
     point: Vec3,
     bounds: MapBounds,
+    terrain: &TerrainHeightField,
     economies: &Economies,
     structures: &Query<StructurePrereqItem<'_>>,
     occupiers: &Query<
@@ -1357,7 +1368,32 @@ pub(crate) fn structure_placement_validity_for_faction(
     if structure_placement_collides(point, def.radius, occupiers) {
         return StructurePlacementValidity::CollidesWithObject;
     }
+    if !terrain_site_is_buildable(terrain, point, def.radius) {
+        return StructurePlacementValidity::UnevenTerrain;
+    }
     StructurePlacementValidity::Valid
+}
+
+/// Structures need level ground: every sampled footprint point must sit within
+/// one climbable step of the center height (rules out cliff edges and ramps).
+pub(crate) fn terrain_site_is_buildable(
+    terrain: &TerrainHeightField,
+    point: Vec3,
+    radius: f32,
+) -> bool {
+    if terrain.is_flat() {
+        return true;
+    }
+    let mut lowest = terrain.height_at(point);
+    let mut highest = lowest;
+    for i in 0..8 {
+        let angle = i as f32 * std::f32::consts::TAU / 8.0;
+        let sample = point + Vec3::new(angle.cos(), 0.0, angle.sin()) * radius;
+        let height = terrain.height_at(sample);
+        lowest = lowest.min(height);
+        highest = highest.max(height);
+    }
+    highest - lowest <= TERRAIN_MAX_STEP_M
 }
 
 pub(crate) fn selected_under_construction_stop_target<'a>(

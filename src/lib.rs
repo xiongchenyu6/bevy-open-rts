@@ -28,6 +28,8 @@ pub(crate) use audio::*;
 mod ai;
 mod campaign;
 pub(crate) use campaign::*;
+mod terrain;
+pub(crate) use terrain::*;
 mod save;
 pub(crate) use ai::*;
 pub(crate) use save::*;
@@ -1147,6 +1149,8 @@ pub(crate) struct SkirmishMapDef {
     pub(crate) neutral_tech: &'static [NeutralTechSpec],
     pub(crate) supply_crates: &'static [NamedSupplyCrateSpec],
     pub(crate) terrain_walls: &'static [TerrainWallSpec],
+    pub(crate) terrain_plateaus: &'static [TerrainPlateauSpec],
+    pub(crate) terrain_ramps: &'static [TerrainRampSpec],
 }
 
 impl SkirmishMapDef {
@@ -2200,6 +2204,7 @@ pub(crate) fn localized_skirmish_map_name(map: &SkirmishMapDef) -> &'static str 
         "MAP_NAME_TECH_DIVIDE" => t("科技分界线", "Tech Divide"),
         "MAP_NAME_BIG_ARENA" => t("大型竞技场", "Big Arena"),
         "MAP_NAME_CANYON_PASS" => t("峡谷通道", "Canyon Pass"),
+        "MAP_NAME_HIGHLAND_BASTION" => t("高地要塞", "Highland Bastion"),
         "MAP_NAME_CROSSFIRE" => t("交叉火线", "Crossfire"),
         "MAP_NAME_RING_VALLEY" => t("环形谷地", "Ring Valley"),
         _ => map.name,
@@ -3537,6 +3542,75 @@ pub(crate) const RING_VALLEY_WALLS: &[TerrainWallSpec] = &[
     },
 ];
 
+/// Highland Bastion: each base sits on its own plateau; the crystal high
+/// grounds in the middle are only reachable over ramps, so holding a ramp
+/// mouth holds the expansion.
+pub(crate) const HIGHLAND_BASTION_SPAWNS: &[(f32, f32)] = &[(12.0, 30.0), (48.0, 30.0)];
+pub(crate) const HIGHLAND_BASTION_RESOURCES: &[ResourceSpec] = &[
+    map_ore!(8.0, 24.0),
+    map_ore!(6.8, 25.6),
+    map_ore!(9.2, 26.8),
+    map_ore!(52.0, 24.0),
+    map_ore!(53.2, 25.6),
+    map_ore!(50.8, 26.8),
+    map_crystal!(30.0, 10.0),
+    map_crystal!(30.0, 50.0),
+    map_ore!(27.0, 10.0),
+    map_ore!(33.0, 50.0),
+];
+pub(crate) const HIGHLAND_BASTION_PLATEAUS: &[TerrainPlateauSpec] = &[
+    // West and east base plateaus.
+    TerrainPlateauSpec {
+        min: (2.0, 18.0),
+        max: (20.0, 42.0),
+        level: 1,
+    },
+    TerrainPlateauSpec {
+        min: (40.0, 18.0),
+        max: (58.0, 42.0),
+        level: 1,
+    },
+    // North and south crystal high grounds.
+    TerrainPlateauSpec {
+        min: (24.0, 2.0),
+        max: (36.0, 16.0),
+        level: 1,
+    },
+    TerrainPlateauSpec {
+        min: (24.0, 44.0),
+        max: (36.0, 58.0),
+        level: 1,
+    },
+];
+pub(crate) const HIGHLAND_BASTION_RAMPS: &[TerrainRampSpec] = &[
+    // Down from each base plateau toward the valley floor.
+    TerrainRampSpec {
+        min: (20.0, 27.0),
+        max: (27.0, 33.0),
+        level: 1,
+        direction: RampDirection::MinusX,
+    },
+    TerrainRampSpec {
+        min: (33.0, 27.0),
+        max: (40.0, 33.0),
+        level: 1,
+        direction: RampDirection::PlusX,
+    },
+    // Single ramp onto each crystal high ground: a defensible choke.
+    TerrainRampSpec {
+        min: (28.0, 16.0),
+        max: (32.0, 23.0),
+        level: 1,
+        direction: RampDirection::MinusZ,
+    },
+    TerrainRampSpec {
+        min: (28.0, 37.0),
+        max: (32.0, 44.0),
+        level: 1,
+        direction: RampDirection::PlusZ,
+    },
+];
+
 pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
     SkirmishMapDef {
         id: "plain_and_simple",
@@ -3550,6 +3624,8 @@ pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
         neutral_tech: EMPTY_NEUTRAL_TECH,
         supply_crates: EMPTY_NAMED_CRATES,
         terrain_walls: EMPTY_TERRAIN_WALLS,
+        terrain_plateaus: EMPTY_TERRAIN_PLATEAUS,
+        terrain_ramps: EMPTY_TERRAIN_RAMPS,
     },
     SkirmishMapDef {
         id: "four_corners",
@@ -3563,6 +3639,8 @@ pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
         neutral_tech: FOUR_CORNERS_NEUTRAL_TECH,
         supply_crates: FOUR_CORNERS_CRATES,
         terrain_walls: EMPTY_TERRAIN_WALLS,
+        terrain_plateaus: EMPTY_TERRAIN_PLATEAUS,
+        terrain_ramps: EMPTY_TERRAIN_RAMPS,
     },
     SkirmishMapDef {
         id: "tech_divide",
@@ -3576,6 +3654,8 @@ pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
         neutral_tech: TECH_DIVIDE_NEUTRAL_TECH,
         supply_crates: TECH_DIVIDE_CRATES,
         terrain_walls: EMPTY_TERRAIN_WALLS,
+        terrain_plateaus: EMPTY_TERRAIN_PLATEAUS,
+        terrain_ramps: EMPTY_TERRAIN_RAMPS,
     },
     SkirmishMapDef {
         id: "big_arena",
@@ -3589,6 +3669,8 @@ pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
         neutral_tech: BIG_ARENA_NEUTRAL_TECH,
         supply_crates: BIG_ARENA_CRATES,
         terrain_walls: EMPTY_TERRAIN_WALLS,
+        terrain_plateaus: EMPTY_TERRAIN_PLATEAUS,
+        terrain_ramps: EMPTY_TERRAIN_RAMPS,
     },
     SkirmishMapDef {
         id: "canyon_pass",
@@ -3602,6 +3684,8 @@ pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
         neutral_tech: EMPTY_NEUTRAL_TECH,
         supply_crates: EMPTY_NAMED_CRATES,
         terrain_walls: CANYON_PASS_WALLS,
+        terrain_plateaus: EMPTY_TERRAIN_PLATEAUS,
+        terrain_ramps: EMPTY_TERRAIN_RAMPS,
     },
     SkirmishMapDef {
         id: "crossfire",
@@ -3615,6 +3699,8 @@ pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
         neutral_tech: EMPTY_NEUTRAL_TECH,
         supply_crates: EMPTY_NAMED_CRATES,
         terrain_walls: CROSSFIRE_WALLS,
+        terrain_plateaus: EMPTY_TERRAIN_PLATEAUS,
+        terrain_ramps: EMPTY_TERRAIN_RAMPS,
     },
     SkirmishMapDef {
         id: "ring_valley",
@@ -3628,6 +3714,23 @@ pub(crate) const SKIRMISH_MAPS: &[SkirmishMapDef] = &[
         neutral_tech: EMPTY_NEUTRAL_TECH,
         supply_crates: EMPTY_NAMED_CRATES,
         terrain_walls: RING_VALLEY_WALLS,
+        terrain_plateaus: EMPTY_TERRAIN_PLATEAUS,
+        terrain_ramps: EMPTY_TERRAIN_RAMPS,
+    },
+    SkirmishMapDef {
+        id: "highland_bastion",
+        godot_path: "bevy://maps/HighlandBastion",
+        name: "Highland Bastion",
+        name_key: "MAP_NAME_HIGHLAND_BASTION",
+        players: 2,
+        size: (60.0, 60.0),
+        spawn_points: HIGHLAND_BASTION_SPAWNS,
+        resources: HIGHLAND_BASTION_RESOURCES,
+        neutral_tech: EMPTY_NEUTRAL_TECH,
+        supply_crates: EMPTY_NAMED_CRATES,
+        terrain_walls: EMPTY_TERRAIN_WALLS,
+        terrain_plateaus: HIGHLAND_BASTION_PLATEAUS,
+        terrain_ramps: HIGHLAND_BASTION_RAMPS,
     },
 ];
 
@@ -3867,6 +3970,7 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<PendingLoadedSave>()
         .init_resource::<ReplayTimeline>()
         .init_resource::<ActiveMission>()
+        .init_resource::<TerrainHeightField>()
         .init_resource::<MissionTriggerState>()
         .init_resource::<BuildQueue>()
         .init_resource::<BuildStructureTab>()
@@ -4629,6 +4733,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .in_set(SimulationPhase::Combat)
                 .run_if(match_in_progress),
             (
+                settle_new_entities_on_terrain.before(rebuild_nav_grid),
                 rebuild_nav_grid.before(plan_unit_paths),
                 plan_unit_paths.before(move_units),
             )
@@ -5238,6 +5343,7 @@ pub(crate) struct VisualFaction(pub(crate) SkirmishFaction);
 
 #[derive(SystemParam)]
 pub(crate) struct OrderResources<'w> {
+    pub(crate) terrain: Res<'w, TerrainHeightField>,
     pub(crate) map_bounds: Res<'w, MapBounds>,
     pub(crate) relations: Res<'w, TeamRelations>,
     pub(crate) command_mode: ResMut<'w, CommandMode>,
@@ -5293,6 +5399,7 @@ pub(crate) struct StructurePlacementInputResources<'w, 's> {
 
 #[derive(SystemParam)]
 pub(crate) struct StructurePlacementPreviewParams<'w, 's> {
+    pub(crate) terrain: Res<'w, TerrainHeightField>,
     pub(crate) command_mode: Res<'w, CommandMode>,
     pub(crate) hud_zones: Res<'w, HudHitZones>,
     pub(crate) visible_player: Res<'w, VisiblePlayer>,
@@ -5979,6 +6086,7 @@ pub(crate) fn setup(
     setup_settings: Res<MatchSetupSettings>,
     camera_state: Res<RtsCamera>,
     options: Res<MenuOptionsState>,
+    mut terrain_field: ResMut<TerrainHeightField>,
 ) {
     let skirmish_map = selected_map.definition();
     let catalog_consistent = skirmish_map.is_catalog_consistent();
@@ -6019,20 +6127,25 @@ pub(crate) fn setup(
         MatchScopedEntity,
     ));
 
+    terrain_field.rebuild(skirmish_map);
+    let terrain_mesh_handle = if terrain_field.is_flat() {
+        meshes.add(
+            Plane3d::default()
+                .mesh()
+                .size(skirmish_map.size.0, skirmish_map.size.1),
+        )
+    } else {
+        meshes.add(terrain_mesh(&terrain_field))
+    };
     commands.spawn((
         Name::new(format!("{} Terrain", skirmish_map.name)),
-        Mesh3d(
-            meshes.add(
-                Plane3d::default()
-                    .mesh()
-                    .size(skirmish_map.size.0, skirmish_map.size.1),
-            ),
-        ),
+        Mesh3d(terrain_mesh_handle),
         MeshMaterial3d(materials.add(StandardMaterial {
             base_color: Color::srgb(0.18, 0.22, 0.2),
             perceptual_roughness: 0.92,
             ..default()
         })),
+        bevy_rts_camera::Ground,
         MatchScopedEntity,
     ));
 
@@ -6045,6 +6158,7 @@ pub(crate) fn setup(
             &mut materials,
             &mut images,
             map_bounds,
+            terrain_field.max_height() + FOG_OVERLAY_Y,
         );
     }
 
@@ -7955,6 +8069,7 @@ pub(crate) fn spawn_fog_overlay(
     materials: &mut Assets<StandardMaterial>,
     images: &mut Assets<Image>,
     bounds: MapBounds,
+    surface_y: f32,
 ) {
     use bevy::image::ImageSampler;
     use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat};
@@ -7993,7 +8108,7 @@ pub(crate) fn spawn_fog_overlay(
             unlit: true,
             ..default()
         })),
-        Transform::from_xyz(0.0, FOG_OVERLAY_Y, 0.0),
+        Transform::from_xyz(0.0, surface_y, 0.0),
         FogOverlayPlane,
         MatchScopedEntity,
     ));
@@ -8563,6 +8678,7 @@ pub(crate) fn place_structure_at(
     point: Vec3,
     rotation_y_radians: f32,
     bounds: MapBounds,
+    terrain: &TerrainHeightField,
     economies: &mut Economies,
     structures: &Query<StructurePrereqItem<'_>>,
     occupiers: &Query<
@@ -8586,6 +8702,7 @@ pub(crate) fn place_structure_at(
         point,
         rotation_y_radians,
         bounds,
+        terrain,
         economies,
         structures,
         occupiers,
@@ -8603,6 +8720,7 @@ pub(crate) fn place_structure_at_for_faction(
     point: Vec3,
     rotation_y_radians: f32,
     bounds: MapBounds,
+    terrain: &TerrainHeightField,
     economies: &mut Economies,
     structures: &Query<StructurePrereqItem<'_>>,
     occupiers: &Query<
@@ -8617,7 +8735,7 @@ pub(crate) fn place_structure_at_for_faction(
 ) -> Result<(Entity, &'static str), StructurePlacementValidity> {
     let def = registry::entity(id).ok_or(StructurePlacementValidity::MissingTech)?;
     let validity = structure_placement_validity_for_faction(
-        team, faction, id, point, bounds, economies, structures, occupiers,
+        team, faction, id, point, bounds, terrain, economies, structures, occupiers,
     );
     if validity != StructurePlacementValidity::Valid {
         return Err(validity);
@@ -12346,7 +12464,13 @@ pub(crate) fn draw_world_overlays(
         && let Ok(window) = placement_preview.window_q.single()
         && let Some(point) = pending.position.or_else(|| {
             (!cursor_is_over_hud(window, &placement_preview.hud_zones))
-                .then(|| pointer_ground(window, &placement_preview.camera_q))
+                .then(|| {
+                    pointer_ground(
+                        window,
+                        &placement_preview.camera_q,
+                        &placement_preview.terrain,
+                    )
+                })
                 .flatten()
         })
     {
@@ -12359,6 +12483,7 @@ pub(crate) fn draw_world_overlays(
                 .slot_faction(placement_preview.visible_player.team),
             point,
             *placement_preview.map_bounds,
+            &placement_preview.terrain,
             &placement_preview.economies,
             &placement_preview.structures,
             &placement_preview.occupiers,
@@ -12436,9 +12561,9 @@ pub(crate) fn structure_placement_preview_color(validity: StructurePlacementVali
         StructurePlacementValidity::NotEnoughResources => Color::srgba(1.0, 0.78, 0.24, 0.9),
         StructurePlacementValidity::OutOfBaseRadius => Color::srgba(1.0, 0.5, 0.18, 0.9),
         StructurePlacementValidity::MissingTech => Color::srgba(0.72, 0.54, 1.0, 0.9),
-        StructurePlacementValidity::OutOfMap | StructurePlacementValidity::CollidesWithObject => {
-            Color::srgba(1.0, 0.2, 0.16, 0.9)
-        }
+        StructurePlacementValidity::OutOfMap
+        | StructurePlacementValidity::CollidesWithObject
+        | StructurePlacementValidity::UnevenTerrain => Color::srgba(1.0, 0.2, 0.16, 0.9),
     }
 }
 

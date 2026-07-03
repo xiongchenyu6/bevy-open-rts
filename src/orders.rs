@@ -296,6 +296,7 @@ pub(crate) fn setup_command_tooltip(commands: &mut Commands, font: Handle<Font>)
 
 pub(crate) fn select_entities(
     mut commands: Commands,
+    terrain: Res<TerrainHeightField>,
     mouse: Res<ButtonInput<MouseButton>>,
     keyboard: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
@@ -436,7 +437,7 @@ pub(crate) fn select_entities(
         return;
     }
 
-    let Some(point) = pointer_ground(window, &camera_q) else {
+    let Some(point) = pointer_ground(window, &camera_q, &terrain) else {
         if std::env::var_os("RTS_SELECT_DIAG").is_some() {
             eprintln!("[select-diag] pointer_ground=None at {cursor:?}");
         }
@@ -742,7 +743,7 @@ pub(crate) fn issue_orders(
         }
         return;
     }
-    let Some(raw_point) = pointer_ground(window, &camera_q) else {
+    let Some(raw_point) = pointer_ground(window, &camera_q, &order_resources.terrain) else {
         return;
     };
     let Some(point) = validated_terrain_target_in_bounds(raw_point, *order_resources.map_bounds)
@@ -4746,11 +4747,12 @@ pub(crate) fn should_draw_action_queue_path(team: Team, visible_team: Team) -> b
 pub(crate) fn pointer_ground(
     window: &Window,
     camera_q: &Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    terrain: &TerrainHeightField,
 ) -> Option<Vec3> {
     let cursor = window.cursor_position()?;
     let (camera, camera_transform) = camera_q.single().ok()?;
     let ray = camera.viewport_to_world(camera_transform, cursor).ok()?;
-    ray.plane_intersection_point(Vec3::ZERO, InfinitePlane3d::new(Vec3::Y))
+    terrain.raycast(ray.origin, *ray.direction)
 }
 
 pub(crate) fn screen_polygon_for_drag(start: Vec2, end: Vec2) -> Option<Vec<Vec2>> {

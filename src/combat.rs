@@ -2172,6 +2172,7 @@ pub(crate) fn move_units(
     mut kill_credits: ResMut<KillCredits>,
     mut match_state: ResMut<MatchState>,
     mut latest_battle_event: ResMut<LatestBattleEvent>,
+    terrain: Res<TerrainHeightField>,
     mut unit_queries: ParamSet<(
         Query<(
             Entity,
@@ -2312,7 +2313,17 @@ pub(crate) fn move_units(
                 direction
             };
             let intended_position = previous_position + move_direction * step;
+            // Cliff faces are impassable on foot even when steering pushes into
+            // them; A* already routes around, this is the last-resort guard.
+            if *domain == MovementDomain::Terrain
+                && terrain.step_blocked(previous_position, intended_position)
+            {
+                continue;
+            }
             transform.translation += move_direction * step.min(distance);
+            if *domain == MovementDomain::Terrain && !terrain.is_flat() {
+                transform.translation.y = terrain.height_at(transform.translation);
+            }
             let actual_position = transform.translation;
             let look_at = transform.translation + move_direction;
             if xz_distance(transform.translation, look_at) > 0.05 {

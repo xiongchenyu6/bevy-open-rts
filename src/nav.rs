@@ -164,7 +164,15 @@ pub(crate) struct NavGrid {
 }
 
 impl NavGrid {
-    pub(crate) fn rebuild(&mut self, bounds: MapBounds, obstacles: &[(Vec3, f32)]) {
+    /// Full rebuild: static obstacles plus terrain cliffs. A cell whose height
+    /// differs from a 4-neighbor by more than a unit can climb becomes blocked,
+    /// so cliff bands stop A*/line_clear while gentle ramps stay open.
+    pub(crate) fn rebuild_with_terrain(
+        &mut self,
+        bounds: MapBounds,
+        obstacles: &[(Vec3, f32)],
+        terrain: &TerrainHeightField,
+    ) {
         self.origin_x = -bounds.half_width;
         self.origin_z = -bounds.half_depth;
         self.width = ((bounds.half_width * 2.0) / NAV_GRID_CELL_M).ceil() as i32;
@@ -182,6 +190,24 @@ impl NavGrid {
                     let dx = center.x - position.x;
                     let dz = center.z - position.z;
                     if dx * dx + dz * dz < reach * reach {
+                        self.blocked[(cz * self.width + cx) as usize] = true;
+                    }
+                }
+            }
+        }
+        if !terrain.is_flat() {
+            for cz in 0..self.height {
+                for cx in 0..self.width {
+                    let here = terrain.height_at(self.cell_center(cx, cz));
+                    let cliff = [(1i32, 0i32), (-1, 0), (0, 1), (0, -1)]
+                        .iter()
+                        .any(|&(dx, dz)| {
+                            let nx = (cx + dx).clamp(0, self.width - 1);
+                            let nz = (cz + dz).clamp(0, self.height - 1);
+                            let there = terrain.height_at(self.cell_center(nx, nz));
+                            (there - here).abs() > TERRAIN_MAX_STEP_M
+                        });
+                    if cliff {
                         self.blocked[(cz * self.width + cx) as usize] = true;
                     }
                 }
@@ -361,6 +387,7 @@ pub(crate) struct PlannedPath {
 /// Rebuilds the nav grid when structures/resource nodes appear or disappear.
 pub(crate) fn rebuild_nav_grid(
     map_bounds: Res<MapBounds>,
+    terrain: Res<TerrainHeightField>,
     mut grid: ResMut<NavGrid>,
     obstacles: Query<
         (&Transform, &Selectable, Option<&Health>),
@@ -382,7 +409,7 @@ pub(crate) fn rebuild_nav_grid(
         .filter(|(_, _, health)| !health.is_some_and(|health| health.current <= 0.0))
         .map(|(transform, selectable, _)| (transform.translation, selectable.radius))
         .collect();
-    grid.rebuild(*map_bounds, &snapshot);
+    grid.rebuild_with_terrain(*map_bounds, &snapshot, &terrain);
 }
 
 /// Gives terrain units whose straight line to the MoveOrder target is blocked an
@@ -473,7 +500,7 @@ mod tests {
         // blocked, A* must find a detour and string-pull it into few waypoints.
         let bounds = MapBounds::from_size((10.0, 10.0));
         let wall = vec![(Vec3::ZERO, 1.5)];
-        grid.rebuild(bounds, &wall);
+        grid.rebuild_with_terrain(bounds, &wall, &TerrainHeightField::default());
         let from = Vec3::new(-4.0, 0.0, 0.0);
         let to = Vec3::new(4.0, 0.0, 0.0);
         assert!(
@@ -504,7 +531,7 @@ mod tests {
         let rocks: Vec<(Vec3, f32)> = (0..9)
             .map(|i| (Vec3::new(-6.0 + i as f32 * 1.5, 0.0, 0.0), 0.8))
             .collect();
-        grid.rebuild(bounds, &rocks);
+        grid.rebuild_with_terrain(bounds, &rocks, &TerrainHeightField::default());
         let from = Vec3::new(0.0, 0.0, -6.0);
         let to = Vec3::new(0.0, 0.0, 6.0);
         assert!(
@@ -524,7 +551,11 @@ mod tests {
     #[test]
     fn nav_grid_open_map_needs_no_path() {
         let mut grid = NavGrid::default();
-        grid.rebuild(MapBounds::from_size((10.0, 10.0)), &[]);
+        grid.rebuild_with_terrain(
+            MapBounds::from_size((10.0, 10.0)),
+            &[],
+            &TerrainHeightField::default(),
+        );
         assert!(grid.line_clear(Vec3::new(-4.0, 0.0, -4.0), Vec3::new(4.0, 0.0, 4.0)));
     }
 }
