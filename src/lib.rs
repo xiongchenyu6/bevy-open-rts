@@ -43,6 +43,8 @@ mod fog;
 pub(crate) use fog::*;
 mod match_screens;
 pub(crate) use match_screens::*;
+mod combat_vfx;
+pub(crate) use combat_vfx::*;
 mod save;
 pub(crate) use ai::*;
 pub(crate) use save::*;
