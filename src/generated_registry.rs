@@ -217,46 +217,34 @@ const PARTS_ANTIGROUNDTURRET: &[RenderPart] = &[RenderPart {
 }];
 const MODELS_ARCCOILDEFENSETOWER: &[&str] = &[
     "models/kenney-spacekit/machine_generatorLarge.glb",
-    "models/kenney-spacekit/machine_wireless.glb",
+    "models/kenney-spacekit/platform_large.glb",
     "models/kenney-spacekit/satelliteDish.glb",
-    "models/kenney-spacekit/structure_detailed.glb",
+    "models/kenney-spacekit/structure_closed.glb",
 ];
 const PARTS_ARCCOILDEFENSETOWER: &[RenderPart] = &[
     RenderPart {
-        model: "models/kenney-spacekit/structure_detailed.glb",
-        translation: [-1.36, 0.0, -1.02],
+        model: "models/kenney-spacekit/platform_large.glb",
+        translation: [0.0, 0.0, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.5304, 0.5304, 0.5304],
+        scale: [0.95, 0.8, 0.95],
+    },
+    RenderPart {
+        model: "models/kenney-spacekit/structure_closed.glb",
+        translation: [0.0, 0.36, 0.0],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [1.0, 1.3, 1.0],
     },
     RenderPart {
         model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-0.646, 0.0, -0.102],
+        translation: [0.0, 1.55, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2856, 0.2856, 0.2856],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-2.074, 0.0, -0.102],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2856, 0.2856, 0.2856],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-1.36, 0.1904, -1.02],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3944, 0.3944, 0.3944],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_wireless.glb",
-        translation: [-1.36, 0.646, -1.02],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3536, 0.3536, 0.3536],
+        scale: [1.15, 1.15, 1.15],
     },
     RenderPart {
         model: "models/kenney-spacekit/satelliteDish.glb",
-        translation: [-1.36, 0.918, -1.02],
+        translation: [0.0, 2.05, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2312, 0.2312, 0.2312],
+        scale: [0.85, 0.85, 0.85],
     },
 ];
 const MODELS_BARRACKS: &[&str] = &[
@@ -809,41 +797,35 @@ const PARTS_JAMMERVEHICLE: &[RenderPart] = &[
     },
 ];
 const MODELS_LANCEBEAMDEFENSETOWER: &[&str] = &[
-    "models/kenney-spacekit/machine_generator.glb",
+    "models/kenney-spacekit/platform_large.glb",
     "models/kenney-spacekit/structure_closed.glb",
     "models/kenney-spacekit/turret_single.glb",
     "models/kenney-spacekit/weapon_gun.glb",
 ];
 const PARTS_LANCEBEAMDEFENSETOWER: &[RenderPart] = &[
     RenderPart {
+        model: "models/kenney-spacekit/platform_large.glb",
+        translation: [0.0, 0.0, 0.0],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [0.95, 0.8, 0.95],
+    },
+    RenderPart {
         model: "models/kenney-spacekit/structure_closed.glb",
-        translation: [-1.44, 0.0, -1.08],
+        translation: [0.0, 0.36, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.5904, 0.5904, 0.5904],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generator.glb",
-        translation: [-0.792, 0.0, -0.072],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3456, 0.3456, 0.3456],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generator.glb",
-        translation: [-2.088, 0.0, -0.072],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3456, 0.3456, 0.3456],
+        scale: [1.05, 1.15, 1.05],
     },
     RenderPart {
         model: "models/kenney-spacekit/turret_single.glb",
-        translation: [-1.44, 0.324, -1.08],
+        translation: [0.0, 1.45, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.5616, 0.5616, 0.5616],
+        scale: [1.35, 1.35, 1.35],
     },
     RenderPart {
         model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-1.44, 0.792, -1.404],
+        translation: [0.0, 1.55, 0.35],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.4608, 0.4608, 0.4608],
+        scale: [1.2, 1.2, 1.2],
     },
 ];
 const MODELS_LANCEBEAMTANK: &[&str] = &[
@@ -1197,41 +1179,35 @@ const PARTS_POWERREACTOR: &[RenderPart] = &[
     },
 ];
 const MODELS_PRISMDEFENSEOBELISK: &[&str] = &[
-    "models/kenney-spacekit/machine_generatorLarge.glb",
+    "models/kenney-spacekit/platform_large.glb",
     "models/kenney-spacekit/rock_crystalsLargeA.glb",
-    "models/kenney-spacekit/satelliteDish_large.glb",
+    "models/kenney-spacekit/satelliteDish.glb",
     "models/kenney-spacekit/structure_closed.glb",
 ];
 const PARTS_PRISMDEFENSEOBELISK: &[RenderPart] = &[
     RenderPart {
+        model: "models/kenney-spacekit/platform_large.glb",
+        translation: [0.0, 0.0, 0.0],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [0.95, 0.8, 0.95],
+    },
+    RenderPart {
         model: "models/kenney-spacekit/structure_closed.glb",
-        translation: [-1.44, 0.0, -1.08],
+        translation: [0.0, 0.36, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.6192, 0.6192, 0.6192],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-0.72, 0.0, -0.072],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3024, 0.3024, 0.3024],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-2.16, 0.0, -0.072],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3024, 0.3024, 0.3024],
+        scale: [1.0, 1.0, 1.0],
     },
     RenderPart {
         model: "models/kenney-spacekit/rock_crystalsLargeA.glb",
-        translation: [-1.44, 0.396, -1.08],
+        translation: [0.0, 1.35, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.4464, 0.864, 0.4464],
+        scale: [1.25, 1.25, 1.25],
     },
     RenderPart {
-        model: "models/kenney-spacekit/satelliteDish_large.glb",
-        translation: [-1.44, 1.044, -1.08],
+        model: "models/kenney-spacekit/satelliteDish.glb",
+        translation: [0.75, 0.36, -0.55],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.216, 0.216, 0.216],
+        scale: [0.75, 0.75, 0.75],
     },
 ];
 const MODELS_PULSERIFLECOMMANDO: &[&str] = &[
@@ -1349,41 +1325,35 @@ const PARTS_RAILARTILLERYWALKER: &[RenderPart] = &[
     },
 ];
 const MODELS_RAILCANNONBUNKER: &[&str] = &[
-    "models/kenney-spacekit/machine_barrelLarge.glb",
+    "models/kenney-spacekit/platform_large.glb",
     "models/kenney-spacekit/structure_closed.glb",
     "models/kenney-spacekit/turret_double.glb",
     "models/kenney-spacekit/weapon_gun.glb",
 ];
 const PARTS_RAILCANNONBUNKER: &[RenderPart] = &[
     RenderPart {
+        model: "models/kenney-spacekit/platform_large.glb",
+        translation: [0.0, 0.0, 0.0],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [1.05, 0.8, 1.05],
+    },
+    RenderPart {
         model: "models/kenney-spacekit/structure_closed.glb",
-        translation: [-1.56, 0.0, -1.17],
+        translation: [0.0, 0.36, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.702, 0.702, 0.702],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_barrelLarge.glb",
-        translation: [-0.8736, 0.078, -0.156],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3276, 0.3276, 0.3276],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_barrelLarge.glb",
-        translation: [-2.2464, 0.078, -0.156],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3276, 0.3276, 0.3276],
+        scale: [1.2, 0.85, 1.2],
     },
     RenderPart {
         model: "models/kenney-spacekit/turret_double.glb",
-        translation: [-1.56, 0.3744, -1.17],
+        translation: [0.0, 1.15, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.6708, 0.6708, 0.6708],
+        scale: [1.5, 1.5, 1.5],
     },
     RenderPart {
         model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-1.56, 0.8424, -1.6536],
+        translation: [0.0, 1.25, 0.55],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.6708, 0.6708, 0.6708],
+        scale: [1.4, 1.4, 1.4],
     },
 ];
 const MODELS_RAILSNIPERTEAM: &[&str] = &[
@@ -1856,78 +1826,65 @@ const PARTS_TECHAIRPORT: &[RenderPart] = &[
 const MODELS_TECHBUNKER: &[&str] = &[
     "models/kenney-spacekit/machine_barrelLarge.glb",
     "models/kenney-spacekit/machine_wireless.glb",
+    "models/kenney-spacekit/platform_large.glb",
     "models/kenney-spacekit/structure_closed.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
 ];
 const PARTS_TECHBUNKER: &[RenderPart] = &[
     RenderPart {
-        model: "models/kenney-spacekit/structure_closed.glb",
-        translation: [-1.64, 0.0, -1.23],
+        model: "models/kenney-spacekit/platform_large.glb",
+        translation: [0.0, 0.0, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.861, 0.6068, 0.861],
+        scale: [1.1, 0.8, 1.1],
+    },
+    RenderPart {
+        model: "models/kenney-spacekit/structure_closed.glb",
+        translation: [0.0, 0.36, 0.0],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [1.35, 1.0, 1.35],
+    },
+    RenderPart {
+        model: "models/kenney-spacekit/machine_barrelLarge.glb",
+        translation: [0.85, 0.36, 0.55],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [0.95, 0.95, 0.95],
     },
     RenderPart {
         model: "models/kenney-spacekit/machine_wireless.glb",
-        translation: [-1.066, 0.7872, -1.0496],
+        translation: [-0.8, 0.36, -0.65],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2296, 0.2296, 0.2296],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_barrelLarge.glb",
-        translation: [-0.8856, 0.0984, -0.3444],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2624, 0.2624, 0.2624],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_barrelLarge.glb",
-        translation: [-2.3944, 0.0984, -0.3444],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2624, 0.2624, 0.2624],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-1.64, 0.6724, -0.6396],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.4264, 0.4264, 0.4264],
+        scale: [0.8, 0.8, 0.8],
     },
 ];
 const MODELS_TECHHOSPITAL: &[&str] = &[
-    "models/kenney-spacekit/machine_generatorLarge.glb",
-    "models/kenney-spacekit/platform_small.glb",
+    "models/kenney-spacekit/hangar_roundGlass.glb",
+    "models/kenney-spacekit/machine_wireless.glb",
+    "models/kenney-spacekit/platform_large.glb",
     "models/kenney-spacekit/satelliteDish.glb",
-    "models/kenney-spacekit/stairs_short.glb",
-    "models/kenney-spacekit/structure_closed.glb",
 ];
 const PARTS_TECHHOSPITAL: &[RenderPart] = &[
     RenderPart {
-        model: "models/kenney-spacekit/platform_small.glb",
+        model: "models/kenney-spacekit/platform_large.glb",
         translation: [0.0, 0.0, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.612, 0.3024, 0.612],
+        scale: [1.5, 0.8, 1.5],
     },
     RenderPart {
-        model: "models/kenney-spacekit/structure_closed.glb",
-        translation: [-0.612, 0.036, -0.54],
+        model: "models/kenney-spacekit/hangar_roundGlass.glb",
+        translation: [0.0, 0.36, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.4464, 0.4464, 0.4464],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [0.54, 0.036, 0.468],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2448, 0.2448, 0.2448],
+        scale: [0.92, 0.92, 0.92],
     },
     RenderPart {
         model: "models/kenney-spacekit/satelliteDish.glb",
-        translation: [0.612, 0.288, -0.54],
+        translation: [1.2, 0.36, -0.95],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.216, 0.216, 0.216],
+        scale: [1.0, 1.0, 1.0],
     },
     RenderPart {
-        model: "models/kenney-spacekit/stairs_short.glb",
-        translation: [-0.612, 0.0144, 0.612],
+        model: "models/kenney-spacekit/machine_wireless.glb",
+        translation: [-1.15, 0.36, 0.95],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.4176, 0.2304, 0.4176],
+        scale: [0.85, 0.85, 0.85],
     },
 ];
 const MODELS_TECHLAB: &[&str] = &[
@@ -1956,61 +1913,48 @@ const PARTS_TECHLAB: &[RenderPart] = &[
     },
 ];
 const MODELS_TECHOILDERRICK: &[&str] = &[
-    "models/kenney-spacekit/machine_generatorLarge.glb",
-    "models/kenney-spacekit/pipe_ringHigh.glb",
-    "models/kenney-spacekit/pipe_straight.glb",
+    "models/kenney-spacekit/chimney_detailed.glb",
+    "models/kenney-spacekit/machine_barrelLarge.glb",
+    "models/kenney-spacekit/pipe_ringHighEnd.glb",
+    "models/kenney-spacekit/platform_large.glb",
     "models/kenney-spacekit/rocket_fuelA.glb",
-    "models/kenney-spacekit/satelliteDish.glb",
-    "models/kenney-spacekit/structure_detailed.glb",
 ];
 const PARTS_TECHOILDERRICK: &[RenderPart] = &[
     RenderPart {
-        model: "models/kenney-spacekit/structure_detailed.glb",
+        model: "models/kenney-spacekit/platform_large.glb",
         translation: [0.0, 0.0, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.504, 0.324, 0.504],
+        scale: [1.42, 0.8, 1.42],
     },
     RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-0.468, 0.108, 0.108],
+        model: "models/kenney-spacekit/pipe_ringHighEnd.glb",
+        translation: [0.0, 0.36, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3024, 0.3024, 0.3024],
+        scale: [1.15, 1.15, 1.15],
+    },
+    RenderPart {
+        model: "models/kenney-spacekit/chimney_detailed.glb",
+        translation: [0.0, 0.36, 0.0],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [0.7, 0.7, 0.7],
     },
     RenderPart {
         model: "models/kenney-spacekit/rocket_fuelA.glb",
-        translation: [0.612, 0.036, -0.396],
+        translation: [1.05, 0.36, -0.7],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2448, 0.2448, 0.2448],
+        scale: [0.85, 0.85, 0.85],
     },
     RenderPart {
         model: "models/kenney-spacekit/rocket_fuelA.glb",
-        translation: [0.612, 0.036, 0.3456],
+        translation: [1.05, 0.36, 0.7],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2448, 0.2448, 0.2448],
+        scale: [0.85, 0.85, 0.85],
     },
     RenderPart {
-        model: "models/kenney-spacekit/pipe_ringHigh.glb",
-        translation: [-0.9, 0.144, 0.0],
+        model: "models/kenney-spacekit/machine_barrelLarge.glb",
+        translation: [-1.0, 0.36, 0.75],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.252, 0.468, 0.252],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/pipe_straight.glb",
-        translation: [-0.144, 0.036, -0.72],
-        rotation: [0.0, 0.7071, 0.0, 0.7071],
-        scale: [0.18, 0.18, 0.18],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/pipe_straight.glb",
-        translation: [0.324, 0.036, 0.72],
-        rotation: [0.0, 0.7071, 0.0, 0.7071],
-        scale: [0.18, 0.18, 0.18],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/satelliteDish.glb",
-        translation: [-0.684, 0.396, -0.468],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2736, 0.2736, 0.2736],
+        scale: [1.1, 1.1, 1.1],
     },
 ];
 const MODELS_TECHREPAIRDEPOT: &[&str] = &[
@@ -2130,48 +2074,42 @@ const PARTS_VEHICLEFACTORY: &[RenderPart] = &[
     },
 ];
 const MODELS_WEATHERCONTROLSPIRE: &[&str] = &[
-    "models/kenney-spacekit/hangar_roundGlass.glb",
+    "models/kenney-spacekit/chimney_detailed.glb",
     "models/kenney-spacekit/machine_generatorLarge.glb",
-    "models/kenney-spacekit/machine_wireless.glb",
+    "models/kenney-spacekit/pipe_ringHighEnd.glb",
+    "models/kenney-spacekit/platform_large.glb",
     "models/kenney-spacekit/satelliteDish_large.glb",
-    "models/kenney-spacekit/structure_detailed.glb",
 ];
 const PARTS_WEATHERCONTROLSPIRE: &[RenderPart] = &[
     RenderPart {
-        model: "models/kenney-spacekit/hangar_roundGlass.glb",
-        translation: [-1.64, 0.0, -1.23],
+        model: "models/kenney-spacekit/platform_large.glb",
+        translation: [0.0, 0.0, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.7708, 0.7708, 0.7708],
+        scale: [1.6, 0.8, 1.6],
     },
     RenderPart {
-        model: "models/kenney-spacekit/structure_detailed.glb",
-        translation: [-1.64, 0.041, 0.246],
+        model: "models/kenney-spacekit/pipe_ringHighEnd.glb",
+        translation: [0.0, 0.36, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.4592, 0.4592, 0.4592],
+        scale: [1.35, 1.35, 1.35],
     },
     RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-0.738, 0.0, -0.205],
+        model: "models/kenney-spacekit/chimney_detailed.glb",
+        translation: [0.0, 1.2, 0.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.4264, 0.4264, 0.4264],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-2.542, 0.0, -0.205],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.4264, 0.4264, 0.4264],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_wireless.glb",
-        translation: [-1.64, 0.6724, -1.23],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.574, 0.574, 0.574],
+        scale: [0.8, 0.8, 0.8],
     },
     RenderPart {
         model: "models/kenney-spacekit/satelliteDish_large.glb",
-        translation: [-1.64, 1.2136, -1.23],
+        translation: [1.2, 0.36, -1.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3772, 0.3772, 0.3772],
+        scale: [1.15, 1.15, 1.15],
+    },
+    RenderPart {
+        model: "models/kenney-spacekit/machine_generatorLarge.glb",
+        translation: [-1.25, 0.36, 0.95],
+        rotation: [0.0, 0.0, 0.0, 1.0],
+        scale: [1.0, 1.0, 1.0],
     },
 ];
 const MODELS_WORKER: &[&str] = &[
