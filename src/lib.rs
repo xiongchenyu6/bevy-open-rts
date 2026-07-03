@@ -2788,6 +2788,12 @@ pub fn build_game_app(mode: GameAppMode) -> App {
             add_headless_game_plugins(&mut app);
         }
     };
+    // godot's WorldEnvironment: white ambient over a procedural sky.
+    app.insert_resource(GlobalAmbientLight {
+        color: Color::WHITE,
+        brightness: 340.0,
+        affects_lightmapped_meshes: true,
+    });
     app.insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
         .insert_resource(StartupLoadingPolicy {
             preload_assets: matches!(mode, GameAppMode::Interactive),
@@ -4445,13 +4451,15 @@ pub(crate) fn setup(
         MatchScopedEntity,
     ));
 
+    // Sun direction and warm ambient mirror godot's Match.tscn
+    // (DirectionalLight3D basis -Z, white ambient, procedural sky).
     commands.spawn((
         DirectionalLight {
             shadow_maps_enabled: true,
-            illuminance: 14_000.0,
+            illuminance: 16_000.0,
             ..default()
         },
-        Transform::from_xyz(-4.0, 12.0, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_xyz(0.0, 38.0, 0.0).looking_to(Vec3::new(0.534, -0.784, -0.318), Vec3::Y),
         MatchScopedEntity,
     ));
 
@@ -4468,9 +4476,10 @@ pub(crate) fn setup(
     commands.spawn((
         Name::new(format!("{} Terrain", skirmish_map.name)),
         Mesh3d(terrain_mesh_handle),
+        // godot terrain.material.tres: warm sand albedo (0.96, 0.745, 0.655).
         MeshMaterial3d(materials.add(StandardMaterial {
-            base_color: Color::srgb(0.18, 0.22, 0.2),
-            perceptual_roughness: 0.92,
+            base_color: Color::srgb(0.96, 0.745, 0.655),
+            perceptual_roughness: 0.95,
             ..default()
         })),
         bevy_rts_camera::Ground,
