@@ -2338,6 +2338,7 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<ReplayTimeline>()
         .init_resource::<ActiveMission>()
         .init_resource::<TerrainHeightField>()
+        .init_resource::<TeamColorMaterials>()
         .init_resource::<MissionTriggerState>()
         .init_resource::<BuildQueue>()
         .init_resource::<BuildStructureTab>()
@@ -2791,7 +2792,7 @@ pub fn build_game_app(mode: GameAppMode) -> App {
     // godot's WorldEnvironment: white ambient over a procedural sky.
     app.insert_resource(GlobalAmbientLight {
         color: Color::WHITE,
-        brightness: 340.0,
+        brightness: 190.0,
         affects_lightmapped_meshes: true,
     });
     app.insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
@@ -3180,6 +3181,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 animate_construction_workers,
                 animate_structure_construction,
                 apply_construction_ghost_material,
+                apply_team_color_materials,
                 update_combat_wreckage,
             )
                 .chain()
@@ -6353,18 +6355,24 @@ pub(crate) fn draw_world_overlays(
         }
     }
 
-    // A faint battlefield grid so the ground reads with scale instead of as a
-    // flat void — a baseline RTS readability cue.
-    let cells = (MAP_HALF_EXTENT as u32) * 2;
-    gizmos.grid(
-        Isometry3d::new(
-            Vec3::new(0.0, 0.02, 0.0),
-            Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2),
-        ),
-        UVec2::new(cells, cells),
-        Vec2::splat(1.0),
-        Color::srgba(0.30, 0.38, 0.40, 0.14),
-    );
+    // Placement grid only while a structure ghost is on the cursor (godot
+    // draws no world grid on open ground).
+    if placement_preview
+        .command_mode
+        .pending_structure_placement
+        .is_some()
+    {
+        let cells = (MAP_HALF_EXTENT as u32) * 2;
+        gizmos.grid(
+            Isometry3d::new(
+                Vec3::new(0.0, 0.02, 0.0),
+                Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2),
+            ),
+            UVec2::new(cells, cells),
+            Vec2::splat(1.0),
+            Color::srgba(0.35, 0.3, 0.24, 0.16),
+        );
+    }
 
     for (
         transform,
@@ -6593,22 +6601,29 @@ pub(crate) fn draw_world_overlays(
     for (transform, effect) in &vfx.promotion {
         draw_veterancy_promotion_effect(&mut gizmos, transform.translation, effect, &player_colors);
     }
-    for i in -24..=24 {
-        let c = if i % 4 == 0 {
-            Color::srgba(0.5, 0.58, 0.6, 0.16)
-        } else {
-            Color::srgba(0.5, 0.58, 0.6, 0.06)
-        };
-        gizmos.line(
-            Vec3::new(i as f32, 0.012, -MAP_HALF_EXTENT),
-            Vec3::new(i as f32, 0.012, MAP_HALF_EXTENT),
-            c,
-        );
-        gizmos.line(
-            Vec3::new(-MAP_HALF_EXTENT, 0.012, i as f32),
-            Vec3::new(MAP_HALF_EXTENT, 0.012, i as f32),
-            c,
-        );
+    // Build-grid only while placing a structure (godot draws no world grid).
+    if placement_preview
+        .command_mode
+        .pending_structure_placement
+        .is_some()
+    {
+        for i in -24..=24 {
+            let c = if i % 4 == 0 {
+                Color::srgba(0.35, 0.3, 0.24, 0.22)
+            } else {
+                Color::srgba(0.35, 0.3, 0.24, 0.09)
+            };
+            gizmos.line(
+                Vec3::new(i as f32, 0.012, -MAP_HALF_EXTENT),
+                Vec3::new(i as f32, 0.012, MAP_HALF_EXTENT),
+                c,
+            );
+            gizmos.line(
+                Vec3::new(-MAP_HALF_EXTENT, 0.012, i as f32),
+                Vec3::new(MAP_HALF_EXTENT, 0.012, i as f32),
+                c,
+            );
+        }
     }
     if let Some(pending) = placement_preview.command_mode.pending_structure_placement
         && let Ok(window) = placement_preview.window_q.single()

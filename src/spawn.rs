@@ -780,6 +780,94 @@ pub(crate) fn spawn_faction_identity_marker_model(
     }
 }
 
+/// kenney's gold accent material ("metalRed", linear 1.0/0.6285/0.2028 ==
+/// sRGB ~0.99/0.81/0.48). godot repaints every material matching that albedo
+/// (Unit.gd MATERIAL_ALBEDO_TO_REPLACE, eps 0.05) with the player color; this
+/// mirrors it so team colors visually bind the part collages together.
+pub(crate) const TEAM_PAINT_TARGET_SRGB: [f32; 3] = [0.99, 0.81, 0.48];
+pub(crate) const TEAM_PAINT_EPSILON: f32 = 0.06;
+
+/// Marker: this mesh has been considered (and possibly repainted) already.
+#[derive(Component)]
+pub(crate) struct TeamColorProcessed;
+
+/// One shared repaint material per palette slot.
+#[derive(Resource, Default)]
+pub(crate) struct TeamColorMaterials(
+    pub(crate) std::collections::HashMap<usize, Handle<StandardMaterial>>,
+);
+
+pub(crate) fn material_matches_team_paint_target(color: Color) -> bool {
+    let srgba = color.to_srgba();
+    (srgba.red - TEAM_PAINT_TARGET_SRGB[0]).abs() <= TEAM_PAINT_EPSILON
+        && (srgba.green - TEAM_PAINT_TARGET_SRGB[1]).abs() <= TEAM_PAINT_EPSILON
+        && (srgba.blue - TEAM_PAINT_TARGET_SRGB[2]).abs() <= TEAM_PAINT_EPSILON
+}
+
+/// Repaints kenney gold-accent parts in each player's color, mirroring godot's
+/// player-color material replacement. GLB parts stream in over several frames,
+/// so this sweeps meshes that have not been considered yet. Under-construction
+/// structures are skipped (their parts wear the ghost material) and get
+/// painted right after completion restores the originals.
+pub(crate) fn apply_team_color_materials(
+    mut commands: Commands,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut cache: ResMut<TeamColorMaterials>,
+    color_slots: Res<PlayerColorSlots>,
+    mut unpainted: Query<
+        (Entity, &mut MeshMaterial3d<StandardMaterial>),
+        Without<TeamColorProcessed>,
+    >,
+    parents: Query<&ChildOf>,
+    roots: Query<(&Team, Has<UnderConstruction>), Or<(With<Unit>, With<Structure>)>>,
+) {
+    let Some(mut materials) = materials else {
+        return;
+    };
+    for (entity, mut part) in &mut unpainted {
+        let mut cursor = entity;
+        let owner = loop {
+            if let Ok(owner) = roots.get(cursor) {
+                break Some(owner);
+            }
+            match parents.get(cursor) {
+                Ok(child_of) => cursor = child_of.0,
+                Err(_) => break None,
+            }
+        };
+        let Some((team, under_construction)) = owner else {
+            commands.entity(entity).try_insert(TeamColorProcessed);
+            continue;
+        };
+        if under_construction {
+            continue;
+        }
+        let Some(slot) = color_slots.slot(*team) else {
+            commands.entity(entity).try_insert(TeamColorProcessed);
+            continue;
+        };
+        let is_gold = materials
+            .get(&part.0)
+            .is_some_and(|material| material_matches_team_paint_target(material.base_color));
+        if is_gold {
+            let handle = cache
+                .0
+                .entry(slot)
+                .or_insert_with(|| {
+                    materials.add(StandardMaterial {
+                        base_color: player_color(slot),
+                        metallic: 0.55,
+                        perceptual_roughness: 0.45,
+                        ..default()
+                    })
+                })
+                .clone();
+            part.0 = handle;
+        }
+        commands.entity(entity).try_insert(TeamColorProcessed);
+    }
+}
+
 pub(crate) fn spawn_procedural_entity_model(
     commands: &mut Commands,
     root: Entity,

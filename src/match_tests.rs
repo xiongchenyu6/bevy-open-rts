@@ -1086,6 +1086,72 @@ fn construction_sites_render_as_ghost_shell_then_restore_materials() {
 }
 
 #[test]
+fn kenney_gold_accents_get_repainted_in_the_player_color() {
+    let mut app = App::new();
+    app.init_resource::<Assets<StandardMaterial>>();
+    app.init_resource::<TeamColorMaterials>();
+    app.init_resource::<PlayerColorSlots>();
+    app.add_systems(Update, apply_team_color_materials);
+
+    let gold = app
+        .world_mut()
+        .resource_mut::<Assets<StandardMaterial>>()
+        .add(StandardMaterial {
+            // kenney "metalRed" accent as loaded from the GLBs (linear).
+            base_color: Color::linear_rgb(1.0, 0.6285, 0.2028),
+            ..default()
+        });
+    let hull = app
+        .world_mut()
+        .resource_mut::<Assets<StandardMaterial>>()
+        .add(StandardMaterial {
+            base_color: Color::linear_rgb(0.843, 0.87, 0.91),
+            ..default()
+        });
+    let root = app
+        .world_mut()
+        .spawn((Structure { id: "Barracks" }, Team::Player(0)))
+        .id();
+    let accent = app
+        .world_mut()
+        .spawn((ChildOf(root), MeshMaterial3d(gold.clone())))
+        .id();
+    let body = app
+        .world_mut()
+        .spawn((ChildOf(root), MeshMaterial3d(hull.clone())))
+        .id();
+
+    app.update();
+    let painted = app
+        .world()
+        .get::<MeshMaterial3d<StandardMaterial>>(accent)
+        .unwrap()
+        .0
+        .clone();
+    assert_ne!(painted, gold, "gold accents must swap to the team material");
+    assert_eq!(
+        app.world()
+            .get::<MeshMaterial3d<StandardMaterial>>(body)
+            .unwrap()
+            .0,
+        hull,
+        "non-accent materials stay untouched"
+    );
+    let materials = app.world().resource::<Assets<StandardMaterial>>();
+    let team_color = materials.get(&painted).unwrap().base_color;
+    let expected = player_color(
+        app.world()
+            .resource::<PlayerColorSlots>()
+            .slot(Team::Player(0))
+            .unwrap(),
+    );
+    assert_eq!(
+        team_color, expected,
+        "repaint uses the player palette color"
+    );
+}
+
+#[test]
 fn structure_emerges_from_ground_with_construction_progress() {
     let mut app = App::new();
     app.add_systems(Update, animate_structure_construction);
