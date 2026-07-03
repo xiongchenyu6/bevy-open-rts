@@ -1012,6 +1012,76 @@ fn construction_worker_model_scale_animates_and_resets() {
 }
 
 #[test]
+fn construction_sites_render_as_ghost_shell_then_restore_materials() {
+    let mut app = App::new();
+    app.init_resource::<Assets<StandardMaterial>>();
+    app.add_systems(Update, apply_construction_ghost_material);
+
+    let original = app
+        .world_mut()
+        .resource_mut::<Assets<StandardMaterial>>()
+        .add(StandardMaterial::default());
+    let root = app
+        .world_mut()
+        .spawn((
+            Structure { id: "Barracks" },
+            UnderConstruction {
+                remaining: 8.0,
+                total: 8.0,
+                cost: registry::Cost::default(),
+                free_worker_origin: None,
+            },
+        ))
+        .id();
+    let part = app
+        .world_mut()
+        .spawn((ChildOf(root), MeshMaterial3d(original.clone())))
+        .id();
+
+    app.update();
+    let ghosted = app
+        .world()
+        .get::<MeshMaterial3d<StandardMaterial>>(part)
+        .unwrap()
+        .0
+        .clone();
+    assert_ne!(
+        ghosted, original,
+        "under-construction parts must swap to the ghost material"
+    );
+
+    // A part that streams in later gets ghosted on a following frame too.
+    let late_part = app
+        .world_mut()
+        .spawn((ChildOf(root), MeshMaterial3d(original.clone())))
+        .id();
+    app.update();
+    assert_eq!(
+        app.world()
+            .get::<MeshMaterial3d<StandardMaterial>>(late_part)
+            .unwrap()
+            .0,
+        ghosted,
+        "late-loading parts join the ghost shell"
+    );
+
+    app.world_mut()
+        .entity_mut(root)
+        .remove::<UnderConstruction>();
+    app.update();
+    for entity in [part, late_part] {
+        assert_eq!(
+            app.world()
+                .get::<MeshMaterial3d<StandardMaterial>>(entity)
+                .unwrap()
+                .0,
+            original,
+            "finished structures restore their real materials"
+        );
+    }
+}
+
+#[test]
 fn structure_emerges_from_ground_with_construction_progress() {
     let mut app = App::new();
     app.add_systems(Update, animate_structure_construction);

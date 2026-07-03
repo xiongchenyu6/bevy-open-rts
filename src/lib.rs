@@ -3173,6 +3173,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 update_construction_work_pulses,
                 animate_construction_workers,
                 animate_structure_construction,
+                apply_construction_ghost_material,
                 update_combat_wreckage,
             )
                 .chain()

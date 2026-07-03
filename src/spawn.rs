@@ -167,6 +167,7 @@ pub(crate) fn spawn_unit_with_visual_faction(
             .try_insert(VisualFaction(faction));
     }
     spawn_entity_models(commands, asset_server, entity_id, visual_faction, def);
+    spawn_structure_foundation_pad(commands, entity_id, def);
     if let Some(weapon) = def.weapon {
         let weapon_damage =
             (weapon.damage * VETERANCY_DAMAGE_MULTIPLIER_BY_RANK[veterancy_idx] * 10.0).round()
@@ -778,6 +779,48 @@ pub(crate) fn spawn_faction_identity_marker_model(
             );
         }
     }
+}
+
+/// A flat dark base plate under every structure. The kenney part collages
+/// (godot uses the same compositions) read as loose props on our untextured
+/// terrain; one shared pad visually glues each building into a single lot.
+pub(crate) fn spawn_structure_foundation_pad(
+    commands: &mut Commands,
+    root: Entity,
+    def: &registry::EntityDef,
+) {
+    let pad_radius = (def.radius * 1.12) / def.scale.max(0.1);
+    commands.queue(move |world: &mut World| {
+        if world.get_entity(root).is_err() {
+            return;
+        }
+        let Some(mesh) = add_procedural_mesh(
+            world,
+            Cylinder {
+                radius: pad_radius,
+                half_height: 0.04,
+            },
+        ) else {
+            return;
+        };
+        let Some(material) = add_procedural_material(
+            world,
+            Color::srgb(0.1, 0.11, 0.13),
+            0.0,
+            0.95,
+            LinearRgba::NONE,
+        ) else {
+            return;
+        };
+        spawn_procedural_mesh_child(
+            world,
+            root,
+            "Foundation pad",
+            mesh,
+            material,
+            Transform::from_xyz(0.0, 0.04, 0.0),
+        );
+    });
 }
 
 pub(crate) fn spawn_procedural_entity_model(

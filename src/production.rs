@@ -1084,6 +1084,81 @@ pub(crate) fn update_construction_work_pulses(
     }
 }
 
+/// Remembers the original part materials of a structure whose model is
+/// currently swapped to the shared under-construction ghost material.
+#[derive(Component, Default)]
+pub(crate) struct GhostedModelMaterials(pub(crate) Vec<(Entity, Handle<StandardMaterial>)>);
+
+/// godot fidelity: structures under construction render as a translucent
+/// white shell (structure_under_construction.material.tres) until finished.
+/// GLB parts stream in over several frames, so this keeps sweeping the
+/// children of building sites and restores the recorded materials once the
+/// structure completes.
+pub(crate) fn apply_construction_ghost_material(
+    mut commands: Commands,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut ghost_handle: Local<Option<Handle<StandardMaterial>>>,
+    building: Query<
+        (Entity, Option<&GhostedModelMaterials>),
+        (With<Structure>, With<UnderConstruction>),
+    >,
+    finished: Query<
+        (Entity, &GhostedModelMaterials),
+        (With<Structure>, Without<UnderConstruction>),
+    >,
+    children_q: Query<&Children>,
+    mut part_materials: Query<&mut MeshMaterial3d<StandardMaterial>>,
+) {
+    let Some(mut materials) = materials else {
+        return;
+    };
+    let ghost = ghost_handle
+        .get_or_insert_with(|| {
+            materials.add(StandardMaterial {
+                base_color: Color::srgba(1.0, 1.0, 1.0, 0.45),
+                alpha_mode: AlphaMode::Blend,
+                unlit: true,
+                ..default()
+            })
+        })
+        .clone();
+    for (root, ghosted) in &building {
+        let mut recorded: Vec<(Entity, Handle<StandardMaterial>)> = Vec::new();
+        for child in children_q.iter_descendants(root) {
+            if let Ok(mut part) = part_materials.get_mut(child)
+                && part.0 != ghost
+            {
+                recorded.push((child, part.0.clone()));
+                part.0 = ghost.clone();
+            }
+        }
+        if recorded.is_empty() {
+            continue;
+        }
+        if ghosted.is_some() {
+            commands.queue(move |world: &mut World| {
+                if let Ok(mut entity) = world.get_entity_mut(root)
+                    && let Some(mut list) = entity.get_mut::<GhostedModelMaterials>()
+                {
+                    list.0.extend(recorded);
+                }
+            });
+        } else {
+            commands
+                .entity(root)
+                .try_insert(GhostedModelMaterials(recorded));
+        }
+    }
+    for (root, ghosted) in &finished {
+        for (child, original) in &ghosted.0 {
+            if let Ok(mut part) = part_materials.get_mut(*child) {
+                part.0 = original.clone();
+            }
+        }
+        commands.entity(root).try_remove::<GhostedModelMaterials>();
+    }
+}
+
 /// Structures grow out of the ground while under construction instead of
 /// standing at full height from the first frame. Godot shows a translucent
 /// shell instead; a vertical emergence tied to build progress reads better
