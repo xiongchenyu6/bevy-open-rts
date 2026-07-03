@@ -3505,3 +3505,123 @@ mod damage_number_tests {
         assert_eq!(pending, 0, "markers are consumed every frame");
     }
 }
+
+pub(crate) const MINIMAP_SIZE_PX: f32 = 158.0;
+
+// godot anchors the minimap/radar in the bottom-LEFT corner.
+pub(crate) const MINIMAP_LEFT_PX: f32 = 12.0;
+
+pub(crate) const MINIMAP_BOTTOM_PX: f32 = 12.0;
+
+pub(crate) const MINIMAP_ENTITY_MARKER_PX: f32 = 4.6;
+
+pub(crate) const MINIMAP_STRUCTURE_MARKER_PX: f32 = 6.2;
+
+pub(crate) const MINIMAP_RESOURCE_MARKER_PX: f32 = 3.8;
+
+pub(crate) fn update_minimap(
+    mut commands: Commands,
+    economies: Res<Economies>,
+    visible_player: Res<VisiblePlayer>,
+    player_colors: Res<PlayerColorSlots>,
+    camera_state: Res<RtsCamera>,
+    map_bounds: Res<MapBounds>,
+    mut battle_log: ResMut<BattleLog>,
+    content_q: Query<Entity, With<MinimapContent>>,
+    mut root_q: Query<&mut BackgroundColor, With<MinimapRoot>>,
+    mut status_text_q: Query<&mut Text, With<MinimapStatusText>>,
+    marker_q: Query<Entity, With<MinimapMarker>>,
+    world_q: Query<(
+        &Transform,
+        &Team,
+        &Selectable,
+        &VisibilityState,
+        Option<&Unit>,
+        Option<&Structure>,
+        Option<&Health>,
+        Option<&ResourceNode>,
+        Option<&SupplyCrate>,
+    )>,
+) {
+    for marker in &marker_q {
+        commands.entity(marker).try_despawn();
+    }
+
+    let Ok(content) = content_q.single() else {
+        return;
+    };
+    let visible_team = visible_player.team;
+    let radar_state = radar_state_for_team(visible_team, &economies, &world_q);
+    if let Ok(mut root_color) = root_q.single_mut() {
+        *root_color = BackgroundColor(if radar_state == MinimapRadarState::Online {
+            Color::srgba(0.025, 0.048, 0.052, 0.9)
+        } else {
+            Color::srgba(0.025, 0.03, 0.034, 0.9)
+        });
+    }
+    if let Ok(mut text) = status_text_q.single_mut() {
+        **text = radar_state.status_text().to_string();
+    }
+    if radar_state != MinimapRadarState::Online {
+        for entry in &mut battle_log.entries {
+            entry.minimap_ping_active = false;
+        }
+        return;
+    }
+
+    let Ok(mut content_commands) = commands.get_entity(content) else {
+        return;
+    };
+    content_commands.with_children(|parent| {
+        for (transform, team, _selectable, visibility, unit, structure, health, resource, supply) in
+            &world_q
+        {
+            if health.is_some_and(|health| health.current <= 0.0) {
+                continue;
+            }
+            if *team != visible_team && !visibility.visible {
+                continue;
+            }
+
+            let (size, color) = minimap_entity_marker_style(
+                *team,
+                unit,
+                structure,
+                resource,
+                supply,
+                &player_colors,
+            );
+            parent.spawn(minimap_marker_bundle(
+                transform.translation,
+                size,
+                color,
+                *map_bounds,
+            ));
+        }
+
+        parent.spawn(minimap_camera_marker_bundle(
+            camera_state.focus,
+            *map_bounds,
+        ));
+
+        for entry in battle_log
+            .entries
+            .iter()
+            .filter(|entry| entry.minimap_ping_active && entry.focus.is_some())
+        {
+            let focus = entry.focus.unwrap();
+            let progress = minimap_ping_progress(entry);
+            let size = minimap_ping_size_at_progress(entry.ping_kind, progress);
+            let color = minimap_ping_color_at_progress(entry.ping_kind, progress);
+            parent.spawn(minimap_ping_bundle(focus, size, color, *map_bounds));
+        }
+    });
+}
+
+pub(crate) fn cursor_minimap_local(window: &Window) -> Option<Vec2> {
+    let cursor = window.cursor_position()?;
+    if !minimap_contains_cursor(window, cursor) {
+        return None;
+    }
+    Some(cursor - minimap_screen_min(window))
+}
