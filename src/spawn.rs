@@ -794,7 +794,7 @@ pub(crate) struct TeamColorProcessed;
 /// One shared repaint material per palette slot.
 #[derive(Resource, Default)]
 pub(crate) struct TeamColorMaterials(
-    pub(crate) std::collections::HashMap<usize, Handle<StandardMaterial>>,
+    pub(crate) std::collections::HashMap<(usize, bool), Handle<StandardMaterial>>,
 );
 
 pub(crate) fn material_matches_team_paint_target(color: Color) -> bool {
@@ -819,7 +819,7 @@ pub(crate) fn apply_team_color_materials(
         Without<TeamColorProcessed>,
     >,
     parents: Query<&ChildOf>,
-    roots: Query<(&Team, Has<UnderConstruction>), Or<(With<Unit>, With<Structure>)>>,
+    roots: Query<(&Team, Has<UnderConstruction>, Has<Unit>), Or<(With<Unit>, With<Structure>)>>,
 ) {
     let Some(mut materials) = materials else {
         return;
@@ -835,7 +835,7 @@ pub(crate) fn apply_team_color_materials(
                 Err(_) => break None,
             }
         };
-        let Some((team, under_construction)) = owner else {
+        let Some((team, under_construction, is_unit)) = owner else {
             commands.entity(entity).try_insert(TeamColorProcessed);
             continue;
         };
@@ -852,11 +852,22 @@ pub(crate) fn apply_team_color_materials(
         if is_gold {
             let handle = cache
                 .0
-                .entry(slot)
+                .entry((slot, is_unit))
                 .or_insert_with(|| {
+                    // Units get an emissive team color so even a tiny accent
+                    // glows under bloom and reads as team identity at RTS zoom;
+                    // structures have large accents already, so they stay a solid
+                    // (non-glowing) team color to avoid washing out under bloom.
+                    let emissive = if is_unit {
+                        let [r, g, b] = player_color_rgb(slot);
+                        LinearRgba::rgb(r * 0.7, g * 0.7, b * 0.7)
+                    } else {
+                        LinearRgba::NONE
+                    };
                     materials.add(StandardMaterial {
                         base_color: player_color(slot),
-                        metallic: 0.55,
+                        emissive,
+                        metallic: 0.4,
                         perceptual_roughness: 0.45,
                         ..default()
                     })
