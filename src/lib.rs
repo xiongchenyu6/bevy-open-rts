@@ -6540,12 +6540,15 @@ pub(crate) fn draw_world_overlays(
     }
     for pulse in &pulses {
         // Brighten the team color toward a hot muzzle/tracer hue so shots read as
-        // attacks, and draw it thick so a brief tracer is actually noticeable.
+        // attacks. Fade over the pulse's short life so many simultaneous shots
+        // read as brief flashes, not a persistent spiderweb of beams.
+        let alpha = (pulse.ttl / 0.15).clamp(0.0, 1.0);
         let base = player_colors.color(pulse.team).to_srgba();
-        let tracer = Color::srgb(
+        let tracer = Color::srgba(
             (base.red * 0.4 + 0.85).min(1.0),
             (base.green * 0.4 + 0.78).min(1.0),
             (base.blue * 0.4 + 0.30).min(1.0),
+            alpha,
         );
         hud.line(pulse.from, pulse.to, tracer);
     }
@@ -6838,10 +6841,12 @@ pub(crate) fn structure_placement_preview_color(validity: StructurePlacementVali
 pub(crate) fn draw_terrain_order_path(gizmos: &mut Gizmos, start: Vec3, targets: &[Vec3]) {
     let mut from = start;
     for (index, target) in targets.iter().enumerate() {
+        // Subtle: a whole selected army draws one of these each, so keep them a
+        // faint hint of where units are headed, not a dominant web of beams.
         let color = if index == 0 {
-            Color::srgba(0.65, 0.9, 1.0, 0.82)
+            Color::srgba(0.65, 0.9, 1.0, 0.34)
         } else {
-            Color::srgba(0.32, 0.78, 1.0, 0.55)
+            Color::srgba(0.32, 0.78, 1.0, 0.22)
         };
         gizmos.line(
             terrain_overlay_point(from),

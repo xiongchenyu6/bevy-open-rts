@@ -1512,7 +1512,7 @@ pub(crate) fn update_mines(
                     ShotPulse {
                         from: mine_transform.translation + Vec3::Y * 0.2,
                         to: mine_transform.translation + Vec3::Y * 1.0,
-                        ttl: 0.24,
+                        ttl: 0.13,
                         team: *mine_team,
                     },
                     MatchScopedEntity,
@@ -2497,7 +2497,7 @@ pub(crate) fn combat(
                 ShotPulse {
                     from: from + Vec3::Y * 0.6,
                     to: to + Vec3::Y * 0.6,
-                    ttl: 0.30,
+                    ttl: 0.13,
                     team,
                 },
                 MatchScopedEntity,
@@ -2507,7 +2507,7 @@ pub(crate) fn combat(
                 ShotPulse {
                     from: to + Vec3::Y * 0.05,
                     to: to + Vec3::Y * 1.1,
-                    ttl: 0.22,
+                    ttl: 0.15,
                     team,
                 },
                 MatchScopedEntity,
