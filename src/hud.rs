@@ -1047,12 +1047,17 @@ pub(crate) fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
                     font_size: FontSize::Px(14.0),
                     ..default()
                 },
-                TextColor(Color::srgb(0.86, 0.95, 0.88)),
+                TextColor(Color::srgb(0.93, 0.98, 0.94)),
                 TextLayout::justify(Justify::Center),
                 Node {
                     max_width: px(460),
+                    // Dark rounded backing so the objective reads over the bright
+                    // sand terrain instead of washing out.
+                    padding: UiRect::axes(px(12.0), px(6.0)),
+                    border_radius: BorderRadius::all(px(4.0)),
                     ..default()
                 },
+                BackgroundColor(Color::srgba(0.04, 0.06, 0.08, 0.74)),
                 ObjectiveTrackerText,
             ));
             center
@@ -1371,8 +1376,22 @@ pub(crate) fn push_battle_log_with_kind(
     focus: Option<Vec3>,
     ping_kind: BattleEventPingKind,
 ) {
+    let message = message.into();
+    // Collapse repeats (e.g. spamming "资源不足"): if the newest entry says the
+    // same thing, just refresh its lifetime instead of stacking duplicates.
+    if let Some(last) = battle_log.entries.back_mut()
+        && last.message == message
+    {
+        last.remaining = BATTLE_LOG_ENTRY_TTL_SECONDS;
+        if focus.is_some() {
+            last.focus = focus;
+            last.minimap_ping_active = true;
+            last.minimap_ping_remaining = BATTLE_EVENT_PING_LIFETIME_SECONDS;
+        }
+        return;
+    }
     battle_log.entries.push_back(BattleLogEntry {
-        message: message.into(),
+        message,
         remaining: BATTLE_LOG_ENTRY_TTL_SECONDS,
         focus,
         ping_kind,
