@@ -1172,14 +1172,6 @@ impl SkirmishMenuSelection {
         is_random_map_index(self.map_index)
     }
 
-    pub(crate) fn map_label(self) -> &'static str {
-        if self.map_choice_is_random() {
-            random_map_label()
-        } else {
-            localized_skirmish_map_name(self.map())
-        }
-    }
-
     pub(crate) fn from_match_setup(settings: MatchSetupSettings) -> Self {
         let map_index = SKIRMISH_MAPS
             .iter()
@@ -1547,11 +1539,6 @@ impl SkirmishMenuSelection {
         }
         self.lobby_color_slots[slot] =
             (self.lobby_color_slots[slot] + 1) % PLAYER_COLOR_PALETTE.len();
-    }
-
-    pub(crate) fn team_id(self, team: Team) -> Option<usize> {
-        self.runtime_slot_for_team(team)
-            .map(|slot| (self.lobby_team_ids[slot] % SKIRMISH_TEAM_OPTION_COUNT) as usize)
     }
 
     pub(crate) fn player_faction(self, team: Team) -> Option<SkirmishFaction> {
@@ -4283,71 +4270,6 @@ pub(crate) fn update_main_menu_summary(
     for (label, mut text) in &mut button_label_q {
         **text = main_menu_button_label_text(label.action, *selection);
     }
-}
-
-pub(crate) fn skirmish_player_controller_text(selection: SkirmishMenuSelection) -> String {
-    player_teams(selection.active_teams().len())
-        .filter_map(|team| {
-            selection
-                .player_controller(team)
-                .map(|controller| format!("{}={}", team.label(), controller.short_label()))
-        })
-        .collect::<Vec<_>>()
-        .join("/")
-}
-
-pub(crate) fn skirmish_team_setup_text(selection: SkirmishMenuSelection) -> String {
-    let active_teams = selection.active_teams();
-    player_teams(active_teams.len())
-        .filter_map(|team| {
-            let index = team.economy_index()?;
-            active_teams.get(index).copied().unwrap_or(false).then(|| {
-                format!(
-                    "{}=T{}",
-                    team.label(),
-                    selection.team_id(team).unwrap_or(0) + 1
-                )
-            })
-        })
-        .collect::<Vec<_>>()
-        .join("/")
-}
-
-pub(crate) fn skirmish_player_faction_text(selection: SkirmishMenuSelection) -> String {
-    let active_teams = selection.active_teams();
-    player_teams(active_teams.len())
-        .filter_map(|team| {
-            let index = team.economy_index()?;
-            active_teams.get(index).copied().unwrap_or(false).then(|| {
-                format!(
-                    "{}={}",
-                    team.label(),
-                    selection
-                        .player_faction(team)
-                        .unwrap_or_else(|| SkirmishFaction::from_team(team))
-                        .label()
-                )
-            })
-        })
-        .collect::<Vec<_>>()
-        .join("/")
-}
-
-pub(crate) fn skirmish_player_color_text(selection: SkirmishMenuSelection) -> String {
-    let active_teams = selection.active_teams();
-    player_teams(active_teams.len())
-        .filter_map(|team| {
-            let index = team.economy_index()?;
-            active_teams.get(index).copied().unwrap_or(false).then(|| {
-                format!(
-                    "{}=C{}",
-                    team.label(),
-                    selection.player_color_slot(team).unwrap_or(index) + 1
-                )
-            })
-        })
-        .collect::<Vec<_>>()
-        .join("/")
 }
 
 pub(crate) fn skirmish_opponents_text(selection: SkirmishMenuSelection) -> String {

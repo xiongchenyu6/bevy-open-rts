@@ -2365,38 +2365,24 @@ pub(crate) fn main_menu_summary_text(selection: SkirmishMenuSelection) -> String
     } else {
         t("我方出生槽", "My Spawn Slot")
     };
+    let _ = &map;
+    // Concise status line — the per-slot control/team/faction/color detail is
+    // already visible in the players panel, so this stays a compact confirmation
+    // that fits the dialog on a 720p screen instead of a verbose dev dump.
     format!(
-        "{}: {}  |  {}: {}  |  {}: {}  |  AI: {}\n{}: {}  |  {}: {}\n{}: {}  |  {}: {}\n{}: {}/{}  |  {}: {}  |  {}: {}  |  {}: {}/{}  |  {}\n{}",
-        t("地图", "Map"),
-        selection.map_label(),
+        "{}: {}  ·  AI: {}  ·  {}: {}\n{}: {}/{}  ·  {}: {}/{}  ·  {}",
         t("模式", "Mode"),
         selection.match_mode.label(),
+        selection.ai_difficulty.short_label(),
         focus_label,
         selection.focus_team().label(),
-        selection.ai_difficulty.short_label(),
-        t("控制", "Control"),
-        skirmish_player_controller_text(selection),
-        t("队伍", "Teams"),
-        skirmish_team_setup_text(selection),
-        t("种族", "Faction"),
-        skirmish_player_faction_text(selection),
-        t("颜色", "Color"),
-        skirmish_player_color_text(selection),
         t("参战玩家", "Players"),
         selection.active_team_count(),
         selection.selected_map_player_slots(),
-        t("需要出生点", "Spawns needed"),
-        selection.required_player_slots(),
-        t("地图出生点", "Map spawns"),
-        map.players,
         t("资源", "Resources"),
         resources.ore,
         resources.crystal,
         selection.start_status().summary_label(),
-        t(
-            "开始: Enter/点击开始对战",
-            "Start: Enter / click Start Match"
-        ),
     )
 }
 
