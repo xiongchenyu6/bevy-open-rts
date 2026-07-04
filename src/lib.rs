@@ -4462,6 +4462,8 @@ pub(crate) fn setup(
             },
             ..default()
         },
+        bevy::camera::Hdr,
+        cinematic_camera_look(),
         MainCamera,
         MatchScopedEntity,
     ));

@@ -106,6 +106,23 @@ pub(crate) fn camera_distance_from_zoom(zoom: f32) -> f32 {
 }
 
 /// Builds the `bevy_rts_camera` component from the game's camera state + map bounds.
+/// A shippable-looking camera pipeline for the low-poly scene: HDR + ACES
+/// filmic tonemapping (analytic, no LUT asset) + a gentle bloom so the emissive
+/// muzzle/impact/death flashes and team-color accents actually glow. Applied to
+/// both the live match camera and the offscreen capture camera so screenshots
+/// match what the player sees.
+pub(crate) fn cinematic_camera_look() -> impl Bundle {
+    use bevy::core_pipeline::tonemapping::Tonemapping;
+    use bevy::post_process::bloom::Bloom;
+    (
+        Tonemapping::AcesFitted,
+        Bloom {
+            intensity: 0.14,
+            ..Bloom::NATURAL
+        },
+    )
+}
+
 pub(crate) fn rts_camera_component(state: &RtsCamera, bounds: MapBounds, tilt: f32) -> RtsCam {
     let mut cam = RtsCam {
         // Fixed isometric-ish tilt (player-adjustable via Options → 镜头).

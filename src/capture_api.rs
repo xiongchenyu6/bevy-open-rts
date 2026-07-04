@@ -287,6 +287,8 @@ pub fn capture_spawn_model_harness_page(
         world.spawn((
             Name::new("Model Harness Camera"),
             Camera3d::default(),
+            bevy::camera::Hdr,
+            cinematic_camera_look(),
             Camera {
                 clear_color: ClearColorConfig::Custom(Color::srgb(0.028, 0.034, 0.045)),
                 ..default()

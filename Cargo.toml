@@ -20,6 +20,7 @@ bevy = { version = "0.19.0", default-features = false, features = [
   "bevy_winit",
   "wayland",
   "3d_bevy_render",
+  "bevy_post_process",
   "ui_bevy_render",
   "scene",
   "picking",
