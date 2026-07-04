@@ -138,25 +138,33 @@ pub(crate) fn spawn_combat_flash(
         {
             return;
         }
-        let mesh = match world.get_resource::<CombatFlashMesh>().and_then(|m| m.0.clone()) {
+        let mesh = match world
+            .get_resource::<CombatFlashMesh>()
+            .and_then(|m| m.0.clone())
+        {
             Some(handle) => handle,
             None => {
-                let handle = world
-                    .resource_mut::<Assets<Mesh>>()
-                    .add(Sphere::new(1.0).mesh().ico(2).unwrap_or_else(|_| Sphere::new(1.0).mesh().build()));
+                let handle = world.resource_mut::<Assets<Mesh>>().add(
+                    Sphere::new(1.0)
+                        .mesh()
+                        .ico(2)
+                        .unwrap_or_else(|_| Sphere::new(1.0).mesh().build()),
+                );
                 if let Some(mut res) = world.get_resource_mut::<CombatFlashMesh>() {
                     res.0 = Some(handle.clone());
                 }
                 handle
             }
         };
-        let material = world.resource_mut::<Assets<StandardMaterial>>().add(StandardMaterial {
-            base_color: Color::srgba(color.red, color.green, color.blue, 0.85),
-            emissive: color,
-            alpha_mode: AlphaMode::Blend,
-            unlit: true,
-            ..default()
-        });
+        let material = world
+            .resource_mut::<Assets<StandardMaterial>>()
+            .add(StandardMaterial {
+                base_color: Color::srgba(color.red, color.green, color.blue, 0.85),
+                emissive: color,
+                alpha_mode: AlphaMode::Blend,
+                unlit: true,
+                ..default()
+            });
         world.spawn((
             Name::new("Combat flash"),
             Mesh3d(mesh),
@@ -208,7 +216,9 @@ pub(crate) fn update_combat_flashes(
 pub(crate) fn impact_flash_color(kind: ImpactBurstKind) -> LinearRgba {
     match kind {
         ImpactBurstKind::Ballistic => LinearRgba::new(1.0, 0.86, 0.5, 1.0),
-        ImpactBurstKind::Explosive | ImpactBurstKind::Heavy => LinearRgba::new(1.0, 0.55, 0.16, 1.0),
+        ImpactBurstKind::Explosive | ImpactBurstKind::Heavy => {
+            LinearRgba::new(1.0, 0.55, 0.16, 1.0)
+        }
         ImpactBurstKind::Energy => LinearRgba::new(0.5, 0.95, 1.0, 1.0),
         ImpactBurstKind::Electric => LinearRgba::new(0.55, 0.8, 1.0, 1.0),
         ImpactBurstKind::Fire => LinearRgba::new(1.0, 0.42, 0.12, 1.0),
@@ -230,7 +240,11 @@ pub(crate) fn spawn_destruction_effects(
     }
     spawn_combat_wreckage(commands, asset_server, position, radius);
     // A bright expanding fireball so a kill visibly booms (bigger for buildings).
-    let boom = if is_structure { radius * 1.35 } else { radius * 0.95 };
+    let boom = if is_structure {
+        radius * 1.35
+    } else {
+        radius * 0.95
+    };
     spawn_combat_flash(
         commands,
         position + Vec3::Y * 0.3,
