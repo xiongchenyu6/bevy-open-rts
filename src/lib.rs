@@ -2798,6 +2798,9 @@ pub fn build_game_app(mode: GameAppMode) -> App {
         brightness: 190.0,
         affects_lightmapped_meshes: true,
     });
+    // Crisper sun shadows: a 4K shadow atlas turns the blobby low-res unit
+    // shadows into readable silhouettes.
+    app.insert_resource(bevy::light::DirectionalLightShadowMap { size: 4096 });
     app.insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
         .insert_resource(StartupLoadingPolicy {
             preload_assets: matches!(mode, GameAppMode::Interactive),
@@ -4476,6 +4479,16 @@ pub(crate) fn setup(
             illuminance: 16_000.0,
             ..default()
         },
+        // Tight cascades pack shadow-map resolution over the visible playfield
+        // instead of stretching it across the whole map.
+        bevy::light::CascadeShadowConfigBuilder {
+            num_cascades: 4,
+            minimum_distance: 0.1,
+            maximum_distance: 120.0,
+            first_cascade_far_bound: 28.0,
+            overlap_proportion: 0.2,
+        }
+        .build(),
         Transform::from_xyz(0.0, 38.0, 0.0).looking_to(Vec3::new(0.534, -0.784, -0.318), Vec3::Y),
         MatchScopedEntity,
     ));

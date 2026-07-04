@@ -105,7 +105,6 @@ pub(crate) fn camera_distance_from_zoom(zoom: f32) -> f32 {
     CAMERA_MAX_DISTANCE - zoom.clamp(0.0, 1.0) * span
 }
 
-/// Builds the `bevy_rts_camera` component from the game's camera state + map bounds.
 /// A shippable-looking camera pipeline for the low-poly scene: HDR + ACES
 /// filmic tonemapping (analytic, no LUT asset) + a gentle bloom so the emissive
 /// muzzle/impact/death flashes and team-color accents actually glow. Applied to
@@ -113,6 +112,7 @@ pub(crate) fn camera_distance_from_zoom(zoom: f32) -> f32 {
 /// match what the player sees.
 pub(crate) fn cinematic_camera_look() -> impl Bundle {
     use bevy::core_pipeline::tonemapping::Tonemapping;
+    use bevy::light::ShadowFilteringMethod;
     use bevy::post_process::bloom::Bloom;
     (
         Tonemapping::AcesFitted,
@@ -120,9 +120,12 @@ pub(crate) fn cinematic_camera_look() -> impl Bundle {
             intensity: 0.14,
             ..Bloom::NATURAL
         },
+        // Soft PCF so cascade edges read as gentle penumbra, not stair-steps.
+        ShadowFilteringMethod::Gaussian,
     )
 }
 
+/// Builds the `bevy_rts_camera` component from the game's camera state + map bounds.
 pub(crate) fn rts_camera_component(state: &RtsCamera, bounds: MapBounds, tilt: f32) -> RtsCam {
     let mut cam = RtsCam {
         // Fixed isometric-ish tilt (player-adjustable via Options → 镜头).
