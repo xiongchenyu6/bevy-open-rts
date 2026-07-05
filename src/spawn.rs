@@ -532,7 +532,7 @@ pub(crate) fn spawn_entity_models(
             let mut spawned = commands.spawn((
                 ChildOf(root),
                 WorldAssetRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(part.model))),
-                render_part_transform(part),
+                scaled_render_part_transform(part, entity_visual_scale(def.id)),
             ));
             if let Some(marker) = HunyuanModelPart::for_render_part(def.id, part) {
                 spawned.insert(marker);
@@ -572,7 +572,7 @@ pub(crate) fn spawn_entity_models_for_harness(
             let mut spawned = world.spawn((
                 ChildOf(root),
                 WorldAssetRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(part.model))),
-                render_part_transform(part),
+                scaled_render_part_transform(part, entity_visual_scale(def.id)),
             ));
             if let Some(marker) = HunyuanModelPart::for_render_part(def.id, part) {
                 spawned.insert(marker);
@@ -591,19 +591,24 @@ pub(crate) fn spawn_entity_models_for_harness(
     }
 }
 
-pub(crate) fn render_part_transform(part: &registry::RenderPart) -> Transform {
-    Transform::from_translation(Vec3::new(
-        part.translation[0],
-        part.translation[1],
-        part.translation[2],
-    ))
+/// Uniformly scales a part's translation AND scale so a whole composition grows
+/// around the entity origin with its layout intact (part translations bake the
+/// kenney node-offset compensation, so both must scale together).
+pub(crate) fn scaled_render_part_transform(part: &registry::RenderPart, factor: f32) -> Transform {
+    Transform::from_translation(
+        Vec3::new(
+            part.translation[0],
+            part.translation[1],
+            part.translation[2],
+        ) * factor,
+    )
     .with_rotation(Quat::from_xyzw(
         part.rotation[0],
         part.rotation[1],
         part.rotation[2],
         part.rotation[3],
     ))
-    .with_scale(Vec3::new(part.scale[0], part.scale[1], part.scale[2]))
+    .with_scale(Vec3::new(part.scale[0], part.scale[1], part.scale[2]) * factor)
 }
 
 pub(crate) fn spawn_faction_identity_marker(

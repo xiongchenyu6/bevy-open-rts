@@ -4581,8 +4581,23 @@ pub(crate) const DEMON_STRUCTURE_WEAPON_DAMAGE_MULTIPLIER: f32 = 1.12;
 pub(crate) const CHAOS_INCOMING_WEAPON_DAMAGE_SCALE: f32 = 0.9;
 
 pub(crate) fn is_infantry_unit(unit: &Unit) -> bool {
+    is_infantry_id(unit.id)
+}
+
+/// Infantry (and the worker) render ~35% larger than their registry transforms
+/// so a soldier is more than a speck at gameplay zoom. Visual only: selection
+/// radius, nav footprint and combat ranges keep the original values.
+pub(crate) fn entity_visual_scale(id: &str) -> f32 {
+    if is_infantry_id(id) || id == "Worker" {
+        1.35
+    } else {
+        1.0
+    }
+}
+
+pub(crate) fn is_infantry_id(id: &str) -> bool {
     matches!(
-        unit.id,
+        id,
         "LightRifleInfantry"
             | "RocketInfantry"
             | "FieldMedic"
