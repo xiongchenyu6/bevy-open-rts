@@ -1615,6 +1615,8 @@ pub(crate) fn faction_ai_profile_for_difficulty(
             profile.capture_interval = (AI_CAPTURE_INTERVAL_SECONDS - 1.0).max(1.0);
             profile.saboteur_interval = (AI_SABOTEUR_INTERVAL_SECONDS - 1.0).max(1.0);
             profile.support_interval = 2.5;
+            profile.defense_limit_bonus = 1;
+            profile.tesla_fence_limit_bonus = 2;
         }
     }
     if matches!(difficulty, AiDifficulty::Beginner) {

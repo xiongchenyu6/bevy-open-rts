@@ -1406,13 +1406,17 @@ fn ai_defense_profile_limits_match_godot_difficulty_targets() {
         "Easy AI should not inherit the Normal defense build queue"
     );
     assert!(
-        !easy.active_offense_enabled,
-        "Easy AI should give the player a build-up window instead of launching attack waves"
+        easy.active_offense_enabled,
+        "Easy AI attacks gently (small waves) so it threatens more than Beginner"
+    );
+    assert!(
+        easy.opening_attack_grace >= 120.0,
+        "Easy AI must leave a long build-up window before its first wave"
     );
     assert_eq!(
         ai_battlegroup_target_units(&easy),
-        2,
-        "Easy AI should still train a small defensive force"
+        3,
+        "Easy AI trains one small battlegroup"
     );
     assert_eq!(ai_structure_profile_limit("AntiGroundTurret", &easy), 0);
     assert_eq!(ai_structure_profile_limit("TeslaFenceSegment", &easy), 0);
