@@ -190,6 +190,186 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
             },
         ],
     },
+    MissionDef {
+        id: "highland_bastion_stand",
+        name_zh: "第四关:高地堡垒",
+        name_en: "Mission 4: Highland Bastion",
+        briefing_zh: "敌军将分波强攻高地。据守西侧坡道 5 分钟,空投补给中途抵达。",
+        briefing_en: "Enemy waves will storm the highland. Hold the west ramp for 5 minutes.",
+        map_id: "highland_bastion",
+        player_faction: SkirmishFaction::Alliance,
+        enemy_faction: SkirmishFaction::Demon,
+        enemy_difficulty: AiDifficulty::Normal,
+        starting_resources: StartingResources::new(56, 28),
+        victory: MissionVictory::SurviveFor(300.0),
+        triggers: &[
+            MissionTrigger {
+                at_sec: 5.0,
+                action: MissionAction::Message {
+                    zh: "指挥部: 高地只有一条坡道可上,把守住它!",
+                    en: "Command: one ramp leads up here — hold it!",
+                },
+            },
+            MissionTrigger {
+                at_sec: 60.0,
+                action: MissionAction::SpawnWave {
+                    team_index: 1,
+                    units: &[("HeavyMachinegunTrooper", 4)],
+                    at: (36.0, 30.0),
+                    attack_to: Some((12.0, 30.0)),
+                },
+            },
+            MissionTrigger {
+                at_sec: 140.0,
+                action: MissionAction::SpawnWave {
+                    team_index: 1,
+                    units: &[("GrenadierTrooper", 3), ("FlameAssaultBuggy", 2)],
+                    at: (37.0, 20.0),
+                    attack_to: Some((12.0, 30.0)),
+                },
+            },
+            MissionTrigger {
+                at_sec: 175.0,
+                action: MissionAction::Message {
+                    zh: "指挥部: 空投补给已落在你的基地。",
+                    en: "Command: supply drop landed at your base.",
+                },
+            },
+            MissionTrigger {
+                at_sec: 176.0,
+                action: MissionAction::GrantResources {
+                    team_index: 0,
+                    ore: 40,
+                    crystal: 20,
+                },
+            },
+            MissionTrigger {
+                at_sec: 250.0,
+                action: MissionAction::SpawnWave {
+                    team_index: 1,
+                    units: &[("Tank", 2), ("HeavyMachinegunTrooper", 4)],
+                    at: (37.0, 40.0),
+                    attack_to: Some((12.0, 30.0)),
+                },
+            },
+        ],
+    },
+    MissionDef {
+        id: "twin_front",
+        name_zh: "第五关:两线鏖战",
+        name_en: "Mission 5: Twin Front",
+        briefing_zh: "敌军主力盘踞对角,两翼另有伏兵。全歼四角战场上的所有敌军。",
+        briefing_en: "Their main force holds the far corner; flanks hide more. Annihilate them all.",
+        map_id: "four_corners",
+        player_faction: SkirmishFaction::Alliance,
+        enemy_faction: SkirmishFaction::Chaos,
+        enemy_difficulty: AiDifficulty::Hard,
+        starting_resources: StartingResources::new(72, 36),
+        victory: MissionVictory::DestroyAllEnemies,
+        triggers: &[
+            MissionTrigger {
+                at_sec: 5.0,
+                action: MissionAction::Message {
+                    zh: "指挥部: 敌军不止一处营地,提防两翼突袭!",
+                    en: "Command: more than one enemy camp — watch both flanks!",
+                },
+            },
+            MissionTrigger {
+                at_sec: 90.0,
+                action: MissionAction::SpawnWave {
+                    team_index: 1,
+                    units: &[("HeavyMachinegunTrooper", 4)],
+                    at: (10.0, 62.0),
+                    attack_to: Some((10.0, 10.0)),
+                },
+            },
+            MissionTrigger {
+                at_sec: 205.0,
+                action: MissionAction::Message {
+                    zh: "指挥部: 侦察警报——东南角装甲集群正在逼近!",
+                    en: "Command: scouts report armour inbound from the south-east!",
+                },
+            },
+            MissionTrigger {
+                at_sec: 210.0,
+                action: MissionAction::SpawnWave {
+                    team_index: 1,
+                    units: &[("Tank", 2), ("FlameAssaultBuggy", 2)],
+                    at: (62.0, 62.0),
+                    attack_to: Some((10.0, 10.0)),
+                },
+            },
+            MissionTrigger {
+                at_sec: 300.0,
+                action: MissionAction::Message {
+                    zh: "指挥部: 友军装甲连抵达战场,转守为攻!",
+                    en: "Command: allied armour has arrived — go on the offensive!",
+                },
+            },
+            MissionTrigger {
+                at_sec: 301.0,
+                action: MissionAction::SpawnWave {
+                    team_index: 0,
+                    units: &[("Tank", 3), ("GrenadierTrooper", 4)],
+                    at: (24.0, 10.0),
+                    attack_to: None,
+                },
+            },
+        ],
+    },
+    MissionDef {
+        id: "thunder_decapitation",
+        name_zh: "第六关:雷霆斩首",
+        name_en: "Mission 6: Thunder Decapitation",
+        briefing_zh: "终局:补给线被切断,以现有储备直取敌指挥中枢。后勤纵队正在赶来。",
+        briefing_en: "Endgame: supply lines cut. Take their command centre with what you have.",
+        map_id: "tech_divide",
+        player_faction: SkirmishFaction::Alliance,
+        enemy_faction: SkirmishFaction::Demon,
+        enemy_difficulty: AiDifficulty::Hard,
+        starting_resources: StartingResources::new(24, 8),
+        victory: MissionVictory::Headquarters,
+        triggers: &[
+            MissionTrigger {
+                at_sec: 5.0,
+                action: MissionAction::Message {
+                    zh: "指挥部: 储备见底,别恋战——摧毁敌指挥中心即告胜利。",
+                    en: "Command: stores are dry — strike the HQ, nothing else matters.",
+                },
+            },
+            MissionTrigger {
+                at_sec: 90.0,
+                action: MissionAction::Message {
+                    zh: "指挥部: 后勤纵队突破封锁,物资已送达!",
+                    en: "Command: the supply column broke through — materiel delivered!",
+                },
+            },
+            MissionTrigger {
+                at_sec: 91.0,
+                action: MissionAction::GrantResources {
+                    team_index: 0,
+                    ore: 60,
+                    crystal: 30,
+                },
+            },
+            MissionTrigger {
+                at_sec: 240.0,
+                action: MissionAction::Message {
+                    zh: "指挥部: 最后一批装甲增援已就位,发起总攻!",
+                    en: "Command: final armour reserves committed — all-out assault!",
+                },
+            },
+            MissionTrigger {
+                at_sec: 241.0,
+                action: MissionAction::SpawnWave {
+                    team_index: 0,
+                    units: &[("Tank", 2), ("HeavyMachinegunTrooper", 3)],
+                    at: (10.0, 6.0),
+                    attack_to: None,
+                },
+            },
+        ],
+    },
 ];
 
 /// The mission currently being played (index into [`CAMPAIGN_MISSIONS`]).
