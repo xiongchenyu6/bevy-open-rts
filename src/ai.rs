@@ -15,7 +15,7 @@ pub(crate) const AI_REPAIR_MAX_STARTS_PER_REFRESH: usize = 2;
 
 pub(crate) const AI_REPAIR_REFRESH_INTERVAL_SECONDS: f32 = 0.5;
 
-pub(crate) const AI_OPENING_ATTACK_GRACE_SECONDS: f32 = 45.0;
+pub(crate) const AI_OPENING_ATTACK_GRACE_SECONDS: f32 = 60.0;
 
 pub(crate) const AI_TECH_BUNKER_GARRISON_REFRESH_INTERVAL_SECONDS: f32 = 1.0;
 
@@ -1577,14 +1577,17 @@ pub(crate) fn faction_ai_profile_for_difficulty(
             profile.expected_workers = 2;
             profile.expected_refineries = 1;
             profile.expected_battlegroups = 1;
-            profile.expected_units_in_battlegroup = 2;
-            profile.active_offense_enabled = false;
-            profile.opening_attack_grace = 90.0;
+            profile.expected_units_in_battlegroup = 3;
+            // Easy attacks — gently. Total passivity made it identical to
+            // Beginner in threat; now it sends a small wave every so often
+            // after a long settle-in grace, teaching the player to defend.
+            profile.active_offense_enabled = true;
+            profile.opening_attack_grace = 150.0;
             profile.capture_enabled = false;
             profile.saboteur_enabled = false;
             profile.support_powers_enabled = false;
             profile.production_interval = 6.5;
-            profile.attack_interval = 14.0;
+            profile.attack_interval = 18.0;
             profile.build_interval = 13.0;
             profile.capture_interval = AI_CAPTURE_INTERVAL_SECONDS + 2.0;
             profile.saboteur_interval = AI_SABOTEUR_INTERVAL_SECONDS + 3.0;
@@ -1594,20 +1597,24 @@ pub(crate) fn faction_ai_profile_for_difficulty(
         }
         AiDifficulty::Normal => {}
         AiDifficulty::Hard => {
-            profile.expected_command_centers = 2;
-            profile.expected_workers = 3;
-            profile.expected_refineries = 2;
+            // Tempo-only buff over Normal, tuned by duels: extra economy
+            // buildings (2nd CC/refinery), turret/fence bonuses and a too-short
+            // attack interval all made Hard WEAKER than Normal — early money
+            // left the army, and frequent wave re-orders churned units. Hard is
+            // Normal with faster production/build ticks, one more worker and
+            // bigger battlegroups.
+            profile.expected_workers = 4;
             profile.expected_battlegroups = 3;
             profile.expected_units_in_battlegroup = 5;
-            profile.opening_attack_grace = 35.0;
+            // Later than Normal's 60s on purpose: the duel meta has a strong
+            // defender's advantage, so Hard absorbs Normal's opening wave with
+            // its faster production, then counterattacks in force.
+            profile.opening_attack_grace = 75.0;
             profile.production_interval = 3.0;
-            profile.attack_interval = 4.5;
-            profile.build_interval = 8.0;
+            profile.build_interval = 9.0;
             profile.capture_interval = (AI_CAPTURE_INTERVAL_SECONDS - 1.0).max(1.0);
             profile.saboteur_interval = (AI_SABOTEUR_INTERVAL_SECONDS - 1.0).max(1.0);
             profile.support_interval = 2.5;
-            profile.defense_limit_bonus = 1;
-            profile.tesla_fence_limit_bonus = 2;
         }
     }
     if matches!(difficulty, AiDifficulty::Beginner) {
