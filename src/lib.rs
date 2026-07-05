@@ -2782,7 +2782,7 @@ pub fn build_game_app(mode: GameAppMode) -> App {
     // godot's WorldEnvironment: white ambient over a procedural sky.
     app.insert_resource(GlobalAmbientLight {
         color: Color::WHITE,
-        brightness: 190.0,
+        brightness: 150.0,
         affects_lightmapped_meshes: true,
     });
     // Crisper sun shadows: a 4K shadow atlas turns the blobby low-res unit
@@ -4398,7 +4398,7 @@ pub(crate) fn setup(
     commands.spawn((
         DirectionalLight {
             shadow_maps_enabled: true,
-            illuminance: 16_000.0,
+            illuminance: 11_000.0,
             ..default()
         },
         // Tight cascades pack shadow-map resolution over the visible playfield
@@ -4417,20 +4417,18 @@ pub(crate) fn setup(
 
     terrain_field.rebuild(skirmish_map);
     let terrain_mesh_handle = if terrain_field.is_flat() {
-        meshes.add(
-            Plane3d::default()
-                .mesh()
-                .size(skirmish_map.size.0, skirmish_map.size.1),
-        )
+        meshes.add(flat_terrain_mesh(skirmish_map.size))
     } else {
         meshes.add(terrain_mesh(&terrain_field))
     };
     commands.spawn((
         Name::new(format!("{} Terrain", skirmish_map.name)),
         Mesh3d(terrain_mesh_handle),
-        // godot terrain.material.tres: warm sand albedo (0.96, 0.745, 0.655).
+        // Warm sand in godot's hue (terrain.material.tres) but darkened to sit
+        // mid-tonemap-curve, so the vertex-color ground variation reads instead
+        // of blowing out white under the sun + ACES shoulder.
         MeshMaterial3d(materials.add(StandardMaterial {
-            base_color: Color::srgb(0.96, 0.745, 0.655),
+            base_color: Color::srgb(0.82, 0.6, 0.5),
             perceptual_roughness: 0.95,
             ..default()
         })),

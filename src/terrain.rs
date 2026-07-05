@@ -214,20 +214,87 @@ impl TerrainHeightField {
 /// Generates the terrain mesh (positions displaced by the field, normals
 /// recomputed) — only called for maps with elevation.
 pub(crate) fn terrain_mesh(field: &TerrainHeightField) -> Mesh {
+    grid_terrain_mesh(
+        field.origin_x,
+        field.origin_z,
+        field.width.max(2),
+        field.depth.max(2),
+        TERRAIN_CELL_M,
+        |cx, cz| field.sample_cell(cx, cz),
+    )
+}
+
+/// Flat maps get the same grid mesh (heights all zero) so they carry the
+/// vertex-color ground variation too, instead of a single featureless quad.
+pub(crate) fn flat_terrain_mesh(size: (f32, f32)) -> Mesh {
+    let cell = 1.0;
+    let width = (size.0 / cell).ceil() as i32 + 1;
+    let depth = (size.1 / cell).ceil() as i32 + 1;
+    grid_terrain_mesh(-size.0 * 0.5, -size.1 * 0.5, width, depth, cell, |_, _| 0.0)
+}
+
+/// Deterministic 0..1 hash for terrain tinting (no RNG: same map, same look).
+fn terrain_hash01(ix: i32, iz: i32) -> f32 {
+    let mut h = (ix as u32)
+        .wrapping_mul(374_761_393)
+        .wrapping_add((iz as u32).wrapping_mul(668_265_263));
+    h = (h ^ (h >> 13)).wrapping_mul(1_274_126_177);
+    ((h ^ (h >> 16)) & 0xffff) as f32 / 65_535.0
+}
+
+/// Smooth value noise sampled at world position with the given wavelength.
+fn terrain_value_noise(x: f32, z: f32, wavelength: f32) -> f32 {
+    let fx = x / wavelength;
+    let fz = z / wavelength;
+    let ix = fx.floor() as i32;
+    let iz = fz.floor() as i32;
+    let tx = fx - ix as f32;
+    let tz = fz - iz as f32;
+    let sx = tx * tx * (3.0 - 2.0 * tx);
+    let sz = tz * tz * (3.0 - 2.0 * tz);
+    let h00 = terrain_hash01(ix, iz);
+    let h10 = terrain_hash01(ix + 1, iz);
+    let h01 = terrain_hash01(ix, iz + 1);
+    let h11 = terrain_hash01(ix + 1, iz + 1);
+    h00 * (1.0 - sx) * (1.0 - sz) + h10 * sx * (1.0 - sz) + h01 * (1.0 - sx) * sz + h11 * sx * sz
+}
+
+/// Subtle two-octave ground tint: broad 9m patches plus fine 2.6m grain, a few
+/// percent of luminance with a slight warm/dark bias — enough to break up the
+/// flat sand color without reading as a texture or a grid.
+pub(crate) fn terrain_vertex_color(x: f32, z: f32) -> [f32; 4] {
+    let broad = terrain_value_noise(x, z, 9.0);
+    let fine = terrain_value_noise(x + 43.7, z - 17.3, 2.6);
+    let n = broad * 0.72 + fine * 0.28;
+    // ~0.86..1.04 luminance, darker patches drift toward brown — strong enough
+    // to survive the bright ambient + filmic tonemap.
+    let tint = 0.86 + n * 0.18;
+    let warm = 1.0 - (1.0 - n) * 0.07;
+    [tint, tint * warm, tint * warm * warm, 1.0]
+}
+
+fn grid_terrain_mesh(
+    origin_x: f32,
+    origin_z: f32,
+    width: i32,
+    depth: i32,
+    cell: f32,
+    height_at_cell: impl Fn(i32, i32) -> f32,
+) -> Mesh {
     use bevy::mesh::{Indices, PrimitiveTopology};
-    let width = field.width.max(2);
-    let depth = field.depth.max(2);
     let mut positions = Vec::with_capacity((width * depth) as usize);
     let mut uvs = Vec::with_capacity((width * depth) as usize);
+    let mut colors = Vec::with_capacity((width * depth) as usize);
     for cz in 0..depth {
         for cx in 0..width {
-            let x = field.origin_x + cx as f32 * TERRAIN_CELL_M;
-            let z = field.origin_z + cz as f32 * TERRAIN_CELL_M;
-            positions.push([x, field.sample_cell(cx, cz), z]);
+            let x = origin_x + cx as f32 * cell;
+            let z = origin_z + cz as f32 * cell;
+            positions.push([x, height_at_cell(cx, cz), z]);
             uvs.push([
                 cx as f32 / (width - 1) as f32,
                 cz as f32 / (depth - 1) as f32,
             ]);
+            colors.push(terrain_vertex_color(x, z));
         }
     }
     let mut indices = Vec::new();
@@ -246,6 +313,7 @@ pub(crate) fn terrain_mesh(field: &TerrainHeightField) -> Mesh {
     );
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, positions);
     mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, colors);
     mesh.insert_indices(Indices::U32(indices));
     mesh.compute_normals();
     mesh
