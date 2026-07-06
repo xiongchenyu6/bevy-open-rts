@@ -1376,6 +1376,48 @@ fn resource_nodes_emit_short_lived_glints() {
 }
 
 #[test]
+fn weather_cycles_between_clear_and_events_deterministically() {
+    let mut app = App::new();
+    app.insert_resource(Time::<()>::default());
+    app.init_resource::<WeatherState>();
+    app.add_systems(Update, tick_weather);
+
+    // Starts clear with no fog/rain/dust.
+    {
+        let weather = app.world().resource::<WeatherState>();
+        assert_eq!(weather.current, WeatherKind::Clear);
+        let params = weather.blended();
+        assert_eq!(params.fog_density, 0.0);
+        assert_eq!(params.rain + params.dust, 0.0);
+    }
+
+    // Step past the first phase: an event rolls in and cross-fades.
+    let mut kinds = Vec::new();
+    for _ in 0..2400 {
+        app.world_mut()
+            .resource_mut::<Time>()
+            .advance_by(std::time::Duration::from_millis(250));
+        app.update();
+        let weather = app.world().resource::<WeatherState>();
+        assert!((0.0..=1.0).contains(&weather.blend));
+        if kinds.last() != Some(&weather.current) {
+            kinds.push(weather.current);
+        }
+    }
+    // 10 simulated minutes: several phases, alternating clear <-> event.
+    assert!(
+        kinds.len() >= 3,
+        "weather should change over time: {kinds:?}"
+    );
+    for pair in kinds.windows(2) {
+        assert!(
+            (pair[0] == WeatherKind::Clear) != (pair[1] == WeatherKind::Clear),
+            "clear spells must alternate with events: {kinds:?}"
+        );
+    }
+}
+
+#[test]
 fn weapon_fire_kick_decays_after_the_shot() {
     let mut weapon = Weapon::new(6.0, 2.0, 1.5, 0.0, 1.0, 1.0, true, true);
     weapon.cooldown_left = 1.5; // just fired

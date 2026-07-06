@@ -49,6 +49,8 @@ mod limb_animation;
 pub(crate) use limb_animation::*;
 mod structure_ambience;
 pub(crate) use structure_ambience::*;
+mod weather;
+pub(crate) use weather::*;
 mod combat_vfx;
 pub(crate) use combat_vfx::*;
 mod save;
@@ -2333,6 +2335,7 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<TeamColorMaterials>()
         .init_resource::<CombatFlashMesh>()
         .init_resource::<PlacementGhost>()
+        .init_resource::<WeatherState>()
         .init_resource::<MissionTriggerState>()
         .init_resource::<BuildQueue>()
         .init_resource::<BuildStructureTab>()
@@ -3181,19 +3184,31 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             (
                 update_construction_work_pulses,
                 animate_construction_workers,
-                tag_unit_limbs,
-                animate_unit_limbs,
-                face_attack_targets,
-                tag_turret_nodes,
-                animate_turret_nodes,
-                animate_airframes,
-                tag_structure_ambience,
-                spin_dish_nodes,
-                emit_chimney_smoke,
-                update_smoke_puffs,
-                pulse_resource_tints,
-                emit_resource_glints,
-                update_resource_glints,
+                // Unit/vehicle/aircraft animation.
+                (
+                    tag_unit_limbs,
+                    animate_unit_limbs,
+                    face_attack_targets,
+                    tag_turret_nodes,
+                    animate_turret_nodes,
+                    animate_airframes,
+                )
+                    .chain(),
+                // Structure/resource ambience + weather.
+                (
+                    tag_structure_ambience,
+                    spin_dish_nodes,
+                    emit_chimney_smoke,
+                    update_smoke_puffs,
+                    pulse_resource_tints,
+                    emit_resource_glints,
+                    update_resource_glints,
+                    tick_weather,
+                    apply_weather_environment,
+                    emit_dust_puffs,
+                    update_dust_puffs,
+                )
+                    .chain(),
                 animate_structure_construction,
                 apply_construction_ghost_material,
                 apply_team_color_materials,
@@ -3239,7 +3254,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             draw_world_overlays
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
-            draw_selected_rally_flags
+            (draw_selected_rally_flags, draw_rain)
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
         ),
