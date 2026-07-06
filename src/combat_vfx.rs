@@ -167,6 +167,7 @@ pub(crate) fn spawn_combat_flash(
             });
         world.spawn((
             Name::new("Combat flash"),
+            bevy::light::NotShadowCaster,
             Mesh3d(mesh),
             MeshMaterial3d(material.clone()),
             Transform::from_translation(position + Vec3::Y * (end_scale * 0.4))

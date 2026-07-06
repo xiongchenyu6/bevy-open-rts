@@ -121,6 +121,7 @@ pub(crate) fn emit_chimney_smoke(
         let mouth = vent_gt.transform_point(Vec3::Y * 2.0);
         commands.spawn((
             Name::new("Chimney smoke"),
+            bevy::light::NotShadowCaster,
             Mesh3d(mesh),
             MeshMaterial3d(material.clone()),
             Transform::from_translation(mouth).with_scale(Vec3::splat(0.06)),
@@ -279,6 +280,7 @@ pub(crate) fn emit_resource_glints(
         });
         commands.spawn((
             Name::new("Resource glint"),
+            bevy::light::NotShadowCaster,
             Mesh3d(mesh),
             MeshMaterial3d(material.clone()),
             Transform::from_translation(spot).with_scale(Vec3::splat(0.01)),

@@ -848,6 +848,24 @@ pub fn capture_stage_worker_collecting(app: &mut App) -> Option<Vec3> {
     Some(spot)
 }
 
+/// Forces a weather kind at full blend so captures can photograph it without
+/// waiting out the ~100s phase clock.
+pub fn capture_set_weather(app: &mut App, kind: &str) -> bool {
+    let kind = match kind {
+        "clear" => WeatherKind::Clear,
+        "overcast" => WeatherKind::Overcast,
+        "rain" => WeatherKind::Rain,
+        "sandstorm" => WeatherKind::Sandstorm,
+        _ => return false,
+    };
+    let mut weather = app.world_mut().resource_mut::<WeatherState>();
+    weather.previous = kind;
+    weather.current = kind;
+    weather.blend = 1.0;
+    weather.phase_remaining = 10_000.0;
+    true
+}
+
 pub fn capture_player_command_center(app: &mut App) -> Option<(Entity, Vec3, Vec3)> {
     let (children_map, aabb_map, model_roots) = capture_world_geometry_maps(app);
     let player = Team::Player(0);

@@ -48,12 +48,13 @@ use bevy_open_rts::{
     capture_player_worker_position, capture_run_ai_duel, capture_run_ai_match_until_resolved,
     capture_run_arena, capture_select_map, capture_selected_player_unit_average_position,
     capture_selected_player_unit_count, capture_selected_player_unit_ids, capture_set_all_factions,
-    capture_set_cursor, capture_set_structure_rally, capture_show_campaign_menu,
-    capture_show_credits_menu, capture_show_main_menu, capture_show_options_menu,
-    capture_show_skirmish_setup_menu, capture_show_skirmish_setup_with_dropdown,
-    capture_spawn_construction_showcase, capture_spawn_model_harness_page,
-    capture_stage_worker_collecting, capture_world_to_screen, capture_worst_model_alignment_offset,
-    capture_zoom_camera_closest, start_shared_match_scene_with_current_setup,
+    capture_set_cursor, capture_set_structure_rally, capture_set_weather,
+    capture_show_campaign_menu, capture_show_credits_menu, capture_show_main_menu,
+    capture_show_options_menu, capture_show_skirmish_setup_menu,
+    capture_show_skirmish_setup_with_dropdown, capture_spawn_construction_showcase,
+    capture_spawn_model_harness_page, capture_stage_worker_collecting, capture_world_to_screen,
+    capture_worst_model_alignment_offset, capture_zoom_camera_closest,
+    start_shared_match_scene_with_current_setup,
 };
 
 const WIDTH: u32 = 1280;
@@ -227,6 +228,14 @@ fn main() {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("screenshots/placement/placement.png"));
             render_placement_ghost(&path)
+        }
+        Some("weather") => {
+            let kind = args.next().unwrap_or_else(|| "sandstorm".into());
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from(format!("screenshots/weather/{kind}.png")));
+            render_weather(&kind, &path)
         }
         Some("base") => {
             let path = args
@@ -1416,6 +1425,31 @@ fn render_placement_ghost(path: &Path) -> Result<(), String> {
         capture_player_in_placement_mode(&mut app),
         capture_placement_is_valid(&mut app),
     );
+    let handle = capture_handle(&app);
+    app.world_mut()
+        .spawn(Screenshot::image(handle))
+        .observe(save_to_disk(path.to_path_buf()));
+    for _ in 0..FLUSH_TICKS {
+        app.update();
+    }
+    println!("[capture] wrote {}", path.display());
+    Ok(())
+}
+
+fn render_weather(kind: &str, path: &Path) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let mut app = start_match_app();
+    if !capture_set_weather(&mut app, kind) {
+        return Err(format!(
+            "unknown weather '{kind}' (clear|overcast|rain|sandstorm)"
+        ));
+    }
+    // Let fog/light apply and a few dust puffs/rain sheets build up.
+    for _ in 0..120 {
+        app.update();
+    }
     let handle = capture_handle(&app);
     app.world_mut()
         .spawn(Screenshot::image(handle))

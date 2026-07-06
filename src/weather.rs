@@ -221,17 +221,20 @@ pub(crate) fn draw_rain(
     let center =
         camera.translation() + forward * (camera.translation().y / forward.y.abs().max(0.1));
     let t = time.elapsed_secs();
-    let streaks = (170.0 * strength) as u32;
+    let streaks = (220.0 * strength) as u32;
     let slant = Vec3::new(0.16, -1.0, 0.1).normalize();
     for index in 0..streaks {
         let hx = weather_hash01(index, 101);
         let hz = weather_hash01(index, 202);
         let hp = weather_hash01(index, 303);
-        let x = center.x + (hx - 0.5) * 30.0;
-        let z = center.z + (hz - 0.5) * 24.0;
-        // Each streak falls from ~9m and wraps around.
-        let fall = ((t * 9.0 + hp * 9.0) % 9.0) / 9.0;
-        let top = Vec3::new(x, 9.0 * (1.0 - fall), z);
+        // Cover the whole visible ground: the isometric view shows more world
+        // toward the camera (+z of the look point), and tall streaks read
+        // up-screen, so bias the sheet down-screen and keep tops low.
+        let x = center.x + (hx - 0.5) * 34.0;
+        let z = center.z + (hz - 0.28) * 26.0;
+        // Each streak falls from ~6m and wraps around.
+        let fall = ((t * 8.0 + hp * 6.0) % 6.0) / 6.0;
+        let top = Vec3::new(x, 6.0 * (1.0 - fall), z);
         gizmos.line(
             top,
             top + slant * 0.8,
@@ -297,6 +300,7 @@ pub(crate) fn emit_dust_puffs(
     });
     commands.spawn((
         Name::new("Dust puff"),
+        bevy::light::NotShadowCaster,
         Mesh3d(mesh),
         MeshMaterial3d(material.clone()),
         Transform::from_translation(spawn).with_scale(Vec3::splat(0.5)),
