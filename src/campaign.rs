@@ -61,6 +61,8 @@ pub(crate) struct MissionDef {
     pub(crate) starting_resources: StartingResources,
     pub(crate) victory: MissionVictory,
     pub(crate) triggers: &'static [MissionTrigger],
+    /// Briefing keyart shown by the mission cutscene (assets-relative path).
+    pub(crate) art: &'static str,
 }
 
 pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
@@ -120,6 +122,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 },
             },
         ],
+        art: "campaign/mission_01.jpg",
     },
     MissionDef {
         id: "strike_the_outpost",
@@ -151,6 +154,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 },
             },
         ],
+        art: "campaign/mission_02.jpg",
     },
     MissionDef {
         id: "canyon_siege",
@@ -189,6 +193,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 },
             },
         ],
+        art: "campaign/mission_03.jpg",
     },
     MissionDef {
         id: "highland_bastion_stand",
@@ -253,6 +258,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 },
             },
         ],
+        art: "campaign/mission_04.jpg",
     },
     MissionDef {
         id: "twin_front",
@@ -316,6 +322,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 },
             },
         ],
+        art: "campaign/mission_05.jpg",
     },
     MissionDef {
         id: "thunder_decapitation",
@@ -369,6 +376,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 },
             },
         ],
+        art: "campaign/mission_06.jpg",
     },
 ];
 

@@ -51,6 +51,8 @@ mod structure_ambience;
 pub(crate) use structure_ambience::*;
 mod weather;
 pub(crate) use weather::*;
+mod cutscene;
+pub(crate) use cutscene::*;
 mod combat_vfx;
 pub(crate) use combat_vfx::*;
 mod save;
@@ -2451,6 +2453,7 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
                 reset_replay_timeline_for_new_match,
                 apply_loaded_save,
                 resume_replay_recording_after_load,
+                spawn_mission_cutscene,
             )
                 .chain(),
         )
@@ -2869,6 +2872,8 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
         Update,
         (
             structure_placement_input,
+            animate_mission_cutscene,
+            dismiss_mission_cutscene,
             compute_placement_ghost.after(structure_placement_input),
             apply_placement_ghost_transform.after(compute_placement_ghost),
             tint_placement_ghost.after(apply_placement_ghost_transform),

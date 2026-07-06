@@ -52,8 +52,8 @@ use bevy_open_rts::{
     capture_show_campaign_menu, capture_show_credits_menu, capture_show_main_menu,
     capture_show_options_menu, capture_show_skirmish_setup_menu,
     capture_show_skirmish_setup_with_dropdown, capture_spawn_construction_showcase,
-    capture_spawn_model_harness_page, capture_stage_worker_collecting, capture_world_to_screen,
-    capture_worst_model_alignment_offset, capture_zoom_camera_closest,
+    capture_spawn_model_harness_page, capture_stage_worker_collecting, capture_start_mission,
+    capture_world_to_screen, capture_worst_model_alignment_offset, capture_zoom_camera_closest,
     start_shared_match_scene_with_current_setup,
 };
 
@@ -236,6 +236,14 @@ fn main() {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from(format!("screenshots/weather/{kind}.png")));
             render_weather(&kind, &path)
+        }
+        Some("mission") => {
+            let index: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(0);
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/mission"));
+            render_mission_cutscene(index, &dir)
         }
         Some("base") => {
             let path = args
@@ -1458,6 +1466,45 @@ fn render_weather(kind: &str, path: &Path) -> Result<(), String> {
         app.update();
     }
     println!("[capture] wrote {}", path.display());
+    Ok(())
+}
+
+fn render_mission_cutscene(index: usize, dir: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    let mut app = build_capture_app(WIDTH, HEIGHT);
+    for _ in 0..WARMUP_TICKS {
+        app.update();
+    }
+    if !capture_start_mission(&mut app, index) {
+        return Err(format!("mission {index} not found"));
+    }
+    for _ in 0..MATCH_SETTLE_TICKS + 60 {
+        app.update();
+    }
+    let handle = capture_handle(&app);
+    app.world_mut()
+        .spawn(Screenshot::image(handle.clone()))
+        .observe(save_to_disk(dir.join("00_cutscene.png")));
+    for _ in 0..FLUSH_TICKS {
+        app.update();
+    }
+    // Dismiss with Enter, then shoot gameplay.
+    capture_key(&mut app, KeyCode::Enter, true);
+    app.update();
+    capture_key(&mut app, KeyCode::Enter, false);
+    for _ in 0..20 {
+        app.update();
+    }
+    app.world_mut()
+        .spawn(Screenshot::image(handle))
+        .observe(save_to_disk(dir.join("01_after_dismiss.png")));
+    for _ in 0..FLUSH_TICKS {
+        app.update();
+    }
+    println!(
+        "[capture] wrote mission cutscene frames to {}",
+        dir.display()
+    );
     Ok(())
 }
 

@@ -866,6 +866,25 @@ pub fn capture_set_weather(app: &mut App, kind: &str) -> bool {
     true
 }
 
+/// Launches campaign mission `index` exactly like the campaign menu does.
+pub fn capture_start_mission(app: &mut App, index: usize) -> bool {
+    let Some(mission) = mission_by_index(index) else {
+        return false;
+    };
+    let Some(settings) = match_settings_for_mission(mission) else {
+        return false;
+    };
+    let world = app.world_mut();
+    world.resource_mut::<SelectedSkirmishMap>().godot_path = settings.map_path;
+    *world.resource_mut::<MatchSetupSettings>() = settings;
+    world.resource_mut::<ActiveMission>().0 = Some(index);
+    *world.resource_mut::<MissionTriggerState>() = MissionTriggerState::default();
+    world
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::InMatch);
+    true
+}
+
 pub fn capture_player_command_center(app: &mut App) -> Option<(Entity, Vec3, Vec3)> {
     let (children_map, aabb_map, model_roots) = capture_world_geometry_maps(app);
     let player = Team::Player(0);
