@@ -318,3 +318,35 @@ pub(crate) fn update_resource_glints(
         transform.scale = Vec3::splat(0.02 + envelope * 0.085);
     }
 }
+
+/// The node's spawn-time amount and base scale, captured on first sight so
+/// depletion can shrink the crystal cluster proportionally.
+#[derive(Component)]
+pub(crate) struct ResourceVisualBase {
+    pub(crate) initial_amount: i32,
+    pub(crate) base_scale: Vec3,
+}
+
+/// Mined-out nodes visibly dwindle: the cluster shrinks toward 70% of its
+/// spawn size as its amount runs down, so rich veins and dregs read apart.
+pub(crate) fn decay_resource_visuals(
+    mut commands: Commands,
+    mut nodes: Query<(
+        Entity,
+        &ResourceNode,
+        &mut Transform,
+        Option<&ResourceVisualBase>,
+    )>,
+) {
+    for (entity, node, mut transform, base) in &mut nodes {
+        let Some(base) = base else {
+            commands.entity(entity).try_insert(ResourceVisualBase {
+                initial_amount: node.amount.max(1),
+                base_scale: transform.scale,
+            });
+            continue;
+        };
+        let ratio = (node.amount as f32 / base.initial_amount as f32).clamp(0.0, 1.0);
+        transform.scale = base.base_scale * (0.7 + 0.3 * ratio);
+    }
+}

@@ -2322,6 +2322,13 @@ pub(crate) fn update_repair_orders(
         target_health.current = (target_health.current
             + repairer.capability.rate * time.delta_secs())
         .min(target_health.max);
+        if heal_sparkle_due(
+            time.elapsed_secs(),
+            time.delta_secs(),
+            repairer.entity.to_bits(),
+        ) {
+            spawn_heal_sparkle(&mut commands, target_transform.translation);
+        }
         if target_health.current >= target_health.max {
             commands.entity(repairer.entity).try_remove::<RepairOrder>();
         }

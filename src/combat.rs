@@ -846,6 +846,7 @@ pub(crate) fn update_support_effects(
 }
 
 pub(crate) fn update_repair_and_healing_auras(
+    mut commands: Commands,
     time: Res<Time>,
     economies: Res<Economies>,
     relations: Res<TeamRelations>,
@@ -969,7 +970,7 @@ pub(crate) fn update_repair_and_healing_auras(
         for (
             entity,
             _target_team,
-            _target_transform,
+            target_transform,
             _target_unit,
             _target_structure,
             _target_domain,
@@ -983,13 +984,16 @@ pub(crate) fn update_repair_and_healing_auras(
                 .sum::<f32>();
             if repaired > 0.0 {
                 target_health.current = (target_health.current + repaired).min(target_health.max);
+                if heal_sparkle_due(time.elapsed_secs(), time.delta_secs(), entity.to_bits()) {
+                    spawn_heal_sparkle(&mut commands, target_transform.translation);
+                }
             }
         }
     }
 
     if !healing_sources.is_empty() {
         for (
-            _target_entity,
+            target_entity,
             target_team,
             target_transform,
             target_unit,
@@ -1019,6 +1023,13 @@ pub(crate) fn update_repair_and_healing_auras(
             }
             if healed > 0.0 {
                 target_health.current = (target_health.current + healed).min(target_health.max);
+                if heal_sparkle_due(
+                    time.elapsed_secs(),
+                    time.delta_secs(),
+                    target_entity.to_bits(),
+                ) {
+                    spawn_heal_sparkle(&mut commands, target_transform.translation);
+                }
             }
         }
     }

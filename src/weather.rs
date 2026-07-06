@@ -345,3 +345,26 @@ pub(crate) fn update_dust_puffs(
         }
     }
 }
+
+/// The live terrain material, kept so rain can wet the ground.
+#[derive(Resource)]
+pub(crate) struct TerrainMaterialHandle(pub(crate) Handle<StandardMaterial>);
+
+/// Rain slicks the ground: roughness drops (specular sheen) and the sand
+/// darkens while wet, easing back as the shower passes.
+pub(crate) fn wet_ground_with_rain(
+    weather: Res<WeatherState>,
+    terrain: Option<Res<TerrainMaterialHandle>>,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+) {
+    let (Some(terrain), Some(mut materials)) = (terrain, materials) else {
+        return;
+    };
+    let Some(mut material) = materials.get_mut(&terrain.0) else {
+        return;
+    };
+    let wet = weather.blended().rain;
+    material.perceptual_roughness = 0.95 - wet * 0.55;
+    let darken = 1.0 - wet * 0.18;
+    material.base_color = Color::srgb(0.82 * darken, 0.6 * darken, 0.5 * darken);
+}

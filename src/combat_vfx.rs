@@ -1174,3 +1174,166 @@ pub(crate) fn spawn_construction_complete_flash(
         DebrisPalette::Masonry,
     );
 }
+
+// ---------------------------------------------------------------------------
+// Heal sparkles, landing dust, low-power sparks
+// ---------------------------------------------------------------------------
+
+/// Per-entity clock for low-power spark emission (kept separate from
+/// VfxEmitClock so damage smoke and sparks never fight over one timer).
+#[derive(Component)]
+pub(crate) struct SparkClock {
+    pub(crate) next: f32,
+}
+
+/// Deterministic per-target throttle for heal/repair sparkles: fires roughly
+/// twice a second, phased by the target entity so a group being healed
+/// twinkles instead of blinking in lockstep.
+pub(crate) fn heal_sparkle_due(elapsed: f32, dt: f32, entity_bits: u64) -> bool {
+    let phase = vfx_hash01(entity_bits, 91) * 0.5;
+    ((elapsed + phase) % 0.5) < dt
+}
+
+/// A small rising green cross-glint over a healed/repaired target.
+pub(crate) fn spawn_heal_sparkle(commands: &mut Commands, position: Vec3) {
+    commands.queue(move |world: &mut World| {
+        if !world.contains_resource::<Assets<Mesh>>()
+            || !world.contains_resource::<Assets<StandardMaterial>>()
+        {
+            return;
+        }
+        let mesh = world
+            .resource_mut::<Assets<Mesh>>()
+            .add(Sphere::new(1.0).mesh().ico(1).unwrap());
+        let material = world
+            .resource_mut::<Assets<StandardMaterial>>()
+            .add(StandardMaterial {
+                base_color: Color::srgba(0.5, 1.0, 0.6, 0.85),
+                emissive: LinearRgba::new(0.35, 2.6, 0.7, 1.0),
+                alpha_mode: AlphaMode::Add,
+                unlit: true,
+                ..default()
+            });
+        let seed = (position.x.to_bits() as u64) ^ ((position.z.to_bits() as u64) << 17);
+        let jitter = Vec3::new(
+            (vfx_hash01(seed, 3) - 0.5) * 0.5,
+            0.5 + vfx_hash01(seed, 5) * 0.5,
+            (vfx_hash01(seed, 7) - 0.5) * 0.5,
+        );
+        world.spawn((
+            Name::new("Heal sparkle"),
+            bevy::light::NotShadowCaster,
+            Mesh3d(mesh),
+            MeshMaterial3d(material.clone()),
+            Transform::from_translation(position + jitter).with_scale(Vec3::splat(0.01)),
+            ResourceGlint {
+                age: 0.0,
+                ttl: 0.4,
+                material,
+            },
+            MatchScopedEntity,
+        ));
+    });
+}
+
+/// A ring of kicked-up dust plus a soft pop where a paradropped unit lands.
+pub(crate) fn spawn_landing_dust(commands: &mut Commands, position: Vec3) {
+    spawn_combat_flash(
+        commands,
+        position + Vec3::Y * 0.15,
+        0.12,
+        0.5,
+        0.25,
+        LinearRgba::new(1.1, 1.0, 0.85, 1.0),
+    );
+    commands.queue(move |world: &mut World| {
+        if !world.contains_resource::<Assets<Mesh>>()
+            || !world.contains_resource::<Assets<StandardMaterial>>()
+        {
+            return;
+        }
+        let mesh = world
+            .resource_mut::<Assets<Mesh>>()
+            .add(Sphere::new(1.0).mesh().ico(1).unwrap());
+        let seed = (position.x.to_bits() as u64) ^ ((position.z.to_bits() as u64) << 21);
+        for index in 0..5u32 {
+            let angle = index as f32 / 5.0 * std::f32::consts::TAU + vfx_hash01(seed, index) * 0.7;
+            let material = world
+                .resource_mut::<Assets<StandardMaterial>>()
+                .add(StandardMaterial {
+                    base_color: Color::srgba(0.74, 0.62, 0.48, 0.28),
+                    alpha_mode: AlphaMode::Blend,
+                    unlit: true,
+                    ..default()
+                });
+            world.spawn((
+                Name::new("Landing dust"),
+                bevy::light::NotShadowCaster,
+                Mesh3d(mesh.clone()),
+                MeshMaterial3d(material.clone()),
+                Transform::from_translation(
+                    position + Vec3::new(angle.cos() * 0.45, 0.12, angle.sin() * 0.45),
+                )
+                .with_scale(Vec3::splat(0.09)),
+                SmokePuff {
+                    age: 0.0,
+                    ttl: 0.9,
+                    material,
+                },
+                MatchScopedEntity,
+            ));
+        }
+    });
+}
+
+/// Structures on a starved power grid arc little blue sparks — the brownout
+/// is visible on the base itself, not just in the HUD warning.
+pub(crate) fn emit_low_power_sparks(
+    mut commands: Commands,
+    time: Res<Time>,
+    economies: Res<Economies>,
+    mut structures: Query<
+        (
+            Entity,
+            &Team,
+            &GlobalTransform,
+            &Selectable,
+            Option<&mut SparkClock>,
+        ),
+        (With<Structure>, Without<UnderConstruction>),
+    >,
+) {
+    let dt = time.delta_secs();
+    for (entity, team, gt, selectable, clock) in &mut structures {
+        if team.economy_index().is_none() || !economies.get(*team).low_power() {
+            continue;
+        }
+        let Some(mut clock) = clock else {
+            commands.entity(entity).try_insert(SparkClock {
+                next: vfx_hash01(entity.to_bits(), 47) * 2.0,
+            });
+            continue;
+        };
+        clock.next -= dt;
+        if clock.next > 0.0 {
+            continue;
+        }
+        clock.next = 1.6 + vfx_hash01(entity.to_bits(), 53) * 1.2;
+        let seed = entity
+            .to_bits()
+            .wrapping_add(time.elapsed_secs().to_bits() as u64);
+        let offset = Vec3::new(
+            (vfx_hash01(seed, 3) - 0.5) * selectable.radius,
+            0.5 + vfx_hash01(seed, 5) * 0.6,
+            (vfx_hash01(seed, 7) - 0.5) * selectable.radius,
+        );
+        spawn_combat_flash(
+            &mut commands,
+            gt.translation() + offset,
+            0.04,
+            0.16,
+            0.16,
+            LinearRgba::new(0.5, 1.3, 3.2, 1.0),
+        );
+    }
+}

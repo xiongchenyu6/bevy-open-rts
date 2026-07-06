@@ -1014,6 +1014,8 @@ pub(crate) fn spawn_paradrop_units(
             faction,
             visible_team,
         );
+        // Touch-down: a soft pop and a ring of kicked-up dust per trooper.
+        spawn_landing_dust(commands, spawn_position);
     }
 }
 

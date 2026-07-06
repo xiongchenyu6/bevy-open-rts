@@ -3205,12 +3205,15 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                     update_resource_glints,
                     tick_weather,
                     apply_weather_environment,
+                    wet_ground_with_rain,
                     emit_dust_puffs,
                     update_dust_puffs,
                     update_debris_chunks,
                     update_scorch_marks,
                     emit_damage_smoke,
                     emit_drive_dust,
+                    emit_low_power_sparks,
+                    decay_resource_visuals,
                 )
                     .chain(),
                 animate_structure_construction,
@@ -4457,17 +4460,21 @@ pub(crate) fn setup(
     } else {
         meshes.add(terrain_mesh(&terrain_field))
     };
+    // Kept as a resource so the weather system can wet the ground during rain.
+    let terrain_material = materials.add(StandardMaterial {
+        base_color: Color::srgb(0.82, 0.6, 0.5),
+        perceptual_roughness: 0.95,
+        ..default()
+    });
+    commands.insert_resource(TerrainMaterialHandle(terrain_material.clone()));
     commands.spawn((
         Name::new(format!("{} Terrain", skirmish_map.name)),
         Mesh3d(terrain_mesh_handle),
         // Warm sand in godot's hue (terrain.material.tres) but darkened to sit
         // mid-tonemap-curve, so the vertex-color ground variation reads instead
-        // of blowing out white under the sun + ACES shoulder.
-        MeshMaterial3d(materials.add(StandardMaterial {
-            base_color: Color::srgb(0.82, 0.6, 0.5),
-            perceptual_roughness: 0.95,
-            ..default()
-        })),
+        // of blowing out white under the sun + ACES shoulder. The handle is
+        // kept so the weather system can wet the ground during rain.
+        MeshMaterial3d(terrain_material.clone()),
         bevy_rts_camera::Ground,
         MatchScopedEntity,
     ));
