@@ -29,7 +29,9 @@ pub(crate) struct VisionRadius(pub(crate) f32);
 pub(crate) const FOG_OVERLAY_RES: usize = 192;
 
 /// Alpha of the dim shroud over explored-but-not-currently-visible terrain.
-pub(crate) const FOG_OVERLAY_EXPLORED_ALPHA: u8 = 150;
+/// Keep this LIGHT: it multiplies with the filmic exposure, and at 150 the
+/// explored map read as nearly unexplored-black ("点亮的地图很快就黑了").
+pub(crate) const FOG_OVERLAY_EXPLORED_ALPHA: u8 = 92;
 
 /// Height above the terrain at which the shroud plane sits.
 pub(crate) const FOG_OVERLAY_Y: f32 = 0.06;
