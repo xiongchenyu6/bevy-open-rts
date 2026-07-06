@@ -1292,6 +1292,54 @@ fn turret_nodes_traverse_toward_the_attack_target() {
 }
 
 #[test]
+fn chimneys_puff_smoke_that_rises_and_expires() {
+    let mut app = App::new();
+    app.insert_resource(Time::<()>::default());
+    app.init_resource::<Assets<Mesh>>();
+    app.init_resource::<Assets<StandardMaterial>>();
+    app.add_systems(Update, (emit_chimney_smoke, update_smoke_puffs).chain());
+
+    let structure = app.world_mut().spawn(Structure { id: "PowerReactor" }).id();
+    app.world_mut().spawn((
+        ChimneyVent {
+            root: structure,
+            next_emit: 0.1,
+        },
+        GlobalTransform::from(Transform::from_xyz(3.0, 0.0, 4.0)),
+    ));
+
+    app.world_mut()
+        .resource_mut::<Time>()
+        .advance_by(std::time::Duration::from_millis(200));
+    app.update();
+    app.update(); // command flush -> puff visible to queries
+    let mut puffs = app.world_mut().query::<(&SmokePuff, &Transform)>();
+    let (_, spawn_tf) = puffs.single(app.world()).expect("a puff should spawn");
+    let spawn_y = spawn_tf.translation.y;
+    assert!(
+        spawn_y > 1.0,
+        "puff spawns at the chimney mouth, y={spawn_y}"
+    );
+
+    // Halfway through life it has risen; past ttl it despawns.
+    app.world_mut()
+        .resource_mut::<Time>()
+        .advance_by(std::time::Duration::from_millis(800));
+    app.update();
+    let (_, risen_tf) = puffs.single(app.world()).expect("puff still alive");
+    assert!(risen_tf.translation.y > spawn_y, "smoke rises");
+    app.world_mut()
+        .resource_mut::<Time>()
+        .advance_by(std::time::Duration::from_secs(3));
+    app.update();
+    app.update();
+    // The original puff expired; anything alive is from a newer emit cycle.
+    for (puff, _) in puffs.iter(app.world()) {
+        assert!(puff.age < puff.ttl, "expired puffs must despawn");
+    }
+}
+
+#[test]
 fn weapon_fire_kick_decays_after_the_shot() {
     let mut weapon = Weapon::new(6.0, 2.0, 1.5, 0.0, 1.0, 1.0, true, true);
     weapon.cooldown_left = 1.5; // just fired

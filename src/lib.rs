@@ -47,6 +47,8 @@ mod placement_ghost;
 pub(crate) use placement_ghost::*;
 mod limb_animation;
 pub(crate) use limb_animation::*;
+mod structure_ambience;
+pub(crate) use structure_ambience::*;
 mod combat_vfx;
 pub(crate) use combat_vfx::*;
 mod save;
@@ -3185,6 +3187,10 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 tag_turret_nodes,
                 animate_turret_nodes,
                 animate_airframes,
+                tag_structure_ambience,
+                spin_dish_nodes,
+                emit_chimney_smoke,
+                update_smoke_puffs,
                 animate_structure_construction,
                 apply_construction_ghost_material,
                 apply_team_color_materials,
