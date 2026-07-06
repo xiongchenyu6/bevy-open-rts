@@ -1340,6 +1340,42 @@ fn chimneys_puff_smoke_that_rises_and_expires() {
 }
 
 #[test]
+fn resource_nodes_emit_short_lived_glints() {
+    let mut app = App::new();
+    app.insert_resource(Time::<()>::default());
+    app.init_resource::<Assets<Mesh>>();
+    app.init_resource::<Assets<StandardMaterial>>();
+    app.add_systems(
+        Update,
+        (emit_resource_glints, update_resource_glints).chain(),
+    );
+
+    app.world_mut().spawn((
+        ResourceNode {
+            kind: ResourceKind::Ore,
+            amount: 100,
+        },
+        GlobalTransform::from(Transform::from_xyz(2.0, 0.0, 3.0)),
+    ));
+
+    // Step ~4s in 100ms ticks; at least one glint must appear and every live
+    // glint must die within its ttl.
+    let mut seen = 0u32;
+    for _ in 0..40 {
+        app.world_mut()
+            .resource_mut::<Time>()
+            .advance_by(std::time::Duration::from_millis(100));
+        app.update();
+        let mut glints = app.world_mut().query::<&ResourceGlint>();
+        for glint in glints.iter(app.world()) {
+            seen += 1;
+            assert!(glint.age <= glint.ttl + 0.101, "glints must expire on time");
+        }
+    }
+    assert!(seen > 0, "expected at least one glint over 4 seconds");
+}
+
+#[test]
 fn weapon_fire_kick_decays_after_the_shot() {
     let mut weapon = Weapon::new(6.0, 2.0, 1.5, 0.0, 1.0, 1.0, true, true);
     weapon.cooldown_left = 1.5; // just fired
