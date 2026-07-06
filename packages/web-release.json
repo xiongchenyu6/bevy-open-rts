@@ -1,5 +1,5 @@
 {
-  "tag": "web-latest",
-  "url": "https://github.com/xiongchenyu6/bevy-open-rts/releases/download/web-latest/web-dist.zip",
-  "sha256": "sha256-XGu5yj+2x79JKRIPIuDSpqfuTlpw9lhWv2EU1DL+Ck4="
+  "tag": "v0.1.0",
+  "url": "https://github.com/xiongchenyu6/bevy-open-rts/releases/download/v0.1.0/bevy-open-rts-web.tar.gz",
+  "sha256": "sha256-JNKUGDbR1JvCoY/7ckqy/vR9wGGeHA7sF1ds3psyZI0="
 }
