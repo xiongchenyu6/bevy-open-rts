@@ -208,7 +208,7 @@ pub(crate) fn issue_orders(
     mut commands: Commands,
     mouse: Res<ButtonInput<MouseButton>>,
     keyboard: Res<ButtonInput<KeyCode>>,
-    economies: Res<Economies>,
+
     visible_player: Res<VisiblePlayer>,
     hud_zones: Res<HudHitZones>,
     window_q: Query<&Window, With<PrimaryWindow>>,
@@ -219,7 +219,7 @@ pub(crate) fn issue_orders(
         Query<(&Team, &mut RallyPoint), SelectedRallyPointFilter>,
     )>,
     selectable_q: Query<SelectableOrderTargetItem<'_>>,
-    structures: Query<StructurePrereqItem<'_>>,
+
     structure_targets: Query<(Entity, &Structure, &Team, Option<&UnderConstruction>), With<Health>>,
     garrison_targets: Query<
         (
@@ -283,28 +283,8 @@ pub(crate) fn issue_orders(
     };
 
     if order_resources.command_mode.support_power.is_some() {
-        let power = order_resources.command_mode.support_power.unwrap();
-        let support_targets = support_power_target_snapshots(&selectable_q);
-        if activate_support_power(
-            &mut commands,
-            point,
-            power,
-            visible_team,
-            visible_team,
-            &economies,
-            &mut order_resources.support_cooldowns,
-            &mut order_resources.battle_log,
-            &order_resources.relations,
-            &structures,
-            &support_targets,
-        ) {
-            record_support_power_audio_feedback(
-                &mut order_resources.audio_feedback,
-                visible_team,
-                visible_team,
-                power,
-            );
-        }
+        // Right-click cancels an armed support power (left-click fires it —
+        // see fire_support_power_on_left_click).
         order_resources.command_mode.support_power = None;
         return;
     }

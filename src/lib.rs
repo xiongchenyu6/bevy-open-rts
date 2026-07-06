@@ -2336,6 +2336,7 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<CombatFlashMesh>()
         .init_resource::<PlacementGhost>()
         .init_resource::<WeatherState>()
+        .init_resource::<SupportFireClickGuard>()
         .init_resource::<MissionTriggerState>()
         .init_resource::<BuildQueue>()
         .init_resource::<BuildStructureTab>()
@@ -2894,6 +2895,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .run_if(match_in_progress),
             (
                 refresh_hud_hit_zones.before(select_entities),
+                fire_support_power_on_left_click.before(select_entities),
                 select_entities,
             )
                 .in_set(SimulationPhase::UiAndManagement)
@@ -6610,6 +6612,34 @@ pub(crate) fn draw_world_overlays(
     for (transform, effect) in &vfx.promotion {
         draw_veterancy_promotion_effect(&mut gizmos, transform.translation, effect, &player_colors);
     }
+    // Armed support power: a pulsing target ring at the cursor so the player
+    // sees they're in targeting mode and how large the effect footprint is.
+    if let Some(power) = placement_preview.command_mode.support_power
+        && let Ok(window) = placement_preview.window_q.single()
+        && !cursor_is_over_hud(window, &placement_preview.hud_zones)
+        && let Some(point) = pointer_ground(
+            window,
+            &placement_preview.camera_q,
+            &placement_preview.terrain,
+        )
+    {
+        let def = power.definition();
+        let pulse = 1.0 + (vfx.time.elapsed_secs() * 5.0).sin() * 0.06;
+        let color = Color::srgba(0.45, 0.9, 1.0, 0.85);
+        draw_ring(&mut gizmos, point, def.radius * pulse, color);
+        draw_ring(&mut gizmos, point, def.radius * 0.15, color);
+        gizmos.line(
+            terrain_overlay_point(point) - Vec3::X * def.radius * 0.3,
+            terrain_overlay_point(point) + Vec3::X * def.radius * 0.3,
+            color,
+        );
+        gizmos.line(
+            terrain_overlay_point(point) - Vec3::Z * def.radius * 0.3,
+            terrain_overlay_point(point) + Vec3::Z * def.radius * 0.3,
+            color,
+        );
+    }
+
     // Build-grid only while placing a structure (godot draws no world grid).
     if placement_preview
         .command_mode

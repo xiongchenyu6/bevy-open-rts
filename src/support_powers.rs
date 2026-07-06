@@ -1374,3 +1374,76 @@ pub(crate) fn any_enemy_support_target_position(
             )
         })
 }
+
+/// Set for one frame when a left-click just fired an armed support power, so
+/// the selection system swallows that click instead of also box-selecting.
+#[derive(Resource, Default)]
+pub(crate) struct SupportFireClickGuard(pub(crate) bool);
+
+/// Fires the armed support power at the cursor on LEFT-click — the genre
+/// convention (left = confirm target, right = cancel). This used to be
+/// right-click-to-fire with left-click silently disarming, which read as
+/// "F1 does nothing" the moment anyone clicked their target normally.
+pub(crate) fn fire_support_power_on_left_click(
+    mut commands: Commands,
+    mouse: Res<ButtonInput<MouseButton>>,
+    window_q: Query<&Window, With<PrimaryWindow>>,
+    camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    hud_zones: Res<HudHitZones>,
+    visible_player: Res<VisiblePlayer>,
+    economies: Res<Economies>,
+    structures: Query<StructurePrereqItem<'_>>,
+    selectable_q: Query<SelectableOrderTargetItem<'_>>,
+    mut order_resources: OrderResources,
+    mut guard: ResMut<SupportFireClickGuard>,
+) {
+    guard.0 = false;
+    if !mouse.just_pressed(MouseButton::Left) {
+        return;
+    }
+    let Some(power) = order_resources.command_mode.support_power else {
+        return;
+    };
+    let Some(visible_team) = controlled_player_team(Some(&*visible_player)) else {
+        return;
+    };
+    let Ok(window) = window_q.single() else {
+        return;
+    };
+    if window
+        .cursor_position()
+        .is_none_or(|cursor| cursor_blocks_world_order_controls(cursor, &hud_zones))
+    {
+        return;
+    }
+    let Some(raw_point) = pointer_ground(window, &camera_q, &order_resources.terrain) else {
+        return;
+    };
+    let Some(point) = validated_terrain_target_in_bounds(raw_point, *order_resources.map_bounds)
+    else {
+        return;
+    };
+    let support_targets = support_power_target_snapshots(&selectable_q);
+    if activate_support_power(
+        &mut commands,
+        point,
+        power,
+        visible_team,
+        visible_team,
+        &economies,
+        &mut order_resources.support_cooldowns,
+        &mut order_resources.battle_log,
+        &order_resources.relations,
+        &structures,
+        &support_targets,
+    ) {
+        record_support_power_audio_feedback(
+            &mut order_resources.audio_feedback,
+            visible_team,
+            visible_team,
+            power,
+        );
+    }
+    order_resources.command_mode.support_power = None;
+    guard.0 = true;
+}

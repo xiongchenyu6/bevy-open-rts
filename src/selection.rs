@@ -47,11 +47,12 @@ impl Default for DoubleClickState {
 pub(crate) fn select_entities(
     mut commands: Commands,
     terrain: Res<TerrainHeightField>,
+    support_fire_guard: Res<SupportFireClickGuard>,
     mouse: Res<ButtonInput<MouseButton>>,
     keyboard: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
     visible_player: Res<VisiblePlayer>,
-    mut command_mode: ResMut<CommandMode>,
+    command_mode: ResMut<CommandMode>,
     hud_zones: Res<HudHitZones>,
     window_q: Query<&Window, With<PrimaryWindow>>,
     camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
@@ -91,11 +92,13 @@ pub(crate) fn select_entities(
         return;
     };
 
-    disarm_support_power_on_left_click(
-        &mut command_mode,
-        &mouse,
-        cursor_is_over_hud(window, &hud_zones),
-    );
+    // A left-click that just fired an armed support power is consumed here so
+    // it doesn't also start a selection.
+    if support_fire_guard.0 && mouse.just_pressed(MouseButton::Left) {
+        drag_state.active = false;
+        drag_state.dragging = false;
+        return;
+    }
 
     if mouse.just_pressed(MouseButton::Left) {
         drag_state.active = true;
