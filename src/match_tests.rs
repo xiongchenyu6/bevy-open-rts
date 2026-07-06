@@ -1152,10 +1152,10 @@ fn kenney_gold_accents_get_repainted_in_the_player_color() {
 }
 
 #[test]
-fn worker_limbs_animate_while_working_and_return_to_rest() {
+fn unit_limbs_animate_by_activity_and_return_to_rest() {
     let mut app = App::new();
     app.insert_resource(Time::<()>::default());
-    app.add_systems(Update, animate_worker_limbs);
+    app.add_systems(Update, animate_unit_limbs);
 
     let worker = app
         .world_mut()
@@ -1175,37 +1175,67 @@ fn worker_limbs_animate_while_working_and_return_to_rest() {
         ))
         .id();
     let rest = Transform::from_xyz(0.13, 0.47, 0.0);
-    let arm = app
-        .world_mut()
-        .spawn((
-            WorkerLimb {
-                kind: WorkerLimbKind::ArmRight,
-                root: worker,
+    let limb = |kind, root| {
+        (
+            Limb {
+                kind,
+                root,
                 rest_translation: rest.translation,
                 rest_rotation: rest.rotation,
                 seed: 0.0,
             },
             rest,
-        ))
-        .id();
+        )
+    };
+    let arm = app.world_mut().spawn(limb(LimbKind::ArmRight, worker)).id();
+    let leg = app.world_mut().spawn(limb(LimbKind::LegLeft, worker)).id();
 
-    // Advance time so the pose phase is non-zero, then run the animator.
     app.world_mut()
         .resource_mut::<Time>()
         .advance_by(std::time::Duration::from_millis(400));
     app.update();
-    let mining_pose = *app.world().get::<Transform>(arm).unwrap();
     assert_ne!(
-        mining_pose.rotation, rest.rotation,
+        app.world().get::<Transform>(arm).unwrap().rotation,
+        rest.rotation,
         "collecting workers must swing their arm"
     );
+    assert_eq!(
+        app.world().get::<Transform>(leg).unwrap().rotation,
+        rest.rotation,
+        "legs stay planted while standing at the node"
+    );
 
-    // Stop working: the limb snaps back to its exact rest pose.
+    // Walking: legs stride and arms swing in the gait.
     app.world_mut().entity_mut(worker).remove::<HarvestOrder>();
+    app.world_mut().entity_mut(worker).insert(MoveOrder {
+        target: Vec3::new(5.0, 0.0, 0.0),
+    });
     app.update();
-    let idle_pose = *app.world().get::<Transform>(arm).unwrap();
-    assert_eq!(idle_pose.rotation, rest.rotation);
-    assert_eq!(idle_pose.translation, rest.translation);
+    assert_ne!(
+        app.world().get::<Transform>(leg).unwrap().rotation,
+        rest.rotation,
+        "moving units must stride"
+    );
+
+    // Idle: everything snaps back to the exact rest pose.
+    app.world_mut().entity_mut(worker).remove::<MoveOrder>();
+    app.update();
+    for entity in [arm, leg] {
+        let pose = *app.world().get::<Transform>(entity).unwrap();
+        assert_eq!(pose.rotation, rest.rotation);
+        assert_eq!(pose.translation, rest.translation);
+    }
+}
+
+#[test]
+fn weapon_fire_kick_decays_after_the_shot() {
+    let mut weapon = Weapon::new(6.0, 2.0, 1.5, 0.0, 1.0, 1.0, true, true);
+    weapon.cooldown_left = 1.5; // just fired
+    assert!(weapon_fire_kick(&weapon) > 0.9);
+    weapon.cooldown_left = 1.2; // 0.3s later, past the kick window
+    assert_eq!(weapon_fire_kick(&weapon), 0.0);
+    weapon.cooldown_left = 0.0; // ready to fire again
+    assert_eq!(weapon_fire_kick(&weapon), 0.0);
 }
 
 #[test]

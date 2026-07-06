@@ -45,8 +45,8 @@ mod match_screens;
 pub(crate) use match_screens::*;
 mod placement_ghost;
 pub(crate) use placement_ghost::*;
-mod worker_animation;
-pub(crate) use worker_animation::*;
+mod limb_animation;
+pub(crate) use limb_animation::*;
 mod combat_vfx;
 pub(crate) use combat_vfx::*;
 mod save;
@@ -3179,8 +3179,8 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             (
                 update_construction_work_pulses,
                 animate_construction_workers,
-                tag_worker_limbs,
-                animate_worker_limbs,
+                tag_unit_limbs,
+                animate_unit_limbs,
                 animate_structure_construction,
                 apply_construction_ghost_material,
                 apply_team_color_materials,
