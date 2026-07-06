@@ -1119,6 +1119,8 @@ pub(crate) fn update_command_mode(
     support_cooldowns: Res<SupportCooldowns>,
     structures: Query<StructurePrereqItem<'_>>,
     mut command_mode: ResMut<CommandMode>,
+    mut audio_feedback: ResMut<AudioFeedback>,
+    mut battle_log: ResMut<BattleLog>,
 ) {
     let Some(visible_team) = controlled_player_team(Some(&*visible_player)) else {
         clear_targeting_modes(&mut command_mode);
@@ -1138,18 +1140,46 @@ pub(crate) fn update_command_mode(
         return;
     }
     for power in SupportPowerKind::ALL {
-        if keyboard.just_pressed(power.hotkey())
-            && player_support_power_available(
-                visible_team,
-                power,
-                &economies,
-                &support_cooldowns,
-                &structures,
-            )
-        {
-            toggle_support_power_mode(&mut command_mode, power);
-            return;
+        if !keyboard.just_pressed(power.hotkey()) {
+            continue;
         }
+        if player_support_power_available(
+            visible_team,
+            power,
+            &economies,
+            &support_cooldowns,
+            &structures,
+        ) {
+            toggle_support_power_mode(&mut command_mode, power);
+        } else {
+            // A silent no-op here read as "F1 does nothing" — say WHY the
+            // power can't fire right now.
+            let def = power.definition();
+            let missing = support_power_missing_requirement_labels(
+                visible_team,
+                def.requirements,
+                &structures,
+            );
+            let reason = if !missing.is_empty() {
+                format!("{}: {}", t("需要", "Requires"), missing.join(" + "))
+            } else if def.requires_power && economies.get(visible_team).low_power() {
+                t("电力不足", "Low power").to_string()
+            } else {
+                t("冷却中", "Cooling down").to_string()
+            };
+            push_battle_log(
+                &mut battle_log,
+                format!(
+                    "{} {}: {}",
+                    power.label(),
+                    t("不可用", "unavailable"),
+                    reason
+                ),
+                None,
+            );
+            record_sound_audio_feedback(&mut audio_feedback, SoundEffectKind::Error);
+        }
+        return;
     }
 }
 

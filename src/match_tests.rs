@@ -1478,6 +1478,59 @@ fn damaged_units_smoke_and_healthy_units_do_not() {
 }
 
 #[test]
+fn f1_hotkey_arms_radar_sweep_when_available_and_explains_when_not() {
+    let mut app = App::new();
+    app.init_resource::<CommandMode>();
+    let mut economies = Economies::default();
+    let _ = economies.get_mut(Team::Player(0)); // materialize the player slot
+    app.insert_resource(economies);
+    app.init_resource::<SupportCooldowns>();
+    app.init_resource::<AudioFeedback>();
+    app.init_resource::<BattleLog>();
+    app.insert_resource(VisiblePlayer::per_player(Team::Player(0)));
+    app.init_resource::<ButtonInput<KeyCode>>();
+    app.add_systems(Update, update_command_mode);
+
+    // No RadarUplink yet: F1 must NOT arm, and must explain itself.
+    app.world_mut()
+        .resource_mut::<ButtonInput<KeyCode>>()
+        .press(KeyCode::F1);
+    app.update();
+    assert_eq!(
+        app.world().resource::<CommandMode>().support_power,
+        None,
+        "locked power must not arm"
+    );
+    assert!(
+        !app.world().resource::<BattleLog>().entries.is_empty(),
+        "pressing a locked hotkey must log why"
+    );
+    app.world_mut()
+        .resource_mut::<ButtonInput<KeyCode>>()
+        .clear_just_pressed(KeyCode::F1);
+    app.world_mut()
+        .resource_mut::<ButtonInput<KeyCode>>()
+        .release(KeyCode::F1);
+    app.update();
+
+    // With a constructed RadarUplink, F1 arms targeting mode.
+    app.world_mut().spawn((
+        Structure { id: "RadarUplink" },
+        Team::Player(0),
+        Transform::default(),
+    ));
+    app.world_mut()
+        .resource_mut::<ButtonInput<KeyCode>>()
+        .press(KeyCode::F1);
+    app.update();
+    assert_eq!(
+        app.world().resource::<CommandMode>().support_power,
+        Some(SupportPowerKind::RadarSweep),
+        "F1 must arm radar sweep once the uplink is built"
+    );
+}
+
+#[test]
 fn weapon_fire_kick_decays_after_the_shot() {
     let mut weapon = Weapon::new(6.0, 2.0, 1.5, 0.0, 1.0, 1.0, true, true);
     weapon.cooldown_left = 1.5; // just fired
