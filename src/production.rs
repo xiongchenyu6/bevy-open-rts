@@ -1442,6 +1442,11 @@ pub(crate) fn progress_under_construction_structures(
 
         health.current = health.max;
         commands.entity(entity).try_remove::<UnderConstruction>();
+        spawn_construction_complete_flash(
+            &mut commands,
+            transform.translation,
+            registry::entity(structure.id).map_or(1.4, |def| def.radius),
+        );
         // A completed refinery grants a Worker for every team. Human-owned
         // workers still gather manually, so the player keeps direct control.
         if let Some(origin) = construction.free_worker_origin {

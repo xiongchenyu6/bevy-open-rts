@@ -1418,6 +1418,66 @@ fn weather_cycles_between_clear_and_events_deterministically() {
 }
 
 #[test]
+fn damaged_units_smoke_and_healthy_units_do_not() {
+    let mut app = App::new();
+    app.insert_resource(Time::<()>::default());
+    app.init_resource::<Assets<Mesh>>();
+    app.init_resource::<Assets<StandardMaterial>>();
+    app.add_systems(Update, emit_damage_smoke);
+
+    let hurt = app
+        .world_mut()
+        .spawn((
+            Unit {
+                id: "Tank",
+                speed: 2.0,
+                can_crush: true,
+                can_be_crushed: false,
+            },
+            Health {
+                current: 3.0,
+                max: 10.0,
+            },
+            Selectable { radius: 0.8 },
+            GlobalTransform::from(Transform::from_xyz(1.0, 0.0, 1.0)),
+        ))
+        .id();
+    app.world_mut().spawn((
+        Unit {
+            id: "Tank",
+            speed: 2.0,
+            can_crush: true,
+            can_be_crushed: false,
+        },
+        Health {
+            current: 10.0,
+            max: 10.0,
+        },
+        Selectable { radius: 0.8 },
+        GlobalTransform::from(Transform::from_xyz(5.0, 0.0, 5.0)),
+    ));
+
+    let mut puffs_seen = 0;
+    for _ in 0..30 {
+        app.world_mut()
+            .resource_mut::<Time>()
+            .advance_by(std::time::Duration::from_millis(100));
+        app.update();
+        let mut puffs = app.world_mut().query::<(&SmokePuff, &Transform)>();
+        for (_, transform) in puffs.iter(app.world()) {
+            puffs_seen += 1;
+            assert!(
+                transform.translation.distance(Vec3::new(1.0, 0.5, 1.0)) < 2.5,
+                "smoke must come from the wounded unit only, got {:?}",
+                transform.translation
+            );
+        }
+    }
+    assert!(puffs_seen > 0, "a unit at 30% HP must smoke");
+    let _ = hurt;
+}
+
+#[test]
 fn weapon_fire_kick_decays_after_the_shot() {
     let mut weapon = Weapon::new(6.0, 2.0, 1.5, 0.0, 1.0, 1.0, true, true);
     weapon.cooldown_left = 1.5; // just fired

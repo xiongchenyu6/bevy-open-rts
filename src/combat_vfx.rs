@@ -982,3 +982,195 @@ pub(crate) fn update_scorch_marks(
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// Damage smoke/fire and vehicle dust trails
+// ---------------------------------------------------------------------------
+
+/// Per-entity emission clock for damage smoke / drive dust.
+#[derive(Component)]
+pub(crate) struct VfxEmitClock {
+    pub(crate) next: f32,
+}
+
+/// Damaged units/structures smoke; badly damaged ones catch fire. The classic
+/// at-a-glance health read: below 50% HP a dark smoke column, below 25% added
+/// flame flashes.
+pub(crate) fn emit_damage_smoke(
+    mut commands: Commands,
+    time: Res<Time>,
+    meshes: Option<ResMut<Assets<Mesh>>>,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut smoke_mesh: Local<Option<Handle<Mesh>>>,
+    mut wounded: Query<
+        (
+            Entity,
+            &Health,
+            &GlobalTransform,
+            &Selectable,
+            Option<&mut VfxEmitClock>,
+            Has<UnderConstruction>,
+        ),
+        Or<(With<Unit>, With<Structure>)>,
+    >,
+) {
+    let (Some(mut meshes), Some(mut materials)) = (meshes, materials) else {
+        return;
+    };
+    let dt = time.delta_secs();
+    for (entity, health, gt, selectable, clock, under_construction) in &mut wounded {
+        let ratio = if health.max > 0.0 {
+            health.current / health.max
+        } else {
+            1.0
+        };
+        if ratio >= 0.5 || health.current <= 0.0 || under_construction {
+            continue;
+        }
+        let burning = ratio < 0.25;
+        let Some(mut clock) = clock else {
+            commands.entity(entity).try_insert(VfxEmitClock {
+                next: vfx_hash01(entity.to_bits(), 3) * 0.6,
+            });
+            continue;
+        };
+        clock.next -= dt;
+        if clock.next > 0.0 {
+            continue;
+        }
+        clock.next = if burning { 0.4 } else { 0.85 };
+        let seed = entity
+            .to_bits()
+            .wrapping_add(time.elapsed_secs().to_bits() as u64);
+        let offset = Vec3::new(
+            (vfx_hash01(seed, 11) - 0.5) * selectable.radius * 0.8,
+            0.4 + vfx_hash01(seed, 13) * 0.4,
+            (vfx_hash01(seed, 17) - 0.5) * selectable.radius * 0.8,
+        );
+        let mesh = smoke_mesh
+            .get_or_insert_with(|| meshes.add(Sphere::new(1.0).mesh().ico(1).unwrap()))
+            .clone();
+        // Dark battle smoke (darker when burning).
+        let shade = if burning { 0.16 } else { 0.3 };
+        let material = materials.add(StandardMaterial {
+            base_color: Color::srgba(shade, shade, shade, 0.34),
+            alpha_mode: AlphaMode::Blend,
+            unlit: true,
+            ..default()
+        });
+        commands.spawn((
+            Name::new("Damage smoke"),
+            bevy::light::NotShadowCaster,
+            Mesh3d(mesh),
+            MeshMaterial3d(material.clone()),
+            Transform::from_translation(gt.translation() + offset).with_scale(Vec3::splat(0.08)),
+            SmokePuff {
+                age: 0.0,
+                ttl: 1.4,
+                material,
+            },
+            MatchScopedEntity,
+        ));
+        if burning {
+            // Licks of flame between the smoke.
+            spawn_combat_flash(
+                &mut commands,
+                gt.translation() + offset * 0.6,
+                0.06,
+                0.16 + vfx_hash01(seed, 23) * 0.1,
+                0.3,
+                LinearRgba::new(2.2, 0.8, 0.15, 1.0),
+            );
+        }
+    }
+}
+
+/// Ground vehicles kick up a dust trail while driving.
+pub(crate) fn emit_drive_dust(
+    mut commands: Commands,
+    time: Res<Time>,
+    meshes: Option<ResMut<Assets<Mesh>>>,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut dust_mesh: Local<Option<Handle<Mesh>>>,
+    mut movers: Query<
+        (
+            Entity,
+            &Unit,
+            &GlobalTransform,
+            &MovementDomain,
+            Option<&mut VfxEmitClock>,
+        ),
+        With<MoveOrder>,
+    >,
+) {
+    let (Some(mut meshes), Some(mut materials)) = (meshes, materials) else {
+        return;
+    };
+    let dt = time.delta_secs();
+    for (entity, unit, gt, domain, clock) in &mut movers {
+        // Vehicles only: infantry boots don't raise a plume, aircraft don't touch
+        // the ground.
+        if *domain != MovementDomain::Terrain || unit.speed <= 0.0 || is_infantry_unit(unit) {
+            continue;
+        }
+        let Some(mut clock) = clock else {
+            commands.entity(entity).try_insert(VfxEmitClock {
+                next: vfx_hash01(entity.to_bits(), 5) * 0.3,
+            });
+            continue;
+        };
+        clock.next -= dt;
+        if clock.next > 0.0 {
+            continue;
+        }
+        clock.next = 0.3;
+        let behind = gt.translation() - *gt.forward() * 0.35;
+        let mesh = dust_mesh
+            .get_or_insert_with(|| meshes.add(Sphere::new(1.0).mesh().ico(1).unwrap()))
+            .clone();
+        let material = materials.add(StandardMaterial {
+            base_color: Color::srgba(0.72, 0.6, 0.47, 0.22),
+            alpha_mode: AlphaMode::Blend,
+            unlit: true,
+            ..default()
+        });
+        commands.spawn((
+            Name::new("Drive dust"),
+            bevy::light::NotShadowCaster,
+            Mesh3d(mesh),
+            MeshMaterial3d(material.clone()),
+            Transform::from_translation(Vec3::new(behind.x, 0.12, behind.z))
+                .with_scale(Vec3::splat(0.1)),
+            SmokePuff {
+                age: 0.0,
+                ttl: 0.9,
+                material,
+            },
+            MatchScopedEntity,
+        ));
+    }
+}
+
+/// Completion flourish: a bright pop and a ring of dust when a structure
+/// finishes rising out of the ground.
+pub(crate) fn spawn_construction_complete_flash(
+    commands: &mut Commands,
+    position: Vec3,
+    radius: f32,
+) {
+    spawn_combat_flash(
+        commands,
+        position + Vec3::Y * 0.5,
+        radius * 0.3,
+        radius * 1.1,
+        0.35,
+        LinearRgba::new(1.6, 1.6, 1.4, 1.0),
+    );
+    spawn_debris_burst(
+        commands,
+        position,
+        5,
+        1.4 + radius * 0.5,
+        DebrisPalette::Masonry,
+    );
+}

@@ -3209,6 +3209,8 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                     update_dust_puffs,
                     update_debris_chunks,
                     update_scorch_marks,
+                    emit_damage_smoke,
+                    emit_drive_dust,
                 )
                     .chain(),
                 animate_structure_construction,
