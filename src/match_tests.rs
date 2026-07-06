@@ -1152,6 +1152,63 @@ fn kenney_gold_accents_get_repainted_in_the_player_color() {
 }
 
 #[test]
+fn worker_limbs_animate_while_working_and_return_to_rest() {
+    let mut app = App::new();
+    app.insert_resource(Time::<()>::default());
+    app.add_systems(Update, animate_worker_limbs);
+
+    let worker = app
+        .world_mut()
+        .spawn((
+            Unit {
+                id: "Worker",
+                speed: 2.5,
+                can_crush: false,
+                can_be_crushed: true,
+            },
+            HarvestOrder {
+                resource: None,
+                state: HarvestState::Collecting,
+                collect_remaining: 1.0,
+                last_kind: None,
+            },
+        ))
+        .id();
+    let rest = Transform::from_xyz(0.13, 0.47, 0.0);
+    let arm = app
+        .world_mut()
+        .spawn((
+            WorkerLimb {
+                kind: WorkerLimbKind::ArmRight,
+                root: worker,
+                rest_translation: rest.translation,
+                rest_rotation: rest.rotation,
+                seed: 0.0,
+            },
+            rest,
+        ))
+        .id();
+
+    // Advance time so the pose phase is non-zero, then run the animator.
+    app.world_mut()
+        .resource_mut::<Time>()
+        .advance_by(std::time::Duration::from_millis(400));
+    app.update();
+    let mining_pose = *app.world().get::<Transform>(arm).unwrap();
+    assert_ne!(
+        mining_pose.rotation, rest.rotation,
+        "collecting workers must swing their arm"
+    );
+
+    // Stop working: the limb snaps back to its exact rest pose.
+    app.world_mut().entity_mut(worker).remove::<HarvestOrder>();
+    app.update();
+    let idle_pose = *app.world().get::<Transform>(arm).unwrap();
+    assert_eq!(idle_pose.rotation, rest.rotation);
+    assert_eq!(idle_pose.translation, rest.translation);
+}
+
+#[test]
 fn structure_emerges_from_ground_with_construction_progress() {
     let mut app = App::new();
     app.add_systems(Update, animate_structure_construction);

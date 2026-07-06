@@ -816,6 +816,38 @@ pub fn capture_spawn_construction_showcase(app: &mut App, origin: Vec3) {
     }
 }
 
+/// Deterministically stages the worker limb animation: teleports a player
+/// worker next to the nearest resource node and puts it straight into the
+/// Collecting state, so a capture can frame the mining pose without racing
+/// the real harvest loop.
+pub fn capture_stage_worker_collecting(app: &mut App) -> Option<Vec3> {
+    let world = app.world_mut();
+    let node = {
+        let mut nodes = world.query::<(Entity, &ResourceNode, &Transform)>();
+        nodes
+            .iter(world)
+            .map(|(entity, _, transform)| (entity, transform.translation))
+            .next()?
+    };
+    let worker = {
+        let mut workers = world.query::<(Entity, &Team, &Unit)>();
+        workers
+            .iter(world)
+            .find(|(_, team, unit)| **team == Team::Player(0) && unit.id == "Worker")
+            .map(|(entity, _, _)| entity)?
+    };
+    let spot = node.1 + Vec3::new(0.9, 0.0, 0.9);
+    world.entity_mut(worker).get_mut::<Transform>()?.translation = spot;
+    world.entity_mut(worker).insert(HarvestOrder {
+        resource: Some(node.0),
+        state: HarvestState::Collecting,
+        collect_remaining: 30.0,
+        last_kind: None,
+    });
+    world.entity_mut(worker).remove::<MoveOrder>();
+    Some(spot)
+}
+
 pub fn capture_player_command_center(app: &mut App) -> Option<(Entity, Vec3, Vec3)> {
     let (children_map, aabb_map, model_roots) = capture_world_geometry_maps(app);
     let player = Team::Player(0);

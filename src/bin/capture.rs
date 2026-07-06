@@ -51,9 +51,9 @@ use bevy_open_rts::{
     capture_set_cursor, capture_set_structure_rally, capture_show_campaign_menu,
     capture_show_credits_menu, capture_show_main_menu, capture_show_options_menu,
     capture_show_skirmish_setup_menu, capture_show_skirmish_setup_with_dropdown,
-    capture_spawn_construction_showcase, capture_spawn_model_harness_page, capture_world_to_screen,
-    capture_worst_model_alignment_offset, capture_zoom_camera_closest,
-    start_shared_match_scene_with_current_setup,
+    capture_spawn_construction_showcase, capture_spawn_model_harness_page,
+    capture_stage_worker_collecting, capture_world_to_screen, capture_worst_model_alignment_offset,
+    capture_zoom_camera_closest, start_shared_match_scene_with_current_setup,
 };
 
 const WIDTH: u32 = 1280;
@@ -702,6 +702,16 @@ fn render_harvest(dir: &Path) -> Result<(), String> {
         return Err(format!(
             "Worker harvested but player resources did not grow: ore {ore_before}->{ore_after}, crystal {crystal_before}->{crystal_after}"
         ));
+    }
+    // Close-up of the mining pose, staged deterministically (teleport a worker
+    // into Collecting at the node) so the shot never races the harvest loop.
+    if let Some(spot) = capture_stage_worker_collecting(&mut app) {
+        capture_focus_camera_on(&mut app, spot);
+        capture_zoom_camera_closest(&mut app);
+        for _ in 0..14 {
+            app.update();
+        }
+        shoot(&mut app, &handle, dir.join("03_collecting_closeup.png"));
     }
     println!(
         "[capture] wrote manual-harvest verification to {}",
