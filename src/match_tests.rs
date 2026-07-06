@@ -1228,6 +1228,70 @@ fn unit_limbs_animate_by_activity_and_return_to_rest() {
 }
 
 #[test]
+fn turret_nodes_traverse_toward_the_attack_target() {
+    let mut app = App::new();
+    app.insert_resource(Time::<()>::default());
+    app.add_systems(Update, animate_turret_nodes);
+
+    let target = app
+        .world_mut()
+        .spawn(GlobalTransform::from(Transform::from_xyz(10.0, 0.0, 0.0)))
+        .id();
+    // Tower at the origin facing -Z (identity): the target sits 90° to its left.
+    let tower = app
+        .world_mut()
+        .spawn((
+            Structure {
+                id: "AntiGroundTurret",
+            },
+            GlobalTransform::IDENTITY,
+            AttackOrder { target },
+        ))
+        .id();
+    let turret = app
+        .world_mut()
+        .spawn((
+            TurretNode {
+                root: tower,
+                rest_translation: Vec3::new(0.0, 0.35, 0.0),
+                rest_rotation: Quat::IDENTITY,
+                yaw: 0.0,
+            },
+            Transform::from_xyz(0.0, 0.35, 0.0),
+        ))
+        .id();
+
+    // Several frames of traverse: yaw must move toward the -PI/2 bearing.
+    for _ in 0..8 {
+        app.world_mut()
+            .resource_mut::<Time>()
+            .advance_by(std::time::Duration::from_millis(50));
+        app.update();
+    }
+    let yaw = app.world().get::<TurretNode>(turret).unwrap().yaw;
+    assert!(
+        (yaw - (-std::f32::consts::FRAC_PI_2)).abs() < 0.05,
+        "turret should traverse to face the target, yaw={yaw}"
+    );
+    assert_ne!(
+        app.world().get::<Transform>(turret).unwrap().rotation,
+        Quat::IDENTITY,
+        "the turret node visibly rotates"
+    );
+
+    // Target gone: the turret eases back to center.
+    app.world_mut().entity_mut(tower).remove::<AttackOrder>();
+    for _ in 0..12 {
+        app.world_mut()
+            .resource_mut::<Time>()
+            .advance_by(std::time::Duration::from_millis(50));
+        app.update();
+    }
+    let yaw = app.world().get::<TurretNode>(turret).unwrap().yaw;
+    assert!(yaw.abs() < 0.01, "turret returns to center, yaw={yaw}");
+}
+
+#[test]
 fn weapon_fire_kick_decays_after_the_shot() {
     let mut weapon = Weapon::new(6.0, 2.0, 1.5, 0.0, 1.0, 1.0, true, true);
     weapon.cooldown_left = 1.5; // just fired

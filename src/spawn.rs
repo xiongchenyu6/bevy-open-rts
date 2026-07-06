@@ -528,12 +528,25 @@ pub(crate) fn spawn_entity_models(
             ));
         }
     } else {
+        let airborne =
+            MovementDomain::from_registry(def.domain) == MovementDomain::Air && def.speed > 0.0;
+        if airborne {
+            commands.entity(root).try_insert(AirMotion::default());
+        }
         for part in def.render_parts {
+            let transform = scaled_render_part_transform(part, entity_visual_scale(def.id));
             let mut spawned = commands.spawn((
                 ChildOf(root),
                 WorldAssetRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(part.model))),
-                scaled_render_part_transform(part, entity_visual_scale(def.id)),
+                transform,
             ));
+            if airborne {
+                spawned.insert(AirframePart {
+                    root,
+                    rest_translation: transform.translation,
+                    rest_rotation: transform.rotation,
+                });
+            }
             if let Some(marker) = HunyuanModelPart::for_render_part(def.id, part) {
                 spawned.insert(marker);
             }

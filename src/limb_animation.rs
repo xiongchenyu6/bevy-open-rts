@@ -194,3 +194,165 @@ pub(crate) fn animate_unit_limbs(
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// Vehicles & aircraft
+// ---------------------------------------------------------------------------
+
+/// Stationary attackers smoothly yaw the whole body toward their target.
+/// Without this, tanks fire sideways: `move_units` only faces the travel
+/// direction, and nothing rotated a standing unit toward its victim.
+pub(crate) fn face_attack_targets(
+    time: Res<Time>,
+    targets: Query<&GlobalTransform>,
+    mut attackers: Query<(&mut Transform, &AttackOrder), (With<Unit>, Without<MoveOrder>)>,
+) {
+    let max_step = 4.5 * time.delta_secs();
+    for (mut transform, order) in &mut attackers {
+        let Ok(target) = targets.get(order.target) else {
+            continue;
+        };
+        let to_target = target.translation() - transform.translation;
+        let flat = Vec3::new(to_target.x, 0.0, to_target.z);
+        if flat.length_squared() < 0.01 {
+            continue;
+        }
+        let desired = Transform::from_translation(transform.translation)
+            .looking_to(flat.normalize(), Vec3::Y)
+            .rotation;
+        transform.rotation = transform.rotation.rotate_towards(desired, max_step);
+    }
+}
+
+/// The inner "turret" node of kenney turret_single/turret_double models,
+/// discovered inside a unit's or defense structure's GLB scene. Tracks the
+/// current attack target with smooth traverse and kicks back on each shot —
+/// defense towers keep their base still and swing only the turret.
+#[derive(Component)]
+pub(crate) struct TurretNode {
+    pub(crate) root: Entity,
+    pub(crate) rest_translation: Vec3,
+    pub(crate) rest_rotation: Quat,
+    pub(crate) yaw: f32,
+}
+
+pub(crate) fn tag_turret_nodes(
+    mut commands: Commands,
+    fresh: Query<(Entity, &Name, &Transform), Added<Name>>,
+    parents: Query<&ChildOf>,
+    armed: Query<(), Or<(With<Unit>, With<Structure>)>>,
+) {
+    for (entity, name, transform) in &fresh {
+        if name.as_str() != "turret" {
+            continue;
+        }
+        let mut cursor = entity;
+        let root = loop {
+            match parents.get(cursor) {
+                Ok(child_of) => {
+                    cursor = child_of.0;
+                    if armed.contains(cursor) {
+                        break Some(cursor);
+                    }
+                }
+                Err(_) => break None,
+            }
+        };
+        let Some(root) = root else {
+            continue;
+        };
+        commands.entity(entity).try_insert(TurretNode {
+            root,
+            rest_translation: transform.translation,
+            rest_rotation: transform.rotation,
+            yaw: 0.0,
+        });
+    }
+}
+
+pub(crate) fn animate_turret_nodes(
+    time: Res<Time>,
+    roots: Query<(&GlobalTransform, Option<&AttackOrder>, Option<&Weapon>)>,
+    positions: Query<&GlobalTransform>,
+    mut turrets: Query<(&mut TurretNode, &mut Transform)>,
+) {
+    let dt = time.delta_secs();
+    for (mut turret, mut transform) in &mut turrets {
+        let Ok((root_gt, order, weapon)) = roots.get(turret.root) else {
+            continue;
+        };
+        // Desired local yaw: the target bearing relative to the body's facing;
+        // no target -> traverse back to center.
+        let desired = order
+            .and_then(|order| positions.get(order.target).ok())
+            .map_or(0.0, |target| {
+                let to_target = target.translation() - root_gt.translation();
+                let world_yaw = f32::atan2(-to_target.x, -to_target.z);
+                let (root_yaw, _, _) = root_gt.rotation().to_euler(EulerRot::YXZ);
+                wrap_angle(world_yaw - root_yaw)
+            });
+        let step = 5.0 * dt;
+        let delta = wrap_angle(desired - turret.yaw);
+        turret.yaw += delta.clamp(-step, step);
+        let spin = Quat::from_rotation_y(turret.yaw);
+        let kick = weapon.map_or(0.0, weapon_fire_kick);
+        transform.rotation = turret.rest_rotation * spin;
+        // Recoil: slide back along the barrel's current local facing.
+        transform.translation = turret.rest_translation + spin * (Vec3::Z * (kick * 0.07));
+    }
+}
+
+pub(crate) fn wrap_angle(angle: f32) -> f32 {
+    let mut wrapped = angle % std::f32::consts::TAU;
+    if wrapped > std::f32::consts::PI {
+        wrapped -= std::f32::consts::TAU;
+    } else if wrapped < -std::f32::consts::PI {
+        wrapped += std::f32::consts::TAU;
+    }
+    wrapped
+}
+
+/// One model part of an air unit, posed as a rigid airframe (bob/pitch/roll
+/// around the unit origin). Rotating translation AND rotation together keeps
+/// the kenney node-offset bake intact.
+#[derive(Component)]
+pub(crate) struct AirframePart {
+    pub(crate) root: Entity,
+    pub(crate) rest_translation: Vec3,
+    pub(crate) rest_rotation: Quat,
+}
+
+/// Root-side motion state for aircraft banking.
+#[derive(Component, Default)]
+pub(crate) struct AirMotion {
+    pub(crate) last_yaw: f32,
+    pub(crate) roll: f32,
+}
+
+pub(crate) fn animate_airframes(
+    time: Res<Time>,
+    mut roots: Query<(&GlobalTransform, &mut AirMotion, Has<MoveOrder>), With<Unit>>,
+    mut parts: Query<(&AirframePart, &mut Transform)>,
+) {
+    let t = time.elapsed_secs();
+    let dt = time.delta_secs().max(1e-6);
+    // Update per-aircraft roll from the yaw rate (bank into turns).
+    for (gt, mut motion, _) in &mut roots {
+        let (yaw, _, _) = gt.rotation().to_euler(EulerRot::YXZ);
+        let yaw_rate = wrap_angle(yaw - motion.last_yaw) / dt;
+        motion.last_yaw = yaw;
+        let target_roll = (-yaw_rate * 0.28).clamp(-0.4, 0.4);
+        motion.roll += (target_roll - motion.roll) * (6.0 * dt).min(1.0);
+    }
+    for (part, mut transform) in &mut parts {
+        let Ok((_, motion, moving)) = roots.get_mut(part.root) else {
+            continue;
+        };
+        let seed = (part.root.to_bits() % 97) as f32 * 0.37;
+        let bob = (t * 2.2 + seed).sin() * if moving { 0.02 } else { 0.05 };
+        let pitch = if moving { 0.12 } else { 0.0 };
+        let pose = Quat::from_rotation_z(motion.roll) * Quat::from_rotation_x(pitch);
+        transform.rotation = pose * part.rest_rotation;
+        transform.translation = pose * part.rest_translation + Vec3::Y * bob;
+    }
+}
