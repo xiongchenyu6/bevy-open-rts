@@ -1179,7 +1179,13 @@ pub(crate) fn recenter_entity_models(
     mut commands: Commands,
     roots: Query<
         (Entity, &GlobalTransform, Option<&ModelRecenterTracking>),
-        (With<Selectable>, Without<ModelRecentered>),
+        (
+            // The placement ghost carries the same GLB parts as a real
+            // structure; without recentering it renders offset down-right of
+            // the actual build spot (the raw kenney node-offset bake).
+            Or<(With<Selectable>, With<PlacementGhostRoot>)>,
+            Without<ModelRecentered>,
+        ),
     >,
     children_q: Query<&Children>,
     aabb_q: Query<(&GlobalTransform, &Aabb)>,
