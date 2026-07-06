@@ -254,6 +254,22 @@ pub(crate) fn spawn_destruction_effects(
         if is_structure { 0.55 } else { 0.38 },
         LinearRgba::new(1.0, 0.52, 0.16, 1.0),
     );
+    // Hull shards and embers arc out of the blast; the ground keeps a scorch.
+    let shards = if is_structure {
+        10
+    } else {
+        (4.0 + radius * 4.0) as u32
+    };
+    let throw = 2.6 + radius * 1.6;
+    spawn_debris_burst(commands, position, shards, throw, DebrisPalette::Metal);
+    spawn_debris_burst(
+        commands,
+        position,
+        shards / 2 + 2,
+        throw * 1.25,
+        DebrisPalette::Ember,
+    );
+    spawn_scorch_mark(commands, position, (radius * 1.15).clamp(0.5, 2.6));
     if is_structure {
         spawn_structure_destruction_vfx(commands, position, radius, team);
     }
@@ -460,6 +476,13 @@ pub(crate) fn spawn_impact_burst(
         0.2,
         impact_flash_color(kind),
     );
+    // Rounds chewing on a building chip fragments off the wall plus a couple
+    // of hot sparks — the classic "I'm hitting something solid" read.
+    if target_is_structure {
+        let hit = Vec3::new(position.x, 0.5, position.z);
+        spawn_debris_burst(commands, hit, 3, 1.6 + power * 0.4, DebrisPalette::Masonry);
+        spawn_debris_burst(commands, hit, 2, 2.2 + power * 0.5, DebrisPalette::Ember);
+    }
 }
 
 pub(crate) fn spawn_veterancy_promotion_effect(
@@ -740,4 +763,222 @@ pub(crate) fn draw_veterancy_promotion_effect(
         Vec3::new(center.x + badge_width, crown_y, center.z),
         rank_color,
     );
+}
+
+// ---------------------------------------------------------------------------
+// Physical debris, sparks and scorch marks
+// ---------------------------------------------------------------------------
+
+fn vfx_hash01(seed: u64, salt: u32) -> f32 {
+    let mut h = seed
+        .wrapping_mul(0x9E37_79B9_7F4A_7C15)
+        .wrapping_add(salt as u64)
+        .wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    h ^= h >> 31;
+    ((h & 0xffff) as f32) / 65_535.0
+}
+
+/// A chunk of physical debris: ballistic arc, ground bounce, spin, fade-out.
+#[derive(Component)]
+pub(crate) struct DebrisChunk {
+    pub(crate) velocity: Vec3,
+    pub(crate) spin_axis: Vec3,
+    pub(crate) spin_rate: f32,
+    pub(crate) age: f32,
+    pub(crate) ttl: f32,
+    pub(crate) material: Handle<StandardMaterial>,
+}
+
+/// A fading burn mark left on the ground under an explosion.
+#[derive(Component)]
+pub(crate) struct ScorchMark {
+    pub(crate) age: f32,
+    pub(crate) ttl: f32,
+    pub(crate) material: Handle<StandardMaterial>,
+}
+
+/// What a debris burst is made of.
+#[derive(Clone, Copy)]
+pub(crate) enum DebrisPalette {
+    /// Building chips: pale wall fragments, matte.
+    Masonry,
+    /// Hull shards: dark scorched metal.
+    Metal,
+    /// Glowing embers: emissive fire specks that die fast.
+    Ember,
+}
+
+/// Throws `count` chunks from `position` with speeds around `speed`.
+/// Deterministic per (position, palette, count).
+pub(crate) fn spawn_debris_burst(
+    commands: &mut Commands,
+    position: Vec3,
+    count: u32,
+    speed: f32,
+    palette: DebrisPalette,
+) {
+    commands.queue(move |world: &mut World| {
+        if !world.contains_resource::<Assets<Mesh>>()
+            || !world.contains_resource::<Assets<StandardMaterial>>()
+        {
+            return;
+        }
+        let mesh = world
+            .resource_mut::<Assets<Mesh>>()
+            .add(Cuboid::new(1.0, 0.7, 0.9));
+        let seed = (position.x.to_bits() as u64) << 32 | position.z.to_bits() as u64;
+        for index in 0..count {
+            let h = |salt: u32| vfx_hash01(seed, index.wrapping_mul(31).wrapping_add(salt));
+            let angle = h(1) * std::f32::consts::TAU;
+            let lift = 2.2 + h(2) * 3.4;
+            let pace = speed * (0.55 + h(3) * 0.9);
+            let velocity = Vec3::new(angle.cos() * pace, lift, angle.sin() * pace);
+            let (color, emissive, scale, ttl) = match palette {
+                DebrisPalette::Masonry => (
+                    Color::srgb(0.78 + h(4) * 0.12, 0.76, 0.72),
+                    LinearRgba::NONE,
+                    0.05 + h(5) * 0.05,
+                    1.1 + h(6) * 0.5,
+                ),
+                DebrisPalette::Metal => (
+                    Color::srgb(0.16, 0.15 + h(4) * 0.05, 0.14),
+                    LinearRgba::rgb(0.6, 0.18, 0.03),
+                    0.07 + h(5) * 0.07,
+                    1.4 + h(6) * 0.6,
+                ),
+                DebrisPalette::Ember => (
+                    Color::srgb(1.0, 0.6, 0.2),
+                    LinearRgba::rgb(3.2, 1.1, 0.2),
+                    0.03 + h(5) * 0.025,
+                    0.5 + h(6) * 0.3,
+                ),
+            };
+            let material = world
+                .resource_mut::<Assets<StandardMaterial>>()
+                .add(StandardMaterial {
+                    base_color: color,
+                    emissive,
+                    perceptual_roughness: 0.9,
+                    ..default()
+                });
+            world.spawn((
+                Name::new("Debris"),
+                bevy::light::NotShadowCaster,
+                Mesh3d(mesh.clone()),
+                MeshMaterial3d(material.clone()),
+                Transform::from_translation(position + Vec3::Y * 0.25)
+                    .with_scale(Vec3::splat(scale)),
+                DebrisChunk {
+                    velocity,
+                    spin_axis: Vec3::new(h(7) - 0.5, h(8) - 0.5, h(9) - 0.5).normalize_or(Vec3::Y),
+                    spin_rate: 6.0 + h(10) * 14.0,
+                    age: 0.0,
+                    ttl,
+                    material,
+                },
+                MatchScopedEntity,
+            ));
+        }
+    });
+}
+
+/// Ballistic debris integration: gravity, one soft ground bounce, spin, fade.
+pub(crate) fn update_debris_chunks(
+    mut commands: Commands,
+    time: Res<Time>,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut chunks: Query<(Entity, &mut DebrisChunk, &mut Transform)>,
+) {
+    let Some(mut materials) = materials else {
+        return;
+    };
+    let dt = time.delta_secs();
+    for (entity, mut chunk, mut transform) in &mut chunks {
+        chunk.age += dt;
+        if chunk.age >= chunk.ttl {
+            materials.remove(&chunk.material);
+            commands.entity(entity).try_despawn();
+            continue;
+        }
+        chunk.velocity.y -= 14.0 * dt;
+        let step = chunk.velocity * dt;
+        transform.translation += step;
+        if transform.translation.y < 0.03 && chunk.velocity.y < 0.0 {
+            transform.translation.y = 0.03;
+            chunk.velocity.y *= -0.32;
+            chunk.velocity.x *= 0.55;
+            chunk.velocity.z *= 0.55;
+            chunk.spin_rate *= 0.5;
+        }
+        let (axis, spin) = (chunk.spin_axis, chunk.spin_rate);
+        transform.rotate(Quat::from_axis_angle(axis, spin * dt));
+        // Fade the last 30% of life.
+        let life = chunk.age / chunk.ttl;
+        if life > 0.7
+            && let Some(mut material) = materials.get_mut(&chunk.material)
+        {
+            material.alpha_mode = AlphaMode::Blend;
+            material.base_color.set_alpha(1.0 - (life - 0.7) / 0.3);
+        }
+    }
+}
+
+/// Leaves a dark burn disc on the ground that slowly fades away.
+pub(crate) fn spawn_scorch_mark(commands: &mut Commands, position: Vec3, radius: f32) {
+    commands.queue(move |world: &mut World| {
+        if !world.contains_resource::<Assets<Mesh>>()
+            || !world.contains_resource::<Assets<StandardMaterial>>()
+        {
+            return;
+        }
+        let mesh = world
+            .resource_mut::<Assets<Mesh>>()
+            .add(Cylinder::new(1.0, 0.012).mesh().resolution(20));
+        let material = world
+            .resource_mut::<Assets<StandardMaterial>>()
+            .add(StandardMaterial {
+                base_color: Color::srgba(0.06, 0.05, 0.045, 0.55),
+                alpha_mode: AlphaMode::Blend,
+                unlit: true,
+                ..default()
+            });
+        world.spawn((
+            Name::new("Scorch mark"),
+            bevy::light::NotShadowCaster,
+            Mesh3d(mesh),
+            MeshMaterial3d(material.clone()),
+            Transform::from_translation(Vec3::new(position.x, 0.045, position.z))
+                .with_scale(Vec3::new(radius, 1.0, radius)),
+            ScorchMark {
+                age: 0.0,
+                ttl: 9.0,
+                material,
+            },
+            MatchScopedEntity,
+        ));
+    });
+}
+
+pub(crate) fn update_scorch_marks(
+    mut commands: Commands,
+    time: Res<Time>,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut marks: Query<(Entity, &mut ScorchMark)>,
+) {
+    let Some(mut materials) = materials else {
+        return;
+    };
+    let dt = time.delta_secs();
+    for (entity, mut mark) in &mut marks {
+        mark.age += dt;
+        let life = (mark.age / mark.ttl).clamp(0.0, 1.0);
+        if life >= 1.0 {
+            materials.remove(&mark.material);
+            commands.entity(entity).try_despawn();
+            continue;
+        }
+        if let Some(mut material) = materials.get_mut(&mark.material) {
+            material.base_color.set_alpha(0.55 * (1.0 - life));
+        }
+    }
 }
