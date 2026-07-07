@@ -173,6 +173,14 @@ pub(crate) const SIEGE_DRILL_DEPLOYED_ATTACK_RANGE: f32 = 6.5;
 pub(crate) const SIEGE_DRILL_DEPLOYED_ATTACK_INTERVAL: f32 = 1.0;
 pub(crate) const SIEGE_DRILL_DEPLOYED_STRUCTURE_DAMAGE_MULTIPLIER: f32 = 3.6;
 pub(crate) const SIEGE_DRILL_DEPLOYED_SIGHT_RANGE: f32 = 9.5;
+// Generic vehicle deploy mode: give up all mobility for reach and firepower.
+// Applied multiplicatively to each unit's own registry stats so light
+// artillery and heavy walkers both scale sensibly from their baselines.
+pub(crate) const VEHICLE_DEPLOY_RANGE_MULTIPLIER: f32 = 1.5;
+pub(crate) const VEHICLE_DEPLOY_DAMAGE_MULTIPLIER: f32 = 1.4;
+pub(crate) const VEHICLE_DEPLOY_COOLDOWN_MULTIPLIER: f32 = 1.1;
+pub(crate) const VEHICLE_DEPLOY_STRUCTURE_DAMAGE_MULTIPLIER: f32 = 1.25;
+pub(crate) const VEHICLE_DEPLOY_SIGHT_BONUS: f32 = 2.0;
 pub(crate) const VETERANCY_MAX_RANK: u8 = 2;
 pub(crate) const VETERANCY_DAMAGE_MULTIPLIER_BY_RANK: [f32; 3] = [1.0, 1.25, 1.5];
 pub(crate) const VETERANCY_HP_MULTIPLIER_BY_RANK: [f32; 3] = [1.0, 1.2, 1.5];
@@ -3069,7 +3077,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
         clear_emp_disabled_orders
             .in_set(SimulationPhase::Combat)
             .before(update_attack_move_and_patrol_orders)
-            .before(update_ai_siege_drill_deploy_mode)
+            .before(update_ai_vehicle_deploy_mode)
             .before(chase_attack_targets)
             .before(update_capture_orders)
             .before(update_garrison_orders)
@@ -3087,7 +3095,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             update_attack_move_and_patrol_orders
                 .in_set(SimulationPhase::Combat)
                 .run_if(match_in_progress),
-            update_ai_siege_drill_deploy_mode
+            update_ai_vehicle_deploy_mode
                 .in_set(SimulationPhase::Combat)
                 .before(chase_attack_targets)
                 .run_if(match_in_progress),
@@ -3268,7 +3276,11 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             draw_world_overlays
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
-            (draw_selected_rally_flags, draw_rain)
+            (
+                draw_selected_rally_flags,
+                draw_rain,
+                draw_deployed_vehicle_markers,
+            )
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
         ),

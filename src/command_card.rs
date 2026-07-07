@@ -357,7 +357,7 @@ pub(crate) fn current_command_actions_for_faction(
     }
     if selected_units
         .iter()
-        .any(|(unit, unit_team, ..)| *unit_team == team && unit.id == "SiegeDrillTank")
+        .any(|(unit, unit_team, ..)| *unit_team == team && is_deployable_vehicle(unit.id))
     {
         push_action_unique(&mut actions, BuildAction::ToggleDeployMode);
     }
@@ -1154,7 +1154,7 @@ pub(crate) fn request_selected_deploy_toggle(
 ) -> bool {
     let mut requested_any = false;
     for (entity, unit, unit_team, ..) in selected_units {
-        if *unit_team == team && unit.id == "SiegeDrillTank" {
+        if *unit_team == team && is_deployable_vehicle(unit.id) {
             commands.entity(entity).try_insert(DeployModeToggleRequest);
             requested_any = true;
         }

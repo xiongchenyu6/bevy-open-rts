@@ -133,6 +133,7 @@ pub(crate) struct DeployedSiegeMode {
     pub(crate) previous_hold_position: bool,
     pub(crate) base_speed: f32,
     pub(crate) base_attack_range: f32,
+    pub(crate) base_attack_damage: f32,
     pub(crate) base_attack_interval: f32,
     pub(crate) base_structure_damage_multiplier: f32,
     pub(crate) base_sight_range: f32,

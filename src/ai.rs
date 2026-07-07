@@ -370,8 +370,10 @@ pub(crate) fn ai_profile_requests_offensive_combat_units(profile: &TeamAiProfile
     })
 }
 
-pub(crate) fn ai_siege_drill_should_deploy(
+pub(crate) fn ai_vehicle_should_deploy(
     team: Team,
+    unit_id: &str,
+    currently_deployed: bool,
     position: Vec3,
     weapon: &Weapon,
     health: &Health,
@@ -412,7 +414,8 @@ pub(crate) fn ai_siege_drill_should_deploy(
     if !can_attack_domain(weapon, *target_domain) {
         return false;
     }
-    xz_distance(position, target_transform.translation) <= SIEGE_DRILL_DEPLOYED_ATTACK_RANGE
+    xz_distance(position, target_transform.translation)
+        <= deployed_attack_range(unit_id, weapon.range, currently_deployed)
 }
 
 pub(crate) fn ai_drone_scout_delay(drone: Entity, target: Entity) -> f32 {
@@ -1673,7 +1676,7 @@ pub(crate) fn repair_ai_damaged_structures(
     started
 }
 
-pub(crate) fn update_ai_siege_drill_deploy_mode(
+pub(crate) fn update_ai_vehicle_deploy_mode(
     mut commands: Commands,
     visible_player: Option<Res<VisiblePlayer>>,
     mut drills: Query<
@@ -1719,11 +1722,13 @@ pub(crate) fn update_ai_siege_drill_deploy_mode(
         attack_order,
     ) in &mut drills
     {
-        if *team == player_team || unit.id != "SiegeDrillTank" {
+        if *team == player_team || !is_deployable_vehicle(unit.id) {
             continue;
         }
-        let desired_deployed = ai_siege_drill_should_deploy(
+        let desired_deployed = ai_vehicle_should_deploy(
             *team,
+            unit.id,
+            deployed.is_some(),
             transform.translation,
             &weapon,
             health,
@@ -1734,13 +1739,14 @@ pub(crate) fn update_ai_siege_drill_deploy_mode(
         if desired_deployed == deployed.is_some() {
             continue;
         }
-        apply_siege_drill_deploy_mode(
+        apply_vehicle_deploy_mode(
             &mut commands,
             entity,
             &mut unit,
             &mut hold,
             &mut weapon,
             &mut vision,
+            transform.translation,
             deployed.copied(),
             desired_deployed,
             false,

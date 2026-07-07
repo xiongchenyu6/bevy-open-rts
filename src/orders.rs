@@ -1672,6 +1672,7 @@ pub(crate) fn update_deploy_mode_requests(
             &mut HoldPosition,
             Option<&mut Weapon>,
             &mut VisionRadius,
+            &Transform,
             Option<&DeployedSiegeMode>,
             &Health,
             Option<&EmpDisabled>,
@@ -1681,8 +1682,10 @@ pub(crate) fn update_deploy_mode_requests(
 ) {
     let mut deployable_count = 0usize;
     let mut deployed_count = 0usize;
-    for (_entity, unit, _hold, weapon, _vision, deployed, health, emp) in units.iter_mut() {
-        if siege_drill_can_toggle_deploy_mode(&unit, weapon.is_some(), health, emp) {
+    for (_entity, unit, _hold, weapon, _vision, _transform, deployed, health, emp) in
+        units.iter_mut()
+    {
+        if vehicle_can_toggle_deploy_mode(&unit, weapon.is_some(), health, emp) {
             deployable_count += 1;
             if deployed.is_some() {
                 deployed_count += 1;
@@ -1691,11 +1694,13 @@ pub(crate) fn update_deploy_mode_requests(
     }
     let desired_deployed = deployable_count > 0 && deployed_count != deployable_count;
 
-    for (entity, mut unit, mut hold, weapon, mut vision, deployed, health, emp) in &mut units {
+    for (entity, mut unit, mut hold, weapon, mut vision, transform, deployed, health, emp) in
+        &mut units
+    {
         commands
             .entity(entity)
             .try_remove::<DeployModeToggleRequest>();
-        if !siege_drill_can_toggle_deploy_mode(&unit, weapon.is_some(), health, emp) {
+        if !vehicle_can_toggle_deploy_mode(&unit, weapon.is_some(), health, emp) {
             continue;
         }
         let current_deployed = deployed.is_some();
@@ -1707,13 +1712,14 @@ pub(crate) fn update_deploy_mode_requests(
         let Some(mut weapon) = weapon else {
             continue;
         };
-        apply_siege_drill_deploy_mode(
+        apply_vehicle_deploy_mode(
             &mut commands,
             entity,
             &mut unit,
             &mut hold,
             &mut weapon,
             &mut vision,
+            transform.translation,
             deployed,
             desired_deployed,
             true,
@@ -1721,25 +1727,59 @@ pub(crate) fn update_deploy_mode_requests(
     }
 }
 
-pub(crate) fn siege_drill_can_toggle_deploy_mode(
+/// Vehicles that can trade all mobility for extra range and firepower.
+/// The SiegeDrillTank keeps its bespoke burrow numbers; the rest use the
+/// generic VEHICLE_DEPLOY_* multipliers on their own registry stats.
+pub(crate) const DEPLOYABLE_VEHICLE_IDS: [&str; 7] = [
+    "SiegeDrillTank",
+    "HammerSiegeTank",
+    "SiegeArtilleryVehicle",
+    "LongbowMissileCrawler",
+    "RailArtilleryWalker",
+    "HeavySiegeWalker",
+    "RailgunTank",
+];
+
+pub(crate) fn is_deployable_vehicle(unit_id: &str) -> bool {
+    DEPLOYABLE_VEHICLE_IDS.contains(&unit_id)
+}
+
+/// Attack range the unit would have while deployed. If it is already
+/// deployed the current weapon range IS the deployed range.
+pub(crate) fn deployed_attack_range(
+    unit_id: &str,
+    current_range: f32,
+    currently_deployed: bool,
+) -> f32 {
+    if currently_deployed {
+        current_range
+    } else if unit_id == "SiegeDrillTank" {
+        SIEGE_DRILL_DEPLOYED_ATTACK_RANGE
+    } else {
+        current_range * VEHICLE_DEPLOY_RANGE_MULTIPLIER
+    }
+}
+
+pub(crate) fn vehicle_can_toggle_deploy_mode(
     unit: &Unit,
     has_weapon: bool,
     health: &Health,
     emp: Option<&EmpDisabled>,
 ) -> bool {
-    unit.id == "SiegeDrillTank"
+    is_deployable_vehicle(unit.id)
         && has_weapon
         && health.current > 0.0
         && !emp.is_some_and(|emp| emp.remaining > 0.0)
 }
 
-pub(crate) fn apply_siege_drill_deploy_mode(
+pub(crate) fn apply_vehicle_deploy_mode(
     commands: &mut Commands,
     entity: Entity,
     unit: &mut Unit,
     hold: &mut HoldPosition,
     weapon: &mut Weapon,
     vision: &mut VisionRadius,
+    position: Vec3,
     deployed: Option<DeployedSiegeMode>,
     desired_deployed: bool,
     clear_attack_order: bool,
@@ -1756,26 +1796,39 @@ pub(crate) fn apply_siege_drill_deploy_mode(
             unit.speed = deployed.base_speed;
             hold.enabled = deployed.previous_hold_position;
             weapon.range = deployed.base_attack_range;
+            weapon.damage = deployed.base_attack_damage;
             weapon.cooldown = deployed.base_attack_interval;
             weapon.structure_damage_multiplier = deployed.base_structure_damage_multiplier;
             vision.0 = deployed.base_sight_range;
             commands.entity(entity).try_remove::<DeployedSiegeMode>();
+            spawn_landing_dust(commands, position);
         }
         (None, true) => {
             commands.entity(entity).try_insert(DeployedSiegeMode {
                 previous_hold_position: hold.enabled,
                 base_speed: unit.speed,
                 base_attack_range: weapon.range,
+                base_attack_damage: weapon.damage,
                 base_attack_interval: weapon.cooldown,
                 base_structure_damage_multiplier: weapon.structure_damage_multiplier,
                 base_sight_range: vision.0,
             });
             unit.speed = 0.0;
             hold.enabled = true;
-            weapon.range = SIEGE_DRILL_DEPLOYED_ATTACK_RANGE;
-            weapon.cooldown = SIEGE_DRILL_DEPLOYED_ATTACK_INTERVAL;
-            weapon.structure_damage_multiplier = SIEGE_DRILL_DEPLOYED_STRUCTURE_DAMAGE_MULTIPLIER;
-            vision.0 = SIEGE_DRILL_DEPLOYED_SIGHT_RANGE;
+            if unit.id == "SiegeDrillTank" {
+                weapon.range = SIEGE_DRILL_DEPLOYED_ATTACK_RANGE;
+                weapon.cooldown = SIEGE_DRILL_DEPLOYED_ATTACK_INTERVAL;
+                weapon.structure_damage_multiplier =
+                    SIEGE_DRILL_DEPLOYED_STRUCTURE_DAMAGE_MULTIPLIER;
+                vision.0 = SIEGE_DRILL_DEPLOYED_SIGHT_RANGE;
+            } else {
+                weapon.range *= VEHICLE_DEPLOY_RANGE_MULTIPLIER;
+                weapon.damage *= VEHICLE_DEPLOY_DAMAGE_MULTIPLIER;
+                weapon.cooldown *= VEHICLE_DEPLOY_COOLDOWN_MULTIPLIER;
+                weapon.structure_damage_multiplier *= VEHICLE_DEPLOY_STRUCTURE_DAMAGE_MULTIPLIER;
+                vision.0 += VEHICLE_DEPLOY_SIGHT_BONUS;
+            }
+            spawn_landing_dust(commands, position);
         }
         _ => {}
     }

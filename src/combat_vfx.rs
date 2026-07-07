@@ -1337,3 +1337,28 @@ pub(crate) fn emit_low_power_sparks(
         );
     }
 }
+
+/// Deployed vehicles draw a pulsing amber anchor ring with four ground
+/// stakes so the "mobility traded for firepower" state reads at a glance.
+pub(crate) fn draw_deployed_vehicle_markers(
+    mut gizmos: Gizmos,
+    time: Res<Time>,
+    deployed: Query<(&GlobalTransform, &Selectable), With<DeployedSiegeMode>>,
+) {
+    let pulse = 0.8 + 0.2 * (time.elapsed_secs() * 2.4).sin();
+    for (transform, selectable) in &deployed {
+        let center = transform.translation() + Vec3::Y * 0.06;
+        let radius = selectable.radius * 1.1;
+        let color = LinearRgba::new(1.5 * pulse, 1.05 * pulse, 0.25, 0.85);
+        gizmos.circle(
+            Isometry3d::new(center, Quat::from_rotation_arc(Vec3::Z, Vec3::Y)),
+            radius,
+            color,
+        );
+        for i in 0..4 {
+            let angle = i as f32 * core::f32::consts::FRAC_PI_2 + core::f32::consts::FRAC_PI_4;
+            let dir = Vec3::new(angle.cos(), 0.0, angle.sin());
+            gizmos.line(center + dir * radius, center + dir * (radius + 0.4), color);
+        }
+    }
+}

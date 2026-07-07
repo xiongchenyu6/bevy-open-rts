@@ -2494,3 +2494,81 @@ fn headquarters_mode_falls_when_command_centers_fall() {
         );
     }
 }
+
+// Deploy mode is the "give up mobility for range and firepower" trade: the
+// siege vehicle set can anchor in place, plain combat vehicles cannot.
+#[test]
+fn deployable_vehicles_trade_mobility_for_range_and_firepower() {
+    assert!(is_deployable_vehicle("HammerSiegeTank"));
+    assert!(is_deployable_vehicle("RailArtilleryWalker"));
+    assert!(is_deployable_vehicle("SiegeDrillTank"));
+    assert!(!is_deployable_vehicle("Tank"));
+    assert!(!is_deployable_vehicle("ScoutRover"));
+
+    let mut app = App::new();
+    app.add_systems(Update, update_deploy_mode_requests);
+    let entity = app
+        .world_mut()
+        .spawn((
+            Unit {
+                id: "HammerSiegeTank",
+                speed: 2.2,
+                can_crush: true,
+                can_be_crushed: false,
+            },
+            HoldPosition { enabled: false },
+            Weapon::new(6.0, 10.0, 1.4, 0.0, 0.0, 1.0, false, true),
+            VisionRadius(7.0),
+            Transform::default(),
+            Health {
+                current: 10.0,
+                max: 10.0,
+            },
+            DeployModeToggleRequest,
+        ))
+        .id();
+    app.update();
+    {
+        let world = app.world();
+        assert!(world.get::<DeployedSiegeMode>(entity).is_some());
+        assert_eq!(world.get::<Unit>(entity).unwrap().speed, 0.0);
+        let weapon = world.get::<Weapon>(entity).unwrap();
+        assert_eq!(weapon.range, 6.0 * VEHICLE_DEPLOY_RANGE_MULTIPLIER);
+        assert_eq!(weapon.damage, 10.0 * VEHICLE_DEPLOY_DAMAGE_MULTIPLIER);
+        assert!(world.get::<HoldPosition>(entity).unwrap().enabled);
+        assert_eq!(
+            world.get::<VisionRadius>(entity).unwrap().0,
+            7.0 + VEHICLE_DEPLOY_SIGHT_BONUS
+        );
+    }
+
+    // Undeploying restores every stat from the stored baseline.
+    app.world_mut()
+        .entity_mut(entity)
+        .insert(DeployModeToggleRequest);
+    app.update();
+    let world = app.world();
+    assert!(world.get::<DeployedSiegeMode>(entity).is_none());
+    assert_eq!(world.get::<Unit>(entity).unwrap().speed, 2.2);
+    let weapon = world.get::<Weapon>(entity).unwrap();
+    assert_eq!(weapon.range, 6.0);
+    assert_eq!(weapon.damage, 10.0);
+    assert!(!world.get::<HoldPosition>(entity).unwrap().enabled);
+    assert_eq!(world.get::<VisionRadius>(entity).unwrap().0, 7.0);
+}
+
+// The AI deploy heuristic must use each unit's own prospective deployed
+// range, not the drill's fixed burrow range.
+#[test]
+fn deployed_attack_range_scales_from_unit_baseline() {
+    assert_eq!(
+        deployed_attack_range("HammerSiegeTank", 6.0, false),
+        6.0 * VEHICLE_DEPLOY_RANGE_MULTIPLIER
+    );
+    assert_eq!(
+        deployed_attack_range("SiegeDrillTank", 3.0, false),
+        SIEGE_DRILL_DEPLOYED_ATTACK_RANGE
+    );
+    // Already deployed: the current weapon range IS the deployed range.
+    assert_eq!(deployed_attack_range("HammerSiegeTank", 9.0, true), 9.0);
+}
