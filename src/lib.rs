@@ -3207,6 +3207,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                     tag_turret_nodes,
                     animate_turret_nodes,
                     animate_airframes,
+                    manage_deploy_outriggers,
                 )
                     .chain(),
                 // Structure/resource ambience + weather.

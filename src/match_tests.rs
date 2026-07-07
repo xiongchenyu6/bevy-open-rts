@@ -1256,6 +1256,7 @@ fn turret_nodes_traverse_toward_the_attack_target() {
                 rest_translation: Vec3::new(0.0, 0.35, 0.0),
                 rest_rotation: Quat::IDENTITY,
                 yaw: 0.0,
+                pitch: 0.0,
             },
             Transform::from_xyz(0.0, 0.35, 0.0),
         ))

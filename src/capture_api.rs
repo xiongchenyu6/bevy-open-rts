@@ -848,6 +848,58 @@ pub fn capture_stage_worker_collecting(app: &mut App) -> Option<Vec3> {
     Some(spot)
 }
 
+/// Stages three player siege vehicles anchored (deployed) in front of the
+/// nearest enemy structure so captures can photograph the outrigger pose and
+/// the siege-shot effects. Returns the enemy structure position to focus on.
+pub fn capture_stage_deployed_siege(app: &mut App) -> Option<Vec3> {
+    let world = app.world_mut();
+    let (target_entity, target_pos) = {
+        let mut q = world.query::<(Entity, &Team, &Structure, &Transform)>();
+        q.iter(world)
+            .find(|(_, team, ..)| **team == Team::Player(1))
+            .map(|(entity, _, _, transform)| (entity, transform.translation))?
+    };
+    let asset_server = world.resource::<AssetServer>().clone();
+    let mut next_id = NextSpawnId(world.resource::<NextSpawnId>().0);
+    let mut queue = bevy::ecs::world::CommandQueue::default();
+    let mut spawned = Vec::new();
+    {
+        let mut commands = Commands::new(&mut queue, world);
+        for (index, unit_id) in [
+            "HammerSiegeTank",
+            "RailArtilleryWalker",
+            "LongbowMissileCrawler",
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let offset = Vec3::new(-6.5, 0.0, (index as f32 - 1.0) * 2.4);
+            let entity = spawn_unit(
+                &mut commands,
+                &asset_server,
+                &mut next_id,
+                unit_id,
+                Team::Player(0),
+                target_pos + offset,
+                0,
+                Team::Player(0),
+            );
+            spawned.push(entity);
+        }
+    }
+    queue.apply(world);
+    world.resource_mut::<NextSpawnId>().0 = next_id.0;
+    for entity in spawned {
+        world.entity_mut(entity).insert((
+            DeployModeToggleRequest,
+            AttackOrder {
+                target: target_entity,
+            },
+        ));
+    }
+    Some(target_pos)
+}
+
 /// Forces a weather kind at full blend so captures can photograph it without
 /// waiting out the ~100s phase clock.
 pub fn capture_set_weather(app: &mut App, kind: &str) -> bool {

@@ -50,6 +50,9 @@ pub(crate) enum ImpactBurstKind {
     Electric,
     Fire,
     Heavy,
+    /// A deployed siege vehicle's anchored shot — the heaviest read in the
+    /// game: white-hot core, wide ground ring, scorch and extra debris.
+    Siege,
 }
 
 #[derive(Component, Clone, Copy)]
@@ -223,6 +226,7 @@ pub(crate) fn impact_flash_color(kind: ImpactBurstKind) -> LinearRgba {
         ImpactBurstKind::Energy => LinearRgba::new(0.5, 0.95, 1.0, 1.0),
         ImpactBurstKind::Electric => LinearRgba::new(0.55, 0.8, 1.0, 1.0),
         ImpactBurstKind::Fire => LinearRgba::new(1.0, 0.42, 0.12, 1.0),
+        ImpactBurstKind::Siege => LinearRgba::new(1.35, 0.8, 0.35, 1.0),
     }
 }
 
@@ -483,6 +487,18 @@ pub(crate) fn spawn_impact_burst(
         spawn_debris_burst(commands, hit, 3, 1.6 + power * 0.4, DebrisPalette::Masonry);
         spawn_debris_burst(commands, hit, 2, 2.2 + power * 0.5, DebrisPalette::Ember);
     }
+    // Anchored siege shells crater whatever they land on: a lingering scorch
+    // plus an extra ember shower on top of the double shockwave rings.
+    if kind == ImpactBurstKind::Siege {
+        spawn_scorch_mark(commands, position, (target_radius * 0.6 + 0.4).min(1.3));
+        spawn_debris_burst(
+            commands,
+            Vec3::new(position.x, 0.4, position.z),
+            4,
+            2.6 + power * 0.5,
+            DebrisPalette::Ember,
+        );
+    }
 }
 
 pub(crate) fn spawn_veterancy_promotion_effect(
@@ -644,6 +660,18 @@ pub(crate) fn draw_impact_burst(
             12,
             1.36,
         ),
+        ImpactBurstKind::Siege => (
+            Color::srgba(1.0, 0.74, 0.30, 0.46 + life_ratio * 0.46),
+            Color::srgba(1.0, 0.97, 0.72, 0.55 + life_ratio * 0.45),
+            Color::srgba(
+                0.18 + team_r * 0.06,
+                0.17 + team_g * 0.06,
+                0.15,
+                0.38 * life_ratio,
+            ),
+            16,
+            1.75,
+        ),
     };
     let center = Vec3::new(position.x, 0.12 + burst.power * 0.04, position.z);
     let ground_radius = burst.radius * ground_scale * (0.35 + progress * 1.15);
@@ -718,6 +746,24 @@ pub(crate) fn draw_impact_burst(
                 burst.radius * (0.55 + progress * 0.95),
                 smoke,
             );
+        }
+        ImpactBurstKind::Siege => {
+            // Double expanding shockwave rings — the anchored-artillery
+            // signature that no mobile shot produces.
+            for (delay, tint) in [(0.0, hot), (0.18, core)] {
+                let ring = (progress - delay).max(0.0) / (1.0 - delay);
+                if ring <= 0.0 {
+                    continue;
+                }
+                gizmos.circle(
+                    Isometry3d::new(
+                        center + Vec3::Y * 0.04,
+                        Quat::from_rotation_arc(Vec3::Z, Vec3::Y),
+                    ),
+                    burst.radius * (0.4 + ring * 1.55),
+                    tint,
+                );
+            }
         }
         ImpactBurstKind::Ballistic => {}
     }

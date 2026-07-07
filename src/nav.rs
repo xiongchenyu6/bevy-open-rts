@@ -450,7 +450,10 @@ pub(crate) fn plan_unit_paths(
         }
         match grid.find_path(transform.translation, order.target) {
             Some(waypoints) if !waypoints.is_empty() => {
-                commands.entity(entity).insert(PlannedPath {
+                // try_insert: the unit can be killed between this system
+                // running and the command applying (combat's despawn queue
+                // drains first) — a bare insert panics on the dead entity.
+                commands.entity(entity).try_insert(PlannedPath {
                     goal: order.target,
                     waypoints,
                     next: 0,

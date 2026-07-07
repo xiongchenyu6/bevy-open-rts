@@ -2228,6 +2228,7 @@ pub(crate) fn combat(
         Option<&EmpDisabled>,
         Option<&MoveOrder>,
         Option<&Structure>,
+        Has<DeployedSiegeMode>,
     )>,
     mut health_q: Query<(
         Entity,
@@ -2281,6 +2282,7 @@ pub(crate) fn combat(
         emp,
         move_order,
         structure,
+        is_deployed,
     ) in &mut attackers
     {
         if emp.is_some_and(|emp| emp.remaining > 0.0) {
@@ -2352,9 +2354,11 @@ pub(crate) fn combat(
                 .copied()
         });
         let moving_with_active_order = moving_weapon_fire_blocked(unit, move_order);
+        // Deploying forces hold-position (the chassis is anchored), but an
+        // anchored siege gun must still auto-engage anything in reach.
         let auto_target = if ordered_target.is_none()
             && !moving_with_active_order
-            && !hold_position.is_some_and(|hold| hold.enabled)
+            && (is_deployed || !hold_position.is_some_and(|hold| hold.enabled))
         {
             nearest_enemy_for_auto_acquire(
                 *team,
@@ -2388,8 +2392,11 @@ pub(crate) fn combat(
         }
         weapon.cooldown_left = weapon_cooldown_for_faction(attacker_faction, weapon.cooldown);
         let damage = weapon_damage_against_target(&weapon, attack_damage, target.is_structure);
-        let impact_kind =
-            impact_burst_kind_for_attacker(&weapon, unit, structure, target.is_structure);
+        let impact_kind = if is_deployed {
+            ImpactBurstKind::Siege
+        } else {
+            impact_burst_kind_for_attacker(&weapon, unit, structure, target.is_structure)
+        };
         damage_events.push((
             target.entity,
             damage,
@@ -2418,12 +2425,16 @@ pub(crate) fn combat(
                     attack_damage,
                     splash_target.is_structure,
                 ) * weapon.splash_damage_multiplier;
-                let splash_impact_kind = impact_burst_kind_for_attacker(
-                    &weapon,
-                    unit,
-                    structure,
-                    splash_target.is_structure,
-                );
+                let splash_impact_kind = if is_deployed {
+                    ImpactBurstKind::Siege
+                } else {
+                    impact_burst_kind_for_attacker(
+                        &weapon,
+                        unit,
+                        structure,
+                        splash_target.is_structure,
+                    )
+                };
                 damage_events.push((
                     splash_target.entity,
                     splash_damage,
@@ -2496,20 +2507,30 @@ pub(crate) fn combat(
                 }
             }
             // Muzzle flash at the barrel so shots read as fired, not conjured.
+            // Anchored siege shots get the cannon treatment: a much larger
+            // blast, a dust kick at the mount, and a fatter, longer tracer.
+            let siege_shot = impact_kind == ImpactBurstKind::Siege;
             spawn_combat_flash(
                 &mut commands,
                 from + Vec3::Y * 0.6,
-                0.22,
-                0.34,
-                0.1,
-                LinearRgba::new(1.0, 0.9, 0.55, 1.0),
+                if siege_shot { 0.4 } else { 0.22 },
+                if siege_shot { 0.75 } else { 0.34 },
+                if siege_shot { 0.16 } else { 0.1 },
+                if siege_shot {
+                    LinearRgba::new(1.25, 0.95, 0.6, 1.0)
+                } else {
+                    LinearRgba::new(1.0, 0.9, 0.55, 1.0)
+                },
             );
+            if siege_shot {
+                spawn_landing_dust(&mut commands, from);
+            }
             // Tracer from shooter to target (longer-lived so it's noticeable)…
             commands.spawn((
                 ShotPulse {
                     from: from + Vec3::Y * 0.6,
                     to: to + Vec3::Y * 0.6,
-                    ttl: 0.13,
+                    ttl: if siege_shot { 0.22 } else { 0.13 },
                     team,
                 },
                 MatchScopedEntity,

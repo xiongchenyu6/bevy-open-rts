@@ -234,6 +234,7 @@ pub(crate) struct TurretNode {
     pub(crate) rest_translation: Vec3,
     pub(crate) rest_rotation: Quat,
     pub(crate) yaw: f32,
+    pub(crate) pitch: f32,
 }
 
 pub(crate) fn tag_turret_nodes(
@@ -266,19 +267,25 @@ pub(crate) fn tag_turret_nodes(
             rest_translation: transform.translation,
             rest_rotation: transform.rotation,
             yaw: 0.0,
+            pitch: 0.0,
         });
     }
 }
 
 pub(crate) fn animate_turret_nodes(
     time: Res<Time>,
-    roots: Query<(&GlobalTransform, Option<&AttackOrder>, Option<&Weapon>)>,
+    roots: Query<(
+        &GlobalTransform,
+        Option<&AttackOrder>,
+        Option<&Weapon>,
+        Has<DeployedSiegeMode>,
+    )>,
     positions: Query<&GlobalTransform>,
     mut turrets: Query<(&mut TurretNode, &mut Transform)>,
 ) {
     let dt = time.delta_secs();
     for (mut turret, mut transform) in &mut turrets {
-        let Ok((root_gt, order, weapon)) = roots.get(turret.root) else {
+        let Ok((root_gt, order, weapon, deployed)) = roots.get(turret.root) else {
             continue;
         };
         // Desired local yaw: the target bearing relative to the body's facing;
@@ -294,7 +301,12 @@ pub(crate) fn animate_turret_nodes(
         let step = 5.0 * dt;
         let delta = wrap_angle(desired - turret.yaw);
         turret.yaw += delta.clamp(-step, step);
-        let spin = Quat::from_rotation_y(turret.yaw);
+        // Deployed siege vehicles crank the barrel up into a bombardment
+        // pose — the silhouette change that says "artillery mode".
+        let target_pitch = if deployed { 0.30 } else { 0.0 };
+        let pitch_step = 1.4 * dt;
+        turret.pitch += (target_pitch - turret.pitch).clamp(-pitch_step, pitch_step);
+        let spin = Quat::from_rotation_y(turret.yaw) * Quat::from_rotation_x(turret.pitch);
         let kick = weapon.map_or(0.0, weapon_fire_kick);
         transform.rotation = turret.rest_rotation * spin;
         // Recoil: slide back along the barrel's current local facing.
@@ -354,5 +366,124 @@ pub(crate) fn animate_airframes(
         let pose = Quat::from_rotation_z(motion.roll) * Quat::from_rotation_x(pitch);
         transform.rotation = pose * part.rest_rotation;
         transform.translation = pose * part.rest_translation + Vec3::Y * bob;
+    }
+}
+
+/// Shared assets for deploy-mode stabilizer legs (one mesh, one material,
+/// scaled per unit) so repeated deploys don't leak new assets.
+#[derive(Resource)]
+pub(crate) struct OutriggerAssets {
+    pub(crate) mesh: Handle<Mesh>,
+    pub(crate) material: Handle<StandardMaterial>,
+}
+
+/// One hydraulic stabilizer leg folded out of a deployed vehicle. The legs
+/// extend over ~0.35s on deploy, retract on undeploy, then despawn — the
+/// model itself visibly transforms instead of only gaining a HUD ring.
+#[derive(Component)]
+pub(crate) struct DeployOutrigger {
+    pub(crate) direction: Vec3,
+    pub(crate) length: f32,
+    pub(crate) progress: f32,
+    pub(crate) extending: bool,
+}
+
+pub(crate) fn manage_deploy_outriggers(
+    mut commands: Commands,
+    time: Res<Time>,
+    meshes: Option<ResMut<Assets<Mesh>>>,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    cache: Option<Res<OutriggerAssets>>,
+    newly_deployed: Query<(Entity, &Selectable), (Added<DeployedSiegeMode>, With<Unit>)>,
+    mut undeployed: RemovedComponents<DeployedSiegeMode>,
+    mut outriggers: Query<(Entity, &ChildOf, &mut DeployOutrigger, &mut Transform)>,
+) {
+    // Spawn four legs on every fresh deploy.
+    if !newly_deployed.is_empty()
+        && let (Some(mut meshes), Some(mut materials)) = (meshes, materials)
+    {
+        let (mesh, material) = match cache.as_deref() {
+            Some(assets) => (assets.mesh.clone(), assets.material.clone()),
+            None => {
+                let mesh = meshes.add(Cuboid::new(0.13, 0.09, 1.0));
+                let material = materials.add(StandardMaterial {
+                    base_color: Color::srgb(0.42, 0.44, 0.48),
+                    metallic: 0.75,
+                    perceptual_roughness: 0.4,
+                    ..default()
+                });
+                commands.insert_resource(OutriggerAssets {
+                    mesh: mesh.clone(),
+                    material: material.clone(),
+                });
+                (mesh, material)
+            }
+        };
+        for (root, selectable) in &newly_deployed {
+            let length = (selectable.radius * 0.65).clamp(0.4, 0.85);
+            for i in 0..4 {
+                let angle = i as f32 * core::f32::consts::FRAC_PI_2 + core::f32::consts::FRAC_PI_4;
+                let direction = Vec3::new(angle.cos(), 0.0, angle.sin());
+                let leg = commands
+                    .spawn((
+                        Name::new("Deploy outrigger"),
+                        Mesh3d(mesh.clone()),
+                        MeshMaterial3d(material.clone()),
+                        bevy::light::NotShadowCaster,
+                        DeployOutrigger {
+                            direction,
+                            length,
+                            progress: 0.0,
+                            extending: true,
+                        },
+                        outrigger_pose(direction, length, 0.0),
+                        MatchScopedEntity,
+                    ))
+                    .id();
+                // The vehicle can die between this system running and the
+                // command applying (combat's despawn queue drains first), so
+                // attach via a guarded command instead of a bare add_child.
+                commands.queue(move |world: &mut World| {
+                    if world.get_entity(root).is_ok() {
+                        world.entity_mut(root).add_child(leg);
+                    } else if let Ok(orphan) = world.get_entity_mut(leg) {
+                        orphan.despawn();
+                    }
+                });
+            }
+        }
+    }
+
+    // Undeployed roots: tell their legs to retract.
+    let undeployed_roots: std::collections::HashSet<Entity> = undeployed.read().collect();
+    let dt = time.delta_secs();
+    for (entity, child_of, mut leg, mut transform) in &mut outriggers {
+        if undeployed_roots.contains(&child_of.0) {
+            leg.extending = false;
+        }
+        let step = dt / 0.35;
+        leg.progress = if leg.extending {
+            (leg.progress + step).min(1.0)
+        } else {
+            leg.progress - step
+        };
+        if leg.progress <= 0.0 {
+            commands.entity(entity).try_despawn();
+            continue;
+        }
+        *transform = outrigger_pose(leg.direction, leg.length, leg.progress);
+    }
+}
+
+/// Leg pose at extension `progress`: angled down-and-out from the hull's
+/// shoulder toward the ground, growing to full length as it plants.
+pub(crate) fn outrigger_pose(direction: Vec3, length: f32, progress: f32) -> Transform {
+    let eased = progress * progress * (3.0 - 2.0 * progress);
+    let down_out = (direction - Vec3::Y * 0.6).normalize();
+    let reach = length * (0.25 + 0.75 * eased);
+    Transform {
+        translation: direction * (0.16 + 0.5 * reach) + Vec3::Y * (0.24 - 0.1 * eased),
+        rotation: Quat::from_rotation_arc(Vec3::Z, down_out),
+        scale: Vec3::new(1.0, 1.0, reach),
     }
 }
