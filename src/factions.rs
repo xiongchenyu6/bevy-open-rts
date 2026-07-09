@@ -16,8 +16,9 @@ use bevy::prelude::*;
 
 use crate::*;
 
-pub(crate) const CHAOS_SHIELD_HEALTH_RATIO: f32 = 0.35;
-pub(crate) const CHAOS_SHIELD_RECHARGE_PER_SECOND: f32 = 6.0;
+pub(crate) const CHAOS_SHIELD_HEALTH_RATIO: f32 = 0.45;
+pub(crate) const CHAOS_SHIELD_RECHARGE_PER_SECOND: f32 = 7.0;
+pub(crate) const CHAOS_ELITE_WEAPON_DAMAGE_MULTIPLIER: f32 = 1.1;
 pub(crate) const DEMON_REGEN_HP_PER_SECOND: f32 = 1.2;
 pub(crate) const DEMON_FURY_HEALTH_RATIO: f32 = 0.4;
 pub(crate) const DEMON_FURY_DAMAGE_MULTIPLIER: f32 = 1.2;

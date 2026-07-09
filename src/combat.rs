@@ -338,13 +338,14 @@ pub(crate) fn faction_weapon_damage_multiplier(
     target_team: Team,
     target_is_structure: bool,
 ) -> f32 {
-    if attacker_faction == Some(SkirmishFaction::Demon)
-        && target_is_structure
-        && target_team != Team::Neutral
-    {
-        DEMON_STRUCTURE_WEAPON_DAMAGE_MULTIPLIER
-    } else {
-        1.0
+    match attacker_faction {
+        Some(SkirmishFaction::Demon) if target_is_structure && target_team != Team::Neutral => {
+            DEMON_STRUCTURE_WEAPON_DAMAGE_MULTIPLIER
+        }
+        // Chaos elites hit harder across the board — the offensive half of
+        // the "expensive but strong" identity (shields are the other half).
+        Some(SkirmishFaction::Chaos) => CHAOS_ELITE_WEAPON_DAMAGE_MULTIPLIER,
+        _ => 1.0,
     }
 }
 

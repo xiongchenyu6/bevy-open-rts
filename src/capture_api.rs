@@ -1494,6 +1494,38 @@ pub fn capture_run_ai_duel(
     difficulty_b: &str,
     max_seconds: u32,
 ) -> Result<(u32, &'static str, AiDuelCounts), String> {
+    capture_run_ai_duel_with_factions(difficulty_a, difficulty_b, None, max_seconds)
+}
+
+pub fn capture_run_faction_duel(
+    faction_a: &str,
+    faction_b: &str,
+    max_seconds: u32,
+) -> Result<(u32, &'static str, AiDuelCounts), String> {
+    let faction_a = capture_parse_faction(faction_a)?;
+    let faction_b = capture_parse_faction(faction_b)?;
+    capture_run_ai_duel_with_factions(
+        "normal",
+        "normal",
+        Some((faction_a, faction_b)),
+        max_seconds,
+    )
+}
+
+fn capture_parse_faction(id: &str) -> Result<SkirmishFaction, String> {
+    SkirmishFaction::ALL
+        .into_iter()
+        .find(|faction| faction.registry_id() == id)
+        .ok_or_else(|| format!("unknown faction '{id}' (alliance|demon|chaos)"))
+}
+
+/// AI duel with explicit factions per side — the faction balance harness.
+pub(crate) fn capture_run_ai_duel_with_factions(
+    difficulty_a: &str,
+    difficulty_b: &str,
+    factions: Option<(SkirmishFaction, SkirmishFaction)>,
+    max_seconds: u32,
+) -> Result<(u32, &'static str, AiDuelCounts), String> {
     let difficulty_a = capture_parse_ai_difficulty(difficulty_a)?;
     let difficulty_b = capture_parse_ai_difficulty(difficulty_b)?;
     let mut app = build_game_app(GameAppMode::Headless);
@@ -1515,6 +1547,15 @@ pub fn capture_run_ai_duel(
         settings
             .ai_difficulties
             .set_difficulty(Team::Player(1), difficulty_b);
+        if let Some((faction_a, faction_b)) = factions {
+            if settings.player_factions.len() < 2 {
+                settings
+                    .player_factions
+                    .resize(2, SkirmishFaction::Alliance);
+            }
+            settings.player_factions[0] = faction_a;
+            settings.player_factions[1] = faction_b;
+        }
     }
     app.world_mut()
         .resource_mut::<NextState<AppScreen>>()

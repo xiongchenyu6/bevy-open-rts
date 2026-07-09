@@ -2599,7 +2599,10 @@ fn chaos_shields_absorb_before_health_and_recharge() {
     // A broken shield passes damage through untouched.
     assert_eq!(drain_faction_shield(&mut shield, 5.0), 5.0);
     // Capacity scales with unit size.
-    assert_eq!(chaos_shield_capacity(10.0), 4.0);
+    assert_eq!(
+        chaos_shield_capacity(10.0),
+        (10.0 * CHAOS_SHIELD_HEALTH_RATIO).ceil()
+    );
     assert!(chaos_shield_capacity(40.0) > chaos_shield_capacity(10.0));
 }
 
