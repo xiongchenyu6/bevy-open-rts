@@ -2281,7 +2281,10 @@ pub(crate) fn try_spawn_ai_trained_unit(
     else {
         return false;
     };
-    if !economies.get_mut(team).spend(def.cost) {
+    if !economies
+        .get_mut(team)
+        .spend(faction_unit_cost(Some(faction), def.cost))
+    {
         return false;
     }
 
@@ -2399,7 +2402,10 @@ pub(crate) fn run_ai_capture_logic(
     let Some(target) = best_ai_capture_target(team, origin, capture_structures) else {
         return;
     };
-    if !economies.get_mut(team).spend(def.cost) {
+    if !economies
+        .get_mut(team)
+        .spend(faction_unit_cost(Some(faction), def.cost))
+    {
         return;
     }
 
@@ -2525,7 +2531,10 @@ pub(crate) fn run_ai_saboteur_logic(
     else {
         return;
     };
-    if !economies.get_mut(team).spend(saboteur_def.cost) {
+    if !economies
+        .get_mut(team)
+        .spend(faction_unit_cost(Some(faction), saboteur_def.cost))
+    {
         return;
     }
 

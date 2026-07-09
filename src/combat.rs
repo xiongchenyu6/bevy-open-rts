@@ -348,13 +348,6 @@ pub(crate) fn faction_weapon_damage_multiplier(
     }
 }
 
-pub(crate) fn faction_incoming_weapon_damage_scale(target_faction: Option<SkirmishFaction>) -> f32 {
-    match target_faction {
-        Some(SkirmishFaction::Chaos) => CHAOS_INCOMING_WEAPON_DAMAGE_SCALE,
-        Some(SkirmishFaction::Alliance | SkirmishFaction::Demon) | None => 1.0,
-    }
-}
-
 pub(crate) fn applied_weapon_damage(
     base_damage: f32,
     attacker_faction: Option<SkirmishFaction>,
@@ -364,9 +357,11 @@ pub(crate) fn applied_weapon_damage(
     shield: Option<&SupportShield>,
     passive_shield: Option<&PassiveSupportShield>,
 ) -> f32 {
+    // Chaos's old flat 10% damage reduction is gone — its survivability now
+    // comes from the visible, counterable FactionShield layer instead.
+    let _ = target_faction;
     base_damage
         * faction_weapon_damage_multiplier(attacker_faction, target_team, target_is_structure)
-        * faction_incoming_weapon_damage_scale(target_faction)
         * support_damage_scale(shield, passive_shield)
 }
 
@@ -1680,6 +1675,7 @@ pub(crate) fn apply_kill_credits(
     mut kill_credits: ResMut<KillCredits>,
     mut battle_log: ResMut<BattleLog>,
     mut audio_feedback: ResMut<AudioFeedback>,
+    player_factions: Res<PlayerFactions>,
     visible_player: Option<Res<VisiblePlayer>>,
     mut units: Query<
         (
@@ -1716,7 +1712,11 @@ pub(crate) fn apply_kill_credits(
         if health.current <= 0.0 {
             continue;
         }
-        veteran.experience_points = veteran.experience_points.saturating_add(1);
+        // Alliance troops are drilled professionals: kills teach them twice
+        // as fast, so their army snowballs veterancy ranks.
+        veteran.experience_points = veteran
+            .experience_points
+            .saturating_add(faction_xp_per_kill(player_factions.faction(*team)));
         let target_rank = rank_for_experience_points(veteran.experience_points);
         if target_rank <= veteran.rank {
             continue;
@@ -2241,6 +2241,7 @@ pub(crate) fn combat(
         Option<&SupportShield>,
         Option<&PassiveSupportShield>,
         Option<&FogMemoryVisible>,
+        Option<&mut FactionShield>,
     )>,
     mut match_state: ResMut<MatchState>,
     mut latest_battle_event: ResMut<LatestBattleEvent>,
@@ -2251,9 +2252,9 @@ pub(crate) fn combat(
     let player_team = visible_player_team(visible_player.as_deref());
     let targets: Vec<_> = health_q
         .iter()
-        .filter(|(_, _, _, _, _, _, health, _, _, _)| health.current > 0.0)
+        .filter(|(_, _, _, _, _, _, health, _, _, _, _)| health.current > 0.0)
         .map(
-            |(entity, transform, team, selectable, movement_domain, structure, _, _, _, _)| {
+            |(entity, transform, team, selectable, movement_domain, structure, _, _, _, _, _)| {
                 TargetSnapshot {
                     entity,
                     team: *team,
@@ -2265,6 +2266,21 @@ pub(crate) fn combat(
                 }
             },
         )
+        .collect();
+    // Attacker health ratios for the demon fury passive (the attackers query
+    // can't borrow Health itself — health_q already holds it mutably).
+    let health_ratio_by_entity: std::collections::HashMap<Entity, f32> = health_q
+        .iter()
+        .map(|(entity, _, _, _, _, _, health, _, _, _, _)| {
+            (
+                entity,
+                if health.max > 0.0 {
+                    health.current / health.max
+                } else {
+                    1.0
+                },
+            )
+        })
         .collect();
     let mut damage_events = Vec::new();
 
@@ -2302,6 +2318,17 @@ pub(crate) fn combat(
             continue;
         }
         let attacker_faction = player_factions.faction(*team);
+        // Demon fury: a wounded demon unit fights harder and faster.
+        let fury = demon_fury_active(
+            attacker_faction,
+            unit.is_some(),
+            health_ratio_by_entity.get(&entity).copied(),
+        );
+        let attack_damage = if fury {
+            attack_damage * DEMON_FURY_DAMAGE_MULTIPLIER
+        } else {
+            attack_damage
+        };
         if is_tesla_fence_structure(structure) {
             if weapon.cooldown_left > 0.0 {
                 continue;
@@ -2390,7 +2417,12 @@ pub(crate) fn combat(
         {
             continue;
         }
-        weapon.cooldown_left = weapon_cooldown_for_faction(attacker_faction, weapon.cooldown);
+        weapon.cooldown_left = weapon_cooldown_for_faction(attacker_faction, weapon.cooldown)
+            * if fury {
+                DEMON_FURY_COOLDOWN_MULTIPLIER
+            } else {
+                1.0
+            };
         let damage = weapon_damage_against_target(&weapon, attack_damage, target.is_structure);
         let impact_kind = if is_deployed {
             ImpactBurstKind::Siege
@@ -2468,13 +2500,24 @@ pub(crate) fn combat(
         source,
     ) in damage_events
     {
-        if let Ok((entity, _, _, _, _, _, mut health, shield, passive_shield, fog_memory)) =
-            health_q.get_mut(target)
+        if let Ok((
+            entity,
+            _,
+            _,
+            _,
+            _,
+            _,
+            mut health,
+            shield,
+            passive_shield,
+            fog_memory,
+            faction_shield,
+        )) = health_q.get_mut(target)
         {
             if health.current <= 0.0 {
                 continue;
             }
-            let applied_damage = applied_weapon_damage(
+            let mut applied_damage = applied_weapon_damage(
                 damage,
                 attacker_faction,
                 target_team,
@@ -2483,7 +2526,28 @@ pub(crate) fn combat(
                 shield,
                 passive_shield,
             );
+            // Chaos faction shields soak weapon damage before health; a hit
+            // that lands on the shield shimmers cyan instead of drawing blood.
+            if let Some(mut faction_shield) = faction_shield
+                && applied_damage > 0.0
+            {
+                let before_shield = applied_damage;
+                applied_damage = drain_faction_shield(&mut faction_shield, applied_damage);
+                if applied_damage < before_shield {
+                    spawn_combat_flash(
+                        &mut commands,
+                        to + Vec3::Y * 0.7,
+                        0.28,
+                        0.5,
+                        0.14,
+                        LinearRgba::new(0.35, 0.9, 1.6, 1.0),
+                    );
+                }
+            }
             health.current -= applied_damage;
+            // Restart the out-of-combat clock that gates shield recharge,
+            // demon regeneration and alliance field repair.
+            commands.entity(target).try_insert(RecentDamage::fresh());
             if applied_damage > 0.0 {
                 commands.spawn((
                     PendingDamageNumber {
@@ -2772,10 +2836,29 @@ pub(crate) fn draw_health_bar(
     position: Vec3,
     radius: f32,
     health: Health,
+    faction_shield: Option<FactionShield>,
     bar_right: Vec3,
 ) {
     let width = radius * 1.8;
     let center = Vec3::new(position.x, position.y + 1.25, position.z);
+    // Chaos energy shield: a cyan strip riding just above the health bar,
+    // so shield state reads separately from hitpoints (SC-style).
+    if let Some(shield) = faction_shield
+        && shield.max > 0.0
+    {
+        let shield_center = center + Vec3::Y * 0.14;
+        let ratio = (shield.current / shield.max).clamp(0.0, 1.0);
+        let half = width * 0.5;
+        let left = shield_center - bar_right * half;
+        let right = shield_center + bar_right * half;
+        let fill = left + bar_right * (width * ratio);
+        if ratio < 0.995 {
+            gizmos.line(fill, right, Color::srgb(0.05, 0.14, 0.22));
+        }
+        if ratio > 0.005 {
+            gizmos.line(left, fill, Color::srgb(0.25, 0.75, 1.0));
+        }
+    }
     let ratio = health.ratio();
     let half = width * 0.5;
     // Extend along the camera's right axis so the bar reads as horizontal on

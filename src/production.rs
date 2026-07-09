@@ -153,6 +153,9 @@ pub(crate) struct BuildJob {
     pub(crate) producer_id: &'static str,
     pub(crate) timer: f32,
     pub(crate) origin: Vec3,
+    /// What was actually charged (faction discounts applied) — refunds must
+    /// return exactly this, not the registry list price.
+    pub(crate) cost: registry::Cost,
 }
 
 #[derive(Resource, Default)]
@@ -741,6 +744,7 @@ pub(crate) fn enqueue_build_action_for_faction(
             };
             enqueue_build_jobs_for_producers(
                 team,
+                faction,
                 action,
                 def,
                 &producers,
@@ -767,6 +771,7 @@ pub(crate) fn enqueue_build_action_for_faction(
             };
             enqueue_build_jobs_for_producers(
                 team,
+                faction,
                 action,
                 def,
                 &producers,
@@ -797,6 +802,7 @@ pub(crate) fn build_queue_has_capacity(build_queue: &BuildQueue, producer_entity
 
 pub(crate) fn enqueue_build_jobs_for_producers(
     team: Team,
+    faction: SkirmishFaction,
     action: BuildAction,
     def: &registry::EntityDef,
     producers: &[(Entity, &'static str, Vec3)],
@@ -807,6 +813,12 @@ pub(crate) fn enqueue_build_jobs_for_producers(
     if producers.is_empty() {
         return EnqueueBuildActionResult::Unavailable;
     }
+    // Demon forge economics: unit training is discounted; structures pay list.
+    let charged_cost = if matches!(action, BuildAction::Train(_)) {
+        faction_unit_cost(Some(faction), def.cost)
+    } else {
+        def.cost
+    };
     let mut enqueued_any = false;
     let mut resource_blocked = false;
     for &(producer_entity, producer_id, origin) in producers {
@@ -820,7 +832,7 @@ pub(crate) fn enqueue_build_jobs_for_producers(
             if !build_queue_has_capacity(build_queue, producer_entity) {
                 break;
             }
-            if !economies.get_mut(team).spend(def.cost) {
+            if !economies.get_mut(team).spend(charged_cost) {
                 resource_blocked = true;
                 break;
             }
@@ -831,6 +843,7 @@ pub(crate) fn enqueue_build_jobs_for_producers(
                 producer_id,
                 timer: def.build_seconds,
                 origin,
+                cost: charged_cost,
             });
             enqueued_any = true;
         }
@@ -1693,7 +1706,9 @@ pub(crate) fn process_build_queue(
         {
             Some(index) => index,
             None => {
-                let speed_multiplier = production_speed_multiplier(economies.get(queued_job.team));
+                // Low-power throttle × the faction's forge tempo (demon +25%).
+                let speed_multiplier = production_speed_multiplier(economies.get(queued_job.team))
+                    * faction_production_speed(player_factions.faction(queued_job.team));
                 producer_production_deltas
                     .push((queued_job.producer_entity, frame_delta * speed_multiplier));
                 producer_production_deltas.len() - 1

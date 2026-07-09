@@ -2573,3 +2573,157 @@ fn deployed_attack_range_scales_from_unit_baseline() {
     // Already deployed: the current weapon range IS the deployed range.
     assert_eq!(deployed_attack_range("HammerSiegeTank", 9.0, true), 9.0);
 }
+
+// ---------------------------------------------------------------------------
+// Faction asymmetry: each race carries WC3/SC-style signature mechanics.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn chaos_shields_absorb_before_health_and_recharge() {
+    let mut shield = FactionShield {
+        current: 10.0,
+        max: 10.0,
+    };
+    // A 6-damage hit lands entirely on the shield.
+    assert_eq!(drain_faction_shield(&mut shield, 6.0), 0.0);
+    assert_eq!(shield.current, 4.0);
+    // A 7-damage hit breaks the shield and 3 leaks through to health.
+    assert_eq!(drain_faction_shield(&mut shield, 7.0), 3.0);
+    assert_eq!(shield.current, 0.0);
+    // A broken shield passes damage through untouched.
+    assert_eq!(drain_faction_shield(&mut shield, 5.0), 5.0);
+    // Capacity scales with unit size.
+    assert_eq!(chaos_shield_capacity(10.0), 4.0);
+    assert!(chaos_shield_capacity(40.0) > chaos_shield_capacity(10.0));
+}
+
+#[test]
+fn chaos_units_get_shields_that_refill_out_of_combat() {
+    let mut app = App::new();
+    app.init_resource::<Time>();
+    app.insert_resource(PlayerFactions(vec![SkirmishFaction::Chaos]));
+    app.add_systems(
+        Update,
+        (
+            attach_faction_passives,
+            tick_recent_damage,
+            recharge_faction_shields,
+        )
+            .chain(),
+    );
+    let unit = app
+        .world_mut()
+        .spawn((
+            Unit {
+                id: "Tank",
+                speed: 2.0,
+                can_crush: true,
+                can_be_crushed: false,
+            },
+            Team::Player(0),
+            Health::new(20.0),
+        ))
+        .id();
+    app.update();
+    let shield = *app.world().get::<FactionShield>(unit).expect("shield");
+    assert_eq!(shield.max, chaos_shield_capacity(20.0));
+    assert_eq!(shield.current, shield.max);
+
+    // Damage the shield with the out-of-combat clock running: no recharge...
+    app.world_mut()
+        .get_mut::<FactionShield>(unit)
+        .unwrap()
+        .current = 1.0;
+    app.world_mut()
+        .entity_mut(unit)
+        .insert(RecentDamage::fresh());
+    app.world_mut()
+        .resource_mut::<Time>()
+        .advance_by(std::time::Duration::from_secs_f32(1.0));
+    app.update();
+    assert_eq!(app.world().get::<FactionShield>(unit).unwrap().current, 1.0);
+
+    // ...but once the window expires the shield refills.
+    for _ in 0..8 {
+        app.world_mut()
+            .resource_mut::<Time>()
+            .advance_by(std::time::Duration::from_secs_f32(1.0));
+        app.update();
+    }
+    let shield = app.world().get::<FactionShield>(unit).unwrap();
+    assert_eq!(shield.current, shield.max);
+}
+
+#[test]
+fn demon_fury_and_forge_economy_shape_the_faction() {
+    // Fury: only demons, only units, only when badly wounded and alive.
+    let demon = Some(SkirmishFaction::Demon);
+    assert!(demon_fury_active(demon, true, Some(0.3)));
+    assert!(!demon_fury_active(demon, true, Some(0.5)));
+    assert!(!demon_fury_active(demon, true, Some(0.0)));
+    assert!(!demon_fury_active(demon, false, Some(0.3)));
+    assert!(!demon_fury_active(
+        Some(SkirmishFaction::Alliance),
+        true,
+        Some(0.3)
+    ));
+    // Forge economy: demons train cheaper and faster; others pay list price.
+    let cost = registry::Cost {
+        ore: 100,
+        crystal: 40,
+    };
+    let discounted = faction_unit_cost(demon, cost);
+    assert_eq!(discounted.ore, 85);
+    assert_eq!(discounted.crystal, 34);
+    let listed = faction_unit_cost(Some(SkirmishFaction::Chaos), cost);
+    assert_eq!(listed.ore, 100);
+    assert!(
+        faction_production_speed(demon) > faction_production_speed(Some(SkirmishFaction::Alliance))
+    );
+}
+
+#[test]
+fn demon_units_regenerate_out_of_combat() {
+    let mut app = App::new();
+    app.init_resource::<Time>();
+    app.insert_resource(PlayerFactions(vec![SkirmishFaction::Demon]));
+    app.add_systems(
+        Update,
+        (tick_recent_damage, demon_unit_regeneration).chain(),
+    );
+    let unit = app
+        .world_mut()
+        .spawn((
+            Unit {
+                id: "Tank",
+                speed: 2.0,
+                can_crush: true,
+                can_be_crushed: false,
+            },
+            Team::Player(0),
+            Health {
+                current: 5.0,
+                max: 20.0,
+            },
+        ))
+        .id();
+    for _ in 0..5 {
+        app.world_mut()
+            .resource_mut::<Time>()
+            .advance_by(std::time::Duration::from_secs_f32(1.0));
+        app.update();
+    }
+    let healed = app.world().get::<Health>(unit).unwrap().current;
+    assert!(
+        healed > 5.0 + DEMON_REGEN_HP_PER_SECOND * 3.0,
+        "demon unit should regenerate out of combat, got {healed}"
+    );
+}
+
+#[test]
+fn alliance_veterancy_learns_twice_as_fast() {
+    assert_eq!(faction_xp_per_kill(Some(SkirmishFaction::Alliance)), 2);
+    assert_eq!(faction_xp_per_kill(Some(SkirmishFaction::Demon)), 1);
+    assert_eq!(faction_xp_per_kill(Some(SkirmishFaction::Chaos)), 1);
+    assert_eq!(faction_xp_per_kill(None), 1);
+}

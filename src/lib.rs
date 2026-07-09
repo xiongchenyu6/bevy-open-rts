@@ -55,6 +55,8 @@ mod cutscene;
 pub(crate) use cutscene::*;
 mod combat_vfx;
 pub(crate) use combat_vfx::*;
+mod factions;
+pub(crate) use factions::*;
 mod save;
 pub(crate) use ai::*;
 pub(crate) use save::*;
@@ -3146,7 +3148,20 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             collect_supply_crates
                 .in_set(SimulationPhase::Combat)
                 .run_if(match_in_progress),
-            update_veterancy_regeneration
+            // Veterancy regen + the faction passive layer (chaos shields,
+            // demon regen/fury clock, alliance field repair).
+            (
+                update_veterancy_regeneration,
+                (
+                    attach_faction_passives,
+                    tick_recent_damage,
+                    recharge_faction_shields,
+                    demon_unit_regeneration,
+                    alliance_structure_field_repair,
+                )
+                    .chain()
+                    .before(combat),
+            )
                 .in_set(SimulationPhase::Combat)
                 .run_if(match_in_progress),
             combat
@@ -4390,16 +4405,16 @@ pub(crate) fn faction_product_count(faction: &registry::FactionDef, producer: &s
 pub(crate) fn faction_playstyle_summary(faction: SkirmishFaction) -> &'static str {
     match faction {
         SkirmishFaction::Alliance => t(
-            "苍穹联盟: 全科技混合军，防御和兵种最完整，适合稳步推进",
-            "Alliance: full-tech combined army; best defense and unit roster, for steady pushes",
+            "苍穹联盟: 训练有素——老兵经验双倍、建筑脱战自动修复；全科技正规军，适合稳步推进",
+            "Alliance: drilled regulars — double veterancy XP and structures self-repair out of combat; full-tech army for steady pushes",
         ),
         SkirmishFaction::Demon => t(
-            "炽炎魔军: 火力突击和攻城压制，单位线更集中，适合快速正面进攻",
-            "Demon: firepower rushes and siege pressure; tighter unit line, for fast frontal assaults",
+            "炽炎魔军: 熔炉量产——造兵更快更便宜；魔血再生、残血血怒攻速伤害暴增，适合狂潮进攻",
+            "Demon: forge economy — units train faster and cheaper; battle regeneration and a low-health fury that boosts damage and attack speed. Swarm them",
         ),
         SkirmishFaction::Chaos => t(
-            "混沌裂隙: 护盾、无人机、干扰和高阶防御，适合控场消耗",
-            "Chaos: shields, drones, jamming and high-tier defense, for zone control and attrition",
+            "混沌裂隙: 裂隙护盾——全单位自带可再生能量护盾，先破盾再见血；昂贵精锐，适合控场消耗",
+            "Chaos: rift shields — every unit carries a recharging energy shield that must break before blood; elite and expensive, for zone control",
         ),
     }
 }
@@ -4641,7 +4656,6 @@ pub(crate) fn structure_is_constructed(under_construction: Option<&UnderConstruc
 }
 
 pub(crate) const DEMON_STRUCTURE_WEAPON_DAMAGE_MULTIPLIER: f32 = 1.12;
-pub(crate) const CHAOS_INCOMING_WEAPON_DAMAGE_SCALE: f32 = 0.9;
 
 pub(crate) fn is_infantry_unit(unit: &Unit) -> bool {
     is_infantry_id(unit.id)
@@ -5795,10 +5809,11 @@ pub(crate) fn producer_build_queue_len(build_queue: &BuildQueue, producer_entity
 }
 
 pub(crate) fn refund_build_job_cost(job: &BuildJob, economies: &mut Economies) -> bool {
-    let Some(def) = registry::entity(build_target_product(job.action)) else {
+    if registry::entity(build_target_product(job.action)).is_none() {
         return false;
-    };
-    economies.get_mut(job.team).refund(def.cost);
+    }
+    // Refund what was actually charged (faction discounts included).
+    economies.get_mut(job.team).refund(job.cost);
     true
 }
 
@@ -6311,6 +6326,7 @@ pub(crate) fn draw_world_overlays(
             Option<&Structure>,
             Option<&HarvestOrder>,
             Option<&ResourceCargo>,
+            Option<&FactionShield>,
         ),
         With<Selected>,
     >,
@@ -6324,6 +6340,7 @@ pub(crate) fn draw_world_overlays(
             Option<&Structure>,
             Option<&HarvestOrder>,
             Option<&ResourceCargo>,
+            Option<&FactionShield>,
         ),
         Without<Selected>,
     >,
@@ -6414,6 +6431,7 @@ pub(crate) fn draw_world_overlays(
         structure,
         harvest_order,
         cargo,
+        faction_shield,
     ) in &selected
     {
         let selected_color = Color::srgb(0.62, 0.95, 0.64);
@@ -6446,6 +6464,7 @@ pub(crate) fn draw_world_overlays(
             transform.translation,
             selectable.radius,
             *health,
+            faction_shield.copied(),
             bar_right,
         );
         if should_draw_action_queue_path(*team, visible_team) {
@@ -6478,7 +6497,18 @@ pub(crate) fn draw_world_overlays(
             );
         }
     }
-    for (transform, selectable, team, health, unit, structure, harvest_order, cargo) in &all {
+    for (
+        transform,
+        selectable,
+        team,
+        health,
+        unit,
+        structure,
+        harvest_order,
+        cargo,
+        faction_shield,
+    ) in &all
+    {
         draw_harvest_and_cargo_visuals(
             &mut gizmos,
             &mut hud,
@@ -6499,12 +6529,15 @@ pub(crate) fn draw_world_overlays(
                 &player_colors,
             );
         }
-        if health.current < health.max {
+        let shield_visibly_drained =
+            faction_shield.is_some_and(|shield| shield.current < shield.max - 0.5);
+        if health.current < health.max || shield_visibly_drained {
             draw_health_bar(
                 &mut hud,
                 transform.translation,
                 selectable.radius,
                 *health,
+                faction_shield.copied(),
                 bar_right,
             );
         }
