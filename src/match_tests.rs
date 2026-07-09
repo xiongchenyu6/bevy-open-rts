@@ -332,9 +332,10 @@ fn support_powers_unlock_only_after_required_structures_are_constructed() {
     {
         let mut query = world.query::<StructurePrereqItem<'_>>();
         let structures = query.query(&world);
-        assert_eq!(visible_support_power_count(team, &structures), 0);
+        assert_eq!(visible_support_power_count(team, None, &structures), 0);
         assert!(!support_power_unlocked(
             team,
+            None,
             SupportPowerKind::RadarSweep,
             &structures
         ));
@@ -346,10 +347,11 @@ fn support_powers_unlock_only_after_required_structures_are_constructed() {
         let structures = query.query(&world);
         assert!(support_power_unlocked(
             team,
+            None,
             SupportPowerKind::RadarSweep,
             &structures
         ));
-        assert_eq!(visible_support_power_count(team, &structures), 1);
+        assert_eq!(visible_support_power_count(team, None, &structures), 1);
     }
 
     world.spawn((
@@ -369,12 +371,13 @@ fn support_powers_unlock_only_after_required_structures_are_constructed() {
         let mut query = world.query::<StructurePrereqItem<'_>>();
         let structures = query.query(&world);
         assert_eq!(
-            visible_support_power_count(team, &structures),
+            visible_support_power_count(team, None, &structures),
             1,
             "under-construction tech must not reveal support buttons"
         );
         assert!(!support_power_unlocked(
             team,
+            None,
             SupportPowerKind::StrategicMissile,
             &structures
         ));
@@ -398,16 +401,18 @@ fn support_powers_unlock_only_after_required_structures_are_constructed() {
         let structures = query.query(&world);
         assert!(support_power_unlocked(
             team,
+            None,
             SupportPowerKind::Paradrop,
             &structures
         ));
         assert!(support_power_unlocked(
             team,
+            None,
             SupportPowerKind::StrategicMissile,
             &structures
         ));
         assert_eq!(
-            visible_support_power_count(team, &structures),
+            visible_support_power_count(team, None, &structures),
             4,
             "radar + airport + weather spire should reveal radar, paradrop, and two superweapons only"
         );
@@ -1482,6 +1487,7 @@ fn damaged_units_smoke_and_healthy_units_do_not() {
 fn f1_hotkey_arms_radar_sweep_when_available_and_explains_when_not() {
     let mut app = App::new();
     app.init_resource::<CommandMode>();
+    app.init_resource::<PlayerFactions>();
     let mut economies = Economies::default();
     let _ = economies.get_mut(Team::Player(0)); // materialize the player slot
     app.insert_resource(economies);
@@ -2726,4 +2732,39 @@ fn alliance_veterancy_learns_twice_as_fast() {
     assert_eq!(faction_xp_per_kill(Some(SkirmishFaction::Demon)), 1);
     assert_eq!(faction_xp_per_kill(Some(SkirmishFaction::Chaos)), 1);
     assert_eq!(faction_xp_per_kill(None), 1);
+}
+
+// Support powers follow faction doctrine: radar for all, logistics for the
+// alliance, bombardment for demons, manipulation for chaos.
+#[test]
+fn support_powers_split_along_faction_doctrine() {
+    use SupportPowerKind::*;
+    let alliance = Some(SkirmishFaction::Alliance);
+    let demon = Some(SkirmishFaction::Demon);
+    let chaos = Some(SkirmishFaction::Chaos);
+    for faction in [alliance, demon, chaos] {
+        assert!(support_power_available_to_faction(faction, RadarSweep));
+    }
+    for power in [Paradrop, NaniteRepairSwarm, ChronoRelay] {
+        assert!(support_power_available_to_faction(alliance, power));
+        assert!(!support_power_available_to_faction(demon, power));
+        assert!(!support_power_available_to_faction(chaos, power));
+    }
+    for power in [OrbitalStrike, StrategicMissile] {
+        assert!(support_power_available_to_faction(demon, power));
+        assert!(!support_power_available_to_faction(alliance, power));
+    }
+    for power in [EmpPulse, ShieldOverdrive, WeatherStorm] {
+        assert!(support_power_available_to_faction(chaos, power));
+        assert!(!support_power_available_to_faction(alliance, power));
+        assert!(!support_power_available_to_faction(demon, power));
+    }
+    // Every faction fields a meaningful doctrine (3-4 powers).
+    for faction in [alliance, demon, chaos] {
+        let count = SupportPowerKind::ALL
+            .into_iter()
+            .filter(|power| support_power_available_to_faction(faction, *power))
+            .count();
+        assert!((3..=4).contains(&count), "doctrine size {count}");
+    }
 }

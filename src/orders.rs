@@ -1115,6 +1115,7 @@ pub(crate) fn unit_supports_patrol(unit: &Unit) -> bool {
 pub(crate) fn update_command_mode(
     keyboard: Res<ButtonInput<KeyCode>>,
     visible_player: Res<VisiblePlayer>,
+    player_factions: Res<PlayerFactions>,
     economies: Res<Economies>,
     support_cooldowns: Res<SupportCooldowns>,
     structures: Query<StructurePrereqItem<'_>>,
@@ -1143,8 +1144,15 @@ pub(crate) fn update_command_mode(
         if !keyboard.just_pressed(power.hotkey()) {
             continue;
         }
+        let faction = player_factions.faction(visible_team);
+        // Powers outside this faction's doctrine don't exist for it at all —
+        // the hotkey is simply unbound, not an error.
+        if !support_power_available_to_faction(faction, power) {
+            continue;
+        }
         if player_support_power_available(
             visible_team,
+            faction,
             power,
             &economies,
             &support_cooldowns,

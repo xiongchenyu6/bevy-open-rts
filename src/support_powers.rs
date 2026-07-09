@@ -912,32 +912,62 @@ pub(crate) fn support_hotkey_modifier_pressed(keyboard: &ButtonInput<KeyCode>) -
 
 pub(crate) fn player_support_power_available(
     team: Team,
+    faction: Option<SkirmishFaction>,
     power: SupportPowerKind,
     economies: &Economies,
     support_cooldowns: &SupportCooldowns,
     structures: &Query<StructurePrereqItem<'_>>,
 ) -> bool {
     let def = power.definition();
-    support_cooldowns.ready(team, power)
+    support_power_available_to_faction(faction, power)
+        && support_cooldowns.ready(team, power)
         && (!def.requires_power || !economies.get(team).low_power())
         && support_requirements_met(team, def.requirements, structures)
 }
 
+/// Which support powers a faction commands — the SC-style doctrine split.
+/// Radar is universal; the rest express each race's identity: alliance
+/// logistics (paradrop/repair/chrono), demon bombardment (orbital/missile),
+/// chaos manipulation (EMP/shields/weather).
+pub(crate) fn support_power_available_to_faction(
+    faction: Option<SkirmishFaction>,
+    power: SupportPowerKind,
+) -> bool {
+    let Some(faction) = faction else {
+        return true;
+    };
+    match power {
+        SupportPowerKind::RadarSweep => true,
+        SupportPowerKind::Paradrop
+        | SupportPowerKind::NaniteRepairSwarm
+        | SupportPowerKind::ChronoRelay => faction == SkirmishFaction::Alliance,
+        SupportPowerKind::OrbitalStrike | SupportPowerKind::StrategicMissile => {
+            faction == SkirmishFaction::Demon
+        }
+        SupportPowerKind::EmpPulse
+        | SupportPowerKind::ShieldOverdrive
+        | SupportPowerKind::WeatherStorm => faction == SkirmishFaction::Chaos,
+    }
+}
+
 pub(crate) fn support_power_unlocked(
     team: Team,
+    faction: Option<SkirmishFaction>,
     power: SupportPowerKind,
     structures: &Query<StructurePrereqItem<'_>>,
 ) -> bool {
-    support_requirements_met(team, power.definition().requirements, structures)
+    support_power_available_to_faction(faction, power)
+        && support_requirements_met(team, power.definition().requirements, structures)
 }
 
 pub(crate) fn visible_support_power_count(
     team: Team,
+    faction: Option<SkirmishFaction>,
     structures: &Query<StructurePrereqItem<'_>>,
 ) -> usize {
     SupportPowerKind::ALL
         .into_iter()
-        .filter(|power| support_power_unlocked(team, *power, structures))
+        .filter(|power| support_power_unlocked(team, faction, *power, structures))
         .count()
 }
 
@@ -1102,6 +1132,7 @@ pub(crate) fn support_power_hotkey_color(state: &SupportPowerButtonState) -> Tex
 
 pub(crate) fn refresh_support_power_panel(
     visible_player: Res<VisiblePlayer>,
+    player_factions: Res<PlayerFactions>,
     economies: Res<Economies>,
     support_cooldowns: Res<SupportCooldowns>,
     mut command_mode: ResMut<CommandMode>,
@@ -1157,9 +1188,10 @@ pub(crate) fn refresh_support_power_panel(
         return;
     };
 
+    let faction = player_factions.faction(team);
     if command_mode
         .support_power
-        .is_some_and(|power| !support_power_unlocked(team, power, &structures))
+        .is_some_and(|power| !support_power_unlocked(team, faction, power, &structures))
     {
         command_mode.support_power = None;
     }
@@ -1169,7 +1201,7 @@ pub(crate) fn refresh_support_power_panel(
     for (button, interaction, mut node, mut button_visibility, mut background, mut border) in
         &mut buttons
     {
-        let unlocked = support_power_unlocked(team, button.kind, &structures);
+        let unlocked = support_power_unlocked(team, faction, button.kind, &structures);
         if unlocked {
             visible_count += 1;
             node.display = Display::Flex;
@@ -1192,7 +1224,7 @@ pub(crate) fn refresh_support_power_panel(
     panel_state.visible_count = visible_count;
     debug_assert_eq!(
         visible_count,
-        visible_support_power_count(team, &structures)
+        visible_support_power_count(team, faction, &structures)
     );
     for mut visibility in &mut panel_q {
         *visibility = if visible_count > 0 {
@@ -1202,7 +1234,7 @@ pub(crate) fn refresh_support_power_panel(
         };
     }
     for (label, mut text, mut text_color) in &mut cooldown_labels {
-        let unlocked = support_power_unlocked(team, label.kind, &structures);
+        let unlocked = support_power_unlocked(team, faction, label.kind, &structures);
         let state = support_power_button_state(
             label.kind,
             unlocked,
@@ -1214,7 +1246,7 @@ pub(crate) fn refresh_support_power_panel(
         *text_color = support_power_badge_color(&state);
     }
     for (label, mut text_color) in &mut hotkey_labels {
-        let unlocked = support_power_unlocked(team, label.kind, &structures);
+        let unlocked = support_power_unlocked(team, faction, label.kind, &structures);
         let state = support_power_button_state(
             label.kind,
             unlocked,
@@ -1228,6 +1260,7 @@ pub(crate) fn refresh_support_power_panel(
 
 pub(crate) fn support_power_buttons(
     mouse: Res<ButtonInput<MouseButton>>,
+    player_factions: Res<PlayerFactions>,
     visible_player: Res<VisiblePlayer>,
     economies: Res<Economies>,
     support_cooldowns: Res<SupportCooldowns>,
@@ -1251,6 +1284,7 @@ pub(crate) fn support_power_buttons(
     };
     if player_support_power_available(
         team,
+        player_factions.faction(team),
         button.kind,
         &economies,
         &support_cooldowns,
@@ -1299,6 +1333,7 @@ pub(crate) fn support_requirements_met(
 
 pub(crate) fn try_activate_ai_support_power(
     team: Team,
+    faction: Option<SkirmishFaction>,
     player_team: Team,
     commands: &mut Commands,
     economies: &Economies,
@@ -1311,7 +1346,14 @@ pub(crate) fn try_activate_ai_support_power(
     structure_targets: &Query<CaptureStructureTargetItem<'_>, With<Structure>>,
 ) -> bool {
     for power in AI_SUPPORT_POWER_PRIORITY {
-        if !ai_support_power_available(team, power, economies, support_cooldowns, structures) {
+        if !ai_support_power_available(
+            team,
+            faction,
+            power,
+            economies,
+            support_cooldowns,
+            structures,
+        ) {
             continue;
         }
         let Some(target) =

@@ -441,13 +441,15 @@ pub(crate) fn ai_supply_crate_distance_to_team_units(
 
 pub(crate) fn ai_support_power_available(
     team: Team,
+    faction: Option<SkirmishFaction>,
     power: SupportPowerKind,
     economies: &Economies,
     support_cooldowns: &SupportCooldowns,
     structures: &Query<StructurePrereqItem<'_>>,
 ) -> bool {
     let def = power.definition();
-    support_cooldowns.ready(team, power)
+    support_power_available_to_faction(faction, power)
+        && support_cooldowns.ready(team, power)
         && (!def.requires_power || !economies.get(team).low_power())
         && support_requirements_met(team, def.requirements, structures)
 }
@@ -746,6 +748,7 @@ pub(crate) fn ai_director(
             resources.director.support_timer[idx] = profile.support_interval;
             let _ = try_activate_ai_support_power(
                 team,
+                Some(faction),
                 player_team,
                 &mut commands,
                 &resources.economies,
