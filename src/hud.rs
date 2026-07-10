@@ -1370,6 +1370,40 @@ pub(crate) fn push_battle_log(
     push_battle_log_with_kind(battle_log, message, focus, BattleEventPingKind::Generic);
 }
 
+/// Promotions fire in bursts (alliance doubles veterancy XP); collapse
+/// consecutive promotion entries into one "×N" line so the battle log
+/// doesn't flood mid-screen during a big fight.
+pub(crate) fn push_promotion_battle_log(
+    battle_log: &mut BattleLog,
+    unit_label: &str,
+    rank: u8,
+    focus: Option<Vec3>,
+) {
+    let prefix = t("单位晋升", "Unit promoted");
+    let detail = format!("{unit_label} {}{rank}", t("等级", "Lv"));
+    if let Some(last) = battle_log.entries.back_mut()
+        && last.message.starts_with(prefix)
+    {
+        let count = last
+            .message
+            .split('×')
+            .nth(1)
+            .and_then(|rest| rest.split(':').next())
+            .and_then(|n| n.trim().parse::<u32>().ok())
+            .unwrap_or(1)
+            + 1;
+        last.message = format!("{prefix} ×{count}: {detail}");
+        last.remaining = BATTLE_LOG_ENTRY_TTL_SECONDS;
+        if focus.is_some() {
+            last.focus = focus;
+            last.minimap_ping_active = true;
+            last.minimap_ping_remaining = BATTLE_EVENT_PING_LIFETIME_SECONDS;
+        }
+        return;
+    }
+    push_battle_log(battle_log, format!("{prefix}: {detail}"), focus);
+}
+
 pub(crate) fn push_battle_log_with_kind(
     battle_log: &mut BattleLog,
     message: impl Into<String>,

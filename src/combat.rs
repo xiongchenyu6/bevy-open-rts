@@ -1751,13 +1751,10 @@ pub(crate) fn apply_kill_credits(
         );
         if *team == player_team {
             let unit_label = localized_entity_label(unit.id);
-            push_battle_log(
+            push_promotion_battle_log(
                 &mut battle_log,
-                format!(
-                    "{}: {unit_label} {}{target_rank}",
-                    t("单位晋升", "Unit promoted"),
-                    t("等级", "Lv")
-                ),
+                &unit_label,
+                target_rank,
                 Some(transform.translation),
             );
             record_sound_audio_feedback(&mut audio_feedback, SoundEffectKind::UnitPromoted);

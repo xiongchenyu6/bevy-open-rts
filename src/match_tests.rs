@@ -2786,3 +2786,26 @@ fn terrain_detail_variation_probe() {
     println!("terrain tint range: {min:.3}..{max:.3}");
     assert!(max - min > 0.12, "noise too flat: {min}..{max}");
 }
+
+// A burst of promotions must collapse into one "×N" battle-log line instead
+// of flooding the center of the screen (alliance doubles veterancy XP).
+#[test]
+fn promotion_battle_log_entries_coalesce() {
+    let mut log = BattleLog::default();
+    push_promotion_battle_log(&mut log, "重机枪兵", 1, None);
+    push_promotion_battle_log(&mut log, "重机枪兵", 2, None);
+    push_promotion_battle_log(&mut log, "火箭兵", 1, None);
+    assert_eq!(log.entries.len(), 1, "consecutive promotions must merge");
+    let message = &log.entries.back().unwrap().message;
+    assert!(message.contains("×3"), "count missing: {message}");
+    assert!(
+        message.contains("火箭兵"),
+        "latest detail missing: {message}"
+    );
+
+    // A different event breaks the run; the next promotion starts fresh.
+    push_battle_log(&mut log, "基地遇袭".to_string(), None);
+    push_promotion_battle_log(&mut log, "狙击兵", 1, None);
+    assert_eq!(log.entries.len(), 3);
+    assert!(!log.entries.back().unwrap().message.contains('×'));
+}
