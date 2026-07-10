@@ -6234,6 +6234,8 @@ pub(crate) struct SelectionHudItem {
     pub(crate) rank: u8,
     pub(crate) garrison: Option<(usize, usize)>,
     pub(crate) cargo: Option<(i32, i32, i32, i32)>,
+    /// Chaos rift shield (current, max) when the unit carries one.
+    pub(crate) shield: Option<(f32, f32)>,
 }
 
 /// Marks an entity whose model children have been recentered onto its origin.

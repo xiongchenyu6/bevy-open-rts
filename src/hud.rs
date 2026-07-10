@@ -2645,6 +2645,7 @@ pub(crate) fn update_hud(
             Option<&Weapon>,
             &Health,
             &Team,
+            Option<&FactionShield>,
         ),
         With<Selected>,
     >,
@@ -2740,7 +2741,9 @@ pub(crate) fn update_hud(
         let mut selected_visible_entities = Vec::new();
         let mut selected_visible_count = 0usize;
         let mut selected_queue_producers = Vec::new();
-        for (entity, unit, structure, garrison, cargo, veteran, weapon, health, team) in &selected {
+        for (entity, unit, structure, garrison, cargo, veteran, weapon, health, team, shield) in
+            &selected
+        {
             if *team == visible_team {
                 selected_visible_entities.push(entity);
                 selected_visible_count += 1;
@@ -2763,6 +2766,7 @@ pub(crate) fn update_hud(
                 cargo: cargo
                     .filter(|cargo| cargo.capacity > 0)
                     .map(|cargo| (cargo.total(), cargo.capacity, cargo.ore, cargo.crystal)),
+                shield: shield.map(|shield| (shield.current.max(0.0), shield.max)),
             });
         }
         **text = selection_hud_text(
@@ -2855,6 +2859,10 @@ pub(crate) fn selection_hud_text(
             attack_text,
             format!("{}: {}", t("军阶", "Rank"), veterancy_rank_label(item.rank)),
         ];
+        if let Some((current, max)) = item.shield.filter(|(_, max)| *max > 0.0) {
+            // Insert right after HP so the two defense pools read together.
+            parts.insert(2, format!("{} {current:.0}/{max:.0}", t("护盾", "Shield")));
+        }
         if let Some(badge) = veterancy_rank_badge(item.rank) {
             parts.push(format!("{} {badge}", t("徽章", "Badge")));
         }
@@ -2898,14 +2906,26 @@ pub(crate) fn selection_hud_text(
                 .join(", ")
         )
     };
+    let total_max: f32 = items.iter().map(|item| item.health_max).sum();
+    let total_current: f32 = items.iter().map(|item| item.health_current).sum();
+    let force_health = if total_max > 0.0 {
+        format!(
+            "  {} {:.0}%",
+            t("部队生命", "Force HP"),
+            (total_current / total_max * 100.0).clamp(0.0, 100.0)
+        )
+    } else {
+        String::new()
+    };
     format!(
-        "{} {}{}  {}: {}  {}",
+        "{} {}{}  {}: {}  {}{}",
         t("已选择", "Selected"),
         items.len(),
         group_text,
         t("类型", "Type"),
         type_text,
-        rank_text
+        rank_text,
+        force_health
     )
 }
 
