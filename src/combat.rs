@@ -2840,8 +2840,12 @@ pub(crate) fn draw_health_bar(
     faction_shield: Option<FactionShield>,
     bar_right: Vec3,
 ) {
-    let width = radius * 1.8;
-    let center = Vec3::new(position.x, position.y + 1.25, position.z);
+    // Capped width: big structures (command center radius ~4m) otherwise get
+    // a bar spanning half the screen; raised clear of tall roofs instead of
+    // slicing through them.
+    let width = (radius * 1.8).clamp(0.9, 3.6);
+    let lift = 1.25 + (radius - 0.9).max(0.0) * 0.5;
+    let center = Vec3::new(position.x, position.y + lift, position.z);
     // Chaos energy shield: a cyan strip riding just above the health bar,
     // so shield state reads separately from hitpoints (SC-style).
     if let Some(shield) = faction_shield
