@@ -1840,3 +1840,36 @@ pub fn capture_frame_whole_map(app: &mut App) {
         camera.snap = true;
     }
 }
+
+/// Gives the player a constructed radar uplink (plus a power reactor so it
+/// isn't browned out) next to their command center, so captures can
+/// photograph the minimap in its radar-online state.
+pub fn capture_stage_player_radar(app: &mut App) -> bool {
+    let Some((_, origin, _)) = capture_player_command_center(app) else {
+        return false;
+    };
+    let world = app.world_mut();
+    let asset_server = world.resource::<AssetServer>().clone();
+    let mut next_id = NextSpawnId(world.resource::<NextSpawnId>().0);
+    let mut queue = bevy::ecs::world::CommandQueue::default();
+    {
+        let mut commands = Commands::new(&mut queue, world);
+        for (id, offset) in [
+            ("PowerReactor", Vec3::new(-5.0, 0.0, 4.5)),
+            ("RadarUplink", Vec3::new(5.0, 0.0, 4.5)),
+        ] {
+            spawn_structure(
+                &mut commands,
+                &asset_server,
+                &mut next_id,
+                id,
+                Team::Player(0),
+                Team::Player(0),
+                origin + offset,
+            );
+        }
+    }
+    queue.apply(world);
+    world.resource_mut::<NextSpawnId>().0 = next_id.0;
+    true
+}

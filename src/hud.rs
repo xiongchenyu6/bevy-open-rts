@@ -283,6 +283,10 @@ pub(crate) struct MinimapRoot;
 #[derive(Component)]
 pub(crate) struct MinimapContent;
 
+/// The darkened terrain backdrop inside the minimap (radar-online only).
+#[derive(Component)]
+pub(crate) struct MinimapTerrainImage;
+
 #[derive(Component)]
 pub(crate) struct MinimapStatusText;
 
@@ -896,7 +900,12 @@ pub(crate) fn update_selection_text_visibility(
     }
 }
 
-pub(crate) fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
+pub(crate) fn setup_ui(
+    commands: &mut Commands,
+    asset_server: &AssetServer,
+    minimap_terrain: Option<Handle<Image>>,
+    map_bounds: MapBounds,
+) {
     let font = asset_server.load(UI_FONT_PATH);
 
     // Top-left resource/power bar (godot ResourcesBar): colored swatch + count per
@@ -1100,7 +1109,7 @@ pub(crate) fn setup_ui(commands: &mut Commands, asset_server: &AssetServer) {
         MatchScopedEntity,
     ));
 
-    setup_minimap(commands, font.clone());
+    setup_minimap(commands, font.clone(), minimap_terrain, map_bounds);
     setup_selection_drag_box(commands);
     setup_match_end_overlay(commands, font.clone());
     setup_match_menu_overlay(commands, font.clone());
@@ -1190,7 +1199,12 @@ pub(crate) fn setup_selection_drag_box(commands: &mut Commands) {
     ));
 }
 
-pub(crate) fn setup_minimap(commands: &mut Commands, font: Handle<Font>) {
+pub(crate) fn setup_minimap(
+    commands: &mut Commands,
+    font: Handle<Font>,
+    minimap_terrain: Option<Handle<Image>>,
+    map_bounds: MapBounds,
+) {
     commands
         .spawn((
             MinimapRoot,
@@ -1208,6 +1222,25 @@ pub(crate) fn setup_minimap(commands: &mut Commands, font: Handle<Font>) {
             MatchScopedEntity,
         ))
         .with_children(|parent| {
+            // Terrain backdrop: the same baked dune/patch texture the ground
+            // uses, darkened to radar-screen levels and aspect-fit to the
+            // marker content rect. Hidden while the radar is offline.
+            if let Some(texture) = minimap_terrain {
+                let rect = map_bounds.minimap_content_rect();
+                parent.spawn((
+                    MinimapTerrainImage,
+                    ImageNode::new(texture).with_color(Color::srgba(0.66, 0.55, 0.46, 0.9)),
+                    Node {
+                        position_type: PositionType::Absolute,
+                        left: px(rect.left),
+                        top: px(rect.top),
+                        width: px(rect.width),
+                        height: px(rect.height),
+                        ..default()
+                    },
+                    Visibility::Hidden,
+                ));
+            }
             parent.spawn((
                 MinimapContent,
                 Node {
@@ -3577,6 +3610,7 @@ pub(crate) fn update_minimap(
     mut battle_log: ResMut<BattleLog>,
     content_q: Query<Entity, With<MinimapContent>>,
     mut root_q: Query<&mut BackgroundColor, With<MinimapRoot>>,
+    mut terrain_image_q: Query<&mut Visibility, With<MinimapTerrainImage>>,
     mut status_text_q: Query<&mut Text, With<MinimapStatusText>>,
     marker_q: Query<Entity, With<MinimapMarker>>,
     world_q: Query<(
@@ -3609,6 +3643,13 @@ pub(crate) fn update_minimap(
     }
     if let Ok(mut text) = status_text_q.single_mut() {
         **text = radar_state.status_text().to_string();
+    }
+    for mut visibility in &mut terrain_image_q {
+        *visibility = if radar_state == MinimapRadarState::Online {
+            Visibility::Inherited
+        } else {
+            Visibility::Hidden
+        };
     }
     if radar_state != MinimapRadarState::Online {
         for entry in &mut battle_log.entries {

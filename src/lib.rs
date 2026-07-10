@@ -4498,11 +4498,12 @@ pub(crate) fn setup(
     // Kept as a resource so the weather system can wet the ground during rain.
     // The baked detail texture multiplies base_color, so weather tint changes
     // (and wet-ground darkening) compose with the dune/patch variation.
+    let terrain_detail = images
+        .as_deref_mut()
+        .map(|images| terrain_detail_texture(images, skirmish_map.size));
     let terrain_material = materials.add(StandardMaterial {
         base_color: Color::srgb(0.82, 0.6, 0.5),
-        base_color_texture: images
-            .as_deref_mut()
-            .map(|images| terrain_detail_texture(images, skirmish_map.size)),
+        base_color_texture: terrain_detail.clone(),
         perceptual_roughness: 0.95,
         ..default()
     });
@@ -4578,7 +4579,7 @@ pub(crate) fn setup(
         skirmish_map,
         setup_settings.visible_player.team,
     );
-    setup_ui(&mut commands, &asset_server);
+    setup_ui(&mut commands, &asset_server, terrain_detail, map_bounds);
 }
 
 #[cfg(test)]

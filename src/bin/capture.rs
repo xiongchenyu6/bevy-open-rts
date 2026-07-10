@@ -53,9 +53,9 @@ use bevy_open_rts::{
     capture_show_credits_menu, capture_show_main_menu, capture_show_options_menu,
     capture_show_skirmish_setup_menu, capture_show_skirmish_setup_with_dropdown,
     capture_spawn_construction_showcase, capture_spawn_model_harness_page,
-    capture_stage_deployed_siege, capture_stage_worker_collecting, capture_start_mission,
-    capture_world_to_screen, capture_worst_model_alignment_offset, capture_zoom_camera_closest,
-    start_shared_match_scene_with_current_setup,
+    capture_stage_deployed_siege, capture_stage_player_radar, capture_stage_worker_collecting,
+    capture_start_mission, capture_world_to_screen, capture_worst_model_alignment_offset,
+    capture_zoom_camera_closest, start_shared_match_scene_with_current_setup,
 };
 
 const WIDTH: u32 = 1280;
@@ -236,6 +236,13 @@ fn main() {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("screenshots/placement/placement.png"));
             render_placement_ghost(&path)
+        }
+        Some("minimap") => {
+            let path = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/minimap/minimap.png"));
+            render_minimap_online(&path)
         }
         Some("deploy") => {
             let dir = args
@@ -1396,6 +1403,22 @@ fn render_construction_showcase(path: &Path) -> Result<(), String> {
         app.update();
     }
     println!("[capture] wrote {}", path.display());
+    Ok(())
+}
+
+fn render_minimap_online(path: &Path) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let mut app = start_match_app();
+    let handle = capture_handle(&app);
+    if !capture_stage_player_radar(&mut app) {
+        return Err("could not stage a radar uplink".into());
+    }
+    for _ in 0..40 {
+        app.update();
+    }
+    shoot(&mut app, &handle, path.to_path_buf());
     Ok(())
 }
 
