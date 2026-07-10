@@ -57,6 +57,16 @@ jobs:
         with:
           cache-on-failure: false
 
+      # Same OOM guard as deploy-wasm-pages.yml: the fat-LTO link outgrows
+      # the runner's RAM without swap.
+      - name: Add swap for the fat-LTO link
+        run: |
+          sudo fallocate -l 10G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+
       - name: Build web bundle
         # build_web.sh pins the wasm-bindgen CLI to the Cargo.lock version and
         # downloads binaryen 130 itself, so no extra tool install is needed.

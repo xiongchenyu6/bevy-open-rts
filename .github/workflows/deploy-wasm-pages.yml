@@ -71,6 +71,17 @@ jobs:
             sudo apt-get install -y binaryen
           fi
 
+      # The fat-LTO release link peaks past the runner's RAM — without swap
+      # the VM gets OOM-terminated mid-link (SIGTERM/exit 143, three in a row
+      # on 2026-07-10).
+      - name: Add swap for the fat-LTO link
+        run: |
+          sudo fallocate -l 10G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+
       - name: Build web artifacts
         run: bash scripts/build_web.sh
 

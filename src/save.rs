@@ -14,6 +14,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::*;
 
+// Web builds keep saves in memory only — the disk path is native-only.
+#[cfg_attr(target_arch = "wasm32", allow(dead_code))]
 pub(crate) const QUICKSAVE_PATH: &str = "saves/quicksave.ron";
 pub(crate) const SAVE_VERSION: u32 = 1;
 
