@@ -252,6 +252,11 @@ pub(crate) struct BattleLogEntryButton(pub(crate) usize);
 #[derive(Component)]
 pub(crate) struct ObjectiveTrackerText;
 
+/// Container of the top-center objective text + progress bar; hidden once
+/// the match resolves so it doesn't overlap the summary panel.
+#[derive(Component)]
+pub(crate) struct ObjectiveTrackerRoot;
+
 /// The fill node of the top-center objective progress bar (godot MissionProgressBar).
 #[derive(Component)]
 pub(crate) struct ObjectiveProgressFill;
@@ -1046,6 +1051,7 @@ pub(crate) fn setup_ui(
                 row_gap: px(4),
                 ..default()
             },
+            ObjectiveTrackerRoot,
             MatchScopedEntity,
         ))
         .with_children(|center| {
@@ -2604,7 +2610,14 @@ pub(crate) fn update_objective_tracker_hud(
     units: Query<(&Unit, &Team, &Health)>,
     mut objective_text: Query<&mut Text, With<ObjectiveTrackerText>>,
     mut objective_fill: Query<&mut Node, With<ObjectiveProgressFill>>,
+    mut objective_root: Query<&mut Visibility, With<ObjectiveTrackerRoot>>,
 ) {
+    for mut visibility in &mut objective_root {
+        // Restored when a new match starts; the match-end sweeper hides it.
+        if *visibility == Visibility::Hidden && match_state.is_running() {
+            *visibility = Visibility::Inherited;
+        }
+    }
     let Ok(mut text) = objective_text.single_mut() else {
         return;
     };
@@ -3733,4 +3746,33 @@ pub(crate) fn cursor_minimap_local(window: &Window) -> Option<Vec2> {
         return None;
     }
     Some(cursor - minimap_screen_min(window))
+}
+
+/// The moment the match resolves, sweep the mid-screen battle HUD (event log
+/// + objective tracker) so nothing floats over the end-of-match summary.
+/// Runs outside the `match_in_progress` gate — the gated HUD systems freeze
+/// on the resolution frame and would leave their last frame on screen.
+pub(crate) fn clear_battle_hud_on_match_end(
+    mut commands: Commands,
+    match_state: Res<MatchState>,
+    mut battle_log: ResMut<BattleLog>,
+    log_roots: Query<(Entity, Option<&Children>), With<BattleLogRoot>>,
+    mut objective_root: Query<&mut Visibility, With<ObjectiveTrackerRoot>>,
+) {
+    if match_state.is_running() {
+        return;
+    }
+    if !battle_log.entries.is_empty() {
+        battle_log.entries.clear();
+    }
+    for (_, children) in &log_roots {
+        for child in children.into_iter().flatten() {
+            commands.entity(*child).try_despawn();
+        }
+    }
+    for mut visibility in &mut objective_root {
+        if *visibility != Visibility::Hidden {
+            *visibility = Visibility::Hidden;
+        }
+    }
 }

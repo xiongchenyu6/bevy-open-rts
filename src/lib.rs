@@ -3331,6 +3331,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             update_match_end_overlay,
             update_match_end_charts,
             update_damage_numbers,
+            clear_battle_hud_on_match_end,
         )
             .chain()
             .run_if(in_state(AppScreen::InMatch)),
