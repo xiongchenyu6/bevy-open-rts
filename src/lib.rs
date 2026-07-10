@@ -4428,7 +4428,7 @@ pub(crate) fn setup(
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    images: Option<ResMut<Assets<Image>>>,
+    mut images: Option<ResMut<Assets<Image>>>,
     mut next_id: ResMut<NextSpawnId>,
     selected_map: Res<SelectedSkirmishMap>,
     setup_settings: Res<MatchSetupSettings>,
@@ -4496,8 +4496,13 @@ pub(crate) fn setup(
         meshes.add(terrain_mesh(&terrain_field))
     };
     // Kept as a resource so the weather system can wet the ground during rain.
+    // The baked detail texture multiplies base_color, so weather tint changes
+    // (and wet-ground darkening) compose with the dune/patch variation.
     let terrain_material = materials.add(StandardMaterial {
         base_color: Color::srgb(0.82, 0.6, 0.5),
+        base_color_texture: images
+            .as_deref_mut()
+            .map(|images| terrain_detail_texture(images, skirmish_map.size)),
         perceptual_roughness: 0.95,
         ..default()
     });
@@ -4544,6 +4549,8 @@ pub(crate) fn setup(
             0.9,
         );
     }
+    // Sparse deterministic pebble clusters so the sand reads hand-dressed.
+    scatter_ground_clutter(&mut commands, &asset_server, skirmish_map, &terrain_field);
 
     for team in player_teams(setup_settings.active_teams.len())
         .filter(|team| setup_settings.team_active(*team))

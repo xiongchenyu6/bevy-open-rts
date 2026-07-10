@@ -259,17 +259,22 @@ fn terrain_value_noise(x: f32, z: f32, wavelength: f32) -> f32 {
     h00 * (1.0 - sx) * (1.0 - sz) + h10 * sx * (1.0 - sz) + h01 * (1.0 - sx) * sz + h11 * sx * sz
 }
 
-/// Subtle two-octave ground tint: broad 9m patches plus fine 2.6m grain, a few
-/// percent of luminance with a slight warm/dark bias — enough to break up the
-/// flat sand color without reading as a texture or a grid.
+/// Subtle three-octave ground tint: 17m dune-scale bands (roughly two bands
+/// inside a gameplay-zoom viewport), broad 9m patches and fine 2.6m grain,
+/// with a slight warm/dark bias — breaks up the flat sand without reading as
+/// a repeating texture.
 pub(crate) fn terrain_vertex_color(x: f32, z: f32) -> [f32; 4] {
+    let dune = terrain_value_noise(x - 111.9, z + 71.2, 17.0);
     let broad = terrain_value_noise(x, z, 9.0);
     let fine = terrain_value_noise(x + 43.7, z - 17.3, 2.6);
-    let n = broad * 0.72 + fine * 0.28;
-    // ~0.86..1.04 luminance, darker patches drift toward brown — strong enough
-    // to survive the bright ambient + filmic tonemap.
-    let tint = 0.86 + n * 0.18;
-    let warm = 1.0 - (1.0 - n) * 0.07;
+    let blended = dune * 0.38 + broad * 0.42 + fine * 0.20;
+    // Summed value noise clusters around 0.5; stretch the contrast so the
+    // result actually spans the tint window instead of hugging its middle
+    // (that clustering is why earlier passes rendered as flat sand).
+    let n = ((blended - 0.5) * 3.0 + 0.5).clamp(0.0, 1.0);
+    // Kept within 0..1 so the baked u8 detail texture can hold the full range.
+    let tint = 0.68 + n * 0.32;
+    let warm = 1.0 - (1.0 - n) * 0.14;
     [tint, tint * warm, tint * warm * warm, 1.0]
 }
 
@@ -485,4 +490,100 @@ mod highland_tests {
         let ramp = map_local_to_world(map, (23.5, 30.0));
         assert!(!terrain_site_is_buildable(&field, ramp, 2.0));
     }
+}
+
+/// Deterministic decorative ground clutter: sparse pebble clusters scattered
+/// on a coarse grid so the sand reads hand-dressed instead of empty. Pure
+/// decor — no Selectable/collision, so pathing and placement ignore it.
+pub(crate) fn scatter_ground_clutter(
+    commands: &mut Commands,
+    asset_server: &AssetServer,
+    map: &SkirmishMapDef,
+    field: &TerrainHeightField,
+) {
+    const CELL: f32 = 13.0;
+    const MARGIN: f32 = 4.0;
+    let half_w = map.size.0 * 0.5 - MARGIN;
+    let half_d = map.size.1 * 0.5 - MARGIN;
+    let cells_x = ((half_w * 2.0) / CELL) as i32;
+    let cells_z = ((half_d * 2.0) / CELL) as i32;
+    for cz in 0..cells_z {
+        for cx in 0..cells_x {
+            let roll = terrain_hash01(cx.wrapping_mul(7) + 3, cz.wrapping_mul(11) - 5);
+            // Sparse: a bit under half the cells get a pebble cluster.
+            if roll > 0.45 {
+                continue;
+            }
+            let jx = terrain_hash01(cx + 101, cz - 47) - 0.5;
+            let jz = terrain_hash01(cx - 61, cz + 89) - 0.5;
+            let x = -half_w + (cx as f32 + 0.5 + jx * 0.8) * CELL;
+            let z = -half_d + (cz as f32 + 0.5 + jz * 0.8) * CELL;
+            if x > half_w || z > half_d {
+                continue;
+            }
+            let position = Vec3::new(x, 0.0, z);
+            let y = if field.is_flat() {
+                0.0
+            } else {
+                field.height_at(position)
+            };
+            let pick = terrain_hash01(cx + 977, cz + 331);
+            let model = if pick < 0.45 {
+                "models/kenney-spacekit/rocks_smallA.glb"
+            } else if pick < 0.9 {
+                "models/kenney-spacekit/rocks_smallB.glb"
+            } else {
+                "models/kenney-spacekit/meteor_half.glb"
+            };
+            let scale = 0.45 + terrain_hash01(cx - 13, cz + 17) * 0.4;
+            let yaw = terrain_hash01(cx + 41, cz - 73) * std::f32::consts::TAU;
+            commands.spawn((
+                Name::new("Ground clutter"),
+                WorldAssetRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(model))),
+                Transform::from_translation(Vec3::new(x, y, z))
+                    .with_scale(Vec3::splat(scale))
+                    .with_rotation(Quat::from_rotation_y(yaw)),
+                MatchScopedEntity,
+            ));
+        }
+    }
+}
+
+/// Bakes the three-octave ground tint into a texture for the terrain
+/// material. Mesh vertex colors don't survive the material pipeline (the
+/// weather system also rewrites `base_color` every frame), so the variation
+/// ships as `base_color_texture` — it multiplies whatever tint weather sets,
+/// keeping wet-ground darkening intact.
+pub(crate) fn terrain_detail_texture(
+    images: &mut Assets<Image>,
+    size: (f32, f32),
+) -> Handle<Image> {
+    use bevy::image::ImageSampler;
+    use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat};
+    const RES: usize = 512;
+    let mut data = Vec::with_capacity(RES * RES * 4);
+    for iz in 0..RES {
+        for ix in 0..RES {
+            let x = (ix as f32 / (RES - 1) as f32 - 0.5) * size.0;
+            let z = (iz as f32 / (RES - 1) as f32 - 0.5) * size.1;
+            let c = terrain_vertex_color(x, z);
+            data.push((c[0].clamp(0.0, 1.0) * 255.0) as u8);
+            data.push((c[1].clamp(0.0, 1.0) * 255.0) as u8);
+            data.push((c[2].clamp(0.0, 1.0) * 255.0) as u8);
+            data.push(255);
+        }
+    }
+    let mut image = Image::new(
+        Extent3d {
+            width: RES as u32,
+            height: RES as u32,
+            depth_or_array_layers: 1,
+        },
+        TextureDimension::D2,
+        data,
+        TextureFormat::Rgba8UnormSrgb,
+        bevy::asset::RenderAssetUsages::all(),
+    );
+    image.sampler = ImageSampler::linear();
+    images.add(image)
 }

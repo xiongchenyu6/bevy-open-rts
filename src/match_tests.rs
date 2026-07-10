@@ -2771,3 +2771,18 @@ fn support_powers_split_along_faction_doctrine() {
         assert!((3..=4).contains(&count), "doctrine size {count}");
     }
 }
+
+#[test]
+fn terrain_detail_variation_probe() {
+    let mut min = f32::MAX;
+    let mut max = f32::MIN;
+    for iz in 0..64 {
+        for ix in 0..64 {
+            let c = terrain_vertex_color(ix as f32 * 1.5 - 48.0, iz as f32 * 1.5 - 48.0);
+            min = min.min(c[0]);
+            max = max.max(c[0]);
+        }
+    }
+    println!("terrain tint range: {min:.3}..{max:.3}");
+    assert!(max - min > 0.12, "noise too flat: {min}..{max}");
+}
