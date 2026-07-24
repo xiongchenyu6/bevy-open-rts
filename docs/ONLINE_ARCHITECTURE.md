@@ -231,7 +231,10 @@ the proven terminal player count.
 The two-browser CI gate sets `OPEN_BEVY_FORCE_RELAY=1`. Before the game loads,
 Playwright wraps `RTCPeerConnection` with `iceTransportPolicy: "relay"`; after
 the authoritative match ends it reads the selected candidate pair from
-`getStats()`. Both clients must have a succeeded, bidirectionally active pair
-whose local candidate type is `relay`. This proves that authenticated Coturn
-allocation and real game traffic work over the public Internet; merely finding
-TURN credentials in `/v1/config` is not accepted as transport proof.
+`getStats()`. Both clients must have a transport-selected, nominated pair with
+connected peer/ICE states, bidirectional traffic, and `relay` candidates on
+both ends. The selected transport ID is authoritative here: Chromium can keep
+the pair's own `state` at `in-progress` briefly after the transport is already
+connected and carrying data. This proves that authenticated Coturn allocation
+and real game traffic work over the public Internet; merely finding TURN
+credentials in `/v1/config` is not accepted as transport proof.

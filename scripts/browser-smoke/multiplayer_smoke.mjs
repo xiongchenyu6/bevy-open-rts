@@ -162,6 +162,9 @@ async function collectIceRoutes(page) {
           index,
           connectionState: peerConnection.connectionState,
           iceConnectionState: peerConnection.iceConnectionState,
+          selectedByTransport: Boolean(
+            transport && selectedPair?.id === transport.selectedCandidatePairId
+          ),
           pairId: selectedPair?.id ?? null,
           pairState: selectedPair?.state ?? null,
           nominated: selectedPair?.nominated ?? false,
@@ -318,10 +321,14 @@ try {
   const relayRoutesPassed = !forceRelay || roles.every((role) => {
     const routes = iceRoutes[role];
     return routes.length > 0 && routes.every((route) =>
-      route.pairState === "succeeded"
+      route.selectedByTransport === true
+        && ["connected", "completed"].includes(route.connectionState)
+        && ["connected", "completed"].includes(route.iceConnectionState)
+        && route.nominated === true
         && route.bytesSent > 0
         && route.bytesReceived > 0
         && route.localCandidateType === "relay"
+        && route.remoteCandidateType === "relay"
     );
   });
   const passed = browserReportsPassed
