@@ -22,12 +22,9 @@ use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, HashMap, HashSet, VecDeque},
     future::Future,
-    sync::{
-        Arc, Mutex,
-        atomic::{AtomicU64, Ordering},
-    },
-    time::{SystemTime, UNIX_EPOCH},
+    sync::{Arc, Mutex},
 };
+use uuid::Uuid;
 
 use crate::*;
 
@@ -4963,15 +4960,7 @@ fn spawn_message_loop(inbox: OnlineAsyncInbox, message_loop: MessageLoopFuture) 
 }
 
 fn new_session_key() -> String {
-    static COUNTER: AtomicU64 = AtomicU64::new(1);
-    let nanos = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_nanos();
-    format!(
-        "{nanos:032x}{:016x}",
-        COUNTER.fetch_add(1, Ordering::Relaxed)
-    )
+    Uuid::new_v4().simple().to_string()
 }
 
 fn truncate_utf8(value: &mut String, max_bytes: usize) {
@@ -4988,6 +4977,15 @@ fn truncate_utf8(value: &mut String, max_bytes: usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn session_keys_are_random_browser_safe_identifiers() {
+        let first = new_session_key();
+        let second = new_session_key();
+        assert_ne!(first, second);
+        assert_eq!(first.len(), 32);
+        assert!(first.bytes().all(|byte| byte.is_ascii_hexdigit()));
+    }
 
     fn sample_world_snapshot(tick: u64, entity_count: usize) -> OnlineWorldSnapshot {
         OnlineWorldSnapshot {

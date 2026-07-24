@@ -163,8 +163,12 @@
             console.error("boot failed:", e);
             fail("加载失败，请刷新重试", "Load failed — please reload");
           });
-        // Safety net: never leave the loader stuck over a running game.
-        setTimeout(hideLoading, 20000);
+        // Safety net for engines that are running but do not resolve init. A
+        // real boot failure must stay visible instead of revealing a blank
+        // canvas and hiding the diagnostic state.
+        setTimeout(() => {
+          if (!loading.classList.contains("error")) hideLoading();
+        }, 20000);
       }
     </script>
   </body>

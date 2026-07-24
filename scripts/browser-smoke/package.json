@@ -1,0 +1,12 @@
+{
+  "name": "open-bevy-browser-smoke",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "smoke": "node online_smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "1.55.0"
+  }
+}

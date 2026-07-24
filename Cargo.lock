@@ -808,6 +808,7 @@ dependencies = [
  "postcard",
  "ron 0.8.1",
  "serde",
+ "uuid",
 ]
 
 [[package]]
