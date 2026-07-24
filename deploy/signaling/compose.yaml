@@ -30,6 +30,7 @@ services:
     image: coturn/coturn:4.7.0
     restart: unless-stopped
     command:
+      - -n
       - --no-cli
       - --fingerprint
       - --use-auth-secret
@@ -40,7 +41,13 @@ services:
       - --min-port=49160
       - --max-port=49200
       - --no-multicast-peers
-      - --no-loopback-peers
+      # Loopback peers are denied by default in Coturn 4.7. The former
+      # --no-loopback-peers flag was removed and makes the process exit 255.
+      - --no-tls
+      - --no-dtls
+      - --user-quota=12
+      - --total-quota=2048
+      - --stale-nonce=600
       - --log-file=stdout
     ports:
       - "3478:3478/tcp"
