@@ -695,6 +695,7 @@ pub(crate) struct MatchState {
     pub(crate) start_time_sec: f32,
     pub(crate) remaining_teams: u32,
     pub(crate) remaining_anchors: u32,
+    pub(crate) active_anchor_teams: Vec<bool>,
     pub(crate) enemy_units_destroyed: u32,
     pub(crate) enemy_structures_destroyed: u32,
     pub(crate) units_lost: u32,
@@ -745,6 +746,7 @@ impl Default for MatchState {
             start_time_sec: 0.0,
             remaining_teams: 0,
             remaining_anchors: 0,
+            active_anchor_teams: Vec::new(),
             enemy_units_destroyed: 0,
             enemy_structures_destroyed: 0,
             units_lost: 0,
@@ -4750,6 +4752,7 @@ pub(crate) fn evaluate_match_end(
     mut match_flow: ResMut<MatchFlow>,
     mut audio_feedback: ResMut<AudioFeedback>,
     relations: Res<TeamRelations>,
+    online_session: Option<Res<OnlineSession>>,
     visible_player: Option<Res<VisiblePlayer>>,
     setup_settings: Res<MatchSetupSettings>,
     structures: Query<(&Structure, &Team, &Health)>,
@@ -4785,6 +4788,51 @@ pub(crate) fn evaluate_match_end(
     let active_teams = active_anchor_team.iter().filter(|active| **active).count() as u32;
     match_state.remaining_teams = active_teams;
     match_state.remaining_anchors = active_anchor_count;
+    match_state.active_anchor_teams = active_anchor_team.clone();
+
+    if online_match_uses_global_result(online_session.as_deref()) {
+        let active = active_anchor_team
+            .iter()
+            .enumerate()
+            .filter_map(|(index, active)| {
+                active.then(|| Team::from_playable_index(index)).flatten()
+            })
+            .collect::<Vec<_>>();
+        let opposing_sides_remain = active.iter().enumerate().any(|(index, left)| {
+            active
+                .iter()
+                .skip(index + 1)
+                .any(|right| relations.are_enemies(*left, *right))
+        });
+        if opposing_sides_remain {
+            return;
+        }
+
+        let phase =
+            online_match_phase_for_perspective(controlled_team, &active_anchor_team, &relations);
+        match phase {
+            MatchPhase::HumanVictory => {
+                record_voice_audio_feedback(&mut audio_feedback, UnitVoiceEvent::Victory)
+            }
+            MatchPhase::HumanDefeat => {
+                record_voice_audio_feedback(&mut audio_feedback, UnitVoiceEvent::Defeat)
+            }
+            MatchPhase::Running | MatchPhase::MatchFinished => {}
+        }
+        let reason = match phase {
+            MatchPhase::HumanVictory => t(
+                "胜利：最后一个敌对阵营已被消灭",
+                "Victory: the last hostile side was eliminated",
+            ),
+            MatchPhase::HumanDefeat => t(
+                "失利：己方阵营未能坚持到对局结束",
+                "Defeat: your side did not survive the match",
+            ),
+            MatchPhase::Running | MatchPhase::MatchFinished => t("战斗结束", "Battle Over"),
+        };
+        finalize_match(&mut match_state, &mut match_flow, phase, reason);
+        return;
+    }
 
     let Some(player_team) = controlled_team else {
         if active_teams <= 1 {
@@ -4841,6 +4889,29 @@ pub(crate) fn evaluate_match_end(
             MatchPhase::MatchFinished,
             t("战斗结束", "Battle Over"),
         );
+    }
+}
+
+pub(crate) fn online_match_phase_for_perspective(
+    controlled_team: Option<Team>,
+    active_anchor_teams: &[bool],
+    relations: &TeamRelations,
+) -> MatchPhase {
+    let Some(controlled_team) = controlled_team else {
+        return MatchPhase::MatchFinished;
+    };
+    if active_anchor_teams
+        .iter()
+        .enumerate()
+        .any(|(index, active)| {
+            *active
+                && Team::from_playable_index(index)
+                    .is_some_and(|team| relations.are_allied(controlled_team, team))
+        })
+    {
+        MatchPhase::HumanVictory
+    } else {
+        MatchPhase::HumanDefeat
     }
 }
 

@@ -49,8 +49,11 @@ native desktop and browser builds.
     - [x] Economy, technology, and production validation
     - [x] Support-power validation
   - [ ] Snapshot delta/compression for battles beyond the full-snapshot budget
-  - [ ] Match-state reconnect/resume
-  - [ ] Victory, disconnect, and return-to-lobby flow
+  - [x] Match-state reconnect/resume through the next authoritative snapshot
+  - [ ] Match completion and session lifecycle
+    - [x] Global multiplayer victory with per-player result presentation
+    - [ ] Disconnect/forfeit policy
+    - [ ] Synchronized return-to-lobby flow
 - [ ] Product verification
   - [ ] Two native clients
   - [ ] Two browser clients

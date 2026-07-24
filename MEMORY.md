@@ -62,7 +62,13 @@
   repair charges, validates support doctrine/tech/power/cooldown/bounds, and
   mirrors support cooldowns in snapshots. Maximum action packets and a
   representative cooldown-bearing snapshot remain below channel limits.
-- The running match still needs in-match reconnect/catch-up, a global
-  multiplayer victory/disconnect/return-to-lobby contract, and visual event
-  replication for transient support warnings/impacts. Large battles also need
-  delta/compressed snapshots rather than relying only on full state.
+- A reconnect Welcome no longer sends a client back to the lobby during a live
+  match; the client keeps `InMatch` state and catches up from the next accepted
+  authoritative snapshot. Snapshots carry active anchor teams and a finished
+  flag. The host waits until no hostile sides remain, while each client derives
+  its own victory or defeat from alliance perspective, so eliminating the host
+  does not prematurely stop remaining opponents.
+- The running match still needs an explicit disconnect/forfeit policy,
+  synchronized return-to-lobby, and visual event replication for transient
+  support warnings/impacts. Large battles also need delta/compressed snapshots
+  rather than relying only on full state.

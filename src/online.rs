@@ -774,6 +774,8 @@ struct OnlineMatchStateSnapshot {
     start_time_sec: f32,
     remaining_teams: u32,
     remaining_anchors: u32,
+    active_anchor_teams: Vec<bool>,
+    finished: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -937,10 +939,13 @@ struct OnlineSnapshotApplyParams<'w, 's> {
     replication: ResMut<'w, OnlineMatchReplication>,
     next_id: ResMut<'w, NextSpawnId>,
     visible_player: Res<'w, VisiblePlayer>,
+    relations: Res<'w, TeamRelations>,
     economies: ResMut<'w, Economies>,
     build_queue: ResMut<'w, BuildQueue>,
     support_cooldowns: ResMut<'w, SupportCooldowns>,
     match_state: ResMut<'w, MatchState>,
+    match_flow: ResMut<'w, MatchFlow>,
+    audio_feedback: ResMut<'w, AudioFeedback>,
     network_entities: Query<'w, 's, (Entity, &'static NetworkEntityId)>,
     entities: Query<'w, 's, OnlineSnapshotTarget<'static>>,
 }
@@ -1309,6 +1314,10 @@ pub(crate) fn online_match_is_authoritative(session: Option<Res<OnlineSession>>)
 
 pub(crate) fn online_match_uses_command_transport(session: Option<&OnlineSession>) -> bool {
     session.is_some_and(|session| session.phase == OnlinePhase::InMatch)
+}
+
+pub(crate) fn online_match_uses_global_result(session: Option<&OnlineSession>) -> bool {
+    online_match_uses_command_transport(session)
 }
 
 fn online_client_match(session: Option<Res<OnlineSession>>) -> bool {
@@ -3553,6 +3562,8 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
             start_time_sec: match_state.start_time_sec,
             remaining_teams: match_state.remaining_teams,
             remaining_anchors: match_state.remaining_anchors,
+            active_anchor_teams: match_state.active_anchor_teams.clone(),
+            finished: !match_state.is_running(),
         },
     };
     let payload = match postcard::to_allocvec(&snapshot) {
@@ -3587,10 +3598,13 @@ fn apply_pending_online_snapshot(params: OnlineSnapshotApplyParams) {
         mut replication,
         mut next_id,
         visible_player,
+        relations,
         mut economies,
         mut build_queue,
         mut support_cooldowns,
         mut match_state,
+        mut match_flow,
+        mut audio_feedback,
         network_entities,
         mut entities,
     } = params;
@@ -3627,6 +3641,35 @@ fn apply_pending_online_snapshot(params: OnlineSnapshotApplyParams) {
     match_state.start_time_sec = snapshot.match_state.start_time_sec;
     match_state.remaining_teams = snapshot.match_state.remaining_teams;
     match_state.remaining_anchors = snapshot.match_state.remaining_anchors;
+    match_state.active_anchor_teams = snapshot.match_state.active_anchor_teams;
+    if snapshot.match_state.finished && match_state.is_running() {
+        let phase = online_match_phase_for_perspective(
+            controlled_player_team(Some(&visible_player)),
+            &match_state.active_anchor_teams,
+            &relations,
+        );
+        match phase {
+            MatchPhase::HumanVictory => {
+                record_voice_audio_feedback(&mut audio_feedback, UnitVoiceEvent::Victory)
+            }
+            MatchPhase::HumanDefeat => {
+                record_voice_audio_feedback(&mut audio_feedback, UnitVoiceEvent::Defeat)
+            }
+            MatchPhase::Running | MatchPhase::MatchFinished => {}
+        }
+        let reason = match phase {
+            MatchPhase::HumanVictory => t(
+                "胜利：最后一个敌对阵营已被消灭",
+                "Victory: the last hostile side was eliminated",
+            ),
+            MatchPhase::HumanDefeat => t(
+                "失利：己方阵营未能坚持到对局结束",
+                "Defeat: your side did not survive the match",
+            ),
+            MatchPhase::Running | MatchPhase::MatchFinished => t("战斗结束", "Battle Over"),
+        };
+        finalize_match(&mut match_state, &mut match_flow, phase, reason);
+    }
 
     let entity_by_network_id = network_entities
         .iter()
@@ -4112,14 +4155,7 @@ fn process_reliable_message(
             player_id,
             assigned_slot,
             snapshot,
-        } => {
-            session.host_peer = Some(peer);
-            session.local_player_id = Some(player_id);
-            session.assigned_slot = Some(assigned_slot);
-            session.lobby = Some(snapshot);
-            session.phase = OnlinePhase::Lobby;
-            session.set_status(t("已加入联机作战室", "Joined online war room"));
-        }
+        } => accept_online_welcome(session, peer, player_id, assigned_slot, snapshot),
         OnlineReliableMessage::LobbySnapshot(snapshot) if session.host_peer == Some(peer) => {
             session.lobby = Some(snapshot);
             session.ui_dirty = true;
@@ -4143,6 +4179,30 @@ fn process_reliable_message(
             session.set_status(format!("{}: {reason}", t("加入被拒绝", "Join rejected")));
         }
         _ => {}
+    }
+}
+
+fn accept_online_welcome(
+    session: &mut OnlineSession,
+    peer: PeerId,
+    player_id: u64,
+    assigned_slot: usize,
+    snapshot: OnlineLobbySnapshot,
+) {
+    let reconnecting_match =
+        session.phase == OnlinePhase::InMatch && session.match_config.is_some();
+    session.host_peer = Some(peer);
+    session.local_player_id = Some(player_id);
+    session.assigned_slot = Some(assigned_slot);
+    session.lobby = Some(snapshot);
+    if reconnecting_match {
+        session.set_status(t(
+            "已恢复主机连接，正在同步对局…",
+            "Host connection restored; synchronizing match...",
+        ));
+    } else {
+        session.phase = OnlinePhase::Lobby;
+        session.set_status(t("已加入联机作战室", "Joined online war room"));
     }
 }
 
@@ -4562,6 +4622,8 @@ mod tests {
                 start_time_sec: 600.0,
                 remaining_teams: 8,
                 remaining_anchors: 8,
+                active_anchor_teams: vec![true; 8],
+                finished: false,
             },
         }
     }
@@ -4667,6 +4729,72 @@ mod tests {
             )
             .unwrap();
         assert_eq!(resumed, (player_id, slot));
+    }
+
+    #[test]
+    fn reconnect_welcome_keeps_client_inside_running_match() {
+        let lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.match_config = Some(OnlineMatchConfig::from(&lobby));
+        let peer = PeerId("00000000-0000-0000-0000-000000000003".parse().unwrap());
+
+        accept_online_welcome(&mut session, peer, 2, 1, lobby);
+
+        assert_eq!(session.phase, OnlinePhase::InMatch);
+        assert_eq!(session.host_peer, Some(peer));
+        assert_eq!(session.local_player_id, Some(2));
+        assert_eq!(session.assigned_slot, Some(1));
+    }
+
+    #[test]
+    fn online_host_elimination_does_not_stop_remaining_opponents() {
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.is_host = true;
+        session.local_player_id = Some(1);
+
+        let mut app = App::new();
+        app.insert_resource(session)
+            .insert_resource(MatchState::default())
+            .insert_resource(MatchFlow::default())
+            .insert_resource(AudioFeedback::default())
+            .insert_resource(TeamRelations::default())
+            .insert_resource(VisiblePlayer::default())
+            .insert_resource(MatchSetupSettings::default())
+            .add_systems(Update, evaluate_match_end);
+        app.world_mut().spawn((
+            Structure {
+                id: "CommandCenter",
+            },
+            Team::Player(1),
+            Health::new(100.0),
+        ));
+        let last_opponent = app
+            .world_mut()
+            .spawn((
+                Structure {
+                    id: "CommandCenter",
+                },
+                Team::Player(2),
+                Health::new(100.0),
+            ))
+            .id();
+
+        app.update();
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::Running
+        );
+        assert!(app.world().resource::<MatchFlow>().is_active());
+
+        app.world_mut().despawn(last_opponent);
+        app.update();
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::HumanDefeat
+        );
+        assert!(!app.world().resource::<MatchFlow>().is_active());
     }
 
     #[test]
