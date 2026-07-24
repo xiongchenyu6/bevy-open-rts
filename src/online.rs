@@ -34,6 +34,32 @@ const RTS_ONLINE_PROTOCOL: u16 = 1;
 const ONLINE_DEFAULT_SERVICE_URL: &str = "http://127.0.0.1:3536";
 const ONLINE_MAX_STATUS_BYTES: usize = 180;
 
+const NETWORK_RESOURCE_NAMESPACE: u64 = 1 << 62;
+const NETWORK_SUPPLY_CRATE_NAMESPACE: u64 = 2 << 62;
+
+/// Stable identity shared by every peer in an online match.
+///
+/// Bevy [`Entity`] values are local allocator handles and must never cross the
+/// network. Dynamic gameplay entities use the deterministic spawn counter;
+/// map-owned resources and crates live in separate namespaces keyed by their
+/// map order.
+#[derive(Component, Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub(crate) struct NetworkEntityId(pub(crate) u64);
+
+impl NetworkEntityId {
+    pub(crate) const fn dynamic(spawn_id: u32) -> Self {
+        Self(spawn_id as u64)
+    }
+
+    pub(crate) const fn map_resource(index: usize) -> Self {
+        Self(NETWORK_RESOURCE_NAMESPACE | index as u64)
+    }
+
+    pub(crate) const fn supply_crate(index: usize) -> Self {
+        Self(NETWORK_SUPPLY_CRATE_NAMESPACE | index as u64)
+    }
+}
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 enum OnlinePhase {
     #[default]
@@ -2140,6 +2166,18 @@ fn truncate_utf8(value: &mut String, max_bytes: usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn network_entity_namespaces_never_overlap() {
+        let dynamic = NetworkEntityId::dynamic(u32::MAX);
+        let resource = NetworkEntityId::map_resource(0);
+        let next_resource = NetworkEntityId::map_resource(1);
+        let crate_id = NetworkEntityId::supply_crate(0);
+
+        assert_ne!(dynamic, resource);
+        assert_ne!(resource, crate_id);
+        assert_ne!(resource, next_resource);
+    }
 
     #[test]
     fn lobby_has_exactly_one_row_per_map_spawn() {

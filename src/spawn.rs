@@ -121,6 +121,7 @@ pub(crate) fn spawn_unit_with_visual_faction(
         return commands.spawn_empty().id();
     };
     next_id.0 += 1;
+    let network_id = NetworkEntityId::dynamic(next_id.0);
     let position = position + Vec3::Y * def.height;
     let unit_speed = if def.mine_trigger_radius > 0.0 {
         0.0
@@ -157,6 +158,7 @@ pub(crate) fn spawn_unit_with_visual_faction(
             VisionRadius(initial_vision),
             initial_visible,
             MovementDomain::from_registry(def.domain),
+            network_id,
             initial_visibility(team, visible_team),
             MatchScopedEntity,
         ))
@@ -332,6 +334,7 @@ pub(crate) fn spawn_structure_for_visual_faction(
         return commands.spawn_empty().id();
     };
     next_id.0 += 1;
+    let network_id = NetworkEntityId::dynamic(next_id.0);
     let initial_visible = initial_visibility_state(team, visible_team);
     let entity_id = commands
         .spawn((
@@ -346,6 +349,7 @@ pub(crate) fn spawn_structure_for_visual_faction(
             VisionRadius(structure_vision_radius(def)),
             initial_visible,
             MovementDomain::from_registry(def.domain),
+            network_id,
             initial_visibility(team, visible_team),
             MatchScopedEntity,
         ))

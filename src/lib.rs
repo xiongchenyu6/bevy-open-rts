@@ -2460,6 +2460,7 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
             OnEnter(AppScreen::InMatch),
             (
                 apply_match_setup_settings,
+                reset_next_spawn_id,
                 begin_match_from_setup,
                 setup_support_cooldowns,
                 setup,
@@ -3962,6 +3963,10 @@ pub(crate) fn begin_match_from_setup(
     battle_log.entries.clear();
     *audio_feedback = AudioFeedback::default();
     *objective_tracker = ObjectiveTrackerState::default();
+}
+
+pub(crate) fn reset_next_spawn_id(mut next_spawn_id: ResMut<NextSpawnId>) {
+    next_spawn_id.0 = 0;
 }
 
 pub(crate) fn window_is_fullscreen(window: &Window) -> bool {

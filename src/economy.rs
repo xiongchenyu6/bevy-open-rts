@@ -304,14 +304,17 @@ pub(crate) fn setup_resource_nodes(
     asset_server: &AssetServer,
     map: &SkirmishMapDef,
 ) {
-    for spec in map.resources {
-        spawn_resource_node(
+    for (index, spec) in map.resources.iter().enumerate() {
+        let entity = spawn_resource_node(
             commands,
             asset_server,
             spec.kind,
             spec.amount,
             map_local_to_world(map, spec.position),
         );
+        commands
+            .entity(entity)
+            .try_insert(NetworkEntityId::map_resource(index));
     }
 }
 
@@ -356,13 +359,16 @@ pub(crate) fn setup_supply_crates(
     asset_server: &AssetServer,
     map: &SkirmishMapDef,
 ) {
-    for spec in map.supply_crates {
-        spawn_supply_crate(
+    for (index, spec) in map.supply_crates.iter().enumerate() {
+        let entity = spawn_supply_crate(
             commands,
             asset_server,
             spec.effect,
             map_local_to_world(map, spec.position),
         );
+        commands
+            .entity(entity)
+            .try_insert(NetworkEntityId::supply_crate(index));
     }
 }
 
