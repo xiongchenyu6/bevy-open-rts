@@ -112,3 +112,13 @@
   `CARGO_MANIFEST_DIR`, so Bevy otherwise looks under `target/debug/assets`.
   Native verification sets `BEVY_ASSET_ROOT` explicitly; normal `cargo run`
   behavior is unchanged.
+- Product verification now uses the same role-driven browser harness for both
+  the two-browser CI gate and native/browser compatibility. A deployed-Pages
+  browser player and a locally built native host completed run
+  `cross-1784925664-1332` in room `366BE938`: both reported two connected humans,
+  snapshot ticks 10/9, the browser's reliable move command was observed on both
+  sides, and the authoritative results were browser defeat/native victory.
+  Browser startup is retried only before entering a room because the live Pages
+  path can transiently expose the unsupported/loading fallback; match failures
+  are never retried. Terminal reports are frozen on first publication so peer
+  shutdown cannot rewrite the player count after successful completion.

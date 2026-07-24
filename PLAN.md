@@ -60,8 +60,8 @@ native desktop and browser builds.
     - [x] Synchronized return-to-lobby flow
 - [ ] Product verification
   - [x] Two native clients
-  - [ ] Two browser clients
-  - [ ] Native-to-browser client
+  - [x] Two browser clients
+  - [x] Native-to-browser client
   - [ ] Internet path through TURN
   - [x] Deployment and operational runbook
 

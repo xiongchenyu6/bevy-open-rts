@@ -205,3 +205,19 @@ Each browser publishes its current report in the hidden
 `#open-bevy-online-verification` JSON element. The CI gate fails unless both
 clients enter the same room, receive snapshots, observe the player command, and
 finish with complementary authoritative results.
+
+Native/browser wire compatibility is exercised against the deployed Pages
+bundle and signaling service:
+
+```sh
+OPEN_BEVY_SIGNALING_URL=https://signal.example.com \
+OPEN_BEVY_GAME_URL=https://games.example.com/open-bevy-rts/ \
+  scripts/verify_cross_platform_online.sh
+```
+
+This launches a native host and one real browser player. The browser uses the
+same role-driven Playwright verifier as the two-browser CI gate; both reports
+must name the same room, see two connected humans, exchange authoritative
+snapshots and a reliable unit order, and finish with host victory/player defeat.
+The first terminal report is immutable so normal peer shutdown cannot overwrite
+the proven terminal player count.

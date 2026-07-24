@@ -2746,6 +2746,12 @@ fn run_online_verification_harness(mut params: OnlineVerificationParams) {
     if params.harness.config.is_none() {
         return;
     }
+    // Keep the first terminal report immutable. Peers normally close as soon
+    // as their own report is complete; publishing another frame would replace
+    // the proven two-player terminal state with post-match disconnect data.
+    if params.harness.stage.is_terminal() && !params.harness.last_report.is_empty() {
+        return;
+    }
 
     params.harness.elapsed += params.real_time.delta_secs();
     if !params.harness.stage.is_terminal()

@@ -15,6 +15,14 @@ const softwareWebGpu = process.env.OPEN_BEVY_SOFTWARE_WEBGPU === "1";
 const runId = process.env.OPEN_BEVY_ONLINE_VERIFY_RUN
   ?? `browser-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
 const timeoutMs = Number(process.env.OPEN_BEVY_MULTIPLAYER_TIMEOUT_MS ?? 180_000);
+const roles = (process.env.OPEN_BEVY_BROWSER_ROLES ?? "host,player")
+  .split(",")
+  .map((role) => role.trim().toLowerCase())
+  .filter(Boolean);
+const expectedHumans = Number(process.env.OPEN_BEVY_EXPECTED_HUMANS ?? 2);
+const reportPath = resolve(
+  process.env.OPEN_BEVY_BROWSER_REPORT ?? `${outputDir}/result.json`,
+);
 const chromeCandidates = [
   process.env.CHROME_BIN,
   "/etc/profiles/per-user/freeman.xiong/bin/google-chrome-stable",
@@ -26,6 +34,16 @@ const executablePath = chromeCandidates.find(existsSync);
 
 if (!executablePath) {
   throw new Error("Chrome not found; set CHROME_BIN to a Chromium executable");
+}
+if (
+  roles.length === 0
+  || roles.length > 2
+  || new Set(roles).size !== roles.length
+  || roles.some((role) => !["host", "player"].includes(role))
+) {
+  throw new Error(
+    `OPEN_BEVY_BROWSER_ROLES must contain unique host/player roles: ${roles.join(",")}`,
+  );
 }
 
 function verificationUrl(role) {
@@ -85,29 +103,36 @@ function collectDiagnostics(page, role) {
 }
 
 async function bootVerificationClient(page, role) {
-  await page.goto(verificationUrl(role), {
-    waitUntil: "domcontentloaded",
-    timeout: 60_000,
-  });
-  await page.waitForFunction(
-    () => {
-      const loading = document.querySelector("#loading");
-      return loading?.classList.contains("hidden")
-        || loading?.classList.contains("error");
-    },
-    undefined,
-    { timeout: 90_000 },
-  );
-  const startup = await page.evaluate(() => ({
-    loadingError: document.querySelector("#loading")?.classList.contains("error") ?? false,
-    unsupportedHidden: document.querySelector("#unsupported")?.hidden ?? false,
-    canvasWidth: document.querySelector("canvas")?.width ?? 0,
-    canvasHeight: document.querySelector("canvas")?.height ?? 0,
-  }));
-  if (startup.loadingError || !startup.unsupportedHidden) {
-    throw new Error(`${role} WebGPU startup failed: ${JSON.stringify(startup)}`);
+  let startup;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    await page.goto(verificationUrl(role), {
+      waitUntil: "domcontentloaded",
+      timeout: 60_000,
+    });
+    await page.waitForFunction(
+      () => {
+        const loading = document.querySelector("#loading");
+        return loading?.classList.contains("hidden")
+          || loading?.classList.contains("error");
+      },
+      undefined,
+      { timeout: 90_000 },
+    );
+    startup = await page.evaluate((currentAttempt) => ({
+      loadingError: document.querySelector("#loading")?.classList.contains("error") ?? false,
+      unsupportedHidden: document.querySelector("#unsupported")?.hidden ?? false,
+      canvasWidth: document.querySelector("canvas")?.width ?? 0,
+      canvasHeight: document.querySelector("canvas")?.height ?? 0,
+      attempt: currentAttempt,
+    }), attempt);
+    if (!startup.loadingError && startup.unsupportedHidden) {
+      return startup;
+    }
+    if (attempt < 3) {
+      await page.waitForTimeout(1_000);
+    }
   }
-  return startup;
+  throw new Error(`${role} WebGPU startup failed: ${JSON.stringify(startup)}`);
 }
 
 async function waitForTerminalReport(page, role) {
@@ -155,86 +180,90 @@ const browserOptions = {
   headless: true,
   args: browserArgs(),
 };
-const [hostBrowser, playerBrowser] = await Promise.all([
-  chromium.launch(browserOptions),
-  chromium.launch(browserOptions),
-]);
+const browsers = await Promise.all(roles.map(() => chromium.launch(browserOptions)));
 
 try {
-  // Two separate browser processes prevent headless Chrome from treating either
-  // real-time simulation as a background tab and reducing requestAnimationFrame
-  // to a handful of ticks per minute.
-  const hostContext = await hostBrowser.newContext({ viewport: { width: 640, height: 360 } });
-  const playerContext = await playerBrowser.newContext({ viewport: { width: 640, height: 360 } });
-  const hostPage = await hostContext.newPage();
-  const playerPage = await playerContext.newPage();
-  const hostDiagnostics = collectDiagnostics(hostPage, "host");
-  const playerDiagnostics = collectDiagnostics(playerPage, "player");
+  // Separate processes prevent headless Chrome from treating either real-time
+  // simulation as a background tab and reducing requestAnimationFrame to a
+  // handful of ticks per minute. A single role is used by the native/browser
+  // compatibility harness while the other peer runs as a desktop binary.
+  const clients = await Promise.all(roles.map(async (role, index) => {
+    const context = await browsers[index].newContext({ viewport: { width: 640, height: 360 } });
+    const page = await context.newPage();
+    return {
+      role,
+      context,
+      page,
+      diagnostics: collectDiagnostics(page, role),
+    };
+  }));
 
-  const [hostStartup, playerStartup] = await Promise.all([
-    bootVerificationClient(hostPage, "host"),
-    bootVerificationClient(playerPage, "player"),
-  ]);
-  const [host, player] = await Promise.all([
-    waitForTerminalReport(hostPage, "host"),
-    waitForTerminalReport(playerPage, "player"),
-  ]);
-
-  const diagnostics = [...hostDiagnostics, ...playerDiagnostics];
+  const startupEntries = await Promise.all(clients.map(async (client) => [
+    client.role,
+    await bootVerificationClient(client.page, client.role),
+  ]));
+  const reportEntries = await Promise.all(clients.map(async (client) => [
+    client.role,
+    await waitForTerminalReport(client.page, client.role),
+  ]));
+  const startups = Object.fromEntries(startupEntries);
+  const reports = Object.fromEntries(reportEntries);
+  const diagnostics = clients.flatMap((client) => client.diagnostics);
   const fatalDiagnostics = diagnostics.filter((message) =>
     /pageerror|requestfailed|boot failed|panicked at|RuntimeError/i.test(message),
   );
-  const passed = host.passed === true
-    && player.passed === true
-    && host.run_id === runId
-    && player.run_id === runId
-    && host.room_code
-    && host.room_code === player.room_code
-    && host.connected_humans === 2
-    && player.connected_humans === 2
-    && host.snapshot_tick > 0
-    && player.snapshot_tick > 0
-    && player.command_sent === true
-    && host.command_observed === true
-    && player.command_observed === true
-    && host.result === "victory"
-    && player.result === "defeat"
+  const browserReportsPassed = roles.every((role) => {
+    const report = reports[role];
+    return report.passed === true
+      && report.run_id === runId
+      && Boolean(report.room_code)
+      && report.connected_humans === expectedHumans
+      && report.snapshot_tick > 0
+      && report.command_observed === true
+      && (role !== "host" || report.result === "victory")
+      && (role !== "player" || (report.command_sent === true && report.result === "defeat"));
+  });
+  const roomCodes = new Set(roles.map((role) => reports[role].room_code));
+  const passed = browserReportsPassed
+    && roomCodes.size === 1
     && fatalDiagnostics.length === 0;
 
   // Publish the functional result before optional visual evidence so a slow
   // software renderer cannot hide the authoritative client reports.
-  console.log(JSON.stringify({ phase: "terminal-reports", passed, host, player }, null, 2));
+  console.log(JSON.stringify({ phase: "terminal-reports", passed, reports }, null, 2));
 
-  const screenshotResults = await Promise.allSettled([
-    capturePage(hostContext, hostPage, `${outputDir}/host-final.png`),
-    capturePage(playerContext, playerPage, `${outputDir}/player-final.png`),
-  ]);
+  const screenshotResults = await Promise.allSettled(clients.map((client) =>
+    capturePage(client.context, client.page, `${outputDir}/${client.role}-final.png`)
+  ));
   const screenshotErrors = screenshotResults
     .filter((result) => result.status === "rejected")
     .map((result) => String(result.reason));
 
-  console.log(JSON.stringify({
+  const result = {
     passed,
     runId,
+    roles,
     gameUrl,
     signalingUrl,
     executablePath,
     softwareWebGpu,
-    hostStartup,
-    playerStartup,
-    host,
-    player,
+    expectedHumans,
+    startups,
+    reports,
+    hostStartup: startups.host,
+    playerStartup: startups.player,
+    host: reports.host,
+    player: reports.player,
     diagnostics,
     screenshotErrors,
-    screenshots: [
-      `${outputDir}/host-final.png`,
-      `${outputDir}/player-final.png`,
-    ],
-  }, null, 2));
+    screenshots: roles.map((role) => `${outputDir}/${role}-final.png`),
+  };
+  writeFileSync(reportPath, `${JSON.stringify(result, null, 2)}\n`);
+  console.log(JSON.stringify(result, null, 2));
 
   if (!passed) {
     process.exitCode = 1;
   }
 } finally {
-  await Promise.allSettled([hostBrowser.close(), playerBrowser.close()]);
+  await Promise.allSettled(browsers.map((browser) => browser.close()));
 }
