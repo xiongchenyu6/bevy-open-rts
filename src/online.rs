@@ -20,7 +20,7 @@ use open_bevy_protocol::{
 };
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::{BTreeMap, HashMap, VecDeque},
+    collections::{BTreeMap, HashMap, HashSet, VecDeque},
     future::Future,
     sync::{
         Arc, Mutex,
@@ -37,6 +37,8 @@ const ONLINE_MAX_STATUS_BYTES: usize = 180;
 const ONLINE_SNAPSHOT_HZ: f32 = 10.0;
 const ONLINE_SNAPSHOT_INTERVAL_SECONDS: f32 = 1.0 / ONLINE_SNAPSHOT_HZ;
 const ONLINE_SNAPSHOT_SNAP_DISTANCE: f32 = 8.0;
+const ONLINE_MAX_UNIT_ORDERS_PER_COMMAND: usize = 256;
+const ONLINE_MAX_RALLY_STRUCTURES_PER_COMMAND: usize = 64;
 
 const NETWORK_RESOURCE_NAMESPACE: u64 = 1 << 62;
 const NETWORK_SUPPLY_CRATE_NAMESPACE: u64 = 2 << 62;
@@ -324,7 +326,167 @@ impl From<&OnlineLobbySnapshot> for OnlineMatchConfig {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+impl OnlineMatchConfig {
+    fn runtime_team_for_player(&self, player_id: u64) -> Option<Team> {
+        self.slots
+            .iter()
+            .position(|slot| {
+                matches!(
+                    slot.occupant,
+                    OnlineSlotOccupant::Human {
+                        player_id: occupant_id,
+                        ..
+                    } if occupant_id == player_id
+                )
+            })
+            .map(Team::Player)
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub(crate) enum OnlineHarvestTarget {
+    Resource,
+    Dropoff,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub(crate) enum OnlineUnitOrderKind {
+    Move {
+        destination: [f32; 3],
+    },
+    Attack {
+        target: u64,
+    },
+    Capture {
+        target: u64,
+    },
+    Garrison {
+        target: u64,
+    },
+    Harvest {
+        target: u64,
+        destination: OnlineHarvestTarget,
+    },
+    Repair {
+        target: u64,
+    },
+    Construct {
+        target: u64,
+    },
+    Follow {
+        target: u64,
+        offset: [f32; 3],
+        allow_enemy: bool,
+    },
+    AttackMove {
+        destination: [f32; 3],
+    },
+    Patrol {
+        origin: [f32; 3],
+        destination: [f32; 3],
+    },
+}
+
+impl OnlineUnitOrderKind {
+    pub(crate) fn from_local(
+        order: &UnitQueuedOrder,
+        mut network_id_for: impl FnMut(Entity) -> Option<u64>,
+    ) -> Option<Self> {
+        Some(match order {
+            UnitQueuedOrder::Move(destination) => Self::Move {
+                destination: destination.to_array(),
+            },
+            UnitQueuedOrder::Attack(target) => Self::Attack {
+                target: network_id_for(*target)?,
+            },
+            UnitQueuedOrder::Capture(target) => Self::Capture {
+                target: network_id_for(*target)?,
+            },
+            UnitQueuedOrder::Garrison(target) => Self::Garrison {
+                target: network_id_for(*target)?,
+            },
+            UnitQueuedOrder::Harvest { target, state } => Self::Harvest {
+                target: network_id_for(*target)?,
+                destination: match state {
+                    HarvestState::MovingToResource | HarvestState::Collecting => {
+                        OnlineHarvestTarget::Resource
+                    }
+                    HarvestState::MovingToDropoff => OnlineHarvestTarget::Dropoff,
+                },
+            },
+            UnitQueuedOrder::Repair(target) => Self::Repair {
+                target: network_id_for(*target)?,
+            },
+            UnitQueuedOrder::Construct(target) => Self::Construct {
+                target: network_id_for(*target)?,
+            },
+            UnitQueuedOrder::Follow { target, offset } => Self::Follow {
+                target: network_id_for(*target)?,
+                offset: offset.to_array(),
+                allow_enemy: false,
+            },
+            UnitQueuedOrder::AttackMove(destination) => Self::AttackMove {
+                destination: destination.to_array(),
+            },
+            UnitQueuedOrder::Patrol {
+                origin,
+                destination,
+            } => Self::Patrol {
+                origin: origin.to_array(),
+                destination: destination.to_array(),
+            },
+            UnitQueuedOrder::ForceFollow { target, offset } => Self::Follow {
+                target: network_id_for(*target)?,
+                offset: offset.to_array(),
+                allow_enemy: true,
+            },
+        })
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub(crate) struct OnlineUnitOrderCommand {
+    pub(crate) unit_id: u64,
+    pub(crate) order: OnlineUnitOrderKind,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub(crate) enum OnlineRallyMode {
+    Move,
+    AttackMove,
+}
+
+impl OnlineRallyMode {
+    fn to_game(self) -> RallyMode {
+        match self {
+            Self::Move => RallyMode::Move,
+            Self::AttackMove => RallyMode::AttackMove,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub(crate) enum OnlinePlayerCommand {
+    UnitOrders {
+        orders: Vec<OnlineUnitOrderCommand>,
+        queue: bool,
+    },
+    SetRallyPoints {
+        structures: Vec<u64>,
+        target: [f32; 3],
+        target_entity: Option<u64>,
+        mode: OnlineRallyMode,
+    },
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct OnlinePlayerCommandEnvelope {
+    protocol: u16,
+    sequence: u64,
+    command: OnlinePlayerCommand,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 enum OnlineReliableMessage {
     Hello {
         protocol: u16,
@@ -339,6 +501,7 @@ enum OnlineReliableMessage {
     LobbyCommand(OnlineLobbyCommand),
     LobbySnapshot(OnlineLobbySnapshot),
     StartMatch(OnlineMatchConfig),
+    PlayerCommand(OnlinePlayerCommandEnvelope),
     Rejected {
         reason: String,
     },
@@ -489,6 +652,61 @@ struct OnlineMatchReplication {
     pending_snapshot: Option<OnlineWorldSnapshot>,
 }
 
+#[derive(Resource, Default)]
+pub(crate) struct OnlineCommandOutbox {
+    next_sequence: u64,
+    pending: VecDeque<OnlinePlayerCommandEnvelope>,
+}
+
+impl OnlineCommandOutbox {
+    pub(crate) fn submit(&mut self, command: OnlinePlayerCommand) {
+        self.next_sequence = self.next_sequence.saturating_add(1);
+        self.pending.push_back(OnlinePlayerCommandEnvelope {
+            protocol: RTS_ONLINE_PROTOCOL,
+            sequence: self.next_sequence,
+            command,
+        });
+    }
+}
+
+#[derive(Clone, Debug)]
+struct AuthorizedOnlinePlayerCommand {
+    player_id: u64,
+    command: OnlinePlayerCommand,
+}
+
+#[derive(Resource, Default)]
+struct OnlineCommandInbox {
+    last_sequence_by_player: HashMap<u64, u64>,
+    pending: VecDeque<AuthorizedOnlinePlayerCommand>,
+}
+
+fn enqueue_online_player_command(
+    inbox: &mut OnlineCommandInbox,
+    player_id: u64,
+    envelope: OnlinePlayerCommandEnvelope,
+) -> bool {
+    if envelope.protocol != RTS_ONLINE_PROTOCOL || envelope.sequence == 0 {
+        return false;
+    }
+    let previous = inbox
+        .last_sequence_by_player
+        .get(&player_id)
+        .copied()
+        .unwrap_or_default();
+    if envelope.sequence <= previous {
+        return false;
+    }
+    inbox
+        .last_sequence_by_player
+        .insert(player_id, envelope.sequence);
+    inbox.pending.push_back(AuthorizedOnlinePlayerCommand {
+        player_id,
+        command: envelope.command,
+    });
+    true
+}
+
 #[derive(Component, Clone, Copy)]
 struct NetworkInterpolation {
     translation: Vec3,
@@ -523,6 +741,27 @@ type OnlineSnapshotTarget<'a> = (
     Option<&'a mut Veterancy>,
 );
 
+type OnlineCommandActor<'a> = (
+    Entity,
+    &'a NetworkEntityId,
+    &'a Team,
+    &'a Unit,
+    &'a Health,
+    &'a Transform,
+    CommandOrderStateItem<'a>,
+);
+
+type OnlineCommandTarget<'a> = (
+    &'a Team,
+    &'a Transform,
+    Option<&'a Unit>,
+    Option<&'a Structure>,
+    Option<&'a ResourceNode>,
+    Option<&'a Health>,
+    Option<&'a UnderConstruction>,
+    Option<&'a Garrison>,
+);
+
 #[derive(SystemParam)]
 struct OnlineSnapshotBroadcastParams<'w, 's> {
     time: Res<'w, Time>,
@@ -545,6 +784,24 @@ struct OnlineSnapshotApplyParams<'w, 's> {
     economies: ResMut<'w, Economies>,
     match_state: ResMut<'w, MatchState>,
     entities: Query<'w, 's, OnlineSnapshotTarget<'static>>,
+}
+
+#[derive(SystemParam)]
+pub(crate) struct OnlineOrderCommandParams<'w, 's> {
+    pub(crate) session: Option<Res<'w, OnlineSession>>,
+    pub(crate) outbox: Option<ResMut<'w, OnlineCommandOutbox>>,
+    pub(crate) network_ids: Query<'w, 's, &'static NetworkEntityId>,
+    pub(crate) selected_rally_points: Query<
+        'w,
+        's,
+        (&'static NetworkEntityId, &'static Team),
+        (
+            With<Selected>,
+            With<Structure>,
+            With<RallyPoint>,
+            Without<Unit>,
+        ),
+    >,
 }
 
 #[derive(Default)]
@@ -646,6 +903,7 @@ pub(crate) struct OnlineSession {
     assigned_slot: Option<usize>,
     host_peer: Option<PeerId>,
     lobby: Option<OnlineLobbySnapshot>,
+    match_config: Option<OnlineMatchConfig>,
     host_runtime: Option<HostLobbyRuntime>,
     ui_dirty: bool,
     rendered_language: Language,
@@ -678,6 +936,7 @@ impl Default for OnlineSession {
             assigned_slot: None,
             host_peer: None,
             lobby: None,
+            match_config: None,
             host_runtime: None,
             ui_dirty: true,
             rendered_language: current_language(),
@@ -703,6 +962,7 @@ impl OnlineSession {
         self.assigned_slot = None;
         self.host_peer = None;
         self.lobby = None;
+        self.match_config = None;
         self.host_runtime = None;
         self.focused_field = None;
         self.ui_dirty = true;
@@ -764,6 +1024,8 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
         .init_resource::<OnlineTransport>()
         .init_resource::<OnlineAsyncInbox>()
         .init_resource::<OnlineMatchReplication>()
+        .init_resource::<OnlineCommandOutbox>()
+        .init_resource::<OnlineCommandInbox>()
         .add_systems(OnEnter(AppScreen::OnlineLobby), enter_online_lobby)
         .add_systems(OnEnter(AppScreen::InMatch), reset_online_match_replication)
         .add_systems(
@@ -784,6 +1046,14 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
                 .run_if(online_client_match),
         )
         .add_systems(
+            Update,
+            (flush_online_player_commands, apply_online_player_commands)
+                .chain()
+                .in_set(SimulationPhase::UiAndManagement)
+                .after(issue_orders)
+                .run_if(match_in_progress),
+        )
+        .add_systems(
             Last,
             broadcast_online_world_snapshot.run_if(in_state(AppScreen::InMatch)),
         )
@@ -802,14 +1072,24 @@ pub(crate) fn online_match_is_authoritative(session: Option<Res<OnlineSession>>)
         .is_none_or(|session| session.phase != OnlinePhase::InMatch || session.is_host)
 }
 
+pub(crate) fn online_match_uses_command_transport(session: Option<&OnlineSession>) -> bool {
+    session.is_some_and(|session| session.phase == OnlinePhase::InMatch)
+}
+
 fn online_client_match(session: Option<Res<OnlineSession>>) -> bool {
     session
         .as_deref()
         .is_some_and(|session| session.phase == OnlinePhase::InMatch && !session.is_host)
 }
 
-fn reset_online_match_replication(mut replication: ResMut<OnlineMatchReplication>) {
+fn reset_online_match_replication(
+    mut replication: ResMut<OnlineMatchReplication>,
+    mut outbox: ResMut<OnlineCommandOutbox>,
+    mut inbox: ResMut<OnlineCommandInbox>,
+) {
     *replication = OnlineMatchReplication::default();
+    *outbox = OnlineCommandOutbox::default();
+    *inbox = OnlineCommandInbox::default();
 }
 
 fn enter_online_lobby(
@@ -1846,6 +2126,7 @@ fn poll_online_transport(
     mut session: ResMut<OnlineSession>,
     mut transport: ResMut<OnlineTransport>,
     mut replication: ResMut<OnlineMatchReplication>,
+    mut command_inbox: ResMut<OnlineCommandInbox>,
     mut setup: ResMut<MatchSetupSettings>,
     mut next_state: ResMut<NextState<AppScreen>>,
 ) {
@@ -1910,6 +2191,7 @@ fn poll_online_transport(
                     socket,
                     peer,
                     message,
+                    &mut command_inbox,
                     &mut setup,
                     &mut next_state,
                 );
@@ -1926,6 +2208,362 @@ fn poll_online_transport(
                 };
                 queue_online_world_snapshot(&mut replication, snapshot);
             }
+        }
+    }
+}
+
+fn flush_online_player_commands(
+    mut session: ResMut<OnlineSession>,
+    mut transport: ResMut<OnlineTransport>,
+    mut outbox: ResMut<OnlineCommandOutbox>,
+    mut inbox: ResMut<OnlineCommandInbox>,
+) {
+    if session.phase != OnlinePhase::InMatch {
+        outbox.pending.clear();
+        return;
+    }
+    if session.is_host {
+        let Some(player_id) = session.local_player_id else {
+            return;
+        };
+        while let Some(envelope) = outbox.pending.pop_front() {
+            enqueue_online_player_command(&mut inbox, player_id, envelope);
+        }
+        return;
+    }
+
+    let Some(host_peer) = session.host_peer else {
+        return;
+    };
+    let Some(socket) = transport.socket.as_mut() else {
+        return;
+    };
+    while let Some(envelope) = outbox.pending.pop_front() {
+        let message = OnlineReliableMessage::PlayerCommand(envelope.clone());
+        if let Err(error) = send_online_message(socket, host_peer, &message) {
+            outbox.pending.push_front(envelope);
+            session.set_status(format!(
+                "{}: {error}",
+                t("无法发送对局命令", "Could not send match command")
+            ));
+            break;
+        }
+    }
+}
+
+fn apply_online_player_commands(
+    mut commands: Commands,
+    session: Res<OnlineSession>,
+    mut inbox: ResMut<OnlineCommandInbox>,
+    map_bounds: Res<MapBounds>,
+    relations: Res<TeamRelations>,
+    network_entities: Query<(Entity, &NetworkEntityId)>,
+    actors: Query<OnlineCommandActor<'_>>,
+    targets: Query<OnlineCommandTarget<'_>>,
+    mut rally_points: Query<(&NetworkEntityId, &Team, &mut RallyPoint), With<Structure>>,
+) {
+    if session.phase != OnlinePhase::InMatch || !session.is_host {
+        inbox.pending.clear();
+        return;
+    }
+    let Some(config) = session.match_config.as_ref() else {
+        inbox.pending.clear();
+        return;
+    };
+    let entity_by_network_id = network_entities
+        .iter()
+        .map(|(entity, network_id)| (network_id.0, entity))
+        .collect::<HashMap<_, _>>();
+
+    while let Some(authorized) = inbox.pending.pop_front() {
+        let Some(team) = config.runtime_team_for_player(authorized.player_id) else {
+            continue;
+        };
+        match authorized.command {
+            OnlinePlayerCommand::UnitOrders { orders, queue } => {
+                if orders.is_empty() || orders.len() > ONLINE_MAX_UNIT_ORDERS_PER_COMMAND {
+                    continue;
+                }
+                let mut commanded_ids = HashSet::with_capacity(orders.len());
+                for command in orders {
+                    if !commanded_ids.insert(command.unit_id) {
+                        continue;
+                    }
+                    let Some(entity) = entity_by_network_id.get(&command.unit_id).copied() else {
+                        continue;
+                    };
+                    let Ok((actor, _network_id, actor_team, unit, health, transform, order_state)) =
+                        actors.get(entity)
+                    else {
+                        continue;
+                    };
+                    if *actor_team != team || health.current <= 0.0 {
+                        continue;
+                    }
+                    let Some(order) = resolve_online_unit_order(
+                        actor,
+                        unit,
+                        *actor_team,
+                        transform,
+                        command.order,
+                        *map_bounds,
+                        &relations,
+                        &entity_by_network_id,
+                        &targets,
+                    ) else {
+                        continue;
+                    };
+                    let (
+                        move_order,
+                        follow_order,
+                        attack_order,
+                        capture_order,
+                        garrison_order,
+                        harvest_order,
+                        repair_order,
+                        construct_order,
+                        attack_move_order,
+                        patrol_order,
+                        order_queue,
+                    ) = order_state;
+                    issue_or_queue_unit_order(
+                        &mut commands,
+                        actor,
+                        order,
+                        queue,
+                        true,
+                        has_active_orders_in_query(
+                            move_order,
+                            follow_order,
+                            attack_order,
+                            capture_order,
+                            garrison_order,
+                            harvest_order,
+                            repair_order,
+                            construct_order,
+                            attack_move_order,
+                            patrol_order,
+                        ),
+                        order_queue,
+                    );
+                    commands
+                        .entity(actor)
+                        .try_insert(HoldPosition { enabled: false });
+                }
+            }
+            OnlinePlayerCommand::SetRallyPoints {
+                structures,
+                target,
+                target_entity,
+                mode,
+            } => {
+                if structures.is_empty()
+                    || structures.len() > ONLINE_MAX_RALLY_STRUCTURES_PER_COMMAND
+                {
+                    continue;
+                }
+                let requested_point = Vec3::from_array(target);
+                let rally_target = target_entity.and_then(|network_id| {
+                    let entity = entity_by_network_id.get(&network_id).copied()?;
+                    let (
+                        target_team,
+                        transform,
+                        unit,
+                        structure,
+                        resource,
+                        health,
+                        _under_construction,
+                        _garrison,
+                    ) = targets.get(entity).ok()?;
+                    let alive = health.is_none_or(|health| health.current > 0.0)
+                        && resource.is_none_or(|resource| resource.amount > 0);
+                    let permitted = resource.is_some()
+                        || (relations.are_allied(team, *target_team)
+                            && (unit.is_some() || structure.is_some()));
+                    (alive && permitted).then_some((entity, transform.translation))
+                });
+                if target_entity.is_some() && rally_target.is_none() {
+                    continue;
+                }
+                if rally_target.is_none()
+                    && validated_terrain_target_in_bounds(requested_point, *map_bounds).is_none()
+                {
+                    continue;
+                }
+                let requested = structures.into_iter().collect::<HashSet<_>>();
+                for (network_id, structure_team, mut rally_point) in &mut rally_points {
+                    if *structure_team != team || !requested.contains(&network_id.0) {
+                        continue;
+                    }
+                    apply_rally_point_command_in_bounds(
+                        &mut rally_point,
+                        requested_point,
+                        rally_target,
+                        mode.to_game(),
+                        *map_bounds,
+                    );
+                }
+            }
+        }
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn resolve_online_unit_order(
+    actor: Entity,
+    unit: &Unit,
+    actor_team: Team,
+    actor_transform: &Transform,
+    order: OnlineUnitOrderKind,
+    map_bounds: MapBounds,
+    relations: &TeamRelations,
+    entity_by_network_id: &HashMap<u64, Entity>,
+    targets: &Query<OnlineCommandTarget<'_>>,
+) -> Option<UnitQueuedOrder> {
+    let resolve_target = |network_id: u64| entity_by_network_id.get(&network_id).copied();
+    let ground_point =
+        |point: [f32; 3]| validated_terrain_target_in_bounds(Vec3::from_array(point), map_bounds);
+    match order {
+        OnlineUnitOrderKind::Move { destination } => (unit.speed > 0.0)
+            .then(|| ground_point(destination))
+            .flatten()
+            .map(UnitQueuedOrder::Move),
+        OnlineUnitOrderKind::Attack { target } => {
+            let target = resolve_target(target)?;
+            let (target_team, _, target_unit, target_structure, _, health, _, _) =
+                targets.get(target).ok()?;
+            (target != actor
+                && registry::entity(unit.id).is_some_and(|def| def.weapon.is_some())
+                && (target_unit.is_some() || target_structure.is_some())
+                && health.is_some_and(|health| health.current > 0.0)
+                && relations.are_enemies(actor_team, *target_team))
+            .then_some(UnitQueuedOrder::Attack(target))
+        }
+        OnlineUnitOrderKind::Capture { target } => {
+            let target = resolve_target(target)?;
+            let (target_team, _, _, structure, _, health, under_construction, _) =
+                targets.get(target).ok()?;
+            (target != actor
+                && can_unit_capture(unit)
+                && structure.is_some()
+                && health.is_some_and(|health| health.current > 0.0)
+                && structure_is_constructed(under_construction)
+                && can_capture_structure_team(actor_team, *target_team, relations))
+            .then_some(UnitQueuedOrder::Capture(target))
+        }
+        OnlineUnitOrderKind::Garrison { target } => {
+            let target = resolve_target(target)?;
+            let (target_team, _, _, structure, _, health, under_construction, garrison) =
+                targets.get(target).ok()?;
+            let (Some(structure), Some(health), Some(garrison)) = (structure, health, garrison)
+            else {
+                return None;
+            };
+            (target != actor
+                && can_unit_garrison(unit)
+                && can_garrison_structure_target(
+                    actor_team,
+                    structure,
+                    *target_team,
+                    health,
+                    garrison,
+                    under_construction,
+                    relations,
+                ))
+            .then_some(UnitQueuedOrder::Garrison(target))
+        }
+        OnlineUnitOrderKind::Harvest {
+            target,
+            destination,
+        } => {
+            let target = resolve_target(target)?;
+            let (target_team, _, _, structure, resource, health, under_construction, _) =
+                targets.get(target).ok()?;
+            if !can_unit_collect_resources(unit) || target == actor {
+                return None;
+            }
+            match destination {
+                OnlineHarvestTarget::Resource => resource
+                    .is_some_and(|resource| resource.amount > 0)
+                    .then_some(UnitQueuedOrder::Harvest {
+                        target,
+                        state: HarvestState::MovingToResource,
+                    }),
+                OnlineHarvestTarget::Dropoff => (structure
+                    .is_some_and(is_resource_dropoff_structure)
+                    && *target_team == actor_team
+                    && health.is_some_and(|health| health.current > 0.0)
+                    && structure_is_constructed(under_construction))
+                .then_some(UnitQueuedOrder::Harvest {
+                    target,
+                    state: HarvestState::MovingToDropoff,
+                }),
+            }
+        }
+        OnlineUnitOrderKind::Repair { target } => {
+            let target = resolve_target(target)?;
+            let (target_team, _, target_unit, structure, _, health, under_construction, _) =
+                targets.get(target).ok()?;
+            let health = health?;
+            (target != actor
+                && repair_capability(unit).is_some()
+                && *target_team == actor_team
+                && can_repair_order_target(target_unit, structure, under_construction, health))
+            .then_some(UnitQueuedOrder::Repair(target))
+        }
+        OnlineUnitOrderKind::Construct { target } => {
+            let target = resolve_target(target)?;
+            let (target_team, _, _, structure, _, health, under_construction, _) =
+                targets.get(target).ok()?;
+            (target != actor
+                && can_unit_construct_structures(unit)
+                && *target_team == actor_team
+                && structure.is_some()
+                && under_construction.is_some()
+                && health.is_some_and(|health| health.current > 0.0))
+            .then_some(UnitQueuedOrder::Construct(target))
+        }
+        OnlineUnitOrderKind::Follow {
+            target,
+            offset,
+            allow_enemy,
+        } => {
+            let target = resolve_target(target)?;
+            let (target_team, _, target_unit, structure, resource, health, _, _) =
+                targets.get(target).ok()?;
+            let alive = health.is_none_or(|health| health.current > 0.0)
+                && resource.is_none_or(|resource| resource.amount > 0);
+            let targetable = target_unit.is_some() || structure.is_some() || resource.is_some();
+            let offset = Vec3::from_array(offset);
+            (target != actor
+                && unit.speed > 0.0
+                && offset.is_finite()
+                && alive
+                && targetable
+                && (allow_enemy || relations.are_allied(actor_team, *target_team)))
+            .then_some(if allow_enemy {
+                UnitQueuedOrder::ForceFollow { target, offset }
+            } else {
+                UnitQueuedOrder::Follow { target, offset }
+            })
+        }
+        OnlineUnitOrderKind::AttackMove { destination } => (unit.speed > 0.0
+            && registry::entity(unit.id).is_some_and(|def| def.weapon.is_some()))
+        .then(|| ground_point(destination))
+        .flatten()
+        .map(UnitQueuedOrder::AttackMove),
+        OnlineUnitOrderKind::Patrol {
+            origin,
+            destination,
+        } => {
+            let origin = ground_point(origin).unwrap_or(actor_transform.translation);
+            (unit.speed > 0.0)
+                .then(|| ground_point(destination))
+                .flatten()
+                .map(|destination| UnitQueuedOrder::Patrol {
+                    origin,
+                    destination,
+                })
         }
     }
 }
@@ -2479,6 +3117,7 @@ fn process_reliable_message(
     socket: &mut WebRtcTransport,
     peer: PeerId,
     message: OnlineReliableMessage,
+    command_inbox: &mut OnlineCommandInbox,
     setup: &mut MatchSetupSettings,
     next_state: &mut NextState<AppScreen>,
 ) {
@@ -2545,6 +3184,18 @@ fn process_reliable_message(
                     broadcast_lobby_snapshot(session, socket);
                 }
             }
+            OnlineReliableMessage::PlayerCommand(envelope)
+                if session.phase == OnlinePhase::InMatch =>
+            {
+                let Some(player_id) = session
+                    .host_runtime
+                    .as_ref()
+                    .and_then(|runtime| runtime.peer_players.get(&peer).copied())
+                else {
+                    return;
+                };
+                enqueue_online_player_command(command_inbox, player_id, envelope);
+            }
             _ => {}
         }
         return;
@@ -2575,6 +3226,7 @@ fn process_reliable_message(
             match online_match_setup(&config, local_slot) {
                 Ok(settings) => {
                     *setup = settings;
+                    session.match_config = Some(config);
                     session.phase = OnlinePhase::InMatch;
                     next_state.set(AppScreen::InMatch);
                 }
@@ -2790,7 +3442,7 @@ fn host_start_online_match(
     let Some(socket) = transport.socket.as_mut() else {
         return;
     };
-    let payload = match postcard::to_allocvec(&OnlineReliableMessage::StartMatch(config)) {
+    let payload = match postcard::to_allocvec(&OnlineReliableMessage::StartMatch(config.clone())) {
         Ok(payload) => payload,
         Err(error) => {
             session.set_status(format!(
@@ -2805,6 +3457,7 @@ fn host_start_online_match(
         return;
     }
     *setup = settings;
+    session.match_config = Some(config);
     session.phase = OnlinePhase::InMatch;
     next_state.set(AppScreen::InMatch);
 }
@@ -3115,5 +3768,153 @@ mod tests {
         assert_eq!(host.team_relations, client.team_relations);
         assert_eq!(host.visible_player.team, Team::Player(0));
         assert_eq!(client.visible_player.team, Team::Player(1));
+    }
+
+    #[test]
+    fn player_command_sequences_reject_replays_and_wrong_protocols() {
+        let mut inbox = OnlineCommandInbox::default();
+        let command = OnlinePlayerCommand::UnitOrders {
+            orders: vec![OnlineUnitOrderCommand {
+                unit_id: 7,
+                order: OnlineUnitOrderKind::Move {
+                    destination: [1.0, 0.0, 2.0],
+                },
+            }],
+            queue: false,
+        };
+        let envelope = OnlinePlayerCommandEnvelope {
+            protocol: RTS_ONLINE_PROTOCOL,
+            sequence: 1,
+            command: command.clone(),
+        };
+        assert!(enqueue_online_player_command(
+            &mut inbox,
+            2,
+            envelope.clone()
+        ));
+        assert!(!enqueue_online_player_command(&mut inbox, 2, envelope));
+        assert!(!enqueue_online_player_command(
+            &mut inbox,
+            2,
+            OnlinePlayerCommandEnvelope {
+                protocol: RTS_ONLINE_PROTOCOL + 1,
+                sequence: 2,
+                command,
+            }
+        ));
+        assert_eq!(inbox.pending.len(), 1);
+    }
+
+    #[test]
+    fn maximum_unit_order_batch_fits_reliable_channel() {
+        let message = OnlineReliableMessage::PlayerCommand(OnlinePlayerCommandEnvelope {
+            protocol: RTS_ONLINE_PROTOCOL,
+            sequence: u64::MAX,
+            command: OnlinePlayerCommand::UnitOrders {
+                orders: (0..ONLINE_MAX_UNIT_ORDERS_PER_COMMAND)
+                    .map(|index| OnlineUnitOrderCommand {
+                        unit_id: index as u64 + 1,
+                        order: OnlineUnitOrderKind::Patrol {
+                            origin: [index as f32, 0.0, 1.0],
+                            destination: [2.0, 0.0, index as f32],
+                        },
+                    })
+                    .collect(),
+                queue: true,
+            },
+        });
+        let encoded = postcard::to_allocvec(&message).unwrap();
+        assert!(
+            encoded.len() <= open_bevy_net::MAX_RELIABLE_PACKET_BYTES,
+            "{} byte command exceeds {} byte reliable channel limit",
+            encoded.len(),
+            open_bevy_net::MAX_RELIABLE_PACKET_BYTES
+        );
+        assert_eq!(
+            postcard::from_bytes::<OnlineReliableMessage>(&encoded).unwrap(),
+            message
+        );
+    }
+
+    #[test]
+    fn host_applies_owned_unit_orders_and_rejects_opponent_control() {
+        let mut lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        lobby.slots[1].occupant = OnlineSlotOccupant::Human {
+            player_id: 2,
+            name: "Player".to_string(),
+            ready: true,
+            connected: true,
+        };
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.is_host = true;
+        session.local_player_id = Some(1);
+        session.match_config = Some(OnlineMatchConfig::from(&lobby));
+
+        let mut app = App::new();
+        app.insert_resource(session)
+            .insert_resource(OnlineCommandInbox::default())
+            .insert_resource(MapBounds::default())
+            .insert_resource(TeamRelations::default())
+            .add_systems(Update, apply_online_player_commands);
+        let host_unit = app
+            .world_mut()
+            .spawn((
+                NetworkEntityId(10),
+                Team::Player(0),
+                Unit {
+                    id: "Worker",
+                    speed: 5.0,
+                    can_crush: false,
+                    can_be_crushed: true,
+                },
+                Health::new(10.0),
+                Transform::default(),
+            ))
+            .id();
+        let player_unit = app
+            .world_mut()
+            .spawn((
+                NetworkEntityId(20),
+                Team::Player(1),
+                Unit {
+                    id: "Worker",
+                    speed: 5.0,
+                    can_crush: false,
+                    can_be_crushed: true,
+                },
+                Health::new(10.0),
+                Transform::default(),
+            ))
+            .id();
+        {
+            let mut inbox = app.world_mut().resource_mut::<OnlineCommandInbox>();
+            for (sequence, unit_id, destination) in
+                [(1, 10, [9.0, 0.0, 9.0]), (2, 20, [4.0, 0.0, 5.0])]
+            {
+                assert!(enqueue_online_player_command(
+                    &mut inbox,
+                    2,
+                    OnlinePlayerCommandEnvelope {
+                        protocol: RTS_ONLINE_PROTOCOL,
+                        sequence,
+                        command: OnlinePlayerCommand::UnitOrders {
+                            orders: vec![OnlineUnitOrderCommand {
+                                unit_id,
+                                order: OnlineUnitOrderKind::Move { destination },
+                            }],
+                            queue: false,
+                        },
+                    }
+                ));
+            }
+        }
+        app.update();
+
+        assert!(app.world().get::<MoveOrder>(host_unit).is_none());
+        assert_eq!(
+            app.world().get::<MoveOrder>(player_unit).unwrap().target,
+            Vec3::new(4.0, 0.0, 5.0)
+        );
     }
 }

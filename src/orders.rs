@@ -233,6 +233,7 @@ pub(crate) fn issue_orders(
     keyboard: Res<ButtonInput<KeyCode>>,
 
     visible_player: Res<VisiblePlayer>,
+    mut online: OnlineOrderCommandParams,
     hud_zones: Res<HudHitZones>,
     window_q: Query<&Window, With<PrimaryWindow>>,
     camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
@@ -242,7 +243,6 @@ pub(crate) fn issue_orders(
         Query<(&Team, &mut RallyPoint), SelectedRallyPointFilter>,
     )>,
     selectable_q: Query<SelectableOrderTargetItem<'_>>,
-
     structure_targets: Query<(Entity, &Structure, &Team, Option<&UnderConstruction>), With<Health>>,
     garrison_targets: Query<
         (
@@ -275,6 +275,8 @@ pub(crate) fn issue_orders(
     let Some(visible_team) = controlled_player_team(Some(&*visible_player)) else {
         return;
     };
+    let use_online_commands =
+        online_match_uses_command_transport(online.session.as_deref()) && online.outbox.is_some();
     if order_resources
         .command_mode
         .pending_structure_placement
@@ -314,14 +316,26 @@ pub(crate) fn issue_orders(
 
     if order_resources.command_mode.rally_point {
         let rally_unit_target = rally_target_at(point, visible_team, &selectable_q);
-        let set_any = apply_selected_rally_points(
-            visible_team,
-            point,
-            rally_unit_target,
-            RallyMode::Move,
-            *order_resources.map_bounds,
-            &mut selected_params.p1(),
-        );
+        let set_any = if use_online_commands {
+            queue_selected_online_rally_points(
+                online.outbox.as_deref_mut().expect("online outbox exists"),
+                &online.network_ids,
+                &online.selected_rally_points,
+                visible_team,
+                point,
+                rally_unit_target,
+                OnlineRallyMode::Move,
+            )
+        } else {
+            apply_selected_rally_points(
+                visible_team,
+                point,
+                rally_unit_target,
+                RallyMode::Move,
+                *order_resources.map_bounds,
+                &mut selected_params.p1(),
+            )
+        };
         if set_any {
             commands.spawn((
                 Transform::from_translation(point + Vec3::Y * 0.04),
@@ -415,6 +429,7 @@ pub(crate) fn issue_orders(
     );
 
     let mut issued_any = false;
+    let mut online_orders = Vec::with_capacity(selected_unit_count);
     for (i, (entity, transform, unit, _unit_team, orders, _cargo)) in
         selected.into_iter().enumerate()
     {
@@ -465,6 +480,26 @@ pub(crate) fn issue_orders(
         ) else {
             continue;
         };
+        if use_online_commands {
+            let Ok(network_id) = online.network_ids.get(entity) else {
+                continue;
+            };
+            let Some(order) = OnlineUnitOrderKind::from_local(&desired, |target| {
+                online
+                    .network_ids
+                    .get(target)
+                    .ok()
+                    .map(|network_id| network_id.0)
+            }) else {
+                continue;
+            };
+            online_orders.push(OnlineUnitOrderCommand {
+                unit_id: network_id.0,
+                order,
+            });
+            issued_any = true;
+            continue;
+        }
         issued_any = true;
         let has_active = has_active_orders_in_query(
             move_order,
@@ -492,18 +527,41 @@ pub(crate) fn issue_orders(
             .try_insert(HoldPosition { enabled: false });
     }
 
+    if !online_orders.is_empty() {
+        online
+            .outbox
+            .as_deref_mut()
+            .expect("online outbox exists")
+            .submit(OnlinePlayerCommand::UnitOrders {
+                orders: online_orders,
+                queue: queue_mode,
+            });
+    }
+
     let set_attack_rally_any = if selected_unit_count == 0
         && order_resources.command_mode.attack_move
         && terrain_target_only
     {
-        apply_selected_rally_points(
-            visible_team,
-            point,
-            None,
-            RallyMode::AttackMove,
-            *order_resources.map_bounds,
-            &mut selected_params.p1(),
-        )
+        if use_online_commands {
+            queue_selected_online_rally_points(
+                online.outbox.as_deref_mut().expect("online outbox exists"),
+                &online.network_ids,
+                &online.selected_rally_points,
+                visible_team,
+                point,
+                None,
+                OnlineRallyMode::AttackMove,
+            )
+        } else {
+            apply_selected_rally_points(
+                visible_team,
+                point,
+                None,
+                RallyMode::AttackMove,
+                *order_resources.map_bounds,
+                &mut selected_params.p1(),
+            )
+        }
     } else {
         false
     };
@@ -515,21 +573,45 @@ pub(crate) fn issue_orders(
     );
     let set_rally_any = if should_set_plain_rally {
         if let Some(rally_unit_target) = rally_target_at(point, visible_team, &selectable_q) {
-            apply_selected_rally_points(
-                visible_team,
-                point,
-                Some(rally_unit_target),
-                RallyMode::Move,
-                *order_resources.map_bounds,
-                &mut selected_params.p1(),
-            )
+            if use_online_commands {
+                queue_selected_online_rally_points(
+                    online.outbox.as_deref_mut().expect("online outbox exists"),
+                    &online.network_ids,
+                    &online.selected_rally_points,
+                    visible_team,
+                    point,
+                    Some(rally_unit_target),
+                    OnlineRallyMode::Move,
+                )
+            } else {
+                apply_selected_rally_points(
+                    visible_team,
+                    point,
+                    Some(rally_unit_target),
+                    RallyMode::Move,
+                    *order_resources.map_bounds,
+                    &mut selected_params.p1(),
+                )
+            }
         } else if terrain_target_only {
-            apply_selected_terrain_rally_points(
-                visible_team,
-                point,
-                *order_resources.map_bounds,
-                &mut selected_params.p1(),
-            )
+            if use_online_commands {
+                queue_selected_online_rally_points(
+                    online.outbox.as_deref_mut().expect("online outbox exists"),
+                    &online.network_ids,
+                    &online.selected_rally_points,
+                    visible_team,
+                    point,
+                    None,
+                    OnlineRallyMode::Move,
+                )
+            } else {
+                apply_selected_terrain_rally_points(
+                    visible_team,
+                    point,
+                    *order_resources.map_bounds,
+                    &mut selected_params.p1(),
+                )
+            }
         } else {
             false
         }
@@ -580,6 +662,48 @@ pub(crate) fn issue_orders(
             MatchScopedEntity,
         ));
     }
+}
+
+fn queue_selected_online_rally_points(
+    outbox: &mut OnlineCommandOutbox,
+    network_ids: &Query<&NetworkEntityId>,
+    selected_rally_points: &Query<
+        (&NetworkEntityId, &Team),
+        (
+            With<Selected>,
+            With<Structure>,
+            With<RallyPoint>,
+            Without<Unit>,
+        ),
+    >,
+    visible_team: Team,
+    point: Vec3,
+    rally_unit_target: Option<(Entity, Vec3)>,
+    mode: OnlineRallyMode,
+) -> bool {
+    let structures = selected_rally_points
+        .iter()
+        .filter_map(|(network_id, team)| (*team == visible_team).then_some(network_id.0))
+        .collect::<Vec<_>>();
+    if structures.is_empty() {
+        return false;
+    }
+    let target_entity = match rally_unit_target {
+        Some((entity, _)) => {
+            let Ok(network_id) = network_ids.get(entity) else {
+                return false;
+            };
+            Some(network_id.0)
+        }
+        None => None,
+    };
+    outbox.submit(OnlinePlayerCommand::SetRallyPoints {
+        structures,
+        target: point.to_array(),
+        target_entity,
+        mode,
+    });
+    true
 }
 
 pub(crate) fn should_set_terrain_rally_points(

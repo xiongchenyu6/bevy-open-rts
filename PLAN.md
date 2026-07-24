@@ -41,7 +41,11 @@ native desktop and browser builds.
   - [x] Stable network entity IDs
   - [x] Host world snapshots, client reconciliation, and interpolation
   - [ ] Serializable high-level commands
+    - [x] Unit orders and structure rally points
+    - [ ] Training, construction, queue management, and command-card actions
   - [ ] Command validation and ownership checks
+    - [x] Unit/rally ownership, capability, target, bounds, and replay validation
+    - [ ] Economy, technology, production, and support-power validation
   - [ ] Snapshot delta/compression for battles beyond the full-snapshot budget
   - [ ] Match-state reconnect/resume
   - [ ] Victory, disconnect, and return-to-lobby flow

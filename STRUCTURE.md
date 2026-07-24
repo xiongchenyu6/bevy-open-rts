@@ -48,7 +48,8 @@ domains live in modules, each re-exported into the crate root
 - `src/hud.rs` — in-match HUD: resource bar, minimap, battle log, objectives,
   selection panel, command card + queue, support strip, HudHitZones, RTS cursor.
 - `src/online.rs` — RTS online lobby/session protocol, stable network entity IDs,
-  host-authoritative world snapshots, client reconciliation, and interpolation.
+  reliable player commands, host validation, authoritative world snapshots,
+  client reconciliation, and interpolation.
 - `src/economy.rs` — Economies/income/power, harvesting + dropoff, resource nodes,
   supply crates.
 - `src/ai.rs` — difficulty tiers, AI director (economy/training/waves/support),
@@ -110,9 +111,13 @@ domains live in modules, each re-exported into the crate root
   snapshot; clients reconcile units, structures, resources, crates, economies,
   and match state by stable ID and interpolate short transform corrections.
 - Full snapshots are bounded by the transport's 64 KiB unreliable-channel
-  limit and covered by an eight-player/512-entity serialization test. Command
-  transport, host ownership validation, and large-battle delta snapshots are
-  the next online-match boundary.
+  limit and covered by an eight-player/512-entity serialization test.
+- Unit orders and structure rally points cross the reliable channel as bounded,
+  sequenced commands that contain only stable network IDs. The host rejects
+  replayed commands, invalid targets, unsupported orders, out-of-bounds points,
+  and attempts to control another player's entities; host-local input follows
+  the same validation path. Training, construction, command-card actions, and
+  large-battle delta snapshots remain the next online-match boundary.
 - `bevy_fluent::FluentPlugin` is registered in the shared game scene so future `.ftl` localization bundles can load through Bevy assets. The existing `Locale` / `t()` path remains the active text source until screens are migrated incrementally.
 - AI drones have an active scouting controller: idle AI `Drone` units pick living enemy units, move to their positions, avoid repeating the previous target when possible, and retarget after a short 0.5-1.0s delay.
 - AI defense profiles follow the godot difficulty targets: Beginner/Easy do not inherit Normal advanced-defense construction, Normal targets one standard defense layer plus 2 Tesla fence segments where the faction supports them, and Hard scales standard defenses to 2 plus 4 Tesla fence segments.

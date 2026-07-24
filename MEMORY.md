@@ -39,7 +39,13 @@
 - Snapshot receivers only accept the negotiated host, current RTS protocol, and
   monotonically newer ticks. A postcard roundtrip test keeps a representative
   eight-player/512-entity snapshot under the 64 KiB channel limit.
-- The running match is not yet command-complete: high-level player commands must
-  use network IDs, be validated against the sending player's ownership on the
-  host, and then be applied to the authoritative simulation. Large battles will
-  also need delta/compressed snapshots rather than relying only on full state.
+- Unit orders and structure rally points now use bounded, sequenced reliable
+  commands containing stable network IDs. Host-local input uses the same inbox
+  as remote input, and the host validates protocol, replay sequence, ownership,
+  capabilities, target relations, liveness, and map bounds before mutating the
+  authoritative simulation. A maximum 256-unit order batch fits the 256 KiB
+  reliable-channel budget.
+- The running match is not yet command-complete: training, construction, queue
+  management, command-card actions, and support powers still need equivalent
+  host-authoritative command paths. Large battles will also need
+  delta/compressed snapshots rather than relying only on full state.
