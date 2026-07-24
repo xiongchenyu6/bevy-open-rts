@@ -1,0 +1,5 @@
+{$SIGNALING_HOST} {
+    # Access logging is deliberately not enabled: browser WebSocket tickets are
+    # query parameters and must not be persisted by the edge proxy.
+    reverse_proxy signaling:3536
+}

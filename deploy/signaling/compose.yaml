@@ -1,0 +1,69 @@
+services:
+  signaling:
+    build:
+      context: ../..
+      dockerfile: services/open-bevy-signaling/Dockerfile
+    restart: unless-stopped
+    environment:
+      OPEN_BEVY_BIND: 0.0.0.0:3536
+      OPEN_BEVY_PUBLIC_WS_BASE: wss://${SIGNALING_HOST:?set SIGNALING_HOST}
+      OPEN_BEVY_ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?set ALLOWED_ORIGINS}
+      OPEN_BEVY_ICE_SERVERS_JSON: >-
+        [{"urls":["stun:${TURN_PUBLIC_HOST:?set TURN_PUBLIC_HOST}:3478"]}]
+      OPEN_BEVY_TURN_URLS: turn:${TURN_PUBLIC_HOST}:3478?transport=udp,turn:${TURN_PUBLIC_HOST}:3478?transport=tcp
+      OPEN_BEVY_TURN_SECRET: ${TURN_SECRET:?set TURN_SECRET}
+      OPEN_BEVY_TURN_CREDENTIAL_TTL_SECS: 3600
+      RUST_LOG: open_bevy_signaling=info
+    expose:
+      - "3536"
+    depends_on:
+      - turn
+    networks:
+      - edge
+
+  turn:
+    image: coturn/coturn:4.7.0
+    restart: unless-stopped
+    command:
+      - --no-cli
+      - --fingerprint
+      - --use-auth-secret
+      - --static-auth-secret=${TURN_SECRET:?set TURN_SECRET}
+      - --realm=${TURN_REALM:?set TURN_REALM}
+      - --external-ip=${TURN_PUBLIC_IP:?set TURN_PUBLIC_IP}
+      - --listening-port=3478
+      - --min-port=49160
+      - --max-port=49200
+      - --no-multicast-peers
+      - --no-loopback-peers
+      - --log-file=stdout
+    ports:
+      - "3478:3478/tcp"
+      - "3478:3478/udp"
+      - "49160-49200:49160-49200/udp"
+    networks:
+      - edge
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    environment:
+      SIGNALING_HOST: ${SIGNALING_HOST:?set SIGNALING_HOST}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - signaling
+    networks:
+      - edge
+
+networks:
+  edge:
+
+volumes:
+  caddy_data:
+  caddy_config:

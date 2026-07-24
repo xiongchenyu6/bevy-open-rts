@@ -6,9 +6,10 @@ right-click orders, automatic combat, registry-driven production/economy, AI
 pressure, and a WebGPU build path.
 
 The architecture follows the useful lesson from Digital Extinction: keep RTS
-behavior separated into ECS systems instead of a single scene script. This pass
-uses one crate, but the systems are grouped by responsibility so Godot mechanics
-can be moved across incrementally. Playable entity data is generated from
+behavior separated into ECS systems instead of a single scene script. The root
+game package is joined by game-independent Open Bevy protocol and signaling
+workspace packages, while RTS systems remain grouped by responsibility.
+Playable entity data is generated from
 `../godot-open-rts/source/match/MatchConstants.gd` and the Godot unit scenes.
 
 ## Run Native
@@ -44,6 +45,22 @@ The web build requires `wasm-bindgen` on `PATH`. The Nix shell in this repo
 includes the wasm target tools. `scripts/build_web.sh` stamps `web/index.html`
 with a content hash of the generated JS/WASM artifacts so browsers do not reuse
 stale game code after a rebuild.
+
+## Run The Open Bevy Signaling Service
+
+The workspace includes a game-independent Matchbox/WebRTC signaling service.
+It provides versioned room creation/discovery, strict room isolation, private
+rooms, build compatibility checks, metrics, and short-lived TURN credentials:
+
+```sh
+cargo run -p open-bevy-signaling
+curl http://127.0.0.1:3536/healthz
+```
+
+Production container and Coturn examples live in `deploy/signaling/`. See
+[`docs/ONLINE_ARCHITECTURE.md`](docs/ONLINE_ARCHITECTURE.md) for the API and
+networking contract. The current game integration milestone is tracked in
+[`PLAN.md`](PLAN.md).
 
 ## Capture And Match Proof
 

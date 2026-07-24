@@ -1,5 +1,19 @@
 # Bevy Open RTS Structure
 
+## Workspace
+
+The repository is a Cargo workspace whose default member remains the root
+`bevy-open-rts` game, so plain `cargo run` keeps its existing behavior.
+
+- `crates/open-bevy-protocol` owns game-independent room/API contracts and
+  identifier validation. It has no Bevy dependency.
+- `services/open-bevy-signaling` owns the reusable Open Bevy room service and a
+  Matchbox-compatible WebSocket endpoint. It has no dependency on the RTS game.
+- `deploy/signaling` contains the production container, Caddy, and Coturn
+  example. TURN credentials are generated with the Coturn REST HMAC contract.
+- `docs/ONLINE_ARCHITECTURE.md` is the online wire/deployment contract;
+  `PLAN.md` tracks the remaining client and gameplay replication milestones.
+
 ## Source Modules
 
 `src/lib.rs` is the crate root: app composition/plugin registration, the match

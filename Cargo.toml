@@ -1,3 +1,12 @@
+[workspace]
+members = [
+  ".",
+  "crates/open-bevy-protocol",
+  "services/open-bevy-signaling",
+]
+default-members = ["."]
+resolver = "2"
+
 [package]
 name = "bevy-open-rts"
 version = "0.1.0"

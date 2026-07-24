@@ -1,0 +1,11 @@
+.git
+.direnv
+.codex
+target
+assets
+docs/model-quality
+screenshots
+web
+result
+__pycache__
+*.pyc

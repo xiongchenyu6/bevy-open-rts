@@ -1,0 +1,57 @@
+name: Open Bevy signaling
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "crates/open-bevy-protocol/**"
+      - "services/open-bevy-signaling/**"
+      - "deploy/signaling/**"
+      - ".github/workflows/signaling.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "crates/open-bevy-protocol/**"
+      - "services/open-bevy-signaling/**"
+      - "deploy/signaling/**"
+      - ".github/workflows/signaling.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Protocol and WebSocket integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: false
+
+      - name: Check formatting
+        run: cargo fmt --all --check
+
+      - name: Lint server packages
+        run: cargo clippy -p open-bevy-protocol -p open-bevy-signaling --all-targets -- -D warnings
+
+      - name: Run protocol and real WebSocket tests
+        run: cargo test -p open-bevy-protocol -p open-bevy-signaling
+
+      - name: Build production container
+        run: docker build -f services/open-bevy-signaling/Dockerfile -t open-bevy-signaling:test .

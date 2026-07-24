@@ -1,0 +1,12 @@
+[package]
+name = "open-bevy-protocol"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95.0"
+license = "MIT OR Apache-2.0"
+description = "Game-independent session and signaling API types for Open Bevy games."
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "2.0"
+
