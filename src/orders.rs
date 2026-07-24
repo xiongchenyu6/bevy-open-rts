@@ -130,6 +130,29 @@ pub(crate) struct UnitOrderContext {
     pub(crate) offset: Vec3,
 }
 
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct FormationMember {
+    pub(crate) position: Vec3,
+    pub(crate) radius: f32,
+    pub(crate) domain: MovementDomain,
+}
+
+impl FormationMember {
+    pub(crate) fn from_unit(transform: &Transform, unit: &Unit) -> Self {
+        let (radius, domain) = registry::entity(unit.id)
+            .map(|def| (def.radius, MovementDomain::from_registry(def.domain)))
+            .unwrap_or((0.5, MovementDomain::Terrain));
+        Self {
+            position: transform.translation,
+            radius,
+            domain,
+        }
+    }
+}
+
+const FORMATION_DISTANCE_REDUCTION_DIVISIONS: usize = 10;
+const FORMATION_DISTANCE_REDUCTION_STEPS: usize = 10;
+
 #[derive(Component)]
 pub(crate) struct OrderQueue {
     pub(crate) orders: VecDeque<UnitQueuedOrder>,
@@ -367,8 +390,31 @@ pub(crate) fn issue_orders(
         return;
     }
 
+    let force_follow_target = enemy_target
+        .or(resource_target)
+        .or(resource_dropoff_target)
+        .or(repair_target)
+        .or(construct_target)
+        .or(garrison_target)
+        .or(follow_target);
+    let formation_pivot = (if force_move {
+        force_follow_target
+    } else {
+        follow_target
+    })
+    .and_then(|entity| selectable_q.get(entity).ok())
+    .map_or(point, |target| target.1.translation);
+    let formation_members = selected
+        .iter()
+        .map(|(_, transform, unit, ..)| FormationMember::from_unit(transform, unit))
+        .collect::<Vec<_>>();
+    let formation_offsets = formation_offsets_for_members(
+        &formation_members,
+        formation_pivot,
+        *order_resources.map_bounds,
+    );
+
     let mut issued_any = false;
-    let count = selected.len().max(1);
     for (i, (entity, transform, unit, _unit_team, orders, _cargo)) in
         selected.into_iter().enumerate()
     {
@@ -385,7 +431,7 @@ pub(crate) fn issue_orders(
             patrol_order,
             queue,
         ) = orders;
-        let offset = formation_offset(i, count);
+        let offset = formation_offsets.get(i).copied().unwrap_or(Vec3::ZERO);
         let Some(desired) = desired_order_for_selected_unit(
             unit,
             OrderTargetChoices {
@@ -663,6 +709,163 @@ pub(crate) fn desired_order_for_selected_unit(
     } else {
         UnitQueuedOrder::Move(destination)
     })
+}
+
+/// Port of Godot's `UnitMovementUtils.crowd_moved_to_new_pivot`: preserve each
+/// movement domain's existing formation around its AABB pivot, then pull overly
+/// loose members inward without allowing their destination discs to overlap.
+/// Returned offsets keep the same ordering as `members`.
+pub(crate) fn formation_offsets_for_members(
+    members: &[FormationMember],
+    new_pivot: Vec3,
+    bounds: MapBounds,
+) -> Vec<Vec3> {
+    let mut offsets = vec![Vec3::ZERO; members.len()];
+    for domain in [MovementDomain::Terrain, MovementDomain::Air] {
+        let indices = members
+            .iter()
+            .enumerate()
+            .filter_map(|(index, member)| (member.domain == domain).then_some(index))
+            .collect::<Vec<_>>();
+        if indices.is_empty() {
+            continue;
+        }
+        let targets = formation_targets_for_domain(members, &indices, new_pivot, bounds);
+        for (index, target) in indices.into_iter().zip(targets) {
+            offsets[index] = target - new_pivot;
+        }
+    }
+    offsets
+}
+
+fn formation_targets_for_domain(
+    members: &[FormationMember],
+    indices: &[usize],
+    new_pivot: Vec3,
+    bounds: MapBounds,
+) -> Vec<Vec3> {
+    if indices.len() == 1 {
+        let member = members[indices[0]];
+        return vec![bounds.clamp_ground_point(new_pivot, member.radius.max(0.25))];
+    }
+
+    let old_pivot = formation_aabb_pivot(members, indices);
+    let mut candidates = indices
+        .iter()
+        .enumerate()
+        .map(|(local_index, member_index)| {
+            let member = members[*member_index];
+            (
+                local_index,
+                new_pivot + (member.position - old_pivot) * Vec3::new(1.0, 0.0, 1.0),
+                member.radius,
+            )
+        })
+        .collect::<Vec<_>>();
+    candidates.sort_by(|a, b| {
+        xz_distance_squared(a.1, new_pivot)
+            .total_cmp(&xz_distance_squared(b.1, new_pivot))
+            .then_with(|| a.0.cmp(&b.0))
+    });
+
+    let interunit_threshold = UNIT_ADHERENCE_MARGIN_M * 2.0;
+    let mut discs = vec![(new_pivot, 0.0f32)];
+    let mut targets = vec![new_pivot; indices.len()];
+    for (local_index, mut position, radius) in candidates {
+        let mut distance = xz_distance(position, new_pivot);
+        let direction = (new_pivot - position).with_y(0.0).normalize_or(Vec3::ZERO);
+
+        for _ in 0..FORMATION_DISTANCE_REDUCTION_DIVISIONS {
+            let candidate = position + direction * (distance * 0.5);
+            if formation_disc_collides(candidate, radius, &discs, interunit_threshold) {
+                break;
+            }
+            distance *= 0.5;
+            position = candidate;
+        }
+
+        let reduction_step = (distance * 0.5 / FORMATION_DISTANCE_REDUCTION_STEPS as f32)
+            .max(interunit_threshold * 0.5);
+        for _ in 0..FORMATION_DISTANCE_REDUCTION_STEPS {
+            let candidate = position + direction * reduction_step;
+            if formation_disc_collides(candidate, radius, &discs, interunit_threshold) {
+                break;
+            }
+            position = candidate;
+        }
+
+        discs.push((position, radius));
+        targets[local_index] = position;
+    }
+
+    fit_formation_targets_to_bounds(&mut targets, members, indices, bounds);
+    targets
+}
+
+fn formation_aabb_pivot(members: &[FormationMember], indices: &[usize]) -> Vec3 {
+    let first = members[indices[0]].position;
+    let mut min_x = first.x;
+    let mut max_x = first.x;
+    let mut min_z = first.z;
+    let mut max_z = first.z;
+    for index in &indices[1..] {
+        let position = members[*index].position;
+        min_x = min_x.min(position.x);
+        max_x = max_x.max(position.x);
+        min_z = min_z.min(position.z);
+        max_z = max_z.max(position.z);
+    }
+    Vec3::new((min_x + max_x) * 0.5, 0.0, (min_z + max_z) * 0.5)
+}
+
+fn formation_disc_collides(
+    position: Vec3,
+    radius: f32,
+    discs: &[(Vec3, f32)],
+    adherence_margin: f32,
+) -> bool {
+    discs.iter().any(|(other_position, other_radius)| {
+        xz_distance(position, *other_position) <= radius + *other_radius + adherence_margin
+    })
+}
+
+fn fit_formation_targets_to_bounds(
+    targets: &mut [Vec3],
+    members: &[FormationMember],
+    indices: &[usize],
+    bounds: MapBounds,
+) {
+    let mut min_x = f32::INFINITY;
+    let mut max_x = f32::NEG_INFINITY;
+    let mut min_z = f32::INFINITY;
+    let mut max_z = f32::NEG_INFINITY;
+    for (target, member_index) in targets.iter().zip(indices) {
+        let radius = members[*member_index].radius;
+        min_x = min_x.min(target.x - radius);
+        max_x = max_x.max(target.x + radius);
+        min_z = min_z.min(target.z - radius);
+        max_z = max_z.max(target.z + radius);
+    }
+
+    let shift_x = if min_x < -bounds.half_width {
+        -bounds.half_width - min_x
+    } else if max_x > bounds.half_width {
+        bounds.half_width - max_x
+    } else {
+        0.0
+    };
+    let shift_z = if min_z < -bounds.half_depth {
+        -bounds.half_depth - min_z
+    } else if max_z > bounds.half_depth {
+        bounds.half_depth - max_z
+    } else {
+        0.0
+    };
+
+    for (target, member_index) in targets.iter_mut().zip(indices) {
+        let radius = members[*member_index].radius.max(0.25);
+        *target = bounds.clamp_ground_point(*target + Vec3::new(shift_x, 0.0, shift_z), radius);
+    }
 }
 
 #[cfg(test)]

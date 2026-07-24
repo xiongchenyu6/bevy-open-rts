@@ -71,6 +71,108 @@ fn shift_right_click_queues_unit_waypoints_only_when_allowed() {
 }
 
 #[test]
+fn godot_style_formation_preserves_sides_and_condenses_the_group() {
+    let members = [
+        FormationMember {
+            position: Vec3::new(-4.0, 0.0, 0.0),
+            radius: 0.5,
+            domain: MovementDomain::Terrain,
+        },
+        FormationMember {
+            position: Vec3::new(4.0, 0.0, 0.0),
+            radius: 0.5,
+            domain: MovementDomain::Terrain,
+        },
+    ];
+    let pivot = Vec3::new(10.0, 0.0, -6.0);
+    let offsets =
+        formation_offsets_for_members(&members, pivot, MapBounds::from_size((80.0, 80.0)));
+    let left = pivot + offsets[0];
+    let right = pivot + offsets[1];
+
+    assert!(left.x < pivot.x && right.x > pivot.x);
+    assert!(((left.x + right.x) * 0.5 - pivot.x).abs() < 0.001);
+    assert!(
+        xz_distance(left, right) < 8.0,
+        "loose groups should be condensed"
+    );
+    assert!(
+        xz_distance(left, right) >= 1.0 + UNIT_ADHERENCE_MARGIN_M * 2.0,
+        "formation destinations must leave room between unit discs"
+    );
+}
+
+#[test]
+fn formation_keeps_air_and_terrain_pivots_independent() {
+    let members = [
+        FormationMember {
+            position: Vec3::new(-5.0, 0.0, 1.0),
+            radius: 0.7,
+            domain: MovementDomain::Terrain,
+        },
+        FormationMember {
+            position: Vec3::new(5.0, 0.0, 1.0),
+            radius: 0.7,
+            domain: MovementDomain::Terrain,
+        },
+        FormationMember {
+            position: Vec3::new(20.0, 0.0, -6.0),
+            radius: 0.6,
+            domain: MovementDomain::Air,
+        },
+        FormationMember {
+            position: Vec3::new(20.0, 0.0, 6.0),
+            radius: 0.6,
+            domain: MovementDomain::Air,
+        },
+    ];
+    let pivot = Vec3::new(-8.0, 0.0, 9.0);
+    let offsets =
+        formation_offsets_for_members(&members, pivot, MapBounds::from_size((80.0, 80.0)));
+    let targets = offsets
+        .into_iter()
+        .map(|offset| pivot + offset)
+        .collect::<Vec<_>>();
+
+    assert!(targets[0].x < pivot.x && targets[1].x > pivot.x);
+    assert!(targets[2].z < pivot.z && targets[3].z > pivot.z);
+    assert!(((targets[0].x + targets[1].x) * 0.5 - pivot.x).abs() < 0.001);
+    assert!(((targets[2].z + targets[3].z) * 0.5 - pivot.z).abs() < 0.001);
+}
+
+#[test]
+fn formation_destinations_keep_unit_discs_inside_map_bounds() {
+    let members = [
+        FormationMember {
+            position: Vec3::new(-5.0, 0.0, -3.0),
+            radius: 1.2,
+            domain: MovementDomain::Terrain,
+        },
+        FormationMember {
+            position: Vec3::new(0.0, 0.0, 0.0),
+            radius: 0.8,
+            domain: MovementDomain::Terrain,
+        },
+        FormationMember {
+            position: Vec3::new(5.0, 0.0, 3.0),
+            radius: 1.0,
+            domain: MovementDomain::Terrain,
+        },
+    ];
+    let bounds = MapBounds::from_size((20.0, 20.0));
+    let pivot = Vec3::new(9.8, 0.0, -9.7);
+    let offsets = formation_offsets_for_members(&members, pivot, bounds);
+
+    for (member, offset) in members.iter().zip(offsets) {
+        let target = pivot + offset;
+        assert!(target.x - member.radius >= -bounds.half_width - 0.001);
+        assert!(target.x + member.radius <= bounds.half_width + 0.001);
+        assert!(target.z - member.radius >= -bounds.half_depth - 0.001);
+        assert!(target.z + member.radius <= bounds.half_depth + 0.001);
+    }
+}
+
+#[test]
 fn rally_point_tracks_move_and_attack_move_modes() {
     let mut rally = RallyPoint {
         target: None,

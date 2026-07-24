@@ -1968,7 +1968,15 @@ pub(crate) fn minimap_input(
                 .filter(|(_, _, _, team, ..)| **team == controlled_team)
                 .collect::<Vec<_>>();
             has_owned_voice_unit = selected.iter().any(|selection| is_voice_unit(selection.2));
-            let count = selected.len().max(1);
+            let formation_members = selected
+                .iter()
+                .map(|(_, transform, unit, ..)| FormationMember::from_unit(transform, unit))
+                .collect::<Vec<_>>();
+            let formation_offsets = formation_offsets_for_members(
+                &formation_members,
+                target,
+                *order_resources.map_bounds,
+            );
             for (index, (entity, transform, unit, _unit_team, orders, _cargo)) in
                 selected.into_iter().enumerate()
             {
@@ -1985,7 +1993,7 @@ pub(crate) fn minimap_input(
                     patrol_order,
                     queue,
                 ) = orders;
-                let offset = formation_offset(index, count);
+                let offset = formation_offsets.get(index).copied().unwrap_or(Vec3::ZERO);
                 let Some(desired) = desired_order_for_selected_unit(
                     unit,
                     OrderTargetChoices {
