@@ -2478,6 +2478,7 @@ pub(crate) fn command_buttons(
     keyboard: Res<ButtonInput<KeyCode>>,
     visible_player: Res<VisiblePlayer>,
     mut action_resources: CommandActionResources,
+    mut online: OnlineProductionCommandParams,
     selected_units: Query<SelectedCommandUnitItem<'_>, SelectedCommandUnitFilter>,
     selected_sell_structures: Query<SelectedSellStructureItem<'_>, With<Selected>>,
     selected_repair_structures: Query<SelectedRepairStructureItem<'_>, With<Selected>>,
@@ -2503,15 +2504,40 @@ pub(crate) fn command_buttons(
             Interaction::Pressed => {
                 if *action != BuildAction::None && availability.enabled {
                     if mouse.just_pressed(MouseButton::Right) {
-                        if cancel_latest_queued_product(
-                            visible_team,
-                            action_resources.player_factions.slot_faction(visible_team),
-                            *action,
-                            &selected_structures,
-                            &producer_structures,
-                            &mut action_resources.build_queue,
-                            &mut action_resources.economies,
-                        ) {
+                        let canceled = if online.is_active() {
+                            let faction =
+                                action_resources.player_factions.slot_faction(visible_team);
+                            let producers = command_queue_producers_for_action(
+                                visible_team,
+                                faction,
+                                *action,
+                                &selected_repair_structures,
+                                &producer_structures,
+                            )
+                            .into_iter()
+                            .map(|entity| online.network_id_for(entity))
+                            .collect::<Option<Vec<_>>>();
+                            let product_id = build_target_product(*action);
+                            producers.is_some_and(|producers| {
+                                !product_id.is_empty()
+                                    && online.submit(OnlinePlayerCommand::CancelProduction {
+                                        producers,
+                                        product_id: product_id.to_string(),
+                                        local_index: None,
+                                    })
+                            })
+                        } else {
+                            cancel_latest_queued_product(
+                                visible_team,
+                                action_resources.player_factions.slot_faction(visible_team),
+                                *action,
+                                &selected_structures,
+                                &producer_structures,
+                                &mut action_resources.build_queue,
+                                &mut action_resources.economies,
+                            )
+                        };
+                        if canceled {
                             record_sound_audio_feedback(
                                 &mut action_resources.audio_feedback,
                                 SoundEffectKind::ConstructionCanceled,
@@ -2536,6 +2562,7 @@ pub(crate) fn command_buttons(
                             &mut action_resources.audio_feedback,
                             &mut action_resources.battle_log,
                             &mut action_resources.idle_worker_cycle,
+                            &mut online,
                             production_batch_modifier_pressed(&keyboard),
                         );
                     }
@@ -2566,6 +2593,7 @@ pub(crate) fn production_queue_slot_buttons(
     mut build_queue: ResMut<BuildQueue>,
     mut economies: ResMut<Economies>,
     mut audio_feedback: ResMut<AudioFeedback>,
+    mut online: OnlineProductionCommandParams,
     mut interaction_q: Query<
         (
             &Interaction,
@@ -2581,16 +2609,46 @@ pub(crate) fn production_queue_slot_buttons(
     for (interaction, target, mut color) in &mut interaction_q {
         match *interaction {
             Interaction::Pressed => {
-                if let Some(producer_entity) = target.producer_entity
-                    && mouse.just_pressed(MouseButton::Left)
-                    && cancel_queued_job_at_local_index(
-                        visible_team,
-                        producer_entity,
-                        target.local_index,
-                        &mut build_queue,
-                        &mut economies,
-                    )
-                {
+                let canceled = target.producer_entity.is_some_and(|producer_entity| {
+                    if !mouse.just_pressed(MouseButton::Left) {
+                        return false;
+                    }
+                    if online.is_active() {
+                        let product_id = build_queue
+                            .0
+                            .iter()
+                            .filter(|job| {
+                                job.team == visible_team && job.producer_entity == producer_entity
+                            })
+                            .nth(target.local_index)
+                            .map(|job| build_target_product(job.action));
+                        let Some((producer, product_id, local_index)) = online
+                            .network_id_for(producer_entity)
+                            .zip(product_id)
+                            .zip(u8::try_from(target.local_index).ok())
+                            .map(|((producer, product_id), local_index)| {
+                                (producer, product_id, local_index)
+                            })
+                        else {
+                            return false;
+                        };
+                        !product_id.is_empty()
+                            && online.submit(OnlinePlayerCommand::CancelProduction {
+                                producers: vec![producer],
+                                product_id: product_id.to_string(),
+                                local_index: Some(local_index),
+                            })
+                    } else {
+                        cancel_queued_job_at_local_index(
+                            visible_team,
+                            producer_entity,
+                            target.local_index,
+                            &mut build_queue,
+                            &mut economies,
+                        )
+                    }
+                });
+                if canceled {
                     record_sound_audio_feedback(
                         &mut audio_feedback,
                         SoundEffectKind::ConstructionCanceled,

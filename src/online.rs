@@ -39,6 +39,9 @@ const ONLINE_SNAPSHOT_INTERVAL_SECONDS: f32 = 1.0 / ONLINE_SNAPSHOT_HZ;
 const ONLINE_SNAPSHOT_SNAP_DISTANCE: f32 = 8.0;
 const ONLINE_MAX_UNIT_ORDERS_PER_COMMAND: usize = 256;
 const ONLINE_MAX_RALLY_STRUCTURES_PER_COMMAND: usize = 64;
+const ONLINE_MAX_PRODUCERS_PER_COMMAND: usize = 64;
+pub(crate) const ONLINE_MAX_CONSTRUCTORS_PER_COMMAND: usize = 64;
+const ONLINE_MAX_ENTITY_ID_BYTES: usize = 64;
 
 const NETWORK_RESOURCE_NAMESPACE: u64 = 1 << 62;
 const NETWORK_SUPPLY_CRATE_NAMESPACE: u64 = 2 << 62;
@@ -341,6 +344,21 @@ impl OnlineMatchConfig {
             })
             .map(Team::Player)
     }
+
+    fn runtime_faction_for_player(&self, player_id: u64) -> SkirmishFaction {
+        self.slots
+            .iter()
+            .find(|slot| {
+                matches!(
+                    slot.occupant,
+                    OnlineSlotOccupant::Human {
+                        player_id: occupant_id,
+                        ..
+                    } if occupant_id == player_id
+                )
+            })
+            .map_or(SkirmishFaction::Alliance, |slot| slot.faction.to_game())
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -476,6 +494,22 @@ pub(crate) enum OnlinePlayerCommand {
         target: [f32; 3],
         target_entity: Option<u64>,
         mode: OnlineRallyMode,
+    },
+    TrainUnits {
+        producers: Vec<u64>,
+        unit_id: String,
+        batch_to_limit: bool,
+    },
+    CancelProduction {
+        producers: Vec<u64>,
+        product_id: String,
+        local_index: Option<u8>,
+    },
+    PlaceStructure {
+        constructors: Vec<u64>,
+        structure_id: String,
+        position: [f32; 3],
+        rotation_y_radians: f32,
     },
 }
 
@@ -629,6 +663,40 @@ struct OnlineEconomySnapshot {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+enum OnlineBuildActionSnapshot {
+    Train(String),
+    Build(String),
+}
+
+impl OnlineBuildActionSnapshot {
+    fn from_game(action: BuildAction) -> Option<Self> {
+        match action {
+            BuildAction::Train(id) => Some(Self::Train(id.to_string())),
+            BuildAction::Build(id) => Some(Self::Build(id.to_string())),
+            _ => None,
+        }
+    }
+
+    fn to_game(&self) -> Option<BuildAction> {
+        match self {
+            Self::Train(id) => registry::entity(id).map(|def| BuildAction::Train(def.id)),
+            Self::Build(id) => registry::entity(id).map(|def| BuildAction::Build(def.id)),
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct OnlineBuildJobSnapshot {
+    team: OnlineEntityTeam,
+    action: OnlineBuildActionSnapshot,
+    producer_entity: u64,
+    producer_id: String,
+    timer: f32,
+    origin: [f32; 3],
+    cost: [i32; 2],
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct OnlineMatchStateSnapshot {
     start_time_sec: f32,
     remaining_teams: u32,
@@ -641,6 +709,7 @@ struct OnlineWorldSnapshot {
     tick: u64,
     entities: Vec<OnlineEntitySnapshot>,
     economies: Vec<OnlineEconomySnapshot>,
+    build_queue: Vec<OnlineBuildJobSnapshot>,
     match_state: OnlineMatchStateSnapshot,
 }
 
@@ -769,7 +838,9 @@ struct OnlineSnapshotBroadcastParams<'w, 's> {
     transport: ResMut<'w, OnlineTransport>,
     replication: ResMut<'w, OnlineMatchReplication>,
     entities: Query<'w, 's, OnlineSnapshotSource<'static>>,
+    network_entities: Query<'w, 's, (Entity, &'static NetworkEntityId)>,
     economies: Res<'w, Economies>,
+    build_queue: Res<'w, BuildQueue>,
     match_state: Res<'w, MatchState>,
 }
 
@@ -782,7 +853,9 @@ struct OnlineSnapshotApplyParams<'w, 's> {
     next_id: ResMut<'w, NextSpawnId>,
     visible_player: Res<'w, VisiblePlayer>,
     economies: ResMut<'w, Economies>,
+    build_queue: ResMut<'w, BuildQueue>,
     match_state: ResMut<'w, MatchState>,
+    network_entities: Query<'w, 's, (Entity, &'static NetworkEntityId)>,
     entities: Query<'w, 's, OnlineSnapshotTarget<'static>>,
 }
 
@@ -801,6 +874,70 @@ pub(crate) struct OnlineOrderCommandParams<'w, 's> {
             With<RallyPoint>,
             Without<Unit>,
         ),
+    >,
+}
+
+#[derive(SystemParam)]
+pub(crate) struct OnlineProductionCommandParams<'w, 's> {
+    session: Option<Res<'w, OnlineSession>>,
+    outbox: Option<ResMut<'w, OnlineCommandOutbox>>,
+    network_ids: Query<'w, 's, &'static NetworkEntityId>,
+}
+
+impl OnlineProductionCommandParams<'_, '_> {
+    pub(crate) fn is_active(&self) -> bool {
+        online_match_uses_command_transport(self.session.as_deref())
+    }
+
+    pub(crate) fn network_id_for(&self, entity: Entity) -> Option<u64> {
+        self.network_ids.get(entity).ok().map(|id| id.0)
+    }
+
+    pub(crate) fn submit(&mut self, command: OnlinePlayerCommand) -> bool {
+        let Some(outbox) = self.outbox.as_deref_mut() else {
+            return false;
+        };
+        outbox.submit(command);
+        true
+    }
+}
+
+#[derive(SystemParam)]
+struct OnlineCommandApplyParams<'w, 's> {
+    commands: Commands<'w, 's>,
+    session: Res<'w, OnlineSession>,
+    inbox: ResMut<'w, OnlineCommandInbox>,
+    asset_server: Option<Res<'w, AssetServer>>,
+    terrain: Option<Res<'w, TerrainHeightField>>,
+    map_bounds: Res<'w, MapBounds>,
+    relations: Res<'w, TeamRelations>,
+    next_id: Option<ResMut<'w, NextSpawnId>>,
+    economies: Option<ResMut<'w, Economies>>,
+    build_queue: Option<ResMut<'w, BuildQueue>>,
+    network_entities: Query<'w, 's, (Entity, &'static NetworkEntityId)>,
+    actors: Query<'w, 's, OnlineCommandActor<'static>>,
+    targets: Query<'w, 's, OnlineCommandTarget<'static>>,
+    rally_points: Query<
+        'w,
+        's,
+        (
+            &'static NetworkEntityId,
+            &'static Team,
+            &'static mut RallyPoint,
+        ),
+        With<Structure>,
+    >,
+    structures: Query<'w, 's, StructurePrereqItem<'static>>,
+    occupiers: Query<
+        'w,
+        's,
+        PlacementOccupierItem<'static>,
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
     >,
 }
 
@@ -1051,6 +1188,10 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
                 .chain()
                 .in_set(SimulationPhase::UiAndManagement)
                 .after(issue_orders)
+                .after(structure_placement_input)
+                .after(command_shortcuts)
+                .after(command_buttons)
+                .after(production_queue_slot_buttons)
                 .run_if(match_in_progress),
         )
         .add_systems(
@@ -2251,17 +2392,25 @@ fn flush_online_player_commands(
     }
 }
 
-fn apply_online_player_commands(
-    mut commands: Commands,
-    session: Res<OnlineSession>,
-    mut inbox: ResMut<OnlineCommandInbox>,
-    map_bounds: Res<MapBounds>,
-    relations: Res<TeamRelations>,
-    network_entities: Query<(Entity, &NetworkEntityId)>,
-    actors: Query<OnlineCommandActor<'_>>,
-    targets: Query<OnlineCommandTarget<'_>>,
-    mut rally_points: Query<(&NetworkEntityId, &Team, &mut RallyPoint), With<Structure>>,
-) {
+fn apply_online_player_commands(params: OnlineCommandApplyParams) {
+    let OnlineCommandApplyParams {
+        mut commands,
+        session,
+        mut inbox,
+        asset_server,
+        terrain,
+        map_bounds,
+        relations,
+        mut next_id,
+        mut economies,
+        mut build_queue,
+        network_entities,
+        actors,
+        targets,
+        mut rally_points,
+        structures: structure_prereqs,
+        occupiers,
+    } = params;
     if session.phase != OnlinePhase::InMatch || !session.is_host {
         inbox.pending.clear();
         return;
@@ -2274,6 +2423,11 @@ fn apply_online_player_commands(
         .iter()
         .map(|(entity, network_id)| (network_id.0, entity))
         .collect::<HashMap<_, _>>();
+    let host_visible_team = session
+        .local_player_id
+        .and_then(|player_id| config.runtime_team_for_player(player_id))
+        .unwrap_or(Team::Player(0));
+    let mut accepted_structure_sites = Vec::<(Vec3, f32)>::new();
 
     while let Some(authorized) = inbox.pending.pop_front() {
         let Some(team) = config.runtime_team_for_player(authorized.player_id) else {
@@ -2404,8 +2558,300 @@ fn apply_online_player_commands(
                     );
                 }
             }
+            OnlinePlayerCommand::TrainUnits {
+                producers,
+                unit_id,
+                batch_to_limit,
+            } => {
+                let (Some(economies), Some(build_queue)) =
+                    (economies.as_deref_mut(), build_queue.as_deref_mut())
+                else {
+                    continue;
+                };
+                let Some(def) = valid_online_registry_entity(&unit_id) else {
+                    continue;
+                };
+                let faction = config.runtime_faction_for_player(authorized.player_id);
+                let Some(producers) = resolve_online_producers(
+                    team,
+                    faction,
+                    def.id,
+                    &producers,
+                    &entity_by_network_id,
+                    &targets,
+                ) else {
+                    continue;
+                };
+                if !requirements_met(def, team, &structure_prereqs) {
+                    continue;
+                }
+                let _ = enqueue_build_jobs_for_producers(
+                    team,
+                    faction,
+                    BuildAction::Train(def.id),
+                    def,
+                    &producers,
+                    batch_to_limit,
+                    economies,
+                    build_queue,
+                );
+            }
+            OnlinePlayerCommand::CancelProduction {
+                producers,
+                product_id,
+                local_index,
+            } => {
+                let (Some(economies), Some(build_queue)) =
+                    (economies.as_deref_mut(), build_queue.as_deref_mut())
+                else {
+                    continue;
+                };
+                let Some(product) = valid_online_registry_entity(&product_id) else {
+                    continue;
+                };
+                let Some(producer_entities) = resolve_owned_online_structure_entities(
+                    team,
+                    &producers,
+                    ONLINE_MAX_PRODUCERS_PER_COMMAND,
+                    &entity_by_network_id,
+                    &targets,
+                ) else {
+                    continue;
+                };
+                if let Some(local_index) = local_index {
+                    if producer_entities.len() != 1
+                        || usize::from(local_index) >= PRODUCTION_QUEUE_LIMIT
+                    {
+                        continue;
+                    }
+                    let _ = cancel_queued_job_at_local_index(
+                        team,
+                        producer_entities[0],
+                        usize::from(local_index),
+                        build_queue,
+                        economies,
+                    );
+                } else {
+                    let _ = cancel_latest_queued_product_for_producers(
+                        team,
+                        product.id,
+                        &producer_entities,
+                        build_queue,
+                        economies,
+                    );
+                }
+            }
+            OnlinePlayerCommand::PlaceStructure {
+                constructors,
+                structure_id,
+                position,
+                rotation_y_radians,
+            } => {
+                let (Some(asset_server), Some(terrain), Some(next_id), Some(economies)) = (
+                    asset_server.as_deref(),
+                    terrain.as_deref(),
+                    next_id.as_deref_mut(),
+                    economies.as_deref_mut(),
+                ) else {
+                    continue;
+                };
+                let Some(def) = valid_online_registry_entity(&structure_id) else {
+                    continue;
+                };
+                let point = Vec3::from_array(position);
+                if !point.is_finite()
+                    || !rotation_y_radians.is_finite()
+                    || accepted_structure_sites.iter().any(|(accepted, radius)| {
+                        xz_distance(*accepted, point) < *radius + def.radius
+                    })
+                {
+                    continue;
+                }
+                let Some(mut constructors) = resolve_online_constructors(
+                    team,
+                    &constructors,
+                    &entity_by_network_id,
+                    &actors,
+                ) else {
+                    continue;
+                };
+                if constructors.is_empty() {
+                    let Some(constructor) = nearest_online_constructor(team, point, &actors) else {
+                        continue;
+                    };
+                    constructors.push(constructor);
+                }
+                let faction = config.runtime_faction_for_player(authorized.player_id);
+                let Ok((structure, _)) = place_structure_at_for_faction(
+                    &mut commands,
+                    asset_server,
+                    next_id,
+                    team,
+                    faction,
+                    host_visible_team,
+                    def.id,
+                    point,
+                    normalize_structure_rotation_y(rotation_y_radians),
+                    *map_bounds,
+                    terrain,
+                    economies,
+                    &structure_prereqs,
+                    &occupiers,
+                ) else {
+                    continue;
+                };
+                accepted_structure_sites.push((point, def.radius));
+                assign_online_constructors(
+                    &mut commands,
+                    team,
+                    structure,
+                    point,
+                    &constructors,
+                    &actors,
+                );
+            }
         }
     }
+}
+
+fn valid_online_registry_entity(id: &str) -> Option<&'static registry::EntityDef> {
+    (!id.is_empty() && id.len() <= ONLINE_MAX_ENTITY_ID_BYTES)
+        .then(|| registry::entity(id))
+        .flatten()
+}
+
+fn resolve_online_producers(
+    team: Team,
+    faction: SkirmishFaction,
+    product_id: &'static str,
+    requested: &[u64],
+    entity_by_network_id: &HashMap<u64, Entity>,
+    targets: &Query<OnlineCommandTarget<'_>>,
+) -> Option<Vec<(Entity, &'static str, Vec3)>> {
+    if requested.is_empty() || requested.len() > ONLINE_MAX_PRODUCERS_PER_COMMAND {
+        return None;
+    }
+    let faction = faction_def(faction)?;
+    let mut seen = HashSet::with_capacity(requested.len());
+    let mut producers = Vec::with_capacity(requested.len());
+    for network_id in requested {
+        if !seen.insert(*network_id) {
+            return None;
+        }
+        let entity = entity_by_network_id.get(network_id).copied()?;
+        let (producer_team, transform, _, structure, _, health, construction, _) =
+            targets.get(entity).ok()?;
+        let (Some(structure), Some(health)) = (structure, health) else {
+            return None;
+        };
+        if *producer_team != team
+            || health.current <= 0.0
+            || !structure_is_constructed(construction)
+            || !faction.can_produce(structure.id, product_id)
+        {
+            return None;
+        }
+        producers.push((entity, structure.id, transform.translation));
+    }
+    Some(producers)
+}
+
+fn resolve_owned_online_structure_entities(
+    team: Team,
+    requested: &[u64],
+    maximum: usize,
+    entity_by_network_id: &HashMap<u64, Entity>,
+    targets: &Query<OnlineCommandTarget<'_>>,
+) -> Option<Vec<Entity>> {
+    if requested.is_empty() || requested.len() > maximum {
+        return None;
+    }
+    let mut seen = HashSet::with_capacity(requested.len());
+    let mut structures = Vec::with_capacity(requested.len());
+    for network_id in requested {
+        if !seen.insert(*network_id) {
+            return None;
+        }
+        let entity = entity_by_network_id.get(network_id).copied()?;
+        let (structure_team, _, _, structure, _, health, construction, _) =
+            targets.get(entity).ok()?;
+        if *structure_team != team
+            || structure.is_none()
+            || health.is_none_or(|health| health.current <= 0.0)
+            || !structure_is_constructed(construction)
+        {
+            return None;
+        }
+        structures.push(entity);
+    }
+    Some(structures)
+}
+
+fn resolve_online_constructors(
+    team: Team,
+    requested: &[u64],
+    entity_by_network_id: &HashMap<u64, Entity>,
+    actors: &Query<OnlineCommandActor<'_>>,
+) -> Option<Vec<Entity>> {
+    if requested.len() > ONLINE_MAX_CONSTRUCTORS_PER_COMMAND {
+        return None;
+    }
+    let mut seen = HashSet::with_capacity(requested.len());
+    let mut constructors = Vec::with_capacity(requested.len());
+    for network_id in requested {
+        if !seen.insert(*network_id) {
+            return None;
+        }
+        let entity = entity_by_network_id.get(network_id).copied()?;
+        let (_, _, constructor_team, unit, health, _, _) = actors.get(entity).ok()?;
+        if *constructor_team != team
+            || health.current <= 0.0
+            || !can_unit_construct_structures(unit)
+        {
+            return None;
+        }
+        constructors.push(entity);
+    }
+    Some(constructors)
+}
+
+fn assign_online_constructors(
+    commands: &mut Commands,
+    team: Team,
+    target: Entity,
+    target_position: Vec3,
+    requested: &[Entity],
+    actors: &Query<OnlineCommandActor<'_>>,
+) -> bool {
+    if !requested.is_empty() {
+        for constructor in requested {
+            issue_unit_order(commands, *constructor, UnitQueuedOrder::Construct(target));
+        }
+        return true;
+    }
+
+    let Some(constructor) = nearest_online_constructor(team, target_position, actors) else {
+        return false;
+    };
+    issue_unit_order(commands, constructor, UnitQueuedOrder::Construct(target));
+    true
+}
+
+fn nearest_online_constructor(
+    team: Team,
+    target_position: Vec3,
+    actors: &Query<OnlineCommandActor<'_>>,
+) -> Option<Entity> {
+    actors
+        .iter()
+        .filter(|(_, _, actor_team, unit, health, _, _)| {
+            **actor_team == team && health.current > 0.0 && can_unit_construct_structures(unit)
+        })
+        .map(|(entity, _, _, _, _, transform, _)| {
+            (entity, xz_distance(transform.translation, target_position))
+        })
+        .min_by(|(_, left), (_, right)| left.total_cmp(right))
+        .map(|(entity, _)| entity)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -2592,7 +3038,9 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
         mut transport,
         mut replication,
         entities,
+        network_entities,
         economies,
+        build_queue,
         match_state,
     } = params;
     if session.phase != OnlinePhase::InMatch || !session.is_host {
@@ -2665,6 +3113,25 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
         )
         .collect::<Vec<_>>();
     entity_snapshots.sort_unstable_by_key(|entity| entity.id);
+    let network_id_by_entity = network_entities
+        .iter()
+        .map(|(entity, network_id)| (entity, network_id.0))
+        .collect::<HashMap<_, _>>();
+    let build_queue = build_queue
+        .0
+        .iter()
+        .filter_map(|job| {
+            Some(OnlineBuildJobSnapshot {
+                team: OnlineEntityTeam::from_game(job.team),
+                action: OnlineBuildActionSnapshot::from_game(job.action)?,
+                producer_entity: *network_id_by_entity.get(&job.producer_entity)?,
+                producer_id: job.producer_id.to_string(),
+                timer: job.timer,
+                origin: job.origin.to_array(),
+                cost: [job.cost.ore, job.cost.crystal],
+            })
+        })
+        .collect();
     let snapshot = OnlineWorldSnapshot {
         protocol: RTS_ONLINE_PROTOCOL,
         tick: replication.next_tick,
@@ -2681,6 +3148,7 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
                 production_veterancy_ranks: economy.production_veterancy_ranks.to_vec(),
             })
             .collect(),
+        build_queue,
         match_state: OnlineMatchStateSnapshot {
             start_time_sec: match_state.start_time_sec,
             remaining_teams: match_state.remaining_teams,
@@ -2720,7 +3188,9 @@ fn apply_pending_online_snapshot(params: OnlineSnapshotApplyParams) {
         mut next_id,
         visible_player,
         mut economies,
+        mut build_queue,
         mut match_state,
+        network_entities,
         mut entities,
     } = params;
     if session.phase != OnlinePhase::InMatch || session.is_host {
@@ -2756,6 +3226,31 @@ fn apply_pending_online_snapshot(params: OnlineSnapshotApplyParams) {
     match_state.start_time_sec = snapshot.match_state.start_time_sec;
     match_state.remaining_teams = snapshot.match_state.remaining_teams;
     match_state.remaining_anchors = snapshot.match_state.remaining_anchors;
+
+    let entity_by_network_id = network_entities
+        .iter()
+        .map(|(entity, network_id)| (network_id.0, entity))
+        .collect::<HashMap<_, _>>();
+    build_queue.0 = snapshot
+        .build_queue
+        .iter()
+        .filter_map(|job| {
+            let producer_entity = entity_by_network_id.get(&job.producer_entity).copied()?;
+            let producer_id = registry::entity(&job.producer_id)?.id;
+            Some(BuildJob {
+                team: job.team.to_game(),
+                action: job.action.to_game()?,
+                producer_entity,
+                producer_id,
+                timer: job.timer.max(0.0),
+                origin: Vec3::from_array(job.origin),
+                cost: registry::Cost {
+                    ore: job.cost[0],
+                    crystal: job.cost[1],
+                },
+            })
+        })
+        .collect();
 
     let mut incoming = snapshot
         .entities
@@ -3649,6 +4144,7 @@ mod tests {
                     production_veterancy_ranks: vec![3; 3],
                 })
                 .collect(),
+            build_queue: Vec::new(),
             match_state: OnlineMatchStateSnapshot {
                 start_time_sec: 600.0,
                 remaining_teams: 8,
@@ -3698,7 +4194,18 @@ mod tests {
 
     #[test]
     fn large_eight_player_snapshot_fits_unreliable_channel() {
-        let snapshot = sample_world_snapshot(42, 512);
+        let mut snapshot = sample_world_snapshot(42, 512);
+        snapshot.build_queue = (0..128)
+            .map(|index| OnlineBuildJobSnapshot {
+                team: OnlineEntityTeam::Player(index % 8),
+                action: OnlineBuildActionSnapshot::Train("Worker".to_string()),
+                producer_entity: index as u64 + 1,
+                producer_id: "CommandCenter".to_string(),
+                timer: 4.5,
+                origin: [index as f32, 0.0, index as f32 * 0.25],
+                cost: [4, 2],
+            })
+            .collect();
         let encoded = postcard::to_allocvec(&snapshot).unwrap();
         assert!(
             encoded.len() <= MAX_SNAPSHOT_PACKET_BYTES,
@@ -3768,6 +4275,30 @@ mod tests {
         assert_eq!(host.team_relations, client.team_relations);
         assert_eq!(host.visible_player.team, Team::Player(0));
         assert_eq!(client.visible_player.team, Team::Player(1));
+        assert!(!team_uses_automatic_construction(
+            Team::Player(0),
+            Some(Team::Player(0)),
+            Some(&host),
+            true,
+        ));
+        assert!(!team_uses_automatic_construction(
+            Team::Player(1),
+            Some(Team::Player(0)),
+            Some(&host),
+            true,
+        ));
+        assert!(team_uses_automatic_construction(
+            Team::Player(2),
+            Some(Team::Player(0)),
+            Some(&host),
+            true,
+        ));
+        assert!(team_uses_automatic_construction(
+            Team::Player(0),
+            None,
+            Some(&host),
+            false,
+        ));
     }
 
     #[test]
@@ -3916,5 +4447,221 @@ mod tests {
             app.world().get::<MoveOrder>(player_unit).unwrap().target,
             Vec3::new(4.0, 0.0, 5.0)
         );
+    }
+
+    #[test]
+    fn host_validates_training_ownership_and_authoritative_refunds() {
+        let mut lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        lobby.slots[1].occupant = OnlineSlotOccupant::Human {
+            player_id: 2,
+            name: "Player".to_string(),
+            ready: true,
+            connected: true,
+        };
+        lobby.slots[1].faction = OnlineFaction::Alliance;
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.is_host = true;
+        session.local_player_id = Some(1);
+        session.match_config = Some(OnlineMatchConfig::from(&lobby));
+
+        let mut economies = Economies::default();
+        for team in [Team::Player(0), Team::Player(1)] {
+            let economy = economies.get_mut(team);
+            economy.ore = 1_000;
+            economy.crystal = 1_000;
+        }
+        let starting_ore = economies.get(Team::Player(1)).ore;
+        let starting_crystal = economies.get(Team::Player(1)).crystal;
+
+        let mut app = App::new();
+        app.insert_resource(session)
+            .insert_resource(OnlineCommandInbox::default())
+            .insert_resource(MapBounds::default())
+            .insert_resource(TeamRelations::default())
+            .insert_resource(economies)
+            .insert_resource(BuildQueue::default())
+            .add_systems(Update, apply_online_player_commands);
+        app.world_mut().spawn((
+            NetworkEntityId(10),
+            Team::Player(0),
+            Structure {
+                id: "CommandCenter",
+            },
+            Health::new(100.0),
+            Transform::default(),
+        ));
+        let player_producer = app
+            .world_mut()
+            .spawn((
+                NetworkEntityId(20),
+                Team::Player(1),
+                Structure {
+                    id: "CommandCenter",
+                },
+                Health::new(100.0),
+                Transform::from_xyz(8.0, 0.0, 4.0),
+            ))
+            .id();
+        {
+            let mut inbox = app.world_mut().resource_mut::<OnlineCommandInbox>();
+            for (sequence, producer) in [(1, 10), (2, 20)] {
+                assert!(enqueue_online_player_command(
+                    &mut inbox,
+                    2,
+                    OnlinePlayerCommandEnvelope {
+                        protocol: RTS_ONLINE_PROTOCOL,
+                        sequence,
+                        command: OnlinePlayerCommand::TrainUnits {
+                            producers: vec![producer],
+                            unit_id: "Worker".to_string(),
+                            batch_to_limit: false,
+                        },
+                    }
+                ));
+            }
+        }
+        app.update();
+
+        let queue = app.world().resource::<BuildQueue>();
+        assert_eq!(queue.0.len(), 1);
+        assert_eq!(queue.0[0].producer_entity, player_producer);
+        assert_eq!(queue.0[0].team, Team::Player(1));
+        assert_eq!(queue.0[0].action, BuildAction::Train("Worker"));
+        let charged = queue.0[0].cost;
+        assert_eq!(
+            app.world().resource::<Economies>().get(Team::Player(1)).ore,
+            starting_ore - charged.ore
+        );
+        assert_eq!(
+            app.world()
+                .resource::<Economies>()
+                .get(Team::Player(1))
+                .crystal,
+            starting_crystal - charged.crystal
+        );
+
+        {
+            let mut inbox = app.world_mut().resource_mut::<OnlineCommandInbox>();
+            assert!(enqueue_online_player_command(
+                &mut inbox,
+                2,
+                OnlinePlayerCommandEnvelope {
+                    protocol: RTS_ONLINE_PROTOCOL,
+                    sequence: 3,
+                    command: OnlinePlayerCommand::CancelProduction {
+                        producers: vec![20],
+                        product_id: "Worker".to_string(),
+                        local_index: None,
+                    },
+                }
+            ));
+        }
+        app.update();
+
+        assert!(app.world().resource::<BuildQueue>().0.is_empty());
+        let economy = app.world().resource::<Economies>().get(Team::Player(1));
+        assert_eq!(economy.ore, starting_ore);
+        assert_eq!(economy.crystal, starting_crystal);
+    }
+
+    #[test]
+    fn host_places_owned_structure_and_assigns_authorized_worker() {
+        let mut lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        lobby.slots[1].occupant = OnlineSlotOccupant::Human {
+            player_id: 2,
+            name: "Player".to_string(),
+            ready: true,
+            connected: true,
+        };
+        lobby.slots[1].faction = OnlineFaction::Alliance;
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.is_host = true;
+        session.local_player_id = Some(1);
+        session.match_config = Some(OnlineMatchConfig::from(&lobby));
+
+        let mut economies = Economies::default();
+        let economy = economies.get_mut(Team::Player(1));
+        economy.ore = 1_000;
+        economy.crystal = 1_000;
+        let structure_cost = registry::entity("PowerReactor").unwrap().cost;
+
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, bevy::asset::AssetPlugin::default()))
+            .init_asset::<WorldAsset>()
+            .insert_resource(session)
+            .insert_resource(OnlineCommandInbox::default())
+            .insert_resource(MapBounds::default())
+            .insert_resource(TeamRelations::default())
+            .insert_resource(TerrainHeightField::default())
+            .insert_resource(NextSpawnId(100))
+            .insert_resource(economies)
+            .insert_resource(BuildQueue::default())
+            .add_systems(Update, apply_online_player_commands);
+        app.world_mut().spawn((
+            NetworkEntityId(20),
+            Team::Player(1),
+            Structure {
+                id: "CommandCenter",
+            },
+            Health::new(100.0),
+            Transform::from_xyz(10.0, 0.0, 0.0),
+            Selectable { radius: 2.0 },
+        ));
+        let worker = app
+            .world_mut()
+            .spawn((
+                NetworkEntityId(30),
+                Team::Player(1),
+                Unit {
+                    id: "Worker",
+                    speed: 3.0,
+                    can_crush: false,
+                    can_be_crushed: true,
+                },
+                Health::new(6.0),
+                Transform::from_xyz(14.0, 0.0, 0.0),
+                Selectable { radius: 0.35 },
+            ))
+            .id();
+        {
+            let mut inbox = app.world_mut().resource_mut::<OnlineCommandInbox>();
+            assert!(enqueue_online_player_command(
+                &mut inbox,
+                2,
+                OnlinePlayerCommandEnvelope {
+                    protocol: RTS_ONLINE_PROTOCOL,
+                    sequence: 1,
+                    command: OnlinePlayerCommand::PlaceStructure {
+                        constructors: vec![30],
+                        structure_id: "PowerReactor".to_string(),
+                        position: [17.0, 0.0, 0.0],
+                        rotation_y_radians: 0.0,
+                    },
+                }
+            ));
+        }
+        app.update();
+
+        let mut structures = app
+            .world_mut()
+            .query::<(Entity, &Structure, &Team, Option<&UnderConstruction>)>();
+        let placed = structures
+            .iter(app.world())
+            .find_map(|(entity, structure, team, construction)| {
+                (structure.id == "PowerReactor"
+                    && *team == Team::Player(1)
+                    && construction.is_some())
+                .then_some(entity)
+            })
+            .expect("host should place the validated structure");
+        assert_eq!(
+            app.world().get::<ConstructOrder>(worker).unwrap().target,
+            placed
+        );
+        let economy = app.world().resource::<Economies>().get(Team::Player(1));
+        assert_eq!(economy.ore, 1_000 - structure_cost.ore);
+        assert_eq!(economy.crystal, 1_000 - structure_cost.crystal);
     }
 }

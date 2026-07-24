@@ -104,7 +104,7 @@ impl BuildStructureTab {
     }
 }
 
-#[derive(Component, Clone, Copy, PartialEq, Eq)]
+#[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum BuildAction {
     None,
     Train(&'static str),
@@ -228,6 +228,7 @@ pub(crate) fn structure_placement_input(
     window_q: Query<&Window, With<PrimaryWindow>>,
     camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     mut placement: StructurePlacementInputResources,
+    mut online: OnlineProductionCommandParams,
     structures: Query<StructurePrereqItem<'_>>,
     occupiers: Query<
         PlacementOccupierItem<'_>,
@@ -291,6 +292,72 @@ pub(crate) fn structure_placement_input(
         return;
     };
     let player_team = placement.visible_player.team;
+    if online.is_active() {
+        let validity = structure_placement_validity_for_faction(
+            team,
+            faction,
+            id,
+            point,
+            map_bounds,
+            &terrain,
+            &placement.economies,
+            &structures,
+            &occupiers,
+        );
+        if validity != StructurePlacementValidity::Valid {
+            record_sound_audio_feedback(&mut placement.audio_feedback, SoundEffectKind::Error);
+            if validity == StructurePlacementValidity::NotEnoughResources {
+                record_voice_audio_feedback(
+                    &mut placement.audio_feedback,
+                    UnitVoiceEvent::NotEnoughResources,
+                );
+            }
+            record_structure_placement_failure_battle_log(
+                team,
+                player_team,
+                validity,
+                point,
+                &mut placement.battle_log,
+            );
+            return;
+        }
+        let constructors = placement
+            .selected_constructors
+            .iter()
+            .filter(|(_, unit, constructor_team, health)| {
+                **constructor_team == team
+                    && health.current > 0.0
+                    && can_unit_construct_structures(unit)
+            })
+            .filter_map(|(entity, ..)| online.network_id_for(entity))
+            .take(ONLINE_MAX_CONSTRUCTORS_PER_COMMAND)
+            .collect::<Vec<_>>();
+        if online.submit(OnlinePlayerCommand::PlaceStructure {
+            constructors,
+            structure_id: id.to_string(),
+            position: point.to_array(),
+            rotation_y_radians,
+        }) {
+            placement.command_mode.pending_structure_placement = None;
+            *placement.placement_feedback = StructurePlacementFeedback::default();
+            record_sound_audio_feedback(
+                &mut placement.audio_feedback,
+                SoundEffectKind::ConstructionStarted,
+            );
+            push_battle_log(
+                &mut placement.battle_log,
+                format!(
+                    "{}: {}",
+                    t("开始施工", "Construction started"),
+                    localized_entity_label(id)
+                ),
+                Some(point),
+            );
+        } else {
+            record_sound_audio_feedback(&mut placement.audio_feedback, SoundEffectKind::Error);
+        }
+        return;
+    }
     match place_structure_at_for_faction(
         &mut commands,
         &placement.asset_server,
@@ -1422,6 +1489,8 @@ pub(crate) fn progress_under_construction_structures(
     mut next_id: ResMut<NextSpawnId>,
     map_bounds: Res<MapBounds>,
     visible_player: Option<Res<VisiblePlayer>>,
+    match_setup: Option<Res<MatchSetupSettings>>,
+    online_session: Option<Res<OnlineSession>>,
     mut audio_feedback: ResMut<AudioFeedback>,
     mut battle_log: ResMut<BattleLog>,
     mut structures: Query<(
@@ -1436,13 +1505,20 @@ pub(crate) fn progress_under_construction_structures(
 ) {
     let player_team = visible_player_team(visible_player.as_deref());
     let controlled_team = controlled_player_team(visible_player.as_deref());
+    let online_match = online_match_uses_command_transport(online_session.as_deref());
     for (entity, structure, team, transform, visual_faction, mut health, mut construction) in
         &mut structures
     {
-        // AI-controlled structures self-construct: the AI keeps its workers
-        // gathering and doesn't reliably free them to build, so advance its
-        // buildings automatically (RA2-style auto-construction).
-        if controlled_team != Some(*team) && construction.remaining > 0.0 {
+        // AI-controlled structures self-construct. Online remote humans are
+        // still human players even though this process is the simulation host,
+        // so derive this from the match controller table instead of visibility.
+        let auto_construct = team_uses_automatic_construction(
+            *team,
+            controlled_team,
+            match_setup.as_deref(),
+            online_match,
+        );
+        if auto_construct && construction.remaining > 0.0 {
             construction.remaining = (construction.remaining
                 - STRUCTURE_CONSTRUCTION_PROGRESS_PER_SECOND * time.delta_secs())
             .max(0.0);
@@ -1492,6 +1568,22 @@ pub(crate) fn progress_under_construction_structures(
             );
         }
     }
+}
+
+pub(crate) fn team_uses_automatic_construction(
+    team: Team,
+    controlled_team: Option<Team>,
+    match_setup: Option<&MatchSetupSettings>,
+    online_match: bool,
+) -> bool {
+    if !online_match {
+        return controlled_team != Some(team);
+    }
+    match_setup.is_some_and(|setup| {
+        team.economy_index()
+            .and_then(|index| setup.player_controllers.get(index))
+            .is_some_and(|controller| matches!(controller, SkirmishPlayerController::Ai(_)))
+    })
 }
 
 #[allow(dead_code)]

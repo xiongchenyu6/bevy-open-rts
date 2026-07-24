@@ -45,7 +45,17 @@
   capabilities, target relations, liveness, and map bounds before mutating the
   authoritative simulation. A maximum 256-unit order batch fits the 256 KiB
   reliable-channel budget.
-- The running match is not yet command-complete: training, construction, queue
-  management, command-card actions, and support powers still need equivalent
-  host-authoritative command paths. Large battles will also need
+- Training, production cancellation, and structure placement now use bounded,
+  sequenced reliable commands with stable producer and Worker IDs. The host
+  validates ownership, faction production relationships, technology, queue
+  capacity, resources, placement legality, and construction capability. Exact
+  charged costs drive cancellation refunds, and authoritative build queues are
+  mirrored in snapshots for client HUD progress.
+- Remote human teams must never be inferred as AI merely because they are not
+  the locally controlled team. Automatic construction now checks the configured
+  slot controller explicitly, so only real AI slots progress foundations
+  without an assigned Worker.
+- The running match is not yet command-complete: remaining command-card actions,
+  support powers, reconnect state, and victory/return-to-lobby flow still need
+  equivalent host-authoritative handling. Large battles will also need
   delta/compressed snapshots rather than relying only on full state.

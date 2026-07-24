@@ -907,6 +907,7 @@ pub(crate) fn command_shortcuts(
     keyboard: Res<ButtonInput<KeyCode>>,
     visible_player: Res<VisiblePlayer>,
     mut action_resources: CommandActionResources,
+    mut online: OnlineProductionCommandParams,
     slot_q: Query<(&CommandSlot, &BuildAction, Option<&CommandSlotAvailability>)>,
     selected_units: Query<SelectedCommandUnitItem<'_>, SelectedCommandUnitFilter>,
     selected_sell_structures: Query<SelectedSellStructureItem<'_>, With<Selected>>,
@@ -959,6 +960,7 @@ pub(crate) fn command_shortcuts(
             &mut action_resources.audio_feedback,
             &mut action_resources.battle_log,
             &mut action_resources.idle_worker_cycle,
+            &mut online,
             production_batch_modifier_pressed(&keyboard),
         );
         return;
@@ -983,6 +985,7 @@ pub(crate) fn execute_command_action(
     audio_feedback: &mut AudioFeedback,
     battle_log: &mut BattleLog,
     idle_worker_cycle: &mut IdleWorkerCycleState,
+    online: &mut OnlineProductionCommandParams,
     batch_to_limit: bool,
 ) -> bool {
     let canceling_construction = action == BuildAction::SellStructure
@@ -1089,17 +1092,33 @@ pub(crate) fn execute_command_action(
             scatter_selected_units(commands, team, selected_units)
         }
         BuildAction::Train(_) => {
-            match enqueue_build_action_for_faction(
-                team,
-                faction,
-                action,
-                selected_structures,
-                producer_structures,
-                structures,
-                economies,
-                build_queue,
-                batch_to_limit,
-            ) {
+            let result = if online.is_active() {
+                submit_online_train_action(
+                    online,
+                    team,
+                    faction,
+                    action,
+                    selected_structures,
+                    producer_structures,
+                    structures,
+                    economies,
+                    build_queue,
+                    batch_to_limit,
+                )
+            } else {
+                enqueue_build_action_for_faction(
+                    team,
+                    faction,
+                    action,
+                    selected_structures,
+                    producer_structures,
+                    structures,
+                    economies,
+                    build_queue,
+                    batch_to_limit,
+                )
+            };
+            match result {
                 EnqueueBuildActionResult::Enqueued => true,
                 EnqueueBuildActionResult::NotEnoughResources => {
                     record_sound_audio_feedback(audio_feedback, SoundEffectKind::Error);
@@ -1145,6 +1164,61 @@ pub(crate) fn execute_command_action(
         record_build_action_audio_feedback(audio_feedback, team, team, action);
     }
     handled
+}
+
+#[allow(clippy::too_many_arguments)]
+fn submit_online_train_action(
+    online: &mut OnlineProductionCommandParams,
+    team: Team,
+    faction: SkirmishFaction,
+    action: BuildAction,
+    selected_structures: &Query<StructureEntityItem<'_>, With<Selected>>,
+    producer_structures: &Query<StructureEntityItem<'_>>,
+    structures: &Query<StructurePrereqItem<'_>>,
+    economies: &Economies,
+    build_queue: &BuildQueue,
+    batch_to_limit: bool,
+) -> EnqueueBuildActionResult {
+    let BuildAction::Train(product_id) = action else {
+        return EnqueueBuildActionResult::Unavailable;
+    };
+    let Some(def) = registry::entity(product_id) else {
+        return EnqueueBuildActionResult::Unavailable;
+    };
+    if !requirements_met(def, team, structures) {
+        return EnqueueBuildActionResult::Unavailable;
+    }
+    let charged_cost = faction_unit_cost(Some(faction), def.cost);
+    if !economies.get(team).can_afford(charged_cost) {
+        return EnqueueBuildActionResult::NotEnoughResources;
+    }
+    let producers = match production_origins_for_faction(
+        team,
+        faction,
+        product_id,
+        selected_structures,
+        producer_structures,
+        build_queue,
+    ) {
+        Ok(producers) => producers,
+        Err(result) => return result,
+    };
+    let producers = producers
+        .into_iter()
+        .map(|(entity, _, _)| online.network_id_for(entity))
+        .collect::<Option<Vec<_>>>();
+    let Some(producers) = producers else {
+        return EnqueueBuildActionResult::Unavailable;
+    };
+    if online.submit(OnlinePlayerCommand::TrainUnits {
+        producers,
+        unit_id: product_id.to_string(),
+        batch_to_limit,
+    }) {
+        EnqueueBuildActionResult::Enqueued
+    } else {
+        EnqueueBuildActionResult::Unavailable
+    }
 }
 
 pub(crate) fn request_selected_deploy_toggle(
