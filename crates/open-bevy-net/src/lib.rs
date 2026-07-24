@@ -21,6 +21,14 @@ pub const RELIABLE_CHANNEL: usize = 0;
 pub const SNAPSHOT_CHANNEL: usize = 1;
 pub const MAX_RELIABLE_PACKET_BYTES: usize = 256 * 1024;
 pub const MAX_SNAPSHOT_PACKET_BYTES: usize = 64 * 1024;
+pub const MAX_DECODED_SNAPSHOT_BYTES: usize = 4 * 1024 * 1024;
+
+const SNAPSHOT_PACKET_MAGIC: &[u8; 4] = b"OBSN";
+const SNAPSHOT_PACKET_VERSION: u8 = 1;
+const SNAPSHOT_CODEC_RAW: u8 = 0;
+const SNAPSHOT_CODEC_LZ4: u8 = 1;
+const SNAPSHOT_PACKET_HEADER_BYTES: usize = 6;
+const SNAPSHOT_COMPRESSION_MIN_BYTES: usize = 256;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ClientError {
@@ -50,6 +58,88 @@ pub enum ClientError {
         actual: usize,
         maximum: usize,
     },
+    #[error("decoded snapshot is {actual} bytes; maximum is {maximum} bytes")]
+    DecodedSnapshotTooLarge { actual: usize, maximum: usize },
+    #[error("invalid snapshot packet: {0}")]
+    InvalidSnapshotPacket(String),
+}
+
+/// Wraps an opaque game snapshot in the shared Open Bevy wire envelope.
+///
+/// Payloads large enough to benefit are compressed with LZ4. Games still own
+/// serialization and delta semantics; this layer only provides a bounded,
+/// versioned packet codec that is identical on native and wasm targets.
+pub fn encode_snapshot_payload(payload: &[u8]) -> Result<Vec<u8>, ClientError> {
+    validate_decoded_snapshot_size(payload.len())?;
+
+    let compressed = (payload.len() >= SNAPSHOT_COMPRESSION_MIN_BYTES)
+        .then(|| lz4_flex::block::compress_prepend_size(payload));
+    let (codec, body) = match compressed {
+        Some(compressed) if compressed.len() < payload.len() => (SNAPSHOT_CODEC_LZ4, compressed),
+        _ => (SNAPSHOT_CODEC_RAW, payload.to_vec()),
+    };
+
+    let mut packet = Vec::with_capacity(SNAPSHOT_PACKET_HEADER_BYTES + body.len());
+    packet.extend_from_slice(SNAPSHOT_PACKET_MAGIC);
+    packet.push(SNAPSHOT_PACKET_VERSION);
+    packet.push(codec);
+    packet.extend_from_slice(&body);
+    validate_packet_size("snapshot", packet.len(), MAX_SNAPSHOT_PACKET_BYTES)?;
+    Ok(packet)
+}
+
+/// Decodes a packet produced by [`encode_snapshot_payload`].
+///
+/// The declared LZ4 output size is checked before allocation so malformed or
+/// hostile packets cannot turn the 64 KiB data channel into an allocation bomb.
+pub fn decode_snapshot_payload(packet: &[u8]) -> Result<Vec<u8>, ClientError> {
+    validate_packet_size("snapshot", packet.len(), MAX_SNAPSHOT_PACKET_BYTES)?;
+    if packet.len() < SNAPSHOT_PACKET_HEADER_BYTES
+        || &packet[..SNAPSHOT_PACKET_MAGIC.len()] != SNAPSHOT_PACKET_MAGIC
+    {
+        return Err(ClientError::InvalidSnapshotPacket(
+            "missing Open Bevy snapshot header".to_string(),
+        ));
+    }
+    if packet[4] != SNAPSHOT_PACKET_VERSION {
+        return Err(ClientError::InvalidSnapshotPacket(format!(
+            "unsupported envelope version {}",
+            packet[4]
+        )));
+    }
+
+    let body = &packet[SNAPSHOT_PACKET_HEADER_BYTES..];
+    match packet[5] {
+        SNAPSHOT_CODEC_RAW => {
+            validate_decoded_snapshot_size(body.len())?;
+            Ok(body.to_vec())
+        }
+        SNAPSHOT_CODEC_LZ4 => {
+            if body.len() < size_of::<u32>() {
+                return Err(ClientError::InvalidSnapshotPacket(
+                    "truncated LZ4 size prefix".to_string(),
+                ));
+            }
+            let declared_size = u32::from_le_bytes(body[..4].try_into().expect("four bytes"));
+            validate_decoded_snapshot_size(declared_size as usize)?;
+            lz4_flex::block::decompress_size_prepended(body)
+                .map_err(|error| ClientError::InvalidSnapshotPacket(error.to_string()))
+        }
+        codec => Err(ClientError::InvalidSnapshotPacket(format!(
+            "unsupported codec {codec}"
+        ))),
+    }
+}
+
+fn validate_decoded_snapshot_size(actual: usize) -> Result<(), ClientError> {
+    if actual > MAX_DECODED_SNAPSHOT_BYTES {
+        Err(ClientError::DecodedSnapshotTooLarge {
+            actual,
+            maximum: MAX_DECODED_SNAPSHOT_BYTES,
+        })
+    } else {
+        Ok(())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -102,24 +192,24 @@ impl RoomServiceClient {
     pub async fn list_rooms(
         &self,
         game_id: &GameId,
-        protocol_version: u16,
+        game_protocol: u16,
     ) -> Result<RoomListResponse, ClientError> {
         let mut url = Url::parse(&format!("{}/v1/rooms", self.base_url))?;
         url.query_pairs_mut()
             .append_pair("game_id", game_id.as_str())
-            .append_pair("protocol_version", &protocol_version.to_string());
+            .append_pair("game_protocol", &game_protocol.to_string());
         self.get_json(url).await
     }
 
     pub async fn room(
         &self,
         game_id: &GameId,
-        protocol_version: u16,
+        game_protocol: u16,
         room_code: &RoomCode,
     ) -> Result<RoomDescriptor, ClientError> {
         self.get_json(format!(
             "{}/v1/rooms/{}/{}/{}",
-            self.base_url, game_id, protocol_version, room_code
+            self.base_url, game_id, game_protocol, room_code
         ))
         .await
     }
@@ -198,7 +288,7 @@ impl TransportConfig {
             signaling_url: format!(
                 "{}{}",
                 websocket_base_url.trim_end_matches('/'),
-                signaling_path(&room.game_id, room.protocol_version, &room.room_code)
+                signaling_path(&room.game_id, room.game_protocol, &room.room_code)
             ),
             player_name,
             role: PeerRole::Player,
@@ -392,11 +482,7 @@ fn matchbox_ice_server(servers: &[IceServer]) -> Option<RtcIceServerConfig> {
     })
 }
 
-pub fn default_game_id() -> GameId {
-    GameId::new("bevy-open-rts").expect("static game id is valid")
-}
-
-pub const fn protocol_version() -> u16 {
+pub const fn session_protocol_version() -> u16 {
     SESSION_PROTOCOL_VERSION
 }
 
@@ -452,6 +538,39 @@ mod tests {
                 MAX_SNAPSHOT_PACKET_BYTES
             ),
             Err(ClientError::PacketTooLarge { .. })
+        ));
+    }
+
+    #[test]
+    fn snapshot_envelope_roundtrips_raw_and_compressed_payloads() {
+        let raw = b"small snapshot";
+        let raw_packet = encode_snapshot_payload(raw).unwrap();
+        assert_eq!(raw_packet[5], SNAPSHOT_CODEC_RAW);
+        assert_eq!(decode_snapshot_payload(&raw_packet).unwrap(), raw);
+
+        let compressible = vec![0x5a; 16 * 1024];
+        let compressed_packet = encode_snapshot_payload(&compressible).unwrap();
+        assert_eq!(compressed_packet[5], SNAPSHOT_CODEC_LZ4);
+        assert!(compressed_packet.len() < compressible.len() / 4);
+        assert_eq!(
+            decode_snapshot_payload(&compressed_packet).unwrap(),
+            compressible
+        );
+    }
+
+    #[test]
+    fn snapshot_envelope_rejects_invalid_headers_and_oversized_output() {
+        assert!(matches!(
+            decode_snapshot_payload(b"not-a-snapshot"),
+            Err(ClientError::InvalidSnapshotPacket(_))
+        ));
+
+        let mut packet = Vec::from(*SNAPSHOT_PACKET_MAGIC);
+        packet.extend_from_slice(&[SNAPSHOT_PACKET_VERSION, SNAPSHOT_CODEC_LZ4]);
+        packet.extend_from_slice(&((MAX_DECODED_SNAPSHOT_BYTES as u32) + 1).to_le_bytes());
+        assert!(matches!(
+            decode_snapshot_payload(&packet),
+            Err(ClientError::DecodedSnapshotTooLarge { .. })
         ));
     }
 }

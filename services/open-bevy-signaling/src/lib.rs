@@ -100,7 +100,7 @@ struct Metrics {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct RoomKey {
     game_id: GameId,
-    protocol_version: u16,
+    game_protocol: u16,
     room_code: RoomCode,
 }
 
@@ -141,7 +141,7 @@ struct SignalQuery {
 #[derive(Debug, Default, Deserialize)]
 struct ListRoomsQuery {
     game_id: Option<String>,
-    protocol_version: Option<u16>,
+    game_protocol: Option<u16>,
 }
 
 #[derive(Debug, Serialize)]
@@ -262,12 +262,12 @@ impl AppState {
         request
             .validate()
             .map_err(|error| ApiError::bad_request("invalid_room", error.to_string()))?;
-        if request.protocol_version != SESSION_PROTOCOL_VERSION {
+        if request.session_protocol != SESSION_PROTOCOL_VERSION {
             return Err(ApiError::bad_request(
-                "unsupported_protocol",
+                "unsupported_session_protocol",
                 format!(
-                    "protocol {} is unsupported; this service accepts protocol {}",
-                    request.protocol_version, SESSION_PROTOCOL_VERSION
+                    "session protocol {} is unsupported; this service accepts session protocol {}",
+                    request.session_protocol, SESSION_PROTOCOL_VERSION
                 ),
             ));
         }
@@ -282,7 +282,7 @@ impl AppState {
             let code = generate_room_code();
             let key = RoomKey {
                 game_id: request.game_id.clone(),
-                protocol_version: request.protocol_version,
+                game_protocol: request.game_protocol,
                 room_code: code.clone(),
             };
             if !rooms.contains_key(&key) {
@@ -316,7 +316,7 @@ impl AppState {
                 .config
                 .public_websocket_base_url
                 .trim_end_matches('/'),
-            signaling_path(&request.game_id, request.protocol_version, &room_code)
+            signaling_path(&request.game_id, request.game_protocol, &room_code)
         );
 
         Ok(CreateRoomResponse {
@@ -542,11 +542,11 @@ pub fn build_router(state: AppState) -> Router {
         .route("/v1/config", get(service_config))
         .route("/v1/rooms", post(create_room).get(list_rooms))
         .route(
-            "/v1/rooms/{game_id}/{protocol_version}/{room_code}",
+            "/v1/rooms/{game_id}/{game_protocol}/{room_code}",
             get(get_room),
         )
         .route(
-            "/v1/signal/{game_id}/{protocol_version}/{room_code}",
+            "/v1/signal/{game_id}/{game_protocol}/{room_code}",
             get(signal_websocket),
         )
         .layer(cors)
@@ -618,8 +618,8 @@ async fn list_rooms(
                     .as_ref()
                     .is_none_or(|game_id| &key.game_id == game_id)
                 && query
-                    .protocol_version
-                    .is_none_or(|version| key.protocol_version == version)
+                    .game_protocol
+                    .is_none_or(|version| key.game_protocol == version)
         })
         .map(|(key, room)| room_descriptor(key, room))
         .collect::<Vec<_>>();
@@ -629,9 +629,9 @@ async fn list_rooms(
 
 async fn get_room(
     State(state): State<AppState>,
-    Path((game_id, protocol_version, room_code)): Path<(String, u16, String)>,
+    Path((game_id, game_protocol, room_code)): Path<(String, u16, String)>,
 ) -> Result<Json<RoomDescriptor>, ApiError> {
-    let key = parse_room_key(game_id, protocol_version, room_code)?;
+    let key = parse_room_key(game_id, game_protocol, room_code)?;
     let rooms = state.inner.rooms.read().await;
     let room = rooms
         .get(&key)
@@ -641,13 +641,13 @@ async fn get_room(
 
 async fn signal_websocket(
     State(state): State<AppState>,
-    Path((game_id, protocol_version, room_code)): Path<(String, u16, String)>,
+    Path((game_id, game_protocol, room_code)): Path<(String, u16, String)>,
     Query(query): Query<SignalQuery>,
     headers: HeaderMap,
     websocket: WebSocketUpgrade,
 ) -> Result<Response, ApiError> {
     validate_origin(&state.inner.config, &headers)?;
-    let key = parse_room_key(game_id, protocol_version, room_code)?;
+    let key = parse_room_key(game_id, game_protocol, room_code)?;
     let query = ValidatedSignalQuery::try_from(query)?;
     if let Err(error) = state.preflight(&key, &query).await {
         state
@@ -870,19 +870,19 @@ fn validate_origin(config: &ServerConfig, headers: &HeaderMap) -> Result<(), Api
 
 fn parse_room_key(
     game_id: String,
-    protocol_version: u16,
+    game_protocol: u16,
     room_code: String,
 ) -> Result<RoomKey, ApiError> {
-    if protocol_version != SESSION_PROTOCOL_VERSION {
+    if game_protocol == 0 {
         return Err(ApiError::bad_request(
-            "unsupported_protocol",
-            format!("protocol {protocol_version} is unsupported"),
+            "invalid_game_protocol",
+            "game protocol must be greater than zero",
         ));
     }
     Ok(RoomKey {
         game_id: GameId::new(game_id)
             .map_err(|error| ApiError::bad_request("invalid_game_id", error.to_string()))?,
-        protocol_version,
+        game_protocol,
         room_code: RoomCode::new(room_code)
             .map_err(|error| ApiError::bad_request("invalid_room_code", error.to_string()))?,
     })
@@ -892,7 +892,8 @@ fn room_descriptor(key: &RoomKey, room: &Room) -> RoomDescriptor {
     RoomDescriptor {
         game_id: key.game_id.clone(),
         build_id: room.build_id.clone(),
-        protocol_version: key.protocol_version,
+        session_protocol: SESSION_PROTOCOL_VERSION,
+        game_protocol: key.game_protocol,
         room_code: key.room_code.clone(),
         visibility: room.visibility,
         max_peers: room.max_peers,
@@ -963,7 +964,8 @@ mod tests {
             .create_room(CreateRoomRequest {
                 game_id: GameId::new("test-game").unwrap(),
                 build_id: BuildId::new("test-build").unwrap(),
-                protocol_version: SESSION_PROTOCOL_VERSION,
+                session_protocol: SESSION_PROTOCOL_VERSION,
+                game_protocol: 7,
                 max_peers: 4,
                 visibility: RoomVisibility::Public,
                 metadata: Default::default(),

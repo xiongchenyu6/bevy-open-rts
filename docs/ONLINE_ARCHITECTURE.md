@@ -14,20 +14,28 @@ peer-to-peer after the data channels connect.
 `open-bevy-net` is the corresponding reusable client. It exposes the room HTTP
 API through `ehttp`, builds safely encoded connection URLs, chooses issued TURN
 credentials when available, and fixes channel 0 as reliable control/commands
-and channel 1 as low-latency unreliable snapshots.
+and channel 1 as low-latency unreliable snapshots. Its snapshot codec is an
+opaque, versioned envelope usable by any Open Bevy game: payloads are compressed
+with LZ4 only when that is smaller, wire packets are capped at 64 KiB, and the
+declared decoded size is rejected before allocation above 4 MiB.
 
 ## Namespacing
 
 Rooms are isolated by this tuple:
 
 ```text
-(game_id, protocol_version, room_code)
+(game_id, game_protocol, room_code)
 ```
+
+`session_protocol` versions the universal room/signaling API and is validated
+by the service. `game_protocol` is owned by each game, may be any non-zero
+value, and isolates incompatible game packet formats without requiring a
+signaling-server release.
 
 The signaling URL is:
 
 ```text
-wss://signal.example.com/v1/signal/{game_id}/{protocol_version}/{room_code}
+wss://signal.example.com/v1/signal/{game_id}/{game_protocol}/{room_code}
   ?name={player_name}
   &role={host|player|spectator}
   &build_id={build_id}
@@ -55,9 +63,10 @@ GET /metrics
 GET /v1/config
 ```
 
-`/v1/config` returns supported protocol versions and ICE servers. When TURN REST
-is configured, each response contains a newly generated, time-limited Coturn
-username and HMAC-SHA1 credential; the static shared secret is never returned.
+`/v1/config` returns supported universal session protocol versions and ICE
+servers. When TURN REST is configured, each response contains a newly
+generated, time-limited Coturn username and HMAC-SHA1 credential; the static
+shared secret is never returned.
 
 ### Create a room
 
@@ -67,7 +76,8 @@ curl -sS http://127.0.0.1:3536/v1/rooms \
   -d '{
     "game_id":"bevy-open-rts",
     "build_id":"0.1.0+git.abcdef0",
-    "protocol_version":1,
+    "session_protocol":1,
+    "game_protocol":4,
     "max_peers":8,
     "visibility":"public",
     "metadata":{"map":"four-corners","mode":"skirmish"}
@@ -80,8 +90,8 @@ and a join token only for private rooms.
 ### Discover rooms
 
 ```text
-GET /v1/rooms?game_id=bevy-open-rts&protocol_version=1
-GET /v1/rooms/{game_id}/{protocol_version}/{room_code}
+GET /v1/rooms?game_id=bevy-open-rts&game_protocol=4
+GET /v1/rooms/{game_id}/{game_protocol}/{room_code}
 ```
 
 Only public rooms appear in discovery. Unlisted/private rooms remain directly
@@ -118,6 +128,19 @@ Bevy Open RTS uses host authority rather than lockstep:
 5. The host sends periodic snapshots/deltas on an unreliable channel.
 6. Clients interpolate remote transforms and reconcile locally predicted
    selections/order feedback.
+
+RTS protocol v4 emits a compressed full keyframe once per second and sends 10
+Hz deltas between keyframes. Each delta references the latest full keyframe,
+not another delta, and contains changed/new entities plus explicit removals.
+This keeps packets small without making later state depend on delivery of an
+earlier unreliable packet. A client that missed a keyframe ignores its deltas
+and recovers automatically at the next keyframe.
+
+Short-lived shot, impact, support-warning, destruction, and promotion effects
+carry monotonically increasing host event IDs. The host repeats active effects
+in snapshot packets; clients keep a bounded deduplication history. A lost packet
+therefore does not normally hide a warning, while duplicate delivery never
+spawns the same effect twice.
 
 The current RTS simulation uses floating-point transforms, wall-clock timers,
 and ordinary Bevy `Update` systems, so deterministic peer lockstep would be a

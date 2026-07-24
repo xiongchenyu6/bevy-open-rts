@@ -10,12 +10,14 @@ use bevy::{
     prelude::*,
     tasks::IoTaskPool,
 };
+#[cfg(test)]
+use open_bevy_net::MAX_SNAPSHOT_PACKET_BYTES;
 use open_bevy_net::{
-    ClientError, MAX_SNAPSHOT_PACKET_BYTES, MessageLoopFuture, PeerId, RoomServiceClient,
-    TransportConfig, TransportEvent, WebRtcTransport, default_game_id, protocol_version,
+    ClientError, MessageLoopFuture, PeerId, RoomServiceClient, TransportConfig, TransportEvent,
+    WebRtcTransport, decode_snapshot_payload, encode_snapshot_payload, session_protocol_version,
 };
 use open_bevy_protocol::{
-    BuildId, CreateRoomRequest, CreateRoomResponse, PlayerName, RoomCode, RoomDescriptor,
+    BuildId, CreateRoomRequest, CreateRoomResponse, GameId, PlayerName, RoomCode, RoomDescriptor,
     RoomListResponse, RoomVisibility, ServiceConfigResponse,
 };
 use serde::{Deserialize, Serialize};
@@ -28,16 +30,22 @@ use uuid::Uuid;
 
 use crate::*;
 
-const RTS_ONLINE_PROTOCOL: u16 = 3;
+const RTS_ONLINE_PROTOCOL: u16 = 4;
 const ONLINE_DEFAULT_SERVICE_URL: &str = "http://127.0.0.1:3536";
 const ONLINE_MAX_STATUS_BYTES: usize = 180;
 const ONLINE_PLAYER_RECONNECT_GRACE_SECONDS: f32 = 30.0;
 const ONLINE_SNAPSHOT_HZ: f32 = 10.0;
 const ONLINE_SNAPSHOT_INTERVAL_SECONDS: f32 = 1.0 / ONLINE_SNAPSHOT_HZ;
+const ONLINE_FULL_SNAPSHOT_INTERVAL_TICKS: u64 = 10;
 const ONLINE_SNAPSHOT_SNAP_DISTANCE: f32 = 8.0;
+const ONLINE_TRANSIENT_EVENT_HISTORY: usize = 4_096;
 const ONLINE_MAX_UNIT_ORDERS_PER_COMMAND: usize = 256;
 const ONLINE_MAX_UNIT_ACTIONS_PER_COMMAND: usize = 256;
 const ONLINE_MAX_RALLY_STRUCTURES_PER_COMMAND: usize = 64;
+
+fn online_game_id() -> GameId {
+    GameId::new("bevy-open-rts").expect("static game id is valid")
+}
 const ONLINE_MAX_PRODUCERS_PER_COMMAND: usize = 64;
 const ONLINE_MAX_STRUCTURE_ACTIONS_PER_COMMAND: usize = 64;
 pub(crate) const ONLINE_MAX_CONSTRUCTORS_PER_COMMAND: usize = 64;
@@ -782,6 +790,112 @@ struct OnlineMatchStateSnapshot {
     finished: bool,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+enum OnlineImpactBurstKind {
+    Ballistic,
+    Explosive,
+    Energy,
+    Electric,
+    Fire,
+    Heavy,
+    Siege,
+}
+
+impl OnlineImpactBurstKind {
+    fn from_game(kind: ImpactBurstKind) -> Self {
+        match kind {
+            ImpactBurstKind::Ballistic => Self::Ballistic,
+            ImpactBurstKind::Explosive => Self::Explosive,
+            ImpactBurstKind::Energy => Self::Energy,
+            ImpactBurstKind::Electric => Self::Electric,
+            ImpactBurstKind::Fire => Self::Fire,
+            ImpactBurstKind::Heavy => Self::Heavy,
+            ImpactBurstKind::Siege => Self::Siege,
+        }
+    }
+
+    fn to_game(self) -> ImpactBurstKind {
+        match self {
+            Self::Ballistic => ImpactBurstKind::Ballistic,
+            Self::Explosive => ImpactBurstKind::Explosive,
+            Self::Energy => ImpactBurstKind::Energy,
+            Self::Electric => ImpactBurstKind::Electric,
+            Self::Fire => ImpactBurstKind::Fire,
+            Self::Heavy => ImpactBurstKind::Heavy,
+            Self::Siege => ImpactBurstKind::Siege,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+enum OnlineStructureDestructionVfxKind {
+    ExplosionFireball,
+    SmokeColumn,
+}
+
+impl OnlineStructureDestructionVfxKind {
+    fn from_game(kind: StructureDestructionVfxKind) -> Self {
+        match kind {
+            StructureDestructionVfxKind::ExplosionFireball => Self::ExplosionFireball,
+            StructureDestructionVfxKind::SmokeColumn => Self::SmokeColumn,
+        }
+    }
+
+    fn to_game(self) -> StructureDestructionVfxKind {
+        match self {
+            Self::ExplosionFireball => StructureDestructionVfxKind::ExplosionFireball,
+            Self::SmokeColumn => StructureDestructionVfxKind::SmokeColumn,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+enum OnlineTransientEventKind {
+    ShotPulse {
+        from: [f32; 3],
+        to: [f32; 3],
+        remaining: f32,
+        team: OnlineEntityTeam,
+    },
+    ImpactBurst {
+        position: [f32; 3],
+        remaining: f32,
+        total: f32,
+        radius: f32,
+        power: f32,
+        team: OnlineEntityTeam,
+        kind: OnlineImpactBurstKind,
+    },
+    SupportWarning {
+        position: [f32; 3],
+        remaining: f32,
+        radius: f32,
+        color: [f32; 4],
+    },
+    StructureDestruction {
+        position: [f32; 3],
+        remaining: f32,
+        total: f32,
+        radius: f32,
+        team: OnlineEntityTeam,
+        kind: OnlineStructureDestructionVfxKind,
+    },
+    VeterancyPromotion {
+        position: [f32; 3],
+        rank: u8,
+        remaining: f32,
+        total: f32,
+        radius: f32,
+        team: OnlineEntityTeam,
+    },
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct OnlineTransientEvent {
+    id: u64,
+    kind: OnlineTransientEventKind,
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 struct OnlineWorldSnapshot {
     protocol: u16,
@@ -792,7 +906,42 @@ struct OnlineWorldSnapshot {
     support_cooldowns: Vec<[f32; SupportPowerKind::ALL.len()]>,
     support_initial_charge_started: Vec<[bool; SupportPowerKind::ALL.len()]>,
     match_state: OnlineMatchStateSnapshot,
+    transient_events: Vec<OnlineTransientEvent>,
 }
+
+impl OnlineWorldSnapshot {
+    fn baseline(mut self) -> Self {
+        self.transient_events.clear();
+        self
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct OnlineWorldDelta {
+    protocol: u16,
+    tick: u64,
+    baseline_tick: u64,
+    entity_updates: Vec<OnlineEntitySnapshot>,
+    removed_entity_ids: Vec<u64>,
+    economies: Vec<OnlineEconomySnapshot>,
+    build_queue: Vec<OnlineBuildJobSnapshot>,
+    support_cooldowns: Vec<[f32; SupportPowerKind::ALL.len()]>,
+    support_initial_charge_started: Vec<[bool; SupportPowerKind::ALL.len()]>,
+    match_state: OnlineMatchStateSnapshot,
+    transient_events: Vec<OnlineTransientEvent>,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+enum OnlineWorldFrame {
+    Full(OnlineWorldSnapshot),
+    Delta(OnlineWorldDelta),
+}
+
+#[derive(Component, Clone, Copy)]
+struct OnlineTransientEventId(u64);
+
+#[derive(Component)]
+struct OnlineReplicatedTransient;
 
 #[derive(Resource, Default)]
 struct OnlineMatchReplication {
@@ -800,6 +949,11 @@ struct OnlineMatchReplication {
     last_applied_tick: u64,
     send_accumulator: f32,
     pending_snapshot: Option<OnlineWorldSnapshot>,
+    send_baseline: Option<OnlineWorldSnapshot>,
+    receive_baseline: Option<OnlineWorldSnapshot>,
+    next_transient_event_id: u64,
+    seen_transient_event_ids: HashSet<u64>,
+    seen_transient_event_order: VecDeque<u64>,
 }
 
 #[derive(Resource, Default)]
@@ -933,6 +1087,43 @@ struct OnlineSnapshotBroadcastParams<'w, 's> {
     build_queue: Res<'w, BuildQueue>,
     support_cooldowns: Res<'w, SupportCooldowns>,
     match_state: Res<'w, MatchState>,
+    shot_pulses: Query<'w, 's, (&'static OnlineTransientEventId, &'static ShotPulse)>,
+    impact_bursts: Query<
+        'w,
+        's,
+        (
+            &'static OnlineTransientEventId,
+            &'static Transform,
+            &'static ImpactBurst,
+        ),
+    >,
+    support_warnings: Query<
+        'w,
+        's,
+        (
+            &'static OnlineTransientEventId,
+            &'static Transform,
+            &'static SupportWarning,
+        ),
+    >,
+    structure_destruction_vfx: Query<
+        'w,
+        's,
+        (
+            &'static OnlineTransientEventId,
+            &'static Transform,
+            &'static StructureDestructionVfx,
+        ),
+    >,
+    veterancy_promotions: Query<
+        'w,
+        's,
+        (
+            &'static OnlineTransientEventId,
+            &'static Transform,
+            &'static VeterancyPromotionEffect,
+        ),
+    >,
 }
 
 #[derive(SystemParam)]
@@ -1354,7 +1545,10 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
         )
         .add_systems(
             Update,
-            interpolate_network_entities
+            (
+                interpolate_network_entities,
+                update_online_replicated_support_warnings,
+            )
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress)
                 .run_if(online_client_match),
@@ -1375,7 +1569,12 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
         )
         .add_systems(
             Last,
-            broadcast_online_world_snapshot.run_if(in_state(AppScreen::InMatch)),
+            (
+                assign_online_transient_event_ids,
+                broadcast_online_world_snapshot,
+            )
+                .chain()
+                .run_if(in_state(AppScreen::InMatch)),
         )
         .add_systems(
             Update,
@@ -2211,9 +2410,10 @@ fn begin_create_room(session: &mut OnlineSession, inbox: &OnlineAsyncInbox) {
         return;
     };
     let request = CreateRoomRequest {
-        game_id: default_game_id(),
+        game_id: online_game_id(),
         build_id,
-        protocol_version: protocol_version(),
+        session_protocol: session_protocol_version(),
+        game_protocol: RTS_ONLINE_PROTOCOL,
         max_peers: MAX_SKIRMISH_LOBBY_SLOTS as u16,
         visibility: RoomVisibility::Public,
         metadata: BTreeMap::from([
@@ -2261,7 +2461,7 @@ fn begin_join_room(session: &mut OnlineSession, inbox: &OnlineAsyncInbox, room_c
         let result = async {
             let config = client.service_config().await.map_err(client_error_text)?;
             let room = client
-                .room(&default_game_id(), protocol_version(), &room_code)
+                .room(&online_game_id(), RTS_ONLINE_PROTOCOL, &room_code)
                 .await
                 .map_err(client_error_text)?;
             Ok((room, config))
@@ -2279,7 +2479,7 @@ fn begin_refresh_rooms(session: &mut OnlineSession, inbox: &OnlineAsyncInbox) {
     spawn_online_request(inbox.clone(), async move {
         OnlineAsyncResult::Rooms(
             client
-                .list_rooms(&default_game_id(), protocol_version())
+                .list_rooms(&online_game_id(), RTS_ONLINE_PROTOCOL)
                 .await
                 .map_err(client_error_text),
         )
@@ -2541,10 +2741,13 @@ fn poll_online_transport(
                 {
                     continue;
                 }
-                let Ok(snapshot) = postcard::from_bytes::<OnlineWorldSnapshot>(&payload) else {
+                let Ok(decoded) = decode_snapshot_payload(&payload) else {
                     continue;
                 };
-                queue_online_world_snapshot(&mut replication, snapshot);
+                let Ok(frame) = postcard::from_bytes::<OnlineWorldFrame>(&decoded) else {
+                    continue;
+                };
+                queue_online_world_frame(&mut replication, frame);
             }
         }
     }
@@ -3735,6 +3938,167 @@ fn resolve_online_unit_order(
     }
 }
 
+fn assign_online_transient_event_ids(
+    mut commands: Commands,
+    session: Res<OnlineSession>,
+    mut replication: ResMut<OnlineMatchReplication>,
+    shot_pulses: Query<Entity, (Added<ShotPulse>, Without<OnlineTransientEventId>)>,
+    impact_bursts: Query<Entity, (Added<ImpactBurst>, Without<OnlineTransientEventId>)>,
+    support_warnings: Query<Entity, (Added<SupportWarning>, Without<OnlineTransientEventId>)>,
+    structure_destruction_vfx: Query<
+        Entity,
+        (
+            Added<StructureDestructionVfx>,
+            Without<OnlineTransientEventId>,
+        ),
+    >,
+    veterancy_promotions: Query<
+        Entity,
+        (
+            Added<VeterancyPromotionEffect>,
+            Without<OnlineTransientEventId>,
+        ),
+    >,
+) {
+    if session.phase != OnlinePhase::InMatch || !session.is_host {
+        return;
+    }
+
+    let mut added = HashSet::new();
+    added.extend(shot_pulses.iter());
+    added.extend(impact_bursts.iter());
+    added.extend(support_warnings.iter());
+    added.extend(structure_destruction_vfx.iter());
+    added.extend(veterancy_promotions.iter());
+    for entity in added {
+        replication.next_transient_event_id = replication.next_transient_event_id.saturating_add(1);
+        commands
+            .entity(entity)
+            .try_insert(OnlineTransientEventId(replication.next_transient_event_id));
+    }
+}
+
+fn online_world_delta(
+    baseline: &OnlineWorldSnapshot,
+    current: &OnlineWorldSnapshot,
+) -> OnlineWorldDelta {
+    let baseline_entities = baseline
+        .entities
+        .iter()
+        .map(|entity| (entity.id, entity))
+        .collect::<HashMap<_, _>>();
+    let current_ids = current
+        .entities
+        .iter()
+        .map(|entity| entity.id)
+        .collect::<HashSet<_>>();
+    let entity_updates = current
+        .entities
+        .iter()
+        .filter(|entity| baseline_entities.get(&entity.id).copied() != Some(*entity))
+        .cloned()
+        .collect();
+    let mut removed_entity_ids = baseline
+        .entities
+        .iter()
+        .filter_map(|entity| (!current_ids.contains(&entity.id)).then_some(entity.id))
+        .collect::<Vec<_>>();
+    removed_entity_ids.sort_unstable();
+
+    OnlineWorldDelta {
+        protocol: current.protocol,
+        tick: current.tick,
+        baseline_tick: baseline.tick,
+        entity_updates,
+        removed_entity_ids,
+        economies: current.economies.clone(),
+        build_queue: current.build_queue.clone(),
+        support_cooldowns: current.support_cooldowns.clone(),
+        support_initial_charge_started: current.support_initial_charge_started.clone(),
+        match_state: current.match_state.clone(),
+        transient_events: current.transient_events.clone(),
+    }
+}
+
+fn apply_online_world_delta(
+    baseline: &OnlineWorldSnapshot,
+    delta: OnlineWorldDelta,
+) -> Option<OnlineWorldSnapshot> {
+    if delta.protocol != RTS_ONLINE_PROTOCOL
+        || baseline.protocol != delta.protocol
+        || baseline.tick != delta.baseline_tick
+        || delta.tick <= delta.baseline_tick
+    {
+        return None;
+    }
+
+    let mut entities = baseline
+        .entities
+        .iter()
+        .cloned()
+        .map(|entity| (entity.id, entity))
+        .collect::<HashMap<_, _>>();
+    for id in delta.removed_entity_ids {
+        entities.remove(&id);
+    }
+    for entity in delta.entity_updates {
+        entities.insert(entity.id, entity);
+    }
+    let mut entities = entities.into_values().collect::<Vec<_>>();
+    entities.sort_unstable_by_key(|entity| entity.id);
+
+    Some(OnlineWorldSnapshot {
+        protocol: delta.protocol,
+        tick: delta.tick,
+        entities,
+        economies: delta.economies,
+        build_queue: delta.build_queue,
+        support_cooldowns: delta.support_cooldowns,
+        support_initial_charge_started: delta.support_initial_charge_started,
+        match_state: delta.match_state,
+        transient_events: delta.transient_events,
+    })
+}
+
+fn encode_online_world_frame(frame: &OnlineWorldFrame) -> Result<Vec<u8>, String> {
+    let serialized = postcard::to_allocvec(frame).map_err(|error| error.to_string())?;
+    encode_snapshot_payload(&serialized).map_err(client_error_text)
+}
+
+fn queue_online_world_frame(
+    replication: &mut OnlineMatchReplication,
+    frame: OnlineWorldFrame,
+) -> bool {
+    match frame {
+        OnlineWorldFrame::Full(snapshot) => {
+            let baseline = snapshot.clone().baseline();
+            if !queue_online_world_snapshot(replication, snapshot) {
+                return false;
+            }
+            replication.receive_baseline = Some(baseline);
+            true
+        }
+        OnlineWorldFrame::Delta(delta) => {
+            if delta.protocol != RTS_ONLINE_PROTOCOL
+                || delta.tick <= replication.last_applied_tick
+                || replication
+                    .pending_snapshot
+                    .as_ref()
+                    .is_some_and(|pending| pending.tick >= delta.tick)
+            {
+                return false;
+            }
+            let Some(baseline) = replication.receive_baseline.as_ref() else {
+                return false;
+            };
+            let Some(snapshot) = apply_online_world_delta(baseline, delta) else {
+                return false;
+            };
+            queue_online_world_snapshot(replication, snapshot)
+        }
+    }
+}
+
 fn queue_online_world_snapshot(
     replication: &mut OnlineMatchReplication,
     snapshot: OnlineWorldSnapshot,
@@ -3764,6 +4128,11 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
         build_queue,
         support_cooldowns,
         match_state,
+        shot_pulses,
+        impact_bursts,
+        support_warnings,
+        structure_destruction_vfx,
+        veterancy_promotions,
     } = params;
     if session.phase != OnlinePhase::InMatch || !session.is_host {
         return;
@@ -3854,6 +4223,71 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
             })
         })
         .collect();
+    let mut transient_events = Vec::new();
+    transient_events.extend(shot_pulses.iter().map(|(id, pulse)| OnlineTransientEvent {
+        id: id.0,
+        kind: OnlineTransientEventKind::ShotPulse {
+            from: pulse.from.to_array(),
+            to: pulse.to.to_array(),
+            remaining: pulse.ttl,
+            team: OnlineEntityTeam::from_game(pulse.team),
+        },
+    }));
+    transient_events.extend(impact_bursts.iter().map(|(id, transform, burst)| {
+        OnlineTransientEvent {
+            id: id.0,
+            kind: OnlineTransientEventKind::ImpactBurst {
+                position: transform.translation.to_array(),
+                remaining: burst.remaining,
+                total: burst.total,
+                radius: burst.radius,
+                power: burst.power,
+                team: OnlineEntityTeam::from_game(burst.team),
+                kind: OnlineImpactBurstKind::from_game(burst.kind),
+            },
+        }
+    }));
+    transient_events.extend(support_warnings.iter().map(|(id, transform, warning)| {
+        let color = warning.color.to_srgba();
+        OnlineTransientEvent {
+            id: id.0,
+            kind: OnlineTransientEventKind::SupportWarning {
+                position: transform.translation.to_array(),
+                remaining: warning.remaining,
+                radius: warning.radius,
+                color: [color.red, color.green, color.blue, color.alpha],
+            },
+        }
+    }));
+    transient_events.extend(
+        structure_destruction_vfx
+            .iter()
+            .map(|(id, transform, effect)| OnlineTransientEvent {
+                id: id.0,
+                kind: OnlineTransientEventKind::StructureDestruction {
+                    position: transform.translation.to_array(),
+                    remaining: effect.remaining,
+                    total: effect.total,
+                    radius: effect.radius,
+                    team: OnlineEntityTeam::from_game(effect.team),
+                    kind: OnlineStructureDestructionVfxKind::from_game(effect.kind),
+                },
+            }),
+    );
+    transient_events.extend(veterancy_promotions.iter().map(|(id, transform, effect)| {
+        OnlineTransientEvent {
+            id: id.0,
+            kind: OnlineTransientEventKind::VeterancyPromotion {
+                position: transform.translation.to_array(),
+                rank: effect.rank,
+                remaining: effect.remaining,
+                total: effect.total,
+                radius: effect.radius,
+                team: OnlineEntityTeam::from_game(effect.team),
+            },
+        }
+    }));
+    transient_events.sort_unstable_by_key(|event| event.id);
     let snapshot = OnlineWorldSnapshot {
         protocol: RTS_ONLINE_PROTOCOL,
         tick: replication.next_tick,
@@ -3880,18 +4314,32 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
             active_anchor_teams: match_state.active_anchor_teams.clone(),
             finished: !match_state.is_running(),
         },
+        transient_events,
     };
-    let payload = match postcard::to_allocvec(&snapshot) {
-        Ok(payload) if payload.len() <= MAX_SNAPSHOT_PACKET_BYTES => payload,
-        Ok(payload) => {
-            session.set_status(format!(
-                "{}: {}/{} bytes",
-                t("对局快照过大", "Match snapshot is too large"),
-                payload.len(),
-                MAX_SNAPSHOT_PACKET_BYTES
-            ));
-            return;
+    let send_full = replication.send_baseline.as_ref().is_none_or(|baseline| {
+        snapshot.tick.saturating_sub(baseline.tick) >= ONLINE_FULL_SNAPSHOT_INTERVAL_TICKS
+    });
+    let (payload, new_baseline) = if send_full {
+        (
+            encode_online_world_frame(&OnlineWorldFrame::Full(snapshot.clone())),
+            Some(snapshot.clone().baseline()),
+        )
+    } else {
+        let baseline = replication
+            .send_baseline
+            .as_ref()
+            .expect("non-keyframe snapshot has a baseline");
+        let delta = online_world_delta(baseline, &snapshot);
+        match encode_online_world_frame(&OnlineWorldFrame::Delta(delta)) {
+            Ok(payload) => (Ok(payload), None),
+            Err(_) => (
+                encode_online_world_frame(&OnlineWorldFrame::Full(snapshot.clone())),
+                Some(snapshot.clone().baseline()),
+            ),
         }
+    };
+    let payload = match payload {
+        Ok(payload) => payload,
         Err(error) => {
             session.set_status(format!(
                 "{}: {error}",
@@ -3900,8 +4348,201 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
             return;
         }
     };
-    if let Err(error) = socket.broadcast_snapshot(&payload) {
-        session.set_status(client_error_text(error));
+    match socket.broadcast_snapshot(&payload) {
+        Ok(()) => {
+            if let Some(baseline) = new_baseline {
+                replication.send_baseline = Some(baseline);
+            }
+        }
+        Err(error) => session.set_status(client_error_text(error)),
+    }
+}
+
+fn apply_online_transient_events(
+    commands: &mut Commands,
+    replication: &mut OnlineMatchReplication,
+    events: Vec<OnlineTransientEvent>,
+) {
+    for event in events {
+        if !replication.seen_transient_event_ids.insert(event.id) {
+            continue;
+        }
+        replication.seen_transient_event_order.push_back(event.id);
+        while replication.seen_transient_event_order.len() > ONLINE_TRANSIENT_EVENT_HISTORY {
+            if let Some(expired) = replication.seen_transient_event_order.pop_front() {
+                replication.seen_transient_event_ids.remove(&expired);
+            }
+        }
+
+        match event.kind {
+            OnlineTransientEventKind::ShotPulse {
+                from,
+                to,
+                remaining,
+                team,
+            } => {
+                let from = Vec3::from_array(from);
+                let to = Vec3::from_array(to);
+                if remaining > 0.0 && remaining.is_finite() && from.is_finite() && to.is_finite() {
+                    commands.spawn((
+                        ShotPulse {
+                            from,
+                            to,
+                            ttl: remaining,
+                            team: team.to_game(),
+                        },
+                        MatchScopedEntity,
+                    ));
+                }
+            }
+            OnlineTransientEventKind::ImpactBurst {
+                position,
+                remaining,
+                total,
+                radius,
+                power,
+                team,
+                kind,
+            } => {
+                let position = Vec3::from_array(position);
+                if remaining > 0.0
+                    && remaining.is_finite()
+                    && total.is_finite()
+                    && radius.is_finite()
+                    && power.is_finite()
+                    && position.is_finite()
+                {
+                    let kind = kind.to_game();
+                    commands.spawn((
+                        Name::new("Replicated impact burst"),
+                        Transform::from_translation(position),
+                        ImpactBurst {
+                            remaining,
+                            total: total.max(remaining),
+                            radius: radius.max(0.05),
+                            power: power.max(0.0),
+                            team: team.to_game(),
+                            kind,
+                        },
+                        MatchScopedEntity,
+                    ));
+                    spawn_combat_flash(
+                        commands,
+                        position + Vec3::Y * 0.17,
+                        (0.1 + power * 0.05).min(0.35),
+                        (0.32 + power * 0.2).clamp(0.35, 1.4),
+                        remaining.min(0.2),
+                        impact_flash_color(kind),
+                    );
+                }
+            }
+            OnlineTransientEventKind::SupportWarning {
+                position,
+                remaining,
+                radius,
+                color,
+            } => {
+                let position = Vec3::from_array(position);
+                if remaining > 0.0
+                    && remaining.is_finite()
+                    && radius.is_finite()
+                    && color.iter().all(|channel| channel.is_finite())
+                    && position.is_finite()
+                {
+                    commands.spawn((
+                        Transform::from_translation(position),
+                        SupportWarning {
+                            remaining,
+                            radius: radius.max(0.05),
+                            color: Color::srgba(color[0], color[1], color[2], color[3]),
+                        },
+                        OnlineReplicatedTransient,
+                        MatchScopedEntity,
+                    ));
+                }
+            }
+            OnlineTransientEventKind::StructureDestruction {
+                position,
+                remaining,
+                total,
+                radius,
+                team,
+                kind,
+            } => {
+                let position = Vec3::from_array(position);
+                if remaining > 0.0
+                    && remaining.is_finite()
+                    && total.is_finite()
+                    && radius.is_finite()
+                    && position.is_finite()
+                {
+                    commands.spawn((
+                        Name::new("Replicated structure destruction"),
+                        Transform::from_translation(position),
+                        StructureDestructionVfx {
+                            kind: kind.to_game(),
+                            remaining,
+                            total: total.max(remaining),
+                            radius: radius.max(0.05),
+                            team: team.to_game(),
+                        },
+                        MatchScopedEntity,
+                    ));
+                }
+            }
+            OnlineTransientEventKind::VeterancyPromotion {
+                position,
+                rank,
+                remaining,
+                total,
+                radius,
+                team,
+            } => {
+                let position = Vec3::from_array(position);
+                if remaining > 0.0
+                    && remaining.is_finite()
+                    && total.is_finite()
+                    && radius.is_finite()
+                    && position.is_finite()
+                {
+                    commands.spawn((
+                        Transform::from_translation(position),
+                        VeterancyPromotionEffect {
+                            rank: rank.min(VETERANCY_MAX_RANK),
+                            remaining,
+                            total: total.max(remaining),
+                            radius: radius.max(0.05),
+                            team: team.to_game(),
+                        },
+                        MatchScopedEntity,
+                    ));
+                }
+            }
+        }
+    }
+}
+
+fn update_online_replicated_support_warnings(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut warnings: Query<
+        (Entity, &mut SupportWarning),
+        (
+            With<OnlineReplicatedTransient>,
+            Without<OnlineTransientEventId>,
+        ),
+    >,
+) {
+    for (entity, mut warning) in &mut warnings {
+        warning.remaining -= time.delta_secs();
+        if warning.remaining <= 0.0 {
+            commands.entity(entity).try_despawn();
+            continue;
+        }
+        warning.radius = (warning.radius + time.delta_secs() * 0.16).min(10.0);
+        if warning.remaining <= 0.2 {
+            warning.radius = (warning.radius * 0.84).max(0.15);
+        }
     }
 }
 
@@ -3927,13 +4568,15 @@ fn apply_pending_online_snapshot(params: OnlineSnapshotApplyParams) {
         replication.pending_snapshot = None;
         return;
     }
-    let Some(snapshot) = replication.pending_snapshot.take() else {
+    let Some(mut snapshot) = replication.pending_snapshot.take() else {
         return;
     };
     if snapshot.tick <= replication.last_applied_tick {
         return;
     }
     replication.last_applied_tick = snapshot.tick;
+    let transient_events = std::mem::take(&mut snapshot.transient_events);
+    apply_online_transient_events(&mut commands, &mut replication, transient_events);
 
     economies.players = snapshot
         .economies
@@ -4010,15 +4653,10 @@ fn apply_pending_online_snapshot(params: OnlineSnapshotApplyParams) {
             })
         })
         .collect();
-    support_cooldowns.remaining = snapshot
-        .support_cooldowns
-        .into_iter()
-        .take(MAX_SKIRMISH_LOBBY_SLOTS)
-        .collect();
+    support_cooldowns.remaining = snapshot.support_cooldowns.into_iter().collect();
     support_cooldowns.initial_charge_started = snapshot
         .support_initial_charge_started
         .into_iter()
-        .take(MAX_SKIRMISH_LOBBY_SLOTS)
         .collect();
 
     let mut incoming = snapshot
@@ -4978,6 +5616,25 @@ fn truncate_utf8(value: &mut String, max_bytes: usize) {
 mod tests {
     use super::*;
 
+    fn replay_test_transient_event(
+        mut commands: Commands,
+        mut replication: ResMut<OnlineMatchReplication>,
+    ) {
+        apply_online_transient_events(
+            &mut commands,
+            &mut replication,
+            vec![OnlineTransientEvent {
+                id: 91,
+                kind: OnlineTransientEventKind::ShotPulse {
+                    from: [1.0, 0.5, 2.0],
+                    to: [4.0, 0.5, 5.0],
+                    remaining: 0.4,
+                    team: OnlineEntityTeam::Player(0),
+                },
+            }],
+        );
+    }
+
     #[test]
     fn session_keys_are_random_browser_safe_identifiers() {
         let first = new_session_key();
@@ -4985,6 +5642,49 @@ mod tests {
         assert_ne!(first, second);
         assert_eq!(first.len(), 32);
         assert!(first.bytes().all(|byte| byte.is_ascii_hexdigit()));
+    }
+
+    #[test]
+    fn host_tags_new_transient_effects_with_stable_event_ids() {
+        let mut app = App::new();
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.is_host = true;
+        app.insert_resource(session)
+            .init_resource::<OnlineMatchReplication>()
+            .add_systems(Last, assign_online_transient_event_ids);
+        let pulse = app
+            .world_mut()
+            .spawn(ShotPulse {
+                from: Vec3::ZERO,
+                to: Vec3::X,
+                ttl: 0.2,
+                team: Team::Player(0),
+            })
+            .id();
+
+        app.update();
+
+        assert_eq!(
+            app.world()
+                .get::<OnlineTransientEventId>(pulse)
+                .map(|id| id.0),
+            Some(1)
+        );
+    }
+
+    #[test]
+    fn repeated_transient_packets_spawn_one_visual_event() {
+        let mut app = App::new();
+        app.init_resource::<OnlineMatchReplication>()
+            .add_systems(Update, replay_test_transient_event);
+
+        app.update();
+        app.update();
+
+        let mut pulses = app.world_mut().query_filtered::<Entity, With<ShotPulse>>();
+        let pulse_count = pulses.iter(app.world()).count();
+        assert_eq!(pulse_count, 1);
     }
 
     fn sample_world_snapshot(tick: u64, entity_count: usize) -> OnlineWorldSnapshot {
@@ -5028,6 +5728,7 @@ mod tests {
                 active_anchor_teams: vec![true; 8],
                 finished: false,
             },
+            transient_events: Vec::new(),
         }
     }
 
@@ -5071,7 +5772,95 @@ mod tests {
     }
 
     #[test]
-    fn large_eight_player_snapshot_fits_unreliable_channel() {
+    fn compressed_keyframe_and_delta_support_battles_beyond_the_raw_packet_budget() {
+        let mut baseline = sample_world_snapshot(40, 2_048);
+        baseline.build_queue = (0..128)
+            .map(|index| OnlineBuildJobSnapshot {
+                team: OnlineEntityTeam::Player(index % 8),
+                action: OnlineBuildActionSnapshot::Train("Worker".to_string()),
+                producer_entity: index as u64 + 1,
+                producer_id: "CommandCenter".to_string(),
+                timer: 4.5,
+                origin: [index as f32, 0.0, index as f32 * 0.25],
+                cost: [4, 2],
+            })
+            .collect();
+        let raw_keyframe =
+            postcard::to_allocvec(&OnlineWorldFrame::Full(baseline.clone())).unwrap();
+        assert!(
+            raw_keyframe.len() > MAX_SNAPSHOT_PACKET_BYTES,
+            "test keyframe must exceed the raw channel budget"
+        );
+        let encoded_keyframe = encode_online_world_frame(&OnlineWorldFrame::Full(baseline.clone()))
+            .expect("compressible keyframe should fit");
+        assert!(encoded_keyframe.len() <= MAX_SNAPSHOT_PACKET_BYTES);
+        let decoded_keyframe = decode_snapshot_payload(&encoded_keyframe).unwrap();
+        assert_eq!(
+            postcard::from_bytes::<OnlineWorldFrame>(&decoded_keyframe).unwrap(),
+            OnlineWorldFrame::Full(baseline.clone())
+        );
+
+        let mut current = baseline.clone();
+        current.tick = 41;
+        current.entities.drain(1_900..);
+        for (index, entity) in current.entities.iter_mut().take(96).enumerate() {
+            entity.translation[0] += index as f32 * 0.125 + 1.0;
+        }
+        current.transient_events.push(OnlineTransientEvent {
+            id: 7,
+            kind: OnlineTransientEventKind::ImpactBurst {
+                position: [12.0, 0.08, 9.0],
+                remaining: 0.2,
+                total: 0.3,
+                radius: 0.8,
+                power: 1.1,
+                team: OnlineEntityTeam::Player(0),
+                kind: OnlineImpactBurstKind::Explosive,
+            },
+        });
+        let delta = online_world_delta(&baseline, &current);
+        let rebuilt = apply_online_world_delta(&baseline, delta.clone()).unwrap();
+        assert_eq!(rebuilt, current);
+        let encoded_delta = encode_online_world_frame(&OnlineWorldFrame::Delta(delta)).unwrap();
+        assert!(encoded_delta.len() < encoded_keyframe.len());
+    }
+
+    #[test]
+    fn delta_requires_its_exact_keyframe_and_recovers_after_a_new_full_frame() {
+        let baseline = sample_world_snapshot(10, 32);
+        let mut current = baseline.clone();
+        current.tick = 11;
+        current.entities[3].health = Some([44.0, 100.0]);
+        let delta = online_world_delta(&baseline, &current);
+        let mut replication = OnlineMatchReplication::default();
+
+        assert!(!queue_online_world_frame(
+            &mut replication,
+            OnlineWorldFrame::Delta(delta.clone())
+        ));
+        assert!(queue_online_world_frame(
+            &mut replication,
+            OnlineWorldFrame::Full(baseline.clone())
+        ));
+        assert!(queue_online_world_frame(
+            &mut replication,
+            OnlineWorldFrame::Delta(delta)
+        ));
+        assert_eq!(replication.pending_snapshot.as_ref(), Some(&current));
+
+        let newer_baseline = sample_world_snapshot(20, 48);
+        assert!(queue_online_world_frame(
+            &mut replication,
+            OnlineWorldFrame::Full(newer_baseline.clone())
+        ));
+        assert_eq!(
+            replication.receive_baseline,
+            Some(newer_baseline.baseline())
+        );
+    }
+
+    #[test]
+    fn representative_cooldown_snapshot_still_fits_after_protocol_upgrade() {
         let mut snapshot = sample_world_snapshot(42, 512);
         snapshot.build_queue = (0..128)
             .map(|index| OnlineBuildJobSnapshot {
@@ -5084,16 +5873,17 @@ mod tests {
                 cost: [4, 2],
             })
             .collect();
-        let encoded = postcard::to_allocvec(&snapshot).unwrap();
+        let encoded = encode_online_world_frame(&OnlineWorldFrame::Full(snapshot.clone())).unwrap();
         assert!(
             encoded.len() <= MAX_SNAPSHOT_PACKET_BYTES,
             "{} byte snapshot exceeds {} byte channel limit",
             encoded.len(),
             MAX_SNAPSHOT_PACKET_BYTES
         );
+        let decoded = decode_snapshot_payload(&encoded).unwrap();
         assert_eq!(
-            postcard::from_bytes::<OnlineWorldSnapshot>(&encoded).unwrap(),
-            snapshot
+            postcard::from_bytes::<OnlineWorldFrame>(&decoded).unwrap(),
+            OnlineWorldFrame::Full(snapshot)
         );
     }
 

@@ -83,7 +83,8 @@ cargo test -p open-bevy-net --test transport \
 ```
 
 This creates an unlisted two-peer room and exchanges payloads over both the
-reliable command channel and unreliable snapshot channel. With
+reliable command channel and unreliable snapshot channel, including a
+compressed Open Bevy snapshot-envelope round trip. With
 `OPEN_BEVY_REQUIRE_TURN=1`, it also rejects a deployment that does not issue
 TURN REST credentials.
 

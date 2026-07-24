@@ -4745,6 +4745,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "lz4_flex"
+version = "0.12.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "90071f8077f8e40adfc4b7fe9cd495ce316263f19e75c2211eeff3fdf475a3d9"
+
+[[package]]
 name = "mach2"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5529,6 +5535,7 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "ehttp",
+ "lz4_flex",
  "matchbox_socket",
  "open-bevy-protocol",
  "open-bevy-signaling",

@@ -20,6 +20,10 @@
 - `open-bevy-net` uses `ehttp` for one HTTP API on native/wasm without requiring
   a Tokio runtime in Bevy. Its Matchbox message-loop future is executor-neutral
   and can run on Bevy's task pool.
+- The universal signaling API and game packet compatibility are separate
+  version domains. `session_protocol` must match the service contract;
+  `game_protocol` is any non-zero game-owned value used in room discovery and
+  paths. `open-bevy-net` therefore must not hardcode an RTS game ID.
 - A real native WebRTC integration test starts the custom server, creates a room
   through `RoomServiceClient`, connects two stock Matchbox sockets with host ICE
   candidates, and verifies both reliable and unreliable payload delivery.
@@ -79,6 +83,16 @@
   host broadcasts a reset lobby snapshot, retains connected identities, resets
   readiness, and reclaims disconnected/forfeited player rows. Online restart and
   client-side speed changes are disabled to prevent divergent local state.
-- The running match still needs visual event replication for transient support
-  warnings/impacts. Large battles also need delta/compressed snapshots rather
-  than relying only on full state.
+- RTS protocol v4 replaces raw full-state broadcasting with a one-second
+  compressed keyframe plus independently recoverable 10 Hz deltas. Every delta
+  references the latest full keyframe rather than the previous unreliable
+  packet, carries changed/new entities and removals, and is ignored until the
+  exact keyframe exists. The reusable `open-bevy-net` snapshot envelope applies
+  LZ4 only when smaller and validates the declared decoded size before
+  allocation. A 2,048-entity test exceeds 64 KiB before compression and fits the
+  data channel after encoding.
+- Shot pulses, impact bursts, support warnings, structure destruction, and
+  veterancy promotions now receive host event IDs, remain present in snapshots
+  while alive, and are deduplicated by clients. This gives dropped unreliable
+  packets another chance to carry the visual event without replaying it when
+  multiple packets arrive.

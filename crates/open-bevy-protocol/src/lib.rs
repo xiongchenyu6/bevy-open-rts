@@ -24,6 +24,8 @@ pub enum ValidationError {
     InvalidMaxPeers,
     #[error("metadata has more than {MAX_METADATA_ENTRIES} entries")]
     TooManyMetadataEntries,
+    #[error("game_protocol must be greater than zero")]
+    InvalidGameProtocol,
 }
 
 macro_rules! validated_id {
@@ -157,8 +159,8 @@ pub struct ServiceConfigResponse {
 pub struct CreateRoomRequest {
     pub game_id: GameId,
     pub build_id: BuildId,
-    #[serde(default = "default_session_protocol")]
-    pub protocol_version: u16,
+    pub session_protocol: u16,
+    pub game_protocol: u16,
     #[serde(default = "default_max_peers")]
     pub max_peers: u16,
     #[serde(default)]
@@ -169,6 +171,9 @@ pub struct CreateRoomRequest {
 
 impl CreateRoomRequest {
     pub fn validate(&self) -> Result<(), ValidationError> {
+        if self.game_protocol == 0 {
+            return Err(ValidationError::InvalidGameProtocol);
+        }
         if !(2..=MAX_PEERS).contains(&self.max_peers) {
             return Err(ValidationError::InvalidMaxPeers);
         }
@@ -189,7 +194,8 @@ pub struct CreateRoomResponse {
 pub struct RoomDescriptor {
     pub game_id: GameId,
     pub build_id: BuildId,
-    pub protocol_version: u16,
+    pub session_protocol: u16,
+    pub game_protocol: u16,
     pub room_code: RoomCode,
     pub visibility: RoomVisibility,
     pub max_peers: u16,
@@ -211,8 +217,8 @@ pub struct ErrorResponse {
     pub message: String,
 }
 
-pub fn signaling_path(game_id: &GameId, protocol_version: u16, room_code: &RoomCode) -> String {
-    format!("/{API_VERSION}/signal/{game_id}/{protocol_version}/{room_code}")
+pub fn signaling_path(game_id: &GameId, game_protocol: u16, room_code: &RoomCode) -> String {
+    format!("/{API_VERSION}/signal/{game_id}/{game_protocol}/{room_code}")
 }
 
 pub fn validate_metadata(metadata: &BTreeMap<String, String>) -> Result<(), ValidationError> {
@@ -245,10 +251,6 @@ fn is_metadata_key_character(character: char) -> bool {
     character.is_ascii_alphanumeric() || matches!(character, '.' | '-' | '_')
 }
 
-const fn default_session_protocol() -> u16 {
-    SESSION_PROTOCOL_VERSION
-}
-
 const fn default_max_peers() -> u16 {
     DEFAULT_MAX_PEERS
 }
@@ -272,12 +274,21 @@ mod tests {
         let request = CreateRoomRequest {
             game_id: GameId::new("bevy-open-rts").unwrap(),
             build_id: BuildId::new("0.1.0+abc123").unwrap(),
-            protocol_version: SESSION_PROTOCOL_VERSION,
+            session_protocol: SESSION_PROTOCOL_VERSION,
+            game_protocol: 4,
             max_peers: MAX_PEERS + 1,
             visibility: RoomVisibility::Public,
             metadata: BTreeMap::new(),
         };
         assert_eq!(request.validate(), Err(ValidationError::InvalidMaxPeers));
+
+        let mut request = request;
+        request.max_peers = 2;
+        request.game_protocol = 0;
+        assert_eq!(
+            request.validate(),
+            Err(ValidationError::InvalidGameProtocol)
+        );
     }
 
     #[test]

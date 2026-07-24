@@ -146,7 +146,8 @@ try {
       body: JSON.stringify({
         game_id: "bevy-open-rts",
         build_id: "browser-smoke",
-        protocol_version: 1,
+        session_protocol: 1,
+        game_protocol: 4,
         max_peers: 2,
         visibility: "unlisted",
         metadata: { purpose: "browser-smoke" },

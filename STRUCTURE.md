@@ -6,10 +6,14 @@ The repository is a Cargo workspace whose default member remains the root
 `bevy-open-rts` game, so plain `cargo run` keeps its existing behavior.
 
 - `crates/open-bevy-protocol` owns game-independent room/API contracts and
-  identifier validation. It has no Bevy dependency.
+  identifier validation. It has no Bevy dependency. Its `session_protocol`
+  versions the universal service API, while each room's `game_protocol` is an
+  opaque, non-zero game-owned namespace component.
 - `crates/open-bevy-net` owns the native/wasm HTTP room client and the two-channel
   Matchbox WebRTC transport. It has no Bevy dependency; games poll transport
-  events and run its message-loop future on their engine task pool.
+  events and run its message-loop future on their engine task pool. It does not
+  contain a default game ID; each consuming game supplies its own ID and game
+  protocol.
 - `services/open-bevy-signaling` owns the reusable Open Bevy room service and a
   Matchbox-compatible WebSocket endpoint. It has no dependency on the RTS game.
 - `deploy/signaling` contains the production container, Caddy, and Coturn
@@ -108,11 +112,17 @@ domains live in modules, each re-exported into the crate root
   supply crates use disjoint map-index namespaces. Local Bevy `Entity` handles
   are never serialized.
 - Online matches run the build, economy, AI, combat, death, and victory systems
-  only on the host. At 10 Hz the host broadcasts an unreliable postcard world
-  snapshot; clients reconcile units, structures, resources, crates, economies,
-  and match state by stable ID and interpolate short transform corrections.
-- Full snapshots are bounded by the transport's 64 KiB unreliable-channel
-  limit and covered by an eight-player/512-entity serialization test.
+  only on the host. Clients reconcile units, structures, resources, crates,
+  economies, and match state by stable ID and interpolate short transform
+  corrections.
+- RTS wire protocol v4 sends one compressed full keyframe per second and 10 Hz
+  deltas against that keyframe. Deltas contain changed/new entities, explicit
+  removals, current global match state, and sequenced transient effects. They
+  never chain from another unreliable delta, so one dropped packet cannot
+  corrupt later state. `open-bevy-net` owns the reusable versioned LZ4 envelope,
+  enforces a 64 KiB wire limit and a 4 MiB pre-allocation decode limit, and is
+  shared unchanged by native and wasm clients. Tests prove a compressible
+  2,048-entity keyframe whose raw postcard form exceeds the channel budget.
 - Unit orders and structure rally points cross the reliable channel as bounded,
   sequenced commands that contain only stable network IDs. The host rejects
   replayed commands, invalid targets, unsupported orders, out-of-bounds points,
@@ -126,7 +136,7 @@ domains live in modules, each re-exported into the crate root
   refunds, and build queues are mirrored in world snapshots so client HUDs show
   host-owned queue state and progress. Remote human teams no longer inherit AI
   automatic construction.
-- RTS wire protocol v3 sends stop/hold/guard/scatter/deploy, structure
+- RTS wire protocol v4 sends stop/hold/guard/scatter/deploy, structure
   sell/repair/cancel, and support-power targeting over the reliable command
   channel. The host resolves stable IDs, rejects foreign/dead/unsupported
   entities, enforces one structure mutation per host tick, and validates support
@@ -136,11 +146,12 @@ domains live in modules, each re-exported into the crate root
   authoritative finished flag, so an eliminated host cannot end a battle while
   hostile remote teams still fight and every client derives victory/defeat from
   its own alliance perspective. A reconnecting client remains in the running
-  match and catches up from the next host snapshot. Protocol v3 gives remote
+  match and catches up from the next host snapshot. Protocol v4 gives remote
   humans a 30-second reconnect grace, turns expiry into a host-authoritative
   forfeit, rejects late/forfeited identities, and synchronizes return to a reset
-  rematch lobby. Transient visual events and large-battle delta snapshots remain
-  the next online boundaries.
+  rematch lobby. Host-sequenced shot, impact, support-warning, structure-death,
+  and promotion effects are repeated while alive and deduplicated by clients.
+  The next online boundary is full multi-client product verification.
 - `bevy_fluent::FluentPlugin` is registered in the shared game scene so future `.ftl` localization bundles can load through Bevy assets. The existing `Locale` / `t()` path remains the active text source until screens are migrated incrementally.
 - AI drones have an active scouting controller: idle AI `Drone` units pick living enemy units, move to their positions, avoid repeating the previous target when possible, and retarget after a short 0.5-1.0s delay.
 - AI defense profiles follow the godot difficulty targets: Beginner/Easy do not inherit Normal advanced-defense construction, Normal targets one standard defense layer plus 2 Tesla fence segments where the faction supports them, and Hard scales standard defenses to 2 plus 4 Tesla fence segments.

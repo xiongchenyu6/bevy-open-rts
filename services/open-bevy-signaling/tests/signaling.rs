@@ -18,6 +18,7 @@ use tokio_tungstenite::{
 };
 
 type ClientSocket = WebSocketStream<MaybeTlsStream<tokio::net::TcpStream>>;
+const TEST_GAME_PROTOCOL: u16 = 7;
 
 struct TestServer {
     http_base: String,
@@ -70,12 +71,22 @@ async fn create_room(
     visibility: RoomVisibility,
     max_peers: u16,
 ) -> CreateRoomResponse {
+    create_room_for_protocol(server, visibility, max_peers, TEST_GAME_PROTOCOL).await
+}
+
+async fn create_room_for_protocol(
+    server: &TestServer,
+    visibility: RoomVisibility,
+    max_peers: u16,
+    game_protocol: u16,
+) -> CreateRoomResponse {
     reqwest::Client::new()
         .post(format!("{}/v1/rooms", server.http_base))
         .json(&CreateRoomRequest {
             game_id: GameId::new("integration-game").unwrap(),
             build_id: BuildId::new("integration-build").unwrap(),
-            protocol_version: SESSION_PROTOCOL_VERSION,
+            session_protocol: SESSION_PROTOCOL_VERSION,
+            game_protocol,
             max_peers,
             visibility,
             metadata: BTreeMap::from([
@@ -320,7 +331,7 @@ async fn host_reconnect_timeout_closes_stranded_players_and_removes_room() {
     assert!(matches!(close, Message::Close(_)));
 
     let response = reqwest::get(format!(
-        "{}/v1/rooms/integration-game/{SESSION_PROTOCOL_VERSION}/{}",
+        "{}/v1/rooms/integration-game/{TEST_GAME_PROTOCOL}/{}",
         server.http_base, room.room.room_code
     ))
     .await
@@ -385,7 +396,7 @@ async fn discovery_only_lists_public_rooms_and_preserves_metadata() {
     let _private_room = create_room(&server, RoomVisibility::Private, 8).await;
 
     let response = reqwest::get(format!(
-        "{}/v1/rooms?game_id=integration-game&protocol_version={SESSION_PROTOCOL_VERSION}",
+        "{}/v1/rooms?game_id=integration-game&game_protocol={TEST_GAME_PROTOCOL}",
         server.http_base
     ))
     .await
@@ -399,4 +410,53 @@ async fn discovery_only_lists_public_rooms_and_preserves_metadata() {
     assert_eq!(response.rooms.len(), 1);
     assert_eq!(response.rooms[0].room_code, public_room.room.room_code);
     assert_eq!(response.rooms[0].metadata["map"], "four-corners");
+}
+
+#[tokio::test]
+async fn game_protocols_are_isolated_and_session_protocol_is_service_owned() {
+    let server = spawn_server().await;
+    let first = create_room_for_protocol(&server, RoomVisibility::Public, 4, 7).await;
+    let second = create_room_for_protocol(&server, RoomVisibility::Public, 4, 42).await;
+
+    assert_eq!(first.room.session_protocol, SESSION_PROTOCOL_VERSION);
+    assert_eq!(first.room.game_protocol, 7);
+    assert_eq!(second.room.game_protocol, 42);
+
+    let first_protocol_rooms = reqwest::get(format!(
+        "{}/v1/rooms?game_id=integration-game&game_protocol=7",
+        server.http_base
+    ))
+    .await
+    .unwrap()
+    .error_for_status()
+    .unwrap()
+    .json::<open_bevy_protocol::RoomListResponse>()
+    .await
+    .unwrap();
+    assert_eq!(first_protocol_rooms.rooms.len(), 1);
+    assert_eq!(
+        first_protocol_rooms.rooms[0].room_code,
+        first.room.room_code
+    );
+
+    let rejected = reqwest::Client::new()
+        .post(format!("{}/v1/rooms", server.http_base))
+        .json(&CreateRoomRequest {
+            game_id: GameId::new("integration-game").unwrap(),
+            build_id: BuildId::new("integration-build").unwrap(),
+            session_protocol: SESSION_PROTOCOL_VERSION + 1,
+            game_protocol: 99,
+            max_peers: 4,
+            visibility: RoomVisibility::Public,
+            metadata: BTreeMap::new(),
+        })
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(rejected.status(), reqwest::StatusCode::BAD_REQUEST);
+    let error = rejected
+        .json::<open_bevy_protocol::ErrorResponse>()
+        .await
+        .unwrap();
+    assert_eq!(error.code, "unsupported_session_protocol");
 }

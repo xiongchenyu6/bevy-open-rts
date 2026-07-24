@@ -9,6 +9,9 @@ native desktop and browser builds.
 ## Architecture Decisions
 
 - The signaling service and wire protocol must not depend on Bevy or RTS code.
+- The universal `session_protocol` is service-owned; every room also carries an
+  arbitrary non-zero `game_protocol`, so different games and incompatible game
+  packet revisions are isolated without changing the signaling server.
 - WebRTC peers use Matchbox's native/wasm socket implementation, but the server
   owns room admission, discovery, isolation, observability, and lifecycle.
 - RTS networking is host-authoritative. Clients submit validated player
@@ -37,7 +40,7 @@ native desktop and browser builds.
   - [x] Online menu, public room discovery/create, room code/token join
   - [x] Exact map slot rows with readiness/faction/team/color synchronization
   - [x] Host-validated settings and synchronized match launch
-- [ ] Host-authoritative match
+- [x] Host-authoritative match
   - [x] Stable network entity IDs
   - [x] Host world snapshots, client reconciliation, and interpolation
   - [x] Serializable high-level commands
@@ -48,7 +51,8 @@ native desktop and browser builds.
     - [x] Unit/rally ownership, capability, target, bounds, and replay validation
     - [x] Economy, technology, and production validation
     - [x] Support-power validation
-  - [ ] Snapshot delta/compression for battles beyond the full-snapshot budget
+  - [x] Snapshot delta/compression for battles beyond the full-snapshot budget
+  - [x] Sequenced transient combat/support visual events with client deduplication
   - [x] Match-state reconnect/resume through the next authoritative snapshot
   - [x] Match completion and session lifecycle
     - [x] Global multiplayer victory with per-player result presentation
@@ -59,7 +63,7 @@ native desktop and browser builds.
   - [ ] Two browser clients
   - [ ] Native-to-browser client
   - [ ] Internet path through TURN
-  - [ ] Deployment and operational runbook
+  - [x] Deployment and operational runbook
 
 ## Verification Gates
 

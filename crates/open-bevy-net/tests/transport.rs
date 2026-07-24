@@ -1,14 +1,20 @@
 use open_bevy_net::{
-    RoomServiceClient, TransportConfig, TransportEvent, WebRtcTransport, default_game_id,
-    protocol_version,
+    RoomServiceClient, TransportConfig, TransportEvent, WebRtcTransport, decode_snapshot_payload,
+    encode_snapshot_payload, session_protocol_version,
 };
 use open_bevy_protocol::{
-    BuildId, CreateRoomRequest, CreateRoomResponse, IceServer, PlayerName, RoomVisibility,
+    BuildId, CreateRoomRequest, CreateRoomResponse, GameId, IceServer, PlayerName, RoomVisibility,
     ServiceConfigResponse,
 };
 use open_bevy_signaling::{AppState, ServerConfig, build_router};
 use std::{collections::BTreeMap, time::Duration};
 use tokio::{net::TcpListener, task::JoinHandle, time::Instant};
+
+const TEST_GAME_PROTOCOL: u16 = 17;
+
+fn test_game_id() -> GameId {
+    GameId::new("open-bevy-net-test").expect("static test game id is valid")
+}
 
 struct TestServer {
     http_base: String,
@@ -111,9 +117,10 @@ async fn exchange_both_channels(room: &CreateRoomResponse, service_config: Servi
 
     host.send_reliable(host_peer, b"lobby-ready".to_vec())
         .unwrap();
-    player
-        .send_snapshot(player_peer, b"snapshot-42".to_vec())
-        .unwrap();
+    let snapshot_body = vec![0x42; 8 * 1024];
+    let snapshot_packet = encode_snapshot_payload(&snapshot_body).unwrap();
+    assert!(snapshot_packet.len() < snapshot_body.len());
+    player.send_snapshot(player_peer, snapshot_packet).unwrap();
 
     let deadline = Instant::now() + Duration::from_secs(8);
     let mut reliable_received = false;
@@ -125,11 +132,11 @@ async fn exchange_both_channels(room: &CreateRoomResponse, service_config: Servi
                 TransportEvent::ReliableMessage { payload, .. } if payload == b"lobby-ready"
             )
         });
-        snapshot_received |= host.poll().unwrap().into_iter().any(|event| {
-            matches!(
-                event,
-                TransportEvent::SnapshotMessage { payload, .. } if payload == b"snapshot-42"
-            )
+        snapshot_received |= host.poll().unwrap().into_iter().any(|event| match event {
+            TransportEvent::SnapshotMessage { payload, .. } => {
+                decode_snapshot_payload(&payload).is_ok_and(|decoded| decoded == snapshot_body)
+            }
+            _ => false,
         });
         tokio::time::sleep(Duration::from_millis(10)).await;
     }
@@ -155,9 +162,10 @@ async fn shared_client_creates_room_and_exchanges_both_webrtc_channel_types() {
     let service_config = service.service_config().await.unwrap();
     let room = service
         .create_room(&CreateRoomRequest {
-            game_id: default_game_id(),
+            game_id: test_game_id(),
             build_id: BuildId::new("transport-integration").unwrap(),
-            protocol_version: protocol_version(),
+            session_protocol: session_protocol_version(),
+            game_protocol: TEST_GAME_PROTOCOL,
             max_peers: 2,
             visibility: RoomVisibility::Public,
             metadata: BTreeMap::from([("mode".to_string(), "transport-test".to_string())]),
@@ -166,7 +174,7 @@ async fn shared_client_creates_room_and_exchanges_both_webrtc_channel_types() {
         .unwrap();
 
     let listed = service
-        .list_rooms(&default_game_id(), protocol_version())
+        .list_rooms(&test_game_id(), TEST_GAME_PROTOCOL)
         .await
         .unwrap();
     assert_eq!(listed.rooms.len(), 1);
@@ -182,8 +190,14 @@ async fn deployed_service_exchanges_reliable_and_snapshot_channels() {
         .expect("OPEN_BEVY_SIGNALING_URL must point at the deployed HTTPS service");
     let service = RoomServiceClient::new(&service_url).unwrap();
     let service_config = service.service_config().await.unwrap();
-    assert_eq!(service_config.min_session_protocol, protocol_version());
-    assert_eq!(service_config.max_session_protocol, protocol_version());
+    assert_eq!(
+        service_config.min_session_protocol,
+        session_protocol_version()
+    );
+    assert_eq!(
+        service_config.max_session_protocol,
+        session_protocol_version()
+    );
 
     let require_turn = std::env::var("OPEN_BEVY_REQUIRE_TURN").is_ok_and(|value| value != "0");
     if require_turn {
@@ -198,9 +212,10 @@ async fn deployed_service_exchanges_reliable_and_snapshot_channels() {
 
     let room = service
         .create_room(&CreateRoomRequest {
-            game_id: default_game_id(),
+            game_id: test_game_id(),
             build_id: BuildId::new("production-transport-smoke").unwrap(),
-            protocol_version: protocol_version(),
+            session_protocol: session_protocol_version(),
+            game_protocol: TEST_GAME_PROTOCOL,
             max_peers: 2,
             visibility: RoomVisibility::Unlisted,
             metadata: BTreeMap::from([("mode".to_string(), "production-smoke".to_string())]),
