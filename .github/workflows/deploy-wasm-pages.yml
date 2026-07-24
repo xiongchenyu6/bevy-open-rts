@@ -89,6 +89,45 @@ jobs:
       - name: Build web artifacts
         run: bash scripts/build_web.sh
 
+      - name: Verify WebGPU startup in Chrome
+        env:
+          OPEN_BEVY_GAME_URL: http://127.0.0.1:8080/
+          OPEN_BEVY_BROWSER_OUTPUT: browser-smoke-output
+        run: |
+          set -euo pipefail
+          mkdir -p browser-smoke-output
+          npm ci --prefix scripts/browser-smoke
+          python3 -m http.server 8080 --directory web \
+            > /tmp/open-bevy-browser-server.log 2>&1 &
+          server_pid=$!
+          cleanup() {
+            cp /tmp/open-bevy-browser-server.log \
+              browser-smoke-output/static-server.log 2>/dev/null || true
+            kill "$server_pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8080/ >/dev/null; then
+              break
+            fi
+            if [[ "$attempt" == 30 ]]; then
+              cat /tmp/open-bevy-browser-server.log
+              exit 1
+            fi
+            sleep 1
+          done
+          npm --prefix scripts/browser-smoke run smoke 2>&1 \
+            | tee browser-smoke-output/report.log
+
+      - name: Upload browser smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-smoke-${{ github.sha }}
+          path: browser-smoke-output/
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Package web bundle
         run: |
           set -euo pipefail
