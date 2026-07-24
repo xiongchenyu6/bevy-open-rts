@@ -33,7 +33,7 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 use tokio::sync::{RwLock, mpsc};
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::cors::{AllowOrigin, Any, CorsLayer};
 use tracing::{debug, info, warn};
 use uuid::Uuid;
 
@@ -534,6 +534,7 @@ fn authorize_room_connection(room: &Room, query: &ValidatedSignalQuery) -> Resul
 }
 
 pub fn build_router(state: AppState) -> Router {
+    let cors = cors_layer(&state.inner.config);
     Router::new()
         .route("/healthz", get(health))
         .route("/readyz", get(health))
@@ -548,13 +549,25 @@ pub fn build_router(state: AppState) -> Router {
             "/v1/signal/{game_id}/{protocol_version}/{room_code}",
             get(signal_websocket),
         )
-        .layer(
-            CorsLayer::new()
-                .allow_origin(Any)
-                .allow_headers(Any)
-                .allow_methods(Any),
-        )
+        .layer(cors)
         .with_state(state)
+}
+
+fn cors_layer(config: &ServerConfig) -> CorsLayer {
+    let allow_origin = if config.allowed_origins.iter().any(|origin| origin == "*") {
+        AllowOrigin::any()
+    } else {
+        let allowed_origins = config.allowed_origins.clone();
+        AllowOrigin::predicate(move |origin, _request| {
+            origin
+                .to_str()
+                .is_ok_and(|origin| allowed_origins.iter().any(|allowed| allowed == origin))
+        })
+    };
+    CorsLayer::new()
+        .allow_origin(allow_origin)
+        .allow_headers(Any)
+        .allow_methods(Any)
 }
 
 async fn health() -> Json<HealthResponse> {
@@ -832,10 +845,15 @@ fn validate_origin(config: &ServerConfig, headers: &HeaderMap) -> Result<(), Api
     if config.allowed_origins.iter().any(|origin| origin == "*") {
         return Ok(());
     }
-    let origin = headers
-        .get(axum::http::header::ORIGIN)
-        .and_then(|value| value.to_str().ok())
-        .ok_or_else(|| ApiError::forbidden("origin_required", "an Origin header is required"))?;
+    let Some(origin) = headers.get(axum::http::header::ORIGIN) else {
+        // Browsers always attach Origin to WebSocket handshakes. Native game
+        // clients generally cannot, and an Origin value is not authentication
+        // because a non-browser client could forge it anyway.
+        return Ok(());
+    };
+    let origin = origin
+        .to_str()
+        .map_err(|_| ApiError::forbidden("origin_not_allowed", "the Origin is invalid"))?;
     if config
         .allowed_origins
         .iter()

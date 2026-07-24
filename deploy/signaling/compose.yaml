@@ -17,6 +17,10 @@ services:
       RUST_LOG: open_bevy_signaling=info
     expose:
       - "3536"
+    ports:
+      # A host-managed TLS proxy can reach the service without exposing plain
+      # HTTP to the internet. The bundled Caddy still uses the Docker network.
+      - "127.0.0.1:${SIGNALING_BIND_PORT:-3536}:3536"
     depends_on:
       - turn
     networks:

@@ -10,7 +10,11 @@ use std::{collections::BTreeMap, time::Duration};
 use tokio::{net::TcpListener, task::JoinHandle, time::timeout};
 use tokio_tungstenite::{
     MaybeTlsStream, WebSocketStream, connect_async,
-    tungstenite::{Error as WebSocketError, Message},
+    tungstenite::{
+        Error as WebSocketError, Message,
+        client::IntoClientRequest,
+        http::{HeaderValue, StatusCode, header::ORIGIN},
+    },
 };
 
 type ClientSocket = WebSocketStream<MaybeTlsStream<tokio::net::TcpStream>>;
@@ -32,12 +36,20 @@ async fn spawn_server() -> TestServer {
 }
 
 async fn spawn_server_with_grace(host_reconnect_grace: Duration) -> TestServer {
+    spawn_server_with_options(host_reconnect_grace, vec!["*".to_string()]).await
+}
+
+async fn spawn_server_with_options(
+    host_reconnect_grace: Duration,
+    allowed_origins: Vec<String>,
+) -> TestServer {
     let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let address = listener.local_addr().unwrap();
     let state = AppState::new(ServerConfig {
         public_websocket_base_url: format!("ws://{address}"),
         room_ttl: Duration::from_secs(60),
         host_reconnect_grace,
+        allowed_origins,
         ..ServerConfig::default()
     });
     let server_state = state.clone();
@@ -93,16 +105,21 @@ async fn connect_player(
     room: &CreateRoomResponse,
     name: &str,
 ) -> Result<ClientSocket, WebSocketError> {
+    connect_async(player_url(room, name))
+        .await
+        .map(|connection| connection.0)
+}
+
+fn player_url(room: &CreateRoomResponse, name: &str) -> String {
     let ticket = room
         .join_token
         .as_ref()
         .map(|token| format!("&ticket={token}"))
         .unwrap_or_default();
-    let url = format!(
+    format!(
         "{}?name={name}&role=player&build_id=integration-build{ticket}",
         room.signaling_url
-    );
-    connect_async(url).await.map(|connection| connection.0)
+    )
 }
 
 async fn receive_event(socket: &mut ClientSocket) -> JsonPeerEvent {
@@ -122,6 +139,68 @@ async fn assigned_id(socket: &mut ClientSocket) -> PeerId {
         JsonPeerEvent::IdAssigned(peer_id) => peer_id,
         event => panic!("expected IdAssigned, received {event:?}"),
     }
+}
+
+#[tokio::test]
+async fn production_origin_policy_allows_native_and_approved_browser_clients() {
+    const GAME_ORIGIN: &str = "https://games.example.test";
+    let server =
+        spawn_server_with_options(Duration::from_secs(30), vec![GAME_ORIGIN.to_string()]).await;
+    let room = create_room(&server, RoomVisibility::Public, 4).await;
+
+    // Native Matchbox clients do not send Origin. They must remain usable when
+    // browser origins are restricted in production.
+    let mut host = connect_host(&room, "NativeHost").await;
+    let _host_id = assigned_id(&mut host).await;
+
+    let mut browser_request = player_url(&room, "BrowserPlayer")
+        .into_client_request()
+        .unwrap();
+    browser_request
+        .headers_mut()
+        .insert(ORIGIN, HeaderValue::from_static(GAME_ORIGIN));
+    let mut browser = connect_async(browser_request).await.unwrap().0;
+    let _browser_id = assigned_id(&mut browser).await;
+
+    let mut rejected_request = player_url(&room, "ForeignBrowser")
+        .into_client_request()
+        .unwrap();
+    rejected_request.headers_mut().insert(
+        ORIGIN,
+        HeaderValue::from_static("https://foreign.example.test"),
+    );
+    let error = connect_async(rejected_request).await.unwrap_err();
+    assert!(matches!(
+        error,
+        WebSocketError::Http(response) if response.status() == StatusCode::FORBIDDEN
+    ));
+
+    let client = reqwest::Client::new();
+    let approved = client
+        .get(format!("{}/v1/config", server.http_base))
+        .header("origin", GAME_ORIGIN)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(
+        approved
+            .headers()
+            .get("access-control-allow-origin")
+            .and_then(|value| value.to_str().ok()),
+        Some(GAME_ORIGIN)
+    );
+    let rejected = client
+        .get(format!("{}/v1/config", server.http_base))
+        .header("origin", "https://foreign.example.test")
+        .send()
+        .await
+        .unwrap();
+    assert!(
+        rejected
+            .headers()
+            .get("access-control-allow-origin")
+            .is_none()
+    );
 }
 
 #[tokio::test]

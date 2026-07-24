@@ -32,6 +32,10 @@ jobs:
     name: Build WebAssembly package
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      # Public, non-secret endpoint compiled into the native/wasm shared lobby.
+      # Configure it with: gh variable set OPEN_BEVY_SIGNALING_URL --body https://...
+      OPEN_BEVY_SIGNALING_URL: ${{ vars.OPEN_BEVY_SIGNALING_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7

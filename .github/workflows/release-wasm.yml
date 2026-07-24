@@ -71,6 +71,8 @@ jobs:
         # build_web.sh pins the wasm-bindgen CLI to the Cargo.lock version and
         # downloads binaryen 130 itself, so no extra tool install is needed.
         run: bash scripts/build_web.sh
+        env:
+          OPEN_BEVY_SIGNALING_URL: ${{ vars.OPEN_BEVY_SIGNALING_URL }}
 
       - name: Package tarball
         id: pkg
