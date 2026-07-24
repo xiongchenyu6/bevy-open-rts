@@ -93,6 +93,9 @@ jobs:
         env:
           OPEN_BEVY_GAME_URL: http://127.0.0.1:8080/
           OPEN_BEVY_BROWSER_OUTPUT: browser-smoke-output
+          # Hosted runners have no physical GPU. Force Chrome's bundled Vulkan
+          # software adapter while exercising the same WebGPU/WASM code path.
+          OPEN_BEVY_SOFTWARE_WEBGPU: "1"
         run: |
           set -euo pipefail
           mkdir -p browser-smoke-output

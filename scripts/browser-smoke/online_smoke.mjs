@@ -7,6 +7,7 @@ const signalingUrl = process.env.OPEN_BEVY_SIGNALING_URL
   ?? "https://signal.101.78.126.6.sslip.io";
 const outputDir = process.env.OPEN_BEVY_BROWSER_OUTPUT
   ?? "/tmp/open-bevy-browser-smoke";
+const softwareWebGpu = process.env.OPEN_BEVY_SOFTWARE_WEBGPU === "1";
 const chromeCandidates = [
   process.env.CHROME_BIN,
   "/etc/profiles/per-user/freeman.xiong/bin/google-chrome-stable",
@@ -84,12 +85,23 @@ mkdirSync(outputDir, { recursive: true });
 const browser = await chromium.launch({
   executablePath,
   headless: true,
-  args: [
-    "--enable-unsafe-webgpu",
-    "--ignore-gpu-blocklist",
-    "--enable-features=Vulkan,UseSkiaRenderer,WebGPU",
-    "--use-angle=vulkan",
-  ],
+  args: softwareWebGpu
+    ? [
+        "--enable-unsafe-webgpu",
+        "--enable-unsafe-swiftshader",
+        "--ignore-gpu-blocklist",
+        "--enable-features=Vulkan,UseSkiaRenderer,WebGPU",
+        "--use-angle=swiftshader",
+        "--use-vulkan=swiftshader",
+        "--disable-vulkan-surface",
+        "--disable-gpu-sandbox",
+      ]
+    : [
+        "--enable-unsafe-webgpu",
+        "--ignore-gpu-blocklist",
+        "--enable-features=Vulkan,UseSkiaRenderer,WebGPU",
+        "--use-angle=vulkan",
+      ],
 });
 
 try {
@@ -198,6 +210,7 @@ try {
     gameUrl,
     signalingUrl,
     executablePath,
+    softwareWebGpu,
     bootAttempts,
     state,
     signaling,
