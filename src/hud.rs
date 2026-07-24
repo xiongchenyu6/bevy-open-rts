@@ -2158,6 +2158,9 @@ pub(crate) fn match_menu_buttons(
     mut windows: Query<&mut Window, With<PrimaryWindow>>,
     mut visible_player: ResMut<VisiblePlayer>,
     active_teams: Res<ActiveTeams>,
+    match_state: Res<MatchState>,
+    online_session: Option<Res<OnlineSession>>,
+    mut online_lifecycle: Option<ResMut<OnlineLifecycleControl>>,
     selected_map: Res<SelectedSkirmishMap>,
     setup_settings: Res<MatchSetupSettings>,
     mut camera_state: ResMut<RtsCamera>,
@@ -2168,8 +2171,15 @@ pub(crate) fn match_menu_buttons(
         &mut BorderColor,
     )>,
 ) {
+    let online_match = online_match_uses_command_transport(online_session.as_deref());
     for (interaction, button, mut background, mut border) in &mut buttons {
-        let enabled = match_menu_action_enabled(button.action, &visible_player, &active_teams);
+        let enabled = match_menu_action_enabled(
+            button.action,
+            &visible_player,
+            &active_teams,
+            match_state.is_running(),
+            online_session.as_deref(),
+        );
         let clicked = match_menu.visible
             && enabled
             && *interaction == Interaction::Pressed
@@ -2209,12 +2219,20 @@ pub(crate) fn match_menu_buttons(
                     }
                 }
                 MatchMenuAction::Restart => {
-                    match_menu.visible = false;
-                    next_state.set(AppScreen::RestartingMatch);
+                    if !online_match {
+                        match_menu.visible = false;
+                        next_state.set(AppScreen::RestartingMatch);
+                    }
                 }
                 MatchMenuAction::ReturnToSetup => {
                     match_menu.visible = false;
-                    next_state.set(AppScreen::MainMenu);
+                    if online_match {
+                        if let Some(lifecycle) = online_lifecycle.as_deref_mut() {
+                            lifecycle.request_return_to_lobby();
+                        }
+                    } else {
+                        next_state.set(AppScreen::MainMenu);
+                    }
                 }
             }
         }
@@ -2233,16 +2251,20 @@ pub(crate) fn match_menu_action_enabled(
     action: MatchMenuAction,
     visible_player: &VisiblePlayer,
     active_teams: &ActiveTeams,
+    match_running: bool,
+    online_session: Option<&OnlineSession>,
 ) -> bool {
+    let online_match = online_match_uses_command_transport(online_session);
     match action {
         MatchMenuAction::PreviousPerspective | MatchMenuAction::NextPerspective => {
             spectator_perspective_switch_enabled(visible_player, active_teams)
         }
-        MatchMenuAction::Resume
-        | MatchMenuAction::SetSpeed(_)
-        | MatchMenuAction::ToggleFullscreen
-        | MatchMenuAction::Restart
-        | MatchMenuAction::ReturnToSetup => true,
+        MatchMenuAction::SetSpeed(_) => !online_match || online_match_is_host(online_session),
+        MatchMenuAction::Restart => !online_match,
+        MatchMenuAction::ReturnToSetup => {
+            !online_match || online_match_is_host(online_session) || !match_running
+        }
+        MatchMenuAction::Resume | MatchMenuAction::ToggleFullscreen => true,
     }
 }
 

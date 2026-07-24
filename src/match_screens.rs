@@ -233,6 +233,8 @@ pub(crate) fn match_end_buttons(
     mouse: Res<ButtonInput<MouseButton>>,
     match_state: Res<MatchState>,
     mut match_menu: ResMut<MatchMenuState>,
+    online_session: Option<Res<OnlineSession>>,
+    mut online_lifecycle: Option<ResMut<OnlineLifecycleControl>>,
     mut next_state: ResMut<NextState<AppScreen>>,
     mut buttons: Query<(
         &Interaction,
@@ -242,8 +244,10 @@ pub(crate) fn match_end_buttons(
     )>,
 ) {
     let match_finished = !match_state.is_running();
+    let online_match = online_match_uses_command_transport(online_session.as_deref());
     for (interaction, button, mut background, mut border) in &mut buttons {
-        let clicked = match_finished
+        let enabled = match_end_action_enabled(button.action, match_finished, online_match);
+        let clicked = enabled
             && *interaction == Interaction::Pressed
             && mouse.just_pressed(MouseButton::Left);
         if clicked {
@@ -252,16 +256,39 @@ pub(crate) fn match_end_buttons(
                 MatchEndAction::Restart => {
                     next_state.set(AppScreen::RestartingMatch);
                 }
-                MatchEndAction::ReturnToSetup | MatchEndAction::ExitToMenu => {
-                    next_state.set(AppScreen::MainMenu);
+                MatchEndAction::ReturnToSetup => {
+                    if online_match {
+                        if let Some(lifecycle) = online_lifecycle.as_deref_mut() {
+                            lifecycle.request_return_to_lobby();
+                        }
+                    } else {
+                        next_state.set(AppScreen::MainMenu);
+                    }
+                }
+                MatchEndAction::ExitToMenu => {
+                    if online_match {
+                        if let Some(lifecycle) = online_lifecycle.as_deref_mut() {
+                            lifecycle.request_leave_session();
+                        }
+                    } else {
+                        next_state.set(AppScreen::MainMenu);
+                    }
                 }
             }
         }
 
-        let (bg, border_color) = match_end_button_visual(*interaction, match_finished);
+        let (bg, border_color) = match_end_button_visual(*interaction, enabled);
         *background = BackgroundColor(bg);
         *border = BorderColor::all(border_color);
     }
+}
+
+pub(crate) fn match_end_action_enabled(
+    action: MatchEndAction,
+    match_finished: bool,
+    online_match: bool,
+) -> bool {
+    match_finished && (!online_match || action != MatchEndAction::Restart)
 }
 
 pub(crate) fn match_end_button_visual(interaction: Interaction, enabled: bool) -> (Color, Color) {

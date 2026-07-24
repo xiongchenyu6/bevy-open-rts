@@ -31,9 +31,10 @@ use std::{
 
 use crate::*;
 
-const RTS_ONLINE_PROTOCOL: u16 = 2;
+const RTS_ONLINE_PROTOCOL: u16 = 3;
 const ONLINE_DEFAULT_SERVICE_URL: &str = "http://127.0.0.1:3536";
 const ONLINE_MAX_STATUS_BYTES: usize = 180;
+const ONLINE_PLAYER_RECONNECT_GRACE_SECONDS: f32 = 30.0;
 const ONLINE_SNAPSHOT_HZ: f32 = 10.0;
 const ONLINE_SNAPSHOT_INTERVAL_SECONDS: f32 = 1.0 / ONLINE_SNAPSHOT_HZ;
 const ONLINE_SNAPSHOT_SNAP_DISTANCE: f32 = 8.0;
@@ -604,10 +605,16 @@ enum OnlineReliableMessage {
         player_id: u64,
         assigned_slot: usize,
         snapshot: OnlineLobbySnapshot,
+        match_config: Option<OnlineMatchConfig>,
     },
     LobbyCommand(OnlineLobbyCommand),
     LobbySnapshot(OnlineLobbySnapshot),
     StartMatch(OnlineMatchConfig),
+    ReturnToLobbyRequest,
+    ReturnToLobby(OnlineLobbySnapshot),
+    SessionClosed {
+        reason: String,
+    },
     PlayerCommand(OnlinePlayerCommandEnvelope),
     Rejected {
         reason: String,
@@ -1060,6 +1067,7 @@ impl HostLobbyRuntime {
         peer: PeerId,
         session_key: String,
         player_name: String,
+        allow_new_player: bool,
     ) -> Result<(u64, usize), &'static str> {
         if let Some(player_id) = self.resume_players.get(&session_key).copied() {
             let slot = snapshot
@@ -1076,6 +1084,10 @@ impl HostLobbyRuntime {
             }
             snapshot.revision = snapshot.revision.saturating_add(1);
             return Ok((player_id, slot));
+        }
+
+        if !allow_new_player {
+            return Err("the match is already in progress");
         }
 
         let Some(slot) = snapshot
@@ -1099,12 +1111,16 @@ impl HostLobbyRuntime {
         Ok((player_id, slot))
     }
 
-    fn disconnect(&mut self, snapshot: &mut OnlineLobbySnapshot, peer: PeerId) -> bool {
+    fn player_for_session(&self, session_key: &str) -> Option<u64> {
+        self.resume_players.get(session_key).copied()
+    }
+
+    fn disconnect(&mut self, snapshot: &mut OnlineLobbySnapshot, peer: PeerId) -> Option<u64> {
         let Some(player_id) = self.peer_players.remove(&peer) else {
-            return false;
+            return None;
         };
         let Some(slot) = snapshot.human_slot(player_id) else {
-            return false;
+            return None;
         };
         if let OnlineSlotOccupant::Human {
             connected, ready, ..
@@ -1114,7 +1130,72 @@ impl HostLobbyRuntime {
             *ready = false;
         }
         snapshot.revision = snapshot.revision.saturating_add(1);
-        true
+        Some(player_id)
+    }
+
+    fn retain_players(&mut self, retained: &HashSet<u64>) {
+        self.peer_players
+            .retain(|_, player_id| retained.contains(player_id));
+        self.resume_players
+            .retain(|_, player_id| retained.contains(player_id));
+    }
+}
+
+#[derive(Resource, Default)]
+pub(crate) struct OnlineLifecycleControl {
+    local_return_to_lobby: bool,
+    local_leave_session: bool,
+    remote_return_requests: Vec<u64>,
+    disconnected_players: HashMap<u64, f32>,
+    forfeited_players: HashSet<u64>,
+    session_closed_reason: Option<String>,
+    transport_stopped_reason: Option<String>,
+}
+
+impl OnlineLifecycleControl {
+    pub(crate) fn request_return_to_lobby(&mut self) {
+        self.local_return_to_lobby = true;
+    }
+
+    pub(crate) fn request_leave_session(&mut self) {
+        self.local_leave_session = true;
+    }
+
+    fn note_disconnect(&mut self, player_id: u64) {
+        if !self.forfeited_players.contains(&player_id) {
+            self.disconnected_players
+                .insert(player_id, ONLINE_PLAYER_RECONNECT_GRACE_SECONDS);
+        }
+    }
+
+    fn note_reconnect(&mut self, player_id: u64) {
+        self.disconnected_players.remove(&player_id);
+    }
+
+    fn tick_disconnects(&mut self, delta_seconds: f32) -> Vec<u64> {
+        for remaining in self.disconnected_players.values_mut() {
+            *remaining -= delta_seconds.max(0.0);
+        }
+        let expired = self
+            .disconnected_players
+            .iter()
+            .filter_map(|(player_id, remaining)| (*remaining <= 0.0).then_some(*player_id))
+            .collect::<Vec<_>>();
+        for player_id in &expired {
+            self.disconnected_players.remove(player_id);
+            self.forfeited_players.insert(*player_id);
+        }
+        expired
+    }
+
+    fn reset_match(&mut self) {
+        self.local_return_to_lobby = false;
+        self.local_leave_session = false;
+        self.remote_return_requests.clear();
+        self.disconnected_players.clear();
+        self.forfeited_players.clear();
+        self.session_closed_reason = None;
+        self.transport_stopped_reason = None;
     }
 }
 
@@ -1260,6 +1341,7 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
         .init_resource::<OnlineMatchReplication>()
         .init_resource::<OnlineCommandOutbox>()
         .init_resource::<OnlineCommandInbox>()
+        .init_resource::<OnlineLifecycleControl>()
         .add_systems(OnEnter(AppScreen::OnlineLobby), enter_online_lobby)
         .add_systems(OnEnter(AppScreen::InMatch), reset_online_match_replication)
         .add_systems(
@@ -1267,6 +1349,7 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
             (
                 process_online_async_results,
                 poll_online_transport,
+                process_online_lifecycle,
                 apply_pending_online_snapshot,
             )
                 .chain()
@@ -1320,6 +1403,10 @@ pub(crate) fn online_match_uses_global_result(session: Option<&OnlineSession>) -
     online_match_uses_command_transport(session)
 }
 
+pub(crate) fn online_match_is_host(session: Option<&OnlineSession>) -> bool {
+    session.is_some_and(|session| session.phase == OnlinePhase::InMatch && session.is_host)
+}
+
 fn online_client_match(session: Option<Res<OnlineSession>>) -> bool {
     session
         .as_deref()
@@ -1330,10 +1417,12 @@ fn reset_online_match_replication(
     mut replication: ResMut<OnlineMatchReplication>,
     mut outbox: ResMut<OnlineCommandOutbox>,
     mut inbox: ResMut<OnlineCommandInbox>,
+    mut lifecycle: ResMut<OnlineLifecycleControl>,
 ) {
     *replication = OnlineMatchReplication::default();
     *outbox = OnlineCommandOutbox::default();
     *inbox = OnlineCommandInbox::default();
+    lifecycle.reset_match();
 }
 
 fn enter_online_lobby(
@@ -2234,6 +2323,7 @@ fn process_online_async_results(
     mut session: ResMut<OnlineSession>,
     mut transport: ResMut<OnlineTransport>,
     inbox: Res<OnlineAsyncInbox>,
+    mut lifecycle: ResMut<OnlineLifecycleControl>,
 ) {
     let results = inbox
         .0
@@ -2333,6 +2423,7 @@ fn process_online_async_results(
             OnlineAsyncResult::Rooms(Err(error)) => session.set_status(error),
             OnlineAsyncResult::TransportStopped(error) => {
                 if session.phase != OnlinePhase::Home {
+                    lifecycle.transport_stopped_reason = Some(error.clone());
                     session.set_status(format!(
                         "{}: {error}",
                         t("网络连接已停止", "Network connection stopped")
@@ -2371,6 +2462,7 @@ fn poll_online_transport(
     mut transport: ResMut<OnlineTransport>,
     mut replication: ResMut<OnlineMatchReplication>,
     mut command_inbox: ResMut<OnlineCommandInbox>,
+    mut lifecycle: ResMut<OnlineLifecycleControl>,
     mut setup: ResMut<MatchSetupSettings>,
     mut next_state: ResMut<NextState<AppScreen>>,
 ) {
@@ -2398,16 +2490,20 @@ fn poll_online_transport(
             }
             TransportEvent::PeerDisconnected(peer) => {
                 if session.is_host {
+                    let in_match = session.phase == OnlinePhase::InMatch;
                     let OnlineSession {
                         host_runtime,
                         lobby,
                         ..
                     } = &mut *session;
-                    let changed = host_runtime
+                    let disconnected_player = host_runtime
                         .as_mut()
                         .zip(lobby.as_mut())
-                        .is_some_and(|(runtime, lobby)| runtime.disconnect(lobby, peer));
-                    if changed {
+                        .and_then(|(runtime, lobby)| runtime.disconnect(lobby, peer));
+                    if let Some(player_id) = disconnected_player {
+                        if in_match {
+                            lifecycle.note_disconnect(player_id);
+                        }
                         broadcast_lobby_snapshot(&session, socket);
                         session.ui_dirty = true;
                     }
@@ -2436,6 +2532,7 @@ fn poll_online_transport(
                     peer,
                     message,
                     &mut command_inbox,
+                    &mut lifecycle,
                     &mut setup,
                     &mut next_state,
                 );
@@ -2454,6 +2551,227 @@ fn poll_online_transport(
             }
         }
     }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn process_online_lifecycle(
+    mut commands: Commands,
+    real_time: Res<Time<Real>>,
+    mut session: ResMut<OnlineSession>,
+    mut transport: ResMut<OnlineTransport>,
+    mut lifecycle: ResMut<OnlineLifecycleControl>,
+    match_state: Res<MatchState>,
+    mut build_queue: ResMut<BuildQueue>,
+    mut next_state: ResMut<NextState<AppScreen>>,
+    team_entities: Query<(Entity, &Team), With<MatchScopedEntity>>,
+    pending_paradrops: Query<(Entity, &PendingParadrop)>,
+) {
+    if let Some(reason) = lifecycle.session_closed_reason.take() {
+        disconnect_online(&mut session, &mut transport);
+        session.set_status(format!(
+            "{}: {reason}",
+            t("联机会话已结束", "Online session ended")
+        ));
+        lifecycle.reset_match();
+        next_state.set(AppScreen::OnlineLobby);
+        return;
+    }
+    if let Some(reason) = lifecycle.transport_stopped_reason.take() {
+        disconnect_online(&mut session, &mut transport);
+        session.set_status(format!(
+            "{}: {reason}",
+            t("网络连接已停止", "Network connection stopped")
+        ));
+        lifecycle.reset_match();
+        next_state.set(AppScreen::OnlineLobby);
+        return;
+    }
+
+    if lifecycle.local_leave_session {
+        lifecycle.local_leave_session = false;
+        if session.is_host
+            && session.phase == OnlinePhase::InMatch
+            && let Some(socket) = transport.socket.as_mut()
+        {
+            let _ = broadcast_online_message(
+                socket,
+                &OnlineReliableMessage::SessionClosed {
+                    reason: t("房主已结束联机会话", "The host ended the online session")
+                        .to_string(),
+                },
+            );
+        }
+        disconnect_online(&mut session, &mut transport);
+        lifecycle.reset_match();
+        next_state.set(AppScreen::MainMenu);
+        return;
+    }
+
+    if session.phase != OnlinePhase::InMatch {
+        lifecycle.local_return_to_lobby = false;
+        lifecycle.remote_return_requests.clear();
+        lifecycle.disconnected_players.clear();
+        lifecycle.forfeited_players.clear();
+        return;
+    }
+
+    if session.is_host {
+        for player_id in lifecycle.tick_disconnects(real_time.delta_secs()) {
+            forfeit_disconnected_online_player(
+                &mut commands,
+                &session,
+                player_id,
+                &mut build_queue,
+                &team_entities,
+                &pending_paradrops,
+            );
+        }
+
+        let host_requested = std::mem::take(&mut lifecycle.local_return_to_lobby);
+        let client_requested_after_match =
+            !match_state.is_running() && !lifecycle.remote_return_requests.is_empty();
+        lifecycle.remote_return_requests.clear();
+        if host_requested || client_requested_after_match {
+            host_return_to_online_lobby(
+                &mut session,
+                &mut transport,
+                &mut lifecycle,
+                &mut next_state,
+            );
+        }
+        return;
+    }
+
+    if std::mem::take(&mut lifecycle.local_return_to_lobby) {
+        if match_state.is_running() {
+            session.set_status(t(
+                "对局进行中，只有房主可以结束整场对局",
+                "Only the host can end a running match",
+            ));
+        } else {
+            match (transport.socket.as_mut(), session.host_peer) {
+                (Some(socket), Some(host_peer)) => match send_online_message(
+                    socket,
+                    host_peer,
+                    &OnlineReliableMessage::ReturnToLobbyRequest,
+                ) {
+                    Ok(()) => session.set_status(t(
+                        "已请求返回联机作战室，等待房主确认…",
+                        "Requested return to the online war room; waiting for host...",
+                    )),
+                    Err(error) => session.set_status(error),
+                },
+                _ => session.set_status(t(
+                    "房主连接尚未恢复",
+                    "The host connection has not recovered yet",
+                )),
+            }
+        }
+    }
+}
+
+fn forfeit_disconnected_online_player(
+    commands: &mut Commands,
+    session: &OnlineSession,
+    player_id: u64,
+    build_queue: &mut BuildQueue,
+    team_entities: &Query<(Entity, &Team), With<MatchScopedEntity>>,
+    pending_paradrops: &Query<(Entity, &PendingParadrop)>,
+) {
+    let Some(team) = session
+        .match_config
+        .as_ref()
+        .and_then(|config| config.runtime_team_for_player(player_id))
+    else {
+        return;
+    };
+    build_queue.0.retain(|job| job.team != team);
+    for (entity, entity_team) in team_entities.iter() {
+        if *entity_team == team {
+            commands.entity(entity).try_despawn();
+        }
+    }
+    for (entity, pending) in pending_paradrops.iter() {
+        if pending.team == team {
+            commands.entity(entity).try_despawn();
+        }
+    }
+}
+
+fn host_return_to_online_lobby(
+    session: &mut OnlineSession,
+    transport: &mut OnlineTransport,
+    lifecycle: &mut OnlineLifecycleControl,
+    next_state: &mut NextState<AppScreen>,
+) {
+    let Some(snapshot) = prepare_online_lobby_for_rematch(session, lifecycle) else {
+        session.set_status(t(
+            "无法恢复联机作战室",
+            "Could not restore the online war room",
+        ));
+        return;
+    };
+    if let Some(socket) = transport.socket.as_mut()
+        && let Err(error) = broadcast_online_message(
+            socket,
+            &OnlineReliableMessage::ReturnToLobby(snapshot.clone()),
+        )
+    {
+        session.set_status(error);
+    }
+    accept_online_return_to_lobby(session, lifecycle, snapshot, next_state);
+}
+
+fn prepare_online_lobby_for_rematch(
+    session: &mut OnlineSession,
+    lifecycle: &OnlineLifecycleControl,
+) -> Option<OnlineLobbySnapshot> {
+    let host_player_id = session.lobby.as_ref()?.host_player_id;
+    let connected_players = session
+        .host_runtime
+        .as_ref()?
+        .peer_players
+        .values()
+        .copied()
+        .chain(std::iter::once(host_player_id))
+        .collect::<HashSet<_>>();
+    let mut retained_players = HashSet::new();
+    let lobby = session.lobby.as_mut()?;
+    for slot in &mut lobby.slots {
+        let OnlineSlotOccupant::Human {
+            player_id,
+            ready,
+            connected,
+            ..
+        } = &mut slot.occupant
+        else {
+            continue;
+        };
+        if connected_players.contains(player_id) && !lifecycle.forfeited_players.contains(player_id)
+        {
+            *ready = false;
+            *connected = true;
+            retained_players.insert(*player_id);
+        } else {
+            slot.occupant = OnlineSlotOccupant::Open;
+        }
+    }
+    lobby.revision = lobby.revision.saturating_add(1);
+    session
+        .host_runtime
+        .as_mut()?
+        .retain_players(&retained_players);
+    Some(lobby.clone())
+}
+
+fn broadcast_online_message(
+    socket: &mut WebRtcTransport,
+    message: &OnlineReliableMessage,
+) -> Result<(), String> {
+    let payload = postcard::to_allocvec(message).map_err(|error| error.to_string())?;
+    socket
+        .broadcast_reliable(&payload)
+        .map_err(client_error_text)
 }
 
 fn flush_online_player_commands(
@@ -4067,6 +4385,7 @@ fn process_reliable_message(
     peer: PeerId,
     message: OnlineReliableMessage,
     command_inbox: &mut OnlineCommandInbox,
+    lifecycle: &mut OnlineLifecycleControl,
     setup: &mut MatchSetupSettings,
     next_state: &mut NextState<AppScreen>,
 ) {
@@ -4087,16 +4406,44 @@ fn process_reliable_message(
                     );
                     return;
                 }
+                let allow_new_player = session.phase != OnlinePhase::InMatch;
+                let resumed_player = session
+                    .host_runtime
+                    .as_ref()
+                    .and_then(|runtime| runtime.player_for_session(&session_key));
+                if !allow_new_player && resumed_player.is_none() {
+                    let _ = send_online_message(
+                        socket,
+                        peer,
+                        &OnlineReliableMessage::Rejected {
+                            reason: "the match is already in progress".to_string(),
+                        },
+                    );
+                    return;
+                }
+                if resumed_player
+                    .is_some_and(|player_id| lifecycle.forfeited_players.contains(&player_id))
+                {
+                    let _ = send_online_message(
+                        socket,
+                        peer,
+                        &OnlineReliableMessage::Rejected {
+                            reason: "the player already forfeited this match".to_string(),
+                        },
+                    );
+                    return;
+                }
                 let admission = session
                     .host_runtime
                     .as_mut()
                     .zip(session.lobby.as_mut())
                     .ok_or("host lobby is unavailable")
                     .and_then(|(runtime, lobby)| {
-                        runtime.admit(lobby, peer, session_key, player_name)
+                        runtime.admit(lobby, peer, session_key, player_name, allow_new_player)
                     });
                 match admission {
                     Ok((player_id, assigned_slot)) => {
+                        lifecycle.note_reconnect(player_id);
                         let snapshot = session.lobby.clone().expect("host lobby exists");
                         let _ = send_online_message(
                             socket,
@@ -4105,6 +4452,7 @@ fn process_reliable_message(
                                 player_id,
                                 assigned_slot,
                                 snapshot,
+                                match_config: session.match_config.clone(),
                             },
                         );
                         broadcast_lobby_snapshot(session, socket);
@@ -4145,6 +4493,20 @@ fn process_reliable_message(
                 };
                 enqueue_online_player_command(command_inbox, player_id, envelope);
             }
+            OnlineReliableMessage::ReturnToLobbyRequest
+                if session.phase == OnlinePhase::InMatch =>
+            {
+                let Some(player_id) = session
+                    .host_runtime
+                    .as_ref()
+                    .and_then(|runtime| runtime.peer_players.get(&peer).copied())
+                else {
+                    return;
+                };
+                if !lifecycle.remote_return_requests.contains(&player_id) {
+                    lifecycle.remote_return_requests.push(player_id);
+                }
+            }
             _ => {}
         }
         return;
@@ -4155,7 +4517,17 @@ fn process_reliable_message(
             player_id,
             assigned_slot,
             snapshot,
-        } => accept_online_welcome(session, peer, player_id, assigned_slot, snapshot),
+            match_config,
+        } => accept_online_welcome(
+            session,
+            peer,
+            player_id,
+            assigned_slot,
+            snapshot,
+            match_config,
+            setup,
+            next_state,
+        ),
         OnlineReliableMessage::LobbySnapshot(snapshot) if session.host_peer == Some(peer) => {
             session.lobby = Some(snapshot);
             session.ui_dirty = true;
@@ -4175,6 +4547,12 @@ fn process_reliable_message(
                 Err(error) => session.set_status(error),
             }
         }
+        OnlineReliableMessage::ReturnToLobby(snapshot) if session.host_peer == Some(peer) => {
+            accept_online_return_to_lobby(session, lifecycle, snapshot, next_state);
+        }
+        OnlineReliableMessage::SessionClosed { reason } if session.host_peer == Some(peer) => {
+            lifecycle.session_closed_reason = Some(reason);
+        }
         OnlineReliableMessage::Rejected { reason } => {
             session.set_status(format!("{}: {reason}", t("加入被拒绝", "Join rejected")));
         }
@@ -4188,22 +4566,49 @@ fn accept_online_welcome(
     player_id: u64,
     assigned_slot: usize,
     snapshot: OnlineLobbySnapshot,
+    match_config: Option<OnlineMatchConfig>,
+    setup: &mut MatchSetupSettings,
+    next_state: &mut NextState<AppScreen>,
 ) {
-    let reconnecting_match =
-        session.phase == OnlinePhase::InMatch && session.match_config.is_some();
     session.host_peer = Some(peer);
     session.local_player_id = Some(player_id);
     session.assigned_slot = Some(assigned_slot);
     session.lobby = Some(snapshot);
-    if reconnecting_match {
-        session.set_status(t(
-            "已恢复主机连接，正在同步对局…",
-            "Host connection restored; synchronizing match...",
-        ));
-    } else {
-        session.phase = OnlinePhase::Lobby;
-        session.set_status(t("已加入联机作战室", "Joined online war room"));
+    match match_config {
+        Some(config) => match online_match_setup(&config, assigned_slot) {
+            Ok(settings) => {
+                *setup = settings;
+                session.match_config = Some(config);
+                session.phase = OnlinePhase::InMatch;
+                session.set_status(t(
+                    "已恢复主机连接，正在同步对局…",
+                    "Host connection restored; synchronizing match...",
+                ));
+                next_state.set(AppScreen::InMatch);
+            }
+            Err(error) => session.set_status(error),
+        },
+        None => {
+            session.match_config = None;
+            session.phase = OnlinePhase::Lobby;
+            session.set_status(t("已加入联机作战室", "Joined online war room"));
+            next_state.set(AppScreen::OnlineLobby);
+        }
     }
+}
+
+fn accept_online_return_to_lobby(
+    session: &mut OnlineSession,
+    lifecycle: &mut OnlineLifecycleControl,
+    snapshot: OnlineLobbySnapshot,
+    next_state: &mut NextState<AppScreen>,
+) {
+    session.lobby = Some(snapshot);
+    session.match_config = None;
+    session.phase = OnlinePhase::Lobby;
+    session.set_status(t("已返回联机作战室", "Returned to online war room"));
+    lifecycle.reset_match();
+    next_state.set(AppScreen::OnlineLobby);
 }
 
 fn submit_lobby_command(
@@ -4716,9 +5121,10 @@ mod tests {
                 first_peer,
                 "resume-key".to_string(),
                 "Player".to_string(),
+                true,
             )
             .unwrap();
-        assert!(runtime.disconnect(&mut lobby, first_peer));
+        assert_eq!(runtime.disconnect(&mut lobby, first_peer), Some(player_id));
         let second_peer = PeerId("00000000-0000-0000-0000-000000000002".parse().unwrap());
         let resumed = runtime
             .admit(
@@ -4726,25 +5132,342 @@ mod tests {
                 second_peer,
                 "resume-key".to_string(),
                 "Player".to_string(),
+                false,
             )
             .unwrap();
         assert_eq!(resumed, (player_id, slot));
     }
 
     #[test]
-    fn reconnect_welcome_keeps_client_inside_running_match() {
-        let lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+    fn running_match_rejects_unknown_late_joiners() {
+        let mut lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        let mut runtime = HostLobbyRuntime::new("host-key".to_string());
+        let peer = PeerId("00000000-0000-0000-0000-000000000004".parse().unwrap());
+
+        let result = runtime.admit(
+            &mut lobby,
+            peer,
+            "unknown-key".to_string(),
+            "Late Player".to_string(),
+            false,
+        );
+
+        assert_eq!(result, Err("the match is already in progress"));
+        assert!(runtime.peer_players.is_empty());
+        assert_eq!(lobby.active_slot_count(), 1);
+    }
+
+    #[test]
+    fn disconnect_grace_allows_resume_then_forfeits_after_expiry() {
+        let mut lifecycle = OnlineLifecycleControl::default();
+        lifecycle.note_disconnect(2);
+        assert!(lifecycle.tick_disconnects(29.0).is_empty());
+        lifecycle.note_reconnect(2);
+        assert!(lifecycle.tick_disconnects(2.0).is_empty());
+        assert!(!lifecycle.forfeited_players.contains(&2));
+
+        lifecycle.note_disconnect(2);
+        assert_eq!(lifecycle.tick_disconnects(30.0), vec![2]);
+        assert!(lifecycle.forfeited_players.contains(&2));
+        lifecycle.note_reconnect(2);
+        assert!(lifecycle.forfeited_players.contains(&2));
+    }
+
+    #[test]
+    fn rematch_lobby_keeps_connected_players_and_reclaims_forfeited_slots() {
+        let mut lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        lobby.slots[1].occupant = OnlineSlotOccupant::Human {
+            player_id: 2,
+            name: "Connected".to_string(),
+            ready: true,
+            connected: true,
+        };
+        lobby.slots[2].occupant = OnlineSlotOccupant::Human {
+            player_id: 3,
+            name: "Forfeited".to_string(),
+            ready: true,
+            connected: false,
+        };
+        let peer = PeerId("00000000-0000-0000-0000-000000000005".parse().unwrap());
+        let mut runtime = HostLobbyRuntime::new("host-key".to_string());
+        runtime.peer_players.insert(peer, 2);
+        runtime.resume_players.insert("player-2".to_string(), 2);
+        runtime.resume_players.insert("player-3".to_string(), 3);
         let mut session = OnlineSession::default();
         session.phase = OnlinePhase::InMatch;
-        session.match_config = Some(OnlineMatchConfig::from(&lobby));
-        let peer = PeerId("00000000-0000-0000-0000-000000000003".parse().unwrap());
+        session.is_host = true;
+        session.lobby = Some(lobby);
+        session.host_runtime = Some(runtime);
+        let mut lifecycle = OnlineLifecycleControl::default();
+        lifecycle.forfeited_players.insert(3);
 
-        accept_online_welcome(&mut session, peer, 2, 1, lobby);
+        let rematch = prepare_online_lobby_for_rematch(&mut session, &lifecycle).unwrap();
+
+        assert!(matches!(
+            rematch.slots[0].occupant,
+            OnlineSlotOccupant::Human {
+                player_id: 1,
+                ready: false,
+                connected: true,
+                ..
+            }
+        ));
+        assert!(matches!(
+            rematch.slots[1].occupant,
+            OnlineSlotOccupant::Human {
+                player_id: 2,
+                ready: false,
+                connected: true,
+                ..
+            }
+        ));
+        assert_eq!(rematch.slots[2].occupant, OnlineSlotOccupant::Open);
+        let runtime = session.host_runtime.as_ref().unwrap();
+        assert_eq!(runtime.player_for_session("player-2"), Some(2));
+        assert_eq!(runtime.player_for_session("player-3"), None);
+    }
+
+    #[test]
+    fn reconnect_welcome_keeps_client_inside_running_match() {
+        let mut lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        lobby.slots[1].occupant = OnlineSlotOccupant::Human {
+            player_id: 2,
+            name: "Player".to_string(),
+            ready: true,
+            connected: true,
+        };
+        let config = OnlineMatchConfig::from(&lobby);
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.match_config = Some(config.clone());
+        let peer = PeerId("00000000-0000-0000-0000-000000000003".parse().unwrap());
+        let mut setup = MatchSetupSettings::default();
+        let mut next_state = NextState::<AppScreen>::default();
+
+        accept_online_welcome(
+            &mut session,
+            peer,
+            2,
+            1,
+            lobby,
+            Some(config),
+            &mut setup,
+            &mut next_state,
+        );
 
         assert_eq!(session.phase, OnlinePhase::InMatch);
         assert_eq!(session.host_peer, Some(peer));
         assert_eq!(session.local_player_id, Some(2));
         assert_eq!(session.assigned_slot, Some(1));
+    }
+
+    #[test]
+    fn lobby_welcome_returns_reconnecting_client_from_stale_match() {
+        let lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.match_config = Some(OnlineMatchConfig::from(&lobby));
+        let peer = PeerId("00000000-0000-0000-0000-000000000006".parse().unwrap());
+        let mut setup = MatchSetupSettings::default();
+        let mut next_state = NextState::<AppScreen>::default();
+
+        accept_online_welcome(
+            &mut session,
+            peer,
+            1,
+            0,
+            lobby,
+            None,
+            &mut setup,
+            &mut next_state,
+        );
+
+        assert_eq!(session.phase, OnlinePhase::Lobby);
+        assert!(session.match_config.is_none());
+    }
+
+    #[test]
+    fn disconnect_expiry_removes_owned_entities_and_queued_production() {
+        let mut lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        lobby.slots[1].occupant = OnlineSlotOccupant::Human {
+            player_id: 2,
+            name: "Player".to_string(),
+            ready: true,
+            connected: false,
+        };
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.is_host = true;
+        session.match_config = Some(OnlineMatchConfig::from(&lobby));
+        let mut lifecycle = OnlineLifecycleControl::default();
+        lifecycle.note_disconnect(2);
+        lifecycle.disconnected_players.insert(2, 0.0);
+
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, bevy::state::app::StatesPlugin))
+            .init_state::<AppScreen>()
+            .insert_resource(session)
+            .insert_resource(OnlineTransport::default())
+            .insert_resource(lifecycle)
+            .insert_resource(MatchState::default())
+            .insert_resource(BuildQueue::default())
+            .add_systems(Update, process_online_lifecycle);
+        let producer = app
+            .world_mut()
+            .spawn((Team::Player(1), MatchScopedEntity))
+            .id();
+        let pending = app
+            .world_mut()
+            .spawn((
+                PendingParadrop {
+                    remaining: 3.0,
+                    team: Team::Player(1),
+                    target: Vec3::ZERO,
+                    unit_paths: &[],
+                },
+                MatchScopedEntity,
+            ))
+            .id();
+        app.world_mut()
+            .resource_mut::<BuildQueue>()
+            .0
+            .push(BuildJob {
+                team: Team::Player(1),
+                action: BuildAction::Train("Worker"),
+                producer_entity: producer,
+                producer_id: "CommandCenter",
+                timer: 2.0,
+                origin: Vec3::ZERO,
+                cost: registry::Cost::default(),
+            });
+
+        app.update();
+
+        assert!(app.world().get_entity(producer).is_err());
+        assert!(app.world().get_entity(pending).is_err());
+        assert!(app.world().resource::<BuildQueue>().0.is_empty());
+        assert!(
+            app.world()
+                .resource::<OnlineLifecycleControl>()
+                .forfeited_players
+                .contains(&2)
+        );
+    }
+
+    #[test]
+    fn client_return_request_waits_for_match_end_then_restores_everyone() {
+        let mut lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        lobby.slots[1].occupant = OnlineSlotOccupant::Human {
+            player_id: 2,
+            name: "Player".to_string(),
+            ready: true,
+            connected: true,
+        };
+        let peer = PeerId("00000000-0000-0000-0000-000000000007".parse().unwrap());
+        let mut runtime = HostLobbyRuntime::new("host-key".to_string());
+        runtime.peer_players.insert(peer, 2);
+        runtime.resume_players.insert("player-key".to_string(), 2);
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.is_host = true;
+        session.match_config = Some(OnlineMatchConfig::from(&lobby));
+        session.lobby = Some(lobby);
+        session.host_runtime = Some(runtime);
+        let mut lifecycle = OnlineLifecycleControl::default();
+        lifecycle.remote_return_requests.push(2);
+
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, bevy::state::app::StatesPlugin))
+            .init_state::<AppScreen>()
+            .insert_resource(session)
+            .insert_resource(OnlineTransport::default())
+            .insert_resource(lifecycle)
+            .insert_resource(MatchState::default())
+            .insert_resource(BuildQueue::default())
+            .add_systems(Update, process_online_lifecycle);
+
+        app.update();
+        assert_eq!(
+            app.world().resource::<OnlineSession>().phase,
+            OnlinePhase::InMatch
+        );
+
+        app.world_mut().resource_mut::<MatchState>().phase = MatchPhase::HumanVictory;
+        app.world_mut()
+            .resource_mut::<OnlineLifecycleControl>()
+            .remote_return_requests
+            .push(2);
+        app.update();
+
+        let session = app.world().resource::<OnlineSession>();
+        assert_eq!(session.phase, OnlinePhase::Lobby);
+        assert!(session.match_config.is_none());
+        assert!(matches!(
+            session.lobby.as_ref().unwrap().slots[1].occupant,
+            OnlineSlotOccupant::Human {
+                player_id: 2,
+                ready: false,
+                connected: true,
+                ..
+            }
+        ));
+    }
+
+    #[test]
+    fn online_match_menu_keeps_authoritative_actions_host_only() {
+        let active_teams = ActiveTeams(vec![true, true]);
+        let visible_player = VisiblePlayer::default();
+        let mut client = OnlineSession::default();
+        client.phase = OnlinePhase::InMatch;
+        assert!(!match_menu_action_enabled(
+            MatchMenuAction::Restart,
+            &visible_player,
+            &active_teams,
+            true,
+            Some(&client),
+        ));
+        assert!(!match_menu_action_enabled(
+            MatchMenuAction::SetSpeed(MatchSpeedPreset::Fast),
+            &visible_player,
+            &active_teams,
+            true,
+            Some(&client),
+        ));
+        assert!(!match_menu_action_enabled(
+            MatchMenuAction::ReturnToSetup,
+            &visible_player,
+            &active_teams,
+            true,
+            Some(&client),
+        ));
+        assert!(match_menu_action_enabled(
+            MatchMenuAction::ReturnToSetup,
+            &visible_player,
+            &active_teams,
+            false,
+            Some(&client),
+        ));
+        assert!(!match_end_action_enabled(
+            MatchEndAction::Restart,
+            true,
+            true,
+        ));
+
+        client.is_host = true;
+        assert!(match_menu_action_enabled(
+            MatchMenuAction::SetSpeed(MatchSpeedPreset::Fast),
+            &visible_player,
+            &active_teams,
+            true,
+            Some(&client),
+        ));
+        assert!(match_menu_action_enabled(
+            MatchMenuAction::ReturnToSetup,
+            &visible_player,
+            &active_teams,
+            true,
+            Some(&client),
+        ));
     }
 
     #[test]

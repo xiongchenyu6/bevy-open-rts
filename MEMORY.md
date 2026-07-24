@@ -55,7 +55,7 @@
   the locally controlled team. Automatic construction now checks the configured
   slot controller explicitly, so only real AI slots progress foundations
   without an assigned Worker.
-- RTS wire protocol v2 is command-complete for current player-facing match
+- RTS wire protocol v3 is command-complete for current player-facing match
   controls. Stop/hold/guard/scatter/deploy, sell/repair/cancel-construction, and
   all support powers use the reliable host inbox. The host validates stable-ID
   ownership and capabilities, prevents same-tick duplicate structure refunds or
@@ -68,7 +68,17 @@
   flag. The host waits until no hostile sides remain, while each client derives
   its own victory or defeat from alliance perspective, so eliminating the host
   does not prematurely stop remaining opponents.
-- The running match still needs an explicit disconnect/forfeit policy,
-  synchronized return-to-lobby, and visual event replication for transient
-  support warnings/impacts. Large battles also need delta/compressed snapshots
-  rather than relying only on full state.
+- Remote players receive a 30-second game-level reconnect grace after their data
+  channel disconnects. Rejoining with the stable session key cancels the timer;
+  expiry permanently forfeits that player for the current match, removes its
+  match-scoped entities and pending paradrops, and clears its production queue.
+  Unknown late joiners and already-forfeited identities are rejected while the
+  match is running.
+- Returning to the online lobby is host-authoritative. The host can abort to the
+  lobby, while client requests are accepted only after the global result. The
+  host broadcasts a reset lobby snapshot, retains connected identities, resets
+  readiness, and reclaims disconnected/forfeited player rows. Online restart and
+  client-side speed changes are disabled to prevent divergent local state.
+- The running match still needs visual event replication for transient support
+  warnings/impacts. Large battles also need delta/compressed snapshots rather
+  than relying only on full state.

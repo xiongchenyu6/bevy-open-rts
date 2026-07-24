@@ -123,6 +123,21 @@ The current RTS simulation uses floating-point transforms, wall-clock timers,
 and ordinary Bevy `Update` systems, so deterministic peer lockstep would be a
 separate simulation rewrite rather than a safe shortcut.
 
+### Match Lifecycle
+
+- A disconnected non-host player keeps its stable game identity for a 30-second
+  reconnect grace. Reconnection with the same session key cancels the timer and
+  the next authoritative snapshot catches the client up.
+- Grace expiry is a host-authoritative forfeit: the host removes that player's
+  match entities, pending paradrops, and queued production. New identities and
+  forfeited identities cannot join a running match.
+- Global match completion waits until no hostile sides remain. Each client maps
+  the same finished snapshot to victory or defeat from its own alliance view.
+- Returning to the war room is reliable and synchronized. A host may abort a
+  match; a client may request return only after the global result. The rematch
+  snapshot preserves connected players, clears readiness, and reclaims stale
+  player slots.
+
 ## Production Network Requirements
 
 - HTTPS/WSS reverse proxy with query-string logging disabled.

@@ -49,7 +49,8 @@ domains live in modules, each re-exported into the crate root
   selection panel, command card + queue, support strip, HudHitZones, RTS cursor.
 - `src/online.rs` — RTS online lobby/session protocol, stable network entity IDs,
   reliable player and production commands, host validation, authoritative world
-  and build-queue snapshots, client reconciliation, and interpolation.
+  and build-queue snapshots, client reconciliation/interpolation, reconnect
+  grace/forfeit handling, and synchronized rematch-lobby lifecycle.
 - `src/economy.rs` — Economies/income/power, harvesting + dropoff, resource nodes,
   supply crates.
 - `src/ai.rs` — difficulty tiers, AI director (economy/training/waves/support),
@@ -125,7 +126,7 @@ domains live in modules, each re-exported into the crate root
   refunds, and build queues are mirrored in world snapshots so client HUDs show
   host-owned queue state and progress. Remote human teams no longer inherit AI
   automatic construction.
-- RTS wire protocol v2 sends stop/hold/guard/scatter/deploy, structure
+- RTS wire protocol v3 sends stop/hold/guard/scatter/deploy, structure
   sell/repair/cancel, and support-power targeting over the reliable command
   channel. The host resolves stable IDs, rejects foreign/dead/unsupported
   entities, enforces one structure mutation per host tick, and validates support
@@ -135,9 +136,11 @@ domains live in modules, each re-exported into the crate root
   authoritative finished flag, so an eliminated host cannot end a battle while
   hostile remote teams still fight and every client derives victory/defeat from
   its own alliance perspective. A reconnecting client remains in the running
-  match and catches up from the next host snapshot. Explicit disconnect/forfeit,
-  synchronized return-to-lobby, transient visual events, and large-battle delta
-  snapshots remain the next online boundaries.
+  match and catches up from the next host snapshot. Protocol v3 gives remote
+  humans a 30-second reconnect grace, turns expiry into a host-authoritative
+  forfeit, rejects late/forfeited identities, and synchronizes return to a reset
+  rematch lobby. Transient visual events and large-battle delta snapshots remain
+  the next online boundaries.
 - `bevy_fluent::FluentPlugin` is registered in the shared game scene so future `.ftl` localization bundles can load through Bevy assets. The existing `Locale` / `t()` path remains the active text source until screens are migrated incrementally.
 - AI drones have an active scouting controller: idle AI `Drone` units pick living enemy units, move to their positions, avoid repeating the previous target when possible, and retarget after a short 0.5-1.0s delay.
 - AI defense profiles follow the godot difficulty targets: Beginner/Easy do not inherit Normal advanced-defense construction, Normal targets one standard defense layer plus 2 Tesla fence segments where the faction supports them, and Hard scales standard defenses to 2 plus 4 Tesla fence segments.
