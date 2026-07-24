@@ -1105,8 +1105,8 @@ pub(crate) fn setup_credits_menu(mut commands: Commands, asset_server: Res<Asset
                     ));
                     group.spawn((
                         localized_text(
-                            "核心贡献者：\n- Pawel Lampe (Scony) | Lampe Games\n\n素材：\n- 3D Space Kit by Kenney.nl",
-                            "Core Contributors:\n- Pawel Lampe (Scony) | Lampe Games\n\nAssets:\n- 3D Space Kit by Kenney.nl",
+                            "制作与开发：\n- xiongchenyu6\n\n原项目与素材致谢：\n- Pawel Lampe (Scony) | Lampe Games\n- 3D Space Kit by Kenney.nl",
+                            "Created and developed by:\n- xiongchenyu6\n\nOriginal project and asset acknowledgements:\n- Pawel Lampe (Scony) | Lampe Games\n- 3D Space Kit by Kenney.nl",
                         ),
                         TextFont {
                             font: font.clone().into(),
