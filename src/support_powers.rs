@@ -1436,6 +1436,7 @@ pub(crate) fn fire_support_power_on_left_click(
     economies: Res<Economies>,
     structures: Query<StructurePrereqItem<'_>>,
     selectable_q: Query<SelectableOrderTargetItem<'_>>,
+    mut online: OnlineGameplayCommandParams,
     mut order_resources: OrderResources,
     mut guard: ResMut<SupportFireClickGuard>,
 ) {
@@ -1465,27 +1466,38 @@ pub(crate) fn fire_support_power_on_left_click(
     else {
         return;
     };
-    let support_targets = support_power_target_snapshots(&selectable_q);
-    if activate_support_power(
-        &mut commands,
-        point,
-        power,
-        visible_team,
-        visible_team,
-        &economies,
-        &mut order_resources.support_cooldowns,
-        &mut order_resources.battle_log,
-        &order_resources.relations,
-        &structures,
-        &support_targets,
-    ) {
-        record_support_power_audio_feedback(
-            &mut order_resources.audio_feedback,
-            visible_team,
-            visible_team,
+    let fired = if online.is_active() {
+        online.submit(OnlinePlayerCommand::UseSupportPower {
+            power: OnlineSupportPower::from_game(power),
+            target: point.to_array(),
+        })
+    } else {
+        let support_targets = support_power_target_snapshots(&selectable_q);
+        let fired = activate_support_power(
+            &mut commands,
+            point,
             power,
+            visible_team,
+            visible_team,
+            &economies,
+            &mut order_resources.support_cooldowns,
+            &mut order_resources.battle_log,
+            &order_resources.relations,
+            &structures,
+            &support_targets,
         );
+        if fired {
+            record_support_power_audio_feedback(
+                &mut order_resources.audio_feedback,
+                visible_team,
+                visible_team,
+                power,
+            );
+        }
+        fired
+    };
+    if fired {
+        order_resources.command_mode.support_power = None;
+        guard.0 = true;
     }
-    order_resources.command_mode.support_power = None;
-    guard.0 = true;
 }

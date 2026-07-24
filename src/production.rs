@@ -228,7 +228,7 @@ pub(crate) fn structure_placement_input(
     window_q: Query<&Window, With<PrimaryWindow>>,
     camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     mut placement: StructurePlacementInputResources,
-    mut online: OnlineProductionCommandParams,
+    mut online: OnlineGameplayCommandParams,
     structures: Query<StructurePrereqItem<'_>>,
     occupiers: Query<
         PlacementOccupierItem<'_>,

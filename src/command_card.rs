@@ -64,6 +64,7 @@ pub(crate) fn command_queue_controls(
     visible_player: Res<VisiblePlayer>,
     mut command_mode: ResMut<CommandMode>,
     mut audio_feedback: ResMut<AudioFeedback>,
+    mut online: OnlineGameplayCommandParams,
     selected_units: Query<SelectedCommandUnitItem<'_>, SelectedCommandUnitFilter>,
 ) {
     let Some(visible_team) = controlled_player_team(Some(&*visible_player)) else {
@@ -80,14 +81,26 @@ pub(crate) fn command_queue_controls(
     let ctrl = keyboard.pressed(KeyCode::ControlLeft) || keyboard.pressed(KeyCode::ControlRight);
     // Plain S stops; Ctrl+S is the quicksave hotkey.
     if keyboard.just_pressed(KeyCode::KeyS) && !ctrl {
-        if stop_selected_entities(
-            &mut commands,
-            selected
-                .iter()
-                .filter_map(|(entity, _, team, _, _, orders)| {
-                    (**team == visible_team && has_active_order_state(*orders)).then_some(*entity)
-                }),
-        ) {
+        let entities = selected
+            .iter()
+            .filter_map(|(entity, _, team, _, _, orders)| {
+                (**team == visible_team && has_active_order_state(*orders)).then_some(*entity)
+            })
+            .collect::<Vec<_>>();
+        let handled = if online.is_active() {
+            submit_online_unit_action(&mut online, entities, OnlineUnitAction::Stop)
+        } else {
+            stop_selected_entities(
+                &mut commands,
+                selected
+                    .iter()
+                    .filter_map(|(entity, _, team, _, _, orders)| {
+                        (**team == visible_team && has_active_order_state(*orders))
+                            .then_some(*entity)
+                    }),
+            )
+        };
+        if handled {
             clear_targeting_modes(&mut command_mode);
             record_command_audio_feedback(
                 &mut audio_feedback,
@@ -99,13 +112,27 @@ pub(crate) fn command_queue_controls(
     }
 
     if keyboard.just_pressed(KeyCode::KeyH) {
-        if toggle_selected_hold_position(
-            &mut commands,
-            visible_team,
-            selected
-                .iter()
-                .map(|(entity, unit, team, _, hold, ..)| (*entity, *unit, *team, *hold)),
-        ) {
+        let handled = if online.is_active() {
+            submit_online_unit_action(
+                &mut online,
+                selected
+                    .iter()
+                    .filter(|(_, unit, team, ..)| {
+                        **team == visible_team && unit_supports_hold_position(unit)
+                    })
+                    .map(|(entity, ..)| *entity),
+                OnlineUnitAction::ToggleHoldPosition,
+            )
+        } else {
+            toggle_selected_hold_position(
+                &mut commands,
+                visible_team,
+                selected
+                    .iter()
+                    .map(|(entity, unit, team, _, hold, ..)| (*entity, *unit, *team, *hold)),
+            )
+        };
+        if handled {
             clear_targeting_modes(&mut command_mode);
             record_command_audio_feedback(
                 &mut audio_feedback,
@@ -117,13 +144,27 @@ pub(crate) fn command_queue_controls(
     }
 
     if keyboard.just_pressed(KeyCode::KeyG) {
-        if guard_selected_area(
-            &mut commands,
-            visible_team,
-            selected
-                .iter()
-                .map(|(entity, unit, team, ..)| (*entity, *unit, *team)),
-        ) {
+        let handled = if online.is_active() {
+            submit_online_unit_action(
+                &mut online,
+                selected
+                    .iter()
+                    .filter(|(_, unit, team, ..)| {
+                        **team == visible_team && can_unit_guard_area(unit)
+                    })
+                    .map(|(entity, ..)| *entity),
+                OnlineUnitAction::GuardArea,
+            )
+        } else {
+            guard_selected_area(
+                &mut commands,
+                visible_team,
+                selected
+                    .iter()
+                    .map(|(entity, unit, team, ..)| (*entity, *unit, *team)),
+            )
+        };
+        if handled {
             clear_targeting_modes(&mut command_mode);
             record_command_audio_feedback(
                 &mut audio_feedback,
@@ -140,7 +181,16 @@ pub(crate) fn command_queue_controls(
             .filter(|(_, unit, team, ..)| **team == visible_team && unit.speed > 0.0)
             .map(|(entity, _, _, transform, ..)| (*entity, transform.translation))
             .collect::<Vec<_>>();
-        if scatter_selected_positions(&mut commands, &scatter_units) {
+        let handled = if online.is_active() {
+            submit_online_unit_action(
+                &mut online,
+                scatter_units.iter().map(|(entity, _)| *entity),
+                OnlineUnitAction::Scatter,
+            )
+        } else {
+            scatter_selected_positions(&mut commands, &scatter_units)
+        };
+        if handled {
             clear_targeting_modes(&mut command_mode);
             record_command_audio_feedback(
                 &mut audio_feedback,
@@ -149,6 +199,37 @@ pub(crate) fn command_queue_controls(
             );
         }
     }
+}
+
+fn submit_online_unit_action(
+    online: &mut OnlineGameplayCommandParams,
+    entities: impl IntoIterator<Item = Entity>,
+    action: OnlineUnitAction,
+) -> bool {
+    let Some(units) = entities
+        .into_iter()
+        .map(|entity| online.network_id_for(entity))
+        .collect::<Option<Vec<_>>>()
+    else {
+        return false;
+    };
+    !units.is_empty() && online.submit(OnlinePlayerCommand::UnitAction { units, action })
+}
+
+fn submit_online_structure_action(
+    online: &mut OnlineGameplayCommandParams,
+    entities: impl IntoIterator<Item = Entity>,
+    action: OnlineStructureAction,
+) -> bool {
+    let Some(structures) = entities
+        .into_iter()
+        .map(|entity| online.network_id_for(entity))
+        .collect::<Option<Vec<_>>>()
+    else {
+        return false;
+    };
+    !structures.is_empty()
+        && online.submit(OnlinePlayerCommand::StructureAction { structures, action })
 }
 
 pub(crate) fn update_command_tooltip(
@@ -907,7 +988,7 @@ pub(crate) fn command_shortcuts(
     keyboard: Res<ButtonInput<KeyCode>>,
     visible_player: Res<VisiblePlayer>,
     mut action_resources: CommandActionResources,
-    mut online: OnlineProductionCommandParams,
+    mut online: OnlineGameplayCommandParams,
     slot_q: Query<(&CommandSlot, &BuildAction, Option<&CommandSlotAvailability>)>,
     selected_units: Query<SelectedCommandUnitItem<'_>, SelectedCommandUnitFilter>,
     selected_sell_structures: Query<SelectedSellStructureItem<'_>, With<Selected>>,
@@ -985,7 +1066,7 @@ pub(crate) fn execute_command_action(
     audio_feedback: &mut AudioFeedback,
     battle_log: &mut BattleLog,
     idle_worker_cycle: &mut IdleWorkerCycleState,
-    online: &mut OnlineProductionCommandParams,
+    online: &mut OnlineGameplayCommandParams,
     batch_to_limit: bool,
 ) -> bool {
     let canceling_construction = action == BuildAction::SellStructure
@@ -1009,18 +1090,63 @@ pub(crate) fn execute_command_action(
             )
             .is_some();
     let handled = match action {
-        BuildAction::SellStructure => sell_selected_structures(
-            commands,
-            team,
-            selected_sell_structures,
-            economies,
-            build_queue,
-        ),
+        BuildAction::SellStructure => {
+            if online.is_active() {
+                submit_online_structure_action(
+                    online,
+                    selected_sell_structures
+                        .iter()
+                        .filter(|(_, _, structure_team, health, _)| {
+                            **structure_team == team && health.current > 0.0
+                        })
+                        .map(|(entity, ..)| entity),
+                    OnlineStructureAction::Sell,
+                )
+            } else {
+                sell_selected_structures(
+                    commands,
+                    team,
+                    selected_sell_structures,
+                    economies,
+                    build_queue,
+                )
+            }
+        }
         BuildAction::RepairStructure => {
-            repair_selected_structures(commands, team, selected_repair_structures, economies)
+            if online.is_active() {
+                submit_online_structure_action(
+                    online,
+                    selected_repair_structures
+                        .iter()
+                        .filter(|(_, _, structure_team, health, repair, construction)| {
+                            **structure_team == team
+                                && health.current > 0.0
+                                && health.current < health.max
+                                && repair.is_none()
+                                && structure_is_constructed(*construction)
+                        })
+                        .map(|(entity, ..)| entity),
+                    OnlineStructureAction::Repair,
+                )
+            } else {
+                repair_selected_structures(commands, team, selected_repair_structures, economies)
+            }
         }
         BuildAction::ToggleDeployMode => {
-            request_selected_deploy_toggle(commands, team, selected_units)
+            if online.is_active() {
+                submit_online_unit_action(
+                    online,
+                    selected_units
+                        .iter()
+                        .filter(|(_, unit, unit_team, ..)| {
+                            **unit_team == team && is_deployable_vehicle(unit.id)
+                        })
+                        .map(|(entity, ..)| entity),
+                    OnlineUnitAction::ToggleDeployMode,
+                )
+            } else {
+                request_selected_deploy_toggle(commands, team, selected_units)
+            }
         }
         BuildAction::SetRallyPoint => begin_rally_point_mode(command_mode, true),
         BuildAction::SelectIdleWorker => {
@@ -1029,13 +1155,28 @@ pub(crate) fn execute_command_action(
             true
         }
         BuildAction::HoldPosition => {
-            let handled = toggle_selected_hold_position(
-                commands,
-                team,
-                selected_units
-                    .iter()
-                    .map(|(entity, unit, unit_team, _, hold, ..)| (entity, unit, unit_team, hold)),
-            );
+            let handled = if online.is_active() {
+                submit_online_unit_action(
+                    online,
+                    selected_units
+                        .iter()
+                        .filter(|(_, unit, unit_team, ..)| {
+                            **unit_team == team && unit_supports_hold_position(unit)
+                        })
+                        .map(|(entity, ..)| entity),
+                    OnlineUnitAction::ToggleHoldPosition,
+                )
+            } else {
+                toggle_selected_hold_position(
+                    commands,
+                    team,
+                    selected_units
+                        .iter()
+                        .map(|(entity, unit, unit_team, _, hold, ..)| {
+                            (entity, unit, unit_team, hold)
+                        }),
+                )
+            };
             if handled {
                 clear_targeting_modes(command_mode);
             }
@@ -1061,35 +1202,94 @@ pub(crate) fn execute_command_action(
         ),
         BuildAction::GuardArea => {
             clear_targeting_modes(command_mode);
-            guard_selected_area(
-                commands,
-                team,
-                selected_units
-                    .iter()
-                    .map(|(entity, unit, unit_team, ..)| (entity, unit, unit_team)),
-            )
+            if online.is_active() {
+                submit_online_unit_action(
+                    online,
+                    selected_units
+                        .iter()
+                        .filter(|(_, unit, unit_team, ..)| {
+                            **unit_team == team && can_unit_guard_area(unit)
+                        })
+                        .map(|(entity, ..)| entity),
+                    OnlineUnitAction::GuardArea,
+                )
+            } else {
+                guard_selected_area(
+                    commands,
+                    team,
+                    selected_units
+                        .iter()
+                        .map(|(entity, unit, unit_team, ..)| (entity, unit, unit_team)),
+                )
+            }
         }
         BuildAction::StopSelected => {
             clear_targeting_modes(command_mode);
-            cancel_selected_under_construction_structure(
-                commands,
-                team,
-                selected_units
+            if online.is_active() {
+                let selected_unit_count = selected_units
                     .iter()
                     .filter(|(_, _, unit_team, ..)| **unit_team == team)
-                    .count(),
-                selected_sell_structures.iter().map(
-                    |(entity, _, structure_team, health, under_construction)| {
-                        (entity, structure_team, health, under_construction)
-                    },
-                ),
-                economies,
-                build_queue,
-            ) || stop_selected_units(commands, team, selected_units)
+                    .count();
+                if let Some((entity, _)) = selected_under_construction_stop_target(
+                    team,
+                    selected_unit_count,
+                    selected_sell_structures.iter().map(
+                        |(entity, _, structure_team, health, under_construction)| {
+                            (entity, structure_team, health, under_construction)
+                        },
+                    ),
+                ) {
+                    submit_online_structure_action(
+                        online,
+                        [entity],
+                        OnlineStructureAction::CancelConstruction,
+                    )
+                } else {
+                    submit_online_unit_action(
+                        online,
+                        selected_units
+                            .iter()
+                            .filter_map(|(entity, _, unit_team, _, _, orders)| {
+                                (*unit_team == team && has_active_order_state(orders))
+                                    .then_some(entity)
+                            }),
+                        OnlineUnitAction::Stop,
+                    )
+                }
+            } else {
+                cancel_selected_under_construction_structure(
+                    commands,
+                    team,
+                    selected_units
+                        .iter()
+                        .filter(|(_, _, unit_team, ..)| **unit_team == team)
+                        .count(),
+                    selected_sell_structures.iter().map(
+                        |(entity, _, structure_team, health, under_construction)| {
+                            (entity, structure_team, health, under_construction)
+                        },
+                    ),
+                    economies,
+                    build_queue,
+                ) || stop_selected_units(commands, team, selected_units)
+            }
         }
         BuildAction::ScatterSelected => {
             clear_targeting_modes(command_mode);
-            scatter_selected_units(commands, team, selected_units)
+            if online.is_active() {
+                submit_online_unit_action(
+                    online,
+                    selected_units
+                        .iter()
+                        .filter(|(_, unit, unit_team, ..)| {
+                            **unit_team == team && unit_supports_patrol(unit)
+                        })
+                        .map(|(entity, ..)| entity),
+                    OnlineUnitAction::Scatter,
+                )
+            } else {
+                scatter_selected_units(commands, team, selected_units)
+            }
         }
         BuildAction::Train(_) => {
             let result = if online.is_active() {
@@ -1168,7 +1368,7 @@ pub(crate) fn execute_command_action(
 
 #[allow(clippy::too_many_arguments)]
 fn submit_online_train_action(
-    online: &mut OnlineProductionCommandParams,
+    online: &mut OnlineGameplayCommandParams,
     team: Team,
     faction: SkirmishFaction,
     action: BuildAction,

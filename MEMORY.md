@@ -55,7 +55,14 @@
   the locally controlled team. Automatic construction now checks the configured
   slot controller explicitly, so only real AI slots progress foundations
   without an assigned Worker.
-- The running match is not yet command-complete: remaining command-card actions,
-  support powers, reconnect state, and victory/return-to-lobby flow still need
-  equivalent host-authoritative handling. Large battles will also need
+- RTS wire protocol v2 is command-complete for current player-facing match
+  controls. Stop/hold/guard/scatter/deploy, sell/repair/cancel-construction, and
+  all support powers use the reliable host inbox. The host validates stable-ID
+  ownership and capabilities, prevents same-tick duplicate structure refunds or
+  repair charges, validates support doctrine/tech/power/cooldown/bounds, and
+  mirrors support cooldowns in snapshots. Maximum action packets and a
+  representative cooldown-bearing snapshot remain below channel limits.
+- The running match still needs in-match reconnect/catch-up, a global
+  multiplayer victory/disconnect/return-to-lobby contract, and visual event
+  replication for transient support warnings/impacts. Large battles also need
   delta/compressed snapshots rather than relying only on full state.

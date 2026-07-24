@@ -31,15 +31,17 @@ use std::{
 
 use crate::*;
 
-const RTS_ONLINE_PROTOCOL: u16 = 1;
+const RTS_ONLINE_PROTOCOL: u16 = 2;
 const ONLINE_DEFAULT_SERVICE_URL: &str = "http://127.0.0.1:3536";
 const ONLINE_MAX_STATUS_BYTES: usize = 180;
 const ONLINE_SNAPSHOT_HZ: f32 = 10.0;
 const ONLINE_SNAPSHOT_INTERVAL_SECONDS: f32 = 1.0 / ONLINE_SNAPSHOT_HZ;
 const ONLINE_SNAPSHOT_SNAP_DISTANCE: f32 = 8.0;
 const ONLINE_MAX_UNIT_ORDERS_PER_COMMAND: usize = 256;
+const ONLINE_MAX_UNIT_ACTIONS_PER_COMMAND: usize = 256;
 const ONLINE_MAX_RALLY_STRUCTURES_PER_COMMAND: usize = 64;
 const ONLINE_MAX_PRODUCERS_PER_COMMAND: usize = 64;
+const ONLINE_MAX_STRUCTURE_ACTIONS_PER_COMMAND: usize = 64;
 pub(crate) const ONLINE_MAX_CONSTRUCTORS_PER_COMMAND: usize = 64;
 const ONLINE_MAX_ENTITY_ID_BYTES: usize = 64;
 
@@ -483,11 +485,74 @@ impl OnlineRallyMode {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub(crate) enum OnlineUnitAction {
+    Stop,
+    ToggleHoldPosition,
+    GuardArea,
+    Scatter,
+    ToggleDeployMode,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub(crate) enum OnlineStructureAction {
+    Sell,
+    Repair,
+    CancelConstruction,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub(crate) enum OnlineSupportPower {
+    RadarSweep,
+    OrbitalStrike,
+    EmpPulse,
+    ChronoRelay,
+    ShieldOverdrive,
+    NaniteRepairSwarm,
+    WeatherStorm,
+    StrategicMissile,
+    Paradrop,
+}
+
+impl OnlineSupportPower {
+    pub(crate) fn from_game(power: SupportPowerKind) -> Self {
+        match power {
+            SupportPowerKind::RadarSweep => Self::RadarSweep,
+            SupportPowerKind::OrbitalStrike => Self::OrbitalStrike,
+            SupportPowerKind::EmpPulse => Self::EmpPulse,
+            SupportPowerKind::ChronoRelay => Self::ChronoRelay,
+            SupportPowerKind::ShieldOverdrive => Self::ShieldOverdrive,
+            SupportPowerKind::NaniteRepairSwarm => Self::NaniteRepairSwarm,
+            SupportPowerKind::WeatherStorm => Self::WeatherStorm,
+            SupportPowerKind::StrategicMissile => Self::StrategicMissile,
+            SupportPowerKind::Paradrop => Self::Paradrop,
+        }
+    }
+
+    fn to_game(self) -> SupportPowerKind {
+        match self {
+            Self::RadarSweep => SupportPowerKind::RadarSweep,
+            Self::OrbitalStrike => SupportPowerKind::OrbitalStrike,
+            Self::EmpPulse => SupportPowerKind::EmpPulse,
+            Self::ChronoRelay => SupportPowerKind::ChronoRelay,
+            Self::ShieldOverdrive => SupportPowerKind::ShieldOverdrive,
+            Self::NaniteRepairSwarm => SupportPowerKind::NaniteRepairSwarm,
+            Self::WeatherStorm => SupportPowerKind::WeatherStorm,
+            Self::StrategicMissile => SupportPowerKind::StrategicMissile,
+            Self::Paradrop => SupportPowerKind::Paradrop,
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub(crate) enum OnlinePlayerCommand {
     UnitOrders {
         orders: Vec<OnlineUnitOrderCommand>,
         queue: bool,
+    },
+    UnitAction {
+        units: Vec<u64>,
+        action: OnlineUnitAction,
     },
     SetRallyPoints {
         structures: Vec<u64>,
@@ -510,6 +575,14 @@ pub(crate) enum OnlinePlayerCommand {
         structure_id: String,
         position: [f32; 3],
         rotation_y_radians: f32,
+    },
+    StructureAction {
+        structures: Vec<u64>,
+        action: OnlineStructureAction,
+    },
+    UseSupportPower {
+        power: OnlineSupportPower,
+        target: [f32; 3],
     },
 }
 
@@ -710,6 +783,8 @@ struct OnlineWorldSnapshot {
     entities: Vec<OnlineEntitySnapshot>,
     economies: Vec<OnlineEconomySnapshot>,
     build_queue: Vec<OnlineBuildJobSnapshot>,
+    support_cooldowns: Vec<[f32; SupportPowerKind::ALL.len()]>,
+    support_initial_charge_started: Vec<[bool; SupportPowerKind::ALL.len()]>,
     match_state: OnlineMatchStateSnapshot,
 }
 
@@ -831,6 +906,15 @@ type OnlineCommandTarget<'a> = (
     Option<&'a Garrison>,
 );
 
+type OnlineSupportTarget<'a> = (
+    Entity,
+    &'a Team,
+    &'a Transform,
+    &'a Health,
+    Option<&'a Unit>,
+    Option<&'a Structure>,
+);
+
 #[derive(SystemParam)]
 struct OnlineSnapshotBroadcastParams<'w, 's> {
     time: Res<'w, Time>,
@@ -841,6 +925,7 @@ struct OnlineSnapshotBroadcastParams<'w, 's> {
     network_entities: Query<'w, 's, (Entity, &'static NetworkEntityId)>,
     economies: Res<'w, Economies>,
     build_queue: Res<'w, BuildQueue>,
+    support_cooldowns: Res<'w, SupportCooldowns>,
     match_state: Res<'w, MatchState>,
 }
 
@@ -854,6 +939,7 @@ struct OnlineSnapshotApplyParams<'w, 's> {
     visible_player: Res<'w, VisiblePlayer>,
     economies: ResMut<'w, Economies>,
     build_queue: ResMut<'w, BuildQueue>,
+    support_cooldowns: ResMut<'w, SupportCooldowns>,
     match_state: ResMut<'w, MatchState>,
     network_entities: Query<'w, 's, (Entity, &'static NetworkEntityId)>,
     entities: Query<'w, 's, OnlineSnapshotTarget<'static>>,
@@ -878,13 +964,13 @@ pub(crate) struct OnlineOrderCommandParams<'w, 's> {
 }
 
 #[derive(SystemParam)]
-pub(crate) struct OnlineProductionCommandParams<'w, 's> {
+pub(crate) struct OnlineGameplayCommandParams<'w, 's> {
     session: Option<Res<'w, OnlineSession>>,
     outbox: Option<ResMut<'w, OnlineCommandOutbox>>,
     network_ids: Query<'w, 's, &'static NetworkEntityId>,
 }
 
-impl OnlineProductionCommandParams<'_, '_> {
+impl OnlineGameplayCommandParams<'_, '_> {
     pub(crate) fn is_active(&self) -> bool {
         online_match_uses_command_transport(self.session.as_deref())
     }
@@ -914,9 +1000,15 @@ struct OnlineCommandApplyParams<'w, 's> {
     next_id: Option<ResMut<'w, NextSpawnId>>,
     economies: Option<ResMut<'w, Economies>>,
     build_queue: Option<ResMut<'w, BuildQueue>>,
+    support_cooldowns: Option<ResMut<'w, SupportCooldowns>>,
+    battle_log: Option<ResMut<'w, BattleLog>>,
+    audio_feedback: Option<ResMut<'w, AudioFeedback>>,
     network_entities: Query<'w, 's, (Entity, &'static NetworkEntityId)>,
     actors: Query<'w, 's, OnlineCommandActor<'static>>,
+    holds: Query<'w, 's, Option<&'static HoldPosition>, With<Unit>>,
     targets: Query<'w, 's, OnlineCommandTarget<'static>>,
+    manual_repairs: Query<'w, 's, (), With<ManualStructureRepair>>,
+    support_targets: Query<'w, 's, OnlineSupportTarget<'static>>,
     rally_points: Query<
         'w,
         's,
@@ -1191,7 +1283,9 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
                 .after(structure_placement_input)
                 .after(command_shortcuts)
                 .after(command_buttons)
+                .after(command_queue_controls)
                 .after(production_queue_slot_buttons)
+                .after(fire_support_power_on_left_click)
                 .run_if(match_in_progress),
         )
         .add_systems(
@@ -2404,9 +2498,15 @@ fn apply_online_player_commands(params: OnlineCommandApplyParams) {
         mut next_id,
         mut economies,
         mut build_queue,
+        mut support_cooldowns,
+        mut battle_log,
+        mut audio_feedback,
         network_entities,
         actors,
+        holds,
         targets,
+        manual_repairs,
+        support_targets,
         mut rally_points,
         structures: structure_prereqs,
         occupiers,
@@ -2428,6 +2528,7 @@ fn apply_online_player_commands(params: OnlineCommandApplyParams) {
         .and_then(|player_id| config.runtime_team_for_player(player_id))
         .unwrap_or(Team::Player(0));
     let mut accepted_structure_sites = Vec::<(Vec3, f32)>::new();
+    let mut acted_structures = HashSet::<Entity>::new();
 
     while let Some(authorized) = inbox.pending.pop_front() {
         let Some(team) = config.runtime_team_for_player(authorized.player_id) else {
@@ -2503,6 +2604,106 @@ fn apply_online_player_commands(params: OnlineCommandApplyParams) {
                     commands
                         .entity(actor)
                         .try_insert(HoldPosition { enabled: false });
+                }
+            }
+            OnlinePlayerCommand::UnitAction { units, action } => {
+                let Some(units) = resolve_owned_online_unit_entities(
+                    team,
+                    &units,
+                    &entity_by_network_id,
+                    &actors,
+                ) else {
+                    continue;
+                };
+                match action {
+                    OnlineUnitAction::Stop => {
+                        for entity in units {
+                            clear_order_state(&mut commands, entity);
+                            commands.entity(entity).try_remove::<OrderQueue>();
+                        }
+                    }
+                    OnlineUnitAction::ToggleHoldPosition => {
+                        if !units.iter().all(|entity| {
+                            actors
+                                .get(*entity)
+                                .is_ok_and(|(_, _, _, unit, ..)| unit_supports_hold_position(unit))
+                        }) {
+                            continue;
+                        }
+                        let all_holding = units.iter().all(|entity| {
+                            holds
+                                .get(*entity)
+                                .ok()
+                                .flatten()
+                                .is_some_and(|hold| hold.enabled)
+                        });
+                        let enabled = !all_holding;
+                        for entity in units {
+                            commands.entity(entity).try_insert(HoldPosition { enabled });
+                            if enabled {
+                                clear_order_state(&mut commands, entity);
+                                commands.entity(entity).try_remove::<OrderQueue>();
+                            }
+                        }
+                    }
+                    OnlineUnitAction::GuardArea => {
+                        if !units.iter().all(|entity| {
+                            actors
+                                .get(*entity)
+                                .is_ok_and(|(_, _, _, unit, ..)| can_unit_guard_area(unit))
+                        }) {
+                            continue;
+                        }
+                        for entity in units {
+                            clear_order_state(&mut commands, entity);
+                            commands
+                                .entity(entity)
+                                .try_remove::<OrderQueue>()
+                                .try_insert(HoldPosition { enabled: false });
+                        }
+                    }
+                    OnlineUnitAction::Scatter => {
+                        let scatter_units = units
+                            .iter()
+                            .filter_map(|entity| {
+                                let (_, _, _, unit, _, transform, _) = actors.get(*entity).ok()?;
+                                unit_supports_patrol(unit)
+                                    .then_some((*entity, transform.translation))
+                            })
+                            .collect::<Vec<_>>();
+                        if scatter_units.len() != units.len() {
+                            continue;
+                        }
+                        let positions = scatter_units
+                            .iter()
+                            .map(|(_, position)| *position)
+                            .collect::<Vec<_>>();
+                        for ((entity, _), target) in scatter_units
+                            .iter()
+                            .zip(scatter_target_positions(&positions))
+                        {
+                            clear_order_state(&mut commands, *entity);
+                            commands
+                                .entity(*entity)
+                                .try_remove::<OrderQueue>()
+                                .try_insert(HoldPosition { enabled: false })
+                                .try_insert(MoveOrder {
+                                    target: map_bounds.clamp_ground_point(target, 0.0),
+                                });
+                        }
+                    }
+                    OnlineUnitAction::ToggleDeployMode => {
+                        if !units.iter().all(|entity| {
+                            actors
+                                .get(*entity)
+                                .is_ok_and(|(_, _, _, unit, ..)| is_deployable_vehicle(unit.id))
+                        }) {
+                            continue;
+                        }
+                        for entity in units {
+                            commands.entity(entity).try_insert(DeployModeToggleRequest);
+                        }
+                    }
                 }
             }
             OnlinePlayerCommand::SetRallyPoints {
@@ -2710,6 +2911,149 @@ fn apply_online_player_commands(params: OnlineCommandApplyParams) {
                     &actors,
                 );
             }
+            OnlinePlayerCommand::StructureAction { structures, action } => {
+                let Some(structures) = resolve_owned_online_action_structures(
+                    team,
+                    &structures,
+                    &entity_by_network_id,
+                    &targets,
+                ) else {
+                    continue;
+                };
+                for entity in structures {
+                    if acted_structures.contains(&entity) {
+                        continue;
+                    }
+                    let Ok((_, _, _, structure, _, health, construction, _)) = targets.get(entity)
+                    else {
+                        continue;
+                    };
+                    let (Some(structure), Some(health)) = (structure, health) else {
+                        continue;
+                    };
+                    match action {
+                        OnlineStructureAction::Sell => {
+                            let (Some(economies), Some(build_queue)) =
+                                (economies.as_deref_mut(), build_queue.as_deref_mut())
+                            else {
+                                continue;
+                            };
+                            let refund = if let Some(construction) = construction {
+                                construction_cancel_refund(construction.cost)
+                            } else {
+                                let Some(def) = registry::entity(structure.id) else {
+                                    continue;
+                                };
+                                structure_sell_refund(def, health)
+                            };
+                            if !acted_structures.insert(entity) {
+                                continue;
+                            }
+                            let economy = economies.get_mut(team);
+                            economy.ore += refund.0;
+                            economy.crystal += refund.1;
+                            cancel_jobs_for_producer(build_queue, economies, entity);
+                            commands.entity(entity).try_despawn();
+                        }
+                        OnlineStructureAction::Repair => {
+                            let Some(economies) = economies.as_deref_mut() else {
+                                continue;
+                            };
+                            if !structure_is_constructed(construction)
+                                || health.current >= health.max
+                                || manual_repairs.get(entity).is_ok()
+                            {
+                                continue;
+                            }
+                            let Some(def) = registry::entity(structure.id) else {
+                                continue;
+                            };
+                            let cost = structure_repair_cost(def, health);
+                            if !economies.get_mut(team).spend(cost)
+                                || !acted_structures.insert(entity)
+                            {
+                                continue;
+                            }
+                            commands.entity(entity).try_insert(ManualStructureRepair {
+                                points_remaining: missing_structure_hitpoints(health),
+                            });
+                        }
+                        OnlineStructureAction::CancelConstruction => {
+                            let (Some(economies), Some(build_queue), Some(construction)) = (
+                                economies.as_deref_mut(),
+                                build_queue.as_deref_mut(),
+                                construction,
+                            ) else {
+                                continue;
+                            };
+                            if !acted_structures.insert(entity) {
+                                continue;
+                            }
+                            let refund = construction_cancel_refund(construction.cost);
+                            let economy = economies.get_mut(team);
+                            economy.ore += refund.0;
+                            economy.crystal += refund.1;
+                            cancel_jobs_for_producer(build_queue, economies, entity);
+                            commands.entity(entity).try_despawn();
+                        }
+                    }
+                }
+            }
+            OnlinePlayerCommand::UseSupportPower { power, target } => {
+                let (Some(economies), Some(support_cooldowns), Some(battle_log)) = (
+                    economies.as_deref(),
+                    support_cooldowns.as_deref_mut(),
+                    battle_log.as_deref_mut(),
+                ) else {
+                    continue;
+                };
+                let Some(target) =
+                    validated_terrain_target_in_bounds(Vec3::from_array(target), *map_bounds)
+                else {
+                    continue;
+                };
+                let power = power.to_game();
+                let faction = config.runtime_faction_for_player(authorized.player_id);
+                if !support_power_available_to_faction(Some(faction), power) {
+                    continue;
+                }
+                let targets = support_targets
+                    .iter()
+                    .filter_map(
+                        |(entity, target_team, transform, health, unit, structure)| {
+                            (health.current > 0.0 && (unit.is_some() || structure.is_some()))
+                                .then_some(SupportPowerTargetSnapshot {
+                                    entity,
+                                    team: *target_team,
+                                    position: transform.translation,
+                                    health: *health,
+                                    mobile: unit.is_some_and(|unit| unit.speed > 0.0),
+                                })
+                        },
+                    )
+                    .collect::<Vec<_>>();
+                if activate_support_power(
+                    &mut commands,
+                    target,
+                    power,
+                    team,
+                    host_visible_team,
+                    economies,
+                    support_cooldowns,
+                    battle_log,
+                    &relations,
+                    &structure_prereqs,
+                    &targets,
+                ) && let Some(audio_feedback) = audio_feedback.as_deref_mut()
+                {
+                    record_support_power_audio_feedback(
+                        audio_feedback,
+                        team,
+                        host_visible_team,
+                        power,
+                    );
+                }
+            }
         }
     }
 }
@@ -2718,6 +3062,59 @@ fn valid_online_registry_entity(id: &str) -> Option<&'static registry::EntityDef
     (!id.is_empty() && id.len() <= ONLINE_MAX_ENTITY_ID_BYTES)
         .then(|| registry::entity(id))
         .flatten()
+}
+
+fn resolve_owned_online_unit_entities(
+    team: Team,
+    requested: &[u64],
+    entity_by_network_id: &HashMap<u64, Entity>,
+    actors: &Query<OnlineCommandActor<'_>>,
+) -> Option<Vec<Entity>> {
+    if requested.is_empty() || requested.len() > ONLINE_MAX_UNIT_ACTIONS_PER_COMMAND {
+        return None;
+    }
+    let mut seen = HashSet::with_capacity(requested.len());
+    let mut units = Vec::with_capacity(requested.len());
+    for network_id in requested {
+        if !seen.insert(*network_id) {
+            return None;
+        }
+        let entity = entity_by_network_id.get(network_id).copied()?;
+        let (_, _, unit_team, _, health, _, _) = actors.get(entity).ok()?;
+        if *unit_team != team || health.current <= 0.0 {
+            return None;
+        }
+        units.push(entity);
+    }
+    Some(units)
+}
+
+fn resolve_owned_online_action_structures(
+    team: Team,
+    requested: &[u64],
+    entity_by_network_id: &HashMap<u64, Entity>,
+    targets: &Query<OnlineCommandTarget<'_>>,
+) -> Option<Vec<Entity>> {
+    if requested.is_empty() || requested.len() > ONLINE_MAX_STRUCTURE_ACTIONS_PER_COMMAND {
+        return None;
+    }
+    let mut seen = HashSet::with_capacity(requested.len());
+    let mut structures = Vec::with_capacity(requested.len());
+    for network_id in requested {
+        if !seen.insert(*network_id) {
+            return None;
+        }
+        let entity = entity_by_network_id.get(network_id).copied()?;
+        let (structure_team, _, _, structure, _, health, _, _) = targets.get(entity).ok()?;
+        if *structure_team != team
+            || structure.is_none()
+            || health.is_none_or(|health| health.current <= 0.0)
+        {
+            return None;
+        }
+        structures.push(entity);
+    }
+    Some(structures)
 }
 
 fn resolve_online_producers(
@@ -3041,6 +3438,7 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
         network_entities,
         economies,
         build_queue,
+        support_cooldowns,
         match_state,
     } = params;
     if session.phase != OnlinePhase::InMatch || !session.is_host {
@@ -3149,6 +3547,8 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
             })
             .collect(),
         build_queue,
+        support_cooldowns: support_cooldowns.remaining.clone(),
+        support_initial_charge_started: support_cooldowns.initial_charge_started.clone(),
         match_state: OnlineMatchStateSnapshot {
             start_time_sec: match_state.start_time_sec,
             remaining_teams: match_state.remaining_teams,
@@ -3189,6 +3589,7 @@ fn apply_pending_online_snapshot(params: OnlineSnapshotApplyParams) {
         visible_player,
         mut economies,
         mut build_queue,
+        mut support_cooldowns,
         mut match_state,
         network_entities,
         mut entities,
@@ -3250,6 +3651,16 @@ fn apply_pending_online_snapshot(params: OnlineSnapshotApplyParams) {
                 },
             })
         })
+        .collect();
+    support_cooldowns.remaining = snapshot
+        .support_cooldowns
+        .into_iter()
+        .take(MAX_SKIRMISH_LOBBY_SLOTS)
+        .collect();
+    support_cooldowns.initial_charge_started = snapshot
+        .support_initial_charge_started
+        .into_iter()
+        .take(MAX_SKIRMISH_LOBBY_SLOTS)
         .collect();
 
     let mut incoming = snapshot
@@ -4145,6 +4556,8 @@ mod tests {
                 })
                 .collect(),
             build_queue: Vec::new(),
+            support_cooldowns: vec![[12.0; SupportPowerKind::ALL.len()]; 8],
+            support_initial_charge_started: vec![[true; SupportPowerKind::ALL.len()]; 8],
             match_state: OnlineMatchStateSnapshot {
                 start_time_sec: 600.0,
                 remaining_teams: 8,
@@ -4368,6 +4781,37 @@ mod tests {
     }
 
     #[test]
+    fn maximum_instant_action_batches_fit_reliable_channel() {
+        for command in [
+            OnlinePlayerCommand::UnitAction {
+                units: (1..=ONLINE_MAX_UNIT_ACTIONS_PER_COMMAND as u64).collect(),
+                action: OnlineUnitAction::Scatter,
+            },
+            OnlinePlayerCommand::StructureAction {
+                structures: (1..=ONLINE_MAX_STRUCTURE_ACTIONS_PER_COMMAND as u64).collect(),
+                action: OnlineStructureAction::Sell,
+            },
+        ] {
+            let message = OnlineReliableMessage::PlayerCommand(OnlinePlayerCommandEnvelope {
+                protocol: RTS_ONLINE_PROTOCOL,
+                sequence: u64::MAX,
+                command,
+            });
+            let encoded = postcard::to_allocvec(&message).unwrap();
+            assert!(
+                encoded.len() <= open_bevy_net::MAX_RELIABLE_PACKET_BYTES,
+                "{} byte command exceeds {} byte reliable channel limit",
+                encoded.len(),
+                open_bevy_net::MAX_RELIABLE_PACKET_BYTES
+            );
+            assert_eq!(
+                postcard::from_bytes::<OnlineReliableMessage>(&encoded).unwrap(),
+                message
+            );
+        }
+    }
+
+    #[test]
     fn host_applies_owned_unit_orders_and_rejects_opponent_control() {
         let mut lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
         lobby.slots[1].occupant = OnlineSlotOccupant::Human {
@@ -4446,6 +4890,280 @@ mod tests {
         assert_eq!(
             app.world().get::<MoveOrder>(player_unit).unwrap().target,
             Vec3::new(4.0, 0.0, 5.0)
+        );
+    }
+
+    #[test]
+    fn host_applies_owned_unit_actions_and_rejects_opponent_control() {
+        let mut lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        lobby.slots[1].occupant = OnlineSlotOccupant::Human {
+            player_id: 2,
+            name: "Player".to_string(),
+            ready: true,
+            connected: true,
+        };
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.is_host = true;
+        session.local_player_id = Some(1);
+        session.match_config = Some(OnlineMatchConfig::from(&lobby));
+
+        let mut app = App::new();
+        app.insert_resource(session)
+            .insert_resource(OnlineCommandInbox::default())
+            .insert_resource(MapBounds::default())
+            .insert_resource(TeamRelations::default())
+            .add_systems(Update, apply_online_player_commands);
+        let spawn_unit = |world: &mut World, network_id, team, x| {
+            world
+                .spawn((
+                    NetworkEntityId(network_id),
+                    team,
+                    Unit {
+                        id: "LightRifleInfantry",
+                        speed: 3.4,
+                        can_crush: false,
+                        can_be_crushed: true,
+                    },
+                    Health::new(10.0),
+                    Transform::from_xyz(x, 0.0, 0.0),
+                    HoldPosition { enabled: false },
+                    MoveOrder {
+                        target: Vec3::new(x + 5.0, 0.0, 0.0),
+                    },
+                ))
+                .id()
+        };
+        let host_unit = spawn_unit(app.world_mut(), 10, Team::Player(0), -4.0);
+        let player_unit = spawn_unit(app.world_mut(), 20, Team::Player(1), 4.0);
+        {
+            let mut inbox = app.world_mut().resource_mut::<OnlineCommandInbox>();
+            for (sequence, unit_id) in [(1, 10), (2, 20)] {
+                assert!(enqueue_online_player_command(
+                    &mut inbox,
+                    2,
+                    OnlinePlayerCommandEnvelope {
+                        protocol: RTS_ONLINE_PROTOCOL,
+                        sequence,
+                        command: OnlinePlayerCommand::UnitAction {
+                            units: vec![unit_id],
+                            action: OnlineUnitAction::ToggleHoldPosition,
+                        },
+                    }
+                ));
+            }
+        }
+        app.update();
+
+        assert!(!app.world().get::<HoldPosition>(host_unit).unwrap().enabled);
+        assert!(app.world().get::<MoveOrder>(host_unit).is_some());
+        assert!(
+            app.world()
+                .get::<HoldPosition>(player_unit)
+                .unwrap()
+                .enabled
+        );
+        assert!(app.world().get::<MoveOrder>(player_unit).is_none());
+
+        {
+            let mut inbox = app.world_mut().resource_mut::<OnlineCommandInbox>();
+            assert!(enqueue_online_player_command(
+                &mut inbox,
+                2,
+                OnlinePlayerCommandEnvelope {
+                    protocol: RTS_ONLINE_PROTOCOL,
+                    sequence: 3,
+                    command: OnlinePlayerCommand::UnitAction {
+                        units: vec![20],
+                        action: OnlineUnitAction::Scatter,
+                    },
+                }
+            ));
+        }
+        app.update();
+        assert!(app.world().get::<MoveOrder>(player_unit).is_some());
+        assert!(
+            !app.world()
+                .get::<HoldPosition>(player_unit)
+                .unwrap()
+                .enabled
+        );
+    }
+
+    #[test]
+    fn host_structure_actions_are_owned_and_idempotent_per_tick() {
+        let mut lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        lobby.slots[1].occupant = OnlineSlotOccupant::Human {
+            player_id: 2,
+            name: "Player".to_string(),
+            ready: true,
+            connected: true,
+        };
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.is_host = true;
+        session.local_player_id = Some(1);
+        session.match_config = Some(OnlineMatchConfig::from(&lobby));
+
+        let mut economies = Economies::default();
+        economies.get_mut(Team::Player(1)).ore = 100;
+        economies.get_mut(Team::Player(1)).crystal = 100;
+        let damaged_health = Health {
+            current: 50.0,
+            max: 100.0,
+        };
+        let repair_cost =
+            structure_repair_cost(registry::entity("PowerReactor").unwrap(), &damaged_health);
+        let foundation_cost = registry::Cost {
+            ore: 13,
+            crystal: 7,
+        };
+
+        let mut app = App::new();
+        app.insert_resource(session)
+            .insert_resource(OnlineCommandInbox::default())
+            .insert_resource(MapBounds::default())
+            .insert_resource(TeamRelations::default())
+            .insert_resource(economies)
+            .insert_resource(BuildQueue::default())
+            .add_systems(Update, apply_online_player_commands);
+        let enemy = app
+            .world_mut()
+            .spawn((
+                NetworkEntityId(10),
+                Team::Player(0),
+                Structure { id: "PowerReactor" },
+                Health::new(100.0),
+                Transform::default(),
+            ))
+            .id();
+        let damaged = app
+            .world_mut()
+            .spawn((
+                NetworkEntityId(20),
+                Team::Player(1),
+                Structure { id: "PowerReactor" },
+                damaged_health,
+                Transform::default(),
+            ))
+            .id();
+        let foundation = app
+            .world_mut()
+            .spawn((
+                NetworkEntityId(21),
+                Team::Player(1),
+                Structure { id: "PowerReactor" },
+                Health::new(100.0),
+                Transform::default(),
+                UnderConstruction {
+                    remaining: 5.0,
+                    total: 5.0,
+                    cost: foundation_cost,
+                    free_worker_origin: None,
+                },
+            ))
+            .id();
+        {
+            let mut inbox = app.world_mut().resource_mut::<OnlineCommandInbox>();
+            let commands = [
+                (1, vec![10], OnlineStructureAction::Sell),
+                (2, vec![20], OnlineStructureAction::Repair),
+                (3, vec![20], OnlineStructureAction::Repair),
+                (4, vec![21], OnlineStructureAction::CancelConstruction),
+                (5, vec![21], OnlineStructureAction::CancelConstruction),
+            ];
+            for (sequence, structures, action) in commands {
+                assert!(enqueue_online_player_command(
+                    &mut inbox,
+                    2,
+                    OnlinePlayerCommandEnvelope {
+                        protocol: RTS_ONLINE_PROTOCOL,
+                        sequence,
+                        command: OnlinePlayerCommand::StructureAction { structures, action },
+                    }
+                ));
+            }
+        }
+        app.update();
+
+        assert!(app.world().get_entity(enemy).is_ok());
+        assert!(app.world().get::<ManualStructureRepair>(damaged).is_some());
+        assert!(app.world().get_entity(foundation).is_err());
+        let economy = app.world().resource::<Economies>().get(Team::Player(1));
+        assert_eq!(economy.ore, 100 - repair_cost.ore + foundation_cost.ore);
+        assert_eq!(
+            economy.crystal,
+            100 - repair_cost.crystal + foundation_cost.crystal
+        );
+    }
+
+    #[test]
+    fn host_validates_faction_tech_and_cooldown_for_support_powers() {
+        let mut lobby = OnlineLobbySnapshot::new("ABC123".to_string(), "Host".to_string());
+        lobby.slots[1].occupant = OnlineSlotOccupant::Human {
+            player_id: 2,
+            name: "Player".to_string(),
+            ready: true,
+            connected: true,
+        };
+        lobby.slots[1].faction = OnlineFaction::Alliance;
+        let mut session = OnlineSession::default();
+        session.phase = OnlinePhase::InMatch;
+        session.is_host = true;
+        session.local_player_id = Some(1);
+        session.match_config = Some(OnlineMatchConfig::from(&lobby));
+
+        let mut economies = Economies::default();
+        let _ = economies.get_mut(Team::Player(1));
+        let mut app = App::new();
+        app.insert_resource(session)
+            .insert_resource(OnlineCommandInbox::default())
+            .insert_resource(MapBounds::default())
+            .insert_resource(TeamRelations::default())
+            .insert_resource(economies)
+            .insert_resource(BuildQueue::default())
+            .insert_resource(SupportCooldowns::default())
+            .insert_resource(BattleLog::default())
+            .insert_resource(AudioFeedback::default())
+            .add_systems(Update, apply_online_player_commands);
+        app.world_mut().spawn((
+            NetworkEntityId(20),
+            Team::Player(1),
+            Structure { id: "RadarUplink" },
+            Health::new(100.0),
+            Transform::default(),
+        ));
+        {
+            let mut inbox = app.world_mut().resource_mut::<OnlineCommandInbox>();
+            for (sequence, power) in [
+                (1, OnlineSupportPower::OrbitalStrike),
+                (2, OnlineSupportPower::RadarSweep),
+                (3, OnlineSupportPower::RadarSweep),
+            ] {
+                assert!(enqueue_online_player_command(
+                    &mut inbox,
+                    2,
+                    OnlinePlayerCommandEnvelope {
+                        protocol: RTS_ONLINE_PROTOCOL,
+                        sequence,
+                        command: OnlinePlayerCommand::UseSupportPower {
+                            power,
+                            target: [4.0, 0.0, 3.0],
+                        },
+                    }
+                ));
+            }
+        }
+        app.update();
+
+        let cooldowns = app.world().resource::<SupportCooldowns>();
+        assert_eq!(
+            cooldowns.remaining_for(Team::Player(1), SupportPowerKind::OrbitalStrike),
+            0.0
+        );
+        assert_eq!(
+            cooldowns.remaining_for(Team::Player(1), SupportPowerKind::RadarSweep),
+            SupportPowerKind::RadarSweep.definition().cooldown
         );
     }
 

@@ -124,9 +124,15 @@ domains live in modules, each re-exported into the crate root
   mutating the match. Exact charged costs are retained for authoritative
   refunds, and build queues are mirrored in world snapshots so client HUDs show
   host-owned queue state and progress. Remote human teams no longer inherit AI
-  automatic construction. Remaining command-card actions, support powers,
-  reconnect state, and large-battle delta snapshots are the next online-match
-  boundaries.
+  automatic construction.
+- RTS wire protocol v2 sends stop/hold/guard/scatter/deploy, structure
+  sell/repair/cancel, and support-power targeting over the reliable command
+  channel. The host resolves stable IDs, rejects foreign/dead/unsupported
+  entities, enforces one structure mutation per host tick, and validates support
+  faction doctrine, technology, power, cooldown, and map bounds. Support
+  cooldown and initial-charge arrays are mirrored in snapshots; clients never
+  advance them independently. Match reconnect state, global multiplayer result
+  flow, and large-battle delta snapshots remain the next online boundaries.
 - `bevy_fluent::FluentPlugin` is registered in the shared game scene so future `.ftl` localization bundles can load through Bevy assets. The existing `Locale` / `t()` path remains the active text source until screens are migrated incrementally.
 - AI drones have an active scouting controller: idle AI `Drone` units pick living enemy units, move to their positions, avoid repeating the previous target when possible, and retarget after a short 0.5-1.0s delay.
 - AI defense profiles follow the godot difficulty targets: Beginner/Easy do not inherit Normal advanced-defense construction, Normal targets one standard defense layer plus 2 Tesla fence segments where the faction supports them, and Hard scales standard defenses to 2 plus 4 Tesla fence segments.

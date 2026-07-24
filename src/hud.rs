@@ -2478,7 +2478,7 @@ pub(crate) fn command_buttons(
     keyboard: Res<ButtonInput<KeyCode>>,
     visible_player: Res<VisiblePlayer>,
     mut action_resources: CommandActionResources,
-    mut online: OnlineProductionCommandParams,
+    mut online: OnlineGameplayCommandParams,
     selected_units: Query<SelectedCommandUnitItem<'_>, SelectedCommandUnitFilter>,
     selected_sell_structures: Query<SelectedSellStructureItem<'_>, With<Selected>>,
     selected_repair_structures: Query<SelectedRepairStructureItem<'_>, With<Selected>>,
@@ -2593,7 +2593,7 @@ pub(crate) fn production_queue_slot_buttons(
     mut build_queue: ResMut<BuildQueue>,
     mut economies: ResMut<Economies>,
     mut audio_feedback: ResMut<AudioFeedback>,
-    mut online: OnlineProductionCommandParams,
+    mut online: OnlineGameplayCommandParams,
     mut interaction_q: Query<
         (
             &Interaction,
