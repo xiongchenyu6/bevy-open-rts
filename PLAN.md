@@ -38,10 +38,11 @@ native desktop and browser builds.
   - [x] Exact map slot rows with readiness/faction/team/color synchronization
   - [x] Host-validated settings and synchronized match launch
 - [ ] Host-authoritative match
-  - [ ] Stable network entity IDs
+  - [x] Stable network entity IDs
+  - [x] Host world snapshots, client reconciliation, and interpolation
   - [ ] Serializable high-level commands
   - [ ] Command validation and ownership checks
-  - [ ] Snapshot/delta replication and interpolation
+  - [ ] Snapshot delta/compression for battles beyond the full-snapshot budget
   - [ ] Match-state reconnect/resume
   - [ ] Victory, disconnect, and return-to-lobby flow
 - [ ] Product verification

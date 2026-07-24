@@ -5,13 +5,14 @@
 //! and conversion into the shared match scene.
 
 use bevy::{
+    ecs::system::SystemParam,
     input::keyboard::{Key, KeyboardInput},
     prelude::*,
     tasks::IoTaskPool,
 };
 use open_bevy_net::{
-    ClientError, MessageLoopFuture, PeerId, RoomServiceClient, TransportConfig, TransportEvent,
-    WebRtcTransport, default_game_id, protocol_version,
+    ClientError, MAX_SNAPSHOT_PACKET_BYTES, MessageLoopFuture, PeerId, RoomServiceClient,
+    TransportConfig, TransportEvent, WebRtcTransport, default_game_id, protocol_version,
 };
 use open_bevy_protocol::{
     BuildId, CreateRoomRequest, CreateRoomResponse, PlayerName, RoomCode, RoomDescriptor,
@@ -33,6 +34,9 @@ use crate::*;
 const RTS_ONLINE_PROTOCOL: u16 = 1;
 const ONLINE_DEFAULT_SERVICE_URL: &str = "http://127.0.0.1:3536";
 const ONLINE_MAX_STATUS_BYTES: usize = 180;
+const ONLINE_SNAPSHOT_HZ: f32 = 10.0;
+const ONLINE_SNAPSHOT_INTERVAL_SECONDS: f32 = 1.0 / ONLINE_SNAPSHOT_HZ;
+const ONLINE_SNAPSHOT_SNAP_DISTANCE: f32 = 8.0;
 
 const NETWORK_RESOURCE_NAMESPACE: u64 = 1 << 62;
 const NETWORK_SUPPLY_CRATE_NAMESPACE: u64 = 2 << 62;
@@ -340,6 +344,209 @@ enum OnlineReliableMessage {
     },
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+enum OnlineEntityTeam {
+    Player(usize),
+    Neutral,
+}
+
+impl OnlineEntityTeam {
+    fn from_game(team: Team) -> Self {
+        match team {
+            Team::Player(index) => Self::Player(index),
+            Team::Neutral => Self::Neutral,
+        }
+    }
+
+    fn to_game(self) -> Team {
+        match self {
+            Self::Player(index) => Team::Player(index),
+            Self::Neutral => Team::Neutral,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+enum OnlineResourceKind {
+    Ore,
+    Crystal,
+}
+
+impl OnlineResourceKind {
+    fn from_game(kind: ResourceKind) -> Self {
+        match kind {
+            ResourceKind::Ore => Self::Ore,
+            ResourceKind::Crystal => Self::Crystal,
+        }
+    }
+
+    fn to_game(self) -> ResourceKind {
+        match self {
+            Self::Ore => ResourceKind::Ore,
+            Self::Crystal => ResourceKind::Crystal,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+enum OnlineSupplyCrateEffect {
+    Resources,
+    Repair,
+    Veterancy,
+}
+
+impl OnlineSupplyCrateEffect {
+    fn from_game(effect: SupplyCrateEffect) -> Self {
+        match effect {
+            SupplyCrateEffect::Resources => Self::Resources,
+            SupplyCrateEffect::Repair => Self::Repair,
+            SupplyCrateEffect::Veterancy => Self::Veterancy,
+        }
+    }
+
+    fn to_game(self) -> SupplyCrateEffect {
+        match self {
+            Self::Resources => SupplyCrateEffect::Resources,
+            Self::Repair => SupplyCrateEffect::Repair,
+            Self::Veterancy => SupplyCrateEffect::Veterancy,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+enum OnlineEntityKind {
+    Unit {
+        id: String,
+    },
+    Structure {
+        id: String,
+    },
+    Resource {
+        kind: OnlineResourceKind,
+        amount: i32,
+    },
+    SupplyCrate {
+        effect: OnlineSupplyCrateEffect,
+    },
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct OnlineEntitySnapshot {
+    id: u64,
+    kind: OnlineEntityKind,
+    team: OnlineEntityTeam,
+    translation: [f32; 3],
+    rotation: [f32; 4],
+    scale: [f32; 3],
+    health: Option<[f32; 2]>,
+    visual_faction: Option<OnlineFaction>,
+    cargo: Option<[i32; 3]>,
+    construction: Option<[f32; 2]>,
+    veterancy: Option<(u8, u32)>,
+}
+
+impl OnlineEntitySnapshot {
+    fn transform(&self) -> Transform {
+        Transform {
+            translation: Vec3::from_array(self.translation),
+            rotation: Quat::from_array(self.rotation),
+            scale: Vec3::from_array(self.scale),
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct OnlineEconomySnapshot {
+    ore: i32,
+    crystal: i32,
+    power_used: i32,
+    power_capacity: i32,
+    power_sabotage_remaining: f32,
+    production_veterancy_ranks: Vec<u8>,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct OnlineMatchStateSnapshot {
+    start_time_sec: f32,
+    remaining_teams: u32,
+    remaining_anchors: u32,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct OnlineWorldSnapshot {
+    protocol: u16,
+    tick: u64,
+    entities: Vec<OnlineEntitySnapshot>,
+    economies: Vec<OnlineEconomySnapshot>,
+    match_state: OnlineMatchStateSnapshot,
+}
+
+#[derive(Resource, Default)]
+struct OnlineMatchReplication {
+    next_tick: u64,
+    last_applied_tick: u64,
+    send_accumulator: f32,
+    pending_snapshot: Option<OnlineWorldSnapshot>,
+}
+
+#[derive(Component, Clone, Copy)]
+struct NetworkInterpolation {
+    translation: Vec3,
+    rotation: Quat,
+    scale: Vec3,
+}
+
+type OnlineSnapshotSource<'a> = (
+    &'a NetworkEntityId,
+    &'a Transform,
+    &'a Team,
+    Option<&'a Unit>,
+    Option<&'a Structure>,
+    Option<&'a ResourceNode>,
+    Option<&'a SupplyCrate>,
+    Option<&'a Health>,
+    Option<&'a VisualFaction>,
+    Option<&'a ResourceCargo>,
+    Option<&'a UnderConstruction>,
+    Option<&'a Veterancy>,
+);
+
+type OnlineSnapshotTarget<'a> = (
+    Entity,
+    &'a NetworkEntityId,
+    &'a mut Transform,
+    &'a Team,
+    Option<&'a mut Health>,
+    Option<&'a mut ResourceNode>,
+    Option<&'a mut ResourceCargo>,
+    Option<&'a mut UnderConstruction>,
+    Option<&'a mut Veterancy>,
+);
+
+#[derive(SystemParam)]
+struct OnlineSnapshotBroadcastParams<'w, 's> {
+    time: Res<'w, Time>,
+    session: ResMut<'w, OnlineSession>,
+    transport: ResMut<'w, OnlineTransport>,
+    replication: ResMut<'w, OnlineMatchReplication>,
+    entities: Query<'w, 's, OnlineSnapshotSource<'static>>,
+    economies: Res<'w, Economies>,
+    match_state: Res<'w, MatchState>,
+}
+
+#[derive(SystemParam)]
+struct OnlineSnapshotApplyParams<'w, 's> {
+    commands: Commands<'w, 's>,
+    asset_server: Res<'w, AssetServer>,
+    session: Res<'w, OnlineSession>,
+    replication: ResMut<'w, OnlineMatchReplication>,
+    next_id: ResMut<'w, NextSpawnId>,
+    visible_player: Res<'w, VisiblePlayer>,
+    economies: ResMut<'w, Economies>,
+    match_state: ResMut<'w, MatchState>,
+    entities: Query<'w, 's, OnlineSnapshotTarget<'static>>,
+}
+
 #[derive(Default)]
 struct HostLobbyRuntime {
     next_player_id: u64,
@@ -421,7 +628,7 @@ impl HostLobbyRuntime {
 }
 
 #[derive(Resource)]
-struct OnlineSession {
+pub(crate) struct OnlineSession {
     phase: OnlinePhase,
     is_host: bool,
     service_url: String,
@@ -556,10 +763,29 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
     app.init_resource::<OnlineSession>()
         .init_resource::<OnlineTransport>()
         .init_resource::<OnlineAsyncInbox>()
+        .init_resource::<OnlineMatchReplication>()
         .add_systems(OnEnter(AppScreen::OnlineLobby), enter_online_lobby)
+        .add_systems(OnEnter(AppScreen::InMatch), reset_online_match_replication)
         .add_systems(
             Update,
-            (process_online_async_results, poll_online_transport).chain(),
+            (
+                process_online_async_results,
+                poll_online_transport,
+                apply_pending_online_snapshot,
+            )
+                .chain()
+                .before(SimulationPhase::UiAndManagement),
+        )
+        .add_systems(
+            Update,
+            interpolate_network_entities
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress)
+                .run_if(online_client_match),
+        )
+        .add_systems(
+            Last,
+            broadcast_online_world_snapshot.run_if(in_state(AppScreen::InMatch)),
         )
         .add_systems(
             Update,
@@ -568,6 +794,22 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
                 .run_if(in_state(AppScreen::OnlineLobby)),
         );
     app
+}
+
+pub(crate) fn online_match_is_authoritative(session: Option<Res<OnlineSession>>) -> bool {
+    session
+        .as_deref()
+        .is_none_or(|session| session.phase != OnlinePhase::InMatch || session.is_host)
+}
+
+fn online_client_match(session: Option<Res<OnlineSession>>) -> bool {
+    session
+        .as_deref()
+        .is_some_and(|session| session.phase == OnlinePhase::InMatch && !session.is_host)
+}
+
+fn reset_online_match_replication(mut replication: ResMut<OnlineMatchReplication>) {
+    *replication = OnlineMatchReplication::default();
 }
 
 fn enter_online_lobby(
@@ -1603,6 +1845,7 @@ fn disconnect_online(session: &mut OnlineSession, transport: &mut OnlineTranspor
 fn poll_online_transport(
     mut session: ResMut<OnlineSession>,
     mut transport: ResMut<OnlineTransport>,
+    mut replication: ResMut<OnlineMatchReplication>,
     mut setup: ResMut<MatchSetupSettings>,
     mut next_state: ResMut<NextState<AppScreen>>,
 ) {
@@ -1671,7 +1914,562 @@ fn poll_online_transport(
                     &mut next_state,
                 );
             }
-            TransportEvent::SnapshotMessage { .. } => {}
+            TransportEvent::SnapshotMessage { peer, payload } => {
+                if session.is_host
+                    || session.phase != OnlinePhase::InMatch
+                    || session.host_peer != Some(peer)
+                {
+                    continue;
+                }
+                let Ok(snapshot) = postcard::from_bytes::<OnlineWorldSnapshot>(&payload) else {
+                    continue;
+                };
+                queue_online_world_snapshot(&mut replication, snapshot);
+            }
+        }
+    }
+}
+
+fn queue_online_world_snapshot(
+    replication: &mut OnlineMatchReplication,
+    snapshot: OnlineWorldSnapshot,
+) -> bool {
+    if snapshot.protocol != RTS_ONLINE_PROTOCOL
+        || snapshot.tick <= replication.last_applied_tick
+        || replication
+            .pending_snapshot
+            .as_ref()
+            .is_some_and(|pending| pending.tick >= snapshot.tick)
+    {
+        return false;
+    }
+    replication.pending_snapshot = Some(snapshot);
+    true
+}
+
+fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
+    let OnlineSnapshotBroadcastParams {
+        time,
+        mut session,
+        mut transport,
+        mut replication,
+        entities,
+        economies,
+        match_state,
+    } = params;
+    if session.phase != OnlinePhase::InMatch || !session.is_host {
+        return;
+    }
+    let Some(socket) = transport.socket.as_mut() else {
+        return;
+    };
+    replication.send_accumulator += time.delta_secs();
+    if replication.send_accumulator < ONLINE_SNAPSHOT_INTERVAL_SECONDS {
+        return;
+    }
+    replication.send_accumulator %= ONLINE_SNAPSHOT_INTERVAL_SECONDS;
+    replication.next_tick = replication.next_tick.saturating_add(1);
+
+    let mut entity_snapshots = entities
+        .iter()
+        .filter_map(
+            |(
+                network_id,
+                transform,
+                team,
+                unit,
+                structure,
+                resource,
+                supply_crate,
+                health,
+                visual_faction,
+                cargo,
+                construction,
+                veterancy,
+            )| {
+                let kind = if let Some(unit) = unit {
+                    OnlineEntityKind::Unit {
+                        id: unit.id.to_string(),
+                    }
+                } else if let Some(structure) = structure {
+                    OnlineEntityKind::Structure {
+                        id: structure.id.to_string(),
+                    }
+                } else if let Some(resource) = resource {
+                    OnlineEntityKind::Resource {
+                        kind: OnlineResourceKind::from_game(resource.kind),
+                        amount: resource.amount,
+                    }
+                } else if let Some(supply_crate) = supply_crate {
+                    OnlineEntityKind::SupplyCrate {
+                        effect: OnlineSupplyCrateEffect::from_game(supply_crate.effect),
+                    }
+                } else {
+                    return None;
+                };
+                Some(OnlineEntitySnapshot {
+                    id: network_id.0,
+                    kind,
+                    team: OnlineEntityTeam::from_game(*team),
+                    translation: transform.translation.to_array(),
+                    rotation: transform.rotation.to_array(),
+                    scale: transform.scale.to_array(),
+                    health: health.map(|health| [health.current, health.max]),
+                    visual_faction: visual_faction
+                        .map(|faction| OnlineFaction::from_game(faction.0)),
+                    cargo: cargo.map(|cargo| [cargo.capacity, cargo.ore, cargo.crystal]),
+                    construction: construction
+                        .map(|construction| [construction.remaining, construction.total]),
+                    veterancy: veterancy
+                        .map(|veterancy| (veterancy.rank, veterancy.experience_points)),
+                })
+            },
+        )
+        .collect::<Vec<_>>();
+    entity_snapshots.sort_unstable_by_key(|entity| entity.id);
+    let snapshot = OnlineWorldSnapshot {
+        protocol: RTS_ONLINE_PROTOCOL,
+        tick: replication.next_tick,
+        entities: entity_snapshots,
+        economies: economies
+            .players
+            .iter()
+            .map(|economy| OnlineEconomySnapshot {
+                ore: economy.ore,
+                crystal: economy.crystal,
+                power_used: economy.power_used,
+                power_capacity: economy.power_capacity,
+                power_sabotage_remaining: economy.power_sabotage_remaining,
+                production_veterancy_ranks: economy.production_veterancy_ranks.to_vec(),
+            })
+            .collect(),
+        match_state: OnlineMatchStateSnapshot {
+            start_time_sec: match_state.start_time_sec,
+            remaining_teams: match_state.remaining_teams,
+            remaining_anchors: match_state.remaining_anchors,
+        },
+    };
+    let payload = match postcard::to_allocvec(&snapshot) {
+        Ok(payload) if payload.len() <= MAX_SNAPSHOT_PACKET_BYTES => payload,
+        Ok(payload) => {
+            session.set_status(format!(
+                "{}: {}/{} bytes",
+                t("对局快照过大", "Match snapshot is too large"),
+                payload.len(),
+                MAX_SNAPSHOT_PACKET_BYTES
+            ));
+            return;
+        }
+        Err(error) => {
+            session.set_status(format!(
+                "{}: {error}",
+                t("无法编码对局快照", "Could not encode match snapshot")
+            ));
+            return;
+        }
+    };
+    if let Err(error) = socket.broadcast_snapshot(&payload) {
+        session.set_status(client_error_text(error));
+    }
+}
+
+fn apply_pending_online_snapshot(params: OnlineSnapshotApplyParams) {
+    let OnlineSnapshotApplyParams {
+        mut commands,
+        asset_server,
+        session,
+        mut replication,
+        mut next_id,
+        visible_player,
+        mut economies,
+        mut match_state,
+        mut entities,
+    } = params;
+    if session.phase != OnlinePhase::InMatch || session.is_host {
+        replication.pending_snapshot = None;
+        return;
+    }
+    let Some(snapshot) = replication.pending_snapshot.take() else {
+        return;
+    };
+    if snapshot.tick <= replication.last_applied_tick {
+        return;
+    }
+    replication.last_applied_tick = snapshot.tick;
+
+    economies.players = snapshot
+        .economies
+        .iter()
+        .map(|snapshot| {
+            let mut economy = TeamEconomy::new(snapshot.ore, snapshot.crystal);
+            economy.power_used = snapshot.power_used;
+            economy.power_capacity = snapshot.power_capacity;
+            economy.power_sabotage_remaining = snapshot.power_sabotage_remaining;
+            for (target, source) in economy
+                .production_veterancy_ranks
+                .iter_mut()
+                .zip(&snapshot.production_veterancy_ranks)
+            {
+                *target = *source;
+            }
+            economy
+        })
+        .collect();
+    match_state.start_time_sec = snapshot.match_state.start_time_sec;
+    match_state.remaining_teams = snapshot.match_state.remaining_teams;
+    match_state.remaining_anchors = snapshot.match_state.remaining_anchors;
+
+    let mut incoming = snapshot
+        .entities
+        .into_iter()
+        .map(|entity| (entity.id, entity))
+        .collect::<HashMap<_, _>>();
+    for (
+        entity,
+        network_id,
+        mut transform,
+        team,
+        health,
+        resource,
+        cargo,
+        construction,
+        veterancy,
+    ) in &mut entities
+    {
+        let Some(snapshot) = incoming.remove(&network_id.0) else {
+            commands.entity(entity).despawn();
+            continue;
+        };
+        let target = snapshot.transform();
+        if transform.translation.distance(target.translation) > ONLINE_SNAPSHOT_SNAP_DISTANCE {
+            *transform = target;
+            commands.entity(entity).try_remove::<NetworkInterpolation>();
+        } else {
+            commands.entity(entity).try_insert(NetworkInterpolation {
+                translation: target.translation,
+                rotation: target.rotation,
+                scale: target.scale,
+            });
+        }
+        if *team != snapshot.team.to_game() {
+            commands.entity(entity).try_insert(snapshot.team.to_game());
+        }
+        sync_optional_health(&mut commands, entity, health, snapshot.health);
+        sync_optional_resource(&mut commands, entity, resource, &snapshot.kind);
+        sync_optional_cargo(&mut commands, entity, cargo, snapshot.cargo);
+        sync_optional_construction(
+            &mut commands,
+            entity,
+            construction,
+            snapshot.construction,
+            &snapshot.kind,
+        );
+        sync_optional_veterancy(
+            &mut commands,
+            entity,
+            veterancy,
+            snapshot.veterancy,
+            &snapshot.kind,
+        );
+        sync_visual_faction(&mut commands, entity, snapshot.visual_faction);
+    }
+
+    for snapshot in incoming.into_values() {
+        spawn_online_snapshot_entity(
+            &mut commands,
+            &asset_server,
+            &mut next_id,
+            visible_player.team,
+            &snapshot,
+        );
+    }
+}
+
+fn sync_optional_health(
+    commands: &mut Commands,
+    entity: Entity,
+    health: Option<Mut<Health>>,
+    snapshot: Option<[f32; 2]>,
+) {
+    match (health, snapshot) {
+        (Some(mut health), Some([current, max])) => {
+            health.current = current;
+            health.max = max;
+        }
+        (None, Some([current, max])) => {
+            commands.entity(entity).try_insert(Health { current, max });
+        }
+        (Some(_), None) => {
+            commands.entity(entity).try_remove::<Health>();
+        }
+        (None, None) => {}
+    }
+}
+
+fn sync_optional_resource(
+    commands: &mut Commands,
+    entity: Entity,
+    resource: Option<Mut<ResourceNode>>,
+    kind: &OnlineEntityKind,
+) {
+    match (resource, kind) {
+        (Some(mut resource), OnlineEntityKind::Resource { kind, amount }) => {
+            resource.kind = kind.to_game();
+            resource.amount = *amount;
+        }
+        (None, OnlineEntityKind::Resource { kind, amount }) => {
+            commands.entity(entity).try_insert(ResourceNode {
+                kind: kind.to_game(),
+                amount: *amount,
+            });
+        }
+        (Some(_), _) => {
+            commands.entity(entity).try_remove::<ResourceNode>();
+        }
+        (None, _) => {}
+    }
+}
+
+fn sync_optional_cargo(
+    commands: &mut Commands,
+    entity: Entity,
+    cargo: Option<Mut<ResourceCargo>>,
+    snapshot: Option<[i32; 3]>,
+) {
+    match (cargo, snapshot) {
+        (Some(mut cargo), Some([capacity, ore, crystal])) => {
+            cargo.capacity = capacity;
+            cargo.ore = ore;
+            cargo.crystal = crystal;
+        }
+        (None, Some([capacity, ore, crystal])) => {
+            commands.entity(entity).try_insert(ResourceCargo {
+                capacity,
+                ore,
+                crystal,
+            });
+        }
+        (Some(_), None) => {
+            commands.entity(entity).try_remove::<ResourceCargo>();
+        }
+        (None, None) => {}
+    }
+}
+
+fn sync_optional_construction(
+    commands: &mut Commands,
+    entity: Entity,
+    construction: Option<Mut<UnderConstruction>>,
+    snapshot: Option<[f32; 2]>,
+    kind: &OnlineEntityKind,
+) {
+    match (construction, snapshot) {
+        (Some(mut construction), Some([remaining, total])) => {
+            construction.remaining = remaining;
+            construction.total = total;
+        }
+        (None, Some([remaining, total])) => {
+            let cost = match kind {
+                OnlineEntityKind::Structure { id } => {
+                    registry::entity(id).map_or(registry::Cost::default(), |def| def.cost)
+                }
+                _ => registry::Cost::default(),
+            };
+            commands.entity(entity).try_insert(UnderConstruction {
+                remaining,
+                total,
+                cost,
+                free_worker_origin: None,
+            });
+        }
+        (Some(_), None) => {
+            commands.entity(entity).try_remove::<UnderConstruction>();
+        }
+        (None, None) => {}
+    }
+}
+
+fn sync_optional_veterancy(
+    commands: &mut Commands,
+    entity: Entity,
+    veterancy: Option<Mut<Veterancy>>,
+    snapshot: Option<(u8, u32)>,
+    kind: &OnlineEntityKind,
+) {
+    match (veterancy, snapshot) {
+        (Some(mut veterancy), Some((rank, experience_points))) => {
+            veterancy.rank = rank;
+            veterancy.experience_points = experience_points;
+        }
+        (None, Some((rank, experience_points))) => {
+            let OnlineEntityKind::Unit { id } = kind else {
+                return;
+            };
+            let Some(def) = registry::entity(id) else {
+                return;
+            };
+            let Some(weapon) = def.weapon else {
+                return;
+            };
+            commands.entity(entity).try_insert(Veterancy {
+                rank,
+                experience_points,
+                base_health: def.health,
+                base_damage: weapon.damage,
+                base_range: weapon.range,
+                base_vision: unit_vision_radius(def),
+            });
+        }
+        (Some(_), None) => {
+            commands.entity(entity).try_remove::<Veterancy>();
+        }
+        (None, None) => {}
+    }
+}
+
+fn sync_visual_faction(commands: &mut Commands, entity: Entity, snapshot: Option<OnlineFaction>) {
+    if let Some(faction) = snapshot {
+        commands
+            .entity(entity)
+            .try_insert(VisualFaction(faction.to_game()));
+    } else {
+        commands.entity(entity).try_remove::<VisualFaction>();
+    }
+}
+
+fn spawn_online_snapshot_entity(
+    commands: &mut Commands,
+    asset_server: &AssetServer,
+    next_id: &mut NextSpawnId,
+    visible_team: Team,
+    snapshot: &OnlineEntitySnapshot,
+) {
+    let team = snapshot.team.to_game();
+    let visual_faction = snapshot.visual_faction.map(OnlineFaction::to_game);
+    let transform = snapshot.transform();
+    let entity = match &snapshot.kind {
+        OnlineEntityKind::Unit { id } => {
+            let Some(def) = registry::entity(id) else {
+                return;
+            };
+            spawn_unit_with_visual_faction(
+                commands,
+                asset_server,
+                next_id,
+                def.id,
+                team,
+                transform.translation,
+                snapshot.veterancy.map_or(0, |veterancy| veterancy.0),
+                visual_faction,
+                visible_team,
+            )
+        }
+        OnlineEntityKind::Structure { id } => {
+            let Some(def) = registry::entity(id) else {
+                return;
+            };
+            if snapshot.construction.is_some() {
+                spawn_structure_under_construction_with_visual_faction(
+                    commands,
+                    asset_server,
+                    next_id,
+                    def.id,
+                    team,
+                    transform.translation,
+                    None,
+                    0.0,
+                    visible_team,
+                    visual_faction,
+                )
+            } else {
+                spawn_structure_for_visual_faction(
+                    commands,
+                    asset_server,
+                    next_id,
+                    def.id,
+                    team,
+                    visible_team,
+                    transform.translation,
+                    0.0,
+                    visual_faction,
+                )
+            }
+        }
+        OnlineEntityKind::Resource { kind, amount } => spawn_resource_node(
+            commands,
+            asset_server,
+            kind.to_game(),
+            *amount,
+            transform.translation,
+        ),
+        OnlineEntityKind::SupplyCrate { effect } => spawn_supply_crate(
+            commands,
+            asset_server,
+            effect.to_game(),
+            transform.translation,
+        ),
+    };
+    commands
+        .entity(entity)
+        .try_insert((NetworkEntityId(snapshot.id), transform, team));
+    if let Some([current, max]) = snapshot.health {
+        commands.entity(entity).try_insert(Health { current, max });
+    }
+    if let Some([capacity, ore, crystal]) = snapshot.cargo {
+        commands.entity(entity).try_insert(ResourceCargo {
+            capacity,
+            ore,
+            crystal,
+        });
+    }
+    if let Some([remaining, total]) = snapshot.construction {
+        let cost = match &snapshot.kind {
+            OnlineEntityKind::Structure { id } => {
+                registry::entity(id).map_or(registry::Cost::default(), |def| def.cost)
+            }
+            _ => registry::Cost::default(),
+        };
+        commands.entity(entity).try_insert(UnderConstruction {
+            remaining,
+            total,
+            cost,
+            free_worker_origin: None,
+        });
+    }
+    if let Some((rank, experience_points)) = snapshot.veterancy
+        && let OnlineEntityKind::Unit { id } = &snapshot.kind
+        && let Some(def) = registry::entity(id)
+        && let Some(weapon) = def.weapon
+    {
+        commands.entity(entity).try_insert(Veterancy {
+            rank,
+            experience_points,
+            base_health: def.health,
+            base_damage: weapon.damage,
+            base_range: weapon.range,
+            base_vision: unit_vision_radius(def),
+        });
+    }
+    sync_visual_faction(commands, entity, snapshot.visual_faction);
+}
+
+fn interpolate_network_entities(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut entities: Query<(Entity, &mut Transform, &NetworkInterpolation)>,
+) {
+    let alpha = 1.0 - (-18.0 * time.delta_secs()).exp();
+    for (entity, mut transform, target) in &mut entities {
+        transform.translation = transform.translation.lerp(target.translation, alpha);
+        transform.rotation = transform.rotation.slerp(target.rotation, alpha);
+        transform.scale = transform.scale.lerp(target.scale, alpha);
+        if transform.translation.distance_squared(target.translation) < 0.0001
+            && transform.rotation.angle_between(target.rotation) < 0.001
+        {
+            transform.translation = target.translation;
+            transform.rotation = target.rotation;
+            transform.scale = target.scale;
+            commands.entity(entity).try_remove::<NetworkInterpolation>();
         }
     }
 }
@@ -2167,6 +2965,45 @@ fn truncate_utf8(value: &mut String, max_bytes: usize) {
 mod tests {
     use super::*;
 
+    fn sample_world_snapshot(tick: u64, entity_count: usize) -> OnlineWorldSnapshot {
+        OnlineWorldSnapshot {
+            protocol: RTS_ONLINE_PROTOCOL,
+            tick,
+            entities: (0..entity_count)
+                .map(|index| OnlineEntitySnapshot {
+                    id: index as u64 + 1,
+                    kind: OnlineEntityKind::Unit {
+                        id: "HeavyAssaultVehicle".to_string(),
+                    },
+                    team: OnlineEntityTeam::Player(index % 8),
+                    translation: [index as f32, 0.5, index as f32 * 0.25],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.0; 3],
+                    health: Some([75.0, 100.0]),
+                    visual_faction: Some(OnlineFaction::Alliance),
+                    cargo: None,
+                    construction: None,
+                    veterancy: Some((2, 12)),
+                })
+                .collect(),
+            economies: (0..8)
+                .map(|_| OnlineEconomySnapshot {
+                    ore: 999,
+                    crystal: 333,
+                    power_used: 70,
+                    power_capacity: 100,
+                    power_sabotage_remaining: 0.0,
+                    production_veterancy_ranks: vec![3; 3],
+                })
+                .collect(),
+            match_state: OnlineMatchStateSnapshot {
+                start_time_sec: 600.0,
+                remaining_teams: 8,
+                remaining_anchors: 8,
+            },
+        }
+    }
+
     #[test]
     fn network_entity_namespaces_never_overlap() {
         let dynamic = NetworkEntityId::dynamic(u32::MAX);
@@ -2177,6 +3014,49 @@ mod tests {
         assert_ne!(dynamic, resource);
         assert_ne!(resource, crate_id);
         assert_ne!(resource, next_resource);
+    }
+
+    #[test]
+    fn world_snapshot_rejects_stale_and_wrong_protocol_packets() {
+        let mut replication = OnlineMatchReplication {
+            last_applied_tick: 10,
+            ..default()
+        };
+        assert!(!queue_online_world_snapshot(
+            &mut replication,
+            sample_world_snapshot(10, 1)
+        ));
+        assert!(queue_online_world_snapshot(
+            &mut replication,
+            sample_world_snapshot(12, 1)
+        ));
+        assert!(!queue_online_world_snapshot(
+            &mut replication,
+            sample_world_snapshot(11, 1)
+        ));
+        let mut wrong_protocol = sample_world_snapshot(13, 1);
+        wrong_protocol.protocol += 1;
+        assert!(!queue_online_world_snapshot(
+            &mut replication,
+            wrong_protocol
+        ));
+        assert_eq!(replication.pending_snapshot.unwrap().tick, 12);
+    }
+
+    #[test]
+    fn large_eight_player_snapshot_fits_unreliable_channel() {
+        let snapshot = sample_world_snapshot(42, 512);
+        let encoded = postcard::to_allocvec(&snapshot).unwrap();
+        assert!(
+            encoded.len() <= MAX_SNAPSHOT_PACKET_BYTES,
+            "{} byte snapshot exceeds {} byte channel limit",
+            encoded.len(),
+            MAX_SNAPSHOT_PACKET_BYTES
+        );
+        assert_eq!(
+            postcard::from_bytes::<OnlineWorldSnapshot>(&encoded).unwrap(),
+            snapshot
+        );
     }
 
     #[test]

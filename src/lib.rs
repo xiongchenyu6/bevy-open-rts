@@ -2967,16 +2967,20 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .run_if(match_in_progress),
             update_support_cooldowns
                 .in_set(SimulationPhase::UiAndManagement)
-                .run_if(match_in_progress),
+                .run_if(match_in_progress)
+                .run_if(online_match_is_authoritative),
             economy_tick
                 .in_set(SimulationPhase::UiAndManagement)
-                .run_if(match_in_progress),
+                .run_if(match_in_progress)
+                .run_if(online_match_is_authoritative),
             ai_director
                 .in_set(SimulationPhase::UiAndManagement)
-                .run_if(match_in_progress),
+                .run_if(match_in_progress)
+                .run_if(online_match_is_authoritative),
             auto_assign_ai_construction_workers
                 .in_set(SimulationPhase::UiAndManagement)
-                .run_if(match_in_progress),
+                .run_if(match_in_progress)
+                .run_if(online_match_is_authoritative),
         ),
     );
     app.add_systems(
@@ -2984,10 +2988,12 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
         (
             auto_assign_idle_resource_collectors
                 .in_set(SimulationPhase::UiAndManagement)
-                .run_if(match_in_progress),
+                .run_if(match_in_progress)
+                .run_if(online_match_is_authoritative),
             auto_assign_ai_supply_crate_collectors
                 .in_set(SimulationPhase::UiAndManagement)
-                .run_if(match_in_progress),
+                .run_if(match_in_progress)
+                .run_if(online_match_is_authoritative),
         ),
     )
     .add_systems(
@@ -3018,7 +3024,8 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
         Update,
         update_ai_drone_scouting
             .in_set(SimulationPhase::UiAndManagement)
-            .run_if(match_in_progress),
+            .run_if(match_in_progress)
+            .run_if(online_match_is_authoritative),
     )
     .add_systems(
         Update,
@@ -3038,26 +3045,31 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
         restore_ai_attack_wave_orders
             .after(ai_director)
             .in_set(SimulationPhase::UiAndManagement)
-            .run_if(match_in_progress),
+            .run_if(match_in_progress)
+            .run_if(online_match_is_authoritative),
     )
     .add_systems(
         Update,
         update_ai_tech_bunker_garrisons
             .in_set(SimulationPhase::UiAndManagement)
-            .run_if(match_in_progress),
+            .run_if(match_in_progress)
+            .run_if(online_match_is_authoritative),
     )
     .add_systems(
         Update,
         update_rally_point_targets
             .in_set(SimulationPhase::UiAndManagement)
-            .run_if(match_in_progress),
+            .run_if(match_in_progress)
+            .run_if(online_match_is_authoritative),
     )
     .add_systems(
         Update,
         (
             monitor_low_power_audio_feedback.run_if(match_in_progress),
             play_pending_audio_feedback,
-            update_match_clock.run_if(match_in_progress),
+            update_match_clock
+                .run_if(match_in_progress)
+                .run_if(online_match_is_authoritative),
         )
             .chain()
             .in_set(SimulationPhase::UiAndManagement),
@@ -3071,6 +3083,14 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             SimulationPhase::PostCombat,
         )
             .chain(),
+    )
+    .configure_sets(
+        Update,
+        SimulationPhase::BuildProcessing.run_if(online_match_is_authoritative),
+    )
+    .configure_sets(
+        Update,
+        SimulationPhase::Combat.run_if(online_match_is_authoritative),
     )
     .add_systems(
         Update,
@@ -3183,8 +3203,12 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
     .add_systems(
         Update,
         (
-            update_support_effects.run_if(match_in_progress),
-            update_repair_and_healing_auras.run_if(match_in_progress),
+            update_support_effects
+                .run_if(match_in_progress)
+                .run_if(online_match_is_authoritative),
+            update_repair_and_healing_auras
+                .run_if(match_in_progress)
+                .run_if(online_match_is_authoritative),
         ),
     )
     .add_systems(
@@ -3193,6 +3217,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             .before(evaluate_match_end)
             .in_set(SimulationPhase::PostCombat)
             .run_if(match_in_progress)
+            .run_if(online_match_is_authoritative)
             .run_if(resource_exists::<AssetServer>),
     )
     .add_systems(
@@ -3200,7 +3225,8 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
         (
             apply_kill_credits
                 .in_set(SimulationPhase::PostCombat)
-                .run_if(match_in_progress),
+                .run_if(match_in_progress)
+                .run_if(online_match_is_authoritative),
             evaluate_match_end
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),

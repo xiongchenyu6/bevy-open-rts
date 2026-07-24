@@ -47,6 +47,8 @@ domains live in modules, each re-exported into the crate root
 - `src/menu.rs` — front menu, options, credits, skirmish lobby + widgets.
 - `src/hud.rs` — in-match HUD: resource bar, minimap, battle log, objectives,
   selection panel, command card + queue, support strip, HudHitZones, RTS cursor.
+- `src/online.rs` — RTS online lobby/session protocol, stable network entity IDs,
+  host-authoritative world snapshots, client reconciliation, and interpolation.
 - `src/economy.rs` — Economies/income/power, harvesting + dropoff, resource nodes,
   supply crates.
 - `src/ai.rs` — difficulty tiers, AI director (economy/training/waves/support),
@@ -99,6 +101,18 @@ domains live in modules, each re-exported into the crate root
 - Lobby team buttons remain an 8-row setup UI concern, but runtime team IDs are stored and derived as unbounded `usize` values. The battle core no longer clamps alliances to three teams or to the current lobby button count.
 - Runtime spawning is not capped to the map's authored spawn-point count. Players beyond the map rows receive clamped virtual fallback base positions instead of being skipped.
 - AI/runtime fallback helpers are not capped to the lobby slot count: active AI iteration, opponent helpers, late-slot resources, cooldowns, fallback home positions, virtual spawn positions, runtime team relation IDs, and battle AI participation are verified beyond eight players.
+- Runtime entities receive stable `NetworkEntityId` components. Dynamic units
+  and structures use the reset-per-match spawn sequence; authored resources and
+  supply crates use disjoint map-index namespaces. Local Bevy `Entity` handles
+  are never serialized.
+- Online matches run the build, economy, AI, combat, death, and victory systems
+  only on the host. At 10 Hz the host broadcasts an unreliable postcard world
+  snapshot; clients reconcile units, structures, resources, crates, economies,
+  and match state by stable ID and interpolate short transform corrections.
+- Full snapshots are bounded by the transport's 64 KiB unreliable-channel
+  limit and covered by an eight-player/512-entity serialization test. Command
+  transport, host ownership validation, and large-battle delta snapshots are
+  the next online-match boundary.
 - `bevy_fluent::FluentPlugin` is registered in the shared game scene so future `.ftl` localization bundles can load through Bevy assets. The existing `Locale` / `t()` path remains the active text source until screens are migrated incrementally.
 - AI drones have an active scouting controller: idle AI `Drone` units pick living enemy units, move to their positions, avoid repeating the previous target when possible, and retarget after a short 0.5-1.0s delay.
 - AI defense profiles follow the godot difficulty targets: Beginner/Easy do not inherit Normal advanced-defense construction, Normal targets one standard defense layer plus 2 Tesla fence segments where the faction supports them, and Hard scales standard defenses to 2 plus 4 Tesla fence segments.

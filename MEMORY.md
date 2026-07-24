@@ -31,6 +31,15 @@
   room discovery/create, code/token join, reconnect-aware player identity,
   exact map-derived slot rows, host-validated lobby options, readiness, and a
   synchronized transition into the existing match setup.
-- This lobby milestone does not yet network the running RTS simulation. The
-  next boundary is stable network entity IDs, validated high-level commands,
-  and host snapshots; clients must not exchange local Bevy `Entity` values.
+- Running online matches now have stable `NetworkEntityId` components and a
+  first host-authoritative replication path. The host alone advances economy,
+  build, AI, combat, death, and victory systems, then broadcasts 10 Hz world
+  snapshots over the unreliable channel. Clients reconcile replicated entities,
+  economies, and match state by stable ID and interpolate transform corrections.
+- Snapshot receivers only accept the negotiated host, current RTS protocol, and
+  monotonically newer ticks. A postcard roundtrip test keeps a representative
+  eight-player/512-entity snapshot under the 64 KiB channel limit.
+- The running match is not yet command-complete: high-level player commands must
+  use network IDs, be validated against the sending player's ownership on the
+  host, and then be applied to the authoritative simulation. Large battles will
+  also need delta/compressed snapshots rather than relying only on full state.
