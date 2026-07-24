@@ -34,9 +34,11 @@ wss://signal.example.com/v1/signal/{game_id}/{protocol_version}/{room_code}
   &ticket={optional_ticket}
 ```
 
-The first connection must be the room host and must present the one-time host
+The first connection must be the room host and must present the host resume
 ticket returned by room creation. Private rooms additionally require their join
-token. A build mismatch is rejected before WebSocket upgrade.
+token. A build mismatch is rejected before WebSocket upgrade. The host keeps
+this ticket for the lifetime of the room so a transient disconnect can resume
+the same room during the configured grace window.
 
 Do not log query strings at the reverse proxy: browser WebSocket APIs cannot set
 an Authorization header, so short-lived connection credentials travel in the
@@ -72,7 +74,7 @@ curl -sS http://127.0.0.1:3536/v1/rooms \
   }'
 ```
 
-The response includes the room descriptor, signaling URL, one-time host ticket,
+The response includes the room descriptor, signaling URL, host resume ticket,
 and a join token only for private rooms.
 
 ### Discover rooms
@@ -95,8 +97,11 @@ WebSocket text frames use `matchbox_protocol::JsonPeerRequest` and
 - `Signal` is relayed only when sender and receiver are currently in the same
   room;
 - peers receive `PeerLeft` on disconnect;
-- host disconnect closes the room because Open Bevy games use a host-authority
-  simulation.
+- host disconnect pauses admission and starts a bounded reconnect grace window;
+  existing peers remain connected to signaling, and a host presenting the same
+  ticket rejoins with a new signaling peer ID;
+- if the grace window expires, the service closes the remaining peer sockets
+  and removes the room.
 
 This makes the server usable by stock `matchbox_socket::WebRtcSocketBuilder`.
 

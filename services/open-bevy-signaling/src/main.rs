@@ -22,6 +22,13 @@ struct Args {
     #[arg(long, env = "OPEN_BEVY_ROOM_TTL_SECS", default_value_t = 900)]
     room_ttl_secs: u64,
 
+    #[arg(
+        long,
+        env = "OPEN_BEVY_HOST_RECONNECT_GRACE_SECS",
+        default_value_t = 30
+    )]
+    host_reconnect_grace_secs: u64,
+
     #[arg(long, env = "OPEN_BEVY_ALLOWED_ORIGINS", default_value = "*")]
     allowed_origins: String,
 
@@ -85,6 +92,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         ice_servers,
         turn_rest,
         room_ttl: Duration::from_secs(args.room_ttl_secs),
+        host_reconnect_grace: Duration::from_secs(args.host_reconnect_grace_secs),
         allowed_origins: args
             .allowed_origins
             .split(',')

@@ -31,7 +31,8 @@ native desktop and browser builds.
 - [ ] Shared native/wasm client transport
   - [x] Reliable and unreliable channels
   - [x] Connection lifecycle and structured errors
-  - [ ] Reconnect/session-resume contract
+  - [x] Signaling-level host reconnect/resume contract
+  - [ ] Game-session identity and state resume
 - [ ] Bevy Open RTS online lobby
   - [ ] Online menu, create room, room code join
   - [ ] Player readiness, slot/faction/team/color synchronization

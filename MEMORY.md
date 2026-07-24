@@ -23,3 +23,7 @@
 - A real native WebRTC integration test starts the custom server, creates a room
   through `RoomServiceClient`, connects two stock Matchbox sockets with host ICE
   candidates, and verifies both reliable and unreliable payload delivery.
+- The signaling service keeps the host ticket valid and preserves connected
+  players for a configurable 30-second host reconnect window. A resumed host
+  receives a new Matchbox peer ID, so game-level identity must use its own
+  stable session key rather than treating `PeerId` as player identity.

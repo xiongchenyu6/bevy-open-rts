@@ -17,6 +17,7 @@ type ClientSocket = WebSocketStream<MaybeTlsStream<tokio::net::TcpStream>>;
 
 struct TestServer {
     http_base: String,
+    state: AppState,
     task: JoinHandle<()>,
 }
 
@@ -27,18 +28,27 @@ impl Drop for TestServer {
 }
 
 async fn spawn_server() -> TestServer {
+    spawn_server_with_grace(Duration::from_secs(30)).await
+}
+
+async fn spawn_server_with_grace(host_reconnect_grace: Duration) -> TestServer {
     let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let address = listener.local_addr().unwrap();
     let state = AppState::new(ServerConfig {
         public_websocket_base_url: format!("ws://{address}"),
         room_ttl: Duration::from_secs(60),
+        host_reconnect_grace,
         ..ServerConfig::default()
     });
+    let server_state = state.clone();
     let task = tokio::spawn(async move {
-        axum::serve(listener, build_router(state)).await.unwrap();
+        axum::serve(listener, build_router(server_state))
+            .await
+            .unwrap();
     });
     TestServer {
         http_base: format!("http://{address}"),
+        state,
         task,
     }
 }
@@ -152,6 +162,91 @@ async fn relays_matchbox_signals_and_reports_disconnects() {
         receive_event(&mut host).await,
         JsonPeerEvent::PeerLeft(player_id)
     );
+}
+
+#[tokio::test]
+async fn host_can_resume_with_the_same_ticket_without_dropping_players() {
+    let server = spawn_server().await;
+    let room = create_room(&server, RoomVisibility::Public, 4).await;
+    let mut host = connect_host(&room, "Host").await;
+    let first_host_id = assigned_id(&mut host).await;
+    let mut player = connect_player(&room, "Player").await.unwrap();
+    let player_id = assigned_id(&mut player).await;
+    assert_eq!(
+        receive_event(&mut host).await,
+        JsonPeerEvent::NewPeer(player_id)
+    );
+
+    host.close(None).await.unwrap();
+    assert_eq!(
+        receive_event(&mut player).await,
+        JsonPeerEvent::PeerLeft(first_host_id)
+    );
+
+    let mut resumed_host = connect_host(&room, "Host").await;
+    let resumed_host_id = assigned_id(&mut resumed_host).await;
+    assert_ne!(resumed_host_id, first_host_id);
+    assert_eq!(
+        receive_event(&mut player).await,
+        JsonPeerEvent::NewPeer(resumed_host_id)
+    );
+
+    let offer = json!({"Sdp": {"type": "offer", "sdp": "resumed-host"}});
+    resumed_host
+        .send(Message::Text(
+            JsonPeerRequest::Signal {
+                receiver: player_id,
+                data: offer.clone(),
+            }
+            .to_string()
+            .into(),
+        ))
+        .await
+        .unwrap();
+    assert_eq!(
+        receive_event(&mut player).await,
+        JsonPeerEvent::Signal {
+            sender: resumed_host_id,
+            data: offer,
+        }
+    );
+}
+
+#[tokio::test]
+async fn host_reconnect_timeout_closes_stranded_players_and_removes_room() {
+    let server = spawn_server_with_grace(Duration::from_millis(20)).await;
+    let room = create_room(&server, RoomVisibility::Public, 4).await;
+    let mut host = connect_host(&room, "Host").await;
+    let host_id = assigned_id(&mut host).await;
+    let mut player = connect_player(&room, "Player").await.unwrap();
+    let player_id = assigned_id(&mut player).await;
+    assert_eq!(
+        receive_event(&mut host).await,
+        JsonPeerEvent::NewPeer(player_id)
+    );
+
+    host.close(None).await.unwrap();
+    assert_eq!(
+        receive_event(&mut player).await,
+        JsonPeerEvent::PeerLeft(host_id)
+    );
+    tokio::time::sleep(Duration::from_millis(30)).await;
+    assert_eq!(server.state.remove_expired_rooms().await, 1);
+
+    let close = timeout(Duration::from_secs(2), player.next())
+        .await
+        .expect("timed out waiting for reconnect-expiry close")
+        .expect("player stream ended before close frame")
+        .expect("player websocket read failed");
+    assert!(matches!(close, Message::Close(_)));
+
+    let response = reqwest::get(format!(
+        "{}/v1/rooms/integration-game/{SESSION_PROTOCOL_VERSION}/{}",
+        server.http_base, room.room.room_code
+    ))
+    .await
+    .unwrap();
+    assert_eq!(response.status(), reqwest::StatusCode::NOT_FOUND);
 }
 
 #[tokio::test]

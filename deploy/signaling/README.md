@@ -15,5 +15,9 @@
 
 5. Confirm `/v1/config` returns both STUN and time-limited TURN entries.
 
+`HOST_RECONNECT_GRACE_SECS` controls how long an existing room remains alive
+after its host loses signaling. The default 30 seconds lets the same host resume
+with its original host ticket while connected players stay in the room.
+
 The Caddy access log redacts request URIs so host/join tickets are not written to
 disk. Keep that behavior when replacing Caddy with another edge proxy.

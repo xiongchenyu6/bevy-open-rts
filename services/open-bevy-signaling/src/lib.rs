@@ -48,6 +48,7 @@ pub struct ServerConfig {
     pub ice_servers: Vec<IceServer>,
     pub turn_rest: Option<TurnRestConfig>,
     pub room_ttl: Duration,
+    pub host_reconnect_grace: Duration,
     pub allowed_origins: Vec<String>,
 }
 
@@ -69,6 +70,7 @@ impl Default for ServerConfig {
             }],
             turn_rest: None,
             room_ttl: Duration::from_secs(15 * 60),
+            host_reconnect_grace: Duration::from_secs(30),
             allowed_origins: vec!["*".to_string()],
         }
     }
@@ -227,9 +229,30 @@ impl AppState {
     pub async fn remove_expired_rooms(&self) -> usize {
         let now = unix_time_ms();
         let mut rooms = self.inner.rooms.write().await;
-        let before = rooms.len();
-        rooms.retain(|_, room| !room.peers.is_empty() || room.expires_at_unix_ms > now);
-        before.saturating_sub(rooms.len())
+        let expired = rooms
+            .iter()
+            .filter(|(_, room)| room.host_peer.is_none() && room.expires_at_unix_ms <= now)
+            .map(|(key, _)| key.clone())
+            .collect::<Vec<_>>();
+        let mut stranded_peers = Vec::new();
+        for key in &expired {
+            if let Some(room) = rooms.remove(key) {
+                stranded_peers.extend(room.peers.into_values().map(|peer| peer.outbound));
+            }
+        }
+        drop(rooms);
+
+        self.inner
+            .metrics
+            .active_connections
+            .fetch_sub(stranded_peers.len() as u64, Ordering::Relaxed);
+        for peer in stranded_peers {
+            let _ = peer.send(OutboundMessage::Close {
+                code: CLOSE_SERVER_ERROR,
+                reason: "room host reconnect window expired".to_string(),
+            });
+        }
+        expired.len()
     }
 
     async fn create_room(
@@ -331,7 +354,6 @@ impl AppState {
             .map(|peer| peer.outbound.clone())
             .collect();
         if query.role == PeerRole::Host {
-            room.host_ticket = None;
             room.host_peer = Some(peer_id);
         }
         room.last_activity_unix_ms = unix_time_ms();
@@ -399,7 +421,7 @@ impl AppState {
     }
 
     async fn disconnect_peer(&self, key: &RoomKey, peer_id: PeerId) {
-        let (remaining, close_room, peer_label) = {
+        let (remaining, was_host, peer_label) = {
             let mut rooms = self.inner.rooms.write().await;
             let Some(room) = rooms.get_mut(key) else {
                 return;
@@ -408,40 +430,34 @@ impl AppState {
             let Some(removed) = removed else {
                 return;
             };
-            let close_room = room.host_peer == Some(peer_id);
+            let was_host = room.host_peer == Some(peer_id);
             let peer_label = format!("{} ({:?})", removed.name, removed.role);
             let remaining = room
                 .peers
                 .values()
                 .map(|peer| peer.outbound.clone())
                 .collect::<Vec<_>>();
-            if close_room || room.peers.is_empty() {
-                rooms.remove(key);
+            let now = unix_time_ms();
+            room.last_activity_unix_ms = now;
+            if was_host {
+                room.host_peer = None;
+                room.expires_at_unix_ms =
+                    now.saturating_add(self.inner.config.host_reconnect_grace.as_millis() as u64);
             } else {
-                room.last_activity_unix_ms = unix_time_ms();
+                room.expires_at_unix_ms =
+                    now.saturating_add(self.inner.config.room_ttl.as_millis() as u64);
             }
-            (remaining, close_room, peer_label)
+            (remaining, was_host, peer_label)
         };
 
-        let disconnected_count = if close_room {
-            remaining.len().saturating_add(1)
-        } else {
-            1
-        };
         self.inner
             .metrics
             .active_connections
-            .fetch_sub(disconnected_count as u64, Ordering::Relaxed);
+            .fetch_sub(1, Ordering::Relaxed);
         for peer in remaining {
             let _ = peer.send(OutboundMessage::Event(JsonPeerEvent::PeerLeft(peer_id)));
-            if close_room {
-                let _ = peer.send(OutboundMessage::Close {
-                    code: CLOSE_SERVER_ERROR,
-                    reason: "room host disconnected".to_string(),
-                });
-            }
         }
-        info!(%peer_id, peer = %peer_label, host = close_room, "peer disconnected");
+        info!(%peer_id, peer = %peer_label, host = was_host, "peer disconnected");
     }
 }
 
@@ -493,7 +509,7 @@ fn authorize_room_connection(room: &Room, query: &ValidatedSignalQuery) -> Resul
             if room.host_ticket.as_deref() != query.ticket.as_deref() {
                 return Err(ApiError::forbidden(
                     "invalid_host_ticket",
-                    "a valid one-time host ticket is required",
+                    "a valid host resume ticket is required",
                 ));
             }
         }
