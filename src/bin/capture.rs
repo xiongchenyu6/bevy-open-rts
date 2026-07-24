@@ -38,7 +38,7 @@ use bevy_open_rts::{
     capture_model_harness_page_count, capture_mouse_button, capture_nearest_enemy_anchor_position,
     capture_nearest_visible_resource_click_position_to, capture_nearest_visible_resource_position,
     capture_onscreen_resource_model_center, capture_placement_is_valid,
-    capture_player_army_unit_count, capture_player_attack_move_all, capture_player_build_queue_len,
+    capture_player_army_unit_count, capture_player_build_queue_len,
     capture_player_combat_order_count, capture_player_command_center,
     capture_player_completed_structure_count, capture_player_completed_structure_position,
     capture_player_constructing_count, capture_player_harvesting_count,
@@ -1688,12 +1688,38 @@ fn render_resources_closeup(path: &Path) -> Result<(), String> {
 fn render_frames(dir: &Path, count: usize) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
     let mut app = start_match_app();
-    // Give the camera real action to film: send the player army at the enemy
-    // base instead of waiting out the AI's opening grace.
-    capture_player_attack_move_all(&mut app);
+    capture_dismiss_match_briefing(&mut app);
+
+    // Exercise the same selection and command-card input path as a player. The
+    // selected unit receives repeated Scatter commands for the full clip,
+    // which makes a frozen or input-broken capture fail instead of producing a
+    // plausible still.
+    select_all_player_army(&mut app);
+    for _ in 0..4 {
+        app.update();
+    }
+    let origin = capture_selected_player_unit_average_position(&mut app)
+        .ok_or("capture frames could not select a player army unit")?;
+    capture_focus_camera_on(&mut app, origin);
+    for _ in 0..12 {
+        app.update();
+    }
+    let command_interval = (count / 5).max(1);
+    let mut max_displacement = 0.0_f32;
     let handle = capture_handle(&app);
     for i in 0..count {
+        if i % command_interval == 0 {
+            tap_key(&mut app, KeyCode::KeyX);
+        }
+        if i % 3 == 0
+            && let Some(position) = capture_selected_player_unit_average_position(&mut app)
+        {
+            capture_focus_camera_on(&mut app, position);
+        }
         app.update();
+        if let Some(position) = capture_selected_player_unit_average_position(&mut app) {
+            max_displacement = max_displacement.max(position.distance(origin));
+        }
         let path = dir.join(format!("frame{i:05}.png"));
         app.world_mut()
             .spawn(Screenshot::image(handle.clone()))
@@ -1701,6 +1727,11 @@ fn render_frames(dir: &Path, count: usize) -> Result<(), String> {
     }
     for _ in 0..FLUSH_TICKS {
         app.update();
+    }
+    if max_displacement < 2.0 {
+        return Err(format!(
+            "capture unit only moved {max_displacement:.2}m across real ground orders"
+        ));
     }
     println!("[capture] wrote {count} frames to {}", dir.display());
     Ok(())
