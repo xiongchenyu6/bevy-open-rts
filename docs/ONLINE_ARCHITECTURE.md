@@ -221,3 +221,11 @@ must name the same room, see two connected humans, exchange authoritative
 snapshots and a reliable unit order, and finish with host victory/player defeat.
 The first terminal report is immutable so normal peer shutdown cannot overwrite
 the proven terminal player count.
+
+The two-browser CI gate sets `OPEN_BEVY_FORCE_RELAY=1`. Before the game loads,
+Playwright wraps `RTCPeerConnection` with `iceTransportPolicy: "relay"`; after
+the authoritative match ends it reads the selected candidate pair from
+`getStats()`. Both clients must have a succeeded, bidirectionally active pair
+whose local candidate type is `relay`. This proves that authenticated Coturn
+allocation and real game traffic work over the public Internet; merely finding
+TURN credentials in `/v1/config` is not accepted as transport proof.

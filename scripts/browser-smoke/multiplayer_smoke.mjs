@@ -15,6 +15,7 @@ const softwareWebGpu = process.env.OPEN_BEVY_SOFTWARE_WEBGPU === "1";
 const runId = process.env.OPEN_BEVY_ONLINE_VERIFY_RUN
   ?? `browser-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
 const timeoutMs = Number(process.env.OPEN_BEVY_MULTIPLAYER_TIMEOUT_MS ?? 180_000);
+const forceRelay = process.env.OPEN_BEVY_FORCE_RELAY === "1";
 const roles = (process.env.OPEN_BEVY_BROWSER_ROLES ?? "host,player")
   .split(",")
   .map((role) => role.trim().toLowerCase())
@@ -100,6 +101,88 @@ function collectDiagnostics(page, role) {
     );
   });
   return diagnostics;
+}
+
+async function installRelayProbe(context) {
+  await context.addInitScript(() => {
+    const peerConnections = [];
+    Object.defineProperty(window, "__openBevyPeerConnections", {
+      value: peerConnections,
+      configurable: false,
+      enumerable: false,
+      writable: false,
+    });
+
+    const NativePeerConnection = window.RTCPeerConnection;
+    if (!NativePeerConnection) return;
+    function RelayPeerConnection(configuration, constraints) {
+      const relayConfiguration = {
+        ...(configuration ?? {}),
+        iceTransportPolicy: "relay",
+      };
+      const peerConnection = new NativePeerConnection(relayConfiguration, constraints);
+      peerConnections.push(peerConnection);
+      return peerConnection;
+    }
+    RelayPeerConnection.prototype = NativePeerConnection.prototype;
+    Object.setPrototypeOf(RelayPeerConnection, NativePeerConnection);
+    Object.defineProperty(window, "RTCPeerConnection", {
+      value: RelayPeerConnection,
+      configurable: true,
+      writable: true,
+    });
+  });
+}
+
+async function collectIceRoutes(page) {
+  return page.evaluate(async () => {
+    const peerConnections = window.__openBevyPeerConnections ?? [];
+    return Promise.all(peerConnections.map(async (peerConnection, index) => {
+      try {
+        const stats = await peerConnection.getStats();
+        const reports = new Map();
+        stats.forEach((report) => reports.set(report.id, report));
+        const transport = [...reports.values()].find((report) =>
+          report.type === "transport" && report.selectedCandidatePairId
+        );
+        const selectedPair = transport
+          ? reports.get(transport.selectedCandidatePairId)
+          : [...reports.values()].find((report) =>
+            report.type === "candidate-pair"
+              && report.state === "succeeded"
+              && (report.nominated === true || report.selected === true)
+          );
+        const localCandidate = selectedPair
+          ? reports.get(selectedPair.localCandidateId)
+          : undefined;
+        const remoteCandidate = selectedPair
+          ? reports.get(selectedPair.remoteCandidateId)
+          : undefined;
+        return {
+          index,
+          connectionState: peerConnection.connectionState,
+          iceConnectionState: peerConnection.iceConnectionState,
+          pairId: selectedPair?.id ?? null,
+          pairState: selectedPair?.state ?? null,
+          nominated: selectedPair?.nominated ?? false,
+          bytesSent: selectedPair?.bytesSent ?? 0,
+          bytesReceived: selectedPair?.bytesReceived ?? 0,
+          localCandidateType: localCandidate?.candidateType ?? null,
+          localProtocol: localCandidate?.protocol ?? null,
+          localRelayProtocol: localCandidate?.relayProtocol ?? null,
+          remoteCandidateType: remoteCandidate?.candidateType ?? null,
+          remoteProtocol: remoteCandidate?.protocol ?? null,
+        };
+      } catch (error) {
+        return {
+          index,
+          connectionState: peerConnection.connectionState,
+          iceConnectionState: peerConnection.iceConnectionState,
+          error: String(error),
+        };
+      }
+    }));
+  });
 }
 
 async function bootVerificationClient(page, role) {
@@ -189,6 +272,9 @@ try {
   // compatibility harness while the other peer runs as a desktop binary.
   const clients = await Promise.all(roles.map(async (role, index) => {
     const context = await browsers[index].newContext({ viewport: { width: 640, height: 360 } });
+    if (forceRelay) {
+      await installRelayProbe(context);
+    }
     const page = await context.newPage();
     return {
       role,
@@ -208,6 +294,11 @@ try {
   ]));
   const startups = Object.fromEntries(startupEntries);
   const reports = Object.fromEntries(reportEntries);
+  const iceRouteEntries = await Promise.all(clients.map(async (client) => [
+    client.role,
+    await collectIceRoutes(client.page),
+  ]));
+  const iceRoutes = Object.fromEntries(iceRouteEntries);
   const diagnostics = clients.flatMap((client) => client.diagnostics);
   const fatalDiagnostics = diagnostics.filter((message) =>
     /pageerror|requestfailed|boot failed|panicked at|RuntimeError/i.test(message),
@@ -224,8 +315,18 @@ try {
       && (role !== "player" || (report.command_sent === true && report.result === "defeat"));
   });
   const roomCodes = new Set(roles.map((role) => reports[role].room_code));
+  const relayRoutesPassed = !forceRelay || roles.every((role) => {
+    const routes = iceRoutes[role];
+    return routes.length > 0 && routes.every((route) =>
+      route.pairState === "succeeded"
+        && route.bytesSent > 0
+        && route.bytesReceived > 0
+        && route.localCandidateType === "relay"
+    );
+  });
   const passed = browserReportsPassed
     && roomCodes.size === 1
+    && relayRoutesPassed
     && fatalDiagnostics.length === 0;
 
   // Publish the functional result before optional visual evidence so a slow
@@ -247,9 +348,11 @@ try {
     signalingUrl,
     executablePath,
     softwareWebGpu,
+    forceRelay,
     expectedHumans,
     startups,
     reports,
+    iceRoutes,
     hostStartup: startups.host,
     playerStartup: startups.player,
     host: reports.host,

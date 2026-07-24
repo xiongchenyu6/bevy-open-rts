@@ -88,6 +88,20 @@ compressed Open Bevy snapshot-envelope round trip. With
 `OPEN_BEVY_REQUIRE_TURN=1`, it also rejects a deployment that does not issue
 TURN REST credentials.
 
+Credential issuance is only the control-plane check. To force real browser game
+traffic through Coturn and inspect the selected ICE pair, run:
+
+```sh
+OPEN_BEVY_GAME_URL="https://games.example.com/open-bevy-rts/" \
+OPEN_BEVY_SIGNALING_URL="https://${SIGNALING_HOST}" \
+OPEN_BEVY_FORCE_RELAY=1 \
+npm --prefix scripts/browser-smoke run multiplayer
+```
+
+The command completes a host-authoritative match and fails unless both browsers
+select a succeeded local `relay` candidate with non-zero sent and received
+bytes. The Pages release workflow runs this forced-relay gate automatically.
+
 ## Publish A Game Client
 
 The endpoint is public configuration, not a secret. Set it once on each Open

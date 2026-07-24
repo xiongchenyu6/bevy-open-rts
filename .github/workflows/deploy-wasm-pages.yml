@@ -143,6 +143,9 @@ jobs:
           OPEN_BEVY_GAME_URL: http://127.0.0.1:8080/
           OPEN_BEVY_BROWSER_OUTPUT: ${{ github.workspace }}/browser-smoke-output/multiplayer
           OPEN_BEVY_SOFTWARE_WEBGPU: "1"
+          # Force both peers onto authenticated TURN candidates and verify the
+          # selected ICE pair through browser WebRTC stats.
+          OPEN_BEVY_FORCE_RELAY: "1"
           OPEN_BEVY_MULTIPLAYER_TIMEOUT_MS: "180000"
         run: |
           set -euo pipefail

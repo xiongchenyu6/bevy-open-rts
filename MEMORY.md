@@ -122,3 +122,11 @@
   path can transiently expose the unsupported/loading fallback; match failures
   are never retried. Terminal reports are frozen on first publication so peer
   shutdown cannot rewrite the player count after successful completion.
+- TURN is verified at the selected-route level, not inferred from configuration.
+  Playwright can force `iceTransportPolicy: relay`, retain the actual browser
+  peer connections, and inspect their selected candidate pairs after the match.
+  Run `browser-1784925977685-56195672` completed room `937CFB2A` with host/player
+  snapshot ticks 10/11 and complementary results. Both selected pairs were
+  `relay` to `relay` over UDP; each side reported the same 6,652/2,873 bytes in
+  opposite sent/received directions. The Pages workflow now requires this
+  forced-relay full-match gate on every release.

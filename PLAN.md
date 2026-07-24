@@ -62,7 +62,7 @@ native desktop and browser builds.
   - [x] Two native clients
   - [x] Two browser clients
   - [x] Native-to-browser client
-  - [ ] Internet path through TURN
+  - [x] Internet path through TURN
   - [x] Deployment and operational runbook
 
 ## Verification Gates
