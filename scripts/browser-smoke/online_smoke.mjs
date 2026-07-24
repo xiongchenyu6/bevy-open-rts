@@ -1,12 +1,16 @@
 import { existsSync, mkdirSync } from "node:fs";
+import { resolve } from "node:path";
 import { chromium } from "playwright-core";
 
 const gameUrl = process.env.OPEN_BEVY_GAME_URL
   ?? "https://xiongchenyu6.github.io/bevy-open-rts/";
 const signalingUrl = process.env.OPEN_BEVY_SIGNALING_URL
   ?? "https://signal.101.78.126.6.sslip.io";
-const outputDir = process.env.OPEN_BEVY_BROWSER_OUTPUT
-  ?? "/tmp/open-bevy-browser-smoke";
+const outputDir = resolve(
+  process.env.GITHUB_WORKSPACE ?? process.cwd(),
+  process.env.OPEN_BEVY_BROWSER_OUTPUT
+    ?? "/tmp/open-bevy-browser-smoke",
+);
 const softwareWebGpu = process.env.OPEN_BEVY_SOFTWARE_WEBGPU === "1";
 const chromeCandidates = [
   process.env.CHROME_BIN,

@@ -1,12 +1,16 @@
 import { existsSync, mkdirSync } from "node:fs";
+import { resolve } from "node:path";
 import { chromium } from "playwright-core";
 
 const gameUrl = process.env.OPEN_BEVY_GAME_URL
   ?? "https://xiongchenyu6.github.io/bevy-open-rts/";
 const signalingUrl = process.env.OPEN_BEVY_SIGNALING_URL
   ?? "https://signal.101.78.126.6.sslip.io";
-const outputDir = process.env.OPEN_BEVY_BROWSER_OUTPUT
-  ?? "/tmp/open-bevy-multiplayer-smoke";
+const outputDir = resolve(
+  process.env.GITHUB_WORKSPACE ?? process.cwd(),
+  process.env.OPEN_BEVY_BROWSER_OUTPUT
+    ?? "/tmp/open-bevy-multiplayer-smoke",
+);
 const softwareWebGpu = process.env.OPEN_BEVY_SOFTWARE_WEBGPU === "1";
 const runId = process.env.OPEN_BEVY_ONLINE_VERIFY_RUN
   ?? `browser-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
@@ -33,8 +37,16 @@ function verificationUrl(role) {
 }
 
 function browserArgs() {
+  const schedulingArgs = [
+    "--disable-background-timer-throttling",
+    "--disable-backgrounding-occluded-windows",
+    "--disable-renderer-backgrounding",
+    "--disable-ipc-flooding-protection",
+    "--disable-features=CalculateNativeWinOcclusion",
+  ];
   if (softwareWebGpu) {
     return [
+      ...schedulingArgs,
       "--enable-unsafe-webgpu",
       "--enable-unsafe-swiftshader",
       "--ignore-gpu-blocklist",
@@ -46,6 +58,7 @@ function browserArgs() {
     ];
   }
   return [
+    ...schedulingArgs,
     "--enable-unsafe-webgpu",
     "--ignore-gpu-blocklist",
     "--enable-features=Vulkan,UseSkiaRenderer,WebGPU",
@@ -122,15 +135,22 @@ async function waitForTerminalReport(page, role) {
 
 mkdirSync(outputDir, { recursive: true });
 
-const browser = await chromium.launch({
+const browserOptions = {
   executablePath,
   headless: true,
   args: browserArgs(),
-});
+};
+const [hostBrowser, playerBrowser] = await Promise.all([
+  chromium.launch(browserOptions),
+  chromium.launch(browserOptions),
+]);
 
 try {
-  const hostContext = await browser.newContext({ viewport: { width: 1280, height: 800 } });
-  const playerContext = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  // Two separate browser processes prevent headless Chrome from treating either
+  // real-time simulation as a background tab and reducing requestAnimationFrame
+  // to a handful of ticks per minute.
+  const hostContext = await hostBrowser.newContext({ viewport: { width: 1280, height: 800 } });
+  const playerContext = await playerBrowser.newContext({ viewport: { width: 1280, height: 800 } });
   const hostPage = await hostContext.newPage();
   const playerPage = await playerContext.newPage();
   const hostDiagnostics = collectDiagnostics(hostPage, "host");
@@ -193,5 +213,5 @@ try {
     process.exitCode = 1;
   }
 } finally {
-  await browser.close();
+  await Promise.allSettled([hostBrowser.close(), playerBrowser.close()]);
 }
