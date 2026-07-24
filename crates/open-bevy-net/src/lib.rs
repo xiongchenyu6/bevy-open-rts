@@ -10,11 +10,11 @@ use matchbox_socket::{
 pub use matchbox_socket::{MessageLoopFuture, PeerId};
 use open_bevy_protocol::{
     BuildId, CreateRoomRequest, CreateRoomResponse, ErrorResponse, GameId, IceServer, PeerRole,
-    PlayerName, RoomCode, RoomDescriptor, RoomListResponse, SESSION_PROTOCOL_VERSION,
-    ServiceConfigResponse, signaling_path,
+    PlayerName, RoomCode, RoomDescriptor, RoomListResponse, RoomVisibility,
+    SESSION_PROTOCOL_VERSION, ServiceConfigResponse, ValidationError, signaling_path,
 };
 use serde::de::DeserializeOwned;
-use std::time::Duration;
+use std::{collections::BTreeMap, time::Duration};
 use url::Url;
 
 pub const RELIABLE_CHANNEL: usize = 0;
@@ -48,6 +48,8 @@ pub enum ClientError {
     InvalidHttpScheme,
     #[error("signaling URL must use ws:// or wss://")]
     InvalidWebSocketScheme,
+    #[error("invalid Open Bevy room configuration: {0}")]
+    InvalidRoomConfiguration(#[from] ValidationError),
     #[error("WebRTC channel is unavailable: {0}")]
     Channel(String),
     #[error("WebRTC transport is closed")]
@@ -228,6 +230,103 @@ impl RoomServiceClient {
     }
 }
 
+/// A game-scoped client for the universal Open Bevy room service.
+///
+/// Each game chooses a stable [`GameId`], its own non-zero packet protocol,
+/// and a build identifier. Keeping those values together prevents discovery or
+/// joins from accidentally crossing game/protocol namespaces.
+#[derive(Debug, Clone)]
+pub struct OpenBevyGameClient {
+    service: RoomServiceClient,
+    game_id: GameId,
+    build_id: BuildId,
+    game_protocol: u16,
+}
+
+impl OpenBevyGameClient {
+    pub fn new(
+        service_url: impl Into<String>,
+        game_id: GameId,
+        build_id: BuildId,
+        game_protocol: u16,
+    ) -> Result<Self, ClientError> {
+        Self::from_service(
+            RoomServiceClient::new(service_url)?,
+            game_id,
+            build_id,
+            game_protocol,
+        )
+    }
+
+    pub fn from_service(
+        service: RoomServiceClient,
+        game_id: GameId,
+        build_id: BuildId,
+        game_protocol: u16,
+    ) -> Result<Self, ClientError> {
+        if game_protocol == 0 {
+            return Err(ValidationError::InvalidGameProtocol.into());
+        }
+        Ok(Self {
+            service,
+            game_id,
+            build_id,
+            game_protocol,
+        })
+    }
+
+    pub fn service(&self) -> &RoomServiceClient {
+        &self.service
+    }
+
+    pub fn game_id(&self) -> &GameId {
+        &self.game_id
+    }
+
+    pub fn build_id(&self) -> &BuildId {
+        &self.build_id
+    }
+
+    pub const fn game_protocol(&self) -> u16 {
+        self.game_protocol
+    }
+
+    pub async fn service_config(&self) -> Result<ServiceConfigResponse, ClientError> {
+        self.service.service_config().await
+    }
+
+    pub async fn create_room(
+        &self,
+        max_peers: u16,
+        visibility: RoomVisibility,
+        metadata: BTreeMap<String, String>,
+    ) -> Result<CreateRoomResponse, ClientError> {
+        let request = CreateRoomRequest {
+            game_id: self.game_id.clone(),
+            build_id: self.build_id.clone(),
+            session_protocol: SESSION_PROTOCOL_VERSION,
+            game_protocol: self.game_protocol,
+            max_peers,
+            visibility,
+            metadata,
+        };
+        request.validate()?;
+        self.service.create_room(&request).await
+    }
+
+    pub async fn list_rooms(&self) -> Result<RoomListResponse, ClientError> {
+        self.service
+            .list_rooms(&self.game_id, self.game_protocol)
+            .await
+    }
+
+    pub async fn room(&self, room_code: &RoomCode) -> Result<RoomDescriptor, ClientError> {
+        self.service
+            .room(&self.game_id, self.game_protocol, room_code)
+            .await
+    }
+}
+
 fn decode_response<T>(response: ehttp::Response) -> Result<T, ClientError>
 where
     T: DeserializeOwned,
@@ -281,6 +380,7 @@ impl TransportConfig {
         websocket_base_url: &str,
         room: &RoomDescriptor,
         player_name: PlayerName,
+        build_id: BuildId,
         ticket: Option<String>,
         ice_servers: Vec<IceServer>,
     ) -> Self {
@@ -292,7 +392,7 @@ impl TransportConfig {
             ),
             player_name,
             role: PeerRole::Player,
-            build_id: room.build_id.clone(),
+            build_id,
             ticket,
             ice_servers,
             reconnect_attempts: Some(5),
@@ -303,10 +403,18 @@ impl TransportConfig {
         websocket_base_url: &str,
         room: &RoomDescriptor,
         player_name: PlayerName,
+        build_id: BuildId,
         ticket: Option<String>,
         ice_servers: Vec<IceServer>,
     ) -> Self {
-        let mut config = Self::player(websocket_base_url, room, player_name, ticket, ice_servers);
+        let mut config = Self::player(
+            websocket_base_url,
+            room,
+            player_name,
+            build_id,
+            ticket,
+            ice_servers,
+        );
         config.role = PeerRole::Spectator;
         config
     }
@@ -491,6 +599,33 @@ mod tests {
     use super::*;
 
     #[test]
+    fn game_client_owns_one_validated_namespace() {
+        let client = OpenBevyGameClient::new(
+            "https://signal.example.test",
+            GameId::new("open-bevy-arena").unwrap(),
+            BuildId::new("1.4.0+release").unwrap(),
+            12,
+        )
+        .unwrap();
+        assert_eq!(client.game_id().as_str(), "open-bevy-arena");
+        assert_eq!(client.build_id().as_str(), "1.4.0+release");
+        assert_eq!(client.game_protocol(), 12);
+        assert_eq!(client.service().base_url(), "https://signal.example.test");
+
+        assert!(matches!(
+            OpenBevyGameClient::new(
+                "https://signal.example.test",
+                GameId::new("open-bevy-arena").unwrap(),
+                BuildId::new("1.4.0").unwrap(),
+                0,
+            ),
+            Err(ClientError::InvalidRoomConfiguration(
+                ValidationError::InvalidGameProtocol
+            ))
+        ));
+    }
+
+    #[test]
     fn websocket_query_values_are_percent_encoded() {
         let config = TransportConfig {
             signaling_url: "wss://signal.example.test/v1/signal/game/1/ABC123".to_string(),
@@ -508,6 +643,40 @@ mod tests {
         assert_eq!(pairs["name"], "玩家 One");
         assert_eq!(pairs["ticket"], "secret&other=value");
         assert_eq!(pairs["build_id"], "0.1.0+abc");
+    }
+
+    #[test]
+    fn player_transport_reports_the_local_build_not_the_host_build() {
+        let room = RoomDescriptor {
+            game_id: GameId::new("open-bevy-arena").unwrap(),
+            build_id: BuildId::new("host-build").unwrap(),
+            session_protocol: SESSION_PROTOCOL_VERSION,
+            game_protocol: 5,
+            room_code: RoomCode::new("ABC123").unwrap(),
+            visibility: RoomVisibility::Public,
+            max_peers: 4,
+            peer_count: 1,
+            host_connected: true,
+            created_at_unix_ms: 1,
+            expires_at_unix_ms: 2,
+            metadata: BTreeMap::new(),
+        };
+        let config = TransportConfig::player(
+            "wss://signal.example.test",
+            &room,
+            PlayerName::new("Player").unwrap(),
+            BuildId::new("local-build").unwrap(),
+            None,
+            Vec::new(),
+        );
+        let url = config.websocket_url().unwrap();
+        assert_eq!(
+            url.query_pairs()
+                .find(|(key, _)| key == "build_id")
+                .map(|(_, value)| value.into_owned())
+                .as_deref(),
+            Some("local-build")
+        );
     }
 
     #[test]

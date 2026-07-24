@@ -130,3 +130,16 @@
   `relay` to `relay` over UDP; each side reported the same 6,652/2,873 bytes in
   opposite sent/received directions. The Pages workflow now requires this
   forced-relay full-match gate on every release.
+- `OpenBevyGameClient` is the reusable SDK entry point for another Open Bevy
+  title. It binds one service client to a validated `game_id`, local `build_id`,
+  and non-zero game protocol, then scopes room create/list/get calls so game
+  code cannot accidentally query another namespace. Bevy Open RTS uses this
+  same adapter. Player/spectator transport now requires the caller's local
+  build ID instead of copying the room host's build, restoring the server's
+  pre-upgrade compatibility rejection. The native `universal_room` example and
+  `docs/OPEN_BEVY_GAME_INTEGRATION.md` are the onboarding surface.
+- The SDK onboarding executable was run against production as namespace
+  `(open-bevy-sdk-proof, 1)` with build `0.1.0+sdk`; it resolved the deployed
+  `open-bevy-signaling` service and public WSS endpoint. After migrating RTS to
+  the scoped client, native/browser run `cross-1784926999-637` completed room
+  `94423B34` with snapshot ticks 9/10 and complementary authoritative results.

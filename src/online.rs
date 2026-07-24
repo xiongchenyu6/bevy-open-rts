@@ -13,12 +13,12 @@ use bevy::{
 #[cfg(test)]
 use open_bevy_net::MAX_SNAPSHOT_PACKET_BYTES;
 use open_bevy_net::{
-    ClientError, MessageLoopFuture, PeerId, RoomServiceClient, TransportConfig, TransportEvent,
-    WebRtcTransport, decode_snapshot_payload, encode_snapshot_payload, session_protocol_version,
+    ClientError, MessageLoopFuture, OpenBevyGameClient, PeerId, TransportConfig, TransportEvent,
+    WebRtcTransport, decode_snapshot_payload, encode_snapshot_payload,
 };
 use open_bevy_protocol::{
-    BuildId, CreateRoomRequest, CreateRoomResponse, GameId, PlayerName, RoomCode, RoomDescriptor,
-    RoomListResponse, RoomVisibility, ServiceConfigResponse,
+    BuildId, CreateRoomResponse, GameId, PlayerName, RoomCode, RoomDescriptor, RoomListResponse,
+    RoomVisibility, ServiceConfigResponse,
 };
 use serde::{Deserialize, Serialize};
 use std::{
@@ -2630,7 +2630,7 @@ fn begin_create_room_with_metadata(
     inbox: &OnlineAsyncInbox,
     extra_metadata: BTreeMap<String, String>,
 ) {
-    let Some((client, player_name, build_id)) = validated_online_request(session) else {
+    let Some((client, player_name)) = validated_online_request(session) else {
         return;
     };
     let mut metadata = BTreeMap::from([
@@ -2641,15 +2641,6 @@ fn begin_create_room_with_metadata(
         ("map".to_string(), SKIRMISH_MAPS[0].id.to_string()),
     ]);
     metadata.extend(extra_metadata);
-    let request = CreateRoomRequest {
-        game_id: online_game_id(),
-        build_id,
-        session_protocol: session_protocol_version(),
-        game_protocol: RTS_ONLINE_PROTOCOL,
-        max_peers: MAX_SKIRMISH_LOBBY_SLOTS as u16,
-        visibility: RoomVisibility::Public,
-        metadata,
-    };
     session.phase = OnlinePhase::Connecting;
     session.focused_field = None;
     session.set_status(t("正在创建房间…", "Creating room..."));
@@ -2658,7 +2649,11 @@ fn begin_create_room_with_metadata(
         let result = async {
             let config = client.service_config().await.map_err(client_error_text)?;
             let room = client
-                .create_room(&request)
+                .create_room(
+                    MAX_SKIRMISH_LOBBY_SLOTS as u16,
+                    RoomVisibility::Public,
+                    metadata,
+                )
                 .await
                 .map_err(client_error_text)?;
             Ok((room, config))
@@ -2669,7 +2664,7 @@ fn begin_create_room_with_metadata(
 }
 
 fn begin_join_room(session: &mut OnlineSession, inbox: &OnlineAsyncInbox, room_code: String) {
-    let Some((client, _player_name, _build_id)) = validated_online_request(session) else {
+    let Some((client, _player_name)) = validated_online_request(session) else {
         return;
     };
     let room_code = match RoomCode::new(room_code.trim().to_ascii_uppercase()) {
@@ -2686,10 +2681,7 @@ fn begin_join_room(session: &mut OnlineSession, inbox: &OnlineAsyncInbox, room_c
     spawn_online_request(inbox.clone(), async move {
         let result = async {
             let config = client.service_config().await.map_err(client_error_text)?;
-            let room = client
-                .room(&online_game_id(), RTS_ONLINE_PROTOCOL, &room_code)
-                .await
-                .map_err(client_error_text)?;
+            let room = client.room(&room_code).await.map_err(client_error_text)?;
             Ok((room, config))
         }
         .await;
@@ -2698,23 +2690,18 @@ fn begin_join_room(session: &mut OnlineSession, inbox: &OnlineAsyncInbox, room_c
 }
 
 fn begin_refresh_rooms(session: &mut OnlineSession, inbox: &OnlineAsyncInbox) {
-    let Some((client, _, _)) = validated_online_request(session) else {
+    let Some((client, _)) = validated_online_request(session) else {
         return;
     };
     session.set_status(t("正在查询公开房间…", "Searching public rooms..."));
     spawn_online_request(inbox.clone(), async move {
-        OnlineAsyncResult::Rooms(
-            client
-                .list_rooms(&online_game_id(), RTS_ONLINE_PROTOCOL)
-                .await
-                .map_err(client_error_text),
-        )
+        OnlineAsyncResult::Rooms(client.list_rooms().await.map_err(client_error_text))
     });
 }
 
 fn validated_online_request(
     session: &mut OnlineSession,
-) -> Option<(RoomServiceClient, PlayerName, BuildId)> {
+) -> Option<(OpenBevyGameClient, PlayerName)> {
     let player_name = match PlayerName::new(session.player_name.trim()) {
         Ok(name) => name,
         Err(error) => {
@@ -2725,7 +2712,12 @@ fn validated_online_request(
             return None;
         }
     };
-    let client = match RoomServiceClient::new(session.service_url.trim()) {
+    let client = match OpenBevyGameClient::new(
+        session.service_url.trim(),
+        online_game_id(),
+        online_build_id(),
+        RTS_ONLINE_PROTOCOL,
+    ) {
         Ok(client) => client,
         Err(error) => {
             session.set_status(format!(
@@ -2735,11 +2727,14 @@ fn validated_online_request(
             return None;
         }
     };
+    Some((client, player_name))
+}
+
+fn online_build_id() -> BuildId {
     let build = option_env!("OPEN_BEVY_BUILD_ID")
         .filter(|value| !value.is_empty())
         .unwrap_or(env!("CARGO_PKG_VERSION"));
-    let build_id = BuildId::new(build).expect("package/build id is valid");
-    Some((client, player_name, build_id))
+    BuildId::new(build).expect("package/build id is valid")
 }
 
 fn run_online_verification_harness(mut params: OnlineVerificationParams) {
@@ -3264,6 +3259,7 @@ fn process_online_async_results(
                     &config.websocket_base_url,
                     &room,
                     player_name,
+                    online_build_id(),
                     ticket,
                     config.ice_servers.clone(),
                 );

@@ -19,6 +19,12 @@ opaque, versioned envelope usable by any Open Bevy game: payloads are compressed
 with LZ4 only when that is smaller, wire packets are capped at 64 KiB, and the
 declared decoded size is rejected before allocation above 4 MiB.
 
+Consumers use `OpenBevyGameClient` to bind a room service to their own
+`game_id`, local `build_id`, and `game_protocol`. The same scoped adapter is used
+by Bevy Open RTS and the `universal_room` onboarding example. Player/spectator
+transport requires the caller's local build ID, so the server's build mismatch
+check cannot be bypassed by copying the room descriptor's host build.
+
 ## Namespacing
 
 Rooms are isolated by this tuple:

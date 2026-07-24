@@ -80,10 +80,27 @@ async fn create_room_for_protocol(
     max_peers: u16,
     game_protocol: u16,
 ) -> CreateRoomResponse {
+    create_room_for_game_protocol(
+        server,
+        "integration-game",
+        visibility,
+        max_peers,
+        game_protocol,
+    )
+    .await
+}
+
+async fn create_room_for_game_protocol(
+    server: &TestServer,
+    game_id: &str,
+    visibility: RoomVisibility,
+    max_peers: u16,
+    game_protocol: u16,
+) -> CreateRoomResponse {
     reqwest::Client::new()
         .post(format!("{}/v1/rooms", server.http_base))
         .json(&CreateRoomRequest {
-            game_id: GameId::new("integration-game").unwrap(),
+            game_id: GameId::new(game_id).unwrap(),
             build_id: BuildId::new("integration-build").unwrap(),
             session_protocol: SESSION_PROTOCOL_VERSION,
             game_protocol,
@@ -459,4 +476,99 @@ async fn game_protocols_are_isolated_and_session_protocol_is_service_owned() {
         .await
         .unwrap();
     assert_eq!(error.code, "unsupported_session_protocol");
+}
+
+#[tokio::test]
+async fn game_ids_isolate_discovery_lookup_and_signaling_namespaces() {
+    const GAME_PROTOCOL: u16 = 23;
+    let server = spawn_server().await;
+    let arena = create_room_for_game_protocol(
+        &server,
+        "open-bevy-arena",
+        RoomVisibility::Public,
+        4,
+        GAME_PROTOCOL,
+    )
+    .await;
+
+    let arena_rooms = reqwest::get(format!(
+        "{}/v1/rooms?game_id=open-bevy-arena&game_protocol={GAME_PROTOCOL}",
+        server.http_base
+    ))
+    .await
+    .unwrap()
+    .error_for_status()
+    .unwrap()
+    .json::<open_bevy_protocol::RoomListResponse>()
+    .await
+    .unwrap();
+    let builder_rooms = reqwest::get(format!(
+        "{}/v1/rooms?game_id=open-bevy-builder&game_protocol={GAME_PROTOCOL}",
+        server.http_base
+    ))
+    .await
+    .unwrap()
+    .error_for_status()
+    .unwrap()
+    .json::<open_bevy_protocol::RoomListResponse>()
+    .await
+    .unwrap();
+    assert_eq!(arena_rooms.rooms.len(), 1);
+    assert!(builder_rooms.rooms.is_empty());
+
+    let cross_game_lookup = reqwest::get(format!(
+        "{}/v1/rooms/open-bevy-builder/{GAME_PROTOCOL}/{}",
+        server.http_base, arena.room.room_code
+    ))
+    .await
+    .unwrap();
+    assert_eq!(cross_game_lookup.status(), StatusCode::NOT_FOUND);
+
+    let websocket_base = server.http_base.replacen("http://", "ws://", 1);
+    let cross_game_signal_url = format!(
+        "{websocket_base}/v1/signal/open-bevy-builder/{GAME_PROTOCOL}/{}?name=WrongGame&role=host&ticket={}&build_id=integration-build",
+        arena.room.room_code, arena.host_token
+    );
+    let error = connect_async(cross_game_signal_url)
+        .await
+        .expect_err("a ticket from another game namespace must not upgrade");
+    assert!(matches!(
+        error,
+        WebSocketError::Http(response) if response.status() == StatusCode::NOT_FOUND
+    ));
+
+    let builder = create_room_for_game_protocol(
+        &server,
+        "open-bevy-builder",
+        RoomVisibility::Public,
+        4,
+        GAME_PROTOCOL,
+    )
+    .await;
+    let arena_rooms = reqwest::get(format!(
+        "{}/v1/rooms?game_id=open-bevy-arena&game_protocol={GAME_PROTOCOL}",
+        server.http_base
+    ))
+    .await
+    .unwrap()
+    .error_for_status()
+    .unwrap()
+    .json::<open_bevy_protocol::RoomListResponse>()
+    .await
+    .unwrap();
+    let builder_rooms = reqwest::get(format!(
+        "{}/v1/rooms?game_id=open-bevy-builder&game_protocol={GAME_PROTOCOL}",
+        server.http_base
+    ))
+    .await
+    .unwrap()
+    .error_for_status()
+    .unwrap()
+    .json::<open_bevy_protocol::RoomListResponse>()
+    .await
+    .unwrap();
+    assert_eq!(arena_rooms.rooms[0].room_code, arena.room.room_code);
+    assert_eq!(builder_rooms.rooms[0].room_code, builder.room.room_code);
+    assert_eq!(arena_rooms.rooms[0].game_id.as_str(), "open-bevy-arena");
+    assert_eq!(builder_rooms.rooms[0].game_id.as_str(), "open-bevy-builder");
 }

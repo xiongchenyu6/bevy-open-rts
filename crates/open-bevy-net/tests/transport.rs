@@ -1,9 +1,9 @@
 use open_bevy_net::{
-    RoomServiceClient, TransportConfig, TransportEvent, WebRtcTransport, decode_snapshot_payload,
+    OpenBevyGameClient, TransportConfig, TransportEvent, WebRtcTransport, decode_snapshot_payload,
     encode_snapshot_payload, session_protocol_version,
 };
 use open_bevy_protocol::{
-    BuildId, CreateRoomRequest, CreateRoomResponse, GameId, IceServer, PlayerName, RoomVisibility,
+    BuildId, CreateRoomResponse, GameId, IceServer, PlayerName, RoomVisibility,
     ServiceConfigResponse,
 };
 use open_bevy_signaling::{AppState, ServerConfig, build_router};
@@ -77,6 +77,7 @@ async fn exchange_both_channels(room: &CreateRoomResponse, service_config: Servi
         &service_config.websocket_base_url,
         &room.room,
         PlayerName::new("Player").unwrap(),
+        room.room.build_id.clone(),
         room.join_token.clone(),
         service_config.ice_servers,
     ))
@@ -158,25 +159,24 @@ async fn exchange_both_channels(room: &CreateRoomResponse, service_config: Servi
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn shared_client_creates_room_and_exchanges_both_webrtc_channel_types() {
     let server = spawn_server().await;
-    let service = RoomServiceClient::new(&server.http_base).unwrap();
-    let service_config = service.service_config().await.unwrap();
-    let room = service
-        .create_room(&CreateRoomRequest {
-            game_id: test_game_id(),
-            build_id: BuildId::new("transport-integration").unwrap(),
-            session_protocol: session_protocol_version(),
-            game_protocol: TEST_GAME_PROTOCOL,
-            max_peers: 2,
-            visibility: RoomVisibility::Public,
-            metadata: BTreeMap::from([("mode".to_string(), "transport-test".to_string())]),
-        })
+    let game = OpenBevyGameClient::new(
+        &server.http_base,
+        test_game_id(),
+        BuildId::new("transport-integration").unwrap(),
+        TEST_GAME_PROTOCOL,
+    )
+    .unwrap();
+    let service_config = game.service_config().await.unwrap();
+    let room = game
+        .create_room(
+            2,
+            RoomVisibility::Public,
+            BTreeMap::from([("mode".to_string(), "transport-test".to_string())]),
+        )
         .await
         .unwrap();
 
-    let listed = service
-        .list_rooms(&test_game_id(), TEST_GAME_PROTOCOL)
-        .await
-        .unwrap();
+    let listed = game.list_rooms().await.unwrap();
     assert_eq!(listed.rooms.len(), 1);
     assert_eq!(listed.rooms[0].room_code, room.room.room_code);
 
@@ -188,8 +188,14 @@ async fn shared_client_creates_room_and_exchanges_both_webrtc_channel_types() {
 async fn deployed_service_exchanges_reliable_and_snapshot_channels() {
     let service_url = std::env::var("OPEN_BEVY_SIGNALING_URL")
         .expect("OPEN_BEVY_SIGNALING_URL must point at the deployed HTTPS service");
-    let service = RoomServiceClient::new(&service_url).unwrap();
-    let service_config = service.service_config().await.unwrap();
+    let game = OpenBevyGameClient::new(
+        &service_url,
+        test_game_id(),
+        BuildId::new("production-transport-smoke").unwrap(),
+        TEST_GAME_PROTOCOL,
+    )
+    .unwrap();
+    let service_config = game.service_config().await.unwrap();
     assert_eq!(
         service_config.min_session_protocol,
         session_protocol_version()
@@ -210,16 +216,12 @@ async fn deployed_service_exchanges_reliable_and_snapshot_channels() {
         );
     }
 
-    let room = service
-        .create_room(&CreateRoomRequest {
-            game_id: test_game_id(),
-            build_id: BuildId::new("production-transport-smoke").unwrap(),
-            session_protocol: session_protocol_version(),
-            game_protocol: TEST_GAME_PROTOCOL,
-            max_peers: 2,
-            visibility: RoomVisibility::Unlisted,
-            metadata: BTreeMap::from([("mode".to_string(), "production-smoke".to_string())]),
-        })
+    let room = game
+        .create_room(
+            2,
+            RoomVisibility::Unlisted,
+            BTreeMap::from([("mode".to_string(), "production-smoke".to_string())]),
+        )
         .await
         .unwrap();
     println!(

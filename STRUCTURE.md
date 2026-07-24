@@ -12,13 +12,15 @@ The repository is a Cargo workspace whose default member remains the root
 - `crates/open-bevy-net` owns the native/wasm HTTP room client and the two-channel
   Matchbox WebRTC transport. It has no Bevy dependency; games poll transport
   events and run its message-loop future on their engine task pool. It does not
-  contain a default game ID; each consuming game supplies its own ID and game
-  protocol.
+  contain a default game ID; each consuming game supplies its own ID, local
+  build, and game protocol through `OpenBevyGameClient`. The compiler-checked
+  `examples/universal_room.rs` demonstrates onboarding without RTS code.
 - `services/open-bevy-signaling` owns the reusable Open Bevy room service and a
   Matchbox-compatible WebSocket endpoint. It has no dependency on the RTS game.
 - `deploy/signaling` contains the production container, Caddy, and Coturn
   example. TURN credentials are generated with the Coturn REST HMAC contract.
 - `docs/ONLINE_ARCHITECTURE.md` is the online wire/deployment contract;
+  `docs/OPEN_BEVY_GAME_INTEGRATION.md` is the cross-repository onboarding guide;
   `PLAN.md` tracks the remaining client and gameplay replication milestones.
 
 ## Source Modules

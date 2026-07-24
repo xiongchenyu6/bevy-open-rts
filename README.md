@@ -59,13 +59,14 @@ curl http://127.0.0.1:3536/healthz
 
 Production container and Coturn examples live in `deploy/signaling/`. See
 [`docs/ONLINE_ARCHITECTURE.md`](docs/ONLINE_ARCHITECTURE.md) for the API and
-networking contract. The current game integration milestone is tracked in
-[`PLAN.md`](PLAN.md).
+networking contract. Other Open Bevy games should start with
+[`docs/OPEN_BEVY_GAME_INTEGRATION.md`](docs/OPEN_BEVY_GAME_INTEGRATION.md) and
+the compiler-checked `open-bevy-net/examples/universal_room.rs` client. The
+current integration milestone is tracked in [`PLAN.md`](PLAN.md).
 
 The native game's **Online** command-menu entry can discover or create public
 rooms and join by room code/private token. Hosts configure the map-derived
-player slots and launch the same match setup on every peer. Live battle-state
-replication remains the next milestone and is not yet presented as complete.
+player slots and launch the same host-authoritative match on every peer.
 
 ## Capture And Match Proof
 

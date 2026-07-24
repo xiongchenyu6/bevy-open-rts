@@ -58,7 +58,7 @@ native desktop and browser builds.
     - [x] Global multiplayer victory with per-player result presentation
     - [x] Disconnect grace, reconnect cancellation, and authoritative forfeit
     - [x] Synchronized return-to-lobby flow
-- [ ] Product verification
+- [x] Product verification
   - [x] Two native clients
   - [x] Two browser clients
   - [x] Native-to-browser client
