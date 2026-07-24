@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { chromium } from "playwright-core";
 
@@ -133,6 +133,21 @@ async function waitForTerminalReport(page, role) {
   return report;
 }
 
+async function capturePage(context, page, path) {
+  const session = await context.newCDPSession(page);
+  try {
+    const { data } = await session.send("Page.captureScreenshot", {
+      format: "png",
+      fromSurface: true,
+      captureBeyondViewport: false,
+    });
+    writeFileSync(path, Buffer.from(data, "base64"));
+    return path;
+  } finally {
+    await session.detach();
+  }
+}
+
 mkdirSync(outputDir, { recursive: true });
 
 const browserOptions = {
@@ -149,8 +164,8 @@ try {
   // Two separate browser processes prevent headless Chrome from treating either
   // real-time simulation as a background tab and reducing requestAnimationFrame
   // to a handful of ticks per minute.
-  const hostContext = await hostBrowser.newContext({ viewport: { width: 1280, height: 800 } });
-  const playerContext = await playerBrowser.newContext({ viewport: { width: 1280, height: 800 } });
+  const hostContext = await hostBrowser.newContext({ viewport: { width: 640, height: 360 } });
+  const playerContext = await playerBrowser.newContext({ viewport: { width: 640, height: 360 } });
   const hostPage = await hostContext.newPage();
   const playerPage = await playerContext.newPage();
   const hostDiagnostics = collectDiagnostics(hostPage, "host");
@@ -163,11 +178,6 @@ try {
   const [host, player] = await Promise.all([
     waitForTerminalReport(hostPage, "host"),
     waitForTerminalReport(playerPage, "player"),
-  ]);
-
-  await Promise.all([
-    hostPage.screenshot({ path: `${outputDir}/host-final.png` }),
-    playerPage.screenshot({ path: `${outputDir}/player-final.png` }),
   ]);
 
   const diagnostics = [...hostDiagnostics, ...playerDiagnostics];
@@ -191,6 +201,18 @@ try {
     && player.result === "defeat"
     && fatalDiagnostics.length === 0;
 
+  // Publish the functional result before optional visual evidence so a slow
+  // software renderer cannot hide the authoritative client reports.
+  console.log(JSON.stringify({ phase: "terminal-reports", passed, host, player }, null, 2));
+
+  const screenshotResults = await Promise.allSettled([
+    capturePage(hostContext, hostPage, `${outputDir}/host-final.png`),
+    capturePage(playerContext, playerPage, `${outputDir}/player-final.png`),
+  ]);
+  const screenshotErrors = screenshotResults
+    .filter((result) => result.status === "rejected")
+    .map((result) => String(result.reason));
+
   console.log(JSON.stringify({
     passed,
     runId,
@@ -203,6 +225,7 @@ try {
     host,
     player,
     diagnostics,
+    screenshotErrors,
     screenshots: [
       `${outputDir}/host-final.png`,
       `${outputDir}/player-final.png`,

@@ -50,7 +50,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           cache-targets: true
-          cache-on-failure: false
+          cache-on-failure: true
 
       - name: Cache wasm tool binaries
         uses: actions/cache@v6
@@ -88,6 +88,22 @@ jobs:
 
       - name: Build web artifacts
         run: bash scripts/build_web.sh
+
+      # Upload the immutable build before runtime gates. A failed browser gate
+      # still blocks release/deploy, while leaving a debuggable bundle behind.
+      - name: Package web bundle
+        run: |
+          set -euo pipefail
+          (cd web && zip -r -q ../web-dist.zip .)
+          ls -la web-dist.zip
+
+      - name: Upload web bundle (passes the build between jobs)
+        uses: actions/upload-artifact@v7
+        with:
+          name: web-dist-${{ github.sha }}
+          path: web-dist.zip
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Verify WebGPU startup in Chrome
         env:
@@ -161,20 +177,6 @@ jobs:
           path: browser-smoke-output/
           if-no-files-found: warn
           retention-days: 14
-
-      - name: Package web bundle
-        run: |
-          set -euo pipefail
-          (cd web && zip -r -q ../web-dist.zip .)
-          ls -la web-dist.zip
-
-      - name: Upload web bundle (passes the build between jobs)
-        uses: actions/upload-artifact@v7
-        with:
-          name: web-dist-${{ github.sha }}
-          path: web-dist.zip
-          if-no-files-found: error
-          retention-days: 7
 
   release-web:
     name: Publish GitHub Release
