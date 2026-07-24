@@ -62,6 +62,11 @@ Production container and Coturn examples live in `deploy/signaling/`. See
 networking contract. The current game integration milestone is tracked in
 [`PLAN.md`](PLAN.md).
 
+The native game's **Online** command-menu entry can discover or create public
+rooms and join by room code/private token. Hosts configure the map-derived
+player slots and launch the same match setup on every peer. Live battle-state
+replication remains the next milestone and is not yet presented as complete.
+
 ## Capture And Match Proof
 
 ```sh

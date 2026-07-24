@@ -27,3 +27,10 @@
   players for a configurable 30-second host reconnect window. A resumed host
   receives a new Matchbox peer ID, so game-level identity must use its own
   stable session key rather than treating `PeerId` as player identity.
+- `src/online.rs` now provides the first real game integration slice: public
+  room discovery/create, code/token join, reconnect-aware player identity,
+  exact map-derived slot rows, host-validated lobby options, readiness, and a
+  synchronized transition into the existing match setup.
+- This lobby milestone does not yet network the running RTS simulation. The
+  next boundary is stable network entity IDs, validated high-level commands,
+  and host snapshots; clients must not exchange local Bevy `Entity` values.

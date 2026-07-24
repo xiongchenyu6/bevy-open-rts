@@ -34,6 +34,7 @@ pub(crate) enum MainMenuAction {
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum FrontMenuAction {
     Play,
+    Online,
     Campaign,
     Options,
     Credits,
@@ -386,7 +387,8 @@ pub(crate) fn setup_front_menu(mut commands: Commands, asset_server: Res<AssetSe
                     ));
                     panel.spawn(front_divider_node());
                     for (action, zh, en, height) in [
-                        (FrontMenuAction::Play, "开始游戏", "Play", 62.0),
+                        (FrontMenuAction::Play, "单人对战", "Skirmish", 62.0),
+                        (FrontMenuAction::Online, "联机对战", "Online", 58.0),
                         (FrontMenuAction::Campaign, "战役", "Campaign", 58.0),
                         (FrontMenuAction::Options, "设置", "Options", 58.0),
                         (FrontMenuAction::Credits, "制作人员", "Credits", 58.0),
@@ -537,6 +539,7 @@ pub(crate) fn front_menu_buttons(
         if clicked {
             match button.action {
                 FrontMenuAction::Play => next_state.set(AppScreen::SkirmishSetup),
+                FrontMenuAction::Online => next_state.set(AppScreen::OnlineLobby),
                 FrontMenuAction::Campaign => next_state.set(AppScreen::CampaignMenu),
                 FrontMenuAction::Options => next_state.set(AppScreen::OptionsMenu),
                 FrontMenuAction::Credits => next_state.set(AppScreen::CreditsMenu),

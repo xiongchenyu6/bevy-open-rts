@@ -28,21 +28,22 @@ native desktop and browser builds.
   - [x] Matchbox-compatible WebSocket signaling
   - [x] Room isolation, capacity, host ownership, cleanup, metrics
   - [x] Container, TURN REST credentials, CI, integration tests
-- [ ] Shared native/wasm client transport
+- [x] Shared native/wasm client transport
   - [x] Reliable and unreliable channels
   - [x] Connection lifecycle and structured errors
   - [x] Signaling-level host reconnect/resume contract
-  - [ ] Game-session identity and state resume
-- [ ] Bevy Open RTS online lobby
-  - [ ] Online menu, create room, room code join
-  - [ ] Player readiness, slot/faction/team/color synchronization
-  - [ ] Host-controlled match launch
+  - [x] Stable game-session identity across signaling peer changes
+- [x] Bevy Open RTS online lobby
+  - [x] Online menu, public room discovery/create, room code/token join
+  - [x] Exact map slot rows with readiness/faction/team/color synchronization
+  - [x] Host-validated settings and synchronized match launch
 - [ ] Host-authoritative match
   - [ ] Stable network entity IDs
   - [ ] Serializable high-level commands
   - [ ] Command validation and ownership checks
   - [ ] Snapshot/delta replication and interpolation
-  - [ ] Victory, disconnect, reconnect, and return-to-lobby flow
+  - [ ] Match-state reconnect/resume
+  - [ ] Victory, disconnect, and return-to-lobby flow
 - [ ] Product verification
   - [ ] Two native clients
   - [ ] Two browser clients
@@ -53,7 +54,9 @@ native desktop and browser builds.
 ## Verification Gates
 
 - `cargo run` still starts the native RTS game.
-- `cargo test -p open-bevy-protocol -p open-bevy-signaling` passes.
+- `cargo test -p open-bevy-protocol -p open-bevy-net -p open-bevy-signaling`
+  passes.
+- `cargo test -p bevy-open-rts online::tests --lib` passes.
 - Signaling integration tests prove room isolation, signal relay, capacity, and
   disconnect cleanup using real WebSocket clients.
 - Two game clients can create/join a lobby and complete a match while observing

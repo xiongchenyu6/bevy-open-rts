@@ -5,9 +5,9 @@
 //! future on the engine task pool.
 
 use matchbox_socket::{
-    ChannelConfig, MessageLoopFuture, Packet, PeerId, PeerState, RtcIceServerConfig, WebRtcSocket,
-    WebRtcSocketBuilder,
+    ChannelConfig, Packet, PeerState, RtcIceServerConfig, WebRtcSocket, WebRtcSocketBuilder,
 };
+pub use matchbox_socket::{MessageLoopFuture, PeerId};
 use open_bevy_protocol::{
     BuildId, CreateRoomRequest, CreateRoomResponse, ErrorResponse, GameId, IceServer, PeerRole,
     PlayerName, RoomCode, RoomDescriptor, RoomListResponse, SESSION_PROTOCOL_VERSION,

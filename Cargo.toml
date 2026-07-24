@@ -51,6 +51,9 @@ bevy_common_assets = { version = "0.17.0", default-features = false, features = 
 bevy_rts_camera = "0.14"
 iyes_progress = { version = "0.17.0", default-features = false, features = ["assets"] }
 moonshine-kind = "0.5.1"
+open-bevy-net = { path = "crates/open-bevy-net" }
+open-bevy-protocol = { path = "crates/open-bevy-protocol" }
+postcard = { version = "1.1", features = ["alloc"] }
 # Bevy's text stack reaches ICU4X through Parley. In debug builds, icu_provider
 # writes missing complex-segmentation warnings directly to stderr unless its
 # logging feature is enabled; enabling it lets Bevy's LogPlugin filter them.

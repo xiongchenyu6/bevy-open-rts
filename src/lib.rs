@@ -70,6 +70,8 @@ mod economy;
 pub(crate) use economy::*;
 mod hud;
 pub(crate) use hud::*;
+mod online;
+pub(crate) use online::*;
 mod menu;
 pub(crate) use menu::*;
 mod camera;
@@ -327,6 +329,7 @@ pub(crate) enum AppScreen {
     AssetLoading,
     MainMenu,
     SkirmishSetup,
+    OnlineLobby,
     CampaignMenu,
     OptionsMenu,
     CreditsMenu,
@@ -2443,7 +2446,8 @@ pub(crate) fn add_main_menu_scene(app: &mut App) -> &mut App {
         )
             .chain()
             .run_if(in_state(AppScreen::SkirmishSetup)),
-    )
+    );
+    add_online_scene(app)
 }
 
 /// Registers the live match scene shared by `cargo run`, capture, and gameplay tests.
