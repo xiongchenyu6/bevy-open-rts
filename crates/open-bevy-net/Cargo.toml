@@ -1,0 +1,21 @@
+[package]
+name = "open-bevy-net"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95.0"
+license = "MIT OR Apache-2.0"
+description = "Native and wasm WebRTC transport shared by Open Bevy games."
+
+[dependencies]
+ehttp = { version = "0.7.1", features = ["json", "native-async"] }
+matchbox_socket = "0.14.0"
+open-bevy-protocol = { path = "../open-bevy-protocol" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+url = "2.5"
+
+[dev-dependencies]
+axum = "0.8"
+open-bevy-signaling = { path = "../../services/open-bevy-signaling" }
+tokio = { version = "1.48", features = ["macros", "net", "rt-multi-thread", "time"] }

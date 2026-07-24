@@ -1,6 +1,7 @@
 [workspace]
 members = [
   ".",
+  "crates/open-bevy-net",
   "crates/open-bevy-protocol",
   "services/open-bevy-signaling",
 ]

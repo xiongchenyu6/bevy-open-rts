@@ -6,6 +6,7 @@ on:
     paths:
       - "Cargo.toml"
       - "Cargo.lock"
+      - "crates/open-bevy-net/**"
       - "crates/open-bevy-protocol/**"
       - "services/open-bevy-signaling/**"
       - "deploy/signaling/**"
@@ -15,6 +16,7 @@ on:
     paths:
       - "Cargo.toml"
       - "Cargo.lock"
+      - "crates/open-bevy-net/**"
       - "crates/open-bevy-protocol/**"
       - "services/open-bevy-signaling/**"
       - "deploy/signaling/**"
@@ -38,6 +40,7 @@ jobs:
         with:
           toolchain: stable
           components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
 
       - name: Cache Rust build artifacts
         uses: Swatinem/rust-cache@v2
@@ -48,10 +51,13 @@ jobs:
         run: cargo fmt --all --check
 
       - name: Lint server packages
-        run: cargo clippy -p open-bevy-protocol -p open-bevy-signaling --all-targets -- -D warnings
+        run: cargo clippy -p open-bevy-protocol -p open-bevy-net -p open-bevy-signaling --all-targets -- -D warnings
 
-      - name: Run protocol and real WebSocket tests
-        run: cargo test -p open-bevy-protocol -p open-bevy-signaling
+      - name: Run protocol, WebSocket, and real WebRTC tests
+        run: cargo test -p open-bevy-protocol -p open-bevy-net -p open-bevy-signaling
+
+      - name: Check browser transport target
+        run: cargo check -p open-bevy-net --target wasm32-unknown-unknown
 
       - name: Build production container
         run: docker build -f services/open-bevy-signaling/Dockerfile -t open-bevy-signaling:test .

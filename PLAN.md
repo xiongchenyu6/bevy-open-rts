@@ -29,8 +29,8 @@ native desktop and browser builds.
   - [x] Room isolation, capacity, host ownership, cleanup, metrics
   - [x] Container, TURN REST credentials, CI, integration tests
 - [ ] Shared native/wasm client transport
-  - [ ] Reliable and unreliable channels
-  - [ ] Connection lifecycle and structured errors
+  - [x] Reliable and unreliable channels
+  - [x] Connection lifecycle and structured errors
   - [ ] Reconnect/session-resume contract
 - [ ] Bevy Open RTS online lobby
   - [ ] Online menu, create room, room code join

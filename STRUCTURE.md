@@ -7,6 +7,9 @@ The repository is a Cargo workspace whose default member remains the root
 
 - `crates/open-bevy-protocol` owns game-independent room/API contracts and
   identifier validation. It has no Bevy dependency.
+- `crates/open-bevy-net` owns the native/wasm HTTP room client and the two-channel
+  Matchbox WebRTC transport. It has no Bevy dependency; games poll transport
+  events and run its message-loop future on their engine task pool.
 - `services/open-bevy-signaling` owns the reusable Open Bevy room service and a
   Matchbox-compatible WebSocket endpoint. It has no dependency on the RTS game.
 - `deploy/signaling` contains the production container, Caddy, and Coturn

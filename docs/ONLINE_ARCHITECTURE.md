@@ -11,6 +11,11 @@ The service is compatible with `matchbox_socket` 0.14 on native and wasm. It
 only carries WebRTC session descriptions and ICE candidates; game packets flow
 peer-to-peer after the data channels connect.
 
+`open-bevy-net` is the corresponding reusable client. It exposes the room HTTP
+API through `ehttp`, builds safely encoded connection URLs, chooses issued TURN
+credentials when available, and fixes channel 0 as reliable control/commands
+and channel 1 as low-latency unreliable snapshots.
+
 ## Namespacing
 
 Rooms are isolated by this tuple:

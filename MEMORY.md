@@ -17,3 +17,9 @@
 - Browser WebSocket clients cannot attach an Authorization header. Connection
   tickets therefore use query parameters; production proxies must use WSS and
   must not persist request URIs.
+- `open-bevy-net` uses `ehttp` for one HTTP API on native/wasm without requiring
+  a Tokio runtime in Bevy. Its Matchbox message-loop future is executor-neutral
+  and can run on Bevy's task pool.
+- A real native WebRTC integration test starts the custom server, creates a room
+  through `RoomServiceClient`, connects two stock Matchbox sockets with host ICE
+  candidates, and verifies both reliable and unreliable payload delivery.
