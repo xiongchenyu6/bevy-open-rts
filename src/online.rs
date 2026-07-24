@@ -1405,6 +1405,7 @@ pub(crate) struct OnlineSession {
     local_player_id: Option<u64>,
     assigned_slot: Option<usize>,
     host_peer: Option<PeerId>,
+    hello_retry_elapsed: f32,
     lobby: Option<OnlineLobbySnapshot>,
     match_config: Option<OnlineMatchConfig>,
     host_runtime: Option<HostLobbyRuntime>,
@@ -1438,6 +1439,7 @@ impl Default for OnlineSession {
             local_player_id: None,
             assigned_slot: None,
             host_peer: None,
+            hello_retry_elapsed: 0.0,
             lobby: None,
             match_config: None,
             host_runtime: None,
@@ -1464,6 +1466,7 @@ impl OnlineSession {
         self.local_player_id = None;
         self.assigned_slot = None;
         self.host_peer = None;
+        self.hello_retry_elapsed = 0.0;
         self.lobby = None;
         self.match_config = None;
         self.host_runtime = None;
@@ -1491,6 +1494,210 @@ enum OnlineAsyncResult {
     Joined(Result<(RoomDescriptor, ServiceConfigResponse), String>),
     Rooms(Result<RoomListResponse, String>),
     TransportStopped(String),
+}
+
+#[cfg(target_arch = "wasm32")]
+const ONLINE_VERIFICATION_STATUS_ELEMENT_ID: &str = "open-bevy-online-verification";
+const ONLINE_VERIFICATION_TIMEOUT_SECONDS: f32 = 120.0;
+const ONLINE_VERIFICATION_MOVE_DISTANCE: f32 = 2.0;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "lowercase")]
+enum OnlineVerificationRole {
+    Host,
+    Player,
+}
+
+impl OnlineVerificationRole {
+    fn parse(value: &str) -> Option<Self> {
+        match value.trim().to_ascii_lowercase().as_str() {
+            "host" => Some(Self::Host),
+            "player" | "client" => Some(Self::Player),
+            _ => None,
+        }
+    }
+
+    const fn as_str(self) -> &'static str {
+        match self {
+            Self::Host => "host",
+            Self::Player => "player",
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+enum OnlineVerificationStage {
+    #[default]
+    Disabled,
+    Booting,
+    EnteringLobby,
+    CreatingRoom,
+    DiscoveringRoom,
+    JoiningRoom,
+    WaitingForPlayers,
+    StartingMatch,
+    MatchEntered,
+    CommandSent,
+    CommandObserved,
+    EndingMatch,
+    Passed,
+    Failed,
+}
+
+impl OnlineVerificationStage {
+    fn is_terminal(self) -> bool {
+        matches!(self, Self::Passed | Self::Failed)
+    }
+}
+
+#[derive(Clone, Debug)]
+struct OnlineVerificationConfig {
+    role: OnlineVerificationRole,
+    run_id: String,
+    service_url: String,
+    #[cfg(not(target_arch = "wasm32"))]
+    status_path: Option<String>,
+}
+
+#[derive(Resource, Debug)]
+struct OnlineVerificationHarness {
+    config: Option<OnlineVerificationConfig>,
+    stage: OnlineVerificationStage,
+    elapsed: f32,
+    next_room_refresh: f32,
+    room_code: Option<String>,
+    tracked_unit_id: Option<u64>,
+    tracked_unit_origin: Option<Vec3>,
+    command_sent: bool,
+    command_observed: bool,
+    result: Option<String>,
+    error: Option<String>,
+    last_report: String,
+}
+
+impl Default for OnlineVerificationHarness {
+    fn default() -> Self {
+        let config = online_verification_config();
+        Self {
+            stage: if config.is_some() {
+                OnlineVerificationStage::Booting
+            } else {
+                OnlineVerificationStage::Disabled
+            },
+            config,
+            elapsed: 0.0,
+            next_room_refresh: 0.0,
+            room_code: None,
+            tracked_unit_id: None,
+            tracked_unit_origin: None,
+            command_sent: false,
+            command_observed: false,
+            result: None,
+            error: None,
+            last_report: String::new(),
+        }
+    }
+}
+
+impl OnlineVerificationHarness {
+    fn fail(&mut self, error: impl Into<String>) {
+        if self.stage.is_terminal() {
+            return;
+        }
+        self.error = Some(error.into());
+        self.stage = OnlineVerificationStage::Failed;
+    }
+
+    fn pass(&mut self, result: &'static str) {
+        if self.stage.is_terminal() {
+            return;
+        }
+        self.result = Some(result.to_string());
+        self.stage = OnlineVerificationStage::Passed;
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn online_verification_config() -> Option<OnlineVerificationConfig> {
+    let role = std::env::var("OPEN_BEVY_ONLINE_VERIFY_ROLE").ok()?;
+    let role = OnlineVerificationRole::parse(&role)?;
+    let run_id = std::env::var("OPEN_BEVY_ONLINE_VERIFY_RUN").ok()?;
+    let run_id = run_id.trim();
+    if run_id.is_empty() {
+        return None;
+    }
+    Some(OnlineVerificationConfig {
+        role,
+        run_id: run_id.to_string(),
+        service_url: std::env::var("OPEN_BEVY_SIGNALING_URL")
+            .ok()
+            .filter(|url| !url.trim().is_empty())
+            .unwrap_or_else(|| ONLINE_DEFAULT_SERVICE_URL.to_string()),
+        status_path: std::env::var("OPEN_BEVY_ONLINE_VERIFY_STATUS")
+            .ok()
+            .filter(|path| !path.trim().is_empty()),
+    })
+}
+
+#[cfg(target_arch = "wasm32")]
+fn online_verification_config() -> Option<OnlineVerificationConfig> {
+    let search = web_sys::window()?.location().search().ok()?;
+    let params = web_sys::UrlSearchParams::new_with_str(&search).ok()?;
+    let role = OnlineVerificationRole::parse(&params.get("online_verify")?)?;
+    let run_id = params.get("online_run")?;
+    if run_id.trim().is_empty() {
+        return None;
+    }
+    let service_url = params
+        .get("online_service")
+        .filter(|url| !url.trim().is_empty())
+        .or_else(|| {
+            option_env!("OPEN_BEVY_SIGNALING_URL")
+                .filter(|url| !url.is_empty())
+                .map(str::to_string)
+        })
+        .unwrap_or_else(|| ONLINE_DEFAULT_SERVICE_URL.to_string());
+    Some(OnlineVerificationConfig {
+        role,
+        run_id,
+        service_url,
+    })
+}
+
+#[derive(SystemParam)]
+struct OnlineVerificationParams<'w, 's> {
+    real_time: Res<'w, Time<Real>>,
+    screen: Res<'w, State<AppScreen>>,
+    next_screen: ResMut<'w, NextState<AppScreen>>,
+    harness: ResMut<'w, OnlineVerificationHarness>,
+    session: ResMut<'w, OnlineSession>,
+    transport: ResMut<'w, OnlineTransport>,
+    async_inbox: Res<'w, OnlineAsyncInbox>,
+    setup: ResMut<'w, MatchSetupSettings>,
+    outbox: ResMut<'w, OnlineCommandOutbox>,
+    replication: Res<'w, OnlineMatchReplication>,
+    map_bounds: Res<'w, MapBounds>,
+    match_state: Res<'w, MatchState>,
+    units: Query<
+        'w,
+        's,
+        (
+            &'static NetworkEntityId,
+            &'static Team,
+            &'static Unit,
+            &'static Transform,
+            &'static Health,
+        ),
+        (With<Unit>, Without<Structure>),
+    >,
+    structures: Query<
+        'w,
+        's,
+        (&'static Team, &'static Structure, &'static mut Health),
+        (With<Structure>, Without<Unit>),
+    >,
+    interpolations: Query<'w, 's, (&'static NetworkEntityId, &'static NetworkInterpolation)>,
 }
 
 #[derive(Component)]
@@ -1530,6 +1737,7 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
         .init_resource::<OnlineCommandOutbox>()
         .init_resource::<OnlineCommandInbox>()
         .init_resource::<OnlineLifecycleControl>()
+        .init_resource::<OnlineVerificationHarness>()
         .add_systems(OnEnter(AppScreen::OnlineLobby), enter_online_lobby)
         .add_systems(OnEnter(AppScreen::InMatch), reset_online_match_replication)
         .add_systems(
@@ -1581,6 +1789,14 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
             (online_text_input, online_menu_buttons, rebuild_online_ui)
                 .chain()
                 .run_if(in_state(AppScreen::OnlineLobby)),
+        )
+        .add_systems(
+            Update,
+            run_online_verification_harness
+                .after(process_online_async_results)
+                .after(poll_online_transport)
+                .after(apply_pending_online_snapshot)
+                .after(apply_online_player_commands),
         );
     app
 }
@@ -2406,9 +2622,25 @@ fn handle_online_action(
 }
 
 fn begin_create_room(session: &mut OnlineSession, inbox: &OnlineAsyncInbox) {
+    begin_create_room_with_metadata(session, inbox, BTreeMap::new());
+}
+
+fn begin_create_room_with_metadata(
+    session: &mut OnlineSession,
+    inbox: &OnlineAsyncInbox,
+    extra_metadata: BTreeMap<String, String>,
+) {
     let Some((client, player_name, build_id)) = validated_online_request(session) else {
         return;
     };
+    let mut metadata = BTreeMap::from([
+        (
+            "mode".to_string(),
+            "host-authoritative-skirmish".to_string(),
+        ),
+        ("map".to_string(), SKIRMISH_MAPS[0].id.to_string()),
+    ]);
+    metadata.extend(extra_metadata);
     let request = CreateRoomRequest {
         game_id: online_game_id(),
         build_id,
@@ -2416,13 +2648,7 @@ fn begin_create_room(session: &mut OnlineSession, inbox: &OnlineAsyncInbox) {
         game_protocol: RTS_ONLINE_PROTOCOL,
         max_peers: MAX_SKIRMISH_LOBBY_SLOTS as u16,
         visibility: RoomVisibility::Public,
-        metadata: BTreeMap::from([
-            (
-                "mode".to_string(),
-                "host-authoritative-skirmish".to_string(),
-            ),
-            ("map".to_string(), SKIRMISH_MAPS[0].id.to_string()),
-        ]),
+        metadata,
     };
     session.phase = OnlinePhase::Connecting;
     session.focused_field = None;
@@ -2514,6 +2740,454 @@ fn validated_online_request(
         .unwrap_or(env!("CARGO_PKG_VERSION"));
     let build_id = BuildId::new(build).expect("package/build id is valid");
     Some((client, player_name, build_id))
+}
+
+fn run_online_verification_harness(mut params: OnlineVerificationParams) {
+    if params.harness.config.is_none() {
+        return;
+    }
+
+    params.harness.elapsed += params.real_time.delta_secs();
+    if !params.harness.stage.is_terminal()
+        && params.harness.elapsed > ONLINE_VERIFICATION_TIMEOUT_SECONDS
+    {
+        let stage = params.harness.stage;
+        params
+            .harness
+            .fail(format!("verification timed out in stage {stage:?}"));
+    }
+
+    if !params.harness.stage.is_terminal()
+        && let Err(error) = drive_online_verification(&mut params)
+    {
+        params.harness.fail(error);
+    }
+
+    publish_online_verification_status(&mut params);
+}
+
+fn drive_online_verification(params: &mut OnlineVerificationParams) -> Result<(), String> {
+    let config = params
+        .harness
+        .config
+        .clone()
+        .ok_or_else(|| "verification config is unavailable".to_string())?;
+    let screen = *params.screen.get();
+
+    if params.harness.stage == OnlineVerificationStage::Booting {
+        if screen == AppScreen::AssetLoading {
+            return Ok(());
+        }
+        params.session.reset_connection();
+        params.session.service_url = config.service_url.clone();
+        params.session.player_name = format!(
+            "Verify {} {}",
+            config.role.as_str(),
+            config.run_id.chars().take(12).collect::<String>()
+        );
+        params.session.session_key = new_session_key();
+        params.session.public_rooms.clear();
+        params.session.ui_dirty = true;
+        params.harness.stage = OnlineVerificationStage::EnteringLobby;
+        if screen != AppScreen::OnlineLobby {
+            params.next_screen.set(AppScreen::OnlineLobby);
+            return Ok(());
+        }
+    }
+
+    if params.harness.stage == OnlineVerificationStage::EnteringLobby {
+        if screen != AppScreen::OnlineLobby || params.session.phase != OnlinePhase::Home {
+            return Ok(());
+        }
+        match config.role {
+            OnlineVerificationRole::Host => {
+                begin_create_room_with_metadata(
+                    &mut params.session,
+                    &params.async_inbox,
+                    BTreeMap::from([("verification_id".to_string(), config.run_id.clone())]),
+                );
+                params.harness.stage = OnlineVerificationStage::CreatingRoom;
+            }
+            OnlineVerificationRole::Player => {
+                begin_refresh_rooms(&mut params.session, &params.async_inbox);
+                params.harness.next_room_refresh = params.harness.elapsed + 1.0;
+                params.harness.stage = OnlineVerificationStage::DiscoveringRoom;
+            }
+        }
+        return Ok(());
+    }
+
+    match params.harness.stage {
+        OnlineVerificationStage::CreatingRoom => {
+            if params.session.phase == OnlinePhase::Lobby && params.session.is_host {
+                params.harness.room_code = params
+                    .session
+                    .room
+                    .as_ref()
+                    .map(|room| room.room_code.to_string());
+                submit_lobby_command(
+                    &mut params.session,
+                    &mut params.transport,
+                    OnlineLobbyCommand::VictoryCondition(1),
+                );
+                params.harness.stage = OnlineVerificationStage::WaitingForPlayers;
+            }
+        }
+        OnlineVerificationStage::DiscoveringRoom => {
+            if let Some(room_code) =
+                verification_room_code(&params.session.public_rooms, config.run_id.as_str())
+            {
+                params.harness.room_code = Some(room_code.clone());
+                begin_join_room(&mut params.session, &params.async_inbox, room_code);
+                params.harness.stage = OnlineVerificationStage::JoiningRoom;
+            } else if params.harness.elapsed >= params.harness.next_room_refresh {
+                begin_refresh_rooms(&mut params.session, &params.async_inbox);
+                params.harness.next_room_refresh = params.harness.elapsed + 1.0;
+            }
+        }
+        OnlineVerificationStage::JoiningRoom => {
+            if params.session.phase == OnlinePhase::Lobby && !params.session.is_host {
+                submit_lobby_command(
+                    &mut params.session,
+                    &mut params.transport,
+                    OnlineLobbyCommand::Ready(true),
+                );
+                params.harness.stage = OnlineVerificationStage::WaitingForPlayers;
+            }
+        }
+        OnlineVerificationStage::WaitingForPlayers => match config.role {
+            OnlineVerificationRole::Host => {
+                let ready = params
+                    .session
+                    .lobby
+                    .as_ref()
+                    .is_some_and(OnlineLobbySnapshot::can_start);
+                if ready {
+                    host_start_online_match(
+                        &mut params.session,
+                        &mut params.transport,
+                        &mut params.setup,
+                        &mut params.next_screen,
+                    );
+                    params.harness.stage = OnlineVerificationStage::StartingMatch;
+                }
+            }
+            OnlineVerificationRole::Player => {
+                if params.session.phase == OnlinePhase::InMatch {
+                    params.harness.stage = OnlineVerificationStage::StartingMatch;
+                }
+            }
+        },
+        OnlineVerificationStage::StartingMatch => {
+            if screen == AppScreen::InMatch && params.session.phase == OnlinePhase::InMatch {
+                params.harness.stage = OnlineVerificationStage::MatchEntered;
+            }
+        }
+        OnlineVerificationStage::MatchEntered
+        | OnlineVerificationStage::CommandSent
+        | OnlineVerificationStage::CommandObserved
+        | OnlineVerificationStage::EndingMatch => {
+            drive_online_verification_match(params, config.role)?;
+        }
+        OnlineVerificationStage::Disabled
+        | OnlineVerificationStage::Booting
+        | OnlineVerificationStage::EnteringLobby
+        | OnlineVerificationStage::Passed
+        | OnlineVerificationStage::Failed => {}
+    }
+    Ok(())
+}
+
+fn verification_room_code(rooms: &[RoomDescriptor], run_id: &str) -> Option<String> {
+    rooms
+        .iter()
+        .find(|room| {
+            room.metadata
+                .get("verification_id")
+                .is_some_and(|value| value == run_id)
+        })
+        .map(|room| room.room_code.to_string())
+}
+
+fn drive_online_verification_match(
+    params: &mut OnlineVerificationParams,
+    role: OnlineVerificationRole,
+) -> Result<(), String> {
+    if *params.screen.get() != AppScreen::InMatch || params.session.phase != OnlinePhase::InMatch {
+        return Ok(());
+    }
+
+    let local_player_id = params
+        .session
+        .local_player_id
+        .ok_or_else(|| "online match has no local player id".to_string())?;
+    let config = params
+        .session
+        .match_config
+        .as_ref()
+        .ok_or_else(|| "online match config is unavailable".to_string())?;
+    let local_team = config
+        .runtime_team_for_player(local_player_id)
+        .ok_or_else(|| "local player has no runtime team".to_string())?;
+
+    match role {
+        OnlineVerificationRole::Player => {
+            if !params.harness.command_sent && params.replication.last_applied_tick > 0 {
+                let (unit_id, origin) = verification_unit_for_team(&params.units, local_team)
+                    .ok_or_else(|| "client has no movable replicated unit".to_string())?;
+                let destination = verification_move_destination(*params.map_bounds, origin);
+                if destination.distance(origin) < ONLINE_VERIFICATION_MOVE_DISTANCE * 2.0 {
+                    return Err("could not choose a visible verification destination".to_string());
+                }
+                params.outbox.submit(OnlinePlayerCommand::UnitOrders {
+                    orders: vec![OnlineUnitOrderCommand {
+                        unit_id,
+                        order: OnlineUnitOrderKind::Move {
+                            destination: destination.to_array(),
+                        },
+                    }],
+                    queue: false,
+                });
+                params.harness.tracked_unit_id = Some(unit_id);
+                params.harness.tracked_unit_origin = Some(origin);
+                params.harness.command_sent = true;
+                params.harness.stage = OnlineVerificationStage::CommandSent;
+            }
+        }
+        OnlineVerificationRole::Host => {
+            let enemy_team = config
+                .slots
+                .iter()
+                .enumerate()
+                .find_map(|(index, slot)| match slot.occupant {
+                    OnlineSlotOccupant::Human { player_id, .. } if player_id != local_player_id => {
+                        Some(Team::Player(index))
+                    }
+                    _ => None,
+                })
+                .ok_or_else(|| "host has no remote human opponent".to_string())?;
+            if params.harness.tracked_unit_id.is_none()
+                && let Some((unit_id, origin)) =
+                    verification_unit_for_team(&params.units, enemy_team)
+            {
+                params.harness.tracked_unit_id = Some(unit_id);
+                params.harness.tracked_unit_origin = Some(origin);
+                params.harness.stage = OnlineVerificationStage::MatchEntered;
+            }
+
+            if params.harness.command_observed {
+                if params.harness.stage != OnlineVerificationStage::EndingMatch {
+                    let mut anchors_destroyed = 0;
+                    for (team, structure, mut health) in &mut params.structures {
+                        if *team == enemy_team && is_structure_elimination_anchor(structure) {
+                            health.current = 0.0;
+                            anchors_destroyed += 1;
+                        }
+                    }
+                    if anchors_destroyed == 0 {
+                        return Err("remote player has no headquarters anchor".to_string());
+                    }
+                    params.harness.stage = OnlineVerificationStage::EndingMatch;
+                }
+            }
+        }
+    }
+
+    if let (Some(unit_id), Some(origin)) = (
+        params.harness.tracked_unit_id,
+        params.harness.tracked_unit_origin,
+    ) && let Some(current) =
+        verification_unit_position(&params.units, &params.interpolations, unit_id)
+        && current.distance(origin) >= ONLINE_VERIFICATION_MOVE_DISTANCE
+    {
+        params.harness.command_observed = true;
+        if params.harness.stage != OnlineVerificationStage::EndingMatch {
+            params.harness.stage = OnlineVerificationStage::CommandObserved;
+        }
+    }
+
+    match (role, params.match_state.phase) {
+        (OnlineVerificationRole::Host, MatchPhase::HumanVictory)
+            if params.harness.command_observed && params.replication.next_tick > 0 =>
+        {
+            params.harness.pass("victory");
+        }
+        (OnlineVerificationRole::Player, MatchPhase::HumanDefeat)
+            if params.harness.command_observed && params.replication.last_applied_tick > 0 =>
+        {
+            params.harness.pass("defeat");
+        }
+        (OnlineVerificationRole::Host, MatchPhase::HumanDefeat) => {
+            return Err("host received defeat instead of victory".to_string());
+        }
+        (OnlineVerificationRole::Player, MatchPhase::HumanVictory) => {
+            return Err("player received victory instead of defeat".to_string());
+        }
+        _ => {}
+    }
+    Ok(())
+}
+
+fn verification_unit_for_team(
+    units: &Query<
+        (&NetworkEntityId, &Team, &Unit, &Transform, &Health),
+        (With<Unit>, Without<Structure>),
+    >,
+    team: Team,
+) -> Option<(u64, Vec3)> {
+    units
+        .iter()
+        .filter(|(_, unit_team, unit, _, health)| {
+            **unit_team == team && unit.speed > 0.0 && health.current > 0.0
+        })
+        .map(|(network_id, _, _, transform, _)| (network_id.0, transform.translation))
+        .min_by_key(|(network_id, _)| *network_id)
+}
+
+fn verification_unit_position(
+    units: &Query<
+        (&NetworkEntityId, &Team, &Unit, &Transform, &Health),
+        (With<Unit>, Without<Structure>),
+    >,
+    interpolations: &Query<(&NetworkEntityId, &NetworkInterpolation)>,
+    target_id: u64,
+) -> Option<Vec3> {
+    let current = units
+        .iter()
+        .find(|(network_id, _, _, _, health)| network_id.0 == target_id && health.current > 0.0)
+        .map(|(_, _, _, transform, _)| transform.translation)?;
+    Some(
+        interpolations
+            .iter()
+            .find(|(network_id, _)| network_id.0 == target_id)
+            .map_or(current, |(_, target)| target.translation),
+    )
+}
+
+fn verification_move_destination(bounds: MapBounds, origin: Vec3) -> Vec3 {
+    [
+        Vec3::new(12.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, 12.0),
+        Vec3::new(-12.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, -12.0),
+    ]
+    .into_iter()
+    .map(|offset| bounds.clamp_ground_point(origin + offset, 1.0))
+    .max_by(|left, right| {
+        left.distance_squared(origin)
+            .total_cmp(&right.distance_squared(origin))
+    })
+    .unwrap_or(origin)
+}
+
+fn publish_online_verification_status(params: &mut OnlineVerificationParams) {
+    let Some(config) = params.harness.config.as_ref() else {
+        return;
+    };
+    let connected_humans = params
+        .session
+        .lobby
+        .as_ref()
+        .map(|lobby| {
+            lobby
+                .slots
+                .iter()
+                .filter(|slot| {
+                    matches!(
+                        slot.occupant,
+                        OnlineSlotOccupant::Human {
+                            connected: true,
+                            ..
+                        }
+                    )
+                })
+                .count()
+        })
+        .unwrap_or_default();
+    let snapshot_tick = if config.role == OnlineVerificationRole::Host {
+        params.replication.next_tick
+    } else {
+        params.replication.last_applied_tick
+    };
+    let report = serde_json::json!({
+        "schema": 1,
+        "passed": params.harness.stage == OnlineVerificationStage::Passed,
+        "terminal": params.harness.stage.is_terminal(),
+        "role": config.role,
+        "run_id": config.run_id,
+        "stage": params.harness.stage,
+        "elapsed_seconds": params.harness.elapsed.floor() as u64,
+        "service_url": config.service_url,
+        "room_code": params.harness.room_code,
+        "app_screen": format!("{:?}", params.screen.get()),
+        "online_phase": format!("{:?}", params.session.phase),
+        "session_status": params.session.status.as_str(),
+        "local_player_id": params.session.local_player_id,
+        "connected_humans": connected_humans,
+        "snapshot_tick": snapshot_tick,
+        "command_sent": params.harness.command_sent,
+        "command_observed": params.harness.command_observed,
+        "match_phase": format!("{:?}", params.match_state.phase),
+        "result": params.harness.result,
+        "error": params.harness.error,
+    });
+    let Ok(report) = serde_json::to_string(&report) else {
+        return;
+    };
+    if report == params.harness.last_report {
+        return;
+    }
+    if publish_online_verification_report(config, &report).is_ok() {
+        params.harness.last_report = report;
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn publish_online_verification_report(
+    config: &OnlineVerificationConfig,
+    report: &str,
+) -> Result<(), String> {
+    println!("[online-verification] {report}");
+    let Some(path) = config.status_path.as_deref() else {
+        return Ok(());
+    };
+    let path = std::path::Path::new(path);
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|error| error.to_string())?;
+    }
+    let temporary = path.with_extension("tmp");
+    std::fs::write(&temporary, report).map_err(|error| error.to_string())?;
+    std::fs::rename(&temporary, path).map_err(|error| error.to_string())
+}
+
+#[cfg(target_arch = "wasm32")]
+fn publish_online_verification_report(
+    _config: &OnlineVerificationConfig,
+    report: &str,
+) -> Result<(), String> {
+    let document = web_sys::window()
+        .and_then(|window| window.document())
+        .ok_or_else(|| "browser document is unavailable".to_string())?;
+    let element = match document.get_element_by_id(ONLINE_VERIFICATION_STATUS_ELEMENT_ID) {
+        Some(element) => element,
+        None => {
+            let element = document
+                .create_element("script")
+                .map_err(|_| "could not create verification status element".to_string())?;
+            element.set_id(ONLINE_VERIFICATION_STATUS_ELEMENT_ID);
+            element
+                .set_attribute("type", "application/json")
+                .map_err(|_| "could not configure verification status element".to_string())?;
+            document
+                .body()
+                .ok_or_else(|| "browser document body is unavailable".to_string())?
+                .append_child(&element)
+                .map_err(|_| "could not attach verification status element".to_string())?;
+            element
+        }
+    };
+    element.set_text_content(Some(report));
+    Ok(())
 }
 
 fn process_online_async_results(
@@ -2655,6 +3329,7 @@ fn disconnect_online(session: &mut OnlineSession, transport: &mut OnlineTranspor
 }
 
 fn poll_online_transport(
+    time: Res<Time>,
     mut session: ResMut<OnlineSession>,
     mut transport: ResMut<OnlineTransport>,
     mut replication: ResMut<OnlineMatchReplication>,
@@ -2666,6 +3341,27 @@ fn poll_online_transport(
     let Some(socket) = transport.socket.as_mut() else {
         return;
     };
+    if !session.is_host
+        && session.phase == OnlinePhase::Connecting
+        && session.local_player_id.is_none()
+        && let Some(host_peer) = session.host_peer
+    {
+        session.hello_retry_elapsed += time.delta_secs();
+        if session.hello_retry_elapsed >= 1.0 {
+            session.hello_retry_elapsed = 0.0;
+            let hello = OnlineReliableMessage::Hello {
+                protocol: RTS_ONLINE_PROTOCOL,
+                session_key: session.session_key.clone(),
+                player_name: session.player_name.clone(),
+            };
+            if let Err(error) = send_online_message(socket, host_peer, &hello) {
+                session.set_status(format!(
+                    "{}: {error}",
+                    t("正在重试房间握手", "Retrying room handshake")
+                ));
+            }
+        }
+    }
     let events = match socket.poll() {
         Ok(events) => events,
         Err(error) => {
@@ -2677,12 +3373,19 @@ fn poll_online_transport(
         match event {
             TransportEvent::PeerConnected(peer) => {
                 if !session.is_host {
+                    session.host_peer = Some(peer);
+                    session.hello_retry_elapsed = 0.0;
                     let hello = OnlineReliableMessage::Hello {
                         protocol: RTS_ONLINE_PROTOCOL,
                         session_key: session.session_key.clone(),
                         player_name: session.player_name.clone(),
                     };
-                    let _ = send_online_message(socket, peer, &hello);
+                    if let Err(error) = send_online_message(socket, peer, &hello) {
+                        session.set_status(format!(
+                            "{}: {error}",
+                            t("无法开始房间握手", "Could not start room handshake")
+                        ));
+                    }
                 }
             }
             TransportEvent::PeerDisconnected(peer) => {
@@ -5642,6 +6345,37 @@ mod tests {
         assert_ne!(first, second);
         assert_eq!(first.len(), 32);
         assert!(first.bytes().all(|byte| byte.is_ascii_hexdigit()));
+    }
+
+    #[test]
+    fn verification_roles_accept_host_player_and_client_alias() {
+        assert_eq!(
+            OnlineVerificationRole::parse("host"),
+            Some(OnlineVerificationRole::Host)
+        );
+        assert_eq!(
+            OnlineVerificationRole::parse("PLAYER"),
+            Some(OnlineVerificationRole::Player)
+        );
+        assert_eq!(
+            OnlineVerificationRole::parse("client"),
+            Some(OnlineVerificationRole::Player)
+        );
+        assert_eq!(OnlineVerificationRole::parse("observer"), None);
+    }
+
+    #[test]
+    fn verification_destination_moves_and_stays_inside_map() {
+        let bounds = MapBounds::from_size((40.0, 30.0));
+        for origin in [
+            Vec3::ZERO,
+            Vec3::new(19.0, 0.0, 14.0),
+            Vec3::new(-19.0, 0.0, -14.0),
+        ] {
+            let destination = verification_move_destination(bounds, origin);
+            assert!(bounds.contains_ground_point(destination));
+            assert!(destination.distance(origin) >= ONLINE_VERIFICATION_MOVE_DISTANCE * 2.0);
+        }
     }
 
     #[test]

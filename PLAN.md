@@ -59,7 +59,7 @@ native desktop and browser builds.
     - [x] Disconnect grace, reconnect cancellation, and authoritative forfeit
     - [x] Synchronized return-to-lobby flow
 - [ ] Product verification
-  - [ ] Two native clients
+  - [x] Two native clients
   - [ ] Two browser clients
   - [ ] Native-to-browser client
   - [ ] Internet path through TURN

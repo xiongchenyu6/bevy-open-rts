@@ -173,3 +173,35 @@ separate simulation rewrite rather than a safe shortcut.
 
 The deployment example in `deploy/signaling/` provides the service, Coturn, and
 Caddy wiring. Secrets and public addresses are intentionally required inputs.
+
+## Product Verification
+
+The verification harness is disabled during normal play. It is enabled only by
+an explicit role and run ID, and it drives the existing lobby and match systems
+rather than a separate mock protocol.
+
+Two native clients against the deployed service:
+
+```sh
+OPEN_BEVY_SIGNALING_URL=https://signal.example.com \
+  scripts/verify_native_online.sh
+```
+
+The script builds once, launches isolated host/player processes, and requires
+both atomic JSON reports to name the same room and prove a synchronized move
+command plus host-victory/player-defeat result.
+
+The WebGPU workflow runs `scripts/browser-smoke/multiplayer_smoke.mjs` against
+the freshly built web bundle. It launches two independent browser contexts with
+these query parameters:
+
+```text
+?online_verify={host|player}
+&online_run={unique-run-id}
+&online_service={signaling-base-url}
+```
+
+Each browser publishes its current report in the hidden
+`#open-bevy-online-verification` JSON element. The CI gate fails unless both
+clients enter the same room, receive snapshots, observe the player command, and
+finish with complementary authoritative results.

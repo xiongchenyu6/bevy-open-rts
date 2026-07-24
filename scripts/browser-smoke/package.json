@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "smoke": "node online_smoke.mjs"
+    "smoke": "node online_smoke.mjs",
+    "multiplayer": "node multiplayer_smoke.mjs"
   },
   "devDependencies": {
     "playwright-core": "1.55.0"

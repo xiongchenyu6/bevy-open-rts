@@ -122,6 +122,37 @@ jobs:
           npm --prefix scripts/browser-smoke run smoke 2>&1 \
             | tee browser-smoke-output/report.log
 
+      - name: Complete a two-browser online match
+        env:
+          OPEN_BEVY_GAME_URL: http://127.0.0.1:8080/
+          OPEN_BEVY_BROWSER_OUTPUT: browser-smoke-output/multiplayer
+          OPEN_BEVY_SOFTWARE_WEBGPU: "1"
+          OPEN_BEVY_MULTIPLAYER_TIMEOUT_MS: "180000"
+        run: |
+          set -euo pipefail
+          mkdir -p browser-smoke-output/multiplayer
+          python3 -m http.server 8080 --directory web \
+            > /tmp/open-bevy-multiplayer-server.log 2>&1 &
+          server_pid=$!
+          cleanup() {
+            cp /tmp/open-bevy-multiplayer-server.log \
+              browser-smoke-output/multiplayer/static-server.log 2>/dev/null || true
+            kill "$server_pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8080/ >/dev/null; then
+              break
+            fi
+            if [[ "$attempt" == 30 ]]; then
+              cat /tmp/open-bevy-multiplayer-server.log
+              exit 1
+            fi
+            sleep 1
+          done
+          npm --prefix scripts/browser-smoke run multiplayer 2>&1 \
+            | tee browser-smoke-output/multiplayer/report.log
+
       - name: Upload browser smoke evidence
         if: always()
         uses: actions/upload-artifact@v7

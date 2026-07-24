@@ -96,3 +96,19 @@
   while alive, and are deduplicated by clients. This gives dropped unreliable
   packets another chance to carry the visual event without replaying it when
   multiple packets arrive.
+- The game now has an opt-in two-client product verification path rather than a
+  signaling-only smoke test. A run-tagged host and player use the real public
+  room discovery, lobby readiness, match transition, reliable unit-order
+  validation, authoritative snapshots, and victory flow. Native clients write
+  atomic JSON reports; browser clients expose the same report in a hidden DOM
+  element for Playwright. A 2026-07-25 native run completed room `B7116009` at
+  snapshot tick 14 with host victory and player defeat.
+- Client admission cannot rely on a one-shot `Hello`/`Welcome` exchange. A real
+  two-process run showed the host admitting the player while the first Welcome
+  was not observed by the client. Clients now retain the candidate host peer
+  and retry the same stable-session Hello once per second until admission;
+  host admission is idempotent through the existing resume-key path.
+- Directly launching `target/debug/bevy-open-rts` does not inherit Cargo's
+  `CARGO_MANIFEST_DIR`, so Bevy otherwise looks under `target/debug/assets`.
+  Native verification sets `BEVY_ASSET_ROOT` explicitly; normal `cargo run`
+  behavior is unchanged.

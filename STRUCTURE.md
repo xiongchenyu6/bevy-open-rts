@@ -151,7 +151,13 @@ domains live in modules, each re-exported into the crate root
   forfeit, rejects late/forfeited identities, and synchronizes return to a reset
   rematch lobby. Host-sequenced shot, impact, support-warning, structure-death,
   and promotion effects are repeated while alive and deduplicated by clients.
-  The next online boundary is full multi-client product verification.
+  Explicit `online_verify` query/environment parameters enable a dormant
+  end-to-end verification driver without changing normal player startup. Two
+  clients discover the same run-tagged public room, ready up, enter the real
+  match, send a normal reliable move order, observe authoritative movement,
+  and finish with opposite synchronized results. Native runs publish atomic
+  JSON files through `scripts/verify_native_online.sh`; browser runs publish a
+  hidden JSON status element consumed by Playwright in the Pages workflow.
 - `bevy_fluent::FluentPlugin` is registered in the shared game scene so future `.ftl` localization bundles can load through Bevy assets. The existing `Locale` / `t()` path remains the active text source until screens are migrated incrementally.
 - AI drones have an active scouting controller: idle AI `Drone` units pick living enemy units, move to their positions, avoid repeating the previous target when possible, and retarget after a short 0.5-1.0s delay.
 - AI defense profiles follow the godot difficulty targets: Beginner/Easy do not inherit Normal advanced-defense construction, Normal targets one standard defense layer plus 2 Tesla fence segments where the faction supports them, and Hard scales standard defenses to 2 plus 4 Tesla fence segments.
