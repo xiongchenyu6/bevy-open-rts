@@ -16,7 +16,10 @@ The repository is a Cargo workspace whose default member remains the root
   build, and game protocol through `OpenBevyGameClient`. The compiler-checked
   `examples/universal_room.rs` demonstrates onboarding without RTS code.
 - `services/open-bevy-signaling` owns the reusable Open Bevy room service and a
-  Matchbox-compatible WebSocket endpoint. It has no dependency on the RTS game.
+  Matchbox-compatible WebSocket endpoint. The parent crate is the native
+  Axum/Tokio target; `cloudflare-worker/` implements the same contract with a
+  directory Durable Object and one hibernatable Durable Object per room. It has
+  no dependency on the RTS game.
 - `deploy/signaling` contains the production container, Caddy, and Coturn
   example. TURN credentials are generated with the Coturn REST HMAC contract.
 - `docs/ONLINE_ARCHITECTURE.md` is the online wire/deployment contract;

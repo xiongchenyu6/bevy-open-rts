@@ -5,6 +5,7 @@ members = [
   "crates/open-bevy-protocol",
   "services/open-bevy-signaling",
 ]
+exclude = ["services/open-bevy-signaling/cloudflare-worker"]
 default-members = ["."]
 resolver = "2"
 

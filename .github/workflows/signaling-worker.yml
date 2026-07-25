@@ -1,0 +1,167 @@
+name: Open Bevy signaling Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "crates/open-bevy-protocol/**"
+      - "services/open-bevy-signaling/cloudflare-worker/**"
+      - ".github/workflows/signaling-worker.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/open-bevy-protocol/**"
+      - "services/open-bevy-signaling/cloudflare-worker/**"
+      - ".github/workflows/signaling-worker.yml"
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deploy after the build and protocol checks pass
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: open-bevy-signaling-worker-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  WORKER_DIR: services/open-bevy-signaling/cloudflare-worker
+  WORKER_BUILD_VERSION: 0.8.5
+  WRANGLER_VERSION: 4.114.0
+
+jobs:
+  build:
+    name: Build and test Worker protocol
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ env.WORKER_DIR }} -> target
+          cache-targets: true
+          cache-on-failure: true
+
+      - name: Cache Worker build tools
+        id: worker-tools
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/bin/worker-build
+            ~/.cache/worker-build
+          key: ${{ runner.os }}-worker-build-${{ env.WORKER_BUILD_VERSION }}-${{ hashFiles('services/open-bevy-signaling/cloudflare-worker/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-worker-build-${{ env.WORKER_BUILD_VERSION }}-
+
+      - name: Install worker-build
+        if: steps.worker-tools.outputs.cache-hit != 'true'
+        run: cargo install worker-build --version "${WORKER_BUILD_VERSION}" --locked
+
+      - name: Check formatting
+        working-directory: ${{ env.WORKER_DIR }}
+        run: cargo fmt --check
+
+      - name: Run protocol tests
+        working-directory: ${{ env.WORKER_DIR }}
+        run: cargo test --lib
+
+      - name: Lint native test surface
+        working-directory: ${{ env.WORKER_DIR }}
+        run: cargo clippy --lib --tests -- -D warnings
+
+      - name: Check wasm target
+        working-directory: ${{ env.WORKER_DIR }}
+        run: cargo clippy --lib --target wasm32-unknown-unknown -- -D warnings
+
+      - name: Build deployment bundle
+        working-directory: ${{ env.WORKER_DIR }}
+        run: bash scripts/build.sh
+
+      - name: Verify local Durable Objects and WebRTC transport
+        working-directory: ${{ env.WORKER_DIR }}
+        env:
+          WRANGLER_VERSION: ${{ env.WRANGLER_VERSION }}
+        run: bash scripts/verify_local.sh
+
+      - name: Upload Worker bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: open-bevy-signaling-worker-${{ github.sha }}
+          path: ${{ env.WORKER_DIR }}/build/
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    name: Deploy open-bevy-signaling
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.CLOUDFLARE_WORKER_DEPLOY_ENABLED == 'true') ||
+      (github.event_name == 'workflow_dispatch' && inputs.deploy)
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ env.WORKER_DIR }} -> target
+          cache-targets: true
+          cache-on-failure: true
+
+      - name: Cache Worker build tools
+        id: worker-tools
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/bin/worker-build
+            ~/.cache/worker-build
+          key: ${{ runner.os }}-worker-build-${{ env.WORKER_BUILD_VERSION }}-${{ hashFiles('services/open-bevy-signaling/cloudflare-worker/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-worker-build-${{ env.WORKER_BUILD_VERSION }}-
+
+      - name: Install worker-build
+        if: steps.worker-tools.outputs.cache-hit != 'true'
+        run: cargo install worker-build --version "${WORKER_BUILD_VERSION}" --locked
+
+      - name: Require Cloudflare credentials
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}"
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}"
+
+      - name: Deploy Worker and Durable Objects
+        working-directory: ${{ env.WORKER_DIR }}
+        run: npx --yes "wrangler@${WRANGLER_VERSION}" deploy
+
+      - name: Verify deployed health and config
+        run: |
+          set -euo pipefail
+          base=https://open-bevy-signaling.xiongchenyu6.workers.dev
+          curl --retry 10 --retry-all-errors --retry-delay 3 -fsS "$base/readyz"
+          curl --retry 10 --retry-all-errors --retry-delay 3 -fsS "$base/v1/config" \
+            | jq -e '.service == "open-bevy-signaling" and (.websocket_base_url | startswith("wss://"))'

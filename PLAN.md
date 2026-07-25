@@ -31,6 +31,8 @@ native desktop and browser builds.
   - [x] Matchbox-compatible WebSocket signaling
   - [x] Room isolation, capacity, host ownership, cleanup, metrics
   - [x] Container, TURN REST credentials, CI, integration tests
+  - [x] Native container and Cloudflare Worker/Durable Objects deployments share
+        the same API, room rules, and WebRTC verification harness
 - [x] Shared native/wasm client transport
   - [x] Reliable and unreliable channels
   - [x] Connection lifecycle and structured errors

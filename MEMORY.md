@@ -31,6 +31,11 @@
   players for a configurable 30-second host reconnect window. A resumed host
   receives a new Matchbox peer ID, so game-level identity must use its own
   stable session key rather than treating `PeerId` as player identity.
+- `open-bevy-signaling` now has protocol-compatible native and Cloudflare
+  deployment targets. The Worker uses `RoomDirectory` plus isolated `GameRoom`
+  Durable Objects with hibernatable WebSockets. It prefers short-lived
+  Cloudflare Realtime TURN credentials and can fall back to the existing
+  Coturn REST secret without exposing either long-term credential.
 - `src/online.rs` now provides the first real game integration slice: public
   room discovery/create, code/token join, reconnect-aware player identity,
   exact map-derived slot rows, host-validated lobby options, readiness, and a

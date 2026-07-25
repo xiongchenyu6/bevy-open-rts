@@ -1,8 +1,13 @@
-# Open Bevy Signaling Operations
+# Open Bevy Signaling Native Operations
 
 This stack is the game-independent WebRTC room, signaling, and TURN edge for
 the Open Bevy family. Game state never passes through it; peers exchange game
 packets over WebRTC data channels after Matchbox signaling completes.
+
+This is the native Axum/Tokio deployment target. The protocol-compatible
+Cloudflare Worker target lives at
+[`services/open-bevy-signaling/cloudflare-worker`](../../services/open-bevy-signaling/cloudflare-worker/README.md).
+Games can switch between them by changing only `OPEN_BEVY_SIGNALING_URL`.
 
 ## Prerequisites
 
@@ -77,9 +82,7 @@ smoke against production:
 ```sh
 OPEN_BEVY_SIGNALING_URL="https://${SIGNALING_HOST}" \
 OPEN_BEVY_REQUIRE_TURN=1 \
-cargo test -p open-bevy-net --test transport \
-  deployed_service_exchanges_reliable_and_snapshot_channels \
-  -- --ignored --nocapture
+scripts/verify_signaling_backend.sh
 ```
 
 This creates an unlisted two-peer room and exchanges payloads over both the

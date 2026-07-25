@@ -11,6 +11,12 @@ The service is compatible with `matchbox_socket` 0.14 on native and wasm. It
 only carries WebRTC session descriptions and ICE candidates; game packets flow
 peer-to-peer after the data channels connect.
 
+The same public contract has two deployment targets. The native Axum/Tokio
+service keeps its room registry in memory and is packaged with Caddy/Coturn.
+The Cloudflare target uses one directory Durable Object plus an isolated,
+hibernatable Durable Object per room. Clients do not branch on the deployment
+type.
+
 `open-bevy-net` is the corresponding reusable client. It exposes the room HTTP
 API through `ehttp`, builds safely encoded connection URLs, chooses issued TURN
 credentials when available, and fixes channel 0 as reliable control/commands
@@ -70,9 +76,10 @@ GET /v1/config
 ```
 
 `/v1/config` returns supported universal session protocol versions and ICE
-servers. When TURN REST is configured, each response contains a newly
-generated, time-limited Coturn username and HMAC-SHA1 credential; the static
-shared secret is never returned.
+servers. The native target can issue a time-limited Coturn HMAC-SHA1
+credential. The Worker can request short-lived Cloudflare Realtime TURN
+credentials and optionally fall back to the same Coturn REST contract. Static
+TURN keys and shared secrets are never returned.
 
 ### Create a room
 
@@ -169,6 +176,8 @@ separate simulation rewrite rather than a safe shortcut.
 
 ## Production Network Requirements
 
+### Native target
+
 - HTTPS/WSS reverse proxy with query-string logging disabled.
 - Coturn reachable on TCP/UDP 3478 and a configured UDP relay range.
 - `OPEN_BEVY_TURN_SECRET` must match Coturn's `static-auth-secret`.
@@ -179,6 +188,20 @@ separate simulation rewrite rather than a safe shortcut.
 
 The deployment example in `deploy/signaling/` provides the service, Coturn, and
 Caddy wiring. Secrets and public addresses are intentionally required inputs.
+
+### Cloudflare target
+
+- Deploy `services/open-bevy-signaling/cloudflare-worker` with both the
+  `GameRoom` and `RoomDirectory` Durable Object bindings.
+- Restrict `ALLOWED_ORIGINS` to production game origins.
+- Configure both `CLOUDFLARE_TURN_KEY_ID` and
+  `CLOUDFLARE_TURN_API_TOKEN` for managed TURN.
+- Keep `LEGACY_TURN_SECRET` and `LEGACY_TURN_URLS` during migration when the
+  native Coturn relay must remain a fallback.
+- Preserve Durable Object migration history when changing class names.
+
+The Worker deployment guide is
+`services/open-bevy-signaling/cloudflare-worker/README.md`.
 
 ## Product Verification
 
