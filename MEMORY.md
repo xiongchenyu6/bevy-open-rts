@@ -154,3 +154,9 @@
   short-lived Cloudflare TURN credential issuance does not depend on Podman's
   bridge DNS forwarder. Its explicitly named Compose network also uses
   `x-podman.disable_dns`, allowing Podman to honor those service-level resolvers.
+- GitHub's two-browser SwiftShader gate can spend roughly 136 seconds entering
+  both match scenes. The verification harness now allows 240 seconds internally
+  (the workflow allows 300) and submits the player command as soon as an initial
+  replicated unit exists, including on snapshot tick zero. This preserves the
+  real full-match/relay assertion without failing before the first actionable
+  match frame.

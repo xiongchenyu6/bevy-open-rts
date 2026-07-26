@@ -24,6 +24,7 @@
 
 use std::env;
 use std::path::{Path, PathBuf};
+use std::time::{Duration, Instant};
 
 use bevy::prelude::*;
 use bevy::render::view::screenshot::{Screenshot, save_to_disk};
@@ -54,8 +55,9 @@ use bevy_open_rts::{
     capture_show_skirmish_setup_menu, capture_show_skirmish_setup_with_dropdown,
     capture_spawn_construction_showcase, capture_spawn_model_harness_page,
     capture_stage_deployed_siege, capture_stage_player_radar, capture_stage_worker_collecting,
-    capture_start_mission, capture_world_to_screen, capture_worst_model_alignment_offset,
-    capture_zoom_camera_closest, start_shared_match_scene_with_current_setup,
+    capture_start_mission, capture_startup_ready, capture_world_to_screen,
+    capture_worst_model_alignment_offset, capture_zoom_camera_closest,
+    start_shared_match_scene_with_current_setup,
 };
 
 const WIDTH: u32 = 1280;
@@ -70,6 +72,8 @@ const MODEL_HARNESS_SETTLE_TICKS: usize = 180;
 const WARMUP_TICKS: usize = 90;
 /// Ticks to let the match scene populate (bases, units) before first capture.
 const MATCH_SETTLE_TICKS: usize = 60;
+const STARTUP_WAIT_TIMEOUT: Duration = Duration::from_secs(30);
+const STARTUP_POLL_INTERVAL: Duration = Duration::from_millis(10);
 /// Extra ticks after the final screenshot request so async readback/save lands.
 const FLUSH_TICKS: usize = 16;
 const TRAIN_COMPLETION_WAIT_TICKS: usize = 360;
@@ -324,7 +328,7 @@ fn main() {
 /// GLB bug (the old harvest "proof" clicked world_to_viewport(origin) and tested
 /// against the same point, so it could never see the model rendered elsewhere).
 fn verify_click_alignment() -> Result<(), String> {
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
     // Let scenes finish streaming and the recenter settle window elapse.
     for _ in 0..90 {
         app.update();
@@ -375,9 +379,7 @@ fn render_map_overview(map_id: &str, path: &Path) -> Result<(), String> {
         std::fs::create_dir_all(parent).map_err(|error| error.to_string())?;
     }
     let mut app = build_capture_app(WIDTH, HEIGHT);
-    for _ in 0..WARMUP_TICKS {
-        app.update();
-    }
+    wait_for_startup(&mut app)?;
     capture_select_map(&mut app, map_id)?;
     start_shared_match_scene_with_current_setup(&mut app);
     for _ in 0..MATCH_SETTLE_TICKS {
@@ -450,16 +452,32 @@ fn run_match_proof(max_seconds: u32) -> Result<(), String> {
 }
 
 /// Builds the offscreen render app, warms up assets, and starts a real match.
-fn start_match_app() -> App {
+fn start_match_app() -> Result<App, String> {
     let mut app = build_capture_app(WIDTH, HEIGHT);
-    for _ in 0..WARMUP_TICKS {
-        app.update();
-    }
+    wait_for_startup(&mut app)?;
     start_shared_match_scene_with_current_setup(&mut app);
     for _ in 0..MATCH_SETTLE_TICKS {
         app.update();
     }
-    app
+    Ok(app)
+}
+
+fn wait_for_startup(app: &mut App) -> Result<(), String> {
+    let deadline = Instant::now() + STARTUP_WAIT_TIMEOUT;
+    while Instant::now() < deadline {
+        app.update();
+        if capture_startup_ready(app) {
+            for _ in 0..WARMUP_TICKS {
+                app.update();
+            }
+            return Ok(());
+        }
+        std::thread::sleep(STARTUP_POLL_INTERVAL);
+    }
+    Err(format!(
+        "startup assets did not finish loading within {} seconds",
+        STARTUP_WAIT_TIMEOUT.as_secs()
+    ))
 }
 
 fn capture_handle(app: &App) -> Handle<Image> {
@@ -609,9 +627,7 @@ fn render_menu_at(path: &Path, width: u32, height: u32) -> Result<(), String> {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
     let mut app = build_capture_app(width, height);
-    for _ in 0..120 {
-        app.update();
-    }
+    wait_for_startup(&mut app)?;
     let handle = capture_handle(&app);
     shoot(&mut app, &handle, path.to_path_buf());
     println!("[capture] wrote menu screenshot to {}", path.display());
@@ -623,9 +639,7 @@ fn render_menu_return(path: &Path) -> Result<(), String> {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
     let mut app = build_capture_app(WIDE_MENU_WIDTH, WIDE_MENU_HEIGHT);
-    for _ in 0..120 {
-        app.update();
-    }
+    wait_for_startup(&mut app)?;
     capture_show_skirmish_setup_menu(&mut app);
     for _ in 0..60 {
         app.update();
@@ -648,9 +662,7 @@ fn render_menu_page(path: &Path, enter_page: fn(&mut App)) -> Result<(), String>
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
     let mut app = build_capture_app(WIDTH, HEIGHT);
-    for _ in 0..120 {
-        app.update();
-    }
+    wait_for_startup(&mut app)?;
     enter_page(&mut app);
     for _ in 0..60 {
         app.update();
@@ -665,7 +677,7 @@ fn render_menu_page(path: &Path, enter_page: fn(&mut App)) -> Result<(), String>
 /// confirm the worker takes a harvest order and the player's ore grows.
 fn render_harvest(dir: &Path) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
     let handle = capture_handle(&app);
     shoot(&mut app, &handle, dir.join("00_start.png"));
 
@@ -786,9 +798,7 @@ fn render_factions(dir: &Path) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
     for index in 0..3 {
         let mut app = build_capture_app(WIDTH, HEIGHT);
-        for _ in 0..WARMUP_TICKS {
-            app.update();
-        }
+        wait_for_startup(&mut app)?;
         let label = capture_set_all_factions(&mut app, index);
         start_shared_match_scene_with_current_setup(&mut app);
         for _ in 0..MATCH_SETTLE_TICKS {
@@ -894,7 +904,7 @@ fn write_model_harness_manifest(dir: &Path, per_page: usize) -> Result<(), Strin
 /// programmatically (Selected count).
 fn render_play(dir: &Path) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
     let handle = capture_handle(&app);
 
     let unit_anchor = capture_player_onscreen_unit_position(&mut app)
@@ -1117,7 +1127,7 @@ fn render_play(dir: &Path) -> Result<(), String> {
 
 fn render_assault(dir: &Path, max_seconds: u32) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
     let handle = capture_handle(&app);
     shoot(&mut app, &handle, dir.join("00_start.png"));
 
@@ -1364,7 +1374,7 @@ fn render_still(path: &Path) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
     let handle = capture_handle(&app);
     app.world_mut()
         .spawn(Screenshot::image(handle))
@@ -1384,7 +1394,7 @@ fn render_construction_showcase(path: &Path) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
     capture_dismiss_match_briefing(&mut app);
     let (_, origin, _) =
         capture_player_command_center(&mut app).ok_or("no player command center found")?;
@@ -1410,7 +1420,7 @@ fn render_minimap_online(path: &Path) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
     let handle = capture_handle(&app);
     if !capture_stage_player_radar(&mut app) {
         return Err("could not stage a radar uplink".into());
@@ -1424,7 +1434,7 @@ fn render_minimap_online(path: &Path) -> Result<(), String> {
 
 fn render_deployed_siege(dir: &Path) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
     let handle = capture_handle(&app);
     let Some(focus) = capture_stage_deployed_siege(&mut app) else {
         return Err("no enemy structure to besiege".into());
@@ -1458,7 +1468,7 @@ fn render_placement_ghost(path: &Path) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
     let Some(worker_anchor) = capture_player_worker_position(&mut app) else {
         return Err("no player worker to build from".into());
     };
@@ -1539,7 +1549,7 @@ fn render_weather(kind: &str, path: &Path) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
     if !capture_set_weather(&mut app, kind) {
         return Err(format!(
             "unknown weather '{kind}' (clear|overcast|rain|sandstorm)"
@@ -1563,9 +1573,7 @@ fn render_weather(kind: &str, path: &Path) -> Result<(), String> {
 fn render_mission_cutscene(index: usize, dir: &Path) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
     let mut app = build_capture_app(WIDTH, HEIGHT);
-    for _ in 0..WARMUP_TICKS {
-        app.update();
-    }
+    wait_for_startup(&mut app)?;
     if !capture_start_mission(&mut app, index) {
         return Err(format!("mission {index} not found"));
     }
@@ -1603,7 +1611,7 @@ fn render_base_selection(path: &Path) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
 
     let (entity, origin, center) =
         capture_player_command_center(&mut app).ok_or("no player command center found")?;
@@ -1665,7 +1673,7 @@ fn render_resources_closeup(path: &Path) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
     let focus = capture_nearest_visible_resource_position(&mut app)
         .or_else(|| capture_player_worker_position(&mut app))
         .ok_or("no resource or worker found to frame")?;
@@ -1687,7 +1695,7 @@ fn render_resources_closeup(path: &Path) -> Result<(), String> {
 
 fn render_frames(dir: &Path, count: usize) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
-    let mut app = start_match_app();
+    let mut app = start_match_app()?;
     capture_dismiss_match_briefing(&mut app);
 
     // Exercise the same selection and command-card input path as a player. The

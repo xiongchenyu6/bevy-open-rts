@@ -1,9 +1,18 @@
 # Bevy Open RTS
 
-This repository is a Bevy `0.19` porting foundation for `../godot-open-rts`.
-It keeps the runtime browser-focused: one playable skirmish scene, selection,
-right-click orders, automatic combat, registry-driven production/economy, AI
-pressure, and a WebGPU build path.
+A playable 3D real-time strategy game built with Bevy `0.19`: harvest resources,
+build a base, field three distinct factions, fight AI skirmishes, or create an
+online room and play in the browser through WebGPU.
+
+[![Bevy Open RTS gameplay: menu, skirmish setup, harvesting, construction, combat, and victory](docs/media/bevy-open-rts-gameplay.gif)](https://xiongchenyu6.github.io/bevy-open-rts/)
+
+**[Play the WebGPU build](https://xiongchenyu6.github.io/bevy-open-rts/)** ·
+**[Run natively](#run-native)** · **[Open Bevy online architecture](docs/ONLINE_ARCHITECTURE.md)**
+
+This repository ports `../godot-open-rts` to Bevy while keeping the runtime
+browser-focused: selection, right-click orders, harvesting, construction,
+registry-driven production and economy, AI pressure, multiplayer rooms, and a
+WebGPU build path all share the same game scene.
 
 The architecture follows the useful lesson from Digital Extinction: keep RTS
 behavior separated into ECS systems instead of a single scene script. The root
@@ -87,6 +96,7 @@ cargo run --bin capture -- match 240
 cargo run --bin capture -- factions screenshots/factions
 cargo run --bin capture -- model-harness screenshots/model-harness 6
 python3 scripts/audit_model_quality.py --fail-critical --require-screenshots
+scripts/build_readme_gif.sh
 ```
 
 `capture menu` renders the Godot-style command menu; `capture menu-wide` renders
@@ -110,6 +120,12 @@ isolated model-gallery pages and writes `screenshots/model-harness/manifest.md`;
 `scripts/audit_model_quality.py --require-screenshots` verifies that every
 registry entity is represented by a non-empty harness page before model quality
 work is accepted.
+
+`scripts/build_readme_gif.sh` runs the real capture harness through the menu,
+setup, base, harvesting, construction, assault, and victory scenes, then builds
+the optimized README loop at `docs/media/bevy-open-rts-gameplay.gif`. Set
+`BEVY_OPEN_RTS_REUSE_README_CAPTURES=1` to recompose an existing capture set in
+`target/readme-gif` without rerunning gameplay.
 
 ## Regenerate Migration Data
 

@@ -1498,7 +1498,7 @@ enum OnlineAsyncResult {
 
 #[cfg(target_arch = "wasm32")]
 const ONLINE_VERIFICATION_STATUS_ELEMENT_ID: &str = "open-bevy-online-verification";
-const ONLINE_VERIFICATION_TIMEOUT_SECONDS: f32 = 120.0;
+const ONLINE_VERIFICATION_TIMEOUT_SECONDS: f32 = 240.0;
 const ONLINE_VERIFICATION_MOVE_DISTANCE: f32 = 2.0;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -2933,9 +2933,11 @@ fn drive_online_verification_match(
 
     match role {
         OnlineVerificationRole::Player => {
-            if !params.harness.command_sent && params.replication.last_applied_tick > 0 {
-                let (unit_id, origin) = verification_unit_for_team(&params.units, local_team)
-                    .ok_or_else(|| "client has no movable replicated unit".to_string())?;
+            if !params.harness.command_sent {
+                let Some((unit_id, origin)) = verification_unit_for_team(&params.units, local_team)
+                else {
+                    return Ok(());
+                };
                 let destination = verification_move_destination(*params.map_bounds, origin);
                 if destination.distance(origin) < ONLINE_VERIFICATION_MOVE_DISTANCE * 2.0 {
                     return Err("could not choose a visible verification destination".to_string());

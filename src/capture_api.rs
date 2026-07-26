@@ -10,6 +10,16 @@ use bevy_rts_camera::RtsCamera as RtsCam;
 
 use crate::*;
 
+/// Returns true once startup assets have loaded and the front menu is active.
+///
+/// The capture binary drives Bevy faster than wall-clock time. Polling this
+/// state lets background asset I/O finish before screenshots are requested.
+pub fn capture_startup_ready(app: &App) -> bool {
+    app.world()
+        .get_resource::<State<AppScreen>>()
+        .is_some_and(|state| *state.get() == AppScreen::MainMenu)
+}
+
 pub fn capture_show_main_menu(app: &mut App) {
     app.world_mut()
         .resource_mut::<NextState<AppScreen>>()

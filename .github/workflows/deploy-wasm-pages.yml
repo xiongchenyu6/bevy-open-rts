@@ -146,7 +146,9 @@ jobs:
           # Force both peers onto authenticated TURN candidates and verify the
           # selected ICE pair through browser WebRTC stats.
           OPEN_BEVY_FORCE_RELAY: "1"
-          OPEN_BEVY_MULTIPLAYER_TIMEOUT_MS: "180000"
+          # SwiftShader can spend more than two minutes initializing both match
+          # scenes on shared runners before the first replicated command frame.
+          OPEN_BEVY_MULTIPLAYER_TIMEOUT_MS: "300000"
         run: |
           set -euo pipefail
           mkdir -p browser-smoke-output/multiplayer
