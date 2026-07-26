@@ -28,6 +28,10 @@ Replace every example value in `.env`. `CLOUDFLARE_TURN_API_TOKEN` is secret and
 must never be committed. `ALLOWED_ORIGINS` is a comma-separated list of browser
 origins such as `https://xiongchenyu6.github.io`; native clients do not send an
 Origin and remain supported. `HOST_RECONNECT_GRACE_SECS` defaults to 30 seconds.
+The container uses Cloudflare's public resolvers by default so it can reach the
+TURN credential API even on Podman hosts with a broken bridge DNS forwarder.
+Override `CONTAINER_DNS_PRIMARY` and `CONTAINER_DNS_SECONDARY` when the host must
+use organization-managed resolvers.
 
 ## Start With The Bundled Caddy
 

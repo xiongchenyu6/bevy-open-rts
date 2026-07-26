@@ -15,6 +15,9 @@ services:
       CLOUDFLARE_TURN_API_TOKEN: ${CLOUDFLARE_TURN_API_TOKEN:?set CLOUDFLARE_TURN_API_TOKEN}
       TURN_CREDENTIAL_TTL_SECONDS: 3600
       RUST_LOG: open_bevy_signaling=info
+    dns:
+      - ${CONTAINER_DNS_PRIMARY:-1.1.1.1}
+      - ${CONTAINER_DNS_SECONDARY:-1.0.0.1}
     expose:
       - "3536"
     ports:

@@ -147,3 +147,9 @@
   `open-bevy-signaling` service and public WSS endpoint. After migrating RTS to
   the scoped client, native/browser run `cross-1784926999-637` completed room
   `94423B34` with snapshot ticks 9/10 and complementary authoritative results.
+- The `sg-office` Podman bridge advertised its embedded resolver at
+  `10.89.0.1`, but DNS queries from the signaling container timed out while the
+  host resolver remained healthy. The native deployment therefore makes
+  container DNS explicit (Cloudflare DNS by default, operator-overridable) so
+  short-lived Cloudflare TURN credential issuance does not depend on Podman's
+  bridge DNS forwarder.
