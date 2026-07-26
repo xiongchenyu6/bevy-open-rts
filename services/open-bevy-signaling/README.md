@@ -14,9 +14,9 @@ HTTP API, and the Matchbox-compatible `/v1/signal/...` WebSocket endpoint.
 Games select a deployment only through `OPEN_BEVY_SIGNALING_URL`; no game
 protocol or client code changes are required.
 
-The native target can issue Coturn REST credentials. The Worker can issue
-Cloudflare Realtime TURN credentials and can fall back to the same Coturn REST
-secret while a Cloudflare TURN key is not configured.
+Both production targets issue short-lived Cloudflare Realtime TURN credentials.
+The long-lived TURN key and API token remain server-side and are never returned
+to game clients.
 
 ## Native development
 
@@ -25,7 +25,7 @@ cargo run -p open-bevy-signaling -- --bind 127.0.0.1:3536
 ```
 
 See [`deploy/signaling/README.md`](../../deploy/signaling/README.md) for the
-container, Caddy, and Coturn production stack.
+container and Caddy production stack.
 
 ## Cloudflare development
 

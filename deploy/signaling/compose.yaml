@@ -10,10 +10,10 @@ services:
       OPEN_BEVY_ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?set ALLOWED_ORIGINS}
       OPEN_BEVY_HOST_RECONNECT_GRACE_SECS: ${HOST_RECONNECT_GRACE_SECS:-30}
       OPEN_BEVY_ICE_SERVERS_JSON: >-
-        [{"urls":["stun:${TURN_PUBLIC_HOST:?set TURN_PUBLIC_HOST}:3478"]}]
-      OPEN_BEVY_TURN_URLS: turn:${TURN_PUBLIC_HOST}:3478?transport=udp,turn:${TURN_PUBLIC_HOST}:3478?transport=tcp
-      OPEN_BEVY_TURN_SECRET: ${TURN_SECRET:?set TURN_SECRET}
-      OPEN_BEVY_TURN_CREDENTIAL_TTL_SECS: 3600
+        [{"urls":["stun:stun.cloudflare.com:3478"]}]
+      CLOUDFLARE_TURN_KEY_ID: ${CLOUDFLARE_TURN_KEY_ID:?set CLOUDFLARE_TURN_KEY_ID}
+      CLOUDFLARE_TURN_API_TOKEN: ${CLOUDFLARE_TURN_API_TOKEN:?set CLOUDFLARE_TURN_API_TOKEN}
+      TURN_CREDENTIAL_TTL_SECONDS: 3600
       RUST_LOG: open_bevy_signaling=info
     expose:
       - "3536"
@@ -21,38 +21,6 @@ services:
       # A host-managed TLS proxy can reach the service without exposing plain
       # HTTP to the internet. The bundled Caddy still uses the Docker network.
       - "127.0.0.1:${SIGNALING_BIND_PORT:-3536}:3536"
-    depends_on:
-      - turn
-    networks:
-      - edge
-
-  turn:
-    image: coturn/coturn:4.7.0
-    restart: unless-stopped
-    command:
-      - -n
-      - --no-cli
-      - --fingerprint
-      - --use-auth-secret
-      - --static-auth-secret=${TURN_SECRET:?set TURN_SECRET}
-      - --realm=${TURN_REALM:?set TURN_REALM}
-      - --external-ip=${TURN_PUBLIC_IP:?set TURN_PUBLIC_IP}
-      - --listening-port=3478
-      - --min-port=49160
-      - --max-port=49200
-      - --no-multicast-peers
-      # Loopback peers are denied by default in Coturn 4.7. The former
-      # --no-loopback-peers flag was removed and makes the process exit 255.
-      - --no-tls
-      - --no-dtls
-      - --user-quota=12
-      - --total-quota=2048
-      - --stale-nonce=600
-      - --log-file=stdout
-    ports:
-      - "3478:3478/tcp"
-      - "3478:3478/udp"
-      - "49160-49200:49160-49200/udp"
     networks:
       - edge
 

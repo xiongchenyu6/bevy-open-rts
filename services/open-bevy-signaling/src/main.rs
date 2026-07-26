@@ -1,6 +1,6 @@
 use clap::Parser;
 use open_bevy_protocol::IceServer;
-use open_bevy_signaling::{AppState, ServerConfig, TurnRestConfig, build_router};
+use open_bevy_signaling::{AppState, CloudflareTurnConfig, ServerConfig, build_router};
 use std::{net::SocketAddr, time::Duration};
 use tokio::net::TcpListener;
 use tracing::{info, warn};
@@ -39,17 +39,13 @@ struct Args {
     )]
     ice_servers_json: String,
 
-    #[arg(long, env = "OPEN_BEVY_TURN_URLS", default_value = "")]
-    turn_urls: String,
+    #[arg(long, env = "CLOUDFLARE_TURN_KEY_ID")]
+    cloudflare_turn_key_id: Option<String>,
 
-    #[arg(long, env = "OPEN_BEVY_TURN_SECRET")]
-    turn_secret: Option<String>,
+    #[arg(long, env = "CLOUDFLARE_TURN_API_TOKEN")]
+    cloudflare_turn_api_token: Option<String>,
 
-    #[arg(
-        long,
-        env = "OPEN_BEVY_TURN_CREDENTIAL_TTL_SECS",
-        default_value_t = 3600
-    )]
+    #[arg(long, env = "TURN_CREDENTIAL_TTL_SECONDS", default_value_t = 3600)]
     turn_credential_ttl_secs: u64,
 }
 
@@ -67,30 +63,29 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if ice_servers.is_empty() {
         return Err("OPEN_BEVY_ICE_SERVERS_JSON must contain at least one ICE server".into());
     }
-    let turn_urls = args
-        .turn_urls
-        .split(',')
-        .map(str::trim)
-        .filter(|url| !url.is_empty())
-        .map(str::to_string)
-        .collect::<Vec<_>>();
-    let turn_rest = match (turn_urls.is_empty(), args.turn_secret) {
-        (true, None) => None,
-        (false, Some(shared_secret)) if !shared_secret.is_empty() => Some(TurnRestConfig {
-            urls: turn_urls,
-            shared_secret,
+    let cloudflare_turn = match (
+        args.cloudflare_turn_key_id
+            .filter(|value| !value.is_empty()),
+        args.cloudflare_turn_api_token
+            .filter(|value| !value.is_empty()),
+    ) {
+        (None, None) => None,
+        (Some(key_id), Some(api_token)) => Some(CloudflareTurnConfig {
+            key_id,
+            api_token,
             credential_ttl: Duration::from_secs(args.turn_credential_ttl_secs),
         }),
         _ => {
             return Err(
-                "OPEN_BEVY_TURN_URLS and OPEN_BEVY_TURN_SECRET must be configured together".into(),
+                "CLOUDFLARE_TURN_KEY_ID and CLOUDFLARE_TURN_API_TOKEN must be configured together"
+                    .into(),
             );
         }
     };
     let state = AppState::new(ServerConfig {
         public_websocket_base_url: args.public_ws_base,
         ice_servers,
-        turn_rest,
+        cloudflare_turn,
         room_ttl: Duration::from_secs(args.room_ttl_secs),
         host_reconnect_grace: Duration::from_secs(args.host_reconnect_grace_secs),
         allowed_origins: args

@@ -13,9 +13,7 @@ use axum::{
     response::{IntoResponse, Response},
     routing::{get, post},
 };
-use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64_STANDARD};
 use futures_util::{SinkExt, StreamExt};
-use hmac::{Hmac, Mac};
 use matchbox_protocol::{JsonPeerEvent, JsonPeerRequest, PeerId};
 use open_bevy_protocol::{
     BuildId, CreateRoomRequest, CreateRoomResponse, ErrorResponse, GameId, IceServer, MAX_PEERS,
@@ -23,7 +21,6 @@ use open_bevy_protocol::{
     SESSION_PROTOCOL_VERSION, ServiceConfigResponse, signaling_path,
 };
 use serde::{Deserialize, Serialize};
-use sha1::Sha1;
 use std::{
     collections::HashMap,
     sync::{
@@ -41,22 +38,29 @@ const MAX_SIGNAL_BYTES: usize = 256 * 1024;
 const MAX_INVALID_MESSAGES: u8 = 3;
 const CLOSE_POLICY_VIOLATION: u16 = 1008;
 const CLOSE_SERVER_ERROR: u16 = 1011;
+const CLOUDFLARE_TURN_API_BASE: &str = "https://rtc.live.cloudflare.com/v1/turn/keys";
 
 #[derive(Clone)]
 pub struct ServerConfig {
     pub public_websocket_base_url: String,
     pub ice_servers: Vec<IceServer>,
-    pub turn_rest: Option<TurnRestConfig>,
+    pub cloudflare_turn: Option<CloudflareTurnConfig>,
     pub room_ttl: Duration,
     pub host_reconnect_grace: Duration,
     pub allowed_origins: Vec<String>,
 }
 
 #[derive(Clone)]
-pub struct TurnRestConfig {
-    pub urls: Vec<String>,
-    pub shared_secret: String,
+pub struct CloudflareTurnConfig {
+    pub key_id: String,
+    pub api_token: String,
     pub credential_ttl: Duration,
+}
+
+#[derive(Debug, Deserialize)]
+struct CloudflareTurnResponse {
+    #[serde(rename = "iceServers")]
+    ice_servers: Vec<IceServer>,
 }
 
 impl Default for ServerConfig {
@@ -68,7 +72,7 @@ impl Default for ServerConfig {
                 username: None,
                 credential: None,
             }],
-            turn_rest: None,
+            cloudflare_turn: None,
             room_ttl: Duration::from_secs(15 * 60),
             host_reconnect_grace: Duration::from_secs(30),
             allowed_origins: vec!["*".to_string()],
@@ -193,6 +197,14 @@ impl ApiError {
         Self {
             status: StatusCode::CONFLICT,
             code,
+            message: message.into(),
+        }
+    }
+
+    fn upstream(message: impl Into<String>) -> Self {
+        Self {
+            status: StatusCode::BAD_GATEWAY,
+            code: "turn_credentials_unavailable",
             message: message.into(),
         }
     }
@@ -577,8 +589,10 @@ async fn health() -> Json<HealthResponse> {
     })
 }
 
-async fn service_config(State(state): State<AppState>) -> Json<ServiceConfigResponse> {
-    Json(ServiceConfigResponse {
+async fn service_config(
+    State(state): State<AppState>,
+) -> Result<Json<ServiceConfigResponse>, ApiError> {
+    Ok(Json(ServiceConfigResponse {
         service: "open-bevy-signaling".to_string(),
         api_version: open_bevy_protocol::API_VERSION.to_string(),
         min_session_protocol: SESSION_PROTOCOL_VERSION,
@@ -586,8 +600,8 @@ async fn service_config(State(state): State<AppState>) -> Json<ServiceConfigResp
         default_max_peers: open_bevy_protocol::DEFAULT_MAX_PEERS,
         max_peers: MAX_PEERS,
         websocket_base_url: state.inner.config.public_websocket_base_url.clone(),
-        ice_servers: issued_ice_servers(&state.inner.config),
-    })
+        ice_servers: issued_ice_servers(&state.inner.config).await?,
+    }))
 }
 
 async fn create_room(
@@ -914,31 +928,58 @@ fn random_secret() -> String {
     Uuid::new_v4().simple().to_string()
 }
 
-fn issued_ice_servers(config: &ServerConfig) -> Vec<IceServer> {
-    let mut servers = config.ice_servers.clone();
-    let Some(turn) = &config.turn_rest else {
-        return servers;
+async fn issued_ice_servers(config: &ServerConfig) -> Result<Vec<IceServer>, ApiError> {
+    let Some(turn) = &config.cloudflare_turn else {
+        return Ok(config.ice_servers.clone());
     };
-
-    let expires_at = unix_time_secs().saturating_add(turn.credential_ttl.as_secs());
-    let username = format!("{expires_at}:{}", Uuid::new_v4().simple());
-    let mut hmac = Hmac::<Sha1>::new_from_slice(turn.shared_secret.as_bytes())
-        .expect("HMAC accepts keys of any size");
-    hmac.update(username.as_bytes());
-    let credential = BASE64_STANDARD.encode(hmac.finalize().into_bytes());
-    servers.push(IceServer {
-        urls: turn.urls.clone(),
-        username: Some(username),
-        credential: Some(credential),
-    });
-    servers
+    let ttl = turn.credential_ttl.as_secs().clamp(60, 172_800);
+    let endpoint = format!(
+        "{CLOUDFLARE_TURN_API_BASE}/{}/credentials/generate-ice-servers",
+        turn.key_id
+    );
+    let response = reqwest::Client::new()
+        .post(endpoint)
+        .bearer_auth(&turn.api_token)
+        .timeout(Duration::from_secs(10))
+        .json(&serde_json::json!({ "ttl": ttl }))
+        .send()
+        .await
+        .map_err(|error| {
+            warn!(%error, "Cloudflare TURN credential request failed");
+            ApiError::upstream("Cloudflare TURN credential request failed")
+        })?;
+    if !response.status().is_success() {
+        let status = response.status();
+        warn!(%status, "Cloudflare TURN credential API rejected the request");
+        return Err(ApiError::upstream(format!(
+            "Cloudflare TURN credential API returned HTTP {status}"
+        )));
+    }
+    let payload = response
+        .json::<CloudflareTurnResponse>()
+        .await
+        .map_err(|error| {
+            warn!(%error, "Cloudflare TURN credential response was invalid");
+            ApiError::upstream("Cloudflare TURN credential response was invalid")
+        })?;
+    validate_cloudflare_ice_servers(payload.ice_servers)
 }
 
-fn unix_time_secs() -> u64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs()
+fn validate_cloudflare_ice_servers(servers: Vec<IceServer>) -> Result<Vec<IceServer>, ApiError> {
+    let has_authenticated_turn = servers.iter().any(|server| {
+        server.username.is_some()
+            && server.credential.is_some()
+            && server
+                .urls
+                .iter()
+                .any(|url| url.starts_with("turn:") || url.starts_with("turns:"))
+    });
+    if !has_authenticated_turn {
+        return Err(ApiError::upstream(
+            "Cloudflare TURN credential API returned no authenticated TURN server",
+        ));
+    }
+    Ok(servers)
 }
 
 fn unix_time_ms() -> u64 {
@@ -1003,21 +1044,30 @@ mod tests {
     }
 
     #[test]
-    fn turn_credentials_are_short_lived_and_hmac_signed() {
-        let config = ServerConfig {
-            turn_rest: Some(TurnRestConfig {
-                urls: vec!["turn:relay.example.com:3478".to_string()],
-                shared_secret: "test-secret".to_string(),
-                credential_ttl: Duration::from_secs(600),
-            }),
-            ..ServerConfig::default()
-        };
-        let servers = issued_ice_servers(&config);
-        let turn = servers.last().unwrap();
-        let username = turn.username.as_deref().unwrap();
-        let expiry = username.split(':').next().unwrap().parse::<u64>().unwrap();
-        assert!(expiry >= unix_time_secs().saturating_add(590));
-        assert_ne!(turn.credential.as_deref(), Some("test-secret"));
-        assert_eq!(turn.urls, ["turn:relay.example.com:3478"]);
+    fn cloudflare_credentials_require_an_authenticated_turn_server() {
+        let servers = vec![
+            IceServer {
+                urls: vec!["stun:stun.cloudflare.com:3478".to_string()],
+                username: None,
+                credential: None,
+            },
+            IceServer {
+                urls: vec!["turns:turn.cloudflare.com:443?transport=tcp".to_string()],
+                username: Some("short-lived-user".to_string()),
+                credential: Some("short-lived-credential".to_string()),
+            },
+        ];
+        assert_eq!(
+            validate_cloudflare_ice_servers(servers.clone()).unwrap(),
+            servers
+        );
+
+        let error = validate_cloudflare_ice_servers(vec![IceServer {
+            urls: vec!["stun:stun.cloudflare.com:3478".to_string()],
+            username: None,
+            credential: None,
+        }])
+        .unwrap_err();
+        assert_eq!(error.code, "turn_credentials_unavailable");
     }
 }

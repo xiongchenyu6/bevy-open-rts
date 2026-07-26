@@ -12,8 +12,7 @@
   `matchbox_protocol`. The custom Open Bevy server retains this format so the
   stock socket client remains compatible.
 - The signaling container was built and run locally on 2026-07-24. Docker
-  reported it healthy; `/healthz`, `/metrics`, and `/v1/config` were exercised,
-  including dynamically issued Coturn REST credentials.
+  reported it healthy; `/healthz`, `/metrics`, and `/v1/config` were exercised.
 - Browser WebSocket clients cannot attach an Authorization header. Connection
   tickets therefore use query parameters; production proxies must use WSS and
   must not persist request URIs.
@@ -33,9 +32,9 @@
   stable session key rather than treating `PeerId` as player identity.
 - `open-bevy-signaling` now has protocol-compatible native and Cloudflare
   deployment targets. The Worker uses `RoomDirectory` plus isolated `GameRoom`
-  Durable Objects with hibernatable WebSockets. It prefers short-lived
-  Cloudflare Realtime TURN credentials and can fall back to the existing
-  Coturn REST secret without exposing either long-term credential.
+  Durable Objects with hibernatable WebSockets. Both targets request short-lived
+  Cloudflare Realtime TURN credentials without exposing the long-term key or
+  API token.
 - `src/online.rs` now provides the first real game integration slice: public
   room discovery/create, code/token join, reconnect-aware player identity,
   exact map-derived slot rows, host-validated lobby options, readiness, and a

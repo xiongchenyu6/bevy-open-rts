@@ -57,7 +57,8 @@ cargo run -p open-bevy-signaling
 curl http://127.0.0.1:3536/healthz
 ```
 
-Production container and Coturn examples live in `deploy/signaling/`. See
+The native production container/Caddy example lives in `deploy/signaling/`;
+both native and Worker targets use Cloudflare Realtime TURN. See
 [`docs/ONLINE_ARCHITECTURE.md`](docs/ONLINE_ARCHITECTURE.md) for the API and
 networking contract. Other Open Bevy games should start with
 [`docs/OPEN_BEVY_GAME_INTEGRATION.md`](docs/OPEN_BEVY_GAME_INTEGRATION.md) and

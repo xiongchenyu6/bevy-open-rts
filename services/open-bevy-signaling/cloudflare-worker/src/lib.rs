@@ -4,8 +4,6 @@
 //! native Axum service. A singleton directory Durable Object owns discovery,
 //! while each game room has an isolated hibernatable Durable Object.
 
-use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64_STANDARD};
-use hmac::{Hmac, Mac};
 use matchbox_protocol::{JsonPeerEvent, JsonPeerRequest, PeerId};
 use open_bevy_protocol::{
     BuildId, CreateRoomRequest, CreateRoomResponse, ErrorResponse, GameId, IceServer, MAX_PEERS,
@@ -13,7 +11,6 @@ use open_bevy_protocol::{
     SESSION_PROTOCOL_VERSION, ServiceConfigResponse, signaling_path,
 };
 use serde::{Deserialize, Serialize};
-use sha1::Sha1;
 use std::str::FromStr;
 use uuid::Uuid;
 use worker::{wasm_bindgen::JsValue, *};
@@ -290,18 +287,12 @@ async fn issued_ice_servers(env: &Env) -> Result<Vec<IceServer>> {
     let cloudflare_key = optional_secret(env, "CLOUDFLARE_TURN_KEY_ID");
     let cloudflare_token = optional_secret(env, "CLOUDFLARE_TURN_API_TOKEN");
     match (cloudflare_key, cloudflare_token) {
-        (Some(key), Some(token)) => match cloudflare_turn_credentials(env, &key, &token).await {
-            Ok(servers) => Ok(servers),
-            Err(error) if optional_secret(env, "LEGACY_TURN_SECRET").is_some() => {
-                console_warn!(
-                    "Cloudflare TURN credentials unavailable; using configured Coturn fallback: {}",
-                    error
-                );
-                legacy_turn_credentials(env)
-            }
-            Err(error) => Err(error),
-        },
-        (None, None) => legacy_turn_credentials(env),
+        (Some(key), Some(token)) => cloudflare_turn_credentials(env, &key, &token).await,
+        (None, None) => Ok(vec![IceServer {
+            urls: vec!["stun:stun.cloudflare.com:3478".to_string()],
+            username: None,
+            credential: None,
+        }]),
         _ => Err(Error::RustError(
             "both CLOUDFLARE_TURN_KEY_ID and CLOUDFLARE_TURN_API_TOKEN are required".to_string(),
         )),
@@ -330,60 +321,20 @@ async fn cloudflare_turn_credentials(env: &Env, key: &str, token: &str) -> Resul
         )));
     }
     let payload: CloudflareTurnResponse = response.json().await?;
-    if payload.ice_servers.is_empty() {
+    let has_authenticated_turn = payload.ice_servers.iter().any(|server| {
+        server.username.is_some()
+            && server.credential.is_some()
+            && server
+                .urls
+                .iter()
+                .any(|url| url.starts_with("turn:") || url.starts_with("turns:"))
+    });
+    if !has_authenticated_turn {
         return Err(Error::RustError(
-            "Cloudflare TURN credential API returned no ICE servers".to_string(),
+            "Cloudflare TURN credential API returned no authenticated TURN server".to_string(),
         ));
     }
     Ok(payload.ice_servers)
-}
-
-fn legacy_turn_credentials(env: &Env) -> Result<Vec<IceServer>> {
-    let mut servers = vec![IceServer {
-        urls: vec!["stun:stun.cloudflare.com:3478".to_string()],
-        username: None,
-        credential: None,
-    }];
-    let Some(secret) = optional_secret(env, "LEGACY_TURN_SECRET") else {
-        return Ok(servers);
-    };
-    let urls = env_var(env, "LEGACY_TURN_URLS")?
-        .split(',')
-        .map(str::trim)
-        .filter(|url| !url.is_empty())
-        .map(ToOwned::to_owned)
-        .collect::<Vec<_>>();
-    if urls.is_empty() {
-        return Err(Error::RustError(
-            "LEGACY_TURN_URLS cannot be empty when LEGACY_TURN_SECRET is configured".to_string(),
-        ));
-    }
-    let ttl = env_u64(env, "TURN_CREDENTIAL_TTL_SECONDS", 3600).clamp(60, 172_800);
-    servers.push(legacy_turn_server(
-        &secret,
-        urls,
-        ttl,
-        unix_time_ms() / 1000,
-    )?);
-    Ok(servers)
-}
-
-fn legacy_turn_server(
-    secret: &str,
-    urls: Vec<String>,
-    ttl: u64,
-    now_unix_seconds: u64,
-) -> Result<IceServer> {
-    let expires_at = now_unix_seconds.saturating_add(ttl);
-    let username = format!("{expires_at}:{}", Uuid::new_v4().simple());
-    let mut hmac = Hmac::<Sha1>::new_from_slice(secret.as_bytes())
-        .map_err(|error| Error::RustError(error.to_string()))?;
-    hmac.update(username.as_bytes());
-    Ok(IceServer {
-        urls,
-        username: Some(username),
-        credential: Some(BASE64_STANDARD.encode(hmac.finalize().into_bytes())),
-    })
 }
 
 fn with_cors(response: Response, origin: Option<&str>, env: &Env) -> Result<Response> {
@@ -1133,21 +1084,6 @@ mod tests {
             build_id: BuildId::new("0.1.0+test").unwrap(),
         };
         assert!(authorize_room_connection(&room, &player).is_err());
-    }
-
-    #[test]
-    fn legacy_turn_credentials_are_short_lived_and_hmac_signed() {
-        let turn = legacy_turn_server(
-            "test-secret",
-            vec!["turn:relay.example.com:3478".to_string()],
-            600,
-            1_000,
-        )
-        .unwrap();
-        let username = turn.username.as_deref().unwrap();
-        assert!(username.starts_with("1600:"));
-        assert_ne!(turn.credential.as_deref(), Some("test-secret"));
-        assert_eq!(turn.urls, ["turn:relay.example.com:3478"]);
     }
 
     #[test]

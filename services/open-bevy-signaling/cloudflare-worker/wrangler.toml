@@ -24,4 +24,3 @@ ALLOWED_ORIGINS = "https://xiongchenyu6.github.io,http://127.0.0.1:8080,http://l
 ROOM_TTL_MS = "900000"
 HOST_RECONNECT_GRACE_MS = "30000"
 TURN_CREDENTIAL_TTL_SECONDS = "3600"
-LEGACY_TURN_URLS = "turn:101.78.126.6:3478?transport=udp,turn:101.78.126.6:3478?transport=tcp"

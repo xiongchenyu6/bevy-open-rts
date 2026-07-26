@@ -12,10 +12,10 @@ only carries WebRTC session descriptions and ICE candidates; game packets flow
 peer-to-peer after the data channels connect.
 
 The same public contract has two deployment targets. The native Axum/Tokio
-service keeps its room registry in memory and is packaged with Caddy/Coturn.
-The Cloudflare target uses one directory Durable Object plus an isolated,
+service keeps its room registry in memory and is packaged with Caddy. The
+Cloudflare target uses one directory Durable Object plus an isolated,
 hibernatable Durable Object per room. Clients do not branch on the deployment
-type.
+type. Both targets request short-lived Cloudflare Realtime TURN credentials.
 
 `open-bevy-net` is the corresponding reusable client. It exposes the room HTTP
 API through `ehttp`, builds safely encoded connection URLs, chooses issued TURN
@@ -76,10 +76,8 @@ GET /v1/config
 ```
 
 `/v1/config` returns supported universal session protocol versions and ICE
-servers. The native target can issue a time-limited Coturn HMAC-SHA1
-credential. The Worker can request short-lived Cloudflare Realtime TURN
-credentials and optionally fall back to the same Coturn REST contract. Static
-TURN keys and shared secrets are never returned.
+servers. Both targets request short-lived Cloudflare Realtime TURN credentials.
+The long-lived TURN key and API token are never returned.
 
 ### Create a room
 
@@ -179,15 +177,14 @@ separate simulation rewrite rather than a safe shortcut.
 ### Native target
 
 - HTTPS/WSS reverse proxy with query-string logging disabled.
-- Coturn reachable on TCP/UDP 3478 and a configured UDP relay range.
-- `OPEN_BEVY_TURN_SECRET` must match Coturn's `static-auth-secret`.
-- The TURN URL must use a public DNS name/IP, not the Compose service name.
+- Configure both `CLOUDFLARE_TURN_KEY_ID` and
+  `CLOUDFLARE_TURN_API_TOKEN` for managed TURN.
 - Restrict `OPEN_BEVY_ALLOWED_ORIGINS` to production game origins.
 - Apply IP-level connection/request limits at the edge proxy.
 - Persist no game state or chat in the signaling service.
 
-The deployment example in `deploy/signaling/` provides the service, Coturn, and
-Caddy wiring. Secrets and public addresses are intentionally required inputs.
+The deployment example in `deploy/signaling/` provides the service and Caddy
+wiring. Secrets and public addresses are intentionally required inputs.
 
 ### Cloudflare target
 
@@ -196,8 +193,6 @@ Caddy wiring. Secrets and public addresses are intentionally required inputs.
 - Restrict `ALLOWED_ORIGINS` to production game origins.
 - Configure both `CLOUDFLARE_TURN_KEY_ID` and
   `CLOUDFLARE_TURN_API_TOKEN` for managed TURN.
-- Keep `LEGACY_TURN_SECRET` and `LEGACY_TURN_URLS` during migration when the
-  native Coturn relay must remain a fallback.
 - Preserve Durable Object migration history when changing class names.
 
 The Worker deployment guide is
@@ -258,6 +253,6 @@ the authoritative match ends it reads the selected candidate pair from
 connected peer/ICE states, bidirectional traffic, and `relay` candidates on
 both ends. The selected transport ID is authoritative here: Chromium can keep
 the pair's own `state` at `in-progress` briefly after the transport is already
-connected and carrying data. This proves that authenticated Coturn allocation
-and real game traffic work over the public Internet; merely finding TURN
+connected and carrying data. This proves that authenticated Cloudflare TURN
+allocation and real game traffic work over the public Internet; merely finding TURN
 credentials in `/v1/config` is not accepted as transport proof.

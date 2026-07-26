@@ -20,8 +20,9 @@ native desktop and browser builds.
   independent data is used for frequent world snapshots.
 - Runtime entities receive stable network IDs. Bevy `Entity` values never cross
   the network.
-- Production deployment includes TURN. A signaling server alone cannot connect
-  every NAT/firewall combination.
+- Production deployment uses Cloudflare Managed TURN with short-lived
+  credentials. A signaling server alone cannot connect every NAT/firewall
+  combination.
 
 ## Milestones
 
@@ -30,7 +31,7 @@ native desktop and browser builds.
   - [x] Room create/discover/join API
   - [x] Matchbox-compatible WebSocket signaling
   - [x] Room isolation, capacity, host ownership, cleanup, metrics
-  - [x] Container, TURN REST credentials, CI, integration tests
+  - [x] Container, Cloudflare Managed TURN credentials, CI, integration tests
   - [x] Native container and Cloudflare Worker/Durable Objects deployments share
         the same API, room rules, and WebRTC verification harness
 - [x] Shared native/wasm client transport

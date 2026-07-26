@@ -31,29 +31,19 @@ Non-secret values live in `wrangler.toml`:
 | `ROOM_TTL_MS` | Lifetime of a room that never receives a host |
 | `HOST_RECONNECT_GRACE_MS` | Admission pause before a disconnected host forfeits the room |
 | `TURN_CREDENTIAL_TTL_SECONDS` | Lifetime of issued TURN credentials |
-| `LEGACY_TURN_URLS` | Existing Coturn UDP/TCP URLs used by the fallback |
 
 Secrets are set with Wrangler and are never committed:
 
 ```sh
-# Preferred managed TURN backend. Both values are required together.
+# Managed TURN backend. Both values are required together in production.
 npx wrangler secret put CLOUDFLARE_TURN_KEY_ID
 npx wrangler secret put CLOUDFLARE_TURN_API_TOKEN
-
-# Optional Coturn fallback. It must match Coturn static-auth-secret.
-npx wrangler secret put LEGACY_TURN_SECRET
 ```
 
-TURN selection is deterministic:
-
-1. When both Cloudflare secrets exist, `/v1/config` requests short-lived
-   Cloudflare Realtime TURN credentials.
-2. If that request fails and `LEGACY_TURN_SECRET` exists, it issues Coturn REST
-   credentials instead.
-3. Without either TURN configuration, it advertises STUN only. This is useful
-   for local development but is not accepted by the production relay gate.
-4. A partial Cloudflare secret configuration is rejected instead of silently
-   using an unintended provider.
+When both secrets exist, `/v1/config` requests short-lived Cloudflare Realtime
+TURN credentials. Without either secret it advertises STUN only for local
+development; production verification rejects that configuration. A partial
+secret configuration is rejected instead of silently using another provider.
 
 ## Build and local development
 

@@ -20,8 +20,9 @@ The repository is a Cargo workspace whose default member remains the root
   Axum/Tokio target; `cloudflare-worker/` implements the same contract with a
   directory Durable Object and one hibernatable Durable Object per room. It has
   no dependency on the RTS game.
-- `deploy/signaling` contains the production container, Caddy, and Coturn
-  example. TURN credentials are generated with the Coturn REST HMAC contract.
+- `deploy/signaling` contains the native production container and Caddy example.
+  Both signaling targets request short-lived Cloudflare Realtime TURN
+  credentials with server-side keys.
 - `docs/ONLINE_ARCHITECTURE.md` is the online wire/deployment contract;
   `docs/OPEN_BEVY_GAME_INTEGRATION.md` is the cross-repository onboarding guide;
   `PLAN.md` tracks the remaining client and gameplay replication milestones.
