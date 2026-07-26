@@ -46,6 +46,10 @@ services:
 
 networks:
   edge:
+    name: open_bevy_signaling_edge
+    # Podman otherwise replaces service-level resolvers with its embedded
+    # Aardvark address. Docker Compose safely ignores this extension.
+    x-podman.disable_dns: true
 
 volumes:
   caddy_data:

@@ -31,7 +31,8 @@ Origin and remain supported. `HOST_RECONNECT_GRACE_SECS` defaults to 30 seconds.
 The container uses Cloudflare's public resolvers by default so it can reach the
 TURN credential API even on Podman hosts with a broken bridge DNS forwarder.
 Override `CONTAINER_DNS_PRIMARY` and `CONTAINER_DNS_SECONDARY` when the host must
-use organization-managed resolvers.
+use organization-managed resolvers. The Compose network also disables Podman's
+Aardvark DNS proxy through an `x-podman` extension; Docker ignores this extension.
 
 ## Start With The Bundled Caddy
 

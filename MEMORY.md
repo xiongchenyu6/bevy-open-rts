@@ -152,4 +152,5 @@
   host resolver remained healthy. The native deployment therefore makes
   container DNS explicit (Cloudflare DNS by default, operator-overridable) so
   short-lived Cloudflare TURN credential issuance does not depend on Podman's
-  bridge DNS forwarder.
+  bridge DNS forwarder. Its explicitly named Compose network also uses
+  `x-podman.disable_dns`, allowing Podman to honor those service-level resolvers.
