@@ -1,0 +1,74 @@
+keys,en,pl,zh_CN
+PLAY,Play,Gra,开始游戏
+OPTIONS,Options,Opcje,设置
+CREDITS,Credits,Twórcy,制作人员
+QUIT,Quit,Wyjście,退出
+FULLSCREEN,Fullscreen,Pełny ekran,全屏
+FULLSCREEN_TOOLTIP,Use browser fullscreen,Użyj pełnego ekranu przeglądarki,使用浏览器全屏
+GAME_TITLE,Open RTS,Open RTS,Open RTS
+GAME_SUBTITLE,Frontline command,Dowództwo frontowe,前线指挥
+MAIN_OPERATION,Operation: Skirmish command,Operacja: dowództwo potyczki,行动：遭遇战指挥
+MAIN_STATUS,Expanded arsenal online. Choose a theater and deploy.,Rozszerzony arsenał gotowy. Wybierz teatr działań i ruszaj.,扩展武备已上线。选择战区并部署。
+MAIN_ROSTER,Available battle group,Dostępna grupa bojowa,可用战斗群
+MAIN_COMMAND,Command menu,Menu dowodzenia,指挥菜单
+MAIN_SYSTEMS_ONLINE,Systems: Online,Systemy: online,系统：在线
+BACK,Back,Wstecz,返回
+CORE_CONTRIBUTORS,Core contributors,Kluczowi współtwórcy,核心贡献者
+ASSETS,Assets,Treści multimedialne,素材
+START,Start,Rozpocznij,开始
+START_DISABLED_NEEDS_PLAYERS,Add at least two active players,Dodaj co najmniej dwóch aktywnych graczy,至少添加两名参战玩家
+START_DISABLED_NEEDS_OPPONENT,Put active players on at least two opposing teams,Umieść aktywnych graczy w co najmniej dwóch przeciwnych drużynach,参战玩家必须分属至少两个敌对队伍
+PLAYER_NONE,None,Brak,无 / None
+PLAYER_HUMAN,Human,Człowiek,玩家 / Human
+PLAYER_AI_BEGINNER,AI Beginner,AI początkujące,傻瓜 AI / AI Beginner
+PLAYER_AI_EASY,AI Easy,AI łatwe,简单 AI / AI Easy
+PLAYER_AI_NORMAL,AI Normal,AI normalne,普通 AI / AI Normal
+PLAYER_AI_HARD,AI Hard,AI trudne,困难 AI / AI Hard
+STARTING_RESOURCES,Starting resources,Zasoby początkowe,初始资源
+STARTING_RESOURCES_LOW,Low,Niskie,低
+STARTING_RESOURCES_STANDARD,Standard,Standardowe,标准
+STARTING_RESOURCES_HIGH,High,Wysokie,高
+STARTING_RESOURCES_RICH,Rich,Bogate,富矿
+MAP,Map,Mapa,地图
+PLAYERS,Players,Gracze,玩家
+RANDOM_MAP,Random Map,Losowa mapa,随机地图
+MAP_DETAILS_PLAYERS,Players,Gracze,玩家
+MAP_DETAILS_MAPS,Maps,Mapy,地图
+MAP_DETAILS_SIZE,Size,Rozmiar,尺寸
+MAP_DETAILS_RANDOM,Random,Losowo,随机
+PLAYER_COLOR_TOOLTIP,Player color {0},Kolor gracza {0},玩家颜色 {0}
+TEAM_SHORT,T{0},D{0},队{0}
+FACTION,Faction,Frakcja,阵营
+FACTION_ALLIANCE,Azure Alliance,Lazurowy Sojusz,苍穹联盟
+FACTION_ALLIANCE_DESCRIPTION,Disciplined high-tech coalition: balanced combined arms with full tech and prism defenses,Zdyscyplinowana zaawansowana koalicja: zrównoważone siły z pełną technologią i obroną pryzmatyczną,纪律严明的高科技联盟：均衡合成军种，完整科技与棱镜防御
+FACTION_DEMON,Demon Legion,Legion demonów,炽炎魔军
+FACTION_DEMON_DESCRIPTION,Infernal war-machine: flame weapons and heavy siege that overwhelm head-on but lack prism tech,Piekielna machina wojenna: broń ogniowa i ciężkie oblężenie miażdżące wprost lecz bez techniki pryzmatycznej,地狱战争机器：火焰武器与重型攻城正面碾压，但缺乏棱镜科技
+FACTION_CHAOS,Chaos Rift,Szczelina chaosu,混沌裂隙
+FACTION_CHAOS_DESCRIPTION,Reality-warping experimentalists: arc and prism energy with jamming and stealth over brute assault,Eksperymentatorzy zaginający rzeczywistość: energia łukowa i pryzmatyczna z zagłuszaniem i ukryciem zamiast siłowego szturmu,扭曲现实的实验者：电弧与棱镜能量、干扰与隐匿，而非蛮力突击
+OPERATION_SUMMARY_TITLE,Operation summary,Podsumowanie operacji,行动摘要
+OPERATION_SUMMARY_MAP,Map,Mapa,地图
+OPERATION_SUMMARY_PLAYERS,Players,Gracze,玩家
+OPERATION_SUMMARY_TEAMS,Teams,Drużyny,队伍
+OPERATION_SUMMARY_RESOURCES,Starting resources,Zasoby początkowe,初始资源
+OPERATION_SUMMARY_OBJECTIVE,Objective,Cel,目标
+OPERATION_SUMMARY_OBJECTIVE_ELIMINATION,Destroy every enemy command anchor,Zniszcz każdy wrogi punkt dowodzenia,摧毁所有敌方指挥锚点
+OPERATION_SUMMARY_FORCES,Forces,Siły,兵力
+OPERATION_SUMMARY_SLOT,P{0},G{0},P{0}
+OPERATION_SUMMARY_EMPTY,None,Brak,无
+OPERATION_SUMMARY_READY,Ready to deploy,Gotowe do rozmieszczenia,准备部署
+OPERATION_SUMMARY_NOT_READY,Choose opposing active teams,Wybierz przeciwne aktywne drużyny,请选择敌对参战队伍
+OPTIONS_VIDEO,Video,Wideo,视频
+OPTIONS_AUDIO,Audio,Dźwięk,音频
+OPTIONS_MASTER_VOLUME,Master,Główna,主音量
+OPTIONS_MUSIC_VOLUME,Music,Muzyka,音乐
+OPTIONS_SFX_VOLUME,SFX,Efekty,音效
+OPTIONS_VOICE_VOLUME,Voices,Głosy,语音
+OPTIONS_LANGUAGE,Language,Język,语言
+OPTIONS_LANGUAGE_SYSTEM,System default,Domyślny systemowy,系统默认
+OPTIONS_LANGUAGE_ENGLISH,English,Angielski,英语
+OPTIONS_LANGUAGE_CHINESE,Simplified Chinese,Chiński uproszczony,简体中文
+OPTIONS_LANGUAGE_POLISH,Polish,Polski,波兰语
+OPTIONS_MOUSE,Mouse,Mysz,鼠标
+OPTIONS_MOUSE_RESTRICTED,Mouse movement restricted to the game window,Ruch myszy ograniczony do okna gry,将鼠标限制在游戏窗口内
+OPTIONS_SCREEN_FULLSCREEN,Fullscreen,Pełny ekran,全屏
+OPTIONS_SCREEN_WINDOW,Window,Okno,窗口

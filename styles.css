@@ -1,0 +1,26 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #05070a;
+}
+
+#bevy-canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+#unsupported {
+  position: fixed;
+  inset: 16px auto auto 16px;
+  max-width: 360px;
+  padding: 12px 14px;
+  border: 1px solid #e58d44;
+  border-radius: 6px;
+  color: #f5e6ce;
+  background: rgba(12, 14, 18, 0.92);
+  font: 14px system-ui, sans-serif;
+}

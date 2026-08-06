@@ -1,0 +1,2052 @@
+(
+    source: "res://source/match/units",
+    generated_by: "scripts/audit_model_mapping.py",
+    entities: [
+        (
+            id: "AdvancedReactorPlant",
+            scene_path: "res://source/match/units/AdvancedReactorPlant.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/structure_detailed.glb",
+                    translation: [-1.092, 0.0, 0.0],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.5148, 0.5148, 0.5148],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-0.078, 0.0, -0.039],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.741, 0.741, 0.741],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_fuelB.glb",
+                    translation: [1.209, 0.039, -0.585],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3744, 0.3744, 0.3744],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_fuelB.glb",
+                    translation: [1.209, 0.039, 0.546],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3744, 0.3744, 0.3744],
+                ),
+                (
+                    model: "models/kenney-spacekit/pipe_ringHigh.glb",
+                    translation: [-1.599, 0.078, 0.6396],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.429, 0.429, 0.429],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wirelessCable.glb",
+                    translation: [1.092, 0.0936, 0.0],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3276, 0.3276, 0.3276],
+                ),
+            ],
+        ),
+        (
+            id: "AircraftFactory",
+            scene_path: "res://source/match/units/AircraftFactory.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/hangar_smallA.glb",
+                    translation: [-1.9, 0.0, -1.425],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.95, 0.95, 0.95],
+                ),
+                (
+                    model: "models/kenney-spacekit/supports_low.glb",
+                    translation: [-1.6884, 0.9244, -1.0403],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.95, 0.95, 0.95],
+                ),
+                (
+                    model: "models/kenney-spacekit/platform_small.glb",
+                    translation: [-1.6884, 1.3278, -1.0403],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.95, 0.95, 0.95],
+                ),
+            ],
+        ),
+        (
+            id: "AntiAirTurret",
+            scene_path: "res://source/match/units/AntiAirTurret.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/turret_double.glb",
+                    translation: [-2.0, 0.0, -1.5],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.0, 1.0, 1.0],
+                ),
+            ],
+        ),
+        (
+            id: "AntiAirWalker",
+            scene_path: "res://source/match/units/AntiAirWalker.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/rover.glb",
+                    translation: [-3.3, 0.0, -2.475],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.65, 1.65, 1.65],
+                ),
+                (
+                    model: "models/kenney-spacekit/turret_double.glb",
+                    translation: [-0.55, 0.45, -0.45],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.65, 0.65, 0.65],
+                ),
+                (
+                    model: "models/kenney-spacekit/satelliteDish.glb",
+                    translation: [0.35, 0.55, 0.25],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.42, 0.42, 0.42],
+                ),
+            ],
+        ),
+        (
+            id: "AntiGroundTurret",
+            scene_path: "res://source/match/units/AntiGroundTurret.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/turret_single.glb",
+                    translation: [-2.0, 0.0, -1.5],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.0, 1.0, 1.0],
+                ),
+            ],
+        ),
+        (
+            id: "ArcCoilDefenseTower",
+            scene_path: "res://source/match/units/ArcCoilDefenseTower.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/structure_detailed.glb",
+                    translation: [-1.36, 0.0, -1.02],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.5304, 0.5304, 0.5304],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-0.646, 0.0, -0.102],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2856, 0.2856, 0.2856],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-2.074, 0.0, -0.102],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2856, 0.2856, 0.2856],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-1.36, 0.1904, -1.02],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3944, 0.3944, 0.3944],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [-1.36, 0.646, -1.02],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3536, 0.3536, 0.3536],
+                ),
+                (
+                    model: "models/kenney-spacekit/satelliteDish.glb",
+                    translation: [-1.36, 0.918, -1.02],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2312, 0.2312, 0.2312],
+                ),
+            ],
+        ),
+        (
+            id: "Barracks",
+            scene_path: "res://source/match/units/Barracks.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/hangar_smallB.glb",
+                    translation: [-1.52, 0.0, -1.12],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.76, 0.76, 0.76],
+                ),
+                (
+                    model: "models/kenney-spacekit/structure_detailed.glb",
+                    translation: [0.16, 0.0, 0.36],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.336, 0.336, 0.336],
+                ),
+                (
+                    model: "models/kenney-spacekit/gate_simple.glb",
+                    translation: [-0.28, 0.0, 1.0],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4, 0.4, 0.4],
+                ),
+                (
+                    model: "models/kenney-spacekit/platform_low.glb",
+                    translation: [0.84, 0.0, 0.2],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.496, 0.496, 0.496],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [1.0, 0.08, -0.68],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.32, 0.32, 0.32],
+                ),
+            ],
+        ),
+        (
+            id: "BomberVTOL",
+            scene_path: "res://source/match/units/BomberVTOL.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoA.glb",
+                    translation: [-1.24, 0.0, -0.93],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.62, 0.62, 0.62],
+                ),
+            ],
+        ),
+        (
+            id: "CommandCenter",
+            scene_path: "res://source/match/units/CommandCenter.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/corridor_cross.glb",
+                    translation: [0.2475, 0.0, 1.3324],
+                    rotation: [0.0, 0.9239, 0.0, 0.3827],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/corridor_corner.glb",
+                    translation: [-0.7425, 0.0, 0.8374],
+                    rotation: [0.0, 0.3827, 0.0, 0.9239],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/corridor_corner.glb",
+                    translation: [0.7425, 0.0, 0.3425],
+                    rotation: [0.0, 0.9239, 0.0, -0.3827],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/corridor_detailed.glb",
+                    translation: [0.7425, 0.0, 2.8173],
+                    rotation: [0.0, 0.9239, 0.0, 0.3827],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/corridor_detailed.glb",
+                    translation: [1.2374, 0.0, 0.8374],
+                    rotation: [0.0, 0.9239, 0.0, -0.3827],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/corridor_open.glb",
+                    translation: [1.2374, 0.0, -1.1425],
+                    rotation: [0.0, 0.9239, 0.0, -0.3827],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/corridor_windowClosed.glb",
+                    translation: [0.7425, 0.0, 0.8374],
+                    rotation: [0.0, 0.9239, 0.0, 0.3827],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/corridor_windowClosed.glb",
+                    translation: [-0.2475, 0.0, 1.8274],
+                    rotation: [0.0, 0.9239, 0.0, 0.3827],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/corridor.glb",
+                    translation: [2.2274, 0.0, -0.1525],
+                    rotation: [0.0, 0.9239, 0.0, -0.3827],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/corridor_end.glb",
+                    translation: [0.9899, 0.0, 0.5899],
+                    rotation: [0.0, 0.9239, 0.0, 0.3827],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generator.glb",
+                    translation: [0.891, 0.0, -1.9839],
+                    rotation: [0.0, -0.3827, 0.0, 0.9239],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [0.7425, 0.7, 1.8274],
+                    rotation: [0.0, 0.9239, 0.0, 0.3827],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/barrels.glb",
+                    translation: [-0.792, 0.0, 1.2829],
+                    rotation: [0.0, 0.9239, 0.0, 0.3827],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/corridor_cornerRoundWindow.glb",
+                    translation: [-0.2475, 0.0, -0.1525],
+                    rotation: [0.0, -0.3827, 0.0, 0.9239],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+            ],
+        ),
+        (
+            id: "CryoSprayer",
+            scene_path: "res://source/match/units/CryoSprayer.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautB.glb",
+                    translation: [-0.31, 0.0, -0.31],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.62, 0.62, 0.62],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.28, 0.58, -0.75],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.7, 0.55, 1.45],
+                ),
+                (
+                    model: "models/kenney-spacekit/barrel.glb",
+                    translation: [0.15, 0.56, 0.16],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.23, 0.23, 0.23],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrel.glb",
+                    translation: [-0.16, 0.57, 0.17],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2, 0.2, 0.2],
+                ),
+            ],
+        ),
+        (
+            id: "Drone",
+            scene_path: "res://source/match/units/Drone.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_speederA.glb",
+                    translation: [-0.6, 0.0, -0.45],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3, 0.3, 0.3],
+                ),
+            ],
+        ),
+        (
+            id: "DroneMineLayer",
+            scene_path: "res://source/match/units/DroneMineLayer.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/rover.glb",
+                    translation: [-3.56, 0.0, -2.67],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.78, 1.78, 1.78],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrel.glb",
+                    translation: [0.0, 0.42, -0.5],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3, 0.3, 0.3],
+                ),
+            ],
+        ),
+        (
+            id: "EngineerDrone",
+            scene_path: "res://source/match/units/EngineerDrone.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_speederA.glb",
+                    translation: [-0.84, 0.0, -0.63],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.42, 0.42, 0.42],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [-0.05, 0.3, -0.05],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.28, 0.28, 0.28],
+                ),
+            ],
+        ),
+        (
+            id: "FieldMedic",
+            scene_path: "res://source/match/units/FieldMedic.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautA.glb",
+                    translation: [-0.28, 0.0, -0.28],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.56, 0.56, 0.56],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [0.16, 0.48, -0.34],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.24, 0.24, 0.24],
+                ),
+            ],
+        ),
+        (
+            id: "FlakHoverTank",
+            scene_path: "res://source/match/units/FlakHoverTank.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_speederB.glb",
+                    translation: [-1.4, 0.05, -1.05],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/turret_double.glb",
+                    translation: [-0.35, 0.42, -0.4],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_finsB.glb",
+                    translation: [-0.55, 0.45, -0.75],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.28, 0.28, 0.28],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_finsB.glb",
+                    translation: [0.55, 0.45, -0.75],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.28, 0.28, 0.28],
+                ),
+            ],
+        ),
+        (
+            id: "FlakRocketTeam",
+            scene_path: "res://source/match/units/FlakRocketTeam.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautA.glb",
+                    translation: [-0.34, 0.0, -0.26],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.58, 0.58, 0.58],
+                ),
+                (
+                    model: "models/kenney-spacekit/astronautA.glb",
+                    translation: [0.22, 0.0, 0.2],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.54, 0.54, 0.54],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.36, 0.66, -0.78],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.46, 0.46, 1.25],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [0.18, 0.62, -0.5],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4, 0.4, 1.1],
+                ),
+            ],
+        ),
+        (
+            id: "FlakRocketTeamMk2",
+            scene_path: "res://source/match/units/FlakRocketTeamMk2.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautA.glb",
+                    translation: [-0.44, 0.0, -0.24],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.6, 0.6, 0.6],
+                ),
+                (
+                    model: "models/kenney-spacekit/astronautA.glb",
+                    translation: [0.26, 0.0, 0.22],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.57, 0.57, 0.57],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_rifle.glb",
+                    translation: [-0.48, 0.62, -0.82],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.64, 0.64, 1.05],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_rifle.glb",
+                    translation: [0.22, 0.58, -0.58],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.58, 0.58, 0.92],
+                ),
+            ],
+        ),
+        (
+            id: "FlameAssaultBuggy",
+            scene_path: "res://source/match/units/FlameAssaultBuggy.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/rover.glb",
+                    translation: [-3.4, 0.0, -2.55],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.7, 1.7, 1.7],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.25, 0.35, -0.85],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.9, 0.9, 1.45],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [0.25, 0.35, -0.85],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.9, 0.9, 1.45],
+                ),
+                (
+                    model: "models/kenney-spacekit/barrel.glb",
+                    translation: [-0.55, 0.28, 0.25],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.45, 0.45, 0.45],
+                ),
+                (
+                    model: "models/kenney-spacekit/barrel.glb",
+                    translation: [0.55, 0.28, 0.25],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.45, 0.45, 0.45],
+                ),
+            ],
+        ),
+        (
+            id: "GrenadierTrooper",
+            scene_path: "res://source/match/units/GrenadierTrooper.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautA.glb",
+                    translation: [-0.3, 0.0, -0.3],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.6, 0.6, 0.6],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_rifle.glb",
+                    translation: [-0.28, 0.56, -0.58],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.45, 0.45, 0.45],
+                ),
+            ],
+        ),
+        (
+            id: "HammerSiegeTank",
+            scene_path: "res://source/match/units/HammerSiegeTank.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoB.glb",
+                    translation: [-1.978, -0.0688, -1.4792],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.989, 0.989, 0.989],
+                ),
+                (
+                    model: "models/kenney-spacekit/turret_double.glb",
+                    translation: [-0.6708, 0.516, -0.4472],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.774, 0.774, 0.774],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.6708, 0.7052, -1.634],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.333, 1.333, 1.935],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-1.0148, 0.43, 0.344],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3096, 0.3096, 0.3096],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-0.2408, 0.43, 0.344],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3096, 0.3096, 0.3096],
+                ),
+            ],
+        ),
+        (
+            id: "HeavyBombardmentAirship",
+            scene_path: "res://source/match/units/HeavyBombardmentAirship.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoB.glb",
+                    translation: [-1.44, 0.0, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.72, 0.72, 0.72],
+                ),
+            ],
+        ),
+        (
+            id: "HeavyMachinegunTrooper",
+            scene_path: "res://source/match/units/HeavyMachinegunTrooper.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautB.glb",
+                    translation: [-0.34, 0.0, -0.34],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.68, 0.68, 0.68],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.42, 0.64, -0.8],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.72, 0.72, 0.72],
+                ),
+            ],
+        ),
+        (
+            id: "HeavySiegeWalker",
+            scene_path: "res://source/match/units/HeavySiegeWalker.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoA.glb",
+                    translation: [-1.665, 0.148, -1.221],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.8288, 0.8288, 0.8288],
+                ),
+                (
+                    model: "models/kenney-spacekit/turret_double.glb",
+                    translation: [-0.5772, 0.703, -0.5328],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.666, 0.666, 0.666],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.74, 0.8288, -1.591],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.851, 0.851, 1.887],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.3848, 0.8288, -1.591],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.851, 0.851, 1.887],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-0.555, 0.6068, 0.2664],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2516, 0.2516, 0.2516],
+                ),
+                (
+                    model: "models/kenney-spacekit/supports_low.glb",
+                    translation: [-0.999, -0.1628, -0.6068],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2368, 0.3404, 0.2368],
+                ),
+                (
+                    model: "models/kenney-spacekit/supports_low.glb",
+                    translation: [-0.074, -0.1628, -0.6068],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2368, 0.3404, 0.2368],
+                ),
+                (
+                    model: "models/kenney-spacekit/supports_low.glb",
+                    translation: [-0.999, -0.1628, 0.333],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2368, 0.3404, 0.2368],
+                ),
+                (
+                    model: "models/kenney-spacekit/supports_low.glb",
+                    translation: [-0.074, -0.1628, 0.333],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2368, 0.3404, 0.2368],
+                ),
+            ],
+        ),
+        (
+            id: "Helicopter",
+            scene_path: "res://source/match/units/Helicopter.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_racer.glb",
+                    translation: [-1.4, 0.0, -1.05],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.7, 0.7, 0.7],
+                ),
+            ],
+        ),
+        (
+            id: "InterceptorVTOL",
+            scene_path: "res://source/match/units/InterceptorVTOL.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_speederD.glb",
+                    translation: [-0.92, 0.0, -0.69],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.46, 0.46, 0.46],
+                ),
+            ],
+        ),
+        (
+            id: "JammerVehicle",
+            scene_path: "res://source/match/units/JammerVehicle.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/rover.glb",
+                    translation: [-3.6, 0.0, -2.7],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.8, 1.8, 1.8],
+                ),
+                (
+                    model: "models/kenney-spacekit/satelliteDish_detailed.glb",
+                    translation: [0.0, 0.7, -0.05],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.5, 0.5, 0.5],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [0.5, 0.45, 0.45],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.55, 0.55, 0.55],
+                ),
+            ],
+        ),
+        (
+            id: "LanceBeamDefenseTower",
+            scene_path: "res://source/match/units/LanceBeamDefenseTower.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/structure_closed.glb",
+                    translation: [-1.44, 0.0, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.5904, 0.5904, 0.5904],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generator.glb",
+                    translation: [-0.792, 0.0, -0.072],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3456, 0.3456, 0.3456],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generator.glb",
+                    translation: [-2.088, 0.0, -0.072],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3456, 0.3456, 0.3456],
+                ),
+                (
+                    model: "models/kenney-spacekit/turret_single.glb",
+                    translation: [-1.44, 0.324, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.5616, 0.5616, 0.5616],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-1.44, 0.792, -1.404],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4608, 0.4608, 0.4608],
+                ),
+            ],
+        ),
+        (
+            id: "LanceBeamTank",
+            scene_path: "res://source/match/units/LanceBeamTank.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoB.glb",
+                    translation: [-1.6416, -0.0608, -1.2312],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.8208, 0.8208, 0.8208],
+                ),
+                (
+                    model: "models/kenney-spacekit/turret_single.glb",
+                    translation: [-0.5472, 0.4256, -0.3952],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.6232, 0.6232, 0.6232],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.57, 0.5928, -1.406],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.76, 0.76, 1.71],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-0.5624, 0.4712, 0.2128],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.1976, 0.1976, 0.1976],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [-0.266, 0.4712, 0.2128],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.1672, 0.1672, 0.1672],
+                ),
+            ],
+        ),
+        (
+            id: "LandMine",
+            scene_path: "res://source/match/units/LandMine.tscn",
+            parts: [
+            ],
+        ),
+        (
+            id: "LightRifleInfantry",
+            scene_path: "res://source/match/units/LightRifleInfantry.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautB.glb",
+                    translation: [-0.29, 0.0, -0.29],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.58, 0.58, 0.58],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.28, 0.52, -0.62],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.48, 0.48, 0.48],
+                ),
+            ],
+        ),
+        (
+            id: "LongbowMissileCrawler",
+            scene_path: "res://source/match/units/LongbowMissileCrawler.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoB.glb",
+                    translation: [-1.638, -0.0624, -1.248],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.819, 0.819, 0.819],
+                ),
+                (
+                    model: "models/kenney-spacekit/turret_single.glb",
+                    translation: [-0.5616, 0.468, -0.4056],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.5616, 0.5616, 0.5616],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_fuelA.glb",
+                    translation: [-0.858, 0.6552, -1.0764],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2808, 0.2808, 0.5616],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_topA.glb",
+                    translation: [-0.858, 0.6552, -1.3884],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2808, 0.2808, 0.2808],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_fuelA.glb",
+                    translation: [-0.3276, 0.6552, -1.0764],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2808, 0.2808, 0.5616],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_topA.glb",
+                    translation: [-0.3276, 0.6552, -1.3884],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2808, 0.2808, 0.2808],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generator.glb",
+                    translation: [-0.8736, 0.4368, 0.2184],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2184, 0.2184, 0.2184],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generator.glb",
+                    translation: [-0.2808, 0.4368, 0.2184],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2184, 0.2184, 0.2184],
+                ),
+            ],
+        ),
+        (
+            id: "MirageScoutTank",
+            scene_path: "res://source/match/units/MirageScoutTank.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_speederC.glb",
+                    translation: [-1.7712, 0.0, -1.3284],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.8856, 0.8856, 0.8856],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [-0.5904, 0.4428, -0.082],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.246, 0.246, 0.246],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.6396, 0.41, -1.189],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4756, 0.4756, 0.7216],
+                ),
+            ],
+        ),
+        (
+            id: "MobileRepairCrawler",
+            scene_path: "res://source/match/units/MobileRepairCrawler.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/rover.glb",
+                    translation: [-3.56, 0.0, -2.67],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.78, 1.78, 1.78],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [-0.45, 0.45, -0.2],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.45, 0.45, 0.45],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [0.45, 0.32, 0.25],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.42, 0.42, 0.42],
+                ),
+            ],
+        ),
+        (
+            id: "MobileShieldProjector",
+            scene_path: "res://source/match/units/MobileShieldProjector.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/rover.glb",
+                    translation: [-3.8, 0.0, -2.85],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.9, 1.9, 1.9],
+                ),
+                (
+                    model: "models/kenney-spacekit/satelliteDish_large.glb",
+                    translation: [-0.15, 0.72, -0.05],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.32, 0.32, 0.32],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [0.42, 0.38, 0.32],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.36, 0.36, 0.36],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wirelessCable.glb",
+                    translation: [-0.48, 0.3, 0.32],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.28, 0.28, 0.28],
+                ),
+            ],
+        ),
+        (
+            id: "ModularMissileCarrier",
+            scene_path: "res://source/match/units/ModularMissileCarrier.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoA.glb",
+                    translation: [-1.7472, -0.0468, -1.3104],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.8736, 0.8736, 0.8736],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_topA.glb",
+                    translation: [-0.897, 0.5616, -0.975],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2964, 0.2964, 0.546],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_topB.glb",
+                    translation: [-0.273, 0.5616, -0.975],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2964, 0.2964, 0.546],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [-0.585, 0.546, -0.351],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.1716, 0.1716, 0.1716],
+                ),
+            ],
+        ),
+        (
+            id: "MortarTeam",
+            scene_path: "res://source/match/units/MortarTeam.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautA.glb",
+                    translation: [-0.45, 0.0, -0.25],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.55, 0.55, 0.55],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_baseA.glb",
+                    translation: [0.2, 0.12, -0.35],
+                    rotation: [0.1719, 0.0, 0.0, 0.9851],
+                    scale: [0.32, 0.5314, 0.5314],
+                ),
+                (
+                    model: "models/kenney-spacekit/barrels.glb",
+                    translation: [0.55, 0.08, 0.25],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.28, 0.28, 0.28],
+                ),
+            ],
+        ),
+        (
+            id: "OrePurifier",
+            scene_path: "res://source/match/units/OrePurifier.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/structure_detailed.glb",
+                    translation: [-1.292, 0.0, -0.342],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4712, 0.4712, 0.4712],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [-0.152, 0.0456, -0.19],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4712, 0.4712, 0.4712],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [0.722, 0.0152, -0.152],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3952, 0.3952, 0.3952],
+                ),
+                (
+                    model: "models/kenney-spacekit/rock_crystalsLargeA.glb",
+                    translation: [-0.988, 0.1216, 0.722],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3344, 0.3344, 0.3344],
+                ),
+                (
+                    model: "models/kenney-spacekit/pipe_ringHigh.glb",
+                    translation: [1.102, 0.0912, 0.5776],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3344, 0.3344, 0.3344],
+                ),
+            ],
+        ),
+        (
+            id: "PhaseSaboteur",
+            scene_path: "res://source/match/units/PhaseSaboteur.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautB.glb",
+                    translation: [-0.27, 0.0, -0.27],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.54, 0.54, 0.54],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generator.glb",
+                    translation: [-0.07, 0.58, 0.03],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.16, 0.16, 0.16],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.36, 0.53, -0.72],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.46, 0.46, 0.62],
+                ),
+            ],
+        ),
+        (
+            id: "PowerReactor",
+            scene_path: "res://source/match/units/PowerReactor.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/structure_detailed.glb",
+                    translation: [-0.936, 0.0, 0.0],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.396, 0.396, 0.396],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-0.144, 0.0, -0.036],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.5904, 0.5904, 0.5904],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_fuelA.glb",
+                    translation: [1.044, 0.036, -0.432],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3024, 0.3024, 0.3024],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_fuelA.glb",
+                    translation: [1.044, 0.036, 0.396],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3024, 0.3024, 0.3024],
+                ),
+                (
+                    model: "models/kenney-spacekit/pipe_ringHigh.glb",
+                    translation: [-1.368, 0.072, 0.54],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.36, 0.36, 0.36],
+                ),
+            ],
+        ),
+        (
+            id: "PrismDefenseObelisk",
+            scene_path: "res://source/match/units/PrismDefenseObelisk.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/structure_closed.glb",
+                    translation: [-1.44, 0.0, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.6192, 0.6192, 0.6192],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-0.72, 0.0, -0.072],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3024, 0.3024, 0.3024],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-2.16, 0.0, -0.072],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3024, 0.3024, 0.3024],
+                ),
+                (
+                    model: "models/kenney-spacekit/rock_crystalsLargeA.glb",
+                    translation: [-1.44, 0.396, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4464, 0.864, 0.4464],
+                ),
+                (
+                    model: "models/kenney-spacekit/satelliteDish_large.glb",
+                    translation: [-1.44, 1.044, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.216, 0.216, 0.216],
+                ),
+            ],
+        ),
+        (
+            id: "PulseRifleCommando",
+            scene_path: "res://source/match/units/PulseRifleCommando.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautB.glb",
+                    translation: [-0.31, 0.0, -0.31],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.62, 0.62, 0.62],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_rifle.glb",
+                    translation: [-0.41, 0.58, -0.86],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.88, 0.5, 0.88],
+                ),
+            ],
+        ),
+        (
+            id: "RadarUplink",
+            scene_path: "res://source/match/units/RadarUplink.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/structure_detailed.glb",
+                    translation: [-1.44, 0.0, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.72, 0.72, 0.72],
+                ),
+                (
+                    model: "models/kenney-spacekit/satelliteDish_large.glb",
+                    translation: [-1.44, 0.7776, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.576, 0.576, 0.576],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [-0.504, 0.144, -0.144],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.468, 0.468, 0.468],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-2.304, 0.0, -0.144],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3744, 0.3744, 0.3744],
+                ),
+            ],
+        ),
+        (
+            id: "RailArtilleryWalker",
+            scene_path: "res://source/match/units/RailArtilleryWalker.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoA.glb",
+                    translation: [-1.6568, 0.076, -1.2008],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.8208, 0.8208, 0.8208],
+                ),
+                (
+                    model: "models/kenney-spacekit/turret_single.glb",
+                    translation: [-0.57, 0.6536, -0.4864],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.5928, 0.5928, 0.5928],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.57, 0.7752, -1.7328],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.026, 1.026, 2.318],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-0.5928, 0.5472, 0.304],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2432, 0.2432, 0.2432],
+                ),
+                (
+                    model: "models/kenney-spacekit/supports_low.glb",
+                    translation: [-1.0184, -0.1672, -0.6232],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.228, 0.3192, 0.228],
+                ),
+                (
+                    model: "models/kenney-spacekit/supports_low.glb",
+                    translation: [-0.0912, -0.1672, -0.6232],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.228, 0.3192, 0.228],
+                ),
+                (
+                    model: "models/kenney-spacekit/supports_low.glb",
+                    translation: [-1.0184, -0.1672, 0.3496],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.228, 0.3192, 0.228],
+                ),
+                (
+                    model: "models/kenney-spacekit/supports_low.glb",
+                    translation: [-0.0912, -0.1672, 0.3496],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.228, 0.3192, 0.228],
+                ),
+            ],
+        ),
+        (
+            id: "RailCannonBunker",
+            scene_path: "res://source/match/units/RailCannonBunker.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/structure_closed.glb",
+                    translation: [-1.56, 0.0, -1.17],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.702, 0.702, 0.702],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [-0.8736, 0.078, -0.156],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3276, 0.3276, 0.3276],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [-2.2464, 0.078, -0.156],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3276, 0.3276, 0.3276],
+                ),
+                (
+                    model: "models/kenney-spacekit/turret_double.glb",
+                    translation: [-1.56, 0.3744, -1.17],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.6708, 0.6708, 0.6708],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-1.56, 0.8424, -1.6536],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.6708, 0.6708, 0.6708],
+                ),
+            ],
+        ),
+        (
+            id: "RailSniperTeam",
+            scene_path: "res://source/match/units/RailSniperTeam.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautB.glb",
+                    translation: [-0.45, 0.0, -0.2],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.5, 0.5, 0.5],
+                ),
+                (
+                    model: "models/kenney-spacekit/astronautB.glb",
+                    translation: [0.08, 0.0, -0.35],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.58, 0.58, 0.58],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_rifle.glb",
+                    translation: [-0.02, 0.56, -0.92],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.95, 0.52, 1.25],
+                ),
+            ],
+        ),
+        (
+            id: "RailgunTank",
+            scene_path: "res://source/match/units/RailgunTank.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoB.glb",
+                    translation: [-1.716, -0.0624, -1.287],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.858, 0.858, 0.858],
+                ),
+                (
+                    model: "models/kenney-spacekit/turret_single.glb",
+                    translation: [-0.5616, 0.4524, -0.4056],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.663, 0.663, 0.663],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.585, 0.6084, -1.482],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.014, 1.014, 1.95],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generator.glb",
+                    translation: [-0.741, 0.429, 0.273],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2496, 0.2496, 0.2496],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generator.glb",
+                    translation: [-0.273, 0.429, 0.273],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2496, 0.2496, 0.2496],
+                ),
+            ],
+        ),
+        (
+            id: "Refinery",
+            scene_path: "res://source/match/units/Refinery.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/structure_detailed.glb",
+                    translation: [-0.925, 0.0, -0.185],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4292, 0.4292, 0.4292],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [0.185, 0.0, -0.074],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.5032, 0.5032, 0.5032],
+                ),
+                (
+                    model: "models/kenney-spacekit/barrels.glb",
+                    translation: [1.147, 0.0, 0.481],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3108, 0.3108, 0.3108],
+                ),
+                (
+                    model: "models/kenney-spacekit/pipe_straight.glb",
+                    translation: [-0.333, 0.111, 0.777],
+                    rotation: [0.7071, 0.0, 0.0, 0.7071],
+                    scale: [0.37, 0.37, 0.37],
+                ),
+                (
+                    model: "models/kenney-spacekit/pipe_cornerRound.glb",
+                    translation: [0.629, 0.0888, 0.777],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3108, 0.3108, 0.3108],
+                ),
+                (
+                    model: "models/kenney-spacekit/chimney_detailed.glb",
+                    translation: [1.073, 0.0, -0.703],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3108, 0.3108, 0.3108],
+                ),
+            ],
+        ),
+        (
+            id: "RepairPad",
+            scene_path: "res://source/match/units/RepairPad.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/platform_large.glb",
+                    translation: [-1.44, 0.0, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.828, 0.1296, 0.828],
+                ),
+                (
+                    model: "models/kenney-spacekit/pipe_ring.glb",
+                    translation: [-1.44, 0.1584, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.648, 0.1296, 0.648],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-1.44, 0.1296, -1.692],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3024, 0.3024, 0.3024],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [-2.052, 0.2592, -0.972],
+                    rotation: [0.0, 0.3827, 0.0, 0.9239],
+                    scale: [0.224, 0.2232, 0.224],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [-0.828, 0.2592, -0.972],
+                    rotation: [0.0, 0.9239, 0.0, 0.3827],
+                    scale: [0.224, 0.2232, 0.224],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [-1.44, 0.1728, -0.468],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2592, 0.2592, 0.2592],
+                ),
+            ],
+        ),
+        (
+            id: "RoboticsBay",
+            scene_path: "res://source/match/units/RoboticsBay.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/hangar_roundB.glb",
+                    translation: [-1.48, 0.0, -1.11],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.666, 0.666, 0.666],
+                ),
+                (
+                    model: "models/kenney-spacekit/structure_detailed.glb",
+                    translation: [-0.518, 0.0, 0.259],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.333, 0.333, 0.333],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [-2.294, 0.148, 0.111],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.37, 0.37, 0.37],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-0.777, 0.0, -0.259],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.37, 0.37, 0.37],
+                ),
+            ],
+        ),
+        (
+            id: "RocketGunship",
+            scene_path: "res://source/match/units/RocketGunship.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_speederC.glb",
+                    translation: [-1.16, 0.0, -0.87],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.58, 0.58, 0.58],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_finsA.glb",
+                    translation: [-0.55, 0.12, -0.55],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.26, 0.26, 0.26],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_finsA.glb",
+                    translation: [0.55, 0.12, -0.55],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.26, 0.26, 0.26],
+                ),
+            ],
+        ),
+        (
+            id: "RocketInfantry",
+            scene_path: "res://source/match/units/RocketInfantry.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautA.glb",
+                    translation: [-0.31, 0.0, -0.31],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.62, 0.62, 0.62],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_rifle.glb",
+                    translation: [-0.35, 0.58, -0.74],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.6, 0.6, 0.6],
+                ),
+            ],
+        ),
+        (
+            id: "RocketTrooperRobot",
+            scene_path: "res://source/match/units/RocketTrooperRobot.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautA.glb",
+                    translation: [-0.31, 0.0, -0.31],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.62, 0.62, 0.62],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_rifle.glb",
+                    translation: [-0.34, 0.55, -0.7],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.52, 0.52, 0.52],
+                ),
+            ],
+        ),
+        (
+            id: "SaboteurInfiltrator",
+            scene_path: "res://source/match/units/SaboteurInfiltrator.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautB.glb",
+                    translation: [-0.27, 0.0, -0.27],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.52, 0.52, 0.52],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generator.glb",
+                    translation: [-0.08, 0.58, 0.02],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.15, 0.15, 0.15],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.35, 0.5, -0.72],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.42, 0.42, 0.72],
+                ),
+            ],
+        ),
+        (
+            id: "ScoutRover",
+            scene_path: "res://source/match/units/ScoutRover.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/rover.glb",
+                    translation: [-3.3, 0.0, -2.475],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.65, 1.65, 1.65],
+                ),
+            ],
+        ),
+        (
+            id: "ShieldTrooper",
+            scene_path: "res://source/match/units/ShieldTrooper.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautB.glb",
+                    translation: [-0.33, 0.0, -0.33],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.66, 0.66, 0.66],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generator.glb",
+                    translation: [0.36, 0.72, -0.28],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.22, 0.22, 0.22],
+                ),
+            ],
+        ),
+        (
+            id: "ShockTrooper",
+            scene_path: "res://source/match/units/ShockTrooper.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautA.glb",
+                    translation: [-0.31, 0.0, -0.31],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.62, 0.62, 0.62],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.28, 0.6, -0.68],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.52, 0.52, 1.0],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generator.glb",
+                    translation: [0.2, 0.58, 0.18],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.18, 0.18, 0.18],
+                ),
+            ],
+        ),
+        (
+            id: "SiegeAirship",
+            scene_path: "res://source/match/units/SiegeAirship.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoB.glb",
+                    translation: [-1.56, 0.0, -1.17],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.78, 0.78, 0.78],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [-0.65, -0.18, -0.1],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.32, 0.32, 0.32],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [0.12, -0.18, -0.1],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.32, 0.32, 0.32],
+                ),
+            ],
+        ),
+        (
+            id: "SiegeArtilleryVehicle",
+            scene_path: "res://source/match/units/SiegeArtilleryVehicle.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoB.glb",
+                    translation: [-1.44, -0.036, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.72, 0.72, 0.72],
+                ),
+                (
+                    model: "models/kenney-spacekit/turret_single.glb",
+                    translation: [-0.504, 0.396, -0.36],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.54, 0.54, 0.54],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.54, 0.54, -1.044],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.152, 1.152, 1.152],
+                ),
+            ],
+        ),
+        (
+            id: "SiegeDrillTank",
+            scene_path: "res://source/match/units/SiegeDrillTank.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoB.glb",
+                    translation: [-1.386, -0.0792, -1.0428],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.693, 0.693, 0.693],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [0.0, 0.231, -0.726],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4092, 0.4092, 0.792],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [0.0, 0.462, -0.3564],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4092, 0.4092, 0.5808],
+                ),
+            ],
+        ),
+        (
+            id: "SniperScout",
+            scene_path: "res://source/match/units/SniperScout.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautB.glb",
+                    translation: [-0.28, 0.0, -0.28],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.56, 0.56, 0.56],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_rifle.glb",
+                    translation: [-0.37, 0.54, -0.78],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.78, 0.46, 0.78],
+                ),
+            ],
+        ),
+        (
+            id: "TacticalOfficer",
+            scene_path: "res://source/match/units/TacticalOfficer.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/astronautA.glb",
+                    translation: [-0.29, 0.0, -0.29],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.58, 0.58, 0.58],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_rifle.glb",
+                    translation: [-0.25, 0.58, -0.62],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.44, 0.44, 0.58],
+                ),
+                (
+                    model: "models/kenney-spacekit/satelliteDish.glb",
+                    translation: [0.28, 0.9, 0.2],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.13, 0.13, 0.13],
+                ),
+            ],
+        ),
+        (
+            id: "Tank",
+            scene_path: "res://source/match/units/Tank.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/craft_cargoB.glb",
+                    translation: [-1.2, -0.0644, -0.9],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.6, 0.6, 0.6],
+                ),
+                (
+                    model: "models/kenney-spacekit/craft_miner.glb",
+                    translation: [-0.84, 0.3522, -1.0015],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.42, 0.42, 0.42],
+                ),
+            ],
+        ),
+        (
+            id: "TechAirport",
+            scene_path: "res://source/match/units/TechAirport.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/platform_large.glb",
+                    translation: [-0.144, 0.0, 0.0],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.54, 0.54, 0.54],
+                ),
+                (
+                    model: "models/kenney-spacekit/hangar_largeA.glb",
+                    translation: [-0.972, 0.036, -0.792],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3024, 0.3024, 0.3024],
+                ),
+                (
+                    model: "models/kenney-spacekit/craft_cargoA.glb",
+                    translation: [0.54, 0.18, 0.468],
+                    rotation: [0.0, 0.1387, 0.0, 0.9903],
+                    scale: [0.2097, 0.216, 0.2097],
+                ),
+                (
+                    model: "models/kenney-spacekit/satelliteDish.glb",
+                    translation: [0.72, 0.18, -0.792],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2304, 0.2304, 0.2304],
+                ),
+            ],
+        ),
+        (
+            id: "TechBunker",
+            scene_path: "res://source/match/units/TechBunker.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/structure_closed.glb",
+                    translation: [-1.64, 0.0, -1.23],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.861, 0.6068, 0.861],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [-1.066, 0.7872, -1.0496],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2296, 0.2296, 0.2296],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [-0.8856, 0.0984, -0.3444],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2624, 0.2624, 0.2624],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [-2.3944, 0.0984, -0.3444],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2624, 0.2624, 0.2624],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-1.64, 0.6724, -0.6396],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4264, 0.4264, 0.4264],
+                ),
+            ],
+        ),
+        (
+            id: "TechHospital",
+            scene_path: "res://source/match/units/TechHospital.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/platform_small.glb",
+                    translation: [0.0, 0.0, 0.0],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.612, 0.3024, 0.612],
+                ),
+                (
+                    model: "models/kenney-spacekit/structure_closed.glb",
+                    translation: [-0.612, 0.036, -0.54],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4464, 0.4464, 0.4464],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [0.54, 0.036, 0.468],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2448, 0.2448, 0.2448],
+                ),
+                (
+                    model: "models/kenney-spacekit/satelliteDish.glb",
+                    translation: [0.612, 0.288, -0.54],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.216, 0.216, 0.216],
+                ),
+                (
+                    model: "models/kenney-spacekit/stairs_short.glb",
+                    translation: [-0.612, 0.0144, 0.612],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4176, 0.2304, 0.4176],
+                ),
+            ],
+        ),
+        (
+            id: "TechLab",
+            scene_path: "res://source/match/units/TechLab.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/hangar_roundGlass.glb",
+                    translation: [-1.56, 0.0, -1.17],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.741, 0.741, 0.741],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-0.585, 0.0, -0.156],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.546, 0.546, 0.546],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [-2.496, 0.156, -0.156],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.507, 0.507, 0.507],
+                ),
+                (
+                    model: "models/kenney-spacekit/structure_detailed.glb",
+                    translation: [-1.56, 0.0, 0.195],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.429, 0.429, 0.429],
+                ),
+            ],
+        ),
+        (
+            id: "TechOilDerrick",
+            scene_path: "res://source/match/units/TechOilDerrick.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/structure_detailed.glb",
+                    translation: [0.0, 0.0, 0.0],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.504, 0.324, 0.504],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-0.468, 0.108, 0.108],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3024, 0.3024, 0.3024],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_fuelA.glb",
+                    translation: [0.612, 0.036, -0.396],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2448, 0.2448, 0.2448],
+                ),
+                (
+                    model: "models/kenney-spacekit/rocket_fuelA.glb",
+                    translation: [0.612, 0.036, 0.3456],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2448, 0.2448, 0.2448],
+                ),
+                (
+                    model: "models/kenney-spacekit/pipe_ringHigh.glb",
+                    translation: [-0.9, 0.144, 0.0],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.252, 0.468, 0.252],
+                ),
+                (
+                    model: "models/kenney-spacekit/pipe_straight.glb",
+                    translation: [-0.144, 0.036, -0.72],
+                    rotation: [0.0, 0.7071, 0.0, 0.7071],
+                    scale: [0.18, 0.18, 0.18],
+                ),
+                (
+                    model: "models/kenney-spacekit/pipe_straight.glb",
+                    translation: [0.324, 0.036, 0.72],
+                    rotation: [0.0, 0.7071, 0.0, 0.7071],
+                    scale: [0.18, 0.18, 0.18],
+                ),
+                (
+                    model: "models/kenney-spacekit/satelliteDish.glb",
+                    translation: [-0.684, 0.396, -0.468],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2736, 0.2736, 0.2736],
+                ),
+            ],
+        ),
+        (
+            id: "TechRepairDepot",
+            scene_path: "res://source/match/units/TechRepairDepot.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/platform_large.glb",
+                    translation: [-1.44, 0.0, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.8784, 0.144, 0.8784],
+                ),
+                (
+                    model: "models/kenney-spacekit/pipe_ring.glb",
+                    translation: [-1.44, 0.1728, -1.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.6912, 0.1296, 0.6912],
+                ),
+                (
+                    model: "models/kenney-spacekit/rail_middle.glb",
+                    translation: [-1.44, 0.18, -1.476],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4176, 0.1296, 0.4176],
+                ),
+                (
+                    model: "models/kenney-spacekit/rail_middle.glb",
+                    translation: [-1.44, 0.18, -0.684],
+                    rotation: [0.0, 1.0, 0.0, 0.0],
+                    scale: [0.4176, 0.1296, 0.4176],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-1.44, 0.144, -1.7424],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3024, 0.3024, 0.3024],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [-2.0736, 0.3024, -0.972],
+                    rotation: [0.0, 0.3827, 0.0, 0.9239],
+                    scale: [0.224, 0.2304, 0.224],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_barrelLarge.glb",
+                    translation: [-0.8064, 0.3024, -0.972],
+                    rotation: [0.0, 0.9239, 0.0, 0.3827],
+                    scale: [0.224, 0.2304, 0.224],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [-1.44, 0.1728, -0.396],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.2448, 0.2448, 0.2448],
+                ),
+            ],
+        ),
+        (
+            id: "TeslaCrawlerMk2",
+            scene_path: "res://source/match/units/TeslaCrawlerMk2.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/rover.glb",
+                    translation: [-3.9, 0.0, -2.92],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [1.95, 1.95, 1.95],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generator.glb",
+                    translation: [0.0, 0.52, -0.08],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.34, 0.34, 0.34],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [-0.34, 0.46, -0.74],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.55, 0.55, 1.15],
+                ),
+                (
+                    model: "models/kenney-spacekit/weapon_gun.glb",
+                    translation: [0.34, 0.46, -0.74],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.55, 0.55, 1.15],
+                ),
+            ],
+        ),
+        (
+            id: "TeslaFenceSegment",
+            scene_path: "res://source/match/units/TeslaFenceSegment.tscn",
+            parts: [
+            ],
+        ),
+        (
+            id: "VehicleFactory",
+            scene_path: "res://source/match/units/VehicleFactory.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/hangar_smallA.glb",
+                    translation: [-1.9, 0.0, -1.425],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.95, 0.95, 0.95],
+                ),
+            ],
+        ),
+        (
+            id: "WeatherControlSpire",
+            scene_path: "res://source/match/units/WeatherControlSpire.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/hangar_roundGlass.glb",
+                    translation: [-1.64, 0.0, -1.23],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.7708, 0.7708, 0.7708],
+                ),
+                (
+                    model: "models/kenney-spacekit/structure_detailed.glb",
+                    translation: [-1.64, 0.041, 0.246],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4592, 0.4592, 0.4592],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-0.738, 0.0, -0.205],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4264, 0.4264, 0.4264],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_generatorLarge.glb",
+                    translation: [-2.542, 0.0, -0.205],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.4264, 0.4264, 0.4264],
+                ),
+                (
+                    model: "models/kenney-spacekit/machine_wireless.glb",
+                    translation: [-1.64, 0.6724, -1.23],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.574, 0.574, 0.574],
+                ),
+                (
+                    model: "models/kenney-spacekit/satelliteDish_large.glb",
+                    translation: [-1.64, 1.2136, -1.23],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [0.3772, 0.3772, 0.3772],
+                ),
+            ],
+        ),
+        (
+            id: "Worker",
+            scene_path: "res://source/match/units/Worker.tscn",
+            parts: [
+                (
+                    model: "models/kenney-spacekit/rover.glb",
+                    translation: [-4.0, -0.02, -3.0],
+                    rotation: [0.0, 0.0, 0.0, 1.0],
+                    scale: [2.0, 2.0, 2.0],
+                ),
+            ],
+        ),
+    ],
+)
