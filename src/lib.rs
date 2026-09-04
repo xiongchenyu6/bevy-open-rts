@@ -35,6 +35,8 @@ mod support_powers;
 pub(crate) use support_powers::*;
 mod spawn;
 pub(crate) use spawn::*;
+mod tank_models;
+pub(crate) use tank_models::*;
 mod selection;
 pub(crate) use selection::*;
 mod command_card;
@@ -3254,6 +3256,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                     face_attack_targets,
                     tag_turret_nodes,
                     animate_turret_nodes,
+                    animate_tank_spinners,
                     animate_airframes,
                     manage_deploy_outriggers,
                 )

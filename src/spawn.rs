@@ -520,6 +520,14 @@ pub(crate) fn spawn_entity_models(
     visual_faction: Option<SkirmishFaction>,
     def: &registry::EntityDef,
 ) {
+    if is_procedural_tank(def.id) {
+        let id = def.id;
+        commands.queue(move |world: &mut World| {
+            spawn_tank_model(world, root, id);
+        });
+        spawn_faction_identity_marker(commands, root, visual_faction, def);
+        return;
+    }
     if def.render_parts.is_empty() {
         if let Some(model) = ProceduralEntityModel::for_entity_id(def.id) {
             spawn_procedural_entity_model(commands, root, model);
@@ -567,7 +575,9 @@ pub(crate) fn spawn_entity_models_for_harness(
 ) {
     let root = root.entity();
     let asset_server = world.resource::<AssetServer>().clone();
-    if def.render_parts.is_empty() {
+    if is_procedural_tank(def.id) {
+        spawn_tank_model(world, root, def.id);
+    } else if def.render_parts.is_empty() {
         if let Some(model) = ProceduralEntityModel::for_entity_id(def.id) {
             match model {
                 ProceduralEntityModel::LandMine => spawn_land_mine_procedural_model(world, root),
