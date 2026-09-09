@@ -45,16 +45,16 @@
             wayland
           ];
 
-          wasm-bindgen-cli-0_2_125 = pkgs.rustPlatform.buildRustPackage rec {
+          wasm-bindgen-cli-0_2_128 = pkgs.rustPlatform.buildRustPackage rec {
             pname = "wasm-bindgen-cli";
-            version = "0.2.125";
+            version = "0.2.128";
 
             src = pkgs.fetchCrate {
               inherit pname version;
-              hash = "sha256-zRawtjxMOdTMX+mZaiNR3YYfTiZJhf9qj7kXSSeMxrc=";
+              hash = "sha256-a7lcXJnnZkYReja+iUO7NqqrWyv3toxnUgQb8s4IS5s=";
             };
 
-            cargoHash = "sha256-aZCfgR23Qb0Pn4Mm4ToMtuuRQqSJjXCR9li/VvP5CTM=";
+            cargoHash = "sha256-R1Tas33Ursy8kqsxguAkG0ZhNed2n5uFTAhw1l2qlLY=";
             doCheck = false;
           };
         in
@@ -88,7 +88,7 @@
                 openssl
                 rustfmt
                 lld
-                wasm-bindgen-cli-0_2_125
+                wasm-bindgen-cli-0_2_128
                 binaryen
                 python3
               ];

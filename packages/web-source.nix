@@ -27,18 +27,18 @@
 }:
 let
   # wasm-bindgen CLI MUST match the wasm-bindgen crate version in Cargo.lock
-  # (0.2.126), or the JS glue and wasm disagree and boot fails with
+  # (0.2.128), or the JS glue and wasm disagree and boot fails with
   # "WebAssembly.Table.grow(): failed to grow table by 4".
   wasm-bindgen-cli = buildWasmBindgenCli rec {
     src = fetchCrate {
       pname = "wasm-bindgen-cli";
-      version = "0.2.126";
-      hash = "sha256-H6Is3fiZVxZCfOMWK5dWMSrtn50VGv0sfdnsT+cTtyk=";
+      version = "0.2.128";
+      hash = "sha256-a7lcXJnnZkYReja+iUO7NqqrWyv3toxnUgQb8s4IS5s=";
     };
     cargoDeps = rustPlatform.fetchCargoVendor {
       inherit src;
       inherit (src) pname version;
-      hash = "sha256-VucqkXbCi4qtQzY/HrXiDnbSURsagPsdNVMn1Tw3UiY=";
+      hash = "sha256-R1Tas33Ursy8kqsxguAkG0ZhNed2n5uFTAhw1l2qlLY=";
     };
   };
 in

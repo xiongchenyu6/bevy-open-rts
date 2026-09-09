@@ -225,6 +225,8 @@ impl IntoResponse for ApiError {
 
 impl AppState {
     pub fn new(config: ServerConfig) -> Self {
+        // Reqwest needs an installed provider; repeated state creation is allowed.
+        let _ = rustls::crypto::ring::default_provider().install_default();
         Self {
             inner: Arc::new(AppStateInner {
                 config,
@@ -994,6 +996,15 @@ fn unix_time_ms() -> u64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn turn_http_client_builds_after_service_initialization() {
+        let _state = AppState::new(ServerConfig::default());
+        reqwest::Client::builder()
+            .https_only(true)
+            .build()
+            .expect("TURN HTTPS client must have a crypto provider");
+    }
 
     #[tokio::test]
     async fn expired_waiting_rooms_are_collected() {
