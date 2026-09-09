@@ -4,14 +4,13 @@
 This harness is deliberately stricter than the Godot mapping audit. Godot scene
 parts are useful reference data, but the Bevy port still needs clear silhouettes:
 critical units must not share the same visible model recipe, and large multipart
-"kitbash" units need screenshot review or replacement with a generated GLB.
+"kitbash" units need screenshot review or a procedural/cohesive replacement.
 """
 
 from __future__ import annotations
 
 import argparse
 import collections
-import json
 import re
 import sys
 from pathlib import Path
@@ -20,7 +19,6 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_RS = REPO_ROOT / "src/generated_registry.rs"
 DEFAULT_REPORT = REPO_ROOT / "screenshots/model-harness/model-quality-report.md"
-DEFAULT_QUEUE = REPO_ROOT / "docs/model-quality/hunyuan3d-queue.json"
 DEFAULT_SCREENSHOT_DIR = REPO_ROOT / "screenshots/model-harness"
 CRITICAL_DISTINCT_GROUPS = [
     ("Worker", "ScoutRover"),
@@ -62,7 +60,7 @@ def parse_roles(registry_path: Path) -> dict[str, str]:
         r"EntityDef\s*\{\s*"
         r'id:\s*"([^"]+)".*?'
         r"role:\s*EntityRole::([A-Za-z]+).*?"
-        r"render_parts:\s*(PARTS_[A-Z0-9_]+),",
+        r"render_parts:\s*(PARTS_[A-Z0-9_]+|&\[\]),",
         re.S,
     )
     for match in entity_re.finditer(text):
@@ -77,7 +75,7 @@ def parse_labels(registry_path: Path) -> dict[str, str]:
         r"EntityDef\s*\{\s*"
         r'id:\s*"([^"]+)".*?'
         r'label:\s*"([^"]+)".*?'
-        r"render_parts:\s*(PARTS_[A-Z0-9_]+),",
+        r"render_parts:\s*(PARTS_[A-Z0-9_]+|&\[\]),",
         re.S,
     )
     for match in entity_re.finditer(text):
@@ -149,17 +147,6 @@ def parse_harness_locations(screenshots_dir: Path) -> dict[str, dict[str, str]]:
     return locations
 
 
-def generation_prompt(entity_id: str, label: str, signature: str) -> str:
-    return (
-        f"Create a single cohesive low-poly 3D RTS game unit GLB for {label} "
-        f"({entity_id}). Style: clean sci-fi base-building RTS, readable from an "
-        "isometric camera, compact silhouette, team-color accent panels, no floating "
-        "or separated kitbash parts, centered pivot at ground contact, proportions "
-        "compatible with Bevy Open RTS / Kenney spacekit units. Current weak source "
-        f"parts: {signature}. Replace them with one fused production-ready model."
-    )
-
-
 def model_harness_coverage(
     registry: dict[str, dict[str, object]],
     screenshots_dir: Path,
@@ -214,12 +201,6 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--registry", type=Path, default=REGISTRY_RS)
     parser.add_argument("--out", type=Path, default=DEFAULT_REPORT)
-    parser.add_argument(
-        "--queue-out",
-        type=Path,
-        default=DEFAULT_QUEUE,
-        help="Write a machine-readable Hunyuan3D replacement queue.",
-    )
     parser.add_argument("--screenshots-dir", type=Path, default=DEFAULT_SCREENSHOT_DIR)
     parser.add_argument(
         "--per-page",
@@ -332,30 +313,14 @@ def main() -> int:
     for entity_id in empty_visuals:
         candidate_reasons[entity_id].add("empty non-procedural visual")
 
-    queue_records = []
-    for entity_id in sorted(candidate_reasons):
-        entry = registry[entity_id]
-        parts = entry["parts"]  # type: ignore[assignment]
-        signature = signature_label(model_signature(parts))
-        label = labels.get(entity_id, entity_id)
-        queue_records.append(
-            {
-                "entity": entity_id,
-                "label": label,
-                "role": roles.get(entity_id, "Unknown"),
-                "reasons": sorted(candidate_reasons[entity_id]),
-                "part_count": len(parts),
-                "model_signature": signature,
-                "render_parts": parts,
-                "harness": harness_locations.get(entity_id),
-                "prompt": generation_prompt(entity_id, label, signature),
-                "negative_prompt": (
-                    "floating pieces, separated weapons, disconnected missiles, unreadable tiny "
-                    "details, realistic high-poly grime, huge base plate, wrong pivot, oversized scale"
-                ),
-                "target_path": f"assets/models/hunyuan3d/{entity_id}.glb",
-            }
-        )
+    candidate_records = [
+        {
+            "entity": entity_id,
+            "reasons": sorted(candidate_reasons[entity_id]),
+            "harness": harness_locations.get(entity_id),
+        }
+        for entity_id in sorted(candidate_reasons)
+    ]
 
     lines = [
         "# Model Quality Audit",
@@ -397,7 +362,7 @@ def main() -> int:
     )
     lines.extend(["## Model Harness Screenshot Coverage", ""])
     lines.extend(markdown_table(harness_rows, ["Check", "Status", "Detail"]))
-    lines.extend(["## Hunyuan3D Replacement Candidates", ""])
+    lines.extend(["## Replacement Candidates", ""])
     lines.extend(
         markdown_table(
             [
@@ -410,7 +375,7 @@ def main() -> int:
                         else "missing harness location"
                     ),
                 ]
-                for record in queue_records
+                for record in candidate_records
             ],
             ["Entity", "Reasons", "Harness"],
         )
@@ -418,18 +383,8 @@ def main() -> int:
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text("\n".join(lines) + "\n")
-    if args.queue_out:
-        args.queue_out.parent.mkdir(parents=True, exist_ok=True)
-        args.queue_out.write_text(json.dumps(queue_records, indent=2, ensure_ascii=False) + "\n")
     display = args.out.relative_to(REPO_ROOT) if args.out.is_relative_to(REPO_ROOT) else args.out
     print(f"[model-quality] wrote {display}")
-    if args.queue_out:
-        queue_display = (
-            args.queue_out.relative_to(REPO_ROOT)
-            if args.queue_out.is_relative_to(REPO_ROOT)
-            else args.queue_out
-        )
-        print(f"[model-quality] wrote {queue_display}")
     print(
         "[model-quality] "
         f"critical_failures={len(critical_failures)} "

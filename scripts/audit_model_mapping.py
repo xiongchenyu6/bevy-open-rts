@@ -89,7 +89,7 @@ def parse_registry() -> dict[str, dict[str, object]]:
         r"EntityDef\s*\{\s*"
         r'id:\s*"([^"]+)".*?'
         r'scene_path:\s*"([^"]+)".*?'
-        r"render_parts:\s*(PARTS_[A-Z0-9_]+),",
+        r"render_parts:\s*(PARTS_[A-Z0-9_]+|&\[\]),",
         re.S,
     )
     for match in entity_re.finditer(text):

@@ -155,17 +155,8 @@ Generated outputs:
   typed `Instance<ModelHarnessRoot>` values and registry coverage is backed by a
   harness-owned, compiler-checked ID table.
 - Uses `scripts/audit_model_quality.py` as the model quality gate. It verifies
-  distinct unit signatures, model-harness screenshot coverage, and writes
-  `docs/model-quality/hunyuan3d-queue.json` for multipart units that should be
-  replaced by cohesive Hunyuan3D GLB assets.
-- Uses `scripts/comfy_hunyuan3d_queue.py` to stage and submit those replacements
-  to ComfyUI/Hunyuan3D. Current generated single-GLB replacements include
-  `CryoSprayer`, `FlakHoverTank`, `FlakRocketTeam`, `FlakRocketTeamMk2`,
-  `FlameAssaultBuggy`, `HammerSiegeTank`, `HeavySiegeWalker`, `LanceBeamTank`,
-  `LongbowMissileCrawler`, `MobileShieldProjector`, `ModularMissileCarrier`,
-  `RailArtilleryWalker`, `RailgunTank`, and `TeslaCrawlerMk2` under
-  `assets/models/hunyuan3d/`; the multipart replacement queue is currently
-  empty.
+  distinct unit signatures and model-harness screenshot coverage. Ground
+  vehicles are drawn procedurally by `src/tank_models.rs`.
 - Mirrors the non-`.import` Godot asset tree and generates 73 playable
   unit/structure definitions across the three Godot factions.
 - Loads all referenced GLB assets for migrated entities; Godot procedural-only
@@ -191,11 +182,9 @@ Generated outputs:
 ```sh
 RUST_LOG=warn cargo run --bin capture -- model-harness screenshots/model-harness 6
 python3 scripts/audit_model_quality.py --fail-critical --require-screenshots
-python3 scripts/comfy_hunyuan3d_queue.py --ssh root@101.78.126.6 --entity CryoSprayer --workflow-mode local-image --use-existing-reference --submit --poll
 ```
 
-The screenshot directory is ignored by git. The Hunyuan3D replacement queue is
-tracked at `docs/model-quality/hunyuan3d-queue.json`.
+The screenshot directory is ignored by git.
 - The OS cursor uses the RTS cursor atlas in `assets/ui/cursors/`: default
   arrow, move/patrol/rally, attack/support targeting, and build/resource
   targeting states.

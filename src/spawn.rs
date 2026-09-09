@@ -1,5 +1,5 @@
 //! Entity spawning: team startup, unit/structure spawn entry points, model
-//! assembly (registry parts, hunyuan GLBs, procedural fallbacks, faction
+//! assembly (registry parts, procedural models, faction
 //! identity markers), placement wrappers, and paradrop spawning.
 
 use bevy::prelude::*;
@@ -444,75 +444,6 @@ pub(crate) fn default_visual_faction(team: Team) -> Option<SkirmishFaction> {
         .map(|_| SkirmishFaction::from_team(team))
 }
 
-#[derive(Component, Clone, Copy, Debug)]
-pub(crate) struct HunyuanModelPart {
-    pub(crate) entity_id: &'static str,
-}
-
-impl HunyuanModelPart {
-    pub(crate) fn for_render_part(
-        entity_id: &'static str,
-        part: &registry::RenderPart,
-    ) -> Option<Self> {
-        is_hunyuan_model_path(part.model).then_some(Self { entity_id })
-    }
-}
-
-#[derive(Component)]
-pub(crate) struct HunyuanModelMaterialized;
-
-#[derive(Resource, Default)]
-pub(crate) struct HunyuanModelMaterialCache {
-    pub(crate) by_entity: BTreeMap<&'static str, Handle<StandardMaterial>>,
-}
-
-impl HunyuanModelMaterialCache {
-    pub(crate) fn handle_for(
-        &mut self,
-        entity_id: &'static str,
-        materials: &mut Assets<StandardMaterial>,
-    ) -> Handle<StandardMaterial> {
-        if let Some(handle) = self.by_entity.get(entity_id) {
-            return handle.clone();
-        }
-        let handle = materials.add(hunyuan_model_material(entity_id));
-        self.by_entity.insert(entity_id, handle.clone());
-        handle
-    }
-}
-
-pub(crate) fn is_hunyuan_model_path(model: &str) -> bool {
-    model.starts_with("models/hunyuan3d/")
-}
-
-pub(crate) fn hunyuan_model_material(entity_id: &str) -> StandardMaterial {
-    let (base, metallic, roughness, glow) = match entity_id {
-        "CryoSprayer" => (Color::srgb(0.70, 0.92, 1.0), 0.72, 0.28, 0.30),
-        "LongbowMissileCrawler" => (Color::srgb(0.26, 0.29, 0.32), 0.90, 0.34, 0.10),
-        "FlameAssaultBuggy" => (Color::srgb(0.92, 0.28, 0.10), 0.62, 0.36, 0.45),
-        "HammerSiegeTank" => (Color::srgb(0.54, 0.55, 0.50), 0.88, 0.32, 0.08),
-        "HeavySiegeWalker" => (Color::srgb(0.46, 0.49, 0.52), 0.88, 0.30, 0.08),
-        "RailArtilleryWalker" => (Color::srgb(0.58, 0.53, 0.44), 0.84, 0.34, 0.10),
-        "FlakHoverTank" => (Color::srgb(0.40, 0.48, 0.38), 0.82, 0.38, 0.08),
-        "LanceBeamTank" => (Color::srgb(0.22, 0.50, 0.92), 0.78, 0.30, 0.32),
-        "RailgunTank" => (Color::srgb(0.50, 0.55, 0.58), 0.90, 0.28, 0.16),
-        "FlakRocketTeam" => (Color::srgb(0.45, 0.42, 0.38), 0.72, 0.44, 0.10),
-        "FlakRocketTeamMk2" => (Color::srgb(0.58, 0.44, 0.34), 0.76, 0.40, 0.12),
-        "MobileShieldProjector" => (Color::srgb(0.48, 0.32, 0.86), 0.74, 0.30, 0.35),
-        "ModularMissileCarrier" => (Color::srgb(0.34, 0.35, 0.36), 0.90, 0.35, 0.14),
-        "TeslaCrawlerMk2" => (Color::srgb(0.16, 0.42, 0.90), 0.80, 0.26, 0.55),
-        _ => (Color::srgb(0.58, 0.56, 0.50), 0.78, 0.36, 0.10),
-    };
-    let lin = base.to_linear();
-    StandardMaterial {
-        base_color: base,
-        metallic,
-        perceptual_roughness: roughness,
-        emissive: LinearRgba::new(lin.red * glow, lin.green * glow, lin.blue * glow, 1.0),
-        ..default()
-    }
-}
-
 pub(crate) fn spawn_entity_models(
     commands: &mut Commands,
     asset_server: &AssetServer,
@@ -559,9 +490,6 @@ pub(crate) fn spawn_entity_models(
                     rest_rotation: transform.rotation,
                 });
             }
-            if let Some(marker) = HunyuanModelPart::for_render_part(def.id, part) {
-                spawned.insert(marker);
-            }
         }
     }
     spawn_faction_identity_marker(commands, root, visual_faction, def);
@@ -596,14 +524,11 @@ pub(crate) fn spawn_entity_models_for_harness(
         }
     } else {
         for part in def.render_parts {
-            let mut spawned = world.spawn((
+            world.spawn((
                 ChildOf(root),
                 WorldAssetRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(part.model))),
                 scaled_render_part_transform(part, entity_visual_scale(def.id)),
             ));
-            if let Some(marker) = HunyuanModelPart::for_render_part(def.id, part) {
-                spawned.insert(marker);
-            }
         }
     }
     if let Some(marker) = visual_faction.map(FactionIdentityMarker::for_faction) {

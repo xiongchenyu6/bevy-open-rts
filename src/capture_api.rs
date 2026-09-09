@@ -183,9 +183,7 @@ pub fn build_model_harness_capture_app(width: u32, height: u32) -> App {
         std::time::Duration::from_secs_f32(1.0 / 30.0),
     ))
     .insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
-    .insert_resource(RenderErrorHandler(handle_render_error))
-    .init_resource::<HunyuanModelMaterialCache>()
-    .add_systems(Update, apply_hunyuan_model_materials);
+    .insert_resource(RenderErrorHandler(handle_render_error));
 
     let image = Image::new_target_texture(
         width,

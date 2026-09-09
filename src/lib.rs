@@ -2375,7 +2375,6 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<CommandMode>()
         .init_resource::<SupportPowerPanelState>()
         .init_resource::<HoveredResource>()
-        .init_resource::<HunyuanModelMaterialCache>()
         .init_resource::<StructurePlacementFeedback>()
         .init_resource::<MatchMenuState>()
         .init_resource::<MatchSpeed>()
@@ -3336,12 +3335,6 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
         ),
-    )
-    .add_systems(
-        Update,
-        apply_hunyuan_model_materials
-            .in_set(SimulationPhase::PostCombat)
-            .run_if(match_in_progress),
     )
     .add_systems(
         Update,
@@ -6367,36 +6360,6 @@ pub(crate) struct ModelRecenterTracking {
 /// long enough for all GLB parts to spawn, short enough that freshly-trained units
 /// snap into alignment quickly.
 pub(crate) const MODEL_RECENTER_SETTLE_FRAMES: u8 = 6;
-
-pub(crate) fn apply_hunyuan_model_materials(
-    mut commands: Commands,
-    mut cache: ResMut<HunyuanModelMaterialCache>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    roots: Query<(Entity, &HunyuanModelPart), Without<HunyuanModelMaterialized>>,
-    children_q: Query<&Children>,
-    mut material_q: Query<&mut MeshMaterial3d<StandardMaterial>>,
-) {
-    for (root, part) in &roots {
-        let handle = cache.handle_for(part.entity_id, &mut materials);
-        let mut applied = false;
-        let mut stack: Vec<Entity> = children_q
-            .get(root)
-            .map(|c| c.iter().collect())
-            .unwrap_or_default();
-        while let Some(entity) = stack.pop() {
-            if let Ok(children) = children_q.get(entity) {
-                stack.extend(children.iter());
-            }
-            if let Ok(mut material) = material_q.get_mut(entity) {
-                material.0 = handle.clone();
-                applied = true;
-            }
-        }
-        if applied {
-            commands.entity(root).insert(HunyuanModelMaterialized);
-        }
-    }
-}
 
 #[derive(SystemParam)]
 pub(crate) struct OverlayVfxQueries<'w, 's> {
