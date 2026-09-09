@@ -4526,6 +4526,8 @@ pub(crate) fn setup(
             overlap_proportion: 0.2,
         }
         .build(),
+        // Sun direction; the -0.318 z component is a tuned angle, not 1/pi.
+        #[allow(clippy::approx_constant)]
         Transform::from_xyz(0.0, 38.0, 0.0).looking_to(Vec3::new(0.534, -0.784, -0.318), Vec3::Y),
         MatchScopedEntity,
     ));
