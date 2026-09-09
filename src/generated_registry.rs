@@ -427,24 +427,6 @@ const PARTS_DRONE: &[RenderPart] = &[RenderPart {
     rotation: [0.0, 0.0, 0.0, 1.0],
     scale: [0.3, 0.3, 0.3],
 }];
-const MODELS_DRONEMINELAYER: &[&str] = &[
-    "models/kenney-spacekit/machine_barrel.glb",
-    "models/kenney-spacekit/rover.glb",
-];
-const PARTS_DRONEMINELAYER: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/rover.glb",
-        translation: [-3.56, 0.0, -2.67],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.78, 1.78, 1.78],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_barrel.glb",
-        translation: [-0.6, 0.42, -0.95],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3, 0.3, 0.3],
-    },
-];
 const MODELS_ENGINEERDRONE: &[&str] = &[
     "models/kenney-spacekit/craft_speederA.glb",
     "models/kenney-spacekit/machine_wireless.glb",
@@ -479,37 +461,6 @@ const PARTS_FIELDMEDIC: &[RenderPart] = &[
         translation: [-0.43, 0.48, -0.68],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [0.24, 0.24, 0.24],
-    },
-];
-const MODELS_FLAKHOVERTANK: &[&str] = &[
-    "models/kenney-spacekit/craft_speederB.glb",
-    "models/kenney-spacekit/rocket_finsB.glb",
-    "models/kenney-spacekit/turret_double.glb",
-];
-const PARTS_FLAKHOVERTANK: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_speederB.glb",
-        translation: [-1.4, 0.05, -1.05],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.7, 0.7, 0.7],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/turret_double.glb",
-        translation: [-0.35, 0.42, -0.4],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.7, 0.7, 0.7],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/rocket_finsB.glb",
-        translation: [-0.55, 0.45, -0.75],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.28, 0.28, 0.28],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/rocket_finsB.glb",
-        translation: [0.55, 0.45, -0.75],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.28, 0.28, 0.28],
     },
 ];
 const MODELS_FLAKROCKETTEAM: &[&str] = &[
@@ -572,43 +523,6 @@ const PARTS_FLAKROCKETTEAMMK2: &[RenderPart] = &[
         scale: [0.58, 0.58, 0.92],
     },
 ];
-const MODELS_FLAMEASSAULTBUGGY: &[&str] = &[
-    "models/kenney-spacekit/barrel.glb",
-    "models/kenney-spacekit/rover.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_FLAMEASSAULTBUGGY: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/rover.glb",
-        translation: [-3.4, 0.0, -2.55],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.7, 1.7, 1.7],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-2.05, 0.35, -3.025],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.9, 0.9, 1.45],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-1.55, 0.35, -3.025],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.9, 0.9, 1.45],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/barrel.glb",
-        translation: [-1.45, 0.28, -0.425],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.45, 0.45, 0.45],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/barrel.glb",
-        translation: [-0.35, 0.28, -0.425],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.45, 0.45, 0.45],
-    },
-];
 const MODELS_GRENADIERTROOPER: &[&str] = &[
     "models/kenney-spacekit/astronautA.glb",
     "models/kenney-spacekit/barrel.glb",
@@ -632,44 +546,6 @@ const PARTS_GRENADIERTROOPER: &[RenderPart] = &[
         translation: [-0.3, 0.54, -0.58],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [0.36, 0.36, 0.42],
-    },
-];
-const MODELS_HAMMERSIEGETANK: &[&str] = &[
-    "models/kenney-spacekit/craft_cargoB.glb",
-    "models/kenney-spacekit/machine_generatorLarge.glb",
-    "models/kenney-spacekit/turret_double.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_HAMMERSIEGETANK: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_cargoB.glb",
-        translation: [-1.978, -0.0688, -1.4792],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.989, 0.989, 0.989],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/turret_double.glb",
-        translation: [-0.6708, 0.516, -0.4472],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.774, 0.774, 0.774],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.6708, 0.7052, -1.634],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.333, 1.333, 1.935],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-1.0148, 0.43, 0.344],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3096, 0.3096, 0.3096],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-0.2408, 0.43, 0.344],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.3096, 0.3096, 0.3096],
     },
 ];
 const MODELS_HEAVYBOMBARDMENTAIRSHIP: &[&str] = &["models/kenney-spacekit/craft_cargoB.glb"];
@@ -774,31 +650,6 @@ const PARTS_INTERCEPTORVTOL: &[RenderPart] = &[RenderPart {
     rotation: [0.0, 0.0, 0.0, 1.0],
     scale: [0.46, 0.46, 0.46],
 }];
-const MODELS_JAMMERVEHICLE: &[&str] = &[
-    "models/kenney-spacekit/machine_wireless.glb",
-    "models/kenney-spacekit/rover.glb",
-    "models/kenney-spacekit/satelliteDish_detailed.glb",
-];
-const PARTS_JAMMERVEHICLE: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/rover.glb",
-        translation: [-3.6, 0.0, -2.7],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.8, 1.8, 1.8],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/satelliteDish_detailed.glb",
-        translation: [-1.0, 0.7, -0.8],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.5, 0.5, 0.5],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_wireless.glb",
-        translation: [-0.6, 0.45, -0.375],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.55, 0.55, 0.55],
-    },
-];
 const MODELS_LANCEBEAMDEFENSETOWER: &[&str] = &[
     "models/kenney-spacekit/platform_large.glb",
     "models/kenney-spacekit/structure_closed.glb",
@@ -831,45 +682,6 @@ const PARTS_LANCEBEAMDEFENSETOWER: &[RenderPart] = &[
         scale: [1.2, 1.2, 1.2],
     },
 ];
-const MODELS_LANCEBEAMTANK: &[&str] = &[
-    "models/kenney-spacekit/craft_cargoB.glb",
-    "models/kenney-spacekit/machine_barrelLarge.glb",
-    "models/kenney-spacekit/machine_generatorLarge.glb",
-    "models/kenney-spacekit/turret_single.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_LANCEBEAMTANK: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_cargoB.glb",
-        translation: [-1.6416, -0.0608, -1.2312],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.8208, 0.8208, 0.8208],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/turret_single.glb",
-        translation: [-0.5472, 0.4256, -0.3952],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.6232, 0.6232, 0.6232],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.57, 0.5928, -1.406],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.76, 0.76, 1.71],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-0.5624, 0.4712, 0.2128],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.1976, 0.1976, 0.1976],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_barrelLarge.glb",
-        translation: [-0.266, 0.4712, 0.2128],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.1672, 0.1672, 0.1672],
-    },
-];
 const MODELS_LANDMINE: &[&str] = &[];
 const PARTS_LANDMINE: &[RenderPart] = &[];
 const MODELS_LIGHTRIFLEINFANTRY: &[&str] = &[
@@ -888,177 +700,6 @@ const PARTS_LIGHTRIFLEINFANTRY: &[RenderPart] = &[
         translation: [-0.32, 0.52, -0.72],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [0.58, 0.42, 0.58],
-    },
-];
-const MODELS_LONGBOWMISSILECRAWLER: &[&str] = &[
-    "models/kenney-spacekit/craft_cargoB.glb",
-    "models/kenney-spacekit/machine_generator.glb",
-    "models/kenney-spacekit/rocket_fuelA.glb",
-    "models/kenney-spacekit/rocket_topA.glb",
-    "models/kenney-spacekit/turret_single.glb",
-];
-const PARTS_LONGBOWMISSILECRAWLER: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_cargoB.glb",
-        translation: [-1.638, -0.0624, -1.248],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.819, 0.819, 0.819],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/turret_single.glb",
-        translation: [-0.5616, 0.468, -0.4056],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.5616, 0.5616, 0.5616],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/rocket_fuelA.glb",
-        translation: [-0.858, 0.6552, -1.0764],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2808, 0.2808, 0.5616],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/rocket_topA.glb",
-        translation: [-0.858, 0.6552, -1.3884],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2808, 0.2808, 0.2808],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/rocket_fuelA.glb",
-        translation: [-0.3276, 0.6552, -1.0764],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2808, 0.2808, 0.5616],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/rocket_topA.glb",
-        translation: [-0.3276, 0.6552, -1.3884],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2808, 0.2808, 0.2808],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generator.glb",
-        translation: [-0.8736, 0.4368, 0.2184],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2184, 0.2184, 0.2184],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generator.glb",
-        translation: [-0.2808, 0.4368, 0.2184],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2184, 0.2184, 0.2184],
-    },
-];
-const MODELS_MIRAGESCOUTTANK: &[&str] = &[
-    "models/kenney-spacekit/craft_speederC.glb",
-    "models/kenney-spacekit/machine_wireless.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_MIRAGESCOUTTANK: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_speederC.glb",
-        translation: [-1.7712, 0.0, -1.3284],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.8856, 0.8856, 0.8856],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_wireless.glb",
-        translation: [-0.5904, 0.4428, -0.082],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.246, 0.246, 0.246],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.6396, 0.41, -1.189],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.4756, 0.4756, 0.7216],
-    },
-];
-const MODELS_MOBILEREPAIRCRAWLER: &[&str] = &[
-    "models/kenney-spacekit/machine_barrelLarge.glb",
-    "models/kenney-spacekit/machine_wireless.glb",
-    "models/kenney-spacekit/rover.glb",
-];
-const PARTS_MOBILEREPAIRCRAWLER: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/rover.glb",
-        translation: [-3.56, 0.0, -2.67],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.78, 1.78, 1.78],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_wireless.glb",
-        translation: [-1.35, 0.45, -0.875],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.45, 0.45, 0.45],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_barrelLarge.glb",
-        translation: [-0.39, 0.32, -0.38],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.42, 0.42, 0.42],
-    },
-];
-const MODELS_MOBILESHIELDPROJECTOR: &[&str] = &[
-    "models/kenney-spacekit/machine_generatorLarge.glb",
-    "models/kenney-spacekit/machine_wirelessCable.glb",
-    "models/kenney-spacekit/rover.glb",
-    "models/kenney-spacekit/satelliteDish_large.glb",
-];
-const PARTS_MOBILESHIELDPROJECTOR: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/rover.glb",
-        translation: [-3.8, 0.0, -2.85],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.9, 1.9, 1.9],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/satelliteDish_large.glb",
-        translation: [-0.79, 0.72, -0.53],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.32, 0.32, 0.32],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-0.3, 0.38, -0.22],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.36, 0.36, 0.36],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_wirelessCable.glb",
-        translation: [-1.04, 0.3, -0.1],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.28, 0.28, 0.28],
-    },
-];
-const MODELS_MODULARMISSILECARRIER: &[&str] = &[
-    "models/kenney-spacekit/craft_cargoA.glb",
-    "models/kenney-spacekit/machine_barrelLarge.glb",
-    "models/kenney-spacekit/rocket_topA.glb",
-    "models/kenney-spacekit/rocket_topB.glb",
-];
-const PARTS_MODULARMISSILECARRIER: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_cargoA.glb",
-        translation: [-1.7472, -0.0468, -1.3104],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.8736, 0.8736, 0.8736],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/rocket_topA.glb",
-        translation: [-0.897, 0.5616, -0.975],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2964, 0.2964, 0.546],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/rocket_topB.glb",
-        translation: [-0.273, 0.5616, -0.975],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2964, 0.2964, 0.546],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_barrelLarge.glb",
-        translation: [-0.585, 0.546, -0.351],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.1716, 0.1716, 0.1716],
     },
 ];
 const MODELS_MORTARTEAM: &[&str] = &[
@@ -1383,44 +1024,6 @@ const PARTS_RAILSNIPERTEAM: &[RenderPart] = &[
         scale: [0.95, 0.52, 1.25],
     },
 ];
-const MODELS_RAILGUNTANK: &[&str] = &[
-    "models/kenney-spacekit/craft_cargoB.glb",
-    "models/kenney-spacekit/machine_generator.glb",
-    "models/kenney-spacekit/turret_single.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_RAILGUNTANK: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_cargoB.glb",
-        translation: [-1.716, -0.0624, -1.287],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.858, 0.858, 0.858],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/turret_single.glb",
-        translation: [-0.5616, 0.4524, -0.4056],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.663, 0.663, 0.663],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.585, 0.6084, -1.482],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.014, 1.014, 1.95],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generator.glb",
-        translation: [-0.741, 0.429, 0.273],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2496, 0.2496, 0.2496],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generator.glb",
-        translation: [-0.273, 0.429, 0.273],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.2496, 0.2496, 0.2496],
-    },
-];
 const MODELS_REFINERY: &[&str] = &[
     "models/kenney-spacekit/barrels_rail.glb",
     "models/kenney-spacekit/chimney.glb",
@@ -1609,13 +1212,6 @@ const PARTS_SABOTEURINFILTRATOR: &[RenderPart] = &[
         scale: [0.42, 0.42, 0.72],
     },
 ];
-const MODELS_SCOUTROVER: &[&str] = &["models/kenney-spacekit/rover.glb"];
-const PARTS_SCOUTROVER: &[RenderPart] = &[RenderPart {
-    model: "models/kenney-spacekit/rover.glb",
-    translation: [-3.3, 0.0, -2.475],
-    rotation: [0.0, 0.0, 0.0, 1.0],
-    scale: [1.65, 1.65, 1.65],
-}];
 const MODELS_SHIELDTROOPER: &[&str] = &[
     "models/kenney-spacekit/astronautB.glb",
     "models/kenney-spacekit/machine_generator.glb",
@@ -1683,56 +1279,6 @@ const PARTS_SIEGEAIRSHIP: &[RenderPart] = &[
         scale: [0.32, 0.32, 0.32],
     },
 ];
-const MODELS_SIEGEARTILLERYVEHICLE: &[&str] = &[
-    "models/kenney-spacekit/craft_cargoB.glb",
-    "models/kenney-spacekit/turret_single.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_SIEGEARTILLERYVEHICLE: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_cargoB.glb",
-        translation: [-1.44, -0.036, -1.08],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.72, 0.72, 0.72],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/turret_single.glb",
-        translation: [-0.504, 0.396, -0.36],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.54, 0.54, 0.54],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.54, 0.54, -1.044],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.152, 1.152, 1.152],
-    },
-];
-const MODELS_SIEGEDRILLTANK: &[&str] = &[
-    "models/kenney-spacekit/craft_cargoB.glb",
-    "models/kenney-spacekit/machine_barrelLarge.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_SIEGEDRILLTANK: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_cargoB.glb",
-        translation: [-1.386, -0.0792, -1.0428],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.693, 0.693, 0.693],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_barrelLarge.glb",
-        translation: [0.0, 0.231, -0.726],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.4092, 0.4092, 0.792],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [0.0, 0.462, -0.3564],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.4092, 0.4092, 0.5808],
-    },
-];
 const MODELS_SNIPERSCOUT: &[&str] = &[
     "models/kenney-spacekit/astronautB.glb",
     "models/kenney-spacekit/weapon_rifle.glb",
@@ -1774,24 +1320,6 @@ const PARTS_TACTICALOFFICER: &[RenderPart] = &[
         translation: [0.28, 0.9, 0.2],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [0.13, 0.13, 0.13],
-    },
-];
-const MODELS_TANK: &[&str] = &[
-    "models/kenney-spacekit/craft_cargoB.glb",
-    "models/kenney-spacekit/craft_miner.glb",
-];
-const PARTS_TANK: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/craft_cargoB.glb",
-        translation: [-1.2, -0.0644, -0.9],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.6, 0.6, 0.6],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/craft_miner.glb",
-        translation: [-0.84, 0.3522, -1.0015],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.42, 0.42, 0.42],
     },
 ];
 const MODELS_TECHAIRPORT: &[&str] = &[
@@ -2016,37 +1544,6 @@ const PARTS_TECHREPAIRDEPOT: &[RenderPart] = &[
         translation: [-1.44, 0.1728, -0.396],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [0.2448, 0.2448, 0.2448],
-    },
-];
-const MODELS_TESLACRAWLERMK2: &[&str] = &[
-    "models/kenney-spacekit/machine_generator.glb",
-    "models/kenney-spacekit/rover.glb",
-    "models/kenney-spacekit/weapon_gun.glb",
-];
-const PARTS_TESLACRAWLERMK2: &[RenderPart] = &[
-    RenderPart {
-        model: "models/kenney-spacekit/rover.glb",
-        translation: [-3.9, 0.0, -2.92],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.95, 1.95, 1.95],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/machine_generator.glb",
-        translation: [-0.68, 0.52, -0.59],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.34, 0.34, 0.34],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-1.44, 0.46, -2.465],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.55, 0.55, 1.15],
-    },
-    RenderPart {
-        model: "models/kenney-spacekit/weapon_gun.glb",
-        translation: [-0.76, 0.46, -2.465],
-        rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [0.55, 0.55, 1.15],
     },
 ];
 const MODELS_TESLAFENCESEGMENT: &[&str] = &[];
@@ -2814,8 +2311,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Drone Mine Layer",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_DRONEMINELAYER,
-        render_parts: PARTS_DRONEMINELAYER,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/DroneMineLayer.png"),
         health: 8.0,
         radius: 0.72,
@@ -2982,8 +2479,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Flak Hover Tank",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_FLAKHOVERTANK,
-        render_parts: PARTS_FLAKHOVERTANK,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/FlakHoverTank.png"),
         health: 10.0,
         radius: 0.72,
@@ -3177,8 +2674,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Flame Assault Buggy",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_FLAMEASSAULTBUGGY,
-        render_parts: PARTS_FLAMEASSAULTBUGGY,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/FlameAssaultBuggy.png"),
         health: 7.0,
         radius: 0.58,
@@ -3307,8 +2804,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Hammer Siege Tank",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_HAMMERSIEGETANK,
-        render_parts: PARTS_HAMMERSIEGETANK,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/HammerSiegeTank.png"),
         health: 17.0,
         radius: 0.9,
@@ -3697,8 +3194,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Jammer Vehicle",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_JAMMERVEHICLE,
-        render_parts: PARTS_JAMMERVEHICLE,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/JammerVehicle.png"),
         health: 8.0,
         radius: 0.7,
@@ -3827,8 +3324,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Lance Beam Tank",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_LANCEBEAMTANK,
-        render_parts: PARTS_LANCEBEAMTANK,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/LanceBeamTank.png"),
         health: 14.0,
         radius: 0.88,
@@ -4013,8 +3510,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Longbow Missile Crawler",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_LONGBOWMISSILECRAWLER,
-        render_parts: PARTS_LONGBOWMISSILECRAWLER,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/LongbowMissileCrawler.png"),
         health: 12.0,
         radius: 0.9,
@@ -4078,8 +3575,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Mirage Scout Tank",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_MIRAGESCOUTTANK,
-        render_parts: PARTS_MIRAGESCOUTTANK,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/MirageScoutTank.png"),
         health: 8.0,
         radius: 0.62,
@@ -4143,8 +3640,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Mobile Repair Crawler",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_MOBILEREPAIRCRAWLER,
-        render_parts: PARTS_MOBILEREPAIRCRAWLER,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/MobileRepairCrawler.png"),
         health: 9.0,
         radius: 0.75,
@@ -4199,8 +3696,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Mobile Shield Projector",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_MOBILESHIELDPROJECTOR,
-        render_parts: PARTS_MOBILESHIELDPROJECTOR,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/MobileShieldProjector.png"),
         health: 10.0,
         radius: 0.8,
@@ -4255,8 +3752,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Modular Missile Carrier",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_MODULARMISSILECARRIER,
-        render_parts: PARTS_MODULARMISSILECARRIER,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/ModularMissileCarrier.png"),
         health: 10.0,
         radius: 0.85,
@@ -4943,8 +4440,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Railgun Tank",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_RAILGUNTANK,
-        render_parts: PARTS_RAILGUNTANK,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/RailgunTank.png"),
         health: 16.0,
         radius: 0.9,
@@ -5436,8 +4933,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Scout Rover",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_SCOUTROVER,
-        render_parts: PARTS_SCOUTROVER,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/ScoutRover.png"),
         health: 5.0,
         radius: 0.55,
@@ -5696,8 +5193,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Siege Artillery Vehicle",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_SIEGEARTILLERYVEHICLE,
-        render_parts: PARTS_SIEGEARTILLERYVEHICLE,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/SiegeArtilleryVehicle.png"),
         health: 12.0,
         radius: 0.85,
@@ -5761,8 +5258,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Siege Drill Tank",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_SIEGEDRILLTANK,
-        render_parts: PARTS_SIEGEDRILLTANK,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/SiegeDrillTank.png"),
         health: 16.0,
         radius: 0.82,
@@ -5956,8 +5453,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Tank",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_TANK,
-        render_parts: PARTS_TANK,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/Tank.png"),
         health: 10.0,
         radius: 0.9,
@@ -6366,8 +5863,8 @@ pub const ENTITY_DEFS: &[EntityDef] = &[
         label: "Tesla Crawler Mk2",
         role: EntityRole::Unit,
         domain: MoveDomain::Terrain,
-        model_assets: MODELS_TESLACRAWLERMK2,
-        render_parts: PARTS_TESLACRAWLERMK2,
+        model_assets: &[],
+        render_parts: &[],
         icon: Some("ui/icons/TeslaCrawlerMk2.png"),
         health: 12.0,
         radius: 0.72,

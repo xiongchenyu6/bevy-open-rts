@@ -28,7 +28,28 @@ CRITICAL_DISTINCT_GROUPS = [
     ("ScoutRover", "ShieldTrooper"),
     ("RocketInfantry", "ShieldTrooper"),
 ]
-PROCEDURAL_EMPTY_OK = {"LandMine", "TeslaFenceSegment"}
+# Entities drawn in code (src/tank_models.rs, spawn.rs) carry no render parts.
+PROCEDURAL_EMPTY_OK = {
+    "LandMine",
+    "TeslaFenceSegment",
+    "Tank",
+    "HammerSiegeTank",
+    "RailgunTank",
+    "LanceBeamTank",
+    "MirageScoutTank",
+    "SiegeDrillTank",
+    "FlakHoverTank",
+    "SiegeArtilleryVehicle",
+    "LongbowMissileCrawler",
+    "ModularMissileCarrier",
+    "TeslaCrawlerMk2",
+    "DroneMineLayer",
+    "MobileRepairCrawler",
+    "MobileShieldProjector",
+    "ScoutRover",
+    "FlameAssaultBuggy",
+    "JammerVehicle",
+}
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_model_mapping  # noqa: E402

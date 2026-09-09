@@ -42,6 +42,9 @@ domains live in modules, each re-exported into the crate root
 - `src/match_tests.rs` — headless match-flow integration tests (cfg(test)).
 - `src/spawn.rs` — entity spawning: team startup, unit/structure spawn entry
   points, model assembly, placement wrappers, paradrop spawning.
+- `src/tank_models.rs` — procedural ground-vehicle models: proportional tracked/
+  wheeled/hover chassis, turrets, guns, per-unit identity; meshes merged per
+  material bucket and cached per unit id.
 - `src/selection.rs` — click/box select, control groups, Tab subgroups,
   idle-worker cycling, pointer→terrain helpers.
 - `src/command_card.rs` — command-card action grid: labels/icons/hotkeys/

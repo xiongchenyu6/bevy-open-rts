@@ -685,7 +685,6 @@ fn critical_units_do_not_share_model_signatures() {
     let worker = registry::entity("Worker").expect("Worker must stay in the registry");
     let scout = registry::entity("ScoutRover").expect("ScoutRover must stay in the registry");
     assert_eq!(worker.render_parts.len(), 2);
-    assert_eq!(scout.render_parts.len(), 1);
     assert!(
         worker
             .render_parts
@@ -698,19 +697,14 @@ fn critical_units_do_not_share_model_signatures() {
             .render_parts
             .iter()
             .any(|part| part.model == "models/kenney-spacekit/rover.glb"),
-        "Worker must not share ScoutRover's rover mesh"
+        "Worker must not use the rover mesh ScoutRover used to have"
     );
-    assert_eq!(
-        scout.render_parts[0].model,
-        "models/kenney-spacekit/rover.glb"
+    assert!(
+        crate::tank_models::is_procedural_tank("ScoutRover") && scout.render_parts.is_empty(),
+        "ScoutRover is drawn by tank_models and carries no glb render parts"
     );
-    assert_eq!(scout.render_parts[0].translation, [-3.3, 0.0, -2.475]);
-    assert_eq!(scout.render_parts[0].scale, [1.65, 1.65, 1.65]);
 
     for (left, right) in [
-        ("Worker", "ScoutRover"),
-        ("ScoutRover", "RocketInfantry"),
-        ("ScoutRover", "ShieldTrooper"),
         ("RocketInfantry", "ShieldTrooper"),
         ("GrenadierTrooper", "RocketInfantry"),
         ("GrenadierTrooper", "RocketTrooperRobot"),
