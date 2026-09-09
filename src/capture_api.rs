@@ -1393,6 +1393,22 @@ pub fn capture_player_combat_order_count(app: &mut App) -> usize {
 }
 
 /// Count of player-owned combat-capable mobile units.
+/// Average world position of the player's living combat units, so capture can
+/// keep the camera on the army while it fights away from home.
+pub fn capture_player_army_average_position(app: &mut App) -> Option<Vec3> {
+    let world = app.world_mut();
+    let mut q = world.query_filtered::<(&Team, &Unit, &Transform), With<Unit>>();
+    let mut sum = Vec3::ZERO;
+    let mut count = 0usize;
+    for (team, unit, transform) in q.iter(world) {
+        if *team == Team::Player(0) && unit_supports_attack_move(unit) {
+            sum += transform.translation;
+            count += 1;
+        }
+    }
+    (count > 0).then_some(sum / count as f32)
+}
+
 pub fn capture_player_army_unit_count(app: &mut App) -> usize {
     let world = app.world_mut();
     let mut q = world.query_filtered::<(&Team, &Unit), With<Unit>>();

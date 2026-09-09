@@ -39,24 +39,24 @@ use bevy_open_rts::{
     capture_model_harness_page_count, capture_mouse_button, capture_nearest_enemy_anchor_position,
     capture_nearest_visible_resource_click_position_to, capture_nearest_visible_resource_position,
     capture_onscreen_resource_model_center, capture_placement_is_valid,
-    capture_player_army_unit_count, capture_player_build_queue_len,
-    capture_player_combat_order_count, capture_player_command_center,
-    capture_player_completed_structure_count, capture_player_completed_structure_position,
-    capture_player_constructing_count, capture_player_harvesting_count,
-    capture_player_in_placement_mode, capture_player_onscreen_unit_position,
-    capture_player_onscreen_worker_position, capture_player_producer_position,
-    capture_player_resources, capture_player_structure_count, capture_player_unit_count,
-    capture_player_worker_position, capture_run_ai_duel, capture_run_ai_match_until_resolved,
-    capture_run_arena, capture_run_faction_duel, capture_select_map,
-    capture_selected_player_unit_average_position, capture_selected_player_unit_count,
-    capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
-    capture_set_structure_rally, capture_set_weather, capture_show_campaign_menu,
-    capture_show_credits_menu, capture_show_main_menu, capture_show_options_menu,
-    capture_show_skirmish_setup_menu, capture_show_skirmish_setup_with_dropdown,
-    capture_spawn_construction_showcase, capture_spawn_model_harness_page,
-    capture_stage_deployed_siege, capture_stage_player_radar, capture_stage_worker_collecting,
-    capture_start_mission, capture_startup_ready, capture_world_to_screen,
-    capture_worst_model_alignment_offset, capture_zoom_camera_closest,
+    capture_player_army_average_position, capture_player_army_unit_count,
+    capture_player_build_queue_len, capture_player_combat_order_count,
+    capture_player_command_center, capture_player_completed_structure_count,
+    capture_player_completed_structure_position, capture_player_constructing_count,
+    capture_player_harvesting_count, capture_player_in_placement_mode,
+    capture_player_onscreen_unit_position, capture_player_onscreen_worker_position,
+    capture_player_producer_position, capture_player_resources, capture_player_structure_count,
+    capture_player_unit_count, capture_player_worker_position, capture_run_ai_duel,
+    capture_run_ai_match_until_resolved, capture_run_arena, capture_run_faction_duel,
+    capture_select_map, capture_selected_player_unit_average_position,
+    capture_selected_player_unit_count, capture_selected_player_unit_ids, capture_set_all_factions,
+    capture_set_cursor, capture_set_structure_rally, capture_set_weather,
+    capture_show_campaign_menu, capture_show_credits_menu, capture_show_main_menu,
+    capture_show_options_menu, capture_show_skirmish_setup_menu,
+    capture_show_skirmish_setup_with_dropdown, capture_spawn_construction_showcase,
+    capture_spawn_model_harness_page, capture_stage_deployed_siege, capture_stage_player_radar,
+    capture_stage_worker_collecting, capture_start_mission, capture_startup_ready,
+    capture_world_to_screen, capture_worst_model_alignment_offset, capture_zoom_camera_closest,
     start_shared_match_scene_with_current_setup,
 };
 
@@ -79,8 +79,9 @@ const FLUSH_TICKS: usize = 16;
 const TRAIN_COMPLETION_WAIT_TICKS: usize = 360;
 const BUILD_COMPLETION_WAIT_TICKS: usize = 900;
 const ASSAULT_DEFAULT_MAX_SECONDS: u32 = 240;
-const ASSAULT_TARGET_ARMY_UNITS: usize = 12;
-const ASSAULT_TRAIN_PRODUCT: &str = "HeavyMachinegunTrooper";
+const ASSAULT_TARGET_ARMY_UNITS: usize = 8;
+const ASSAULT_BUILD_STRUCTURE: &str = "VehicleFactory";
+const ASSAULT_TRAIN_PRODUCT: &str = "Tank";
 const ASSAULT_RETARGET_TICKS: usize = 450;
 
 fn main() {
@@ -1131,11 +1132,11 @@ fn render_assault(dir: &Path, max_seconds: u32) -> Result<(), String> {
     let handle = capture_handle(&app);
     shoot(&mut app, &handle, dir.join("00_start.png"));
 
-    let barracks_pos = build_barracks_via_real_input(&mut app)?;
-    shoot(&mut app, &handle, dir.join("01_barracks.png"));
-    let army_count = train_barracks_army_via_real_input(
+    let factory_pos = build_structure_via_real_input(&mut app, ASSAULT_BUILD_STRUCTURE)?;
+    shoot(&mut app, &handle, dir.join("01_factory.png"));
+    let army_count = train_army_via_real_input(
         &mut app,
-        barracks_pos,
+        factory_pos,
         ASSAULT_TARGET_ARMY_UNITS,
         ASSAULT_TRAIN_PRODUCT,
     )?;
@@ -1154,9 +1155,8 @@ fn render_assault(dir: &Path, max_seconds: u32) -> Result<(), String> {
     }
 
     let max_ticks = max_seconds as usize * 30;
-    // Keep the camera on the fight and grab several combat frames so at least one
+    // Keep the camera on the army and grab several combat frames so at least one
     // catches active tracers/impacts/health bars (not the empty home base).
-    let combat_focus = capture_nearest_enemy_anchor_position(&mut app);
     let combat_shot_ticks = [180usize, 360, 540, 720, 1080];
     let mut combat_shot = 0usize;
     let mut resolved = false;
@@ -1164,8 +1164,13 @@ fn render_assault(dir: &Path, max_seconds: u32) -> Result<(), String> {
     for tick in 0..max_ticks {
         app.update();
         if combat_shot_ticks.contains(&tick) {
-            if let Some(focus) = combat_focus {
+            let focus = capture_player_army_average_position(&mut app)
+                .or_else(|| capture_nearest_enemy_anchor_position(&mut app));
+            if let Some(focus) = focus {
                 capture_focus_camera_on(&mut app, focus);
+                for _ in 0..8 {
+                    app.update();
+                }
             }
             combat_shot += 1;
             shoot(
@@ -1245,8 +1250,12 @@ fn issue_player_attack_move_to_nearest_anchor(
     Ok((selected, attack_key, capture_player_combat_order_count(app)))
 }
 
-fn build_barracks_via_real_input(app: &mut App) -> Result<Vec3, String> {
-    let worker = capture_player_worker_position(app).ok_or("no player Worker to build Barracks")?;
+fn build_structure_via_real_input(
+    app: &mut App,
+    structure_id: &'static str,
+) -> Result<Vec3, String> {
+    let worker = capture_player_worker_position(app)
+        .ok_or_else(|| format!("no player Worker to build {structure_id}"))?;
     capture_focus_camera_on(app, worker);
     for _ in 0..12 {
         app.update();
@@ -1260,12 +1269,16 @@ fn build_barracks_via_real_input(app: &mut App) -> Result<Vec3, String> {
         app.update();
     }
 
-    let Some(build_key) = capture_enabled_build_hotkey_for(app, "Barracks") else {
-        return Err("selected Worker does not expose an enabled Barracks build command".into());
+    let Some(build_key) = capture_enabled_build_hotkey_for(app, structure_id) else {
+        return Err(format!(
+            "selected Worker does not expose an enabled {structure_id} build command"
+        ));
     };
     tap_key(app, build_key);
     if !capture_player_in_placement_mode(app) {
-        return Err("Barracks build hotkey did not enter placement mode".into());
+        return Err(format!(
+            "{structure_id} build hotkey did not enter placement mode"
+        ));
     }
 
     let structures_before = capture_player_structure_count(app);
@@ -1304,39 +1317,44 @@ fn build_barracks_via_real_input(app: &mut App) -> Result<Vec3, String> {
             break;
         }
     }
-    let placed_at = placed_at.ok_or("could not place Barracks at a valid build location")?;
+    let placed_at = placed_at
+        .ok_or_else(|| format!("could not place {structure_id} at a valid build location"))?;
     println!(
-        "[capture] assault Barracks placed at ({:.1},{:.1}) via {build_key:?}",
+        "[capture] assault {structure_id} placed at ({:.1},{:.1}) via {build_key:?}",
         placed_at.x, placed_at.z
     );
 
     let completed = wait_until(app, BUILD_COMPLETION_WAIT_TICKS, |app| {
-        capture_player_completed_structure_position(app, "Barracks").is_some()
+        capture_player_completed_structure_position(app, structure_id).is_some()
     });
     if !completed {
-        return Err("Barracks foundation was placed but did not complete construction".into());
+        return Err(format!(
+            "{structure_id} foundation was placed but did not complete construction"
+        ));
     }
-    let barracks = capture_player_completed_structure_position(app, "Barracks")
-        .ok_or("completed Barracks position missing after construction wait")?;
+    let structure =
+        capture_player_completed_structure_position(app, structure_id).ok_or_else(|| {
+            format!("completed {structure_id} position missing after construction wait")
+        })?;
     println!(
-        "[capture] assault Barracks completed at ({:.1},{:.1})",
-        barracks.x, barracks.z
+        "[capture] assault {structure_id} completed at ({:.1},{:.1})",
+        structure.x, structure.z
     );
-    Ok(barracks)
+    Ok(structure)
 }
 
-fn train_barracks_army_via_real_input(
+fn train_army_via_real_input(
     app: &mut App,
-    barracks: Vec3,
+    producer: Vec3,
     target_army_units: usize,
     product_id: &'static str,
 ) -> Result<usize, String> {
-    capture_focus_camera_on(app, barracks);
+    capture_focus_camera_on(app, producer);
     for _ in 0..12 {
         app.update();
     }
-    let barracks_screen = capture_world_to_screen(app, barracks).ok_or("Barracks offscreen")?;
-    capture_set_cursor(app, barracks_screen);
+    let producer_screen = capture_world_to_screen(app, producer).ok_or("producer offscreen")?;
+    capture_set_cursor(app, producer_screen);
     capture_mouse_button(app, MouseButton::Left, true);
     app.update();
     capture_mouse_button(app, MouseButton::Left, false);
@@ -1364,7 +1382,7 @@ fn train_barracks_army_via_real_input(
     );
     if final_army < desired_army {
         return Err(format!(
-            "Barracks training only reached {final_army}/{desired_army} combat units"
+            "{product_id} training only reached {final_army}/{desired_army} combat units"
         ));
     }
     Ok(final_army)
