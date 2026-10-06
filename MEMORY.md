@@ -160,3 +160,38 @@
   replicated unit exists, including on snapshot tick zero. This preserves the
   real full-match/relay assertion without failing before the first actionable
   match frame.
+
+## Verified battlefield art pass — 2026-10-06
+
+- Matte steel panels use assets/textures/armor-painted-steel.png (1254 square).
+  Imported kit UV scale 0.08 avoids granular repetition; neutral armor roughness
+  is 0.62, vehicle Paint 0.78, team paint 0.68. Team paint preserves hue with
+  restrained brightness; its emission is limited to small unit accents.
+- Soil uses sediment beds, compacted patches, mineral grain and a 2048 detail
+  image. Cool ambient fill and slightly warm sun preserve readable dark armor;
+  weather owns brightness (clear 1000/cloudy 850/rain 750/dust 850).
+- structure_details.rs adds cached roof vents, conduits and foundation lips.
+  Geometry audit: plain roof y1.0, conduit x1.75/2.25; window-center y0.85.
+  Detailed/corner modules keep their authored ribs and gaps. Parents have Visibility.
+- Material recoloring works in renderer-less fixtures; only image loading and
+  decorative geometry need RenderDevice. The existing material test now checks
+  matte team hues, unchanged colored parts and immutable shared source materials.
+- Live and offscreen scenes share configure_scene_lighting, including 4096 shadow
+  atlas. The isolated gallery does not run live faction material processing;
+  use real match captures for surface verification.
+- Verified: cargo fmt/check/build, all 137 library tests (0 failures), and a real
+  Wayland native launch for 12s with no error output (intentional timeout 124).
+  Logs: art-tests-fixed.log, art-build-checked.log, art-check-fixed.log and
+  art-native-verified.log under logs/.
+- All three factions train/build through real input successfully; captures under
+  screenshots/art-revision/final-factions. Rain and sandstorm captures also inspected.
+- Final proof: screenshots/result/7/video.mp4 + 450 raw frames, exactly 30 fps/15s.
+  Bounded base movement 4.24m/150 moving frames, siege 113 damage/94 effect frames.
+  Inspected opening, motion, battle and final frames. Earlier bundles are iterations.
+- The bundle script accepts CAPTURE_BIN to pin a prebuilt executable while other
+  workspace builds run. A matching native binary is kept in target/art-verification.
+  Use RUSTC=/nix/store/yhmi70ln28n1j6wn82h61b8r8q4g562i-rustc-1.95.0/bin/rustc
+  to reuse this host's compiler cache; default shell compiler is newer.
+- Historical screenshots/art-before.png uses an older capture binary and shadow
+  settings, so it is an art reference rather than a controlled lighting comparison.
+- No web publication was performed by this art pass.

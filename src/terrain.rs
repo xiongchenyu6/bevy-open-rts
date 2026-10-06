@@ -259,23 +259,20 @@ fn terrain_value_noise(x: f32, z: f32, wavelength: f32) -> f32 {
     h00 * (1.0 - sx) * (1.0 - sz) + h10 * sx * (1.0 - sz) + h01 * (1.0 - sx) * sz + h11 * sx * sz
 }
 
-/// Subtle three-octave ground tint: 17m dune-scale bands (roughly two bands
-/// inside a gameplay-zoom viewport), broad 9m patches and fine 2.6m grain,
-/// with a slight warm/dark bias — breaks up the flat sand without reading as
-/// a repeating texture.
+/// Map-space soil variation: broad sediment beds, compacted patches and
+/// fine mineral grain. Shared by the terrain mesh and its baked detail map.
 pub(crate) fn terrain_vertex_color(x: f32, z: f32) -> [f32; 4] {
-    let dune = terrain_value_noise(x - 111.9, z + 71.2, 17.0);
-    let broad = terrain_value_noise(x, z, 9.0);
-    let fine = terrain_value_noise(x + 43.7, z - 17.3, 2.6);
-    let blended = dune * 0.38 + broad * 0.42 + fine * 0.20;
-    // Summed value noise clusters around 0.5; stretch the contrast so the
-    // result actually spans the tint window instead of hugging its middle
-    // (that clustering is why earlier passes rendered as flat sand).
-    let n = ((blended - 0.5) * 3.0 + 0.5).clamp(0.0, 1.0);
-    // Kept within 0..1 so the baked u8 detail texture can hold the full range.
-    let tint = 0.68 + n * 0.32;
-    let warm = 1.0 - (1.0 - n) * 0.14;
-    [tint, tint * warm, tint * warm * warm, 1.0]
+    let sediment = terrain_value_noise(x - 111.9, z + 71.2, 17.0);
+    let patches = terrain_value_noise(x, z, 4.5);
+    let gravel = terrain_value_noise(x + 43.7, z - 17.3, 0.38);
+    let grain = terrain_value_noise(x - 21.1, z + 8.7, 0.09);
+    let strata = ((x * 0.7 + z * 0.35 + sediment * 8.0).sin() * 0.5 + 0.5) * 0.06;
+    let tint = (0.48 + sediment * 0.24 + patches * 0.17 + gravel * 0.12 + grain * 0.06 + strata)
+        .clamp(0.0, 1.0);
+    // Cooler mineral deposits interrupt the warm soil without competing with
+    // player colors or resource silhouettes.
+    let mineral = (patches - 0.55).max(0.0) * 0.4;
+    [tint, tint * (0.87 + mineral), tint * (0.72 + mineral), 1.0]
 }
 
 fn grid_terrain_mesh(
@@ -560,7 +557,7 @@ pub(crate) fn terrain_detail_texture(
 ) -> Handle<Image> {
     use bevy::image::ImageSampler;
     use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat};
-    const RES: usize = 512;
+    const RES: usize = 2048;
     let mut data = Vec::with_capacity(RES * RES * 4);
     for iz in 0..RES {
         for ix in 0..RES {

@@ -79,3 +79,20 @@ native desktop and browser builds.
 - Two game clients can create/join a lobby and complete a match while observing
   the same authoritative result.
 - The GitHub Pages build connects through the deployed `wss://` endpoint.
+
+## Battlefield Art Revision (verified)
+
+Goal: improve art presentation so the battlefield reads as military machinery
+and terrain rather than toys.
+
+- [x] Identify initial issues in existing base captures: smooth ground and white panels.
+- [x] Verify layered soil detail in `screenshots/art-revision/base.png`.
+- [x] Verify muted metal armor, controlled team accents and lighting across all three factions.
+- [x] Refine roof fittings, armor wear, palette, sky fill and soil detail from captures.
+- [x] Formatting, build/check, 137 library tests, native launch and faction gameplay checks pass.
+- [x] Inspect `screenshots/result/7`: 450 raw frames and a 15-second, 30-fps video.
+
+Evidence: `logs/art-tests-fixed.log`, `logs/art-build-checked.log`,
+`logs/art-check-fixed.log`, `logs/art-final-factions.log`, and
+`logs/art-proof-verified.log`. Native launch ran on Wayland for 12 seconds
+without error output; final capture verifies 4.24m movement and 113 siege damage.

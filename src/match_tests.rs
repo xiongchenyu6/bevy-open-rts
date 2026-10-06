@@ -1107,7 +1107,7 @@ fn construction_sites_render_as_ghost_shell_then_restore_materials() {
 }
 
 #[test]
-fn kenney_gold_accents_get_repainted_in_the_player_color() {
+fn imported_materials_keep_team_hues_and_gain_matte_armor() {
     let mut app = App::new();
     app.init_resource::<Assets<StandardMaterial>>();
     app.init_resource::<TeamColorMaterials>();
@@ -1142,6 +1142,18 @@ fn kenney_gold_accents_get_repainted_in_the_player_color() {
         .spawn((ChildOf(root), MeshMaterial3d(hull.clone())))
         .id();
 
+    let blue = app
+        .world_mut()
+        .resource_mut::<Assets<StandardMaterial>>()
+        .add(StandardMaterial {
+            base_color: Color::srgb(0.12, 0.25, 0.65),
+            ..default()
+        });
+    let colored_part = app
+        .world_mut()
+        .spawn((ChildOf(root), MeshMaterial3d(blue.clone())))
+        .id();
+
     app.update();
     let painted = app
         .world()
@@ -1150,25 +1162,45 @@ fn kenney_gold_accents_get_repainted_in_the_player_color() {
         .0
         .clone();
     assert_ne!(painted, gold, "gold accents must swap to the team material");
+    let armor_handle = &app
+        .world()
+        .get::<MeshMaterial3d<StandardMaterial>>(body)
+        .unwrap()
+        .0;
+    assert_ne!(
+        *armor_handle, hull,
+        "light neutral panels get their own armor finish"
+    );
     assert_eq!(
         app.world()
-            .get::<MeshMaterial3d<StandardMaterial>>(body)
+            .get::<MeshMaterial3d<StandardMaterial>>(colored_part)
             .unwrap()
             .0,
-        hull,
-        "non-accent materials stay untouched"
+        blue,
+        "authored colored parts retain their material"
     );
     let materials = app.world().resource::<Assets<StandardMaterial>>();
-    let team_color = materials.get(&painted).unwrap().base_color;
-    let expected = player_color(
-        app.world()
-            .resource::<PlayerColorSlots>()
-            .slot(Team::Player(0))
-            .unwrap(),
+    let paint = materials.get(&painted).unwrap();
+    let color = paint.base_color.to_srgba();
+    assert!(
+        color.green > color.red && color.green > color.blue,
+        "green player retains a green team paint hue"
+    );
+    assert!(
+        color.green < player_color(0).to_srgba().green,
+        "paint is more restrained than the bright UI palette"
+    );
+    assert!(paint.perceptual_roughness >= 0.6, "team paint is matte");
+    let armor = materials.get(armor_handle).unwrap();
+    assert!(armor.base_color.to_srgba().blue >= armor.base_color.to_srgba().red);
+    assert!(
+        armor.base_color_texture.is_none(),
+        "headless recoloring does not request textures"
     );
     assert_eq!(
-        team_color, expected,
-        "repaint uses the player palette color"
+        materials.get(&hull).unwrap().base_color,
+        Color::linear_rgb(0.843, 0.87, 0.91),
+        "shared imported source materials are never mutated"
     );
 }
 

@@ -221,3 +221,27 @@ domains live in modules, each re-exported into the crate root
 - Use `cargo fmt`, `cargo check`, targeted `cargo test`, full `cargo test`, `cargo build`, and a short `cargo run` smoke.
 - `timeout` exit code `124` is acceptable for the interactive smoke once the window opens and no runtime warnings indicate a game bug.
 - Dependency direction notes live in `docs/dependency-decisions.md`; currently `iyes_progress 0.17.0` owns startup progress loading, `moonshine-kind 0.5.1` is used for typed harness roots, and `bevy_egui 0.40.1` is reserved for optional debug tooling, not shipped RTS menu/lobby UI.
+
+## Battlefield surface materials
+
+`spawn.rs` preserves imported meshes and faction accents while deriving shared
+weathered steel materials for light neutral panels and restrained matte team paint. `load_armor_surface` uses a
+repeating sampler for the kit meshes' extended UV range; the same texture is
+tracked by startup loading. `assets/textures/armor-painted-steel.png` is a generated
+low-contrast albedo surface. `terrain.rs` bakes map-space sediment, soil patches
+and fine gravel into a 2048-square detail image. Gameplay collision is unchanged.
+
+`structure_details.rs` adds cached command-center roof louvres, fine conduits
+and individual foundation lips, using the same authored transforms in live
+spawning and the model harness. `capture proof-frames <dir> 450 human` records
+base motion and real siege effects with damage checks, then
+`scripts/capture_proof_bundle.sh` encodes and verifies the raw frames at 30 fps.
+
+Live and offscreen apps use `configure_scene_lighting` for the same ambient
+light defaults and 4096 shadow atlas. Weather still owns runtime illuminance
+and ambient brightness; the isolated model gallery overrides ambient brightness.
+
+The proof script accepts `CAPTURE_BIN` for a prebuilt capture executable. This
+allows verification to pin a build while other workspace builds run. Without
+it, the script uses `cargo run --bin capture`. Material recoloring works without
+a renderer; only texture loading and decorative roof geometry need RenderDevice.

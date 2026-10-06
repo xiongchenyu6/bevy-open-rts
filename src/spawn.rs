@@ -492,6 +492,17 @@ pub(crate) fn spawn_entity_models(
             }
         }
     }
+    if def.id == "CommandCenter" {
+        commands.queue(move |world: &mut World| {
+            if world.get_entity(root).is_ok() {
+                structure_details::spawn_structure_details(
+                    world,
+                    root,
+                    registry::entity("CommandCenter").expect("command center registry"),
+                );
+            }
+        });
+    }
     spawn_faction_identity_marker(commands, root, visual_faction, def);
 }
 
@@ -531,6 +542,7 @@ pub(crate) fn spawn_entity_models_for_harness(
             ));
         }
     }
+    structure_details::spawn_structure_details(world, root, def);
     if let Some(marker) = visual_faction.map(FactionIdentityMarker::for_faction) {
         let inv_scale = 1.0 / def.scale.max(0.1);
         let world_size = match def.role {
@@ -737,6 +749,24 @@ pub(crate) fn spawn_faction_identity_marker_model(
     }
 }
 
+pub(crate) const ARMOR_SURFACE_PATH: &str = "textures/armor-painted-steel.png";
+
+pub(crate) fn load_armor_surface(asset_server: &AssetServer) -> Handle<Image> {
+    use bevy::image::{
+        ImageAddressMode, ImageLoaderSettings, ImageSampler, ImageSamplerDescriptor,
+    };
+    asset_server
+        .load_builder()
+        .with_settings(|settings: &mut ImageLoaderSettings| {
+            settings.sampler = ImageSampler::Descriptor(ImageSamplerDescriptor {
+                address_mode_u: ImageAddressMode::Repeat,
+                address_mode_v: ImageAddressMode::Repeat,
+                ..ImageSamplerDescriptor::linear()
+            });
+        })
+        .load(ARMOR_SURFACE_PATH)
+}
+
 /// kenney's gold accent material ("metalRed", linear 1.0/0.6285/0.2028 ==
 /// sRGB ~0.99/0.81/0.48). godot repaints every material matching that albedo
 /// (Unit.gd MATERIAL_ALBEDO_TO_REPLACE, eps 0.05) with the player color; this
@@ -768,9 +798,14 @@ pub(crate) fn material_matches_team_paint_target(color: Color) -> bool {
 /// painted right after completion restores the originals.
 pub(crate) fn apply_team_color_materials(
     mut commands: Commands,
+    render_device: Option<Res<bevy::render::renderer::RenderDevice>>,
     materials: Option<ResMut<Assets<StandardMaterial>>>,
     mut cache: ResMut<TeamColorMaterials>,
+    asset_server: Option<Res<AssetServer>>,
     color_slots: Res<PlayerColorSlots>,
+    mut armor_materials: Local<
+        std::collections::HashMap<AssetId<StandardMaterial>, Handle<StandardMaterial>>,
+    >,
     mut unpainted: Query<
         (Entity, &mut MeshMaterial3d<StandardMaterial>),
         Without<TeamColorProcessed>,
@@ -811,26 +846,54 @@ pub(crate) fn apply_team_color_materials(
                 .0
                 .entry((slot, is_unit))
                 .or_insert_with(|| {
-                    // Units get an emissive team color so even a tiny accent
-                    // glows under bloom and reads as team identity at RTS zoom;
-                    // structures have large accents already, so they stay a solid
-                    // (non-glowing) team color to avoid washing out under bloom.
+                    // A restrained luminous accent keeps units identifiable
+                    // at RTS zoom without making their armor look neon.
+                    let [r, g, b] = player_color_rgb(slot);
+                    let paint = [r * 0.55 + 0.035, g * 0.55 + 0.035, b * 0.55 + 0.035];
                     let emissive = if is_unit {
-                        let [r, g, b] = player_color_rgb(slot);
-                        LinearRgba::rgb(r * 0.7, g * 0.7, b * 0.7)
+                        LinearRgba::rgb(paint[0] * 0.12, paint[1] * 0.12, paint[2] * 0.12)
                     } else {
                         LinearRgba::NONE
                     };
                     materials.add(StandardMaterial {
-                        base_color: player_color(slot),
+                        base_color: Color::srgb(paint[0], paint[1], paint[2]),
                         emissive,
-                        metallic: 0.4,
-                        perceptual_roughness: 0.45,
+                        metallic: 0.22,
+                        perceptual_roughness: 0.68,
                         ..default()
                     })
                 })
                 .clone();
             part.0 = handle;
+        } else if let Some(source) = materials.get(&part.0).cloned() {
+            let color = source.base_color.to_srgba();
+            // Imported kit panels are near-white plastic. Give neutral armor a
+            // muted steel finish while retaining authored colored details,
+            // emissive fixtures, textures and transparent glass.
+            let neutral =
+                (color.red - color.green).abs() < 0.07 && (color.green - color.blue).abs() < 0.07;
+            if neutral && color.red > 0.6 && source.alpha_mode == AlphaMode::Opaque {
+                let id = part.0.id();
+                let handle = armor_materials.entry(id).or_insert_with(|| {
+                    let mut armor = source.clone();
+                    let shade = (color.red - 0.6) / 0.4;
+                    armor.base_color = Color::srgb(
+                        0.55 + shade * 0.20,
+                        0.59 + shade * 0.21,
+                        0.62 + shade * 0.22,
+                    );
+                    if render_device.is_some() && armor.base_color_texture.is_none() {
+                        armor.base_color_texture = asset_server.as_deref().map(load_armor_surface);
+                        // Kit UVs tile dozens of times across a single roof;
+                        // keep wear at a readable scale instead of speckling.
+                        armor.uv_transform = bevy::math::Affine2::from_scale(Vec2::splat(0.08));
+                    }
+                    armor.metallic = 0.42;
+                    armor.perceptual_roughness = 0.62;
+                    materials.add(armor)
+                });
+                part.0 = handle.clone();
+            }
         }
         commands.entity(entity).try_insert(TeamColorProcessed);
     }

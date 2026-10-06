@@ -50,6 +50,7 @@ pub(crate) use placement_ghost::*;
 mod limb_animation;
 pub(crate) use limb_animation::*;
 mod structure_ambience;
+mod structure_details;
 pub(crate) use structure_ambience::*;
 mod weather;
 pub(crate) use weather::*;
@@ -2528,6 +2529,16 @@ pub fn add_game_scenes(app: &mut App) -> &mut App {
     app
 }
 
+/// Live and offscreen scenes share the same ambient and shadow resolution.
+pub(crate) fn configure_scene_lighting(app: &mut App) {
+    app.insert_resource(GlobalAmbientLight {
+        color: Color::srgb(0.74, 0.84, 1.0),
+        brightness: 1000.0,
+        affects_lightmapped_meshes: true,
+    });
+    app.insert_resource(bevy::light::DirectionalLightShadowMap { size: 4096 });
+}
+
 pub(crate) fn queue_startup_loading_assets(
     mut loading: ResMut<AssetsLoading<AppScreen>>,
     mut retained: ResMut<StartupLoadingAssets>,
@@ -2550,6 +2561,11 @@ pub(crate) fn queue_startup_loading_assets(
         &mut loading,
         &mut retained,
         asset_server.load::<Image>("ui/background.png"),
+    );
+    retain_loading_asset(
+        &mut loading,
+        &mut retained,
+        load_armor_surface(&asset_server),
     );
     retain_loading_asset(
         &mut loading,
@@ -2808,15 +2824,7 @@ pub fn build_game_app(mode: GameAppMode) -> App {
             add_headless_game_plugins(&mut app);
         }
     };
-    // godot's WorldEnvironment: white ambient over a procedural sky.
-    app.insert_resource(GlobalAmbientLight {
-        color: Color::WHITE,
-        brightness: 150.0,
-        affects_lightmapped_meshes: true,
-    });
-    // Crisper sun shadows: a 4K shadow atlas turns the blobby low-res unit
-    // shadows into readable silhouettes.
-    app.insert_resource(bevy::light::DirectionalLightShadowMap { size: 4096 });
+    configure_scene_lighting(&mut app);
     app.insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
         .insert_resource(StartupLoadingPolicy {
             preload_assets: matches!(mode, GameAppMode::Interactive),
@@ -4507,6 +4515,7 @@ pub(crate) fn setup(
         DirectionalLight {
             shadow_maps_enabled: true,
             illuminance: 11_000.0,
+            color: Color::srgb(1.0, 0.97, 0.93),
             ..default()
         },
         // Tight cascades pack shadow-map resolution over the visible playfield

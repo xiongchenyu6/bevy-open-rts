@@ -10,6 +10,7 @@
 //! Usage:
 //!   capture screenshot [path]            single still (default screenshots/capture/still.png)
 //!   capture frames <dir> [count]         numbered frameXXXXX.png sequence (default 450)
+//!   capture proof-frames <dir> <count> <faction>  base movement + siege at 30 fps
 //!   capture play <dir>                   real input smoke: select/move/train/build
 //!   capture harvest <dir>                real input smoke: Worker right-clicks ore
 //!   capture assault <dir> [max-seconds]  real input smoke: select army/attack-move/win
@@ -30,8 +31,8 @@ use bevy::prelude::*;
 use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 
 use bevy_open_rts::{
-    CaptureTarget, build_capture_app, build_model_harness_capture_app, capture_build_options_count,
-    capture_dismiss_match_briefing, capture_enabled_build_hotkey_for,
+    CaptureTarget, build_capture_app, build_model_harness_capture_app, capture_art_combat_evidence,
+    capture_build_options_count, capture_dismiss_match_briefing, capture_enabled_build_hotkey_for,
     capture_enabled_train_hotkey_for, capture_enemy_structure_position, capture_entity_is_selected,
     capture_first_enabled_attack_move_hotkey, capture_first_enabled_build_hotkey,
     capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_frame_whole_map,
@@ -54,10 +55,10 @@ use bevy_open_rts::{
     capture_show_campaign_menu, capture_show_credits_menu, capture_show_main_menu,
     capture_show_options_menu, capture_show_skirmish_setup_menu,
     capture_show_skirmish_setup_with_dropdown, capture_spawn_construction_showcase,
-    capture_spawn_model_harness_page, capture_stage_deployed_siege, capture_stage_player_radar,
-    capture_stage_worker_collecting, capture_start_mission, capture_startup_ready,
-    capture_world_to_screen, capture_worst_model_alignment_offset, capture_zoom_camera_closest,
-    start_shared_match_scene_with_current_setup,
+    capture_spawn_model_harness_page, capture_stage_art_combat, capture_stage_deployed_siege,
+    capture_stage_player_radar, capture_stage_worker_collecting, capture_start_mission,
+    capture_startup_ready, capture_world_to_screen, capture_worst_model_alignment_offset,
+    capture_zoom_camera_closest, start_shared_match_scene_with_current_setup,
 };
 
 const WIDTH: u32 = 1280;
@@ -102,6 +103,13 @@ fn main() {
             let count = args.next().and_then(|s| s.parse().ok()).unwrap_or(450usize);
             render_frames(&dir, count)
         }
+        Some("proof-frames") => match (args.next(), args.next(), args.next()) {
+            (Some(dir), Some(count), Some(faction)) => count
+                .parse::<usize>()
+                .map_err(|_| "proof-frames count must be an integer".to_string())
+                .and_then(|count| render_proof_frames(Path::new(&dir), count, &faction)),
+            _ => Err("proof-frames needs <dir> <count> <human|demon|chaos>".into()),
+        },
         Some("play") => {
             let dir = args
                 .next()
@@ -1760,5 +1768,124 @@ fn render_frames(dir: &Path, count: usize) -> Result<(), String> {
         ));
     }
     println!("[capture] wrote {count} frames to {}", dir.display());
+    Ok(())
+}
+
+/// Continuous real-scene proof: a fixed base view followed by deployed siege.
+/// Every recorded frame advances exactly one 1/30-second simulation tick.
+fn render_proof_frames(dir: &Path, count: usize, faction: &str) -> Result<(), String> {
+    let faction_index = match faction {
+        "human" | "alliance" => 0,
+        "demon" => 1,
+        "chaos" => 2,
+        _ => return Err(format!("unknown proof faction: {faction}")),
+    };
+    if !(450..=900).contains(&count) {
+        return Err("proof needs 450–900 frames (15–30 seconds at 30 fps)".into());
+    }
+    std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    let mut app = build_capture_app(WIDTH, HEIGHT);
+    wait_for_startup(&mut app)?;
+    capture_set_all_factions(&mut app, faction_index);
+    start_shared_match_scene_with_current_setup(&mut app);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    capture_dismiss_match_briefing(&mut app);
+    select_all_player_army(&mut app);
+    let origin = capture_selected_player_unit_average_position(&mut app)
+        .ok_or("proof could not select the starting army")?;
+    let base =
+        capture_player_completed_structure_position(&mut app, "CommandCenter").unwrap_or(origin);
+    capture_focus_camera_on(&mut app, (origin + base) * 0.5);
+    for _ in 0..12 {
+        app.update();
+    }
+    capture_set_cursor(&mut app, Vec2::new(WIDTH as f32 * 0.5, HEIGHT as f32 * 0.5));
+    let handle = capture_handle(&app);
+    let combat_start = count / 3;
+    let mut displacement = 0.0_f32;
+    let mut previous_position = origin;
+    let mut moving_frames = 0usize;
+    let mut combat_effect_frames = 0usize;
+    let mut combat_damage = 0.0_f32;
+    let mut last_damage_frame = 0usize;
+    for frame in 0..count {
+        if frame == combat_start {
+            if displacement < 2.0 || moving_frames < combat_start / 2 {
+                return Err(format!(
+                    "base proof lacks army motion: {displacement:.2}m, {moving_frames} moving frames"
+                ));
+            }
+            let focus = capture_stage_art_combat(&mut app)
+                .ok_or("proof has no enemy structure to besiege")?;
+            capture_focus_camera_on(&mut app, focus + Vec3::new(-4.0, 0.0, 0.0));
+            println!(
+                "[capture] base motion verified: {displacement:.2}m across {moving_frames} frames; siege begins at frame {frame}"
+            );
+        }
+        if frame < combat_start && frame % 30 == 0 {
+            // Keep real right-click orders near the base, fully inside the
+            // composition. Scatter can send the unit beyond the visible area.
+            let direction = if (frame / 30) % 2 == 0 { 1.0 } else { -1.0 };
+            let target = base + Vec3::new(direction * 3.0, 0.0, 0.0);
+            let screen = capture_world_to_screen(&mut app, target)
+                .ok_or("base movement target cannot be projected")?;
+            capture_set_cursor(&mut app, screen);
+            capture_mouse_button(&mut app, MouseButton::Right, true);
+        } else {
+            capture_mouse_button(&mut app, MouseButton::Right, false);
+            capture_set_cursor(&mut app, Vec2::new(WIDTH as f32 * 0.5, HEIGHT as f32 * 0.5));
+        }
+        app.update();
+        if frame < combat_start
+            && let Some(position) = capture_selected_player_unit_average_position(&mut app)
+        {
+            displacement = displacement.max(position.distance(origin));
+            if position.distance(previous_position) > 0.005 {
+                moving_frames += 1;
+            }
+            previous_position = position;
+        }
+        if frame >= combat_start {
+            let (effects, damage) = capture_art_combat_evidence(&mut app);
+            if effects > 0 {
+                combat_effect_frames += 1;
+            }
+            if damage > combat_damage {
+                last_damage_frame = frame;
+                combat_damage = damage;
+            }
+            if frame > combat_start + 120 && frame.saturating_sub(last_damage_frame) > 120 {
+                return Err(format!(
+                    "siege stopped dealing damage for 4 seconds at frame {frame}; refusing a static tail"
+                ));
+            }
+        }
+        app.world_mut()
+            .spawn(Screenshot::image(handle.clone()))
+            .observe(save_to_disk(dir.join(format!("frame{frame:05}.png"))));
+        if frame % 30 == 0 {
+            println!(
+                "[capture] proof {frame}/{count} frames ({:.1}s)",
+                frame as f32 / 30.0
+            );
+        }
+    }
+    for _ in 0..FLUSH_TICKS {
+        app.update();
+    }
+    if combat_damage <= 0.0 || combat_effect_frames < 5 || count - 1 - last_damage_frame > 120 {
+        return Err(format!(
+            "combat proof failed: {combat_damage:.0} damage, {combat_effect_frames} effect frames, last damage at {last_damage_frame}"
+        ));
+    }
+    println!(
+        "[capture] siege verified: {combat_damage:.0} damage, {combat_effect_frames} frames with real shot/impact effects"
+    );
+    println!(
+        "[capture] wrote {count} real-scene frames at 30 fps to {}",
+        dir.display()
+    );
     Ok(())
 }

@@ -1735,7 +1735,7 @@ pub(crate) fn tank_material(bucket: TankBucket, look: &TankLook) -> StandardMate
         TankBucket::Paint => StandardMaterial {
             base_color: look.paint,
             metallic: 0.3,
-            perceptual_roughness: 0.55,
+            perceptual_roughness: 0.78,
             ..default()
         },
         TankBucket::Dark => StandardMaterial {
@@ -1774,9 +1774,16 @@ fn upload_parts(world: &mut World, look: &TankLook, parts: PartSet) -> Vec<MeshP
     let mut out = Vec::new();
     for (bucket, mesh) in parts.merged() {
         let mesh = world.resource_mut::<Assets<Mesh>>().add(mesh);
+        let mut surface = tank_material(bucket, look);
+        if bucket == TankBucket::Paint
+            && world.contains_resource::<bevy::render::renderer::RenderDevice>()
+        {
+            surface.base_color_texture =
+                world.get_resource::<AssetServer>().map(load_armor_surface);
+        }
         let material = world
             .resource_mut::<Assets<StandardMaterial>>()
-            .add(tank_material(bucket, look));
+            .add(surface);
         out.push((mesh, material));
     }
     out

@@ -33,7 +33,7 @@ impl WeatherKind {
         match self {
             Self::Clear => WeatherParams {
                 sun_lux: 11_000.0,
-                ambient: 150.0,
+                ambient: 1000.0,
                 fog_density: 0.0,
                 fog_color: Color::srgb(0.8, 0.7, 0.6),
                 rain: 0.0,
@@ -41,7 +41,7 @@ impl WeatherKind {
             },
             Self::Overcast => WeatherParams {
                 sun_lux: 7_200.0,
-                ambient: 120.0,
+                ambient: 850.0,
                 fog_density: 0.004,
                 fog_color: Color::srgb(0.66, 0.66, 0.68),
                 rain: 0.0,
@@ -49,7 +49,7 @@ impl WeatherKind {
             },
             Self::Rain => WeatherParams {
                 sun_lux: 5_400.0,
-                ambient: 100.0,
+                ambient: 750.0,
                 fog_density: 0.010,
                 fog_color: Color::srgb(0.55, 0.6, 0.66),
                 rain: 1.0,
@@ -57,7 +57,7 @@ impl WeatherKind {
             },
             Self::Sandstorm => WeatherParams {
                 sun_lux: 7_000.0,
-                ambient: 110.0,
+                ambient: 850.0,
                 fog_density: 0.022,
                 fog_color: Color::srgb(0.8, 0.64, 0.47),
                 rain: 0.0,

@@ -126,6 +126,7 @@ pub fn build_capture_app(width: u32, height: u32) -> App {
         std::time::Duration::from_secs_f32(1.0 / 30.0),
     ));
 
+    configure_scene_lighting(&mut app);
     app.insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
         .insert_resource(StartupLoadingPolicy {
             preload_assets: true,
@@ -184,6 +185,8 @@ pub fn build_model_harness_capture_app(width: u32, height: u32) -> App {
     ))
     .insert_resource(ClearColor(Color::srgb(0.028, 0.034, 0.045)))
     .insert_resource(RenderErrorHandler(handle_render_error));
+
+    configure_scene_lighting(&mut app);
 
     let image = Image::new_target_texture(
         width,
@@ -906,6 +909,54 @@ pub fn capture_stage_deployed_siege(app: &mut App) -> Option<Vec3> {
         ));
     }
     Some(target_pos)
+}
+
+/// Capture-only durable siege target. Gameplay weapon, turret, projectile and
+/// impact systems remain unchanged; extra health keeps the proof clip active.
+#[derive(Component)]
+struct ArtCombatTarget {
+    initial_health: f32,
+}
+
+pub fn capture_stage_art_combat(app: &mut App) -> Option<Vec3> {
+    let position = capture_stage_deployed_siege(app)?;
+    let world = app.world_mut();
+    let target = {
+        let mut query = world.query::<(Entity, &Team, &Transform, &Structure)>();
+        query
+            .iter(world)
+            .find(|(_, team, transform, _)| {
+                **team == Team::Player(1) && transform.translation.distance(position) < 0.1
+            })
+            .map(|(entity, ..)| entity)?
+    };
+    world.entity_mut(target).insert((
+        Health::new(4000.0),
+        ArtCombatTarget {
+            initial_health: 4000.0,
+        },
+    ));
+    // Fit all three siege vehicles and the target; a model-inspection zoom
+    // cuts the front/rear vehicles out of the frame.
+    let mut camera = world.resource_mut::<RtsCamera>();
+    camera.distance = 24.0;
+    camera.pending_jump = true;
+    Some(position)
+}
+
+/// Visible transient count and real target damage, for frame-by-frame proof.
+pub fn capture_art_combat_evidence(app: &mut App) -> (usize, f32) {
+    let world = app.world_mut();
+    let flashes = world
+        .query_filtered::<Entity, Or<(With<ShotPulse>, With<ImpactBurst>)>>()
+        .iter(world)
+        .count();
+    let damage = world
+        .query::<(&ArtCombatTarget, &Health)>()
+        .iter(world)
+        .map(|(target, health)| target.initial_health - health.current)
+        .sum();
+    (flashes, damage)
 }
 
 /// Forces a weather kind at full blend so captures can photograph it without
