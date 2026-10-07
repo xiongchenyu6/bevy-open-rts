@@ -421,3 +421,18 @@ Latest construction checkpoint:
 - Sixaudio files regenerated/reproduced3runs+actualBevydecoder, ab9826a. Player
   guide+allpackagerREADME/BUILD_NOTES changes99353d3. Human listening/openlicense
   voices/art/performance/hardware gates remain; currentarchives are checkpoints.
+
+### Release retry handoff
+
+- Core verified/frozen commit b4160bd. Warm standard-profile retry launched on
+  that source with ~8.77GiB available; no source delta, only user flake.lock dirty.
+- Unit rts-linux-standard-release-retry1-20261008.service remains active,
+  MainPID2258416. Final fat-LTO rustc2264620 was SIGSTOP'd by hud_polish to avoid
+  growing allocations while another project compiles; root verified process
+  state T and~3.2GiB RSS. Resume the SAME compiler via SIGCONT after headroom
+  recovers. No kill/restart or goal pause; release executable still unproven.
+- hud_polish owns supervision, final package/playerguide/hash verification and
+  clean-container/AMD launch after actual artifact exists. All campaign captures
+  and other agent tasks are terminal; all owned files committed. Six current
+  mission recipes have wins at recorded revisions; final persistent/current
+  complete sequence, balance/performance/audio/art/provider/browser gates remain.
