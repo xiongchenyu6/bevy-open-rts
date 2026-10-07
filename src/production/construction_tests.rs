@@ -1,6 +1,6 @@
 use super::*;
 
-fn captured_construction_app() -> (App, Entity, Entity, Vec3) {
+fn construction_test_app() -> App {
     let mut app = App::new();
     app.add_plugins(MinimalPlugins);
     app.add_plugins(bevy::asset::AssetPlugin::default());
@@ -33,6 +33,11 @@ fn captured_construction_app() -> (App, Entity, Entity, Vec3) {
         )
             .chain(),
     );
+    app
+}
+
+fn captured_construction_app() -> (App, Entity, Entity, Vec3) {
+    let mut app = construction_test_app();
     let factory_position = Vec3::new(-28.0, 0.0, -16.0);
     let factory = app
         .world_mut()
@@ -252,4 +257,192 @@ fn contact_clearance_accepts_tangent_roundoff_without_accepting_overlap() {
         &obstacle,
         &[]
     ));
+}
+
+fn captured_army_contact_geometry() -> (Vec3, Vec3, [(Vec3, f32); 6], [(Vec3, f32); 3]) {
+    let source = Vec3::new(-21.072931, 0.05, -18.432116);
+    let target = Vec3::new(-21.999998, 0.0, -13.000001);
+    let obstacles = [
+        (Vec3::new(-24.0, 0.0, -16.0), 0.6),
+        (Vec3::new(-22.6, 0.0, -14.4), 0.6),
+        (Vec3::new(-26.0, 0.0, -19.500002), 1.45),
+        (Vec3::new(-22.0, 0.0, -22.0), 2.0),
+        (Vec3::new(-18.000002, 0.0, -19.499998), 1.45),
+        (target, 0.6),
+    ];
+    let occupied = [
+        (Vec3::new(-17.898895, 0.05, -14.627776), 0.9),
+        (Vec3::new(-16.060225, 0.05, -15.886452), 0.9),
+        (Vec3::new(-20.37863, 0.05, -14.580074), 0.48),
+    ];
+    (source, target, obstacles, occupied)
+}
+
+#[test]
+fn allied_army_does_not_permanently_cut_off_an_open_construction_contact() {
+    // Minimized from campaign-contact-fixture-2/failure-contact.json. The
+    // resources are alive (204/240), terrain is flat and the source cell is open.
+    // Six static footprints and three allied units reproduce the hard-routing
+    // pocket; removing either the first Tank or infantry restores a route.
+    let (source, target, obstacles, occupied) = captured_army_contact_geometry();
+    let mut grid = NavGrid::default();
+    grid.rebuild_with_terrain(
+        MapBounds {
+            half_width: 30.0,
+            half_depth: 30.0,
+        },
+        &obstacles,
+        &TerrainHeightField::default(),
+    );
+    let source_cell = grid.cell_of(source);
+    assert!(!grid.is_blocked(source_cell.0, source_cell.1));
+    assert!(
+        reachable_unit_contact_approach(source, 0.6, target, 0.6, &grid, &obstacles, &[]).is_some()
+    );
+    let approach = reachable_unit_contact_approach(
+        source, 0.6, target, 0.6, &grid, &obstacles, &occupied,
+    )
+    .expect(
+        "mobile allied troops must not permanently isolate a constructor with free target contacts",
+    );
+    assert!(contact_position_is_clear(
+        approach.target,
+        0.6,
+        &obstacles,
+        &occupied
+    ));
+    assert_eq!(approach.waypoints.last(), Some(&approach.target));
+}
+
+#[test]
+fn constructor_walks_past_allied_army_and_completes_without_crossing_static_footprints() {
+    let mut app = construction_test_app();
+    app.insert_resource(MapBounds {
+        half_width: 30.0,
+        half_depth: 30.0,
+    });
+    let (source, target, obstacles, occupied) = captured_army_contact_geometry();
+    for (index, &(position, radius)) in obstacles[..5].iter().enumerate() {
+        if index < 2 {
+            app.world_mut().spawn((
+                ResourceNode {
+                    kind: ResourceKind::Ore,
+                    amount: [204, 240][index],
+                },
+                Transform::from_translation(position),
+                Selectable { radius },
+            ));
+        } else {
+            app.world_mut().spawn((
+                Structure {
+                    id: ["PowerReactor", "CommandCenter", "Barracks"][index - 2],
+                },
+                Team::Player(0),
+                Transform::from_translation(position),
+                Selectable { radius },
+                Health::new(20.0),
+            ));
+        }
+    }
+    let paid_cost = registry::Cost { ore: 8, crystal: 6 };
+    let foundation = app
+        .world_mut()
+        .spawn((
+            Structure {
+                id: "AntiAirTurret",
+            },
+            Team::Player(0),
+            Transform::from_translation(target),
+            Selectable { radius: 0.6 },
+            Health {
+                current: 1.0,
+                max: 8.0,
+            },
+            UnderConstruction {
+                remaining: 1.0,
+                total: 1.0,
+                cost: paid_cost,
+                free_worker_origin: None,
+            },
+        ))
+        .id();
+    for (index, &(position, radius)) in occupied.iter().enumerate() {
+        app.world_mut().spawn((
+            Unit {
+                id: if index < 2 {
+                    "Tank"
+                } else {
+                    "HeavyMachinegunTrooper"
+                },
+                speed: registry::entity(if index < 2 {
+                    "Tank"
+                } else {
+                    "HeavyMachinegunTrooper"
+                })
+                .unwrap()
+                .speed,
+                can_crush: false,
+                can_be_crushed: index == 2,
+            },
+            Team::Player(0),
+            MovementDomain::Terrain,
+            Transform::from_translation(position),
+            Selectable { radius },
+            Health::new(10.0),
+        ));
+    }
+    let worker = app
+        .world_mut()
+        .spawn((
+            Unit {
+                id: "Worker",
+                speed: 2.5,
+                can_crush: false,
+                can_be_crushed: true,
+            },
+            Team::Player(0),
+            MovementDomain::Terrain,
+            Transform::from_translation(source),
+            Selectable { radius: 0.6 },
+            Health::new(6.0),
+            ConstructOrder { target: foundation },
+        ))
+        .id();
+    let mut previous = source;
+    let mut walked = false;
+    for _ in 0..900 {
+        app.update();
+        let world = app.world();
+        let position = world.get::<Transform>(worker).unwrap().translation;
+        assert!(
+            xz_distance(position, previous) <= (2.5 + UNIT_SEPARATION_MAX_SPEED) / 30.0 + 0.001,
+            "constructor must walk and yield normally; no teleporting"
+        );
+        assert!(
+            obstacles
+                .iter()
+                .all(|(center, radius)| xz_distance(position, *center) + 1.0e-4 >= 0.6 + radius),
+            "constructor penetrated a static footprint at {position:?}"
+        );
+        walked |= xz_distance(position, source) > 1.0;
+        previous = position;
+        if let Some(construction) = world.get::<UnderConstruction>(foundation) {
+            assert_eq!(
+                (construction.cost.ore, construction.cost.crystal),
+                (paid_cost.ore, paid_cost.crystal)
+            );
+        } else {
+            break;
+        }
+    }
+    assert!(
+        walked,
+        "the captured constructor never acquired a real movement route"
+    );
+    assert!(
+        app.world().get::<UnderConstruction>(foundation).is_none(),
+        "mobile allied troops permanently stalled the captured foundation"
+    );
+    assert!(app.world().get::<ConstructOrder>(worker).is_none());
+    assert_eq!(app.world().get::<Health>(foundation).unwrap().current, 8.0);
 }

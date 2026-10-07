@@ -389,3 +389,35 @@ Latest construction checkpoint:
   combat/strategy investigation; index4 failed unchecked builder selection at39.2
   withample76/29resources/normalpower, HMG card selected. release_audit owns bot
   builder verification/setup telemetry/earlier Factory experiment. No game nerf.
+
+## AA construction fallback verified — 2026-10-08
+
+- Exact live Nav/geometry dump is campaign-contact-fixture-2/failure-contact.json:
+  grid120x120/origin-30/version14; source open but mobile-unit inflation seals
+  65cellcomponent. Resources204/240 are alive; Drone far away. Minimal6statics/
+  3mobileallies reproduce realRust RED, with static-only route sanity passing.
+- orders reachable_contact keeps mobile-aware routing preferred, retries static
+  worker-inflated route if no candidate reachable. All endpoints still checked
+  against occupied units; actual movement collision/yield is used, no teleport.
+- 6constructiontests pass (steam-aa-contact-tests-mobile.log); full168 pass59.35s
+  (steam-aa-contact-full-tests.log), check/build/fmt/native12s emptylog pass.
+  Fixtures use real registry ally speeds, preserve Resource entities, and assert
+  physical footprints rather than planner-only buffer after normal separation.
+- Normalinput old AA(-22,-13) now completes49.3. Mission3 victory183.7/HQ20 with
+  completion/nextbriefing inspected: campaign-contact-fixed-2. Ordinary autochase
+  took tanks east (x+18); no explicit assault logged; resolver requires all living
+  hostile units/structures gone. Mission5 victory257.8/HQ20/zero building losses,
+  nextMission6 inspected: campaign-twin-guard-4. Bot commits a407376/60cb4a8;
+  no resource/time/AI grants or level nerfs. All6 recipes have recorded winproof,
+  complete current sequential/persistent campaign audit still needed.
+- Proof15:450frames,15s30fps, movement4.24m,113damage/94effectframes; opening/
+  movement/combat/ending inspected. Its baseline clip is not the AA-specific
+  proof; constructor movement tests and normal-input runtime provide that scope.
+- StandardLinuxrelease34m53s fatLTO was globallyOOM-killed; no executable.
+  Evidence /tmp/rts-standard-release-failed-20261008. sg-office configuredSSH
+  unreachable, serverregistryempty; no credentials/sourcecopy used. Warmcache
+  unchangedflags retry awaits sourcefreeze and ~9GBstablememory, hud_polish
+  supervising. Do not restart because observationtimeout or labeldebug asrelease.
+- Sixaudio files regenerated/reproduced3runs+actualBevydecoder, ab9826a. Player
+  guide+allpackagerREADME/BUILD_NOTES changes99353d3. Human listening/openlicense
+  voices/art/performance/hardware gates remain; currentarchives are checkpoints.

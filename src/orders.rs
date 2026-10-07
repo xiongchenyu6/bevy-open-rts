@@ -2631,57 +2631,63 @@ pub(crate) fn reachable_unit_contact_approach(
     candidates.sort_by(|a, b| {
         xz_distance(source_position, *a).total_cmp(&xz_distance(source_position, *b))
     });
-    let mut routing = NavGrid {
-        version: grid.version,
-        origin_x: grid.origin_x,
-        origin_z: grid.origin_z,
-        width: grid.width,
-        height: grid.height,
-        blocked: grid.blocked.clone(),
-    };
-    if !routing.blocked.is_empty() {
-        for (position, radius, margin) in obstacles
-            .iter()
-            .map(|(p, r)| (*p, *r, MOVEMENT_OBSTACLE_CLEARANCE_M))
-            .chain(
-                occupied
-                    .iter()
-                    .map(|(p, r)| (*p, *r, UNIT_SEPARATION_GAP_M)),
-            )
-        {
-            let reach = source_radius + radius + margin;
-            let (min_x, min_z) = routing.cell_of(position - Vec3::splat(reach));
-            let (max_x, max_z) = routing.cell_of(position + Vec3::splat(reach));
-            for z in min_z.max(0)..=max_z.min(routing.height - 1) {
-                for x in min_x.max(0)..=max_x.min(routing.width - 1) {
-                    if xz_distance(routing.cell_center(x, z), position) < reach {
-                        routing.blocked[(z * routing.width + x) as usize] = true;
+    // Prefer routes around mobile units. If their inflated grid cells seal a
+    // narrow passage, use the static route and let normal movement resolve
+    // mobile collisions. Contact endpoints must remain genuinely unoccupied.
+    for include_mobile_obstacles in [true, false] {
+        let mut routing = NavGrid {
+            version: grid.version,
+            origin_x: grid.origin_x,
+            origin_z: grid.origin_z,
+            width: grid.width,
+            height: grid.height,
+            blocked: grid.blocked.clone(),
+        };
+        if !routing.blocked.is_empty() {
+            for (position, radius, margin) in obstacles
+                .iter()
+                .map(|(p, r)| (*p, *r, MOVEMENT_OBSTACLE_CLEARANCE_M))
+                .chain(
+                    occupied
+                        .iter()
+                        .filter(|_| include_mobile_obstacles)
+                        .map(|(p, r)| (*p, *r, UNIT_SEPARATION_GAP_M)),
+                )
+            {
+                let reach = source_radius + radius + margin;
+                let (min_x, min_z) = routing.cell_of(position - Vec3::splat(reach));
+                let (max_x, max_z) = routing.cell_of(position + Vec3::splat(reach));
+                for z in min_z.max(0)..=max_z.min(routing.height - 1) {
+                    for x in min_x.max(0)..=max_x.min(routing.width - 1) {
+                        if xz_distance(routing.cell_center(x, z), position) < reach {
+                            routing.blocked[(z * routing.width + x) as usize] = true;
+                        }
                     }
                 }
             }
         }
-    }
-    for target in candidates {
-        if !contact_position_is_clear(target, source_radius, obstacles, occupied) {
-            continue;
-        }
-        if routing.blocked.is_empty() {
-            return Some(ContactApproach {
-                target,
-                waypoints: Vec::new(),
-            });
-        }
-        let (x, z) = routing.cell_of(target);
-        // Do not let nearest_open_cell silently redirect an occupied contact
-        // endpoint to a different cell that cannot perform the action.
-        if routing.is_blocked(x, z) {
-            continue;
-        }
-        if let Some(mut waypoints) = routing.find_path(source_position, target) {
-            // Grid cell centers are not exact interaction endpoints. Preserve
-            // the final contact leg explicitly rather than stopping at rounding.
-            waypoints.push(target);
-            return Some(ContactApproach { target, waypoints });
+        for target in candidates.iter().copied() {
+            if !contact_position_is_clear(target, source_radius, obstacles, occupied) {
+                continue;
+            }
+            if routing.blocked.is_empty() {
+                return Some(ContactApproach {
+                    target,
+                    waypoints: Vec::new(),
+                });
+            }
+            let (x, z) = routing.cell_of(target);
+            // Do not let nearest_open_cell silently redirect an occupied contact
+            // endpoint to a different cell that cannot perform the action.
+            if routing.is_blocked(x, z) {
+                continue;
+            }
+            if let Some(mut waypoints) = routing.find_path(source_position, target) {
+                // Grid cell centers are not exact interaction endpoints. Preserve
+                // the final contact leg explicitly rather than stopping at rounding.
+                waypoints.push(target);
+                return Some(ContactApproach { target, waypoints });
+            }
         }
     }
     None

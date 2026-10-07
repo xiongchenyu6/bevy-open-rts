@@ -1302,6 +1302,38 @@ pub fn capture_battle_log_messages(app: &App) -> Vec<String> {
         .collect()
 }
 
+/// Exact read-only geometry for diagnosing a stalled constructor. Sparse grid
+/// indices preserve the real terrain mask without approximating the live map.
+pub fn capture_construction_contact_debug(app: &mut App) -> serde_json::Value {
+    let world = app.world_mut();
+    let mut query = world.query::<(
+        Entity,
+        &Transform,
+        &Selectable,
+        Option<&Unit>,
+        Option<&Structure>,
+        Option<&ResourceNode>,
+        Option<&TerrainWall>,
+        Option<&ConstructOrder>,
+        Option<&Health>,
+    )>();
+    let entities: Vec<_> = query.iter(world).map(|(entity, transform, selectable, unit, structure, resource, wall, constructing, health)| {
+        serde_json::json!({
+            "entity": entity.to_bits(), "position": transform.translation.to_array(), "radius": selectable.radius,
+            "unit": unit.map(|unit| unit.id), "structure": structure.map(|structure| structure.id),
+            "resource_amount": resource.map(|resource| resource.amount), "wall": wall.is_some(),
+            "construct_target": constructing.map(|order| order.target.to_bits()),
+            "health": health.map(|health| health.current),
+        })
+    }).collect();
+    let grid = world.resource::<NavGrid>();
+    serde_json::json!({ "entities":entities, "grid": {
+        "version": grid.version, "origin_x": grid.origin_x, "origin_z": grid.origin_z,
+        "width": grid.width, "height": grid.height,
+        "blocked_indices": grid.blocked.iter().enumerate().filter_map(|(index, blocked)| blocked.then_some(index)).collect::<Vec<_>>(),
+    }})
+}
+
 /// World position of a player worker (its command panel offers Build actions).
 pub fn capture_player_worker_position(app: &mut App) -> Option<Vec3> {
     let player = Team::Player(0);

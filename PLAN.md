@@ -2,45 +2,41 @@
 
 ## Steam quality work (active)
 
-The full acceptance matrix is in `docs/RELEASE_READINESS.md`. It remains open:
-green library tests and the earlier art pass do not establish release readiness.
+The acceptance matrix is in `docs/RELEASE_READINESS.md`; the full Steam goal
+remains open. Current evidence must match the source/artifact being claimed.
 
-- [x] Verify Boot Camp entry, skip, seven lessons, graduation and fresh replay.
-  Native sandbox persistence and restart were verified separately; current
-  full flow is in `logs/steam-training-flow.log` and its screenshot directory.
-- [ ] Verify all six campaign missions, persistent completion and continuation.
-- [ ] Verify save continuity, corruption recovery and player-facing feedback.
-- [ ] Complete desktop delivery, balance/performance, art/audio and provenance gates.
+- [x] Boot Camp entry, skip, seven lessons, graduation and fresh replay;
+  native sandbox persistence/restart verified separately.
+- [x] Remaining missions3/5 now win through ordinary input and continue.
+- [ ] Complete current six-mission sequence, restart persistence, retry/finale audit.
+- [x] Keyboard and mouse save/recovery in skirmish, including missing/corrupt files.
+- [ ] Campaign-runtime save continuity, full UI/browser and audio review.
+- [ ] Release delivery, balance/performance, provenance and store-media gates.
 
-Current verification: 166 library tests pass; formatting, type/build checks and
-12-second native launch pass with no error output. Boot Camp passes with actual
-profile writes; missions 1, 2, 4 and 6 pass normal-input capture and continuation.
-The previously blocked factory now completes by approaching an accessible side.
-Missions 3 and 5 still need acceptance.
-These failures remain open, not accepted as release-ready behavior.
+Current source passes168 library tests, fmt/check/bins build and a12-second
+native launch with no error output. Proof is `screenshots/result/15`:450frames,
+15seconds/30fps, inspected opening/movement/combat/ending. Unit motion4.24m,
+siege113damage and94effectframes are recorded in its log.
 
-Current video proof is `screenshots/result/14` (450 frames,15s,30fps), inspected
-opening/movement/combat/ending. Real Ctrl+S/Ctrl+L restores paid production,
-economy and fog; missing/corrupt files leave the paused match and original file
-unchanged. Error feedback is readable English and loading dismisses the opening
-briefing. Mouse Save/Load and Main Menu navigation now pass at1280x720/900x720;
-campaign runtime save coverage remains open.
-Global command shortcuts and control-group digits are now excluded from the
-command grid: an actively harvesting Worker previously assigned Barracks to
-S/Stop. Regression passes; campaign input acceptance is in progress.
-Windows GNU game/capture now compile; a Wine-rendered menu is inspected.
-Clean Windows hardware/release-profile acceptance remains unproven.
-Missions3/5 still need acceptance; two startup-timeout attempts are recorded.
-The rooted mission3 run reaches real defense construction/grouping, then loses
-at94.2s. Mission5's macro selected an HMG instead of its builder at39.2s; the
-next recipe must verify builder selection before construction and log threats.
-Standard Linux release build is supervised by user service
-`rts-linux-standard-release-20261008.service`; build/packaged runtime remain open.
+An exact alive-worker AA construction stall was reduced to a65-cell routing
+pocket caused by treating nearby mobile units as fixed barriers. Preferred
+unit-aware routing now falls back to worker-sized static routing; endpoint
+occupancy and normal movement collisions remain enforced. Six construction
+regressions cover walking/yielding, physical clearance, speed bounds and cost.
+The same AA(-22,-13) completes through normal input; Mission3 wins3:03/HQ20,
+Mission5 wins4:17/HQ20/no building losses. Other four recipes have prior wins;
+repeat the whole current campaign/profile sequence before closing its gate.
 
-Compact icon cards and disabled tooltips/queues are verified at 1280x720 and
-900x720. Linux development packaging launches without /nix from /tmp on a
-read-only install; release builds, Steam Runtime, hardware and Windows remain.
-See `docs/ASSET_PROVENANCE.md` for exact source hashes and outstanding families.
+Mouse Save/Load and actual Main Menu return pass1280x720/900x720. Existing Linux
+and Windows development archives identify earlier checkpoints. Standard Linux
+release fat LTO was OOM-killed; failed logs/unit are preserved. A warm-cache
+unchanged-profile retry awaits verified source freeze and memory headroom under
+`rts-linux-standard-release-20261008.service`; no release artifact exists yet.
+
+Six authored audio mismatches now regenerate deterministically and pass actual
+Bevy loading/decoding; human listening remains open. Packagers use PLAYER_GUIDE
+as README and retain BUILD_NOTES/inventory/licenses. Remaining art/voice provider
+records are explicit in ASSET_PROVENANCE. User flake.lock/full font are untouched.
 
 ## Objective
 

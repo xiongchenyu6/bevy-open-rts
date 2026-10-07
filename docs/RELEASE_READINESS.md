@@ -9,13 +9,13 @@ build. Previous visual fixes and green unit tests do not establish that goal.
 | Area | Required evidence | Current state |
 | --- | --- | --- |
 | First session | Fresh profile → guided gathering, power, barracks, training, movement, attack and victory through normal controls; skip/replay work | Seven lessons and sandbox persistence pass; normal-input skip/return/graduation/fresh replay captured |
-| Campaign | All six missions complete without cheats; correct objectives, retry/next/finale; completion survives restart | Missions1/2/4/6 win and continue; mission1 unlock survives restart; missions3/5 strategy/failure audit remains |
+| Campaign | All six missions complete without cheats; correct objectives, retry/next/finale; completion survives restart | All six recipes have win/continuation evidence at recorded checkpoints; latest missions3/5 pass; complete current sequence/restart/retry audit remains |
 | Save continuity | Mid-mission save/restart/load preserves triggers, orders, paid production, fog, mines, effects and support; missing/corrupt files recover | 14 save tests pass; real Ctrl+S/Ctrl+L restores paid queue/economy/fog and suppresses opening briefing; missing/corrupt loads preserve current match and show revised player-facing feedback; broader campaign runtime pending |
 | Interface | English default, coherent icons/tooltips, no clipping at supported desktop sizes; small browser viewport inspected | Compact cards, locked tooltip and queue captured at1280x720/900x720; browser, remaining screens/overlays pending |
 | Art/audio | Fresh menu, base, economy, combat, defeat/victory captures; readable silhouettes; commands/music/volume controls verified | Prior material pass only; further review required |
 | Skirmish/balance | All shipped maps/factions/difficulties playable; reproducible multi-seed difficulty and faction sweeps; no indefinite matches | Partial old evidence; full sweep required |
 | Delivery | Windows and Linux archives launch from arbitrary working directories without Rust/Nix; writable user saves/config | Corrected Linux development archive starts in no-Nix/read-only Ubuntu; matching separate harness passes save recovery; Windows GNU compiles and Wine menu/save recovery render correctly; native Windows/release profile/Steam Runtime/hardware pending |
-| Reliability | Full tests, packaged-build smoke, long matches and measured performance on supported hardware | 166 library tests pass; no-Nix/read-only Linux startup passes; release/gameplay/performance gates outstanding |
+| Reliability | Full tests, packaged-build smoke, long matches and measured performance on supported hardware | 168 library tests pass; no-Nix/read-only development startup passes; standard release OOM retained; current release/performance gates outstanding |
 | Distribution | Accurate feature/system-requirement copy, asset provenance/licenses and generated-content inventory; store-ready media | Restricted logo removed; upstream/font notices added; unresolved art/audio provenance in ASSET_PROVENANCE.md |
 
 ## Verification policy
@@ -108,3 +108,33 @@ native launch with an empty warning/error log. Proof14 contains 450 frames at
 30fps/15s; movement and siege behavior remain verified. Existing desktop archive
 hashes identify the earlier checkpoint. The standard Linux release build is
 running and must be packaged/tested before a current release claim.
+
+## Construction and remaining campaign proof
+
+An exact live snapshot (`campaign-contact-fixture-2/failure-contact.json`) shows
+healthy workers, an open source cell and an AA foundation with no path. The
+worker-inflated mobile-unit mask closes a65-cell component although static
+routing has a contact route. The helper now prefers the original occupied-unit
+route and falls back to static routing when needed; occupied endpoints remain
+excluded and normal movement still handles collisions/yielding.
+
+Six construction tests pass, including actual walking, physical non-overlap,
+per-frame speed bound, stored cost and completed8HP AA. All168 library tests,
+check/build/fmt and native12s smoke pass. In the same normal-input scene the AA
+at(-22,-13) completes49.3s instead of remaining stalled at73.7s. Mission3 then
+wins183.7s/HQ20 and proceeds to Mission4; Mission5 wins257.8s/HQ20 with no building
+losses and proceeds to Mission6. Victory/next screenshots were inspected.
+Logs: `steam-aa-contact-full-tests.log`, `steam-campaign-contact-fixed-2.log`,
+`steam-campaign-twin-guard-4.log`; screenshots use the corresponding directories.
+
+Mission3's log has no explicit assault: surviving tanks advanced to the eastern
+enemy base through ordinary automatic pursuit. The current resolver requires
+all living hostile units/structures eliminated, rather than a survival timer.
+Mission5 uses explicit assault and home guard response. These proofs do not
+replace the complete current campaign/profile sequence or broad balance sweeps.
+
+Current video proof15 has450raw frames/15s/30fps; motion/siege and four phases
+were inspected. Standard release fat LTO failed with host OOM, so no current
+release executable/package is claimed. Its preserved evidence is under
+`/tmp/rts-standard-release-failed-20261008`; retry keeps the profile unchanged
+and requires source/memory gates. Human audio/performance/hardware remain open.
