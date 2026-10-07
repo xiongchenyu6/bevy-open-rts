@@ -145,6 +145,17 @@ fn main() {
                 .unwrap_or_else(|| PathBuf::from("screenshots/save-load"));
             save_flow::render(&dir)
         }
+        Some("save-menu") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/save-menu"));
+            let width = args
+                .next()
+                .and_then(|value| value.parse().ok())
+                .unwrap_or(WIDTH);
+            save_flow::render_menu(&dir, width)
+        }
         Some("boot-camp") => {
             let dir = args
                 .next()

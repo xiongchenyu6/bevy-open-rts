@@ -9,10 +9,49 @@ fn chord(app: &mut App, key: KeyCode) {
     app.update();
 }
 
-fn rejected_load(app: &mut App, handle: &Handle<Image>, path: PathBuf) -> Result<(), String> {
+fn invoke(
+    app: &mut App,
+    load: bool,
+    menu: bool,
+    handle: &Handle<Image>,
+    dir: &Path,
+) -> Result<(), String> {
+    if !menu {
+        chord(app, if load { KeyCode::KeyL } else { KeyCode::KeyS });
+        return Ok(());
+    }
+    tap_key(app, KeyCode::Escape);
+    for _ in 0..8 {
+        app.update();
+    }
+    let point =
+        bevy_open_rts::capture_match_menu_button_center(app, if load { "load" } else { "save" })
+            .ok_or("visible match menu has no save/load button")?;
+    shoot(
+        app,
+        handle,
+        dir.join(if load {
+            "load_menu.png"
+        } else {
+            "save_menu.png"
+        }),
+    );
+    capture_click_screen(app, point, MouseButton::Left);
+    for _ in 0..4 {
+        app.update();
+    }
+    Ok(())
+}
+
+fn rejected_load(
+    app: &mut App,
+    handle: &Handle<Image>,
+    path: PathBuf,
+    menu: bool,
+) -> Result<(), String> {
     let before =
         capture_save_observation(app).ok_or("snapshot before rejected load unavailable")?;
-    chord(app, KeyCode::KeyL);
+    invoke(app, true, menu, handle, path.parent().unwrap())?;
     let after = capture_save_observation(app).ok_or("failed load discarded the active match")?;
     if serde_json::to_value(&before).unwrap() != serde_json::to_value(&after).unwrap()
         || !bevy_open_rts::capture_battle_log_messages(app)
@@ -26,6 +65,14 @@ fn rejected_load(app: &mut App, handle: &Handle<Image>, path: PathBuf) -> Result
 }
 
 pub(super) fn render(dir: &Path) -> Result<(), String> {
+    render_with_input(dir, false, WIDTH)
+}
+
+pub(super) fn render_menu(dir: &Path, width: u32) -> Result<(), String> {
+    render_with_input(dir, true, width)
+}
+
+fn render_with_input(dir: &Path, menu: bool, width: u32) -> Result<(), String> {
     let sandbox = std::env::var_os("XDG_DATA_HOME")
         .map(PathBuf::from)
         .filter(|path| path.is_absolute())
@@ -35,11 +82,16 @@ pub(super) fn render(dir: &Path) -> Result<(), String> {
         return Err("save-load refuses to replace an existing quicksave".into());
     }
     std::fs::create_dir_all(dir).map_err(|error| error.to_string())?;
-    let mut app = start_match_app()?;
+    let mut app = build_capture_app(width, HEIGHT);
+    wait_for_startup(&mut app)?;
+    start_shared_match_scene_with_current_setup(&mut app);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
     capture_dismiss_match_briefing(&mut app);
     let handle = capture_handle(&app);
     tap_key(&mut app, KeyCode::F10);
-    rejected_load(&mut app, &handle, dir.join("missing_save.png"))?;
+    rejected_load(&mut app, &handle, dir.join("missing_save.png"), menu)?;
     tap_key(&mut app, KeyCode::F10);
     build_structure_via_real_input(&mut app, "PowerReactor")?;
     let barracks = build_structure_via_real_input(&mut app, "Barracks")?;
@@ -57,7 +109,7 @@ pub(super) fn render(dir: &Path) -> Result<(), String> {
     if expected.jobs.len() != 1 {
         return Err("expected one paid queued unit before saving".into());
     }
-    chord(&mut app, KeyCode::KeyS);
+    invoke(&mut app, false, menu, &handle, dir)?;
     if !save_file.is_file() {
         return Err("Ctrl+S did not write the sandbox quicksave".into());
     }
@@ -68,7 +120,7 @@ pub(super) fn render(dir: &Path) -> Result<(), String> {
         return Err("second normal train command did not change paid production".into());
     }
     shoot(&mut app, &handle, dir.join("01_changed.png"));
-    chord(&mut app, KeyCode::KeyL);
+    invoke(&mut app, true, menu, &handle, dir)?;
     if !wait_until(&mut app, 120, |app| capture_save_restore_ready(app)) {
         return Err("Ctrl+L did not finish the real restart/load flow".into());
     }
@@ -105,25 +157,43 @@ pub(super) fn render(dir: &Path) -> Result<(), String> {
         ));
     }
     shoot(&mut app, &handle, dir.join("02_restored.png"));
-    // Corrupt only our disposable sandbox, then use the ordinary load chord.
+    // Corrupt only our disposable sandbox, then use the ordinary load command.
     // A rejected file must leave the current match and the file intact.
     tap_key(&mut app, KeyCode::F10);
     let valid_bytes = std::fs::read(&save_file).map_err(|error| error.to_string())?;
     let corrupt_bytes = b"invalid quicksave acceptance fixture";
     std::fs::write(&save_file, corrupt_bytes).map_err(|error| error.to_string())?;
-    rejected_load(&mut app, &handle, dir.join("corrupt_save.png"))?;
+    rejected_load(&mut app, &handle, dir.join("corrupt_save.png"), menu)?;
     if std::fs::read(&save_file).map_err(|error| error.to_string())? != corrupt_bytes {
         return Err("failed load modified the corrupt save".into());
     }
     std::fs::write(&save_file, valid_bytes).map_err(|error| error.to_string())?;
-    let evidence = serde_json::json!({"expected":expected,"changed":changed,"restored":restored});
+    let evidence = serde_json::json!({"input": if menu { "mouse menu" } else { "keyboard" }, "width":width,"expected":expected,"changed":changed,"restored":restored});
     std::fs::write(
         dir.join("observations.json"),
         serde_json::to_string_pretty(&evidence).unwrap(),
     )
     .map_err(|error| error.to_string())?;
+    if menu {
+        tap_key(&mut app, KeyCode::Escape);
+        for _ in 0..8 {
+            app.update();
+        }
+        let point = bevy_open_rts::capture_match_menu_button_center(&mut app, "return")
+            .ok_or("match menu return button missing")?;
+        capture_click_screen(&mut app, point, MouseButton::Left);
+        if !wait_until(&mut app, 120, |app| capture_startup_ready(app)) {
+            return Err("Main Menu button did not reach the main menu".into());
+        }
+        shoot(&mut app, &handle, dir.join("03_main_menu.png"));
+    }
     println!(
-        "[capture] real Ctrl+S/Ctrl+L: continuity restored; missing/corrupt loads preserve match and show feedback"
+        "[capture] {}: continuity restored; missing/corrupt loads preserve match and show feedback",
+        if menu {
+            "real mouse Save/Load"
+        } else {
+            "real Ctrl+S/Ctrl+L"
+        }
     );
     Ok(())
 }

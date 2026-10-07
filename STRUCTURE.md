@@ -37,6 +37,9 @@ The repository is a Cargo workspace whose default member remains the root
   Victory persistence runs once per result transition and can retry a replayed win.
 - `save.rs` and `save/continuity.rs` serialize gameplay state with local IDs
   and remap references after restart; `save/tests.rs` verifies restored behavior.
+  The desktop match menu queues Save/Load requests in `MatchMenuState`; the
+  existing save/load handlers consume them after button input, sharing the
+  shortcut path. Setup clears pending UI requests.
 - `docs/RELEASE_READINESS.md` tracks the remaining full Steam-quality gates.
   Desktop packagers live in `scripts/package_linux.sh` and `package_windows.ps1`;
   asset/license evidence is in `docs/ASSET_PROVENANCE.md` and its hash inventory.

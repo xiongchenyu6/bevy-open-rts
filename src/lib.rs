@@ -2973,8 +2973,8 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
             (
-                quicksave_hotkey,
-                quickload_hotkey,
+                quicksave_hotkey.after(match_menu_buttons),
+                quickload_hotkey.after(match_menu_buttons),
                 record_replay_keyframes,
                 replay_jump_hotkeys,
                 tactical_pause_hotkey,
@@ -4039,6 +4039,7 @@ pub(crate) fn begin_match_from_setup(
     *idle_worker_cycle = IdleWorkerCycleState::default();
     *camera_bookmarks = CameraBookmarks::default();
     match_menu.visible = false;
+    match_menu.pending_save_action = None;
     *briefing = MatchBriefingState::default();
     briefing.show();
     battle_log.entries.clear();
@@ -5471,10 +5472,30 @@ pub(crate) fn update_match_menu_overlay(
     visible_player: Res<VisiblePlayer>,
     window_q: Query<&Window, With<PrimaryWindow>>,
     mut overlay_q: Query<&mut Visibility, With<MatchMenuOverlay>>,
-    mut status_q: Query<&mut Text, (With<MatchMenuStatusText>, Without<MatchMenuFullscreenText>)>,
+    mut status_q: Query<
+        &mut Text,
+        (
+            With<MatchMenuStatusText>,
+            Without<MatchMenuFullscreenText>,
+            Without<MatchMenuReturnText>,
+        ),
+    >,
     mut fullscreen_text_q: Query<
         &mut Text,
-        (With<MatchMenuFullscreenText>, Without<MatchMenuStatusText>),
+        (
+            With<MatchMenuFullscreenText>,
+            Without<MatchMenuStatusText>,
+            Without<MatchMenuReturnText>,
+        ),
+    >,
+    online_session: Option<Res<OnlineSession>>,
+    mut return_text_q: Query<
+        &mut Text,
+        (
+            With<MatchMenuReturnText>,
+            Without<MatchMenuStatusText>,
+            Without<MatchMenuFullscreenText>,
+        ),
     >,
 ) {
     for mut visibility in &mut overlay_q {
@@ -5487,6 +5508,15 @@ pub(crate) fn update_match_menu_overlay(
 
     if !match_menu.visible {
         return;
+    }
+
+    for mut text in &mut return_text_q {
+        **text = if online_match_uses_command_transport(online_session.as_deref()) {
+            t("返回大厅", "Return to Lobby")
+        } else {
+            t("主菜单", "Main Menu")
+        }
+        .to_string();
     }
 
     let fullscreen = window_q.single().ok().is_some_and(window_is_fullscreen);

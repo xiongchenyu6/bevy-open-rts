@@ -309,7 +309,10 @@ fn edge_pan_is_disabled_by_options_overlays_and_interactive_ui_only() {
     assert_eq!(
         effective_camera_edge_pan_width(
             &options,
-            &MatchMenuState { visible: true },
+            &MatchMenuState {
+                visible: true,
+                ..default()
+            },
             &MatchBriefingState::default(),
             false,
         ),

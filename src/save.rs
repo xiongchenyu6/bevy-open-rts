@@ -432,9 +432,14 @@ pub(crate) fn read_save_file(path: impl AsRef<std::path::Path>) -> Result<SaveGa
 
 /// Ctrl+S: snapshot the running match in the writable user data directory.
 pub(crate) fn quicksave_hotkey(world: &mut World) {
+    let menu_requested =
+        world.resource::<MatchMenuState>().pending_save_action == Some(MatchMenuAction::Save);
+    if menu_requested {
+        world.resource_mut::<MatchMenuState>().pending_save_action = None;
+    }
     let keyboard = world.resource::<ButtonInput<KeyCode>>();
     let ctrl = keyboard.pressed(KeyCode::ControlLeft) || keyboard.pressed(KeyCode::ControlRight);
-    if !ctrl || !keyboard.just_pressed(KeyCode::KeyS) {
+    if !menu_requested && (!ctrl || !keyboard.just_pressed(KeyCode::KeyS)) {
         return;
     }
     #[cfg(target_arch = "wasm32")]
@@ -462,12 +467,17 @@ pub(crate) fn quicksave_hotkey(world: &mut World) {
 
 /// Ctrl+L: load the user quicksave and restart the match into it.
 pub(crate) fn quickload_hotkey(world: &mut World) {
+    let menu_requested =
+        world.resource::<MatchMenuState>().pending_save_action == Some(MatchMenuAction::Load);
+    if menu_requested {
+        world.resource_mut::<MatchMenuState>().pending_save_action = None;
+    }
     if online_match_uses_command_transport(world.get_resource::<OnlineSession>()) {
         return;
     }
     let keyboard = world.resource::<ButtonInput<KeyCode>>();
     let ctrl = keyboard.pressed(KeyCode::ControlLeft) || keyboard.pressed(KeyCode::ControlRight);
-    if !ctrl || !keyboard.just_pressed(KeyCode::KeyL) {
+    if !menu_requested && (!ctrl || !keyboard.just_pressed(KeyCode::KeyL)) {
         return;
     }
     #[cfg(target_arch = "wasm32")]

@@ -364,3 +364,28 @@ Latest construction checkpoint:
   That build accidentally uses default rustc1.98.1; it is live and must not be
   restarted because observation times out. Future builds should reuse1.95 cache.
   Do not claim either remaining mission passed until actual result/continuation.
+
+## Mouse save menu — 2026-10-08
+
+- Desktop offline Esc menu now has Save/Load buttons showing Ctrl+S/Ctrl+L.
+  Menu queues one request in MatchMenuState; existing save handlers consume it
+  after button input and setup clears requests. Browser omits disk buttons;
+  online disables them. Offline return label is Main Menu; online Return to Lobby.
+- capture save-menu DIR WIDTH runs actual mouse save/restore/rejected loads in
+  a disposable explicit XDG sandbox, then clicks Main Menu and verifies destination.
+  Current final1280/final900 screenshot sets inspected; both complete successfully.
+  Logs: steam-save-menu-final-{1280,900}.log. Production/economy/fog recover;
+  corrupt/missing load leaves paused state/file unchanged. No compatibility path.
+- Final fmt/check/bins build,166 library tests56.23s and native12s smoke pass.
+  Proof14:450 rawframes,15s30fps, movement4.24m, siege113damage/94effectframes;
+  opening/movement/combat/ending inspected.
+- Product source frozen for standard release build. Initial nohup wrapper was
+  authoritatively missing with no compiler, so durable user service replaced it:
+  rts-linux-standard-release-20261008.service, confirmedMainPID2034332.
+  Exact Rust1.95 cargo build --locked --release --jobs2 --bin bevy-open-rts.
+  logs/steam-standard-linux-release-20261008.log advances through dependencies;
+  service/log/exitfile must be checked, not presumed complete. hud_polish supervises.
+- Campaign raw keys/build/grouping now work. Index2 actual t94.2 HQ loss remains
+  combat/strategy investigation; index4 failed unchecked builder selection at39.2
+  withample76/29resources/normalpower, HMG card selected. release_audit owns bot
+  builder verification/setup telemetry/earlier Factory experiment. No game nerf.

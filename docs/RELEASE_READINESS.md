@@ -46,8 +46,8 @@ explored cells remain explored. The production timer and match clock advance by
 one normal frame during restoration. `02_restored.png` shows Game loaded with
 the opening briefing dismissed. This is skirmish runtime evidence; campaign
 triggers, entity remapping and delayed effects are covered by save tests and
-still need broader campaign runtime acceptance. Save/load discovery in the
-match menu remains a usability gap; currently these commands use shortcuts.
+still need broader campaign runtime acceptance. Save/load is now available
+through mouse buttons in the match menu as well as those shortcuts.
 
 `logs/steam-save-recovery-runtime.log` adds ordinary Ctrl+L attempts with absent
 and corrupt files in an explicit disposable XDG sandbox. Both attempts leave the
@@ -90,3 +90,21 @@ flow render under Wine with a read-only installation and separate user sandbox:
 executable evidence, but clean native Windows, MSVC distribution, release
 performance and audible playback remain open. Both packagers exclude ignored
 full-font source files and preserve the original user file.
+
+## Mouse save menu acceptance
+
+`capture save-menu <directory> [width]` uses ordinary Esc, mouse clicks and a
+disposable XDG sandbox. The keyboard proof scenario now also runs through
+Save/Load buttons, including a second paid order and missing/corrupt files.
+`logs/steam-save-menu-final-{1280,900}.log` and matching screenshot directories
+record successful restoration and safe rejected loads. Both layouts were
+inspected; labels and buttons fit at 1280x720 and 900x720. The offline
+Main Menu button reaches the main menu through an actual click.
+Online saves are disabled; browser menus omit disk-save buttons. Online return
+labels now say Return to Lobby; that label still needs online runtime capture.
+
+The updated source passes 166 library tests, bins check/build and a 12-second
+native launch with an empty warning/error log. Proof14 contains 450 frames at
+30fps/15s; movement and siege behavior remain verified. Existing desktop archive
+hashes identify the earlier checkpoint. The standard Linux release build is
+running and must be packaged/tested before a current release claim.

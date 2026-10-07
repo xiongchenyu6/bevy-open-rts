@@ -2234,6 +2234,24 @@ pub fn capture_build_button_center(app: &mut App, id: &'static str) -> Option<(V
         .map(|(_, availability, transform)| (transform.translation, availability.enabled))
 }
 
+pub fn capture_match_menu_button_center(app: &mut App, action: &str) -> Option<Vec2> {
+    if !app.world().resource::<MatchMenuState>().visible {
+        return None;
+    }
+    let requested = match action {
+        "load" => MatchMenuAction::Load,
+        "save" => MatchMenuAction::Save,
+        "return" => MatchMenuAction::ReturnToSetup,
+        _ => return None,
+    };
+    let world = app.world_mut();
+    let mut query = world.query::<(&MatchMenuButton, &UiGlobalTransform)>();
+    query
+        .iter(world)
+        .find(|(button, _)| button.action == requested)
+        .map(|(_, transform)| transform.translation)
+}
+
 pub fn capture_player_combat_unit_position(app: &mut App) -> Option<Vec3> {
     let world = app.world_mut();
     let mut query = world.query::<(&Unit, &Team, &Transform, &Health)>();

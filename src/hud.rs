@@ -41,6 +41,7 @@ impl RtsCursorKind {
 #[derive(Resource, Default, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct MatchMenuState {
     pub(crate) visible: bool,
+    pub(crate) pending_save_action: Option<MatchMenuAction>,
 }
 
 #[derive(Resource, Clone, Copy, Debug, PartialEq)]
@@ -82,6 +83,9 @@ pub(crate) struct MatchMenuStatusText;
 pub(crate) struct MatchMenuFullscreenText;
 
 #[derive(Component)]
+pub(crate) struct MatchMenuReturnText;
+
+#[derive(Component)]
 pub(crate) struct MatchBriefingPanel;
 
 #[derive(Component)]
@@ -109,6 +113,8 @@ pub(crate) struct MatchMenuButton {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum MatchMenuAction {
     Resume,
+    Save,
+    Load,
     SetSpeed(MatchSpeedPreset),
     PreviousPerspective,
     NextPerspective,
@@ -561,6 +567,24 @@ pub(crate) fn setup_match_menu_overlay(commands: &mut Commands, font: Handle<Fon
                             ));
                         });
                     panel.spawn(match_menu_speed_row(font.clone()));
+                    #[cfg(not(target_arch = "wasm32"))]
+                    panel
+                        .spawn(Node {
+                            flex_direction: FlexDirection::Row,
+                            column_gap: px(10),
+                            ..default()
+                        })
+                        .with_children(|row| {
+                            for (action, zh, en) in [
+                                (MatchMenuAction::Save, "保存 (Ctrl+S)", "Save (Ctrl+S)"),
+                                (MatchMenuAction::Load, "载入 (Ctrl+L)", "Load (Ctrl+L)"),
+                            ] {
+                                row.spawn(match_menu_button(action))
+                                    .with_children(|button| {
+                                        button.spawn(match_menu_button_label(zh, en, font.clone()));
+                                    });
+                            }
+                        });
                     panel
                         .spawn(Node {
                             flex_direction: FlexDirection::Row,
@@ -613,10 +637,9 @@ pub(crate) fn setup_match_menu_overlay(commands: &mut Commands, font: Handle<Fon
                     panel
                         .spawn(match_menu_button(MatchMenuAction::ReturnToSetup))
                         .with_children(|button| {
-                            button.spawn(match_menu_button_label(
-                                "返回设置",
-                                "Back to Setup",
-                                font.clone(),
+                            button.spawn((
+                                match_menu_button_label("主菜单", "Main Menu", font.clone()),
+                                MatchMenuReturnText,
                             ));
                         });
                 });
@@ -2346,6 +2369,10 @@ pub(crate) fn match_menu_buttons(
                 MatchMenuAction::Resume => {
                     match_menu.visible = false;
                 }
+                MatchMenuAction::Save | MatchMenuAction::Load => {
+                    match_menu.pending_save_action = Some(button.action);
+                    match_menu.visible = false;
+                }
                 MatchMenuAction::SetSpeed(preset) => {
                     match_speed.preset = preset;
                     virtual_time.set_relative_speed(preset.scale());
@@ -2418,6 +2445,9 @@ pub(crate) fn match_menu_action_enabled(
         }
         MatchMenuAction::SetSpeed(_) => !online_match || online_match_is_host(online_session),
         MatchMenuAction::Restart => !online_match,
+        MatchMenuAction::Save | MatchMenuAction::Load => {
+            !cfg!(target_arch = "wasm32") && !online_match && match_running
+        }
         MatchMenuAction::ReturnToSetup => {
             !online_match || online_match_is_host(online_session) || !match_running
         }
