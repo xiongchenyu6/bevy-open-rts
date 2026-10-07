@@ -90,7 +90,8 @@ cd "$XDG_DATA_HOME/bevy-open-rts"
 exec "$INSTALL_DIR/lib/ld-linux-x86-64.so.2" --library-path "$INSTALL_DIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}:$HOST_LIB_DIRS" "$INSTALL_DIR/bin/bevy-open-rts" "$@"
 ''')
 launcher.chmod(0o755)
-shutil.copy2(root / 'docs' / 'DESKTOP_DELIVERY.md', stage / 'README.md')
+shutil.copy2(root / 'docs' / 'PLAYER_GUIDE.md', stage / 'README.md')
+shutil.copy2(root / 'docs' / 'DESKTOP_DELIVERY.md', stage / 'BUILD_NOTES.md')
 (stage / 'docs').mkdir()
 for notice in ['ASSET_PROVENANCE.md', 'asset-source-hashes.json']:
     shutil.copy2(root / 'docs' / notice, stage / 'docs' / notice)

@@ -34,7 +34,8 @@ Copy-Item -LiteralPath $Binary -Destination (Join-Path $Stage 'bevy-open-rts.exe
 Copy-Item -LiteralPath (Join-Path $Root 'assets') -Destination $Stage -Recurse
 # Full-font sources are local subset-generation inputs, not game runtime assets.
 Get-ChildItem -LiteralPath (Join-Path $Stage 'assets') -Filter '*.full.ttf' -Recurse -File | Remove-Item
-Copy-Item -LiteralPath (Join-Path $Root 'docs/WINDOWS_DELIVERY.md') -Destination (Join-Path $Stage 'README.md')
+Copy-Item -LiteralPath (Join-Path $Root 'docs/PLAYER_GUIDE.md') -Destination (Join-Path $Stage 'README.md')
+Copy-Item -LiteralPath (Join-Path $Root 'docs/WINDOWS_DELIVERY.md') -Destination (Join-Path $Stage 'BUILD_NOTES.md')
 foreach ($Notice in @('ASSET_PROVENANCE.md', 'asset-source-hashes.json')) {
     Copy-Item -LiteralPath (Join-Path $Root "docs/$Notice") -Destination (Join-Path $Stage $Notice)
 }
