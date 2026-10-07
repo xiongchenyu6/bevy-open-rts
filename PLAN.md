@@ -12,10 +12,17 @@ green library tests and the earlier art pass do not establish release readiness.
 - [ ] Verify save continuity, corruption recovery and player-facing feedback.
 - [ ] Complete desktop delivery, balance/performance, art/audio and provenance gates.
 
-Current verification: 146 library tests pass; formatting, type/build checks and
-12-second native launch pass with no error output. `screenshots/result/9` is a
-fresh 450-frame/30-fps proof (4.24m movement, 113 siege damage). Open visual
-issues include health bars over the objective panel and crowded action text.
+Current verification: 160 library tests pass; formatting, type/build checks and
+12-second native launch pass with no error output. Boot Camp passes with actual
+profile writes; current missions 1, 4 and 6 pass normal-input capture and
+continuation. Mission 2's former infantry strategy passed, but the current
+factory recipe hit an unfinished foundation; missions 3 and 5 still lose.
+These failures remain open, not accepted as release-ready behavior.
+
+Compact icon cards and disabled tooltips/queues are verified at 1280x720 and
+900x720. Linux development packaging launches without /nix from /tmp on a
+read-only install; release builds, Steam Runtime, hardware and Windows remain.
+See `docs/ASSET_PROVENANCE.md` for exact source hashes and outstanding families.
 
 ## Objective
 

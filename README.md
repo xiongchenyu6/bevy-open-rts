@@ -2,15 +2,17 @@
 
 A playable 3D real-time strategy game built with Bevy `0.19`: harvest resources,
 build a base, field three distinct factions, fight AI skirmishes, or create an
-online room and play in the browser through WebGPU.
+online room and play in the browser through WebGPU. Boot Camp teaches gathering,
+construction, production and combat through ordinary controls; the six-mission
+campaign records completion separately from resumable match saves.
 
 [![Bevy Open RTS gameplay: menu, skirmish setup, harvesting, construction, combat, and victory](docs/media/bevy-open-rts-gameplay.gif)](https://xiongchenyu6.github.io/bevy-open-rts/)
 
 **[Play the WebGPU build](https://xiongchenyu6.github.io/bevy-open-rts/)** ·
 **[Run natively](#run-native)** · **[Open Bevy online architecture](docs/ONLINE_ARCHITECTURE.md)**
 
-This repository ports `../godot-open-rts` to Bevy while keeping the runtime
-browser-focused: selection, right-click orders, harvesting, construction,
+This repository ports `../godot-open-rts` to Bevy. Desktop and browser share
+selection, right-click orders, harvesting, construction,
 registry-driven production and economy, AI pressure, multiplayer rooms, and a
 WebGPU build path all share the same game scene.
 
@@ -36,6 +38,11 @@ Or run the wrapper directly:
 ```sh
 scripts/run_desktop.sh
 ```
+
+For desktop packaging and the remaining validation gates, see
+[Linux delivery](docs/DESKTOP_DELIVERY.md), [Windows delivery](docs/WINDOWS_DELIVERY.md)
+and [release readiness](docs/RELEASE_READINESS.md). Development archives are
+verification artifacts; release builds and platform acceptance remain in progress.
 
 ## Build WebGPU
 
@@ -79,6 +86,11 @@ rooms and join by room code/private token. Hosts configure the map-derived
 player slots and launch the same host-authoritative match on every peer.
 
 ## Capture And Match Proof
+
+Run `capture boot-camp <dir>` for the seven-step onboarding input test, or
+`capture campaign-play <index> <dir>` for authored mission play, victory recording
+and the real continuation button. Mission indices are zero-based. Campaign
+verification is incomplete; the harness reports failures rather than granting wins.
 
 ```sh
 cargo run --bin capture -- screenshot screenshots/capture/still.png

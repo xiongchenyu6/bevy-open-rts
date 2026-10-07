@@ -69,8 +69,8 @@ impl TutorialStage {
                 "Left-click your infantry, then right-click clear ground to move it.",
             ),
             Self::Attack => t(
-                "用 T 进入攻击移动模式，点击敌方基地。摧毁敌方指挥中心。",
-                "Press T for attack-move, then click toward the enemy base. Destroy its Command Center to graduate.",
+                "选中部队，选择攻击移动，再右键点击敌方基地附近。摧毁敌方指挥中心。",
+                "Select your troops, choose Attack-Move, then right-click toward the enemy base. Destroy its Command Center to graduate.",
             ),
             Self::Complete => t(
                 "你已经掌握了基地建设与作战的基础。",
@@ -98,8 +98,12 @@ pub(crate) fn tutorial_match_settings() -> MatchSetupSettings {
     settings
 }
 
-pub(crate) fn tutorial_enemy_ai_enabled(tutorial: Res<TutorialState>) -> bool {
+pub(crate) fn enemy_ai_enabled(tutorial: Res<TutorialState>, active: Res<ActiveMission>) -> bool {
     !tutorial.active
+        && !active
+            .0
+            .and_then(mission_by_index)
+            .is_some_and(|mission| matches!(mission.victory, MissionVictory::SurviveFor(_)))
 }
 
 #[derive(Component)]
@@ -200,6 +204,7 @@ pub(crate) fn update_tutorial(
         Option<&AttackMoveOrder>,
     )>,
     buildings: Query<(&Structure, &Team, Has<UnderConstruction>)>,
+    command_slots: Query<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>,
     mut panels: Query<&mut Visibility, With<TutorialPanel>>,
     mut titles: Query<&mut Text, (With<TutorialTitle>, Without<TutorialInstruction>)>,
     mut instructions: Query<&mut Text, (With<TutorialInstruction>, Without<TutorialTitle>)>,
@@ -308,6 +313,20 @@ pub(crate) fn update_tutorial(
     }
     for mut instruction in &mut instructions {
         instruction.0 = tutorial.stage.instruction().to_string();
+        if tutorial.stage == TutorialStage::Attack
+            && let Some((slot, _, _)) = command_slots.iter().find(|(_, action, availability)| {
+                matches!(action, BuildAction::AttackMove) && availability.enabled
+            })
+        {
+            let key = command_action_display_key(slot.0, BuildAction::AttackMove);
+            instruction.0 = if current_language() == Language::Zh {
+                format!("按 {key} 进入攻击移动，再右键点击敌方基地附近。摧毁敌方指挥中心。")
+            } else {
+                format!(
+                    "Press {key} for Attack-Move, then right-click the enemy base. Destroy its Command Center to graduate."
+                )
+            };
+        }
     }
 }
 

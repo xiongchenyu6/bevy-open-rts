@@ -593,11 +593,6 @@ pub(crate) fn command_action_enabled_for_panel(
     }
 }
 
-#[cfg(test)]
-pub(crate) fn command_label(index: usize, action: Option<BuildAction>) -> String {
-    command_label_with_queue(index, action, None)
-}
-
 // Asset path of the command-button icon for an action, mirroring godot's command
 // icon mosaic. Train/Build pull the produced entity's registry icon; standing
 // orders use the matching `ui/icons/<Name>.png` mirrored from the godot project.
@@ -642,54 +637,6 @@ pub(crate) fn command_action_display_key(index: usize, action: BuildAction) -> &
         .unwrap_or(" ")
 }
 
-pub(crate) fn command_label_with_queue(
-    index: usize,
-    action: Option<BuildAction>,
-    queue_state: Option<QueueButtonState>,
-) -> String {
-    let Some(action) = action else {
-        return String::new();
-    };
-    let key = command_action_display_key(index, action);
-    match action {
-        BuildAction::Train(id) | BuildAction::Build(id) => {
-            let Some(def) = registry::entity(id) else {
-                return String::new();
-            };
-            let cost = def.cost;
-            let prefix = match (current_language(), action) {
-                (Language::Zh, BuildAction::Build(_)) => "建",
-                (Language::Zh, BuildAction::Train(_)) => "训",
-                (_, BuildAction::Build(_)) => "B",
-                _ => "T",
-            };
-            let queue_badge = queue_state
-                .filter(|state| state.count > 0 || state.full)
-                .map(queue_button_badge_text)
-                .unwrap_or_default();
-            format!(
-                "{key} {prefix} {} {}/{}{queue_badge}",
-                localized_compact_entity_label(id),
-                cost.ore,
-                cost.crystal
-            )
-        }
-        BuildAction::SellStructure => format!("{key} {}", t("出售建筑", "Sell")),
-        BuildAction::RepairStructure => format!("{key} {}", t("维修建筑", "Repair")),
-        BuildAction::ToggleDeployMode => format!("{key} {}", t("切换部署", "Toggle Deploy")),
-        BuildAction::SetRallyPoint => format!("{key} {}", t("设置集结", "Rally Point")),
-        BuildAction::SelectIdleWorker => format!("{key} {}", t("闲置工人", "Idle Worker")),
-        BuildAction::HoldPosition => format!("{key} {}", t("坚守", "Hold")),
-        BuildAction::AttackMove => format!("{key} {}", t("攻击移动", "Attack-Move")),
-        BuildAction::Patrol => format!("{key} {}", t("巡逻", "Patrol")),
-        BuildAction::GuardArea => format!("{key} {}", t("守卫区域", "Guard")),
-        BuildAction::StopSelected => format!("{key} {}", t("停止", "Stop")),
-        BuildAction::ScatterSelected => format!("{key} {}", t("散开", "Scatter")),
-        BuildAction::SelectBuildTab(tab) => format!("{key} {}", tab.label()),
-        BuildAction::None => String::new(),
-    }
-}
-
 pub(crate) fn command_action_tooltip(
     index: usize,
     action: BuildAction,
@@ -712,15 +659,25 @@ pub(crate) fn command_action_tooltip(
             };
             lines.push(format!("{key} {verb} {}", localized_entity_label(id)));
             if let Some(def) = registry::entity(id) {
+                let cost = if matches!(action, BuildAction::Train(_)) {
+                    faction_unit_cost(Some(faction), def.cost)
+                } else {
+                    def.cost
+                };
+                let seconds = if matches!(action, BuildAction::Train(_)) {
+                    def.build_seconds / faction_production_speed(Some(faction))
+                } else {
+                    def.build_seconds
+                };
                 lines.push(format!(
                     "{}: {} {} / {} {}   {}: {:.0}s",
                     t("成本", "Cost"),
                     t("矿石", "Ore"),
-                    def.cost.ore,
+                    cost.ore,
                     t("水晶", "Crystal"),
-                    def.cost.crystal,
+                    cost.crystal,
                     t("用时", "Time"),
-                    def.build_seconds
+                    seconds
                 ));
                 if def.power_delta != 0 {
                     lines.push(format!(

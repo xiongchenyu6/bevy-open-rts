@@ -5,6 +5,7 @@ __pycache__
 result
 screenshots
 target
+/dist/
 web/pkg
 web/assets
 assets/fonts/wqy-microhei-ui.full.ttf

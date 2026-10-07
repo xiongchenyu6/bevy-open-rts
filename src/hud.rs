@@ -8,6 +8,9 @@ use bevy::prelude::*;
 
 use crate::*;
 
+#[derive(Component)]
+pub(crate) struct CommandStack;
+
 #[derive(Resource)]
 pub(crate) struct RtsCursorAssetHandle(pub(crate) Handle<StaticCursor>);
 
@@ -304,6 +307,19 @@ pub(crate) struct CommandSlot(pub(crate) usize);
 #[derive(Component, Clone, Copy)]
 pub(crate) struct CommandSlotLabel(pub(crate) usize);
 
+const COMPACT_COMMAND_WIDTH_PX: f32 = 352.0;
+const COMPACT_COMMAND_BUTTON_WIDTH_PX: f32 = 82.0;
+const COMPACT_COMMAND_BUTTON_HEIGHT_PX: f32 = 64.0;
+const COMPACT_COMMAND_GAP_PX: f32 = 8.0;
+const COMPACT_QUEUE_GAP_PX: f32 = 6.0;
+const COMPACT_QUEUE_HEIGHT_PX: f32 = 40.0;
+
+#[derive(Component, Clone, Copy)]
+pub(crate) enum CommandSlotBadge {
+    Hotkey(usize),
+    Queue(usize),
+}
+
 #[derive(Component, Clone, Copy)]
 pub(crate) struct CommandSlotIcon(pub(crate) usize);
 
@@ -457,10 +473,13 @@ pub(crate) fn setup_match_end_overlay(commands: &mut Commands, font: Handle<Font
                                 });
                             row.spawn(match_end_button(MatchEndAction::ReturnToSetup))
                                 .with_children(|button| {
-                                    button.spawn(match_end_button_label(
-                                        "返回设置",
-                                        "Back to Setup",
-                                        font.clone(),
+                                    button.spawn((
+                                        match_end_button_label(
+                                            "返回设置",
+                                            "Back to Setup",
+                                            font.clone(),
+                                        ),
+                                        MatchReturnLabel,
                                     ));
                                 });
                             row.spawn(match_end_button(MatchEndAction::ExitToMenu))
@@ -1096,6 +1115,7 @@ pub(crate) fn setup_ui(
             bottom: px(12),
             left: px(272),
             max_width: px(372),
+            right: px(12.0 + COMPACT_COMMAND_WIDTH_PX + 16.0),
             padding: UiRect::new(px(8), px(10), px(3), px(3)),
             border: UiRect::all(px(1)),
             ..default()
@@ -1214,11 +1234,13 @@ pub(crate) fn setup_ui(
     let queue_font = font.clone();
     commands
         .spawn((
+            CommandStack,
+            Visibility::Inherited,
             Node {
                 position_type: PositionType::Absolute,
                 right: px(12),
                 bottom: px(12),
-                width: px(612),
+                width: px(COMPACT_COMMAND_WIDTH_PX),
                 flex_direction: FlexDirection::Column,
                 align_items: AlignItems::Stretch,
                 row_gap: px(8),
@@ -1264,6 +1286,14 @@ pub(crate) fn setup_ui(
                         parent.spawn(command_button(index)).with_children(|button| {
                             button.spawn(command_button_icon(index));
                             button.spawn(command_button_label(index, font.clone()));
+                            button.spawn(command_button_badge(
+                                CommandSlotBadge::Hotkey(index),
+                                font.clone(),
+                            ));
+                            button.spawn(command_button_badge(
+                                CommandSlotBadge::Queue(index),
+                                font.clone(),
+                            ));
                         });
                     }
                 });
@@ -1728,18 +1758,16 @@ pub(crate) fn command_button(index: usize) -> impl Bundle {
         CommandSlot(index),
         CommandSlotAvailability::default(),
         Node {
-            width: px(146),
-            height: px(46),
+            width: px(COMPACT_COMMAND_BUTTON_WIDTH_PX),
+            height: px(COMPACT_COMMAND_BUTTON_HEIGHT_PX),
             border: UiRect::all(px(1)),
-            flex_direction: FlexDirection::Row,
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::FlexStart,
-            column_gap: px(6),
-            padding: UiRect::horizontal(px(6)),
+            align_items: AlignItems::FlexStart,
+            justify_content: JustifyContent::Center,
+            padding: UiRect::top(px(4)),
             ..default()
         },
         BorderColor::all(Color::srgb(0.28, 0.34, 0.39)),
-        BackgroundColor(Color::srgba(0.035, 0.045, 0.055, 0.78)),
+        BackgroundColor(Color::srgba(0.035, 0.045, 0.055, 0.94)),
     )
 }
 
@@ -1747,8 +1775,8 @@ pub(crate) fn command_button_icon(index: usize) -> impl Bundle {
     (
         ImageNode::default(),
         Node {
-            width: px(36),
-            height: px(36),
+            width: px(42),
+            height: px(42),
             ..default()
         },
         Visibility::Hidden,
@@ -1756,6 +1784,7 @@ pub(crate) fn command_button_icon(index: usize) -> impl Bundle {
     )
 }
 
+/// The cost badge contains numbers only; names and requirements live in the tooltip.
 pub(crate) fn command_button_label(index: usize, font: Handle<Font>) -> impl Bundle {
     (
         Text::new(""),
@@ -1765,9 +1794,51 @@ pub(crate) fn command_button_label(index: usize, font: Handle<Font>) -> impl Bun
             ..default()
         },
         TextColor(Color::srgb(0.9, 0.94, 0.96)),
+        Node {
+            position_type: PositionType::Absolute,
+            bottom: px(3),
+            left: px(0),
+            right: px(0),
+            ..default()
+        },
+        TextLayout::justify(Justify::Center),
         CommandSlotLabel(index),
         ButtonLabel,
     )
+}
+
+pub(crate) fn command_button_badge(badge: CommandSlotBadge, font: Handle<Font>) -> impl Bundle {
+    let hotkey = matches!(badge, CommandSlotBadge::Hotkey(_));
+    (
+        Text::new(""),
+        TextFont {
+            font: font.into(),
+            font_size: FontSize::Px(11.0),
+            ..default()
+        },
+        TextColor(Color::srgb(0.9, 0.94, 0.96)),
+        Node {
+            position_type: PositionType::Absolute,
+            top: px(3),
+            left: if hotkey { px(4) } else { Val::Auto },
+            right: if hotkey { Val::Auto } else { px(3) },
+            ..default()
+        },
+        badge,
+    )
+}
+
+fn compact_command_icon_path(action: BuildAction) -> Option<&'static str> {
+    // Category tabs have no dedicated icons: reuse representative existing buildings.
+    match action {
+        BuildAction::SelectBuildTab(BuildStructureTab::Production) => {
+            Some("ui/icons/VehicleFactory.png")
+        }
+        BuildAction::SelectBuildTab(BuildStructureTab::Defense) => {
+            Some("ui/icons/AntiAirTurret.png")
+        }
+        _ => command_action_icon_path(action),
+    }
 }
 
 pub(crate) fn setup_support_power_panel(
@@ -1856,7 +1927,7 @@ pub(crate) fn production_queue_slot(index: usize) -> impl Bundle {
         ProductionQueueSlotTarget::default(),
         Visibility::Hidden,
         Node {
-            width: px(92),
+            width: px(COMPACT_COMMAND_BUTTON_WIDTH_PX),
             height: px(40),
             border: UiRect::all(px(1)),
             align_items: AlignItems::Center,
@@ -2416,21 +2487,28 @@ pub(crate) fn refresh_command_panel(
         &mut BorderColor,
         &mut Node,
     )>,
-    mut label_q: Query<(&CommandSlotLabel, &mut Text, &mut TextColor)>,
+    mut label_q: Query<(&CommandSlotLabel, &mut Text, &mut TextColor), Without<CommandSlotBadge>>,
+    mut badge_q: Query<(&CommandSlotBadge, &mut Text, &mut TextColor), Without<CommandSlotLabel>>,
     asset_server: Res<AssetServer>,
     mut icon_q: Query<(&CommandSlotIcon, &mut ImageNode, &mut Visibility)>,
 ) {
     let set_slot_icon =
         |slot_index: usize,
          action: Option<BuildAction>,
+         enabled: bool,
          icon_q: &mut Query<(&CommandSlotIcon, &mut ImageNode, &mut Visibility)>| {
             for (icon, mut image_node, mut visibility) in icon_q.iter_mut() {
                 if icon.0 != slot_index {
                     continue;
                 }
-                match action.and_then(command_action_icon_path) {
+                match action.and_then(compact_command_icon_path) {
                     Some(path) => {
                         image_node.image = asset_server.load(path);
+                        image_node.color = if enabled {
+                            Color::WHITE
+                        } else {
+                            Color::srgba(0.52, 0.57, 0.62, 0.7)
+                        };
                         *visibility = Visibility::Inherited;
                     }
                     None => *visibility = Visibility::Hidden,
@@ -2460,6 +2538,9 @@ pub(crate) fn refresh_command_panel(
         for (_, mut text, mut text_color) in &mut label_q {
             **text = String::new();
             *text_color = command_button_text_color(BuildAction::None, false);
+        }
+        for (_, mut text, _) in &mut badge_q {
+            text.0.clear();
         }
         for (_, _, mut visibility) in &mut icon_q {
             *visibility = Visibility::Hidden;
@@ -2531,9 +2612,44 @@ pub(crate) fn refresh_command_panel(
                 &build_queue,
             )
         });
-        **text = command_label_with_queue(slot.0, action, queue_state);
+        **text = match action {
+            Some(BuildAction::Train(id)) => registry::entity(id)
+                .map(|def| {
+                    let cost = faction_unit_cost(Some(faction), def.cost);
+                    format!("{}/{}", cost.ore, cost.crystal)
+                })
+                .unwrap_or_default(),
+            Some(BuildAction::Build(id)) => registry::entity(id)
+                .map(|def| format!("{}/{}", def.cost.ore, def.cost.crystal))
+                .unwrap_or_default(),
+            _ => String::new(),
+        };
+        for (badge, mut badge_text, mut badge_color) in &mut badge_q {
+            let index = match badge {
+                CommandSlotBadge::Hotkey(index) | CommandSlotBadge::Queue(index) => *index,
+            };
+            if index != slot.0 {
+                continue;
+            }
+            badge_text.0 = match badge {
+                CommandSlotBadge::Hotkey(_) => action
+                    .map(|action| command_action_display_key(slot.0, action).to_string())
+                    .unwrap_or_default(),
+                CommandSlotBadge::Queue(_) => queue_state
+                    .filter(|state| state.count > 0 || state.full)
+                    .map(|state| {
+                        if state.full {
+                            t("满", "FULL").to_string()
+                        } else {
+                            format!("×{}", state.count)
+                        }
+                    })
+                    .unwrap_or_default(),
+            };
+            *badge_color = command_button_text_color(action.unwrap_or(BuildAction::None), enabled);
+        }
         *text_color = command_button_text_color(action.unwrap_or(BuildAction::None), enabled);
-        set_slot_icon(slot.0, action, &mut icon_q);
+        set_slot_icon(slot.0, action, enabled, &mut icon_q);
     }
 }
 
@@ -2831,6 +2947,32 @@ pub(crate) fn update_objective_tracker_hud(
                 seconds % 60
             ),
             progress,
+        )
+    } else if active_mission
+        .0
+        .and_then(mission_by_index)
+        .is_some_and(|mission| mission.victory == MissionVictory::DestroyAllEnemies)
+    {
+        let remaining = structures
+            .iter()
+            .filter(|(_, team, hp)| {
+                hp.current > 0.0 && relations.are_enemies(visible_player.team, **team)
+            })
+            .count()
+            + units
+                .iter()
+                .filter(|(_, team, hp)| {
+                    hp.current > 0.0 && relations.are_enemies(visible_player.team, **team)
+                })
+                .count();
+        objective_tracker.max_enemy_anchors_seen = objective_tracker
+            .max_enemy_anchors_seen
+            .max(remaining as u32);
+        let total = objective_tracker.max_enemy_anchors_seen;
+        (
+            format!("{}  {}", t("剩余敌军", "Enemy forces remaining"), remaining),
+            objective_completion_percent(remaining as u32, total, total > 0 && remaining == 0)
+                as f32,
         )
     } else if setup_settings.victory_condition == VictoryCondition::Headquarters {
         let remaining = structures
@@ -3351,21 +3493,46 @@ pub(crate) fn hud_world_input_rects(
             ),
         ));
     }
-    // Command card (bottom-right): visible command rows + queue rows above them.
-    if command_slots > 0 || queue_slots > 0 {
-        let rows = command_slots.div_ceil(4) + queue_slots.div_ceil(6);
-        let card_height = rows as f32 * COMMAND_CARD_ROW_HIT_PX + 8.0;
+    // Match the compact grids, including only their occupied width and stack gap.
+    let command_rows = command_slots.div_ceil(4);
+    let queue_rows = queue_slots.div_ceil(4);
+    let command_height = command_rows as f32 * COMPACT_COMMAND_BUTTON_HEIGHT_PX
+        + command_rows.saturating_sub(1) as f32 * COMPACT_COMMAND_GAP_PX;
+    let queue_height = queue_rows as f32 * COMPACT_QUEUE_HEIGHT_PX
+        + queue_rows.saturating_sub(1) as f32 * COMPACT_QUEUE_GAP_PX;
+    let right = width - 12.0;
+    let bottom = height - 12.0;
+    if command_rows > 0 {
+        let columns = command_slots.min(4);
+        let occupied_width = columns as f32 * COMPACT_COMMAND_BUTTON_WIDTH_PX
+            + columns.saturating_sub(1) as f32 * COMPACT_COMMAND_GAP_PX;
+        rects.push((
+            Vec2::new(right - occupied_width - 2.0, bottom - command_height - 2.0),
+            Vec2::new(right + 2.0, bottom + 2.0),
+        ));
+    }
+    if queue_rows > 0 {
+        let columns = queue_slots.min(4);
+        let occupied_width = columns as f32 * COMPACT_COMMAND_BUTTON_WIDTH_PX
+            + columns.saturating_sub(1) as f32 * COMPACT_QUEUE_GAP_PX;
+        let queue_bottom = bottom - command_height - if command_rows > 0 { 8.0 } else { 0.0 };
         rects.push((
             Vec2::new(
-                width - 12.0 - COMMAND_CARD_WIDTH_PX - 2.0,
-                height - 12.0 - card_height,
+                right - occupied_width - 2.0,
+                queue_bottom - queue_height - 2.0,
             ),
-            Vec2::new(width, height),
+            Vec2::new(right + 2.0, queue_bottom + 2.0),
         ));
     }
     // Selection panel (bottom-center portrait + text) while something is selected.
     if selection_panel_visible {
-        rects.push((Vec2::new(196.0, height - 88.0), Vec2::new(652.0, height)));
+        rects.push((
+            Vec2::new(196.0, height - 88.0),
+            Vec2::new(
+                652.0_f32.min(width - 12.0 - COMPACT_COMMAND_WIDTH_PX - 8.0),
+                height,
+            ),
+        ));
     }
     rects
 }

@@ -2,6 +2,66 @@
 
 ## Steam quality verification in progress
 
+### Current verified state and next work
+
+- `logs/steam-final-quality-tests.log`: 160 passed, 0 failed (65.27s).
+- Compact icon command cards (352px) pass worker selection, disabled tooltip
+  and real production queue at 1280x720 and 900x720; screenshots under
+  `screenshots/steam-quality/hud-1280`, `hud-900` and `hud-font-final`.
+- Boot Camp uses the actual command-card attack key (E), not obsolete T. Its
+  result identifies graduation and labels destination buttons accurately.
+- Native profile sandbox `target/steam-profile-proof-aZvc19hY` contains actual
+  `training_complete:true` and `completed:["hold_the_line"]` from normal input.
+  `OPEN_RTS_CAPTURE_PLAYER_PROFILE=1` opts capture into production persistence;
+  always give it an isolated absolute XDG_DATA_HOME. Defaults stay in memory.
+- Current `campaign-play` captures pass indices 0, 3 and 5. Index 1's tank
+  factory stayed unfinished, indices 2/4 lose. Prior index1 infantry passed.
+  Construction failure diagnostics now print worker/target/path state; build
+  the latest capture and rerun index1 to diagnose, not bypass, this failure.
+- Survival missions use authored waves rather than additional skirmish AI.
+  Protect rear power, front turrets, and add armour before the final wave.
+  Index3 passed five minutes with normal paid tank production after supply.
+- Twin Front now places enemy main force diagonally opposite and timed waves
+  on both flanks. Campaign annihilation counts all living units/structures.
+- Profiles retain verified corruption backups, block unsafe overwrites on
+  backup failure, and retry once per new victory without per-frame writes.
+  Native I/O tests live in `src/campaign_progress/tests.rs`.
+- Official-source font now includes en/zh_CN CSV catalogs, not Rust-only glyphs.
+  Current SHA: e4be13e4f6c1f226175906922777d5aeede8408601dbd7cdd92480ba5773c0af.
+  Rebuild with `scripts/subset_font.sh`; the ignored full font is untouched.
+- Packaging and asset audits remain finite open gates in RELEASE_READINESS.
+  Windows scripts/workflow are authored but not executed; no Windows claim.
+- `screenshots/result/11` is the current compact-HUD 450-frame/15s/30fps proof.
+  Final-assets Linux archive is `/tmp/rts-linux-final-assets-20261008/`
+  `bevy-open-rts-linux-x86_64.tar.gz`, hash
+  5592a4575619cfbbf79a4dccc6c4fab1c3e510b4cc744d228ac814e1b2baf121.
+  Exact read-only/no-Nix startup evidence is `readonly-result.txt` there.
+- Construction diagnostics build was terminated with143; terminal confirmed,
+  retry started with a PTY. Do not claim the diagnostic reproduction complete
+  until the new binary runs. Current native game/UI binaries and160 tests are
+  already verified; the extra diagnostic helper changes no gameplay behavior.
+- PTY diagnostic rebuild succeeded and `logs/steam-construction-repro.log`
+  reproduces index1. Factory target(-28,-16), selectable radius1.5, remaining1.
+  Worker529 remains at(-23.94,-17.40), still ConstructOrder(target1896), requests
+  contact(-26.04,-17.39), path endpoint(-26.25,-17.25). Nearby power at(-26,-19.5)
+  and idle worker526(-25.11,-17.64) obstruct that approach. Investigate reachable
+  alternate contact approaches in update_construct_orders/orders/NavGrid, not
+  simply raising the capture timeout. Repro image is campaign/1/failure.png.
+
+- New `capture campaign-play <zero-based-index> <dir>` harness exercises
+  economy/build/train/combat, checks campaign completion, then clicks the real
+  Next Mission/finale button. It does not change resources, AI, clocks or armies.
+  Mission 2 baseline passed (`logs/steam-campaign-1.log`); Mission 1 baseline
+  lost at 01:08 because the army was not brought back to defend headquarters.
+  The survival harness now sends its first six troops back before finishing
+  production. Difficulty has not been changed based on this failed strategy.
+- Campaign annihilation previously counted only headquarters/workers. The
+  evaluator now requires every enemy unit/structure to fall; survival victories
+  require the authored timer and run after PostCombat defeat evaluation.
+  New tests cover remaining army, remaining structures, timer and defeat.
+- Failure screenshot showed production cards covering result buttons. The
+  command stack is now hidden once the match ends; runtime recheck pending.
+
 - Offscreen capture UI focus needs a window render target during
   `UiSystems::Focus`; capture restores its image target before rendering.
   This now lets the actual menu Boot Camp button enter the match.

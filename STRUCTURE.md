@@ -33,9 +33,13 @@ The repository is a Cargo workspace whose default member remains the root
   production and combat to advance Boot Camp. It does not issue player orders.
 - `campaign_progress.rs` stores completed mission IDs and training completion
   separately from match saves; interactive clients use per-user storage.
+  Native recovery and retry I/O tests live in `campaign_progress/tests.rs`.
+  Victory persistence runs once per result transition and can retry a replayed win.
 - `save.rs` and `save/continuity.rs` serialize gameplay state with local IDs
   and remap references after restart; `save/tests.rs` verifies restored behavior.
 - `docs/RELEASE_READINESS.md` tracks the remaining full Steam-quality gates.
+  Desktop packagers live in `scripts/package_linux.sh` and `package_windows.ps1`;
+  asset/license evidence is in `docs/ASSET_PROVENANCE.md` and its hash inventory.
 
 `src/lib.rs` is the crate root: app composition/plugin registration, the match
 setup/flow (maps, factions, spawn, fog/visibility) and shared core types. The

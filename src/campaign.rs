@@ -12,7 +12,7 @@ use crate::*;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) enum MissionVictory {
-    /// Standard annihilation (reuse of the skirmish evaluation).
+    /// Destroy every living enemy unit and structure, including surviving armies.
     DestroyAllEnemies,
     /// Hold out for this many simulated seconds.
     SurviveFor(f32),
@@ -54,6 +54,7 @@ pub(crate) struct MissionDef {
     pub(crate) briefing_zh: &'static str,
     pub(crate) briefing_en: &'static str,
     pub(crate) map_id: &'static str,
+    pub(crate) spawn_slots: [usize; 2],
     pub(crate) player_faction: SkirmishFaction,
     pub(crate) enemy_faction: SkirmishFaction,
     pub(crate) enemy_difficulty: AiDifficulty,
@@ -72,6 +73,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
         briefing_zh: "敌军波次将穿过峡谷进攻。坚守基地 4 分钟,增援即至。",
         briefing_en: "Enemy waves will push through the canyon. Hold your base for 4 minutes.",
         map_id: "canyon_pass",
+        spawn_slots: [0, 1],
         player_faction: SkirmishFaction::Alliance,
         enemy_faction: SkirmishFaction::Demon,
         enemy_difficulty: AiDifficulty::Beginner,
@@ -130,6 +132,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
         briefing_zh: "斩首行动:摧毁敌方指挥中心即告胜利。小心交叉火线的卡口。",
         briefing_en: "Decapitation: destroy the enemy command center. Mind the crossfire gaps.",
         map_id: "crossfire",
+        spawn_slots: [0, 1],
         player_faction: SkirmishFaction::Alliance,
         enemy_faction: SkirmishFaction::Chaos,
         enemy_difficulty: AiDifficulty::Easy,
@@ -159,9 +162,10 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
         id: "canyon_siege",
         name_zh: "第三关:峡谷合围",
         name_en: "Mission 3: Canyon Siege",
-        briefing_zh: "决战:全歼环形谷地中的敌军。中心矿区是胜负手,增援将在中期抵达。",
-        briefing_en: "Endgame: annihilate the enemy in Ring Valley. The centre mine decides it.",
+        briefing_zh: "突破环形谷地中的包围。控制中央矿区,消灭所有敌方部队和建筑。",
+        briefing_en: "Break the siege in Ring Valley. Secure the central mine and eliminate every enemy unit and structure.",
         map_id: "ring_valley",
+        spawn_slots: [0, 1],
         player_faction: SkirmishFaction::Alliance,
         enemy_faction: SkirmishFaction::Demon,
         enemy_difficulty: AiDifficulty::Hard,
@@ -201,6 +205,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
         briefing_zh: "敌军将分波强攻高地。据守西侧坡道 5 分钟,空投补给中途抵达。",
         briefing_en: "Enemy waves will storm the highland. Hold the west ramp for 5 minutes.",
         map_id: "highland_bastion",
+        spawn_slots: [0, 1],
         player_faction: SkirmishFaction::Alliance,
         enemy_faction: SkirmishFaction::Demon,
         enemy_difficulty: AiDifficulty::Normal,
@@ -266,6 +271,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
         briefing_zh: "敌军主力盘踞对角,两翼另有伏兵。全歼四角战场上的所有敌军。",
         briefing_en: "Their main force holds the far corner; flanks hide more. Annihilate them all.",
         map_id: "four_corners",
+        spawn_slots: [0, 2],
         player_faction: SkirmishFaction::Alliance,
         enemy_faction: SkirmishFaction::Chaos,
         enemy_difficulty: AiDifficulty::Hard,
@@ -291,8 +297,8 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
             MissionTrigger {
                 at_sec: 205.0,
                 action: MissionAction::Message {
-                    zh: "指挥部: 侦察警报——东南角装甲集群正在逼近!",
-                    en: "Command: scouts report armour inbound from the south-east!",
+                    zh: "指挥部: 侦察警报——东北角装甲集群正在逼近!",
+                    en: "Command: scouts report armour inbound from the north-east!",
                 },
             },
             MissionTrigger {
@@ -300,7 +306,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 action: MissionAction::SpawnWave {
                     team_index: 1,
                     units: &[("Tank", 2), ("FlameAssaultBuggy", 2)],
-                    at: (62.0, 62.0),
+                    at: (62.0, 10.0),
                     attack_to: Some((10.0, 10.0)),
                 },
             },
@@ -330,6 +336,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
         briefing_zh: "终局:补给线被切断,以现有储备直取敌指挥中枢。后勤纵队正在赶来。",
         briefing_en: "Endgame: supply lines cut. Take their command centre with what you have.",
         map_id: "tech_divide",
+        spawn_slots: [0, 1],
         player_faction: SkirmishFaction::Alliance,
         enemy_faction: SkirmishFaction::Demon,
         enemy_difficulty: AiDifficulty::Hard,
@@ -418,7 +425,7 @@ pub(crate) fn match_settings_for_mission(mission: &MissionDef) -> Option<MatchSe
             SkirmishPlayerController::Human,
             SkirmishPlayerController::Ai(mission.enemy_difficulty),
         ],
-        player_spawn_slots: vec![0, 1],
+        player_spawn_slots: mission.spawn_slots.to_vec(),
     })
 }
 
@@ -555,6 +562,102 @@ pub(crate) fn mission_survive_remaining(
 mod tests {
     use super::*;
 
+    fn objective_app(index: usize) -> App {
+        let mut app = App::new();
+        app.init_resource::<MatchState>()
+            .init_resource::<MatchFlow>()
+            .init_resource::<AudioFeedback>()
+            .init_resource::<TeamRelations>()
+            .insert_resource(VisiblePlayer::per_player(Team::Player(0)))
+            .insert_resource(match_settings_for_mission(&CAMPAIGN_MISSIONS[index]).unwrap())
+            .insert_resource(ActiveMission(Some(index)))
+            .add_systems(Update, (evaluate_match_end, check_mission_victory).chain());
+        app.world_mut().spawn((
+            Structure {
+                id: "CommandCenter",
+            },
+            Team::Player(0),
+            Health::new(20.0),
+        ));
+        app
+    }
+
+    #[test]
+    fn annihilation_campaign_requires_surviving_armies_and_structures_to_fall() {
+        let mut app = objective_app(2);
+        let tank = app
+            .world_mut()
+            .spawn((
+                Unit {
+                    id: "Tank",
+                    speed: 1.0,
+                    can_crush: true,
+                    can_be_crushed: false,
+                },
+                Team::Player(1),
+                Health::new(10.0),
+            ))
+            .id();
+        let barracks = app
+            .world_mut()
+            .spawn((
+                Structure { id: "Barracks" },
+                Team::Player(1),
+                Health::new(13.0),
+            ))
+            .id();
+        app.update();
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::Running
+        );
+        app.world_mut().despawn(tank);
+        app.update();
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::Running
+        );
+        app.world_mut().despawn(barracks);
+        app.update();
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::HumanVictory
+        );
+    }
+
+    #[test]
+    fn survival_requires_the_timer_even_when_enemy_base_is_gone() {
+        let mut app = objective_app(0);
+        app.world_mut().resource_mut::<MatchState>().start_time_sec = 239.0;
+        app.update();
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::Running
+        );
+        app.world_mut().resource_mut::<MatchState>().start_time_sec = 240.0;
+        app.update();
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::HumanVictory
+        );
+    }
+
+    #[test]
+    fn survival_still_loses_when_the_player_base_and_workers_are_destroyed() {
+        let mut app = objective_app(0);
+        let mut query = app.world_mut().query_filtered::<Entity, With<Structure>>();
+        let entities = query.iter(app.world()).collect::<Vec<_>>();
+        for entity in entities {
+            app.world_mut().despawn(entity);
+        }
+        app.world_mut().resource_mut::<MatchState>().start_time_sec = 240.0;
+        app.update();
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::HumanDefeat
+        );
+    }
+
     #[test]
     fn every_mission_references_real_maps_and_units() {
         for mission in CAMPAIGN_MISSIONS {
@@ -565,6 +668,14 @@ mod tests {
                 mission.map_id
             );
             let settings = match_settings_for_mission(mission).expect("settings must build");
+            let map = skirmish_map_by_path(settings.map_path).unwrap();
+            for slot in &settings.player_spawn_slots {
+                assert!(
+                    *slot < map.spawn_points.len(),
+                    "{} has an invalid spawn",
+                    mission.id
+                );
+            }
             assert_eq!(settings.player_controllers.len(), 2);
             for trigger in mission.triggers {
                 if let MissionAction::SpawnWave { units, .. } = trigger.action {
@@ -578,6 +689,89 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn twin_front_places_the_main_force_in_the_far_corner_and_waves_on_both_flanks() {
+        let mission = &CAMPAIGN_MISSIONS[4];
+        let settings = match_settings_for_mission(mission).unwrap();
+        let map = skirmish_map_by_path(settings.map_path).unwrap();
+        let player = map_local_to_world(map, map.spawn_points[settings.player_spawn_slots[0]]);
+        let enemy = map_local_to_world(map, map.spawn_points[settings.player_spawn_slots[1]]);
+        assert!(map.spawn_points.iter().all(|point| {
+            map_local_to_world(map, *point).distance_squared(player)
+                <= enemy.distance_squared(player)
+        }));
+        let flanks = mission
+            .triggers
+            .iter()
+            .filter_map(|trigger| match trigger.action {
+                MissionAction::SpawnWave {
+                    team_index: 1, at, ..
+                } => Some(map_local_to_world(map, at)),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        assert!(
+            flanks
+                .iter()
+                .any(|point| point.x == player.x && point.z == enemy.z)
+        );
+        assert!(
+            flanks
+                .iter()
+                .any(|point| point.x == enemy.x && point.z == player.z)
+        );
+    }
+
+    #[test]
+    fn survival_does_not_add_unscheduled_skirmish_armies() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+            std::time::Duration::from_secs_f32(1.0 / 30.0),
+        ));
+        app.world_mut().resource_mut::<ActiveMission>().0 = Some(0);
+        *app.world_mut().resource_mut::<MatchSetupSettings>() =
+            match_settings_for_mission(&CAMPAIGN_MISSIONS[0]).unwrap();
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::InMatch);
+        for _ in 0..40 {
+            app.update();
+        }
+        let mut initial_query = app.world_mut().query::<(Entity, &Unit, &Team)>();
+        let initial_army = initial_query
+            .iter(app.world())
+            .filter(|(_, unit, team)| {
+                **team == Team::Player(1)
+                    && registry::entity(unit.id).is_some_and(|def| def.weapon.is_some())
+            })
+            .map(|(entity, _, _)| entity)
+            .collect::<Vec<_>>();
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .press(KeyCode::Enter);
+        app.update();
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .release(KeyCode::Enter);
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .clear();
+        for _ in 0..900 {
+            app.update();
+        }
+        assert!(app.world().resource::<MatchState>().start_time_sec > 25.0);
+        let mut query = app.world_mut().query::<(Entity, &Unit, &Team)>();
+        let attackers = query
+            .iter(app.world())
+            .filter(|(entity, unit, team)| {
+                **team == Team::Player(1)
+                    && !initial_army.contains(entity)
+                    && registry::entity(unit.id).is_some_and(|def| def.weapon.is_some())
+            })
+            .count();
+        assert_eq!(attackers, 0, "first authored wave arrives at 45 seconds");
     }
 
     #[test]

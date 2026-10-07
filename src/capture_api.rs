@@ -137,6 +137,12 @@ pub fn build_capture_app(width: u32, height: u32) -> App {
             RonAssetPlugin::<GodotModelMapAsset>::new(&["model_map.ron"]),
         ))
         .insert_resource(RenderErrorHandler(handle_render_error));
+    // Persistence acceptance runs opt in explicitly and supply an isolated
+    // XDG_DATA_HOME. Ordinary visual captures never touch the player's profile.
+    #[cfg(not(target_arch = "wasm32"))]
+    if std::env::var("OPEN_RTS_CAPTURE_PLAYER_PROFILE").as_deref() == Ok("1") {
+        app.insert_resource(CampaignProgress::load_for_player());
+    }
     add_game_scenes(&mut app);
 
     // Create the offscreen image directly in the world so the handle is stable
@@ -1077,6 +1083,11 @@ pub fn capture_enemy_structure_position(app: &mut App) -> Option<Vec3> {
 pub fn capture_nearest_enemy_anchor_position(app: &mut App) -> Option<Vec3> {
     let player = Team::Player(0);
     let world = app.world_mut();
+    let all_forces = world
+        .resource::<ActiveMission>()
+        .0
+        .and_then(mission_by_index)
+        .is_some_and(|mission| mission.victory == MissionVictory::DestroyAllEnemies);
     let origin = {
         let mut units = world.query_filtered::<(&Team, &Transform), (With<Unit>, With<Selected>)>();
         let mut sum = Vec3::ZERO;
@@ -1102,7 +1113,7 @@ pub fn capture_nearest_enemy_anchor_position(app: &mut App) -> Option<Vec3> {
             if *team == player
                 || *team == Team::Neutral
                 || health.current <= 0.0
-                || !is_structure_elimination_anchor(structure)
+                || (!all_forces && !is_structure_elimination_anchor(structure))
             {
                 continue;
             }
@@ -1118,7 +1129,7 @@ pub fn capture_nearest_enemy_anchor_position(app: &mut App) -> Option<Vec3> {
             if *team == player
                 || *team == Team::Neutral
                 || health.current <= 0.0
-                || !is_worker_elimination_anchor(unit)
+                || (!all_forces && !is_worker_elimination_anchor(unit))
             {
                 continue;
             }
@@ -1335,6 +1346,83 @@ pub fn capture_player_completed_structure_count(app: &mut App) -> usize {
 }
 
 /// Position of a completed player structure by id.
+pub fn capture_player_completed_structure_count_for(app: &mut App, id: &'static str) -> usize {
+    let world = app.world_mut();
+    let mut query = world.query::<(&Structure, &Team, Has<UnderConstruction>)>();
+    query
+        .iter(world)
+        .filter(|(structure, team, building)| {
+            structure.id == id && **team == Team::Player(0) && !building
+        })
+        .count()
+}
+
+pub fn capture_construction_diagnostics(app: &mut App, id: &'static str) -> String {
+    let world = app.world_mut();
+    let mut buildings = world.query::<(
+        Entity,
+        &Structure,
+        &Team,
+        &Transform,
+        &Selectable,
+        &UnderConstruction,
+    )>();
+    let targets = buildings
+        .iter(world)
+        .filter(|(_, structure, team, ..)| structure.id == id && **team == Team::Player(0))
+        .map(|(entity, _, _, position, radius, construction)| {
+            format!(
+                "foundation {entity:?} position={:?} radius={} remaining={}",
+                position.translation, radius.radius, construction.remaining
+            )
+        })
+        .collect::<Vec<_>>();
+    let mut workers = world.query::<(
+        Entity,
+        &Unit,
+        &Team,
+        &Transform,
+        &Selectable,
+        Option<&ConstructOrder>,
+        Option<&MoveOrder>,
+        Option<&PlannedPath>,
+    )>();
+    let workers = workers
+        .iter(world)
+        .filter(|(_, unit, team, ..)| unit.id == "Worker" && **team == Team::Player(0))
+        .map(|(entity, _, _, position, radius, order, movement, path)| {
+            format!(
+                "worker {entity:?} position={:?} radius={} construct={:?} move={:?} path={:?}",
+                position.translation,
+                radius.radius,
+                order.map(|order| order.target),
+                movement.map(|order| order.target),
+                path.map(|path| (path.next, path.waypoints.last().copied()))
+            )
+        })
+        .collect::<Vec<_>>();
+    targets
+        .into_iter()
+        .chain(workers)
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+pub fn capture_first_enabled_rally_hotkey(app: &mut App) -> Option<KeyCode> {
+    let world = app.world_mut();
+    let mut query = world.query::<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>();
+    query
+        .iter(world)
+        .find(|(_, action, availability)| {
+            matches!(action, BuildAction::SetRallyPoint) && availability.enabled
+        })
+        .and_then(|(slot, _, _)| {
+            COMMAND_SLOT_HOTKEYS
+                .get(slot.0)
+                .map(|hotkey| hotkey.key_code)
+        })
+}
+
 pub fn capture_player_completed_structure_position(
     app: &mut App,
     structure_id: &'static str,
@@ -1351,6 +1439,24 @@ pub fn capture_player_completed_structure_position(
         }
     }
     None
+}
+
+/// Actual completed foundation nearest the requested location, including its
+/// terrain height. Repeated structures must not reuse the first one's position.
+pub fn capture_player_completed_structure_position_near(
+    app: &mut App,
+    id: &'static str,
+    near: Vec3,
+) -> Option<Vec3> {
+    let world = app.world_mut();
+    let mut query = world.query::<(&Structure, &Team, &Transform, Has<UnderConstruction>)>();
+    query
+        .iter(world)
+        .filter(|(structure, team, _, building)| {
+            structure.id == id && **team == Team::Player(0) && !building
+        })
+        .map(|(_, _, transform, _)| transform.translation)
+        .min_by(|left, right| xz_distance(*left, near).total_cmp(&xz_distance(*right, near)))
 }
 
 /// Whether the player currently has a pending structure placement (build mode).
@@ -1985,6 +2091,38 @@ pub fn capture_boot_camp_button(app: &mut App) -> Option<Vec2> {
 
 pub fn capture_tutorial_stage(app: &App) -> usize {
     app.world().resource::<TutorialState>().stage as usize
+}
+
+/// Read-only campaign observations for the normal-input acceptance harness.
+pub fn capture_campaign_completed(app: &App, index: usize) -> bool {
+    app.world().resource::<CampaignProgress>().completed(index)
+}
+
+pub fn capture_campaign_continue_button(app: &mut App) -> Option<Vec2> {
+    let world = app.world_mut();
+    let mut query =
+        world.query_filtered::<(&Node, &UiGlobalTransform), With<CampaignContinueButton>>();
+    query
+        .iter(world)
+        .find(|(node, _)| node.display != Display::None)
+        .map(|(_, transform)| transform.translation)
+}
+
+pub fn capture_active_mission(app: &App) -> Option<usize> {
+    app.world().resource::<ActiveMission>().0
+}
+
+pub fn capture_campaign_menu_open(app: &App) -> bool {
+    *app.world().resource::<State<AppScreen>>().get() == AppScreen::CampaignMenu
+}
+
+pub fn capture_build_button_center(app: &mut App, id: &'static str) -> Option<(Vec2, bool)> {
+    let world = app.world_mut();
+    let mut query = world.query::<(&BuildAction, &CommandSlotAvailability, &UiGlobalTransform)>();
+    query
+        .iter(world)
+        .find(|(action, _, _)| matches!(action, BuildAction::Build(found) if *found == id))
+        .map(|(_, availability, transform)| (transform.translation, availability.enabled))
 }
 
 pub fn capture_player_combat_unit_position(app: &mut App) -> Option<Vec3> {

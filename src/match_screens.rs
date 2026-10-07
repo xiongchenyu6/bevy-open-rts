@@ -52,6 +52,9 @@ pub(crate) struct CampaignContinueButton;
 #[derive(Component)]
 pub(crate) struct CampaignContinueLabel;
 
+#[derive(Component)]
+pub(crate) struct MatchReturnLabel;
+
 pub(crate) fn match_end_button(action: MatchEndAction) -> impl Bundle {
     (
         Button,
@@ -380,9 +383,14 @@ pub(crate) fn match_end_button_visual(interaction: Interaction, enabled: bool) -
 
 pub(crate) fn update_match_end_overlay(
     match_state: Res<MatchState>,
+    tutorial: Res<TutorialState>,
     economies: Res<Economies>,
     visible_player: Res<VisiblePlayer>,
-    mut overlay_q: Query<(&mut Visibility, &Children), With<MatchEndOverlay>>,
+    mut overlay_q: Query<
+        (&mut Visibility, &Children),
+        (With<MatchEndOverlay>, Without<CommandStack>),
+    >,
+    mut command_stacks: Query<&mut Visibility, (With<CommandStack>, Without<MatchEndOverlay>)>,
     mut title_text_q: Query<
         &mut Text,
         (
@@ -408,6 +416,13 @@ pub(crate) fn update_match_end_overlay(
         ),
     >,
 ) {
+    for mut visibility in &mut command_stacks {
+        *visibility = if match_state.is_running() {
+            Visibility::Inherited
+        } else {
+            Visibility::Hidden
+        };
+    }
     if overlay_q.is_empty() {
         return;
     }
@@ -422,10 +437,23 @@ pub(crate) fn update_match_end_overlay(
     *overlay_visibility = Visibility::Visible;
 
     if let Ok(mut title_text) = title_text_q.single_mut() {
-        **title_text = t("对局结算", "Match Results").to_string();
+        **title_text = if tutorial.stage == TutorialStage::Complete {
+            t("基础训练完成", "Boot Camp Complete")
+        } else {
+            t("对局结算", "Match Results")
+        }
+        .to_string();
     }
     if let Ok(mut reason_text) = reason_text_q.single_mut() {
-        **reason_text = match_state.result_reason.to_string();
+        **reason_text = if tutorial.stage == TutorialStage::Complete {
+            t(
+                "你已准备好迎接第一场战役。",
+                "You are ready for your first campaign mission.",
+            )
+        } else {
+            match_state.result_reason
+        }
+        .to_string();
     }
     if let Ok(mut stats_text) = stats_text_q.single_mut() {
         let minutes = (match_state.start_time_sec.max(0.0) / 60.0).floor() as u32;
@@ -457,11 +485,9 @@ pub(crate) fn update_match_end_overlay(
             visible_economy.crystal
         );
         **stats_text = format!(
-            "{}: {}  {}: {}  {}: {:02}:{:02}\n{enemy_losses}\n{human_losses}\n{resources}",
+            "{}: {}  {}: {:02}:{:02}\n{enemy_losses}\n{human_losses}\n{resources}",
             t("剩余阵营", "Teams left"),
             match_state.remaining_teams,
-            t("剩余锚点", "Anchors left"),
-            match_state.remaining_anchors,
             t("用时", "Time"),
             minutes,
             seconds
@@ -475,6 +501,7 @@ pub(crate) fn update_campaign_continue_button(
     tutorial: Res<TutorialState>,
     mut buttons: Query<&mut Node, With<CampaignContinueButton>>,
     mut labels: Query<&mut Text, With<CampaignContinueLabel>>,
+    mut return_labels: Query<&mut Text, (With<MatchReturnLabel>, Without<CampaignContinueLabel>)>,
 ) {
     let available = state.phase == MatchPhase::HumanVictory
         && (active.0.is_some() || tutorial.stage == TutorialStage::Complete);
@@ -492,5 +519,13 @@ pub(crate) fn update_campaign_continue_button(
     };
     for mut label in &mut labels {
         label.0 = text.to_string();
+    }
+    for mut label in &mut return_labels {
+        label.0 = if active.0.is_some() {
+            t("战役地图", "Campaign Map")
+        } else {
+            t("遭遇战设置", "Skirmish Setup")
+        }
+        .to_string();
     }
 }

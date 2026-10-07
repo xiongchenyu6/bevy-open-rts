@@ -31,36 +31,40 @@ use bevy::prelude::*;
 use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 
 use bevy_open_rts::{
-    CaptureTarget, build_capture_app, build_model_harness_capture_app, capture_art_combat_evidence,
-    capture_boot_camp_button, capture_build_options_count, capture_dismiss_match_briefing,
+    CaptureTarget, build_capture_app, build_model_harness_capture_app, capture_active_mission,
+    capture_art_combat_evidence, capture_boot_camp_button, capture_build_button_center,
+    capture_build_options_count, capture_campaign_completed, capture_campaign_continue_button,
+    capture_campaign_menu_open, capture_construction_diagnostics, capture_dismiss_match_briefing,
     capture_enabled_build_hotkey_for, capture_enabled_train_hotkey_for,
     capture_enemy_structure_position, capture_entity_is_selected,
     capture_first_enabled_attack_move_hotkey, capture_first_enabled_build_hotkey,
-    capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_frame_whole_map,
-    capture_key, capture_match_phase_label, capture_model_harness_manifest,
-    capture_model_harness_page_count, capture_mouse_button, capture_nearest_enemy_anchor_position,
-    capture_nearest_visible_resource_click_position_to, capture_nearest_visible_resource_position,
-    capture_onscreen_resource_model_center, capture_placement_is_valid,
-    capture_player_army_average_position, capture_player_army_unit_count,
-    capture_player_build_queue_len, capture_player_combat_order_count,
-    capture_player_combat_unit_position, capture_player_command_center,
-    capture_player_completed_structure_count, capture_player_completed_structure_position,
-    capture_player_constructing_count, capture_player_harvesting_count,
-    capture_player_in_placement_mode, capture_player_onscreen_unit_position,
-    capture_player_onscreen_worker_position, capture_player_producer_position,
-    capture_player_resources, capture_player_structure_count, capture_player_unit_count,
-    capture_player_worker_position, capture_run_ai_duel, capture_run_ai_match_until_resolved,
-    capture_run_arena, capture_run_faction_duel, capture_select_map,
-    capture_selected_player_unit_average_position, capture_selected_player_unit_count,
-    capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
-    capture_set_structure_rally, capture_set_weather, capture_show_campaign_menu,
-    capture_show_credits_menu, capture_show_main_menu, capture_show_options_menu,
-    capture_show_skirmish_setup_menu, capture_show_skirmish_setup_with_dropdown,
-    capture_spawn_construction_showcase, capture_spawn_model_harness_page,
-    capture_stage_art_combat, capture_stage_deployed_siege, capture_stage_player_radar,
-    capture_stage_worker_collecting, capture_start_mission, capture_startup_ready,
-    capture_tutorial_stage, capture_world_to_screen, capture_worst_model_alignment_offset,
-    capture_zoom_camera_closest, start_shared_match_scene_with_current_setup,
+    capture_first_enabled_rally_hotkey, capture_first_enabled_train_hotkey,
+    capture_focus_camera_on, capture_frame_whole_map, capture_key, capture_match_phase_label,
+    capture_model_harness_manifest, capture_model_harness_page_count, capture_mouse_button,
+    capture_nearest_enemy_anchor_position, capture_nearest_visible_resource_click_position_to,
+    capture_nearest_visible_resource_position, capture_onscreen_resource_model_center,
+    capture_placement_is_valid, capture_player_army_average_position,
+    capture_player_army_unit_count, capture_player_build_queue_len,
+    capture_player_combat_order_count, capture_player_combat_unit_position,
+    capture_player_command_center, capture_player_completed_structure_count,
+    capture_player_completed_structure_count_for, capture_player_completed_structure_position,
+    capture_player_completed_structure_position_near, capture_player_constructing_count,
+    capture_player_harvesting_count, capture_player_in_placement_mode,
+    capture_player_onscreen_unit_position, capture_player_onscreen_worker_position,
+    capture_player_producer_position, capture_player_resources, capture_player_structure_count,
+    capture_player_unit_count, capture_player_worker_position, capture_run_ai_duel,
+    capture_run_ai_match_until_resolved, capture_run_arena, capture_run_faction_duel,
+    capture_select_map, capture_selected_player_unit_average_position,
+    capture_selected_player_unit_count, capture_selected_player_unit_ids, capture_set_all_factions,
+    capture_set_cursor, capture_set_structure_rally, capture_set_weather,
+    capture_show_campaign_menu, capture_show_credits_menu, capture_show_main_menu,
+    capture_show_options_menu, capture_show_skirmish_setup_menu,
+    capture_show_skirmish_setup_with_dropdown, capture_spawn_construction_showcase,
+    capture_spawn_model_harness_page, capture_stage_art_combat, capture_stage_deployed_siege,
+    capture_stage_player_radar, capture_stage_worker_collecting, capture_start_mission,
+    capture_startup_ready, capture_tutorial_stage, capture_world_to_screen,
+    capture_worst_model_alignment_offset, capture_zoom_camera_closest,
+    start_shared_match_scene_with_current_setup,
 };
 
 const WIDTH: u32 = 1280;
@@ -112,6 +116,21 @@ fn main() {
                 .and_then(|count| render_proof_frames(Path::new(&dir), count, &faction)),
             _ => Err("proof-frames needs <dir> <count> <human|demon|chaos>".into()),
         },
+        Some("hud-card") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/hud-card"));
+            let width = args
+                .next()
+                .and_then(|value| value.parse().ok())
+                .unwrap_or(WIDTH);
+            let height = args
+                .next()
+                .and_then(|value| value.parse().ok())
+                .unwrap_or(HEIGHT);
+            render_hud_card(&dir, width, height)
+        }
         Some("boot-camp") => {
             let dir = args
                 .next()
@@ -280,6 +299,14 @@ fn main() {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from(format!("screenshots/weather/{kind}.png")));
             render_weather(&kind, &path)
+        }
+        Some("campaign-play") => {
+            let index: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(0);
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from(format!("screenshots/campaign-play/{index}")));
+            render_campaign_play(index, &dir)
         }
         Some("mission") => {
             let index: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(0);
@@ -1267,6 +1294,25 @@ fn issue_player_attack_move_to_nearest_anchor(
     Ok((selected, attack_key, capture_player_combat_order_count(app)))
 }
 
+fn defend_headquarters_via_real_input(app: &mut App) -> Result<(), String> {
+    let (_, base, _) = capture_player_command_center(app).ok_or("headquarters lost")?;
+    select_all_player_army(app);
+    for _ in 0..12 {
+        app.update();
+    }
+    let key = capture_first_enabled_attack_move_hotkey(app)
+        .ok_or("no army available to defend headquarters")?;
+    tap_key(app, key);
+    capture_focus_camera_on(app, base);
+    for _ in 0..12 {
+        app.update();
+    }
+    let point = capture_world_to_screen(app, base + Vec3::new(6.5, 0.0, 0.0))
+        .ok_or("defensive position outside view")?;
+    capture_click_screen(app, point, MouseButton::Right);
+    Ok(())
+}
+
 fn build_structure_via_real_input(
     app: &mut App,
     structure_id: &'static str,
@@ -1289,6 +1335,12 @@ fn build_structure_via_real_input(
         app.update();
     }
 
+    if capture_enabled_build_hotkey_for(app, structure_id).is_none() {
+        tap_key(app, KeyCode::KeyT);
+    }
+    if capture_enabled_build_hotkey_for(app, structure_id).is_none() {
+        tap_key(app, KeyCode::KeyY);
+    }
     let Some(build_key) = capture_enabled_build_hotkey_for(app, structure_id) else {
         return Err(format!(
             "selected Worker does not expose an enabled {structure_id} build command"
@@ -1302,16 +1354,56 @@ fn build_structure_via_real_input(
     }
 
     let structures_before = capture_player_structure_count(app);
-    let placement_offsets = [
-        Vec3::new(4.0, 0.0, 2.5),
-        Vec3::new(4.5, 0.0, -3.5),
-        Vec3::new(-4.0, 0.0, 3.0),
-        Vec3::new(0.0, 0.0, 5.0),
-        Vec3::new(6.0, 0.0, 0.0),
-    ];
+    let completed_before = capture_player_completed_structure_count_for(app, structure_id);
+    let placement_origin = capture_player_command_center(app)
+        .map(|(_, base, _)| base)
+        .unwrap_or(worker);
+    let placement_offsets = if structure_id == "PowerReactor" {
+        // Protect the generator behind the west-side campaign headquarters.
+        [
+            Vec3::new(-4.0, 0.0, 2.5),
+            Vec3::new(-4.5, 0.0, -3.5),
+            Vec3::new(0.0, 0.0, -5.0),
+            Vec3::new(0.0, 0.0, 5.0),
+            Vec3::new(-6.0, 0.0, 0.0),
+        ]
+    } else if structure_id == "VehicleFactory" {
+        [
+            Vec3::new(-6.0, 0.0, 6.0),
+            Vec3::new(-6.0, 0.0, -6.0),
+            Vec3::new(0.0, 0.0, -9.0),
+            Vec3::new(0.0, 0.0, 9.0),
+            Vec3::new(-9.0, 0.0, 0.0),
+        ]
+    } else if structure_id == "RadarUplink" {
+        [
+            Vec3::new(0.0, 0.0, -6.0),
+            Vec3::new(-5.0, 0.0, 5.0),
+            Vec3::new(-6.0, 0.0, -5.0),
+            Vec3::new(0.0, 0.0, 6.0),
+            Vec3::new(-7.0, 0.0, 0.0),
+        ]
+    } else if structure_id == "AntiGroundTurret" {
+        // Cover the approach without clustering both turrets beside the power plant.
+        [
+            Vec3::new(6.0, 0.0, 3.0),
+            Vec3::new(6.0, 0.0, -3.0),
+            Vec3::new(3.0, 0.0, 6.0),
+            Vec3::new(3.0, 0.0, -6.0),
+            Vec3::new(6.0, 0.0, 0.0),
+        ]
+    } else {
+        [
+            Vec3::new(4.0, 0.0, 2.5),
+            Vec3::new(4.5, 0.0, -3.5),
+            Vec3::new(-4.0, 0.0, 3.0),
+            Vec3::new(0.0, 0.0, 5.0),
+            Vec3::new(6.0, 0.0, 0.0),
+        ]
+    };
     let mut placed_at = None;
     for offset in placement_offsets {
-        let candidate = worker + offset;
+        let candidate = placement_origin + offset;
         capture_focus_camera_on(app, candidate);
         for _ in 0..8 {
             app.update();
@@ -1345,17 +1437,19 @@ fn build_structure_via_real_input(
     );
 
     let completed = wait_until(app, BUILD_COMPLETION_WAIT_TICKS, |app| {
-        capture_player_completed_structure_position(app, structure_id).is_some()
+        capture_player_completed_structure_count_for(app, structure_id) > completed_before
     });
     if !completed {
+        println!(
+            "[capture] {}",
+            capture_construction_diagnostics(app, structure_id)
+        );
         return Err(format!(
             "{structure_id} foundation was placed but did not complete construction"
         ));
     }
-    let structure =
-        capture_player_completed_structure_position(app, structure_id).ok_or_else(|| {
-            format!("completed {structure_id} position missing after construction wait")
-        })?;
+    let structure = capture_player_completed_structure_position_near(app, structure_id, placed_at)
+        .ok_or("completed foundation position missing")?;
     println!(
         "[capture] assault {structure_id} completed at ({:.1},{:.1})",
         structure.x, structure.z
@@ -1387,7 +1481,12 @@ fn train_army_via_real_input(
     let mut train_inputs = 0usize;
     let mut ticks = 0usize;
     while ticks < 3_600 && capture_player_army_unit_count(app) < desired_army {
-        if let Some(train_key) = capture_enabled_train_hotkey_for(app, product_id) {
+        if capture_match_phase_label(app) != "Running" {
+            break;
+        }
+        if capture_player_build_queue_len(app) == 0
+            && let Some(train_key) = capture_enabled_train_hotkey_for(app, product_id)
+        {
             tap_key(app, train_key);
             train_inputs += 1;
         }
@@ -1406,6 +1505,65 @@ fn train_army_via_real_input(
         ));
     }
     Ok(final_army)
+}
+
+fn render_hud_card(dir: &Path, width: u32, height: u32) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|error| error.to_string())?;
+    let mut app = build_capture_app(width, height);
+    wait_for_startup(&mut app)?;
+    start_shared_match_scene_with_current_setup(&mut app);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    capture_dismiss_match_briefing(&mut app);
+    let worker = capture_player_worker_position(&mut app).ok_or("worker missing")?;
+    capture_focus_camera_on(&mut app, worker);
+    for _ in 0..12 {
+        app.update();
+    }
+    let worker =
+        capture_player_worker_position(&mut app).ok_or("worker missing after camera settle")?;
+    let point = capture_world_to_screen(&mut app, worker).ok_or("worker outside view")?;
+    capture_click_screen(&mut app, point, MouseButton::Left);
+    if !capture_selected_player_unit_ids(&mut app).contains(&"Worker") {
+        return Err("worker card did not select through normal input".into());
+    }
+    let handle = capture_handle(&app);
+    shoot(&mut app, &handle, dir.join("00_worker.png"));
+    let (point, enabled) = capture_build_button_center(&mut app, "WeatherControlSpire")
+        .ok_or("weather control card missing")?;
+    if enabled {
+        return Err("expected weather control to require technology".into());
+    }
+    capture_set_cursor(&mut app, point);
+    for _ in 0..60 {
+        app.update();
+    }
+    shoot(&mut app, &handle, dir.join("01_disabled_tooltip.png"));
+    capture_set_cursor(&mut app, Vec2::new(32.0, 350.0));
+    for _ in 0..8 {
+        app.update();
+    }
+    build_structure_via_real_input(&mut app, "PowerReactor")?;
+    let barracks = build_structure_via_real_input(&mut app, "Barracks")?;
+    capture_focus_camera_on(&mut app, barracks);
+    for _ in 0..12 {
+        app.update();
+    }
+    let point = capture_world_to_screen(&mut app, barracks).ok_or("barracks outside view")?;
+    capture_click_screen(&mut app, point, MouseButton::Left);
+    let key = capture_enabled_train_hotkey_for(&mut app, "LightRifleInfantry")
+        .ok_or("infantry training card missing")?;
+    tap_key(&mut app, key);
+    tap_key(&mut app, key);
+    if capture_player_build_queue_len(&mut app) == 0 {
+        return Err("normal training input did not enqueue units".into());
+    }
+    shoot(&mut app, &handle, dir.join("02_production_queue.png"));
+    println!(
+        "[capture] compact command card: worker, locked tooltip, production queue at {width}x{height}"
+    );
+    Ok(())
 }
 
 fn render_still(path: &Path) -> Result<(), String> {
@@ -1606,6 +1764,142 @@ fn render_weather(kind: &str, path: &Path) -> Result<(), String> {
     }
     println!("[capture] wrote {}", path.display());
     Ok(())
+}
+
+/// Exercises authored mission settings and ordinary player commands, without
+/// spawning armies, changing resources, clocks, AI or victory state.
+fn render_campaign_play(index: usize, dir: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    let mut app = build_capture_app(WIDTH, HEIGHT);
+    wait_for_startup(&mut app)?;
+    if !capture_start_mission(&mut app, index) {
+        return Err(format!("mission {index} not found"));
+    }
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    let handle = capture_handle(&app);
+    shoot(&mut app, &handle, dir.join("00_briefing.png"));
+    tap_key(&mut app, KeyCode::Enter);
+    capture_dismiss_match_briefing(&mut app);
+    let result = (|| {
+        let worker = capture_player_worker_position(&mut app).ok_or("mission worker missing")?;
+        capture_focus_camera_on(&mut app, worker);
+        for _ in 0..12 {
+            app.update();
+        }
+        let point = capture_world_to_screen(&mut app, worker).ok_or("worker outside view")?;
+        capture_click_screen(&mut app, point, MouseButton::Left);
+        let ore = capture_nearest_visible_resource_click_position_to(&mut app, worker)
+            .ok_or("mission resource deposit missing")?;
+        capture_focus_camera_on(&mut app, ore);
+        for _ in 0..12 {
+            app.update();
+        }
+        let point = capture_world_to_screen(&mut app, ore).ok_or("deposit outside view")?;
+        capture_click_screen(&mut app, point, MouseButton::Right);
+        build_structure_via_real_input(&mut app, "PowerReactor")?;
+        let survival = index == 0 || index == 3;
+        if survival {
+            build_structure_via_real_input(&mut app, "AntiGroundTurret")?;
+            build_structure_via_real_input(&mut app, "AntiGroundTurret")?;
+        }
+        let barracks = build_structure_via_real_input(&mut app, "Barracks")?;
+        if survival {
+            capture_focus_camera_on(&mut app, barracks);
+            for _ in 0..12 {
+                app.update();
+            }
+            let point =
+                capture_world_to_screen(&mut app, barracks).ok_or("barracks outside view")?;
+            capture_click_screen(&mut app, point, MouseButton::Left);
+            let rally = capture_first_enabled_rally_hotkey(&mut app)
+                .ok_or("barracks rally command missing")?;
+            tap_key(&mut app, rally);
+            let (_, base, _) =
+                capture_player_command_center(&mut app).ok_or("headquarters lost")?;
+            capture_focus_camera_on(&mut app, base);
+            for _ in 0..12 {
+                app.update();
+            }
+            let point = capture_world_to_screen(&mut app, base + Vec3::new(6.5, 0.0, 0.0))
+                .ok_or("rally target outside view")?;
+            capture_click_screen(&mut app, point, MouseButton::Right);
+            train_army_via_real_input(&mut app, barracks, 3, "HeavyMachinegunTrooper")?;
+            defend_headquarters_via_real_input(&mut app)?;
+        }
+        if survival {
+            train_army_via_real_input(&mut app, barracks, 8, "HeavyMachinegunTrooper")?;
+            build_structure_via_real_input(&mut app, "RadarUplink")?;
+            train_army_via_real_input(&mut app, barracks, 12, "RocketInfantry")?;
+        } else {
+            let factory = build_structure_via_real_input(&mut app, "VehicleFactory")?;
+            train_army_via_real_input(&mut app, factory, 3, "Tank")?;
+            defend_headquarters_via_real_input(&mut app)?;
+            train_army_via_real_input(&mut app, factory, 8, "Tank")?;
+        }
+        shoot(&mut app, &handle, dir.join("01_army.png"));
+        for round in 0..80 {
+            if capture_match_phase_label(&mut app) != "Running" {
+                break;
+            }
+            if index == 3 && round == 6 {
+                build_structure_via_real_input(&mut app, "PowerReactor")?;
+                let factory = build_structure_via_real_input(&mut app, "VehicleFactory")?;
+                let target = capture_player_army_unit_count(&mut app) + 4;
+                train_army_via_real_input(&mut app, factory, target, "Tank")?;
+                shoot(&mut app, &handle, dir.join("01_armour_reserve.png"));
+            }
+            if !survival {
+                issue_player_attack_move_to_nearest_anchor(&mut app)?;
+            } else {
+                defend_headquarters_via_real_input(&mut app)?;
+            }
+            for _ in 0..450 {
+                app.update();
+            }
+            if round % 8 == 0 {
+                println!(
+                    "[capture] mission {index} round {round}: {} army={} resources={:?}",
+                    capture_match_phase_label(&mut app),
+                    capture_player_army_unit_count(&mut app),
+                    capture_player_resources(&mut app)
+                );
+            }
+        }
+        for _ in 0..8 {
+            app.update();
+        }
+        let phase = capture_match_phase_label(&mut app);
+        if phase != "HumanVictory" {
+            return Err(format!("mission {index} did not win: {phase}"));
+        }
+        if !capture_campaign_completed(&app, index) {
+            return Err(format!("mission {index} victory did not record completion"));
+        }
+        shoot(&mut app, &handle, dir.join("02_victory.png"));
+        let point =
+            capture_campaign_continue_button(&mut app).ok_or("campaign continue button missing")?;
+        capture_click_screen(&mut app, point, MouseButton::Left);
+        for _ in 0..MATCH_SETTLE_TICKS {
+            app.update();
+        }
+        if index < 5 && capture_active_mission(&app) != Some(index + 1) {
+            return Err("Next Mission did not launch the following mission".into());
+        }
+        if index == 5 && !capture_campaign_menu_open(&app) {
+            return Err("campaign finale did not return to the campaign map".into());
+        }
+        shoot(&mut app, &handle, dir.join("03_continue.png"));
+        println!(
+            "[capture] mission {index}: normal-input victory, completion recorded, continuation verified"
+        );
+        Ok(())
+    })();
+    if result.is_err() {
+        shoot(&mut app, &handle, dir.join("failure.png"));
+    }
+    result
 }
 
 fn render_mission_cutscene(index: usize, dir: &Path) -> Result<(), String> {

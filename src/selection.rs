@@ -1096,7 +1096,7 @@ pub(crate) fn draw_unit_selection_marker(
     radius: f32,
     color: Color,
 ) {
-    let center = Vec3::new(position.x, 0.05, position.z);
+    let center = position + Vec3::Y * 0.05;
     // Four short corner arcs leave the footprint readable without a debug disc.
     for quadrant in 0..4 {
         let middle = std::f32::consts::FRAC_PI_4 + quadrant as f32 * std::f32::consts::FRAC_PI_2;

@@ -8,15 +8,15 @@ build. Previous visual fixes and green unit tests do not establish that goal.
 
 | Area | Required evidence | Current state |
 | --- | --- | --- |
-| First session | Fresh profile → guided gathering, power, barracks, training, movement, attack and victory through normal controls; skip/replay work | Seven lessons pass real-input capture; skip/replay and fresh native profile pending |
-| Campaign | All six missions complete without cheats; correct objectives, retry/next/finale; completion survives restart | Progress/continuation implemented, unverified |
+| First session | Fresh profile → guided gathering, power, barracks, training, movement, attack and victory through normal controls; skip/replay work | Seven lessons pass with real sandbox persistence; skip/replay pending |
+| Campaign | All six missions complete without cheats; correct objectives, retry/next/finale; completion survives restart | Current missions1/4/6 win and continue; mission1 unlock survives process restart; current2 construction and3/5 defeats remain open |
 | Save continuity | Mid-mission save/restart/load preserves triggers, orders, paid production, fog, mines, effects and support; missing/corrupt files recover | Schema and restore behavior tests pass; player-facing runtime recovery pending |
-| Interface | English default, coherent icons/tooltips, no clipping at supported desktop sizes; small browser viewport inspected | Resource/objective HUD revised, unverified |
+| Interface | English default, coherent icons/tooltips, no clipping at supported desktop sizes; small browser viewport inspected | Compact cards, locked tooltip and queue captured at1280x720/900x720; browser, remaining screens/overlays pending |
 | Art/audio | Fresh menu, base, economy, combat, defeat/victory captures; readable silhouettes; commands/music/volume controls verified | Prior material pass only; further review required |
 | Skirmish/balance | All shipped maps/factions/difficulties playable; reproducible multi-seed difficulty and faction sweeps; no indefinite matches | Partial old evidence; full sweep required |
-| Delivery | Windows and Linux archives launch from arbitrary working directories without Rust/Nix; writable user saves/config | Packaging required |
-| Reliability | Full tests, packaged-build smoke, long matches and measured performance on supported hardware | 146 library tests pass; packaged smoke/performance outstanding |
-| Distribution | Accurate feature/system-requirement copy, asset provenance/licenses and generated-content inventory; store-ready media | Preparation required |
+| Delivery | Windows and Linux archives launch from arbitrary working directories without Rust/Nix; writable user saves/config | Linux development archive starts in no-Nix Ubuntu container; release profile/Steam Runtime/gameplay/Windows pending |
+| Reliability | Full tests, packaged-build smoke, long matches and measured performance on supported hardware | 160 library tests pass; no-Nix/read-only Linux startup passes; release/gameplay/performance gates outstanding |
+| Distribution | Accurate feature/system-requirement copy, asset provenance/licenses and generated-content inventory; store-ready media | Restricted logo removed; upstream/font notices added; unresolved art/audio provenance in ASSET_PROVENANCE.md |
 
 ## Verification policy
 

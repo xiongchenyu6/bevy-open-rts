@@ -215,13 +215,6 @@ pub(crate) const BATTLE_LOG_MAX_ENTRIES: usize = 5;
 pub(crate) const BATTLE_LOG_UNDER_ATTACK_COOLDOWN_SECONDS: f32 = 7.0;
 pub(crate) const BATTLE_LOG_TOP_PX: f32 = 198.0;
 pub(crate) const BATTLE_LOG_WIDTH_PX: f32 = 390.0;
-// Per-row height of the battle-log click/hover hit area; the hit rect scales with
-// the number of visible entries so an EMPTY log never swallows world clicks (it
-// used to be a fixed 168px band across the top-center of the screen).
-// Bottom-right command card hit geometry (146x46 buttons + 8px gap, 4 per row) and
-// the production-queue rows that stack above it (92px slots, 6 per row).
-pub(crate) const COMMAND_CARD_WIDTH_PX: f32 = 612.0;
-pub(crate) const COMMAND_CARD_ROW_HIT_PX: f32 = 54.0;
 pub(crate) const TERRAIN_TARGET_MAP_MARGIN_M: f32 = 2.5;
 pub(crate) const MAX_SKIRMISH_LOBBY_SLOTS: usize = 8;
 pub(crate) const DEFAULT_LOBBY_CONTROLLERS: [SkirmishPlayerController; MAX_SKIRMISH_LOBBY_SLOTS] = [
@@ -2987,7 +2980,6 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 tactical_pause_hotkey,
                 clear_tactical_pause_on_speed_change,
                 run_mission_triggers,
-                check_mission_victory,
             )
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress),
@@ -3030,12 +3022,12 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .run_if(match_in_progress)
                 .run_if(online_match_is_authoritative),
             ai_director
-                .run_if(tutorial_enemy_ai_enabled)
+                .run_if(enemy_ai_enabled)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress)
                 .run_if(online_match_is_authoritative),
             auto_assign_ai_construction_workers
-                .run_if(tutorial_enemy_ai_enabled)
+                .run_if(enemy_ai_enabled)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress)
                 .run_if(online_match_is_authoritative),
@@ -3049,7 +3041,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .run_if(match_in_progress)
                 .run_if(online_match_is_authoritative),
             auto_assign_ai_supply_crate_collectors
-                .run_if(tutorial_enemy_ai_enabled)
+                .run_if(enemy_ai_enabled)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress)
                 .run_if(online_match_is_authoritative),
@@ -3089,7 +3081,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
     .add_systems(
         Update,
         update_ai_drone_scouting
-            .run_if(tutorial_enemy_ai_enabled)
+            .run_if(enemy_ai_enabled)
             .in_set(SimulationPhase::UiAndManagement)
             .run_if(match_in_progress)
             .run_if(online_match_is_authoritative),
@@ -3294,7 +3286,8 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress)
                 .run_if(online_match_is_authoritative),
-            evaluate_match_end
+            (evaluate_match_end, check_mission_victory)
+                .chain()
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
             update_visibility
@@ -4818,6 +4811,7 @@ pub(crate) fn evaluate_match_end(
     online_session: Option<Res<OnlineSession>>,
     visible_player: Option<Res<VisiblePlayer>>,
     setup_settings: Res<MatchSetupSettings>,
+    active_mission: Option<Res<ActiveMission>>,
     structures: Query<(&Structure, &Team, &Health)>,
     units: Query<(&Unit, &Team, &Health)>,
 ) {
@@ -4914,7 +4908,7 @@ pub(crate) fn evaluate_match_end(
             && Team::from_playable_index(idx)
                 .is_some_and(|team| relations.are_allied(player_team, team))
     });
-    let has_enemy = active_anchor_team.iter().enumerate().any(|(idx, active)| {
+    let mut has_enemy = active_anchor_team.iter().enumerate().any(|(idx, active)| {
         *active
             && Team::from_playable_index(idx)
                 .is_some_and(|team| relations.are_enemies(player_team, team))
@@ -4926,12 +4920,29 @@ pub(crate) fn evaluate_match_end(
             &mut match_state,
             &mut match_flow,
             MatchPhase::HumanDefeat,
-            t(
-                "失利：己方锚点被全部摧毁",
-                "Defeat: all your anchors were destroyed",
-            ),
+            t("失利：己方基地已被消灭", "Defeat: your base was eliminated"),
         );
         return;
+    }
+
+    if let Some(mission) = active_mission
+        .as_ref()
+        .and_then(|active| active.0)
+        .and_then(mission_by_index)
+    {
+        match mission.victory {
+            // Only the authored survival timer may grant this victory, even
+            // if an early counterattack destroys the enemy headquarters.
+            MissionVictory::SurviveFor(_) => return,
+            MissionVictory::DestroyAllEnemies => {
+                has_enemy = structures.iter().any(|(_, team, hp)| {
+                    hp.current > 0.0 && relations.are_enemies(player_team, *team)
+                }) || units.iter().any(|(_, team, hp)| {
+                    hp.current > 0.0 && relations.are_enemies(player_team, *team)
+                });
+            }
+            MissionVictory::Headquarters => {}
+        }
     }
 
     if !has_enemy {
@@ -4940,18 +4951,29 @@ pub(crate) fn evaluate_match_end(
             &mut match_state,
             &mut match_flow,
             MatchPhase::HumanVictory,
-            t("胜利：敌方锚点全部丢失", "Victory: all enemy anchors lost"),
+            if active_mission
+                .as_ref()
+                .and_then(|active| active.0)
+                .and_then(mission_by_index)
+                .is_some_and(|mission| mission.victory == MissionVictory::DestroyAllEnemies)
+            {
+                t(
+                    "胜利：敌军全部被消灭",
+                    "Victory: all enemy forces eliminated",
+                )
+            } else if setup_settings.victory_condition == VictoryCondition::Headquarters {
+                t(
+                    "胜利：敌方指挥中心已被摧毁",
+                    "Victory: enemy Command Centers destroyed",
+                )
+            } else {
+                t(
+                    "胜利：敌方指挥中心和工人已被消灭",
+                    "Victory: enemy Command Centers and workers eliminated",
+                )
+            },
         );
         return;
-    }
-
-    if active_teams <= 1 {
-        finalize_match(
-            &mut match_state,
-            &mut match_flow,
-            MatchPhase::MatchFinished,
-            t("战斗结束", "Battle Over"),
-        );
     }
 }
 
@@ -5870,14 +5892,6 @@ pub(crate) fn queue_button_state_for_product(
     Some(QueueButtonState { count, full })
 }
 
-pub(crate) fn queue_button_badge_text(state: QueueButtonState) -> String {
-    if state.full {
-        t(" [满]", " [Full]").to_string()
-    } else {
-        format!(" [x{}]", state.count)
-    }
-}
-
 pub(crate) fn find_production_spawn_position(
     origin: Vec3,
     producer_id: &'static str,
@@ -6564,7 +6578,11 @@ pub(crate) fn draw_world_overlays(
         } else if unit.is_some() {
             draw_unit_selection_marker(
                 &mut gizmos,
-                transform.translation,
+                Vec3::new(
+                    transform.translation.x,
+                    placement_preview.terrain.height_at(transform.translation),
+                    transform.translation.z,
+                ),
                 marker_radius,
                 selected_color,
             );
@@ -6583,6 +6601,7 @@ pub(crate) fn draw_world_overlays(
                 marker_radius,
                 *team,
                 visible_team,
+                placement_preview.terrain.height_at(transform.translation),
             );
         }
         draw_health_bar(
@@ -6600,7 +6619,12 @@ pub(crate) fn draw_world_overlays(
                 patrol_order,
                 order_queue,
             );
-            draw_terrain_order_path(&mut gizmos, transform.translation, &path_points);
+            draw_terrain_order_path(
+                &mut gizmos,
+                transform.translation,
+                &path_points,
+                &placement_preview.terrain,
+            );
         }
         draw_harvest_and_cargo_visuals(
             &mut gizmos,
@@ -7024,7 +7048,12 @@ pub(crate) fn structure_placement_preview_color(validity: StructurePlacementVali
     }
 }
 
-pub(crate) fn draw_terrain_order_path(gizmos: &mut Gizmos, start: Vec3, targets: &[Vec3]) {
+pub(crate) fn draw_terrain_order_path(
+    gizmos: &mut Gizmos,
+    start: Vec3,
+    targets: &[Vec3],
+    terrain: &TerrainHeightField,
+) {
     let mut from = start;
     for (index, target) in targets.iter().enumerate() {
         // Subtle: a whole selected army draws one of these each, so keep them a
@@ -7035,17 +7064,22 @@ pub(crate) fn draw_terrain_order_path(gizmos: &mut Gizmos, start: Vec3, targets:
             Color::srgba(0.32, 0.78, 1.0, 0.22)
         };
         gizmos.line(
-            terrain_overlay_point(from),
-            terrain_overlay_point(*target),
+            Vec3::new(from.x, terrain.height_at(from) + 0.08, from.z),
+            Vec3::new(target.x, terrain.height_at(*target) + 0.08, target.z),
             color,
         );
-        draw_ring(gizmos, *target, 0.24, color);
+        draw_ring(
+            gizmos,
+            Vec3::new(target.x, terrain.height_at(*target), target.z),
+            0.24,
+            color,
+        );
         from = *target;
     }
 }
 
 pub(crate) fn terrain_overlay_point(position: Vec3) -> Vec3 {
-    Vec3::new(position.x, 0.08, position.z)
+    position + Vec3::Y * 0.08
 }
 
 pub(crate) fn should_draw_air_to_terrain_marker(domain: MovementDomain) -> bool {
@@ -7058,11 +7092,12 @@ pub(crate) fn draw_air_to_terrain_marker(
     radius: f32,
     team: Team,
     visible_team: Team,
+    ground_height: f32,
 ) {
     let Some(color) = air_to_terrain_marker_color(team, visible_team) else {
         return;
     };
-    let ground_position = Vec3::new(position.x, 0.04, position.z);
+    let ground_position = Vec3::new(position.x, ground_height + 0.04, position.z);
     let half = (radius * 0.2).clamp(0.06, 0.16);
     gizmos.line(
         ground_position - Vec3::X * half,
@@ -7098,6 +7133,7 @@ pub(crate) fn air_to_terrain_marker_color(team: Team, visible_team: Team) -> Opt
 pub(crate) fn draw_selected_rally_flags(
     mut gizmos: Gizmos<HudGizmos>,
     visible_player: Res<VisiblePlayer>,
+    terrain: Res<TerrainHeightField>,
     selected: Query<(&Transform, &Team, &RallyPoint), (With<Selected>, With<Structure>)>,
 ) {
     let color = Color::srgb(0.55, 0.95, 0.62);
@@ -7110,7 +7146,7 @@ pub(crate) fn draw_selected_rally_flags(
             continue;
         };
         let base = transform.translation + Vec3::Y * 0.2;
-        let foot = Vec3::new(target.x, 0.05, target.z);
+        let foot = Vec3::new(target.x, terrain.height_at(target) + 0.05, target.z);
         // Tether from the building to the rally point.
         gizmos.line(base, foot + Vec3::Y * 0.15, faint);
         // Flag: a pole with a small triangular banner at the top.
@@ -7132,7 +7168,7 @@ pub(crate) fn draw_selected_rally_flags(
 pub(crate) fn draw_ring(gizmos: &mut Gizmos, position: Vec3, radius: f32, color: Color) {
     gizmos.circle(
         Isometry3d::new(
-            Vec3::new(position.x, 0.05, position.z),
+            position + Vec3::Y * 0.05,
             Quat::from_rotation_arc(Vec3::Z, Vec3::Y),
         ),
         radius,
