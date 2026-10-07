@@ -25,6 +25,10 @@ pub use capture_api::*;
 mod audio;
 pub(crate) use audio::*;
 mod ai;
+mod onboarding;
+pub(crate) use onboarding::*;
+mod campaign_progress;
+pub(crate) use campaign_progress::*;
 mod campaign;
 pub(crate) use campaign::*;
 mod terrain;
@@ -1654,8 +1658,12 @@ pub(crate) fn request_shared_match_scene_start(
     next_state.set(AppScreen::InMatch);
 }
 
-pub(crate) fn clear_active_mission(mut active: ResMut<ActiveMission>) {
+pub(crate) fn clear_active_mission(
+    mut active: ResMut<ActiveMission>,
+    mut tutorial: ResMut<TutorialState>,
+) {
     active.0 = None;
+    *tutorial = TutorialState::default();
 }
 
 pub(crate) fn start_shared_match_from_menu_selection(
@@ -2351,6 +2359,8 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<PendingLoadedSave>()
         .init_resource::<ReplayTimeline>()
         .init_resource::<ActiveMission>()
+        .init_resource::<TutorialState>()
+        .init_resource::<CampaignProgress>()
         .init_resource::<TerrainHeightField>()
         .init_resource::<TeamColorMaterials>()
         .init_resource::<CombatFlashMesh>()
@@ -2473,6 +2483,7 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
                 apply_loaded_save,
                 resume_replay_recording_after_load,
                 spawn_mission_cutscene,
+                setup_tutorial_panel,
             )
                 .chain(),
         )
@@ -2486,6 +2497,18 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
             )
                 .chain(),
         );
+    app.add_systems(
+        Update,
+        (
+            update_tutorial,
+            tutorial_skip,
+            record_campaign_completion,
+            update_campaign_continue_button,
+        )
+            .chain()
+            .in_set(SimulationPhase::UiAndManagement)
+            .run_if(in_state(AppScreen::InMatch)),
+    );
     add_runtime_systems(app);
     app
 }
@@ -2572,6 +2595,25 @@ pub(crate) fn queue_startup_loading_assets(
         &mut retained,
         asset_server.load::<Image>("ui/icons/RosterPreview.png"),
     );
+    for path in [
+        "ui/icons/ResourceA.png",
+        "ui/icons/ResourceB.png",
+        "ui/icons/PowerReactor.png",
+        "ui/icons/TechLocked.png",
+    ] {
+        retain_loading_asset(
+            &mut loading,
+            &mut retained,
+            asset_server.load::<Image>(path),
+        );
+    }
+    for mission in CAMPAIGN_MISSIONS {
+        retain_loading_asset(
+            &mut loading,
+            &mut retained,
+            asset_server.load::<Image>(mission.art),
+        );
+    }
     for faction in [
         SkirmishFaction::Alliance,
         SkirmishFaction::Demon,
@@ -2835,6 +2877,9 @@ pub fn build_game_app(mode: GameAppMode) -> App {
             RonAssetPlugin::<GodotModelMapAsset>::new(&["model_map.ron"]),
         ))
         .insert_resource(RenderErrorHandler(handle_render_error));
+    if matches!(mode, GameAppMode::Interactive) {
+        app.insert_resource(CampaignProgress::load_for_player());
+    }
     add_game_scenes(&mut app);
     app
 }
@@ -2985,10 +3030,12 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .run_if(match_in_progress)
                 .run_if(online_match_is_authoritative),
             ai_director
+                .run_if(tutorial_enemy_ai_enabled)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress)
                 .run_if(online_match_is_authoritative),
             auto_assign_ai_construction_workers
+                .run_if(tutorial_enemy_ai_enabled)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress)
                 .run_if(online_match_is_authoritative),
@@ -3002,6 +3049,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .run_if(match_in_progress)
                 .run_if(online_match_is_authoritative),
             auto_assign_ai_supply_crate_collectors
+                .run_if(tutorial_enemy_ai_enabled)
                 .in_set(SimulationPhase::UiAndManagement)
                 .run_if(match_in_progress)
                 .run_if(online_match_is_authoritative),
@@ -3033,7 +3081,15 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
     )
     .add_systems(
         Update,
+        update_resource_tooltip
+            .after(update_command_tooltip)
+            .in_set(SimulationPhase::UiAndManagement)
+            .run_if(match_in_progress),
+    )
+    .add_systems(
+        Update,
         update_ai_drone_scouting
+            .run_if(tutorial_enemy_ai_enabled)
             .in_set(SimulationPhase::UiAndManagement)
             .run_if(match_in_progress)
             .run_if(online_match_is_authoritative),
@@ -3486,12 +3542,12 @@ pub(crate) struct Locale(pub(crate) Language);
 
 impl Default for Locale {
     fn default() -> Self {
-        Locale(Language::Zh)
+        Locale(Language::En)
     }
 }
 
 pub(crate) static CURRENT_LANGUAGE: std::sync::atomic::AtomicU8 =
-    std::sync::atomic::AtomicU8::new(0);
+    std::sync::atomic::AtomicU8::new(1);
 // The SUBSET font (~128 KB, tracked + deployed). NOT the full 3.2 MB face, which is
 // gitignored and 404s on GitHub Pages. Re-run scripts/subset_font.sh after adding new
 // Chinese UI text so the subset covers it (else tofu).
@@ -5022,28 +5078,6 @@ pub(crate) fn objective_completion_percent(
     ((destroyed as f32 / total_anchors as f32) * 100.0).round() as u32
 }
 
-pub(crate) fn objective_tracker_text(snapshot: ObjectiveTrackerSnapshot) -> String {
-    let title = if snapshot.total_anchors > 0 && snapshot.remaining_anchors == 0 {
-        t("目标完成", "Objective complete")
-    } else {
-        t("目标: 消灭敌方锚点", "Objective: eliminate enemy anchors")
-    };
-    format!(
-        "{title}\n{}: {}  {}: {}/{}\n{}: {}  {}: {}  {}: {}%",
-        t("敌方队伍", "Enemy teams"),
-        snapshot.enemy_teams,
-        t("锚点", "Anchors"),
-        snapshot.remaining_anchors,
-        snapshot.total_anchors,
-        t("结构", "Structures"),
-        snapshot.structures,
-        t("工人", "Workers"),
-        snapshot.workers,
-        t("进度", "Progress"),
-        snapshot.completion_percent,
-    )
-}
-
 pub(crate) fn push_under_attack_log(
     battle_log: &mut BattleLog,
     focus: Vec3,
@@ -6476,20 +6510,8 @@ pub(crate) fn draw_world_overlays(
     {
         let base = transform.translation;
         let half_width = resource_visual_half_width(resource.kind);
-        let color = Color::srgb(1.0, 0.85, 0.25);
-        for (height, scale) in [
-            (0.06_f32, 1.15_f32),
-            (resource_visual_height(resource.kind), 0.7),
-        ] {
-            gizmos.circle(
-                Isometry3d::new(
-                    Vec3::new(base.x, base.y + height, base.z),
-                    Quat::from_rotation_arc(Vec3::Z, Vec3::Y),
-                ),
-                half_width * scale,
-                color,
-            );
-        }
+        let color = Color::srgba(1.0, 0.85, 0.25, 0.72);
+        draw_unit_selection_marker(&mut gizmos, base, half_width * 0.8, color);
     }
 
     // Placement grid only while a structure ghost is on the cursor (godot

@@ -1,5 +1,32 @@
 # Open Bevy Online Notes
 
+## Steam quality verification in progress
+
+- Offscreen capture UI focus needs a window render target during
+  `UiSystems::Focus`; capture restores its image target before rendering.
+  This now lets the actual menu Boot Camp button enter the match.
+- `screenshots/steam-quality/boot-camp/02_gathered.png` proves delivered
+  harvesting advances the tutorial. Full graduation is still unverified.
+- Moving harvesters invalidate a cached click position during camera-settle
+  ticks. The build harness now queries their current position before clicking.
+- Hide the briefing reopen button while training is active; it previously
+  overlapped the tutorial title. Fresh screenshot verification is pending.
+- The current full library run is logged in
+  `logs/steam-quality-tests-current.log`: 146 passed, 0 failed (67.75s).
+- Boot Camp initially referenced nonexistent `PowerSupply`; registry and
+  command card use `PowerReactor`. Both tutorial and harness now use the real ID.
+  A capture has built the reactor; allow the following UI update to observe
+  removal of `UnderConstruction` before asserting the next stage.
+- Full real-input Boot Camp capture now passes all seven lessons. Evidence:
+  `logs/steam-boot-camp-current.log` and `06_graduated.png` in
+  `screenshots/steam-quality/boot-camp`. Reactor/barracks, four infantry and
+  enemy HQ destruction were issued through normal command-card/input paths.
+- `screenshots/result/9` contains the current 450-frame / 15-second / 30-fps
+  proof bundle. Opening and combat inspected; movement 4.24m, siege 113 damage.
+  Remaining visible polish: wide unit health bars can overlap the objective
+  panel; battle notices still resemble debug overlays; HUD action text remains
+  crowded. These are open release-quality issues, not accepted final visuals.
+
 - Bevy Open RTS uses Bevy 0.19 and runs its simulation in normal `Update`
   systems with floating-point transforms and timers. It is not deterministic
   enough for peer lockstep without a much larger simulation rewrite.

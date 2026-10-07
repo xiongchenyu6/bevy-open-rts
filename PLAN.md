@@ -1,5 +1,22 @@
 # Open Bevy Online Plan
 
+## Steam quality work (active)
+
+The full acceptance matrix is in `docs/RELEASE_READINESS.md`. It remains open:
+green library tests and the earlier art pass do not establish release readiness.
+
+- [ ] Verify Boot Camp from menu entry through graduation with normal inputs.
+  Seven lessons pass in `logs/steam-boot-camp-current.log`, with screenshots in
+  `screenshots/steam-quality/boot-camp`. Skip/replay and native profile remain.
+- [ ] Verify all six campaign missions, persistent completion and continuation.
+- [ ] Verify save continuity, corruption recovery and player-facing feedback.
+- [ ] Complete desktop delivery, balance/performance, art/audio and provenance gates.
+
+Current verification: 146 library tests pass; formatting, type/build checks and
+12-second native launch pass with no error output. `screenshots/result/9` is a
+fresh 450-frame/30-fps proof (4.24m movement, 113 siege damage). Open visual
+issues include health bars over the objective panel and crowded action text.
+
 ## Objective
 
 Build one reusable WebRTC signaling and session platform for the Open Bevy game

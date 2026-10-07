@@ -33,6 +33,7 @@ pub(crate) enum MainMenuAction {
 
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum FrontMenuAction {
+    Training,
     Play,
     Online,
     Campaign,
@@ -99,7 +100,7 @@ impl Default for MenuOptionsState {
     fn default() -> Self {
         Self {
             fullscreen: true,
-            language: Language::Zh,
+            language: Language::En,
             mouse_restricted: false,
             master_volume: 1.0,
             music_volume: 1.0,
@@ -254,7 +255,11 @@ pub(crate) fn setup_menu_backdrop(
         });
 }
 
-pub(crate) fn setup_front_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub(crate) fn setup_front_menu(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    progress: Res<CampaignProgress>,
+) {
     let font = asset_server.load(UI_FONT_PATH);
     commands.spawn((
         Name::new("Main Menu Camera"),
@@ -387,7 +392,8 @@ pub(crate) fn setup_front_menu(mut commands: Commands, asset_server: Res<AssetSe
                     ));
                     panel.spawn(front_divider_node());
                     for (action, zh, en, height) in [
-                        (FrontMenuAction::Play, "单人对战", "Skirmish", 62.0),
+                        (FrontMenuAction::Training, "基础训练", "Boot Camp", 62.0),
+                        (FrontMenuAction::Play, "单人对战", "Skirmish", 58.0),
                         (FrontMenuAction::Online, "联机对战", "Online", 58.0),
                         (FrontMenuAction::Campaign, "战役", "Campaign", 58.0),
                         (FrontMenuAction::Options, "设置", "Options", 58.0),
@@ -403,7 +409,13 @@ pub(crate) fn setup_front_menu(mut commands: Commands, asset_server: Res<AssetSe
                             .spawn(front_menu_button(action, height))
                             .with_children(|button| {
                                 button.spawn((
-                                    localized_text(zh, en),
+                                    if action == FrontMenuAction::Training
+                                        && progress.training_complete()
+                                    {
+                                        localized_text("重玩基础训练", "Replay Boot Camp")
+                                    } else {
+                                        localized_text(zh, en)
+                                    },
                                     TextFont {
                                         font: font.clone().into(),
                                         font_size: FontSize::Px(22.0),
@@ -531,6 +543,10 @@ pub(crate) fn front_menu_buttons(
     mouse: Res<ButtonInput<MouseButton>>,
     mut options: ResMut<MenuOptionsState>,
     mut next_state: ResMut<NextState<AppScreen>>,
+    mut tutorial: ResMut<TutorialState>,
+    mut settings: ResMut<MatchSetupSettings>,
+    mut selected_map: ResMut<SelectedSkirmishMap>,
+    mut active_mission: ResMut<ActiveMission>,
     mut windows: Query<&mut Window, With<PrimaryWindow>>,
     mut buttons: Query<(&Interaction, &FrontMenuButton, &mut BackgroundColor)>,
 ) {
@@ -538,7 +554,20 @@ pub(crate) fn front_menu_buttons(
         let clicked = *interaction == Interaction::Pressed && mouse.just_pressed(MouseButton::Left);
         if clicked {
             match button.action {
-                FrontMenuAction::Play => next_state.set(AppScreen::SkirmishSetup),
+                FrontMenuAction::Training => {
+                    *settings = tutorial_match_settings();
+                    selected_map.godot_path = settings.map_path;
+                    active_mission.0 = None;
+                    *tutorial = TutorialState {
+                        active: true,
+                        ..default()
+                    };
+                    next_state.set(AppScreen::InMatch);
+                }
+                FrontMenuAction::Play => {
+                    *tutorial = TutorialState::default();
+                    next_state.set(AppScreen::SkirmishSetup);
+                }
                 FrontMenuAction::Online => next_state.set(AppScreen::OnlineLobby),
                 FrontMenuAction::Campaign => next_state.set(AppScreen::CampaignMenu),
                 FrontMenuAction::Options => next_state.set(AppScreen::OptionsMenu),
@@ -2408,7 +2437,11 @@ pub(crate) enum CampaignMenuAction {
     Back,
 }
 
-pub(crate) fn setup_campaign_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub(crate) fn setup_campaign_menu(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    progress: Res<CampaignProgress>,
+) {
     let font = asset_server.load(UI_FONT_PATH);
     commands.spawn((
         Name::new("Campaign Menu Camera"),
@@ -2434,46 +2467,113 @@ pub(crate) fn setup_campaign_menu(mut commands: Commands, asset_server: Res<Asse
             },
         ))
         .with_children(|root| {
-            root.spawn(options_panel_node()).with_children(|panel| {
+            root.spawn((
+                Node {
+                    width: Val::Percent(84.0),
+                    max_width: px(780),
+                    padding: UiRect::all(px(16)),
+                    flex_direction: FlexDirection::Column,
+                    row_gap: px(10),
+                    border_radius: BorderRadius::all(px(8)),
+                    ..default()
+                },
+                BackgroundColor(Color::srgba(0.035, 0.05, 0.065, 0.96)),
+            ))
+            .with_children(|panel| {
                 panel.spawn(options_group_header("战役", "Campaign", font.clone()));
-                for (index, mission) in CAMPAIGN_MISSIONS.iter().enumerate() {
-                    panel
-                        .spawn((
-                            Button,
-                            CampaignMenuAction::Start(index),
-                            Node {
-                                width: Val::Percent(100.0),
-                                flex_direction: FlexDirection::Column,
-                                row_gap: px(4),
-                                padding: UiRect::all(px(10)),
-                                border: UiRect::all(px(1)),
-                                border_radius: BorderRadius::all(px(6)),
-                                ..default()
-                            },
-                            BorderColor::all(Color::srgb(0.26, 0.32, 0.32)),
-                            BackgroundColor(Color::srgba(0.05, 0.05, 0.048, 0.92)),
-                        ))
-                        .with_children(|card| {
-                            card.spawn((
-                                localized_text(mission.name_zh, mission.name_en),
-                                TextFont {
-                                    font: font.clone().into(),
-                                    font_size: FontSize::Px(18.0),
-                                    ..default()
-                                },
-                                TextColor(Color::srgb(0.96, 0.72, 0.38)),
-                            ));
-                            card.spawn((
-                                localized_text(mission.briefing_zh, mission.briefing_en),
-                                TextFont {
-                                    font: font.clone().into(),
-                                    font_size: FontSize::Px(13.0),
-                                    ..default()
-                                },
-                                TextColor(Color::srgb(0.78, 0.86, 0.84)),
-                            ));
-                        });
+                if let Some(notice) = &progress.notice {
+                    panel.spawn((
+                        Text::new(notice.clone()),
+                        TextFont {
+                            font: font.clone().into(),
+                            font_size: FontSize::Px(14.0),
+                            ..default()
+                        },
+                        TextColor(Color::srgb(1.0, 0.78, 0.46)),
+                    ));
                 }
+                panel
+                    .spawn(Node {
+                        flex_direction: FlexDirection::Row,
+                        flex_wrap: FlexWrap::Wrap,
+                        column_gap: px(10),
+                        row_gap: px(10),
+                        ..default()
+                    })
+                    .with_children(|grid| {
+                        for (index, mission) in CAMPAIGN_MISSIONS.iter().enumerate() {
+                            grid.spawn((
+                                Button,
+                                CampaignMenuAction::Start(index),
+                                Node {
+                                    width: Val::Percent(48.5),
+                                    height: px(160),
+                                    flex_direction: FlexDirection::Column,
+                                    row_gap: px(4),
+                                    padding: UiRect::all(px(10)),
+                                    border: UiRect::all(px(1)),
+                                    border_radius: BorderRadius::all(px(6)),
+                                    ..default()
+                                },
+                                BorderColor::all(Color::srgb(0.26, 0.32, 0.32)),
+                                BackgroundColor(if progress.unlocked(index) {
+                                    Color::srgba(0.05, 0.05, 0.048, 0.92)
+                                } else {
+                                    Color::srgba(0.035, 0.04, 0.045, 0.9)
+                                }),
+                            ))
+                            .with_children(|card| {
+                                if !progress.unlocked(index) {
+                                    card.spawn((
+                                        ImageNode::new(
+                                            asset_server.load("ui/icons/TechLocked.png"),
+                                        ),
+                                        Node {
+                                            position_type: PositionType::Absolute,
+                                            right: px(12),
+                                            top: px(12),
+                                            width: px(24),
+                                            height: px(24),
+                                            ..default()
+                                        },
+                                    ));
+                                }
+                                card.spawn((
+                                    ImageNode::new(asset_server.load(mission.art)),
+                                    Node {
+                                        width: Val::Percent(100.0),
+                                        height: px(54),
+                                        ..default()
+                                    },
+                                ));
+                                card.spawn((
+                                    localized_text(mission.name_zh, mission.name_en),
+                                    TextFont {
+                                        font: font.clone().into(),
+                                        font_size: FontSize::Px(16.0),
+                                        ..default()
+                                    },
+                                    TextColor(Color::srgb(0.96, 0.72, 0.38)),
+                                ));
+                                card.spawn((
+                                    if progress.unlocked(index) {
+                                        localized_text(mission.briefing_zh, mission.briefing_en)
+                                    } else {
+                                        localized_text(
+                                            "完成上一关后解锁",
+                                            "Complete the previous mission to unlock",
+                                        )
+                                    },
+                                    TextFont {
+                                        font: font.clone().into(),
+                                        font_size: FontSize::Px(13.0),
+                                        ..default()
+                                    },
+                                    TextColor(Color::srgb(0.78, 0.86, 0.84)),
+                                ));
+                            });
+                        }
+                    });
                 panel
                     .spawn((
                         Button,
@@ -2507,6 +2607,7 @@ pub(crate) fn setup_campaign_menu(mut commands: Commands, asset_server: Res<Asse
 
 pub(crate) fn campaign_menu_buttons(
     mouse: Res<ButtonInput<MouseButton>>,
+    progress: Res<CampaignProgress>,
     mut setup_settings: ResMut<MatchSetupSettings>,
     mut selected_map: ResMut<SelectedSkirmishMap>,
     mut active_mission: ResMut<ActiveMission>,
@@ -2519,6 +2620,9 @@ pub(crate) fn campaign_menu_buttons(
         if clicked {
             match action {
                 CampaignMenuAction::Start(index) => {
+                    if !progress.unlocked(*index) {
+                        continue;
+                    }
                     if let Some(mission) = mission_by_index(*index)
                         && let Some(settings) = match_settings_for_mission(mission)
                     {

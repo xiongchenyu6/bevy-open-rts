@@ -28,11 +28,16 @@ pub(crate) struct CutsceneTypewriter {
 /// Shows the cutscene when a campaign mission starts (skirmish is unaffected).
 pub(crate) fn spawn_mission_cutscene(
     mut commands: Commands,
+    loaded: Option<Res<LoadedMatchMarker>>,
     asset_server: Option<Res<AssetServer>>,
     active_mission: Res<ActiveMission>,
     locale: Res<Locale>,
     mut virtual_time: ResMut<Time<Virtual>>,
 ) {
+    if loaded.is_some() {
+        commands.remove_resource::<LoadedMatchMarker>();
+        return;
+    }
     let Some(mission) = active_mission.0.and_then(mission_by_index) else {
         return;
     };

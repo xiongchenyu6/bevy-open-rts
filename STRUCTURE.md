@@ -29,6 +29,14 @@ The repository is a Cargo workspace whose default member remains the root
 
 ## Source Modules
 
+- `onboarding.rs` observes normal selection, harvesting, construction,
+  production and combat to advance Boot Camp. It does not issue player orders.
+- `campaign_progress.rs` stores completed mission IDs and training completion
+  separately from match saves; interactive clients use per-user storage.
+- `save.rs` and `save/continuity.rs` serialize gameplay state with local IDs
+  and remap references after restart; `save/tests.rs` verifies restored behavior.
+- `docs/RELEASE_READINESS.md` tracks the remaining full Steam-quality gates.
+
 `src/lib.rs` is the crate root: app composition/plugin registration, the match
 setup/flow (maps, factions, spawn, fog/visibility) and shared core types. The
 domains live in modules, each re-exported into the crate root

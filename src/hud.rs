@@ -437,6 +437,16 @@ pub(crate) fn setup_match_end_overlay(commands: &mut Commands, font: Handle<Font
                             ..default()
                         })
                         .with_children(|row| {
+                            row.spawn((
+                                match_end_button(MatchEndAction::ContinueCampaign),
+                                CampaignContinueButton,
+                            ))
+                            .with_children(|button| {
+                                button.spawn((
+                                    match_end_button_label("下一关", "Next Mission", font.clone()),
+                                    CampaignContinueLabel,
+                                ));
+                            });
                             row.spawn(match_end_button(MatchEndAction::Restart))
                                 .with_children(|button| {
                                     button.spawn(match_end_button_label(
@@ -797,29 +807,43 @@ pub(crate) fn setup_match_briefing(commands: &mut Commands, font: Handle<Font>) 
         });
 }
 
-/// One resource group in the top-left bar: a colored swatch (the mineral color) +
-/// a count label that `update_resource_bar` keeps current.
+/// Hover targets share the command card's tooltip surface.
+#[derive(Component, Clone, Copy)]
+pub(crate) enum HudEconomyTooltip {
+    Resource(ResourceKind),
+    Power,
+}
+
+/// One resource icon and its live stockpile count.
 pub(crate) fn spawn_hud_resource_group(
     bar: &mut ChildSpawnerCommands,
     kind: ResourceKind,
     font: Handle<Font>,
+    asset_server: &AssetServer,
 ) {
-    bar.spawn(Node {
-        flex_direction: FlexDirection::Row,
-        align_items: AlignItems::Center,
-        column_gap: px(6),
-        ..default()
-    })
+    let icon = match kind {
+        ResourceKind::Ore => "ui/icons/ResourceA.png",
+        ResourceKind::Crystal => "ui/icons/ResourceB.png",
+    };
+    bar.spawn((
+        Node {
+            flex_direction: FlexDirection::Row,
+            align_items: AlignItems::Center,
+            column_gap: px(8),
+            min_width: px(82),
+            ..default()
+        },
+        Interaction::None,
+        HudEconomyTooltip::Resource(kind),
+    ))
     .with_children(|group| {
         group.spawn((
+            ImageNode::new(asset_server.load(icon)),
             Node {
-                width: px(14),
-                height: px(14),
-                border: UiRect::all(px(1)),
+                width: px(32),
+                height: px(32),
                 ..default()
             },
-            BorderColor::all(Color::srgba(0.0, 0.0, 0.0, 0.6)),
-            BackgroundColor(kind.color()),
         ));
         group.spawn((
             Text::new("0"),
@@ -832,6 +856,56 @@ pub(crate) fn spawn_hud_resource_group(
             HudResourceCount(kind),
         ));
     });
+}
+
+pub(crate) fn update_resource_tooltip(
+    economies: Res<Economies>,
+    visible_player: Res<VisiblePlayer>,
+    targets: Query<(&HudEconomyTooltip, &Interaction)>,
+    window_q: Query<&Window, With<PrimaryWindow>>,
+    mut tooltip_q: Query<(&mut Node, &mut Visibility), With<CommandTooltip>>,
+    mut text_q: Query<&mut Text, With<CommandTooltipText>>,
+) {
+    let Some((target, _)) = targets.iter().find(|(_, interaction)| {
+        matches!(interaction, Interaction::Hovered | Interaction::Pressed)
+    }) else {
+        return;
+    };
+    let Ok(window) = window_q.single() else {
+        return;
+    };
+    let Some(cursor) = window.cursor_position() else {
+        return;
+    };
+    let Ok((mut node, mut visibility)) = tooltip_q.single_mut() else {
+        return;
+    };
+    let Ok(mut text) = text_q.single_mut() else {
+        return;
+    };
+    let economy = economies.get(visible_player.team);
+    text.0 = match target {
+        HudEconomyTooltip::Resource(kind) => format!(
+            "{}\n{}",
+            kind.label(),
+            t(
+                "派工人采集并送回精炼厂，用于建造和生产。",
+                "Gather with workers and return to a refinery to fund construction and production."
+            ),
+        ),
+        HudEconomyTooltip::Power => format!(
+            "{}: {} / {}\n{}",
+            t("电力消耗 / 供应", "Power used / capacity"),
+            economy.power_used,
+            economy.power_capacity,
+            t(
+                "建造反应堆增加供电。电力不足会减慢生产，并使雷达离线。",
+                "Build reactors to increase capacity. Low power slows production and disables radar."
+            ),
+        ),
+    };
+    position_command_tooltip(&mut node, window, cursor);
+    *visibility = Visibility::Inherited;
 }
 
 pub(crate) fn update_resource_bar(
@@ -913,8 +987,7 @@ pub(crate) fn setup_ui(
 ) {
     let font = asset_server.load(UI_FONT_PATH);
 
-    // Top-left resource/power bar (godot ResourcesBar): colored swatch + count per
-    // resource, then a color-coded power readout + a low-power warning.
+    // Compact economy strip: stockpile icons, live values and power status.
     commands
         .spawn((
             Name::new("Resource Bar"),
@@ -924,38 +997,51 @@ pub(crate) fn setup_ui(
                 left: px(12),
                 flex_direction: FlexDirection::Row,
                 align_items: AlignItems::Center,
-                column_gap: px(16),
-                padding: UiRect::new(px(12), px(14), px(6), px(6)),
+                column_gap: px(18),
+                padding: UiRect::new(px(10), px(12), px(5), px(5)),
                 border: UiRect::all(px(1)),
                 ..default()
             },
-            BorderColor::all(Color::srgb(0.26, 0.32, 0.32)),
-            BackgroundColor(Color::srgba(0.02, 0.04, 0.045, 0.82)),
+            BorderColor::all(Color::srgb(0.24, 0.30, 0.37)),
+            BackgroundColor(Color::srgba(0.035, 0.05, 0.075, 0.94)),
             MatchScopedEntity,
         ))
         .with_children(|bar| {
-            spawn_hud_resource_group(bar, ResourceKind::Ore, font.clone());
-            spawn_hud_resource_group(bar, ResourceKind::Crystal, font.clone());
-            // Power group.
+            spawn_hud_resource_group(bar, ResourceKind::Ore, font.clone(), asset_server);
+            spawn_hud_resource_group(bar, ResourceKind::Crystal, font.clone(), asset_server);
             bar.spawn((
-                localized_text("电力", "PWR"),
-                TextFont {
-                    font: font.clone().into(),
-                    font_size: FontSize::Px(16.0),
+                Node {
+                    flex_direction: FlexDirection::Row,
+                    align_items: AlignItems::Center,
+                    column_gap: px(8),
+                    border: UiRect::left(px(1)),
+                    padding: UiRect::left(px(14)),
                     ..default()
                 },
-                TextColor(Color::srgb(0.7, 0.86, 0.72)),
-            ));
-            bar.spawn((
-                Text::new("0/0"),
-                TextFont {
-                    font: font.clone().into(),
-                    font_size: FontSize::Px(16.0),
-                    ..default()
-                },
-                TextColor(Color::srgb(0.72, 1.0, 0.74)),
-                HudPowerText,
-            ));
+                BorderColor::all(Color::srgb(0.24, 0.30, 0.37)),
+                Interaction::None,
+                HudEconomyTooltip::Power,
+            ))
+            .with_children(|group| {
+                group.spawn((
+                    ImageNode::new(asset_server.load("ui/icons/PowerReactor.png")),
+                    Node {
+                        width: px(32),
+                        height: px(32),
+                        ..default()
+                    },
+                ));
+                group.spawn((
+                    Text::new("0/0"),
+                    TextFont {
+                        font: font.clone().into(),
+                        font_size: FontSize::Px(18.0),
+                        ..default()
+                    },
+                    TextColor(Color::srgb(0.72, 1.0, 0.74)),
+                    HudPowerText,
+                ));
+            });
             bar.spawn((
                 localized_text("低电力", "LOW POWER"),
                 TextFont {
@@ -1065,7 +1151,7 @@ pub(crate) fn setup_ui(
                 TextColor(Color::srgb(0.93, 0.98, 0.94)),
                 TextLayout::justify(Justify::Center),
                 Node {
-                    max_width: px(460),
+                    max_width: px(320),
                     // Dark rounded backing so the objective reads over the bright
                     // sand terrain instead of washing out.
                     padding: UiRect::axes(px(12.0), px(6.0)),
@@ -1078,8 +1164,8 @@ pub(crate) fn setup_ui(
             center
                 .spawn((
                     Node {
-                        width: px(300),
-                        height: px(8),
+                        width: px(260),
+                        height: px(4),
                         border: UiRect::all(px(1)),
                         ..default()
                     },
@@ -2693,6 +2779,8 @@ pub(crate) fn update_objective_tracker_hud(
     relations: Res<TeamRelations>,
     active_mission: Res<ActiveMission>,
     match_state: Res<MatchState>,
+    setup_settings: Res<MatchSetupSettings>,
+    tutorial: Option<Res<TutorialState>>,
     mut objective_tracker: ResMut<ObjectiveTrackerState>,
     structures: Query<(&Structure, &Team, &Health)>,
     units: Query<(&Unit, &Team, &Health)>,
@@ -2700,34 +2788,95 @@ pub(crate) fn update_objective_tracker_hud(
     mut objective_fill: Query<&mut Node, With<ObjectiveProgressFill>>,
     mut objective_root: Query<&mut Visibility, With<ObjectiveTrackerRoot>>,
 ) {
+    let visible =
+        match_state.is_running() && !tutorial.as_ref().is_some_and(|tutorial| tutorial.active);
     for mut visibility in &mut objective_root {
-        // Restored when a new match starts; the match-end sweeper hides it.
-        if *visibility == Visibility::Hidden && match_state.is_running() {
-            *visibility = Visibility::Inherited;
-        }
+        *visibility = if visible {
+            Visibility::Inherited
+        } else {
+            Visibility::Hidden
+        };
+    }
+    if !visible {
+        return;
     }
     let Ok(mut text) = objective_text.single_mut() else {
         return;
     };
-    let snapshot = objective_tracker_snapshot(
-        visible_player.team,
-        &relations,
-        &structures,
-        &units,
-        &mut objective_tracker,
-    );
-    if let Ok(mut fill) = objective_fill.single_mut() {
-        fill.width = Val::Percent(snapshot.completion_percent as f32);
-    }
-    **text = objective_tracker_text(snapshot);
-    // Survive missions show the countdown instead of the anchor objective.
-    if let Some(remaining) = mission_survive_remaining(&active_mission, &match_state) {
-        **text = format!(
-            "{}: {}:{:02}",
-            t("目标: 坚守", "Objective: hold out"),
-            (remaining / 60.0) as u32,
-            remaining as u32 % 60
+    let (label, progress) = if let Some(remaining) =
+        mission_survive_remaining(&active_mission, &match_state)
+    {
+        let total = active_mission
+            .0
+            .and_then(mission_by_index)
+            .and_then(|mission| {
+                if let MissionVictory::SurviveFor(seconds) = mission.victory {
+                    Some(seconds)
+                } else {
+                    None
+                }
+            })
+            .unwrap_or(remaining);
+        let progress = if total > 0.0 {
+            ((total - remaining) / total * 100.0).clamp(0.0, 100.0)
+        } else {
+            100.0
+        };
+        let seconds = remaining.ceil() as u32;
+        (
+            format!(
+                "{}  {}:{:02}",
+                t("坚守", "Hold out"),
+                seconds / 60,
+                seconds % 60
+            ),
+            progress,
+        )
+    } else if setup_settings.victory_condition == VictoryCondition::Headquarters {
+        let remaining = structures
+            .iter()
+            .filter(|(structure, team, health)| {
+                health.current > 0.0
+                    && is_structure_elimination_anchor(structure)
+                    && relations.are_enemies(visible_player.team, **team)
+            })
+            .count() as u32;
+        objective_tracker.max_enemy_anchors_seen =
+            objective_tracker.max_enemy_anchors_seen.max(remaining);
+        let total = objective_tracker.max_enemy_anchors_seen;
+        let progress = objective_completion_percent(remaining, total, total > 0 && remaining == 0);
+        (
+            format!(
+                "{}  {} / {}",
+                t("摧毁敌方指挥中心", "Destroy enemy Command Centers"),
+                total.saturating_sub(remaining),
+                total
+            ),
+            progress as f32,
+        )
+    } else {
+        let snapshot = objective_tracker_snapshot(
+            visible_player.team,
+            &relations,
+            &structures,
+            &units,
+            &mut objective_tracker,
         );
+        (
+            format!(
+                "{}  {}%",
+                t(
+                    "摧毁敌方指挥中心和工人",
+                    "Destroy enemy Command Centers and workers"
+                ),
+                snapshot.completion_percent
+            ),
+            snapshot.completion_percent as f32,
+        )
+    };
+    **text = label;
+    if let Ok(mut fill) = objective_fill.single_mut() {
+        fill.width = Val::Percent(progress);
     }
 }
 
@@ -3225,6 +3374,7 @@ pub(crate) fn hud_world_input_rects(
 /// (a one-frame lag on panel growth is imperceptible for input hit-testing).
 pub(crate) fn refresh_hud_hit_zones(
     mut zones: ResMut<HudHitZones>,
+    tutorial: Option<Res<TutorialState>>,
     window_q: Query<&Window, With<PrimaryWindow>>,
     support_panel: Res<SupportPowerPanelState>,
     battle_log: Res<BattleLog>,
@@ -3255,6 +3405,11 @@ pub(crate) fn refresh_hud_hit_zones(
         queue_slots,
         selection_visible,
     );
+    if tutorial.as_ref().is_some_and(|tutorial| tutorial.active) {
+        zones
+            .world_rects
+            .push((Vec2::new(12.0, 68.0), Vec2::new(312.0, 258.0)));
+    }
 }
 
 pub(crate) fn cursor_is_over_hud(window: &Window, zones: &HudHitZones) -> bool {

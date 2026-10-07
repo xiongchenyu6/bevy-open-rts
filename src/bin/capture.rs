@@ -32,8 +32,9 @@ use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 
 use bevy_open_rts::{
     CaptureTarget, build_capture_app, build_model_harness_capture_app, capture_art_combat_evidence,
-    capture_build_options_count, capture_dismiss_match_briefing, capture_enabled_build_hotkey_for,
-    capture_enabled_train_hotkey_for, capture_enemy_structure_position, capture_entity_is_selected,
+    capture_boot_camp_button, capture_build_options_count, capture_dismiss_match_briefing,
+    capture_enabled_build_hotkey_for, capture_enabled_train_hotkey_for,
+    capture_enemy_structure_position, capture_entity_is_selected,
     capture_first_enabled_attack_move_hotkey, capture_first_enabled_build_hotkey,
     capture_first_enabled_train_hotkey, capture_focus_camera_on, capture_frame_whole_map,
     capture_key, capture_match_phase_label, capture_model_harness_manifest,
@@ -42,22 +43,23 @@ use bevy_open_rts::{
     capture_onscreen_resource_model_center, capture_placement_is_valid,
     capture_player_army_average_position, capture_player_army_unit_count,
     capture_player_build_queue_len, capture_player_combat_order_count,
-    capture_player_command_center, capture_player_completed_structure_count,
-    capture_player_completed_structure_position, capture_player_constructing_count,
-    capture_player_harvesting_count, capture_player_in_placement_mode,
-    capture_player_onscreen_unit_position, capture_player_onscreen_worker_position,
-    capture_player_producer_position, capture_player_resources, capture_player_structure_count,
-    capture_player_unit_count, capture_player_worker_position, capture_run_ai_duel,
-    capture_run_ai_match_until_resolved, capture_run_arena, capture_run_faction_duel,
-    capture_select_map, capture_selected_player_unit_average_position,
-    capture_selected_player_unit_count, capture_selected_player_unit_ids, capture_set_all_factions,
-    capture_set_cursor, capture_set_structure_rally, capture_set_weather,
-    capture_show_campaign_menu, capture_show_credits_menu, capture_show_main_menu,
-    capture_show_options_menu, capture_show_skirmish_setup_menu,
-    capture_show_skirmish_setup_with_dropdown, capture_spawn_construction_showcase,
-    capture_spawn_model_harness_page, capture_stage_art_combat, capture_stage_deployed_siege,
-    capture_stage_player_radar, capture_stage_worker_collecting, capture_start_mission,
-    capture_startup_ready, capture_world_to_screen, capture_worst_model_alignment_offset,
+    capture_player_combat_unit_position, capture_player_command_center,
+    capture_player_completed_structure_count, capture_player_completed_structure_position,
+    capture_player_constructing_count, capture_player_harvesting_count,
+    capture_player_in_placement_mode, capture_player_onscreen_unit_position,
+    capture_player_onscreen_worker_position, capture_player_producer_position,
+    capture_player_resources, capture_player_structure_count, capture_player_unit_count,
+    capture_player_worker_position, capture_run_ai_duel, capture_run_ai_match_until_resolved,
+    capture_run_arena, capture_run_faction_duel, capture_select_map,
+    capture_selected_player_unit_average_position, capture_selected_player_unit_count,
+    capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
+    capture_set_structure_rally, capture_set_weather, capture_show_campaign_menu,
+    capture_show_credits_menu, capture_show_main_menu, capture_show_options_menu,
+    capture_show_skirmish_setup_menu, capture_show_skirmish_setup_with_dropdown,
+    capture_spawn_construction_showcase, capture_spawn_model_harness_page,
+    capture_stage_art_combat, capture_stage_deployed_siege, capture_stage_player_radar,
+    capture_stage_worker_collecting, capture_start_mission, capture_startup_ready,
+    capture_tutorial_stage, capture_world_to_screen, capture_worst_model_alignment_offset,
     capture_zoom_camera_closest, start_shared_match_scene_with_current_setup,
 };
 
@@ -110,6 +112,13 @@ fn main() {
                 .and_then(|count| render_proof_frames(Path::new(&dir), count, &faction)),
             _ => Err("proof-frames needs <dir> <count> <human|demon|chaos>".into()),
         },
+        Some("boot-camp") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/boot-camp"));
+            render_boot_camp(&dir)
+        }
         Some("play") => {
             let dir = args
                 .next()
@@ -1268,6 +1277,9 @@ fn build_structure_via_real_input(
     for _ in 0..12 {
         app.update();
     }
+    // Harvesters keep moving while the camera settles. Aim at the current
+    // position, as a player would, rather than the position twelve ticks ago.
+    let worker = capture_player_worker_position(app).ok_or("worker missing after camera settle")?;
     let worker_screen = capture_world_to_screen(app, worker).ok_or("worker offscreen")?;
     capture_set_cursor(app, worker_screen);
     capture_mouse_button(app, MouseButton::Left, true);
@@ -1888,4 +1900,97 @@ fn render_proof_frames(dir: &Path, count: usize, faction: &str) -> Result<(), St
         dir.display()
     );
     Ok(())
+}
+
+fn render_boot_camp(dir: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    let mut app = build_capture_app(WIDTH, HEIGHT);
+    wait_for_startup(&mut app)?;
+    let handle = capture_handle(&app);
+    shoot(&mut app, &handle, dir.join("00_menu.png"));
+    let point = capture_boot_camp_button(&mut app).ok_or("Boot Camp button missing")?;
+    capture_click_screen(&mut app, point, MouseButton::Left);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    shoot(&mut app, &handle, dir.join("01_select_worker.png"));
+    let worker = capture_player_worker_position(&mut app).ok_or("training worker missing")?;
+    capture_focus_camera_on(&mut app, worker);
+    for _ in 0..12 {
+        app.update();
+    }
+    let point = capture_world_to_screen(&mut app, worker).ok_or("worker outside view")?;
+    capture_click_screen(&mut app, point, MouseButton::Left);
+    require_tutorial_stage(&app, 1)?;
+    let ore = capture_nearest_visible_resource_click_position_to(&mut app, worker)
+        .ok_or("training ore missing")?;
+    capture_focus_camera_on(&mut app, ore);
+    for _ in 0..12 {
+        app.update();
+    }
+    let point = capture_world_to_screen(&mut app, ore).ok_or("ore outside view")?;
+    capture_click_screen(&mut app, point, MouseButton::Right);
+    if !wait_until(&mut app, 1800, |app| capture_tutorial_stage(app) == 2) {
+        return Err("gather lesson did not observe a delivered harvest".into());
+    }
+    shoot(&mut app, &handle, dir.join("02_gathered.png"));
+    build_structure_via_real_input(&mut app, "PowerReactor")?;
+    wait_until(&mut app, 60, |app| capture_tutorial_stage(app) == 3);
+    require_tutorial_stage(&app, 3)?;
+    shoot(&mut app, &handle, dir.join("03_power.png"));
+    let barracks = build_structure_via_real_input(&mut app, "Barracks")?;
+    wait_until(&mut app, 60, |app| capture_tutorial_stage(app) == 4);
+    require_tutorial_stage(&app, 4)?;
+    shoot(&mut app, &handle, dir.join("04_barracks.png"));
+    train_army_via_real_input(&mut app, barracks, 4, "LightRifleInfantry")?;
+    wait_until(&mut app, 60, |app| capture_tutorial_stage(app) == 5);
+    require_tutorial_stage(&app, 5)?;
+    let soldier =
+        capture_player_combat_unit_position(&mut app).ok_or("trained infantry missing")?;
+    capture_focus_camera_on(&mut app, soldier);
+    for _ in 0..12 {
+        app.update();
+    }
+    let point = capture_world_to_screen(&mut app, soldier).ok_or("infantry outside view")?;
+    capture_click_screen(&mut app, point, MouseButton::Left);
+    let target = soldier + Vec3::new(3.5, 0.0, 2.0);
+    let point = capture_world_to_screen(&mut app, target).ok_or("move target outside view")?;
+    capture_click_screen(&mut app, point, MouseButton::Right);
+    if !wait_until(&mut app, 600, |app| capture_tutorial_stage(app) == 6) {
+        return Err("move lesson did not observe selected infantry moving".into());
+    }
+    shoot(&mut app, &handle, dir.join("05_moved.png"));
+    issue_player_attack_move_to_nearest_anchor(&mut app)?;
+    if !wait_until(&mut app, 30 * 300, |app| capture_tutorial_stage(app) == 7) {
+        shoot(&mut app, &handle, dir.join("06_attack_failed.png"));
+        return Err(format!(
+            "boot camp did not finish: {}",
+            capture_match_phase_label(&mut app)
+        ));
+    }
+    shoot(&mut app, &handle, dir.join("06_graduated.png"));
+    println!(
+        "[capture] boot camp: all seven lessons completed through normal menu/worker/build/train/move/attack inputs"
+    );
+    Ok(())
+}
+
+fn capture_click_screen(app: &mut App, point: Vec2, button: MouseButton) {
+    capture_set_cursor(app, point);
+    capture_mouse_button(app, button, true);
+    app.update();
+    capture_mouse_button(app, button, false);
+    app.update();
+    for _ in 0..4 {
+        app.update();
+    }
+}
+
+fn require_tutorial_stage(app: &App, expected: usize) -> Result<(), String> {
+    let stage = capture_tutorial_stage(app);
+    if stage == expected {
+        Ok(())
+    } else {
+        Err(format!("tutorial stage {stage}, expected {expected}"))
+    }
 }

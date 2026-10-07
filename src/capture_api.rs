@@ -150,6 +150,13 @@ pub fn build_capture_app(width: u32, height: u32) -> App {
     let handle = app.world_mut().resource_mut::<Assets<Image>>().add(image);
     app.insert_resource(CaptureTarget(handle));
     app.add_systems(Update, retarget_capture_camera);
+    app.add_systems(
+        PreUpdate,
+        (
+            capture_ui_input_target.before(bevy::ui::UiSystems::Focus),
+            restore_capture_render_target.after(bevy::ui::UiSystems::Focus),
+        ),
+    );
     // Drive the app via manual `update()` calls (not `run()`), so we must run
     // plugin finalization ourselves — this is where `RenderPlugin` creates the
     // `RenderDevice`. Without it the render systems panic on a missing device.
@@ -1523,6 +1530,23 @@ pub fn capture_set_all_factions(app: &mut App, index: usize) -> &'static str {
 }
 
 /// Points the live match's `MainCamera` at the offscreen capture target.
+/// Legacy Interaction hit-testing reads only window-target cameras. Use the
+/// synthetic window during UI focus, then restore the image before rendering.
+fn capture_ui_input_target(mut cameras: Query<&mut RenderTarget, With<CaptureCameraReady>>) {
+    for mut target in &mut cameras {
+        *target = RenderTarget::Window(bevy::window::WindowRef::Primary);
+    }
+}
+
+fn restore_capture_render_target(
+    target: Res<CaptureTarget>,
+    mut cameras: Query<&mut RenderTarget, With<CaptureCameraReady>>,
+) {
+    for mut camera in &mut cameras {
+        *camera = RenderTarget::Image(target.0.clone().into());
+    }
+}
+
 pub(crate) fn retarget_capture_camera(
     mut commands: Commands,
     target: Res<CaptureTarget>,
@@ -1947,4 +1971,31 @@ pub fn capture_stage_player_radar(app: &mut App) -> bool {
     queue.apply(world);
     world.resource_mut::<NextSpawnId>().0 = next_id.0;
     true
+}
+
+/// Menu-space boot camp button center for real mouse input verification.
+pub fn capture_boot_camp_button(app: &mut App) -> Option<Vec2> {
+    let world = app.world_mut();
+    let mut query = world.query::<(&FrontMenuButton, &UiGlobalTransform)>();
+    query
+        .iter(world)
+        .find(|(button, _)| button.action == FrontMenuAction::Training)
+        .map(|(_, transform)| transform.translation)
+}
+
+pub fn capture_tutorial_stage(app: &App) -> usize {
+    app.world().resource::<TutorialState>().stage as usize
+}
+
+pub fn capture_player_combat_unit_position(app: &mut App) -> Option<Vec3> {
+    let world = app.world_mut();
+    let mut query = world.query::<(&Unit, &Team, &Transform, &Health)>();
+    query
+        .iter(world)
+        .find(|(unit, team, _, hp)| {
+            **team == Team::Player(0)
+                && hp.current > 0.0
+                && registry::entity(unit.id).is_some_and(|def| def.weapon.is_some())
+        })
+        .map(|(_, _, transform, _)| transform.translation)
 }

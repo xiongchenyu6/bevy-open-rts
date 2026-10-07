@@ -44,7 +44,13 @@ pub(crate) enum MatchEndAction {
     Restart,
     ReturnToSetup,
     ExitToMenu,
+    ContinueCampaign,
 }
+
+#[derive(Component)]
+pub(crate) struct CampaignContinueButton;
+#[derive(Component)]
+pub(crate) struct CampaignContinueLabel;
 
 pub(crate) fn match_end_button(action: MatchEndAction) -> impl Bundle {
     (
@@ -124,6 +130,8 @@ pub(crate) fn update_match_briefing_overlay(
     time: Res<Time>,
     mut briefing: ResMut<MatchBriefingState>,
     setup_settings: Res<MatchSetupSettings>,
+    active_mission: Res<ActiveMission>,
+    tutorial: Res<TutorialState>,
     visible_player: Res<VisiblePlayer>,
     relations: Res<TeamRelations>,
     active_teams: Res<ActiveTeams>,
@@ -144,12 +152,15 @@ pub(crate) fn update_match_briefing_overlay(
         }
     }
 
+    if tutorial.active {
+        briefing.dismiss();
+    }
     let panel_visibility = if briefing.visible {
         Visibility::Visible
     } else {
         Visibility::Hidden
     };
-    let reopen_visibility = if briefing.visible {
+    let reopen_visibility = if briefing.visible || tutorial.active {
         Visibility::Hidden
     } else {
         Visibility::Visible
@@ -169,6 +180,13 @@ pub(crate) fn update_match_briefing_overlay(
             &relations,
             &active_teams,
         );
+        if let Some(mission) = active_mission.0.and_then(mission_by_index) {
+            **text = format!(
+                "{}\n\n{}",
+                t(mission.name_zh, mission.name_en),
+                t(mission.briefing_zh, mission.briefing_en)
+            );
+        }
     }
 }
 
@@ -181,10 +199,16 @@ pub(crate) fn match_briefing_text(
     let (enemies, allies) = match_briefing_player_counts(visible_team, relations, active_teams);
     format!(
         "{}\n{}: {enemies}\n{}: {allies}\n{}: {} / {}: {}\n{}",
-        t(
-            "目标：摧毁所有敌方指挥中心，并保住至少一个我方指挥中心",
-            "Objective: destroy all enemy Command Centers while keeping at least one of yours",
-        ),
+        match settings.victory_condition {
+            VictoryCondition::Headquarters => t(
+                "目标：摧毁所有敌方指挥中心，保护你的指挥中心",
+                "Objective: destroy enemy Command Centers and protect your own"
+            ),
+            VictoryCondition::Annihilation => t(
+                "目标：消灭敌方基地和工人，保护你的基地",
+                "Objective: destroy enemy bases and workers while protecting your own base"
+            ),
+        },
         t("敌人", "Enemies"),
         t("盟友", "Allies"),
         ResourceKind::Ore.label(),
@@ -236,6 +260,11 @@ pub(crate) fn match_end_buttons(
     online_session: Option<Res<OnlineSession>>,
     mut online_lifecycle: Option<ResMut<OnlineLifecycleControl>>,
     mut next_state: ResMut<NextState<AppScreen>>,
+    mut active_mission: ResMut<ActiveMission>,
+    mut trigger_state: ResMut<MissionTriggerState>,
+    mut setup: ResMut<MatchSetupSettings>,
+    mut selected_map: ResMut<SelectedSkirmishMap>,
+    mut tutorial: ResMut<TutorialState>,
     mut buttons: Query<(
         &Interaction,
         &MatchEndButton,
@@ -246,7 +275,10 @@ pub(crate) fn match_end_buttons(
     let match_finished = !match_state.is_running();
     let online_match = online_match_uses_command_transport(online_session.as_deref());
     for (interaction, button, mut background, mut border) in &mut buttons {
-        let enabled = match_end_action_enabled(button.action, match_finished, online_match);
+        let enabled = match_end_action_enabled(button.action, match_finished, online_match)
+            && (button.action != MatchEndAction::ContinueCampaign
+                || (match_state.phase == MatchPhase::HumanVictory
+                    && (active_mission.0.is_some() || tutorial.stage == TutorialStage::Complete)));
         let clicked = enabled
             && *interaction == Interaction::Pressed
             && mouse.just_pressed(MouseButton::Left);
@@ -254,7 +286,30 @@ pub(crate) fn match_end_buttons(
             match_menu.visible = false;
             match button.action {
                 MatchEndAction::Restart => {
+                    *trigger_state = MissionTriggerState::default();
+                    if tutorial.active || tutorial.stage == TutorialStage::Complete {
+                        *tutorial = TutorialState {
+                            active: true,
+                            ..default()
+                        };
+                    }
                     next_state.set(AppScreen::RestartingMatch);
+                }
+                MatchEndAction::ContinueCampaign => {
+                    if let Some(index) = active_mission.0.map(|index| index + 1)
+                        && let Some(mission) = mission_by_index(index)
+                        && let Some(settings) = match_settings_for_mission(mission)
+                    {
+                        selected_map.godot_path = settings.map_path;
+                        *setup = settings;
+                        active_mission.0 = Some(index);
+                        *trigger_state = MissionTriggerState::default();
+                        *tutorial = TutorialState::default();
+                        next_state.set(AppScreen::RestartingMatch);
+                    } else {
+                        *tutorial = TutorialState::default();
+                        next_state.set(AppScreen::CampaignMenu);
+                    }
                 }
                 MatchEndAction::ReturnToSetup => {
                     if online_match {
@@ -262,7 +317,11 @@ pub(crate) fn match_end_buttons(
                             lifecycle.request_return_to_lobby();
                         }
                     } else {
-                        next_state.set(AppScreen::MainMenu);
+                        next_state.set(if active_mission.0.is_some() {
+                            AppScreen::CampaignMenu
+                        } else {
+                            AppScreen::SkirmishSetup
+                        });
                     }
                 }
                 MatchEndAction::ExitToMenu => {
@@ -288,7 +347,12 @@ pub(crate) fn match_end_action_enabled(
     match_finished: bool,
     online_match: bool,
 ) -> bool {
-    match_finished && (!online_match || action != MatchEndAction::Restart)
+    match_finished
+        && (!online_match
+            || !matches!(
+                action,
+                MatchEndAction::Restart | MatchEndAction::ContinueCampaign
+            ))
 }
 
 pub(crate) fn match_end_button_visual(interaction: Interaction, enabled: bool) -> (Color, Color) {
@@ -402,5 +466,31 @@ pub(crate) fn update_match_end_overlay(
             minutes,
             seconds
         );
+    }
+}
+
+pub(crate) fn update_campaign_continue_button(
+    state: Res<MatchState>,
+    active: Res<ActiveMission>,
+    tutorial: Res<TutorialState>,
+    mut buttons: Query<&mut Node, With<CampaignContinueButton>>,
+    mut labels: Query<&mut Text, With<CampaignContinueLabel>>,
+) {
+    let available = state.phase == MatchPhase::HumanVictory
+        && (active.0.is_some() || tutorial.stage == TutorialStage::Complete);
+    for mut button in &mut buttons {
+        button.display = if available {
+            Display::Flex
+        } else {
+            Display::None
+        };
+    }
+    let text = if active.0.is_some_and(|i| i + 1 < CAMPAIGN_MISSIONS.len()) {
+        t("下一关", "Next Mission")
+    } else {
+        t("战役地图", "Campaign Map")
+    };
+    for mut label in &mut labels {
+        label.0 = text.to_string();
     }
 }

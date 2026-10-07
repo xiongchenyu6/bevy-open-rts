@@ -47,8 +47,7 @@ pub(crate) struct MissionTrigger {
 
 #[derive(Clone, Copy)]
 pub(crate) struct MissionDef {
-    /// Stable id (reserved for campaign-progress persistence).
-    #[allow(dead_code)]
+    /// Stable profile/save identity, independent of menu ordering.
     pub(crate) id: &'static str,
     pub(crate) name_zh: &'static str,
     pub(crate) name_en: &'static str,
