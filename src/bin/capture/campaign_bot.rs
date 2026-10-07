@@ -1,0 +1,572 @@
+//! A campaign macro player: observation is read-only; commands use the same
+//! clicks, production keys and control groups as ordinary play.
+use super::*;
+use bevy_open_rts::{
+    CaptureCampaignUnit, capture_campaign_resources, capture_campaign_state,
+    capture_campaign_units, capture_enabled_hold_position_hotkey,
+};
+use std::collections::{BTreeMap, HashSet};
+use std::io::Write;
+
+const DEFENSE: usize = 0;
+const ASSAULT: usize = 1;
+const GROUP_KEYS: [KeyCode; 2] = [KeyCode::Digit1, KeyCode::Digit2];
+const DEFENSE_QUOTAS: [(&str, usize); 3] = [
+    ("Tank", 3),
+    ("HeavyMachinegunTrooper", 3),
+    ("RocketInfantry", 3),
+];
+
+fn running(app: &mut App) -> Result<(), String> {
+    let phase = capture_match_phase_label(app);
+    if phase == "Running" {
+        Ok(())
+    } else {
+        Err(format!("campaign bot stopped during {phase}"))
+    }
+}
+fn advance(app: &mut App, ticks: usize) {
+    for _ in 0..ticks {
+        app.update();
+        if capture_match_phase_label(app) != "Running" {
+            break;
+        }
+    }
+}
+fn count(units: &[CaptureCampaignUnit], id: &str) -> usize {
+    units.iter().filter(|unit| unit.id == id).count()
+}
+fn grouped(units: &[CaptureCampaignUnit], slot: usize) -> Vec<Entity> {
+    units
+        .iter()
+        .filter(|unit| unit.groups.contains(&slot))
+        .map(|unit| unit.entity)
+        .collect()
+}
+
+/// Verify the actual click selection, including accidental double-click/type
+/// expansion. Never insert Selected or write a control-group resource.
+fn select_units(app: &mut App, ids: &[Entity]) -> Result<Vec<Entity>, String> {
+    running(app)?;
+    let initial = capture_campaign_units(app);
+    let live: Vec<_> = ids
+        .iter()
+        .copied()
+        .filter(|id| initial.iter().any(|unit| unit.entity == *id))
+        .collect();
+    if live.is_empty() {
+        return Ok(Vec::new());
+    }
+    let center = initial
+        .iter()
+        .filter(|unit| live.contains(&unit.entity))
+        .map(|unit| unit.position)
+        .sum::<Vec3>()
+        / live.len() as f32;
+    capture_focus_camera_on(app, center);
+    advance(app, 12);
+    let result = (|| {
+        let mut clicked = Vec::new();
+        for id in live {
+            let Some(unit) = capture_campaign_units(app)
+                .into_iter()
+                .find(|unit| unit.entity == id)
+            else {
+                continue;
+            };
+            let mut screen = capture_world_to_screen(app, unit.click_position);
+            if screen.is_none() {
+                capture_focus_camera_on(app, unit.position);
+                advance(app, 12);
+                let Some(current) = capture_campaign_units(app)
+                    .into_iter()
+                    .find(|unit| unit.entity == id)
+                else {
+                    continue;
+                };
+                screen = capture_world_to_screen(app, current.click_position);
+            }
+            let point = screen.ok_or("campaign unit could not be brought into view")?;
+            capture_key(app, KeyCode::ShiftLeft, !clicked.is_empty());
+            capture_click_screen(app, point, MouseButton::Left);
+            // Ordinary delay prevents clicking two tanks from being interpreted
+            // as a double-click that selects the defensive tanks as well.
+            advance(app, 10);
+            if !capture_entity_is_selected(app, id) {
+                return Err(format!(
+                    "campaign click did not select {:?} ({})",
+                    id, unit.id
+                ));
+            }
+            clicked.push(id);
+        }
+        Ok(clicked)
+    })();
+    capture_key(app, KeyCode::ShiftLeft, false);
+    app.update();
+    let clicked = result?;
+    let units = capture_campaign_units(app);
+    let expected: HashSet<_> = clicked
+        .iter()
+        .copied()
+        .filter(|id| units.iter().any(|unit| unit.entity == *id))
+        .collect();
+    let selected: HashSet<_> = units
+        .iter()
+        .filter(|unit| unit.selected)
+        .map(|unit| unit.entity)
+        .collect();
+    if expected != selected {
+        return Err("campaign selection included units outside the requested group".into());
+    }
+    Ok(expected.into_iter().collect())
+}
+
+fn append_group(app: &mut App, slot: usize, ids: &[Entity]) -> Result<(), String> {
+    let selected = select_units(app, ids)?;
+    if selected.is_empty() {
+        return Ok(());
+    }
+    capture_key(app, KeyCode::ControlLeft, true);
+    capture_key(app, KeyCode::ShiftLeft, true);
+    tap_key(app, GROUP_KEYS[slot]);
+    capture_key(app, KeyCode::ShiftLeft, false);
+    capture_key(app, KeyCode::ControlLeft, false);
+    app.update();
+    let units = capture_campaign_units(app);
+    for id in selected {
+        if units
+            .iter()
+            .any(|unit| unit.entity == id && !unit.groups.contains(&slot))
+        {
+            return Err(
+                "control-group assignment did not accept the selected campaign unit".into(),
+            );
+        }
+    }
+    Ok(())
+}
+fn recall(app: &mut App, slot: usize) -> Result<bool, String> {
+    if grouped(&capture_campaign_units(app), slot).is_empty() {
+        return Ok(false);
+    }
+    tap_key(app, GROUP_KEYS[slot]);
+    advance(app, 4);
+    let units = capture_campaign_units(app);
+    if units
+        .iter()
+        .any(|unit| unit.selected && !unit.groups.contains(&slot))
+    {
+        return Err("group recall selected a unit belonging to another role".into());
+    }
+    Ok(units.iter().any(|unit| unit.selected))
+}
+fn ground_order(app: &mut App, point: Vec3, attack_move: bool) -> Result<(), String> {
+    if attack_move {
+        let key = capture_first_enabled_attack_move_hotkey(app)
+            .ok_or("selected group has no attack-move command")?;
+        tap_key(app, key);
+    }
+    capture_focus_camera_on(app, point);
+    advance(app, 12);
+    let screen =
+        capture_world_to_screen(app, point).ok_or("campaign order target is outside view")?;
+    capture_click_screen(app, screen, MouseButton::Right);
+    Ok(())
+}
+
+fn select_producer(app: &mut App, id: &str) -> Result<bool, String> {
+    let state = capture_campaign_state(app);
+    let Some(producer) = state
+        .structures
+        .iter()
+        .find(|structure| structure.id == id && structure.completed)
+    else {
+        return Ok(false);
+    };
+    let entity = producer.entity;
+    let position = producer.click_position;
+    capture_focus_camera_on(app, position);
+    advance(app, 12);
+    let point = capture_world_to_screen(app, position).ok_or("campaign producer outside view")?;
+    capture_key(app, KeyCode::ShiftLeft, false);
+    capture_click_screen(app, point, MouseButton::Left);
+    advance(app, 10);
+    Ok(capture_entity_is_selected(app, entity))
+}
+fn queue_to_quota(
+    app: &mut App,
+    producer: &str,
+    product: &'static str,
+    quota: usize,
+) -> Result<(), String> {
+    running(app)?;
+    let units = capture_campaign_units(app);
+    let state = capture_campaign_state(app);
+    if count(&units, product) + state.queued.get(product).copied().unwrap_or(0) >= quota {
+        return Ok(());
+    }
+    if !select_producer(app, producer)? {
+        return Ok(());
+    }
+    for _ in 0..5 {
+        let units = capture_campaign_units(app);
+        let state = capture_campaign_state(app);
+        if count(&units, product) + state.queued.get(product).copied().unwrap_or(0) >= quota {
+            break;
+        }
+        let Some(key) = capture_enabled_train_hotkey_for(app, product) else {
+            break;
+        };
+        let before = state.queued.get(product).copied().unwrap_or(0);
+        tap_key(app, key);
+        let after = capture_campaign_state(app)
+            .queued
+            .get(product)
+            .copied()
+            .unwrap_or(0);
+        if after <= before {
+            break;
+        }
+    }
+    Ok(())
+}
+fn train_to_count(
+    app: &mut App,
+    producer: &str,
+    product: &'static str,
+    quota: usize,
+) -> Result<(), String> {
+    for _ in 0..240 {
+        running(app)?;
+        if count(&capture_campaign_units(app), product) >= quota {
+            return Ok(());
+        }
+        queue_to_quota(app, producer, product, quota)?;
+        refresh_groups(app)?;
+        hold_arrived_defenders(app)?;
+        advance(app, 15);
+    }
+    Err(format!(
+        "type-specific production did not reach {quota} {product} units"
+    ))
+}
+
+fn ensure_harvesting(app: &mut App) -> Result<(), String> {
+    let mut workers: Vec<_> = capture_campaign_units(app)
+        .into_iter()
+        .filter(|unit| unit.id == "Worker")
+        .collect();
+    workers.sort_by_key(|unit| unit.entity.to_bits());
+    let worker_count = workers.len();
+    for (index, worker) in workers.into_iter().enumerate() {
+        if worker.constructing {
+            continue;
+        }
+        let kind = if worker_count > 1 && index == worker_count - 1 {
+            "crystal"
+        } else {
+            "ore"
+        };
+        if worker.harvesting && worker.harvest_kind.is_none_or(|current| current == kind) {
+            continue;
+        }
+        let resources = capture_campaign_resources(app);
+        let Some(resource) = resources
+            .into_iter()
+            .filter(|node| node.kind == kind)
+            .min_by(|a, b| {
+                a.position
+                    .distance_squared(worker.position)
+                    .total_cmp(&b.position.distance_squared(worker.position))
+            })
+        else {
+            continue;
+        };
+        select_units(app, &[worker.entity])?;
+        ground_order(app, resource.click_position, false)?;
+    }
+    Ok(())
+}
+fn build(app: &mut App, id: &'static str) -> Result<Vec3, String> {
+    running(app)?;
+    let result = build_campaign_structure_via_real_input(app, id)?;
+    ensure_harvesting(app)?;
+    Ok(result)
+}
+fn defense_point(app: &mut App, ordinal: usize) -> Result<Vec3, String> {
+    let state = capture_campaign_state(app);
+    let base = state
+        .headquarters
+        .as_ref()
+        .ok_or("headquarters lost")?
+        .position;
+    let lane = if ordinal % 2 == 0 {
+        Vec3::new(0.0, 0.0, 6.5)
+    } else {
+        Vec3::new(6.5, 0.0, 0.0)
+    };
+    let lateral = (ordinal / 2 % 3) as f32 - 1.0;
+    let target = base
+        + lane
+        + if ordinal % 2 == 0 {
+            Vec3::X * lateral * 1.2
+        } else {
+            Vec3::Z * lateral * 1.2
+        };
+    Ok(target)
+}
+fn refresh_groups(app: &mut App) -> Result<(), String> {
+    let units = capture_campaign_units(app);
+    let mut quotas: BTreeMap<&str, usize> = DEFENSE_QUOTAS.into_iter().collect();
+    for unit in units.iter().filter(|unit| unit.groups.contains(&DEFENSE)) {
+        if let Some(quota) = quotas.get_mut(unit.id) {
+            *quota = quota.saturating_sub(1);
+        }
+    }
+    let mut defenders = Vec::new();
+    let mut attackers = Vec::new();
+    for unit in units
+        .iter()
+        .filter(|unit| unit.combat && unit.groups.is_empty())
+    {
+        if quotas.get(unit.id).copied().unwrap_or(0) > 0 {
+            defenders.push(unit.entity);
+            *quotas.get_mut(unit.id).unwrap() -= 1;
+        } else {
+            attackers.push(unit.entity);
+        }
+    }
+    let old_defenders = grouped(&units, DEFENSE).len();
+    append_group(app, DEFENSE, &defenders)?;
+    for (index, entity) in defenders.into_iter().enumerate() {
+        if select_units(app, &[entity])?.is_empty() {
+            continue;
+        }
+        let point = defense_point(app, old_defenders + index)?;
+        ground_order(app, point, false)?;
+    }
+    append_group(app, ASSAULT, &attackers)?;
+    Ok(())
+}
+fn hold_arrived_defenders(app: &mut App) -> Result<(), String> {
+    let state = capture_campaign_state(app);
+    let Some(base) = state.headquarters.map(|headquarters| headquarters.position) else {
+        return Ok(());
+    };
+    let arrived: Vec<_> = capture_campaign_units(app)
+        .into_iter()
+        .filter(|unit| {
+            unit.groups.contains(&DEFENSE)
+                && !unit.holding
+                && !unit.moving
+                && unit.position.distance(base) < 12.0
+        })
+        .map(|unit| unit.entity)
+        .collect();
+    if !select_units(app, &arrived)?.is_empty() {
+        let key = capture_enabled_hold_position_hotkey(app)
+            .ok_or("defensive units lack hold-position command")?;
+        tap_key(app, key);
+    }
+    Ok(())
+}
+
+fn rally_to_safe_staging(app: &mut App, producer: &str) -> Result<(), String> {
+    let state = capture_campaign_state(app);
+    let base = state
+        .headquarters
+        .as_ref()
+        .ok_or("headquarters lost")?
+        .position;
+    let offsets = [
+        (-6.0, -6.0),
+        (-8.0, 0.0),
+        (0.0, -8.0),
+        (-8.0, 6.0),
+        (6.0, -8.0),
+        (8.0, 6.0),
+    ];
+    let staging = offsets
+        .into_iter()
+        .map(|(x, z)| base + Vec3::new(x, 0.0, z))
+        .find(|point| {
+            point.x.abs() < state.half_width - 1.5
+                && point.z.abs() < state.half_depth - 1.5
+                && state
+                    .obstacles
+                    .iter()
+                    .all(|(position, radius)| point.distance(*position) >= radius + 1.2)
+        })
+        .ok_or("no clear safe staging point near headquarters")?;
+    if !select_producer(app, producer)? {
+        return Err(format!("{producer} not selectable for rally"));
+    }
+    let key = capture_first_enabled_rally_hotkey(app).ok_or("producer rally command missing")?;
+    tap_key(app, key);
+    ground_order(app, staging, false)
+}
+fn attack(app: &mut App) -> Result<(), String> {
+    if !recall(app, ASSAULT)? {
+        return Ok(());
+    }
+    let target =
+        capture_nearest_enemy_anchor_position(app).ok_or("no living enemy remains for assault")?;
+    ground_order(app, target, true)
+}
+
+fn log_state(app: &mut App, trace: &mut std::fs::File, stage: &str) -> Result<(), String> {
+    let state = capture_campaign_state(app);
+    let units = capture_campaign_units(app);
+    let mut types = BTreeMap::new();
+    for unit in &units {
+        *types.entry(unit.id).or_insert(0usize) += 1;
+    }
+    let value = serde_json::json!({
+        "stage": stage, "clock": state.clock, "phase": capture_match_phase_label(app),
+        "resources": capture_player_resources(app), "low_power": state.low_power,
+        "headquarters": state.headquarters.as_ref().map(|hq| serde_json::json!({"hp":hq.health,"max":hq.max_health,"position":hq.position.to_array()})),
+        "types": types, "queued": state.queued,
+        "defenders": grouped(&units,DEFENSE).iter().map(|id| id.to_bits()).collect::<Vec<_>>(),
+        "attackers": grouped(&units,ASSAULT).iter().map(|id| id.to_bits()).collect::<Vec<_>>(),
+        "threats": state.threats.iter().map(|threat| serde_json::json!({"id":threat.id,"domain":threat.domain,"position":threat.position.to_array(),"hp":threat.health})).collect::<Vec<_>>(),
+        "unit_orders": units.iter().filter(|unit| unit.combat).map(|unit| serde_json::json!({"id":unit.id,"entity":unit.entity.to_bits(),"position":unit.position.to_array(),"hp":unit.health,"groups":unit.groups,"moving":unit.moving,"holding":unit.holding,"move_target":unit.move_target.map(|p|p.to_array())})).collect::<Vec<_>>(),
+    });
+    writeln!(trace, "{value}").map_err(|error| error.to_string())?;
+    trace.flush().map_err(|error| error.to_string())?;
+    println!(
+        "[capture] campaign bot {stage}: t={:.1} HQ={:?} defenders={} attackers={} types={types:?} queue={:?} threats={}",
+        state.clock,
+        state.headquarters.as_ref().map(|hq| hq.health),
+        grouped(&units, DEFENSE).len(),
+        grouped(&units, ASSAULT).len(),
+        state.queued,
+        state.threats.len()
+    );
+    Ok(())
+}
+
+pub(super) fn run(
+    app: &mut App,
+    handle: &Handle<Image>,
+    dir: &Path,
+    index: usize,
+) -> Result<(), String> {
+    let mut trace =
+        std::fs::File::create(dir.join("telemetry.jsonl")).map_err(|error| error.to_string())?;
+    let result = (|| {
+        log_state(app, &mut trace, "opening")?;
+        build(app, "PowerReactor")?;
+        build(app, "Barracks")?;
+        queue_to_quota(app, "Barracks", "HeavyMachinegunTrooper", 3)?;
+        build(app, "AntiGroundTurret")?;
+        refresh_groups(app)?;
+        build(app, "AntiGroundTurret")?;
+        train_to_count(app, "Barracks", "HeavyMachinegunTrooper", 3)?;
+        build(app, "VehicleFactory")?;
+        rally_to_safe_staging(app, "VehicleFactory")?;
+        train_to_count(app, "VehicleFactory", "Tank", 3)?;
+        build(app, "RadarUplink")?;
+        rally_to_safe_staging(app, "Barracks")?;
+        train_to_count(app, "Barracks", "RocketInfantry", 3)?;
+        build(app, "AntiAirTurret")?;
+        queue_to_quota(app, "CommandCenter", "Worker", 4)?;
+        ensure_harvesting(app)?;
+        refresh_groups(app)?;
+        hold_arrived_defenders(app)?;
+        log_state(app, &mut trace, "defense_ready")?;
+        shoot(app, handle, dir.join("01_defense.png"));
+        let mut launched = false;
+        let mut last_attack_clock = -20.0;
+        let mut last_hq_health = capture_campaign_state(app)
+            .headquarters
+            .map(|hq| hq.health)
+            .unwrap_or(0.0);
+        let mut last_threat_capture = -30.0;
+        for round in 0..240 {
+            if capture_match_phase_label(app) != "Running" {
+                break;
+            }
+            ensure_harvesting(app)?;
+            refresh_groups(app)?;
+            hold_arrived_defenders(app)?;
+            queue_to_quota(app, "CommandCenter", "Worker", 4)?;
+            queue_to_quota(app, "Barracks", "HeavyMachinegunTrooper", 3)?;
+            queue_to_quota(app, "Barracks", "RocketInfantry", 5)?;
+            queue_to_quota(app, "VehicleFactory", "Tank", 9)?;
+            let state = capture_campaign_state(app);
+            let units = capture_campaign_units(app);
+            let Some(hq) = state.headquarters.as_ref() else {
+                return Err("campaign headquarters eliminated".into());
+            };
+            let pressure = !state.threats.is_empty() || hq.health + 0.1 < last_hq_health;
+            if pressure && state.clock - last_threat_capture > 15.0 {
+                capture_focus_camera_on(app, hq.position);
+                shoot(
+                    app,
+                    handle,
+                    dir.join(format!("defense-threat-{round:03}.png")),
+                );
+                last_threat_capture = state.clock;
+            }
+            let attackers: Vec<_> = units
+                .iter()
+                .filter(|unit| unit.groups.contains(&ASSAULT))
+                .collect();
+            let tanks = attackers.iter().filter(|unit| unit.id == "Tank").count();
+            let defenders_ready = DEFENSE_QUOTAS.iter().all(|(id, quota)| {
+                units
+                    .iter()
+                    .filter(|unit| unit.groups.contains(&DEFENSE) && unit.id == *id)
+                    .count()
+                    >= *quota
+            });
+            if pressure && hq.health < hq.max_health * 0.75 {
+                if recall(app, ASSAULT)? {
+                    ground_order(app, hq.position + Vec3::new(4.5, 0.0, 4.5), true)?;
+                }
+                launched = false;
+            } else if !pressure
+                && defenders_ready
+                && tanks >= 6
+                && (!launched || state.clock - last_attack_clock >= 15.0)
+            {
+                attack(app)?;
+                if !launched {
+                    shoot(app, handle, dir.join("02_assault.png"));
+                }
+                launched = true;
+                last_attack_clock = state.clock;
+            } else if launched && state.clock - last_attack_clock >= 15.0 && !attackers.is_empty() {
+                attack(app)?;
+                last_attack_clock = state.clock;
+            }
+            log_state(
+                app,
+                &mut trace,
+                if launched { "assault" } else { "regroup" },
+            )?;
+            last_hq_health = hq.health;
+            if state.low_power && round % 12 == 0 {
+                build(app, "PowerReactor")?;
+            }
+            advance(app, 150);
+        }
+        log_state(app, &mut trace, "result")?;
+        let phase = capture_match_phase_label(app);
+        if phase != "HumanVictory" {
+            return Err(format!(
+                "mission {index} defensive macro resolved as {phase}"
+            ));
+        }
+        Ok(())
+    })();
+    if result.is_err() {
+        let _ = log_state(app, &mut trace, "failure");
+        if let Some(hq) = capture_campaign_state(app).headquarters {
+            capture_focus_camera_on(app, hq.position);
+        }
+        shoot(app, handle, dir.join("failure-defense.png"));
+    }
+    result
+}

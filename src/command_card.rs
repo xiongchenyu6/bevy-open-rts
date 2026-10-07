@@ -620,6 +620,49 @@ pub(crate) fn command_grid_hotkey(index: usize) -> Option<CommandHotkey> {
     COMMAND_SLOT_HOTKEYS.get(index).copied()
 }
 
+#[cfg(test)]
+mod hotkey_tests {
+    use super::*;
+
+    #[test]
+    fn grid_keys_do_not_trigger_global_orders_or_control_groups() {
+        let reserved = [
+            KeyCode::KeyS,
+            KeyCode::KeyH,
+            KeyCode::KeyG,
+            KeyCode::KeyX,
+            KeyCode::KeyI,
+            KeyCode::KeyM,
+            KeyCode::KeyP,
+        ];
+        let mut keys = std::collections::HashSet::new();
+        for hotkey in COMMAND_SLOT_HOTKEYS {
+            assert!(
+                !reserved.contains(&hotkey.key_code),
+                "{} triggers another command",
+                hotkey.display
+            );
+            assert!(
+                !GROUP_SLOT_KEYS.contains(&hotkey.key_code),
+                "{} recalls a control group",
+                hotkey.display
+            );
+            assert!(
+                keys.insert(hotkey.key_code),
+                "duplicate grid key {}",
+                hotkey.display
+            );
+        }
+        // Gathering removes SelectIdleWorker and puts Barracks on grid slot 7.
+        assert_ne!(
+            command_action_hotkey(7, BuildAction::Build("Barracks"))
+                .unwrap()
+                .key_code,
+            KeyCode::KeyS
+        );
+    }
+}
+
 pub(crate) fn command_action_hotkey(index: usize, action: BuildAction) -> Option<CommandHotkey> {
     match action {
         BuildAction::None => None,

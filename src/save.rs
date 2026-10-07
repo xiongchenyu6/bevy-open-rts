@@ -392,15 +392,41 @@ pub(crate) fn write_save_file(
 
 #[cfg(not(target_arch = "wasm32"))]
 pub(crate) fn read_save_file(path: impl AsRef<std::path::Path>) -> Result<SaveGame, String> {
-    let raw = std::fs::read_to_string(path).map_err(|error| error.to_string())?;
-    let save: SaveGame = ron::from_str(&raw).map_err(|error| error.to_string())?;
+    let raw = std::fs::read_to_string(path).map_err(|error| {
+        if error.kind() == std::io::ErrorKind::NotFound {
+            t(
+                "没有找到存档。请先保存对局。",
+                "No saved game found. Save a match first.",
+            )
+        } else {
+            t(
+                "无法读取存档。请检查用户数据文件夹的权限。",
+                "Cannot read the saved game. Check your user data folder permissions.",
+            )
+        }
+        .to_string()
+    })?;
+    let save: SaveGame = ron::from_str(&raw).map_err(|_| {
+        t(
+            "存档已损坏，无法载入。当前对局未受影响。",
+            "The saved game is damaged and cannot be loaded. Your current match is unchanged.",
+        )
+        .to_string()
+    })?;
     if save.version != SAVE_VERSION {
-        return Err(format!(
-            "save version {} unsupported (expected {SAVE_VERSION})",
-            save.version
-        ));
+        return Err(t(
+            "此存档与当前版本不兼容。请开始新对局。",
+            "This save is incompatible with this game version. Start a new match.",
+        )
+        .to_string());
     }
-    validate_save(&save)?;
+    validate_save(&save).map_err(|_| {
+        t(
+            "存档已损坏，无法载入。当前对局未受影响。",
+            "The saved game is damaged and cannot be loaded. Your current match is unchanged.",
+        )
+        .to_string()
+    })?;
     Ok(save)
 }
 
@@ -493,6 +519,9 @@ pub(crate) fn apply_loaded_save(world: &mut World) {
         );
         return;
     }
+    // A resumed match already passed its opening instructions. Keep the
+    // optional Objectives button, but do not replay the startup overlay.
+    world.resource_mut::<MatchBriefingState>().dismiss();
     if world.contains_resource::<TutorialState>() {
         *world.resource_mut::<TutorialState>() = save.tutorial.clone().unwrap_or_default();
     }

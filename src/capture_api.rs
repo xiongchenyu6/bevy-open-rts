@@ -1244,6 +1244,64 @@ pub fn capture_player_resources(app: &mut App) -> (i32, i32) {
     (economy.ore, economy.crystal)
 }
 
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct CaptureSaveObservation {
+    pub clock: f32,
+    pub ore: i32,
+    pub crystal: i32,
+    pub units: usize,
+    pub structures: usize,
+    pub jobs: Vec<(String, f32, (i32, i32))>,
+    pub mission: Option<String>,
+    pub fired_triggers: Vec<bool>,
+    pub explored_cells: usize,
+}
+
+pub fn capture_save_observation(app: &mut App) -> Option<CaptureSaveObservation> {
+    let save = collect_save_game(app.world_mut())?;
+    let economy = save.economies.first()?;
+    Some(CaptureSaveObservation {
+        clock: save.clock_sec,
+        ore: economy.ore,
+        crystal: economy.crystal,
+        units: save.units.iter().filter(|unit| unit.team == 0).count(),
+        structures: save
+            .structures
+            .iter()
+            .filter(|structure| structure.team == 0)
+            .count(),
+        jobs: save
+            .build_jobs
+            .iter()
+            .filter(|job| job.team == 0)
+            .map(|job| (job.id.clone(), job.timer, job.cost))
+            .collect(),
+        mission: save.mission_id,
+        fired_triggers: save.mission_triggers,
+        explored_cells: save.explored.iter().filter(|cell| **cell).count(),
+    })
+}
+
+pub fn capture_save_restore_ready(app: &App) -> bool {
+    *app.world().resource::<State<AppScreen>>().get() == AppScreen::InMatch
+        && app.world().resource::<PendingLoadedSave>().0.is_none()
+        && !app.world().contains_resource::<LoadedMatchMarker>()
+}
+
+pub fn capture_match_briefing_visible(app: &App) -> bool {
+    app.world().resource::<MatchBriefingState>().visible
+}
+
+/// Read the player-visible feedback without changing match state.
+pub fn capture_battle_log_messages(app: &App) -> Vec<String> {
+    app.world()
+        .resource::<BattleLog>()
+        .entries
+        .iter()
+        .map(|entry| entry.message.clone())
+        .collect()
+}
+
 /// World position of a player worker (its command panel offers Build actions).
 pub fn capture_player_worker_position(app: &mut App) -> Option<Vec3> {
     let player = Team::Player(0);
@@ -1289,6 +1347,23 @@ pub fn capture_enabled_build_hotkey_for(
         }
     }
     None
+}
+
+/// Observe the displayed tab key; its grid position changes with idle workers.
+pub fn capture_worker_build_tab_hotkey(app: &mut App, production: bool) -> Option<KeyCode> {
+    let requested = if production {
+        BuildStructureTab::Production
+    } else {
+        BuildStructureTab::Defense
+    };
+    let world = app.world_mut();
+    let mut query = world.query::<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>();
+    query.iter(world).find_map(|(slot, action, availability)| {
+        (matches!(action, BuildAction::SelectBuildTab(tab) if *tab == requested)
+            && availability.enabled)
+            .then(|| command_action_hotkey(slot.0, *action).map(|hotkey| hotkey.key_code))
+            .flatten()
+    })
 }
 
 /// Hotkey of the enabled Attack-Move command-panel slot for the current
@@ -2170,4 +2245,222 @@ pub fn capture_player_combat_unit_position(app: &mut App) -> Option<Vec3> {
                 && registry::entity(unit.id).is_some_and(|def| def.weapon.is_some())
         })
         .map(|(_, _, transform, _)| transform.translation)
+}
+
+/// Read-only campaign-bot observations. Commands remain real input events.
+#[derive(Clone, Debug)]
+pub struct CaptureCampaignUnit {
+    pub entity: Entity,
+    pub id: &'static str,
+    pub position: Vec3,
+    pub click_position: Vec3,
+    pub health: f32,
+    pub combat: bool,
+    pub selected: bool,
+    pub holding: bool,
+    pub moving: bool,
+    pub move_target: Option<Vec3>,
+    pub constructing: bool,
+    pub harvesting: bool,
+    pub harvest_kind: Option<&'static str>,
+    pub groups: Vec<usize>,
+}
+
+pub fn capture_campaign_units(app: &mut App) -> Vec<CaptureCampaignUnit> {
+    let (children, aabbs, models) = capture_world_geometry_maps(app);
+    let world = app.world_mut();
+    let groups = world.resource::<UnitGroups>().slots.clone();
+    let mut query = world.query::<(Entity, &Unit, &Team, &Transform, &Health)>();
+    query
+        .iter(world)
+        .filter(|(_, _, team, _, health)| **team == Team::Player(0) && health.current > 0.0)
+        .map(|(entity, unit, _, transform, health)| {
+            let harvest = world.get::<HarvestOrder>(entity);
+            CaptureCampaignUnit {
+                entity,
+                id: unit.id,
+                position: transform.translation,
+                click_position: entity_visual_world_center(entity, &children, &aabbs, &models)
+                    .unwrap_or(transform.translation),
+                health: health.current,
+                combat: unit_supports_attack_move(unit),
+                selected: world.get::<Selected>(entity).is_some(),
+                holding: world
+                    .get::<HoldPosition>(entity)
+                    .is_some_and(|hold| hold.enabled),
+                moving: world.get::<MoveOrder>(entity).is_some(),
+                move_target: world.get::<MoveOrder>(entity).map(|order| order.target),
+                constructing: world.get::<ConstructOrder>(entity).is_some(),
+                harvesting: harvest.is_some(),
+                harvest_kind: harvest
+                    .and_then(|order| order.last_kind)
+                    .map(|kind| match kind {
+                        ResourceKind::Ore => "ore",
+                        ResourceKind::Crystal => "crystal",
+                    }),
+                groups: groups
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(index, group)| group.contains(&entity).then_some(index))
+                    .collect(),
+            }
+        })
+        .collect()
+}
+
+#[derive(Clone, Debug)]
+pub struct CaptureCampaignStructure {
+    pub entity: Entity,
+    pub id: &'static str,
+    pub position: Vec3,
+    pub click_position: Vec3,
+    pub health: f32,
+    pub max_health: f32,
+    pub completed: bool,
+}
+#[derive(Clone, Debug)]
+pub struct CaptureCampaignThreat {
+    pub id: &'static str,
+    pub domain: &'static str,
+    pub position: Vec3,
+    pub health: f32,
+}
+#[derive(Clone, Debug)]
+pub struct CaptureCampaignState {
+    pub clock: f32,
+    pub headquarters: Option<CaptureCampaignStructure>,
+    pub structures: Vec<CaptureCampaignStructure>,
+    pub queued: std::collections::BTreeMap<&'static str, usize>,
+    pub threats: Vec<CaptureCampaignThreat>,
+    pub low_power: bool,
+    pub half_width: f32,
+    pub half_depth: f32,
+    pub obstacles: Vec<(Vec3, f32)>,
+}
+
+pub fn capture_campaign_state(app: &mut App) -> CaptureCampaignState {
+    let (children, aabbs, models) = capture_world_geometry_maps(app);
+    let world = app.world_mut();
+    let player = Team::Player(0);
+    let mut structures_query = world.query::<(
+        Entity,
+        &Structure,
+        &Team,
+        &Transform,
+        &Health,
+        Option<&UnderConstruction>,
+    )>();
+    let structures: Vec<_> = structures_query
+        .iter(world)
+        .filter(|(_, _, team, _, health, _)| **team == player && health.current > 0.0)
+        .map(
+            |(entity, structure, _, transform, health, construction)| CaptureCampaignStructure {
+                entity,
+                id: structure.id,
+                position: transform.translation,
+                click_position: entity_visual_world_center(entity, &children, &aabbs, &models)
+                    .unwrap_or(transform.translation),
+                health: health.current,
+                max_health: health.max,
+                completed: construction.is_none(),
+            },
+        )
+        .collect();
+    let headquarters = structures
+        .iter()
+        .find(|structure| structure.id == "CommandCenter")
+        .cloned();
+    let mut queued = std::collections::BTreeMap::new();
+    for job in &world.resource::<BuildQueue>().0 {
+        if job.team == player
+            && let BuildAction::Train(id) = job.action
+        {
+            *queued.entry(id).or_insert(0) += 1;
+        }
+    }
+    let mut threats_query = world.query::<(&Unit, &Team, &Transform, &Health, &MovementDomain)>();
+    let threats = threats_query
+        .iter(world)
+        .filter(|(_, team, transform, health, _)| {
+            health.current > 0.0
+                && world
+                    .resource::<TeamRelations>()
+                    .are_enemies(player, **team)
+                && headquarters
+                    .as_ref()
+                    .is_some_and(|base| xz_distance(base.position, transform.translation) < 18.0)
+        })
+        .map(
+            |(unit, _, transform, health, domain)| CaptureCampaignThreat {
+                id: unit.id,
+                domain: if *domain == MovementDomain::Air {
+                    "air"
+                } else {
+                    "ground"
+                },
+                position: transform.translation,
+                health: health.current,
+            },
+        )
+        .collect();
+    let mut obstacles_query = world.query_filtered::<(&Transform, &Selectable, Option<&Health>), (
+        Or<(With<Structure>, With<ResourceNode>, With<TerrainWall>)>,
+        Without<Unit>,
+    )>();
+    let obstacles = obstacles_query
+        .iter(world)
+        .filter(|(_, _, health)| !health.is_some_and(|health| health.current <= 0.0))
+        .map(|(transform, selectable, _)| (transform.translation, selectable.radius))
+        .collect();
+    let bounds = world.resource::<MapBounds>();
+    CaptureCampaignState {
+        clock: world.resource::<MatchState>().start_time_sec,
+        headquarters,
+        structures,
+        queued,
+        threats,
+        low_power: world.resource::<Economies>().get(player).low_power(),
+        half_width: bounds.half_width,
+        half_depth: bounds.half_depth,
+        obstacles,
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct CaptureCampaignResource {
+    pub kind: &'static str,
+    pub position: Vec3,
+    pub click_position: Vec3,
+}
+pub fn capture_campaign_resources(app: &mut App) -> Vec<CaptureCampaignResource> {
+    let (children, aabbs, models) = capture_world_geometry_maps(app);
+    let world = app.world_mut();
+    let mut query = world.query::<(Entity, &ResourceNode, &Transform, &VisibilityState)>();
+    query
+        .iter(world)
+        .filter(|(_, node, _, visibility)| node.amount > 0 && visibility.visible)
+        .map(|(entity, node, transform, _)| CaptureCampaignResource {
+            kind: match node.kind {
+                ResourceKind::Ore => "ore",
+                ResourceKind::Crystal => "crystal",
+            },
+            position: transform.translation,
+            click_position: entity_visual_world_center(entity, &children, &aabbs, &models)
+                .unwrap_or(transform.translation),
+        })
+        .collect()
+}
+
+pub fn capture_enabled_hold_position_hotkey(app: &mut App) -> Option<KeyCode> {
+    let world = app.world_mut();
+    let mut query = world.query::<(&CommandSlot, &BuildAction, &CommandSlotAvailability)>();
+    query.iter(world).find_map(|(slot, action, availability)| {
+        (matches!(action, BuildAction::HoldPosition) && availability.enabled)
+            .then(|| {
+                COMMAND_SLOT_HOTKEYS
+                    .get(slot.0)
+                    .map(|hotkey| hotkey.key_code)
+            })
+            .flatten()
+    })
 }

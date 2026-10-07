@@ -30,6 +30,9 @@ use std::time::{Duration, Instant};
 use bevy::prelude::*;
 use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 
+#[path = "capture/save_flow.rs"]
+mod save_flow;
+
 use bevy_open_rts::{
     CaptureTarget, build_capture_app, build_model_harness_capture_app, capture_active_mission,
     capture_art_combat_evidence, capture_boot_camp_button, capture_boot_camp_label,
@@ -67,6 +70,9 @@ use bevy_open_rts::{
     capture_worst_model_alignment_offset, capture_zoom_camera_closest,
     start_shared_match_scene_with_current_setup,
 };
+
+#[path = "capture/campaign_bot.rs"]
+mod campaign_bot;
 
 const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 720;
@@ -131,6 +137,13 @@ fn main() {
                 .and_then(|value| value.parse().ok())
                 .unwrap_or(HEIGHT);
             render_hud_card(&dir, width, height)
+        }
+        Some("save-load") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/save-load"));
+            save_flow::render(&dir)
         }
         Some("boot-camp") => {
             let dir = args
@@ -1318,6 +1331,21 @@ fn build_structure_via_real_input(
     app: &mut App,
     structure_id: &'static str,
 ) -> Result<Vec3, String> {
+    build_structure_with_input_mode(app, structure_id, false)
+}
+
+fn build_campaign_structure_via_real_input(
+    app: &mut App,
+    structure_id: &'static str,
+) -> Result<Vec3, String> {
+    build_structure_with_input_mode(app, structure_id, true)
+}
+
+fn build_structure_with_input_mode(
+    app: &mut App,
+    structure_id: &'static str,
+    observed_tab_keys: bool,
+) -> Result<Vec3, String> {
     let worker = capture_player_worker_position(app)
         .ok_or_else(|| format!("no player Worker to build {structure_id}"))?;
     capture_focus_camera_on(app, worker);
@@ -1336,17 +1364,39 @@ fn build_structure_via_real_input(
         app.update();
     }
 
-    if capture_enabled_build_hotkey_for(app, structure_id).is_none() {
-        tap_key(app, KeyCode::KeyT);
-    }
-    if capture_enabled_build_hotkey_for(app, structure_id).is_none() {
-        tap_key(app, KeyCode::KeyY);
+    if observed_tab_keys {
+        // Mining changes the presence of Idle Worker and shifts tab slots.
+        // Use the actual displayed binding instead of assuming T/Y positions.
+        for production in [true, false] {
+            if capture_enabled_build_hotkey_for(app, structure_id).is_some() {
+                break;
+            }
+            if let Some(key) = bevy_open_rts::capture_worker_build_tab_hotkey(app, production) {
+                tap_key(app, key);
+                for _ in 0..4 {
+                    app.update();
+                }
+            }
+        }
+    } else {
+        if capture_enabled_build_hotkey_for(app, structure_id).is_none() {
+            tap_key(app, KeyCode::KeyT);
+        }
+        if capture_enabled_build_hotkey_for(app, structure_id).is_none() {
+            tap_key(app, KeyCode::KeyY);
+        }
     }
     let Some(build_key) = capture_enabled_build_hotkey_for(app, structure_id) else {
         return Err(format!(
             "selected Worker does not expose an enabled {structure_id} build command"
         ));
     };
+    if observed_tab_keys {
+        println!(
+            "[capture] campaign construction {structure_id}: observed key {build_key:?}, selected {:?}",
+            capture_selected_player_unit_ids(app)
+        );
+    }
     tap_key(app, build_key);
     if !capture_player_in_placement_mode(app) {
         return Err(format!(
@@ -1799,73 +1849,77 @@ fn render_campaign_play(index: usize, dir: &Path) -> Result<(), String> {
         }
         let point = capture_world_to_screen(&mut app, ore).ok_or("deposit outside view")?;
         capture_click_screen(&mut app, point, MouseButton::Right);
-        build_structure_via_real_input(&mut app, "PowerReactor")?;
-        let survival = index == 0 || index == 3;
-        if survival {
-            build_structure_via_real_input(&mut app, "AntiGroundTurret")?;
-            build_structure_via_real_input(&mut app, "AntiGroundTurret")?;
-        }
-        let barracks = build_structure_via_real_input(&mut app, "Barracks")?;
-        if survival {
-            capture_focus_camera_on(&mut app, barracks);
-            for _ in 0..12 {
-                app.update();
-            }
-            let point =
-                capture_world_to_screen(&mut app, barracks).ok_or("barracks outside view")?;
-            capture_click_screen(&mut app, point, MouseButton::Left);
-            let rally = capture_first_enabled_rally_hotkey(&mut app)
-                .ok_or("barracks rally command missing")?;
-            tap_key(&mut app, rally);
-            let (_, base, _) =
-                capture_player_command_center(&mut app).ok_or("headquarters lost")?;
-            capture_focus_camera_on(&mut app, base);
-            for _ in 0..12 {
-                app.update();
-            }
-            let point = capture_world_to_screen(&mut app, base + Vec3::new(6.5, 0.0, 0.0))
-                .ok_or("rally target outside view")?;
-            capture_click_screen(&mut app, point, MouseButton::Right);
-            train_army_via_real_input(&mut app, barracks, 3, "HeavyMachinegunTrooper")?;
-            defend_headquarters_via_real_input(&mut app)?;
-        }
-        if survival {
-            train_army_via_real_input(&mut app, barracks, 8, "HeavyMachinegunTrooper")?;
-            build_structure_via_real_input(&mut app, "RadarUplink")?;
-            train_army_via_real_input(&mut app, barracks, 12, "RocketInfantry")?;
+        if matches!(index, 2 | 4) {
+            campaign_bot::run(&mut app, &handle, dir, index)?;
         } else {
-            let factory = build_structure_via_real_input(&mut app, "VehicleFactory")?;
-            train_army_via_real_input(&mut app, factory, 3, "Tank")?;
-            defend_headquarters_via_real_input(&mut app)?;
-            train_army_via_real_input(&mut app, factory, 8, "Tank")?;
-        }
-        shoot(&mut app, &handle, dir.join("01_army.png"));
-        for round in 0..80 {
-            if capture_match_phase_label(&mut app) != "Running" {
-                break;
+            build_structure_via_real_input(&mut app, "PowerReactor")?;
+            let survival = index == 0 || index == 3;
+            if survival {
+                build_structure_via_real_input(&mut app, "AntiGroundTurret")?;
+                build_structure_via_real_input(&mut app, "AntiGroundTurret")?;
             }
-            if index == 3 && round == 6 {
-                build_structure_via_real_input(&mut app, "PowerReactor")?;
-                let factory = build_structure_via_real_input(&mut app, "VehicleFactory")?;
-                let target = capture_player_army_unit_count(&mut app) + 4;
-                train_army_via_real_input(&mut app, factory, target, "Tank")?;
-                shoot(&mut app, &handle, dir.join("01_armour_reserve.png"));
-            }
-            if !survival {
-                issue_player_attack_move_to_nearest_anchor(&mut app)?;
-            } else {
+            let barracks = build_structure_via_real_input(&mut app, "Barracks")?;
+            if survival {
+                capture_focus_camera_on(&mut app, barracks);
+                for _ in 0..12 {
+                    app.update();
+                }
+                let point =
+                    capture_world_to_screen(&mut app, barracks).ok_or("barracks outside view")?;
+                capture_click_screen(&mut app, point, MouseButton::Left);
+                let rally = capture_first_enabled_rally_hotkey(&mut app)
+                    .ok_or("barracks rally command missing")?;
+                tap_key(&mut app, rally);
+                let (_, base, _) =
+                    capture_player_command_center(&mut app).ok_or("headquarters lost")?;
+                capture_focus_camera_on(&mut app, base);
+                for _ in 0..12 {
+                    app.update();
+                }
+                let point = capture_world_to_screen(&mut app, base + Vec3::new(6.5, 0.0, 0.0))
+                    .ok_or("rally target outside view")?;
+                capture_click_screen(&mut app, point, MouseButton::Right);
+                train_army_via_real_input(&mut app, barracks, 3, "HeavyMachinegunTrooper")?;
                 defend_headquarters_via_real_input(&mut app)?;
             }
-            for _ in 0..450 {
-                app.update();
+            if survival {
+                train_army_via_real_input(&mut app, barracks, 8, "HeavyMachinegunTrooper")?;
+                build_structure_via_real_input(&mut app, "RadarUplink")?;
+                train_army_via_real_input(&mut app, barracks, 12, "RocketInfantry")?;
+            } else {
+                let factory = build_structure_via_real_input(&mut app, "VehicleFactory")?;
+                train_army_via_real_input(&mut app, factory, 3, "Tank")?;
+                defend_headquarters_via_real_input(&mut app)?;
+                train_army_via_real_input(&mut app, factory, 8, "Tank")?;
             }
-            if round % 8 == 0 {
-                println!(
-                    "[capture] mission {index} round {round}: {} army={} resources={:?}",
-                    capture_match_phase_label(&mut app),
-                    capture_player_army_unit_count(&mut app),
-                    capture_player_resources(&mut app)
-                );
+            shoot(&mut app, &handle, dir.join("01_army.png"));
+            for round in 0..80 {
+                if capture_match_phase_label(&mut app) != "Running" {
+                    break;
+                }
+                if index == 3 && round == 6 {
+                    build_structure_via_real_input(&mut app, "PowerReactor")?;
+                    let factory = build_structure_via_real_input(&mut app, "VehicleFactory")?;
+                    let target = capture_player_army_unit_count(&mut app) + 4;
+                    train_army_via_real_input(&mut app, factory, target, "Tank")?;
+                    shoot(&mut app, &handle, dir.join("01_armour_reserve.png"));
+                }
+                if !survival {
+                    issue_player_attack_move_to_nearest_anchor(&mut app)?;
+                } else {
+                    defend_headquarters_via_real_input(&mut app)?;
+                }
+                for _ in 0..450 {
+                    app.update();
+                }
+                if round % 8 == 0 {
+                    println!(
+                        "[capture] mission {index} round {round}: {} army={} resources={:?}",
+                        capture_match_phase_label(&mut app),
+                        capture_player_army_unit_count(&mut app),
+                        capture_player_resources(&mut app)
+                    );
+                }
             }
         }
         for _ in 0..8 {

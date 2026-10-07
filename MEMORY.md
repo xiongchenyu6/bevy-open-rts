@@ -314,3 +314,31 @@ Latest construction checkpoint:
   screenshots/selection-compact/harvest/03_collecting_closeup.png.
 - Final media: screenshots/result/8, 450 raw frames and 15s at 30fps.
   Logs: logs/selection-{build-all,check-final,tests,play,harvest,proof}.log.
+
+## Save/input and desktop checkpoint — 2026-10-08
+
+- Real Ctrl+S/Ctrl+L acceptance harness lives in src/bin/capture/save_flow.rs.
+  Requires an explicit disposable absolute XDG_DATA_HOME and refuses existing
+  quicksaves. Missing/corrupt load leaves paused observations unchanged and
+  corrupt file bytes intact. Ordinary paid production/economy/fog restore;
+  logs/steam-save-friendly-runtime.log and screenshots/steam-quality/save-friendly.
+- Loading suppresses opening briefing. Save read errors now explain missing,
+  damaged/incompatible files without OS/parser internals. README corrected actual
+  shortcuts Ctrl+S/Ctrl+L (previous F5/F9 documentation was wrong).
+- A real campaign control failure exposed Barracks S/Stop collision when mining
+  removes idle-worker command. Grid reserves S/H/G/X/I/M/P and group digits;
+  added regression. Campaign tab keys must be observed, not hardcoded T/Y.
+  New defense/assault bot remains an acceptance experiment; no win claim yet.
+- Integration fmt/check/bins build and 166 library tests pass. Native12s launch
+  exits124 intentionally with empty log. Proof13:450 frames,30fps,15s, movement
+  4.24m,113 siege damage,94 effect frames; opening/motion/battle/end inspected.
+- Font regenerated twice identically:1219 codepoints,215372bytes,
+  SHA4b9451969be0c79fe523fe7132813ab1ad5bda36efab7929e5b596570e65ef7f.
+  All prior1213glyphs/advance widths retained;557 asset/catalog hashes verified.
+  User ignored fullTTF and flake.lock remain untouched.
+- Windows GNU game/capture actually compile and menu renders under Wine on Vulkan.
+  Final package excludes ignored full-font source; clean hardware/MSVC/release
+  performance still open. Linux exact archive save-flow acceptance in progress.
+- Two campaign2 invocations omitted BEVY_ASSET_ROOT and searched target/debug/assets,
+  hitting the30s startup limit before gameplay. Corrected invocation supplies the
+  absolute repo asset root; no timeout padding or gameplay changes were needed.

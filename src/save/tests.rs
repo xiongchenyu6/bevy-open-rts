@@ -1,5 +1,44 @@
 use super::*;
 
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn invalid_save_files_report_actionable_errors_without_modifying_files() {
+    let directory = std::env::temp_dir().join(format!("rts-save-errors-{}", std::process::id()));
+    std::fs::create_dir_all(&directory).unwrap();
+    let missing = directory.join("missing.ron");
+    assert_eq!(
+        read_save_file(&missing).unwrap_err(),
+        t(
+            "没有找到存档。请先保存对局。",
+            "No saved game found. Save a match first."
+        )
+    );
+    assert!(!missing.exists());
+    let corrupt = directory.join("corrupt.ron");
+    let bytes = b"not a valid save";
+    std::fs::write(&corrupt, bytes).unwrap();
+    assert_eq!(
+        read_save_file(&corrupt).unwrap_err(),
+        t(
+            "存档已损坏，无法载入。当前对局未受影响。",
+            "The saved game is damaged and cannot be loaded. Your current match is unchanged."
+        )
+    );
+    assert_eq!(std::fs::read(&corrupt).unwrap(), bytes);
+    let incompatible = directory.join("incompatible.ron");
+    let mut save = sample_save();
+    save.version = 1;
+    std::fs::write(&incompatible, ron::to_string(&save).unwrap()).unwrap();
+    assert_eq!(
+        read_save_file(&incompatible).unwrap_err(),
+        t(
+            "此存档与当前版本不兼容。请开始新对局。",
+            "This save is incompatible with this game version. Start a new match."
+        )
+    );
+    std::fs::remove_dir_all(directory).unwrap();
+}
+
 #[test]
 fn mission_orders_and_production_survive_load_without_replaying_triggers() {
     let mut app = build_game_app(GameAppMode::Headless);
@@ -222,6 +261,10 @@ fn quicksave_roundtrip_restores_world_through_restart_flow() {
         app.update();
     }
 
+    assert!(
+        !app.world().resource::<MatchBriefingState>().visible,
+        "loading must not replay the opening briefing"
+    );
     let after = collect_save_game(app.world_mut()).expect("match running after load");
     assert_eq!(
         after.units.len(),

@@ -12,16 +12,24 @@ green library tests and the earlier art pass do not establish release readiness.
 - [ ] Verify save continuity, corruption recovery and player-facing feedback.
 - [ ] Complete desktop delivery, balance/performance, art/audio and provenance gates.
 
-Current verification: 164 library tests pass; formatting, type/build checks and
+Current verification: 166 library tests pass; formatting, type/build checks and
 12-second native launch pass with no error output. Boot Camp passes with actual
 profile writes; missions 1, 2, 4 and 6 pass normal-input capture and continuation.
 The previously blocked factory now completes by approaching an accessible side.
 Missions 3 and 5 still need acceptance.
 These failures remain open, not accepted as release-ready behavior.
 
-Current video proof is `screenshots/result/12` (450 frames,15s,30fps).
-Windows GNU dependency build is live in an isolated container/target; execution
-under Wine and clean Windows remain unproven. Missions3/5 still need acceptance.
+Current video proof is `screenshots/result/13` (450 frames,15s,30fps), inspected
+opening/movement/combat/ending. Real Ctrl+S/Ctrl+L restores paid production,
+economy and fog; missing/corrupt files leave the paused match and original file
+unchanged. Error feedback is readable English and loading dismisses the opening
+briefing. Campaign runtime save coverage and mouse menu discovery remain open.
+Global command shortcuts and control-group digits are now excluded from the
+command grid: an actively harvesting Worker previously assigned Barracks to
+S/Stop. Regression passes; campaign input acceptance is in progress.
+Windows GNU game/capture now compile; a Wine-rendered menu is inspected.
+Clean Windows hardware/release-profile acceptance remains unproven.
+Missions3/5 still need acceptance; two startup-timeout attempts are recorded.
 
 Compact icon cards and disabled tooltips/queues are verified at 1280x720 and
 900x720. Linux development packaging launches without /nix from /tmp on a

@@ -35,9 +35,9 @@ Unicode characters. It never reads or overwrites the user's ignored full TTF.
 | --- | --- |
 | Official TTC | `e4bca8df123ce01b104780f576ea1a58b9a5ff1662a91124b6d3180cb6c88212` |
 | Converted face 0 TTF | `272435f569f3e7ffa7cea299d0b175346738b5922eccaedb168eadb63f8123da` |
-| Runtime subset | `e4be13e4f6c1f226175906922777d5aeede8408601dbd7cdd92480ba5773c0af` |
+| Runtime subset | `4b9451969be0c79fe523fe7132813ab1ad5bda36efab7929e5b596570e65ef7f` |
 
-Two repeated regenerations produce identical runtime bytes. The cmap has 1,213
+Two repeated regenerations produce identical runtime bytes. The cmap has 1,219
 codepoints and covers full ASCII, current Rust literals/Unicode escapes, and
 all English/Chinese (`en`, `zh_CN`) CSV catalog characters. Polish is not a product
 locale and is not collected. All 616 non-ASCII catalog codepoints, including 南,

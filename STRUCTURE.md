@@ -95,6 +95,11 @@ domains live in modules, each re-exported into the crate root
   campaign menu state, mission victory/trigger systems.
 - `src/capture_api.rs` — the `pub fn capture_*` harness surface + offscreen
   render-target plumbing (used by `src/bin/capture.rs` and tests).
+- `src/bin/capture/save_flow.rs` verifies ordinary save/load input, paid queue
+  continuity and rejected-file recovery in an explicit disposable user directory.
+- `src/bin/capture/campaign_bot.rs` observes real mission state and issues mouse,
+  production and control-group commands for separate home defense and assault.
+  It never spawns armies, grants resources or changes mission clocks/difficulty.
 - `src/generated_registry.rs` — entity registry (hand-extended; do NOT regenerate
   via scripts/generate_registry.py — it would delete the extensions).
 

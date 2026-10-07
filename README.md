@@ -186,7 +186,7 @@ Generated outputs:
   action, cost, prerequisites and availability; **Attack-Move** uses the key
   shown on the selected army's card.
 - Move the pointer to the viewport edge to pan; the mouse wheel zooms.
-- In an offline match, **F5** saves, **F9** loads and **F10** toggles tactical
+- In a desktop offline match, **Ctrl+S** saves, **Ctrl+L** loads and **F10** toggles tactical
   pause. Match saves and campaign completion use your per-user data directory.
 
 ## Model Harness

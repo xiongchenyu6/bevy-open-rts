@@ -113,7 +113,7 @@
     },
     {
       "path": "assets/fonts/wqy-microhei-ui.ttf",
-      "sha256": "e4be13e4f6c1f226175906922777d5aeede8408601dbd7cdd92480ba5773c0af",
+      "sha256": "4b9451969be0c79fe523fe7132813ab1ad5bda36efab7929e5b596570e65ef7f",
       "comparison": "absent_from_upstream",
       "pinned_font_source": {
         "source_url": "https://deb.debian.org/debian/pool/main/f/fonts-wqy-microhei/fonts-wqy-microhei_0.2.0-beta.orig.tar.gz",
@@ -122,9 +122,9 @@
         "face": 0,
         "fonttools_version": "4.61.1",
         "converted_ttf_sha256": "272435f569f3e7ffa7cea299d0b175346738b5922eccaedb168eadb63f8123da",
-        "subset_sha256": "e4be13e4f6c1f226175906922777d5aeede8408601dbd7cdd92480ba5773c0af",
-        "requested_supported_codepoints": 1213,
-        "subset_codepoints": 1213,
+        "subset_sha256": "4b9451969be0c79fe523fe7132813ab1ad5bda36efab7929e5b596570e65ef7f",
+        "requested_supported_codepoints": 1219,
+        "subset_codepoints": 1219,
         "translation_locales": [
           "en",
           "zh_CN"
@@ -149,7 +149,7 @@
         "ascii_complete": true,
         "missing_required_cjk": [],
         "source_unsupported_requested_symbols": [],
-        "output_bytes": 214352,
+        "output_bytes": 215372,
         "script": "scripts/subset_font.sh",
         "script_sha256": "d19738efb114380097772b75dc4e90088f0d42a2024cb133c6686eb22e43ec78",
         "repeat_runs_identical": true,
