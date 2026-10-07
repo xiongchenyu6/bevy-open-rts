@@ -1342,38 +1342,56 @@ fn build_structure_via_real_input(
     app: &mut App,
     structure_id: &'static str,
 ) -> Result<Vec3, String> {
-    build_structure_with_input_mode(app, structure_id, false)
+    build_structure_with_input_mode(app, structure_id, false, None)
 }
 
 fn build_campaign_structure_via_real_input(
     app: &mut App,
     structure_id: &'static str,
+    observer: &mut dyn FnMut(&mut App),
 ) -> Result<Vec3, String> {
-    build_structure_with_input_mode(app, structure_id, true)
+    build_structure_with_input_mode(app, structure_id, true, Some(observer))
+}
+
+fn observed_capture_step(app: &mut App, observer: &mut Option<&mut dyn FnMut(&mut App)>) {
+    app.update();
+    if let Some(callback) = observer.as_deref_mut() {
+        callback(app);
+    }
 }
 
 fn build_structure_with_input_mode(
     app: &mut App,
     structure_id: &'static str,
     observed_tab_keys: bool,
+    mut observer: Option<&mut dyn FnMut(&mut App)>,
 ) -> Result<Vec3, String> {
-    let worker = capture_player_worker_position(app)
-        .ok_or_else(|| format!("no player Worker to build {structure_id}"))?;
-    capture_focus_camera_on(app, worker);
-    for _ in 0..12 {
-        app.update();
-    }
-    // Harvesters keep moving while the camera settles. Aim at the current
-    // position, as a player would, rather than the position twelve ticks ago.
-    let worker = capture_player_worker_position(app).ok_or("worker missing after camera settle")?;
-    let worker_screen = capture_world_to_screen(app, worker).ok_or("worker offscreen")?;
-    capture_set_cursor(app, worker_screen);
-    capture_mouse_button(app, MouseButton::Left, true);
-    app.update();
-    capture_mouse_button(app, MouseButton::Left, false);
-    for _ in 0..12 {
-        app.update();
-    }
+    let worker = if observed_tab_keys {
+        // Campaign builders use the same verified, click-safe selection as
+        // combat groups; don't overwrite it with an unchecked second click.
+        campaign_bot::select_builder(app)?
+    } else {
+        let worker = capture_player_worker_position(app)
+            .ok_or_else(|| format!("no player Worker to build {structure_id}"))?;
+        capture_focus_camera_on(app, worker);
+        for _ in 0..12 {
+            observed_capture_step(app, &mut observer);
+        }
+        // Harvesters keep moving while the camera settles. Aim at the current
+        // position, as a player would, rather than the position twelve ticks ago.
+        let worker =
+            capture_player_worker_position(app).ok_or("worker missing after camera settle")?;
+        let worker_screen = capture_world_to_screen(app, worker).ok_or("worker offscreen")?;
+        capture_set_cursor(app, worker_screen);
+        capture_mouse_button(app, MouseButton::Left, true);
+        observed_capture_step(app, &mut observer);
+        capture_mouse_button(app, MouseButton::Left, false);
+        for _ in 0..12 {
+            observed_capture_step(app, &mut observer);
+        }
+
+        worker
+    };
 
     if observed_tab_keys {
         // Mining changes the presence of Idle Worker and shifts tab slots.
@@ -1385,7 +1403,7 @@ fn build_structure_with_input_mode(
             if let Some(key) = bevy_open_rts::capture_worker_build_tab_hotkey(app, production) {
                 tap_key(app, key);
                 for _ in 0..4 {
-                    app.update();
+                    observed_capture_step(app, &mut observer);
                 }
             }
         }
@@ -1420,7 +1438,15 @@ fn build_structure_with_input_mode(
     let placement_origin = capture_player_command_center(app)
         .map(|(_, base, _)| base)
         .unwrap_or(worker);
-    let placement_offsets = if structure_id == "PowerReactor" {
+    let placement_offsets = if observed_tab_keys && structure_id == "AntiAirTurret" {
+        [
+            Vec3::new(0.0, 0.0, 9.0),
+            Vec3::new(3.0, 0.0, 9.0),
+            Vec3::new(6.0, 0.0, 9.0),
+            Vec3::new(8.0, 0.0, 6.0),
+            Vec3::new(9.0, 0.0, 3.0),
+        ]
+    } else if structure_id == "PowerReactor" {
         // Protect the generator behind the west-side campaign headquarters.
         [
             Vec3::new(-4.0, 0.0, 2.5),
@@ -1468,23 +1494,23 @@ fn build_structure_with_input_mode(
         let candidate = placement_origin + offset;
         capture_focus_camera_on(app, candidate);
         for _ in 0..8 {
-            app.update();
+            observed_capture_step(app, &mut observer);
         }
         let Some(screen) = capture_world_to_screen(app, candidate) else {
             continue;
         };
         capture_set_cursor(app, screen);
         for _ in 0..6 {
-            app.update();
+            observed_capture_step(app, &mut observer);
         }
         if !capture_placement_is_valid(app) {
             continue;
         }
         capture_mouse_button(app, MouseButton::Left, true);
-        app.update();
+        observed_capture_step(app, &mut observer);
         capture_mouse_button(app, MouseButton::Left, false);
         for _ in 0..20 {
-            app.update();
+            observed_capture_step(app, &mut observer);
         }
         if capture_player_structure_count(app) > structures_before {
             placed_at = Some(candidate);
@@ -1498,9 +1524,23 @@ fn build_structure_with_input_mode(
         placed_at.x, placed_at.z
     );
 
-    let completed = wait_until(app, BUILD_COMPLETION_WAIT_TICKS, |app| {
-        capture_player_completed_structure_count_for(app, structure_id) > completed_before
-    });
+    let completed = if observed_tab_keys {
+        let mut complete =
+            capture_player_completed_structure_count_for(app, structure_id) > completed_before;
+        for _ in 0..BUILD_COMPLETION_WAIT_TICKS {
+            if complete || capture_match_phase_label(app) != "Running" {
+                break;
+            }
+            observed_capture_step(app, &mut observer);
+            complete =
+                capture_player_completed_structure_count_for(app, structure_id) > completed_before;
+        }
+        complete
+    } else {
+        wait_until(app, BUILD_COMPLETION_WAIT_TICKS, |app| {
+            capture_player_completed_structure_count_for(app, structure_id) > completed_before
+        })
+    };
     if !completed {
         println!(
             "[capture] {}",
