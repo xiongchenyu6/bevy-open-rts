@@ -22,7 +22,7 @@ rights manifest. Runtime references are in `src/audio.rs`, the generated registr
 | English voices: 14 OGGs | All 14 are byte-identical to pinned official Open RTS. Voice history spans 2023–2025; project MIT notice retained. [Current TTSMaker terms](https://ttsmaker.com/terms-of-service) describe ownership of created audio. | No voice-specific grant or generation-time provider terms were found upstream. Source membership is verified; third-party output rights remain to document. |
 | Chinese voices: 16 OGGs | `scripts/gen_zh_voice.sh` records edge-tts, Yunxi/Xiaoxiao and input lines. | Obtain applicable output-use/redistribution evidence for that actual service, or regenerate through a documented licensed source. The tool's availability is not permission. |
 | Other art | Ten icons and `icosphere.obj` match official upstream. Another 105 icons, three emblems, two cursor files and six VFX images are absent; background and two icons differ. Explicit generated-sheet copy records were recovered for 27 current icons. | Recover missing generation/service records and transformed-image correspondence. VFX creation evidence remains missing. The official MIT notice does not establish rights in absent families. |
-| SFX and music | Recovered oscillator/noise-only FFmpeg creation recipes for all 19 WAVs and the battle loop. Regenerating into `/tmp` matches 14 SFX PCM streams exactly. | Four noise-based effects and `error.wav` do not match regenerated PCM; the music recipe also differs after decoding. Generation evidence is stronger than before, but exact final-output lineage remains partial. |
+| SFX and music | Recovered oscillator/noise-only FFmpeg creation recipes for all 19 WAVs and the battle loop. Fourteen legacy SFX match resynthesis PCM; the other five SFX and music were regenerated with the checked-in deterministic script. Three independent FFmpeg 9.0.1 runs match their file bytes and decoded PCM exactly. | Preserve reproduction script, seed, tool/output hashes and validation records. Human listening on release hardware remains unverified. |
 
 ## Pinned source comparison
 
@@ -52,7 +52,21 @@ The import-era customized checkout named by the migration manifest remains unava
   including RosterPreview. The JSON inventory preserves only relevant recipes,
   timestamps, command hashes and reproduction results. No service credentials or
   unrelated conversation are retained. Exact PCM correspondence is verified for
-  14 effects; the other five and the music retain correspondence gaps.
+  14 legacy effects. The five remaining SFX and music were replaced with
+  reproducible authored outputs; their former mismatches remain historical records.
+- Current audio closure: `scripts/reproduce_authored_audio.py` pins FFmpeg 9.0.1,
+  seed 20261008, scalar CPU flags and single-thread filters. Error tones use explicit half-gain
+  mixing rather than timing-dependent dynamic normalization. It reuses only the
+  recovered oscillator/noise/mix recipes. A 4 ms music endpoint taper and limiter
+  latency compensation preserve the 24-second loop while reducing its join jump
+  to 0.000029 in decoded float PCM. All six files remain mono 44.1 kHz, retain
+  their original durations and have peaks below 0.088. Three independent runs
+  produced identical bytes and decoded PCM; exact hashes/commands are in the JSON
+  inventory. All six current files loaded through the actual Bevy AssetServer,
+  AudioLoader and AudioSource decoder, without clipping or sample-count changes
+  (`logs/authored-audio-assets-load.log`). A native match startup capture also
+  passed (`logs/authored-audio-game-load.log`). Human listening remains unverified.
+  Voice and generated-art provider gaps are unaffected.
 - Generated-sheet source paths are evidence of production steps, not proof of
   applicable model/service terms. VFX creation records remain missing.
 
