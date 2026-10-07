@@ -487,22 +487,83 @@ fn hold_arrived_defenders(app: &mut App) -> Result<(), String> {
     Ok(())
 }
 
-fn rally_to_safe_staging(app: &mut App, producer: &str) -> Result<(), String> {
+fn maintain_twin_defense(app: &mut App) -> Result<(), String> {
+    let state = capture_campaign_state(app);
+    let Some(base) = state.headquarters.map(|hq| hq.position) else {
+        return Ok(());
+    };
+    if let Some(threat) = state
+        .threats
+        .iter()
+        .filter(|threat| threat.domain == "ground")
+        .min_by(|a, b| {
+            a.position
+                .distance_squared(base)
+                .total_cmp(&b.position.distance_squared(base))
+        })
+    {
+        if recall(app, DEFENSE)? {
+            ground_order(app, threat.position, true)?;
+        }
+        return Ok(());
+    }
+    let units = capture_campaign_units(app);
+    let away: Vec<_> = units
+        .iter()
+        .filter(|unit| unit.groups.contains(&DEFENSE) && unit.position.distance(base) > 12.0)
+        .map(|unit| unit.entity)
+        .collect();
+    if !select_units(app, &away)?.is_empty() {
+        ground_order(app, base + Vec3::new(8.0, 0.0, 0.0), false)?;
+    }
+    // Hold immediately inside the home perimeter, including units pursuing a
+    // retreating enemy. Waiting for idle lets guards chase across the map.
+    let home: Vec<_> = capture_campaign_units(app)
+        .into_iter()
+        .filter(|unit| {
+            unit.groups.contains(&DEFENSE) && !unit.holding && unit.position.distance(base) <= 12.0
+        })
+        .map(|unit| unit.entity)
+        .collect();
+    if !select_units(app, &home)?.is_empty() {
+        let key = capture_enabled_hold_position_hotkey(app).ok_or("defenders lack hold command")?;
+        tap_key(app, key);
+    }
+    Ok(())
+}
+
+fn rally_to_safe_staging(
+    app: &mut App,
+    producer: &str,
+    mission_index: usize,
+) -> Result<(), String> {
     let state = capture_campaign_state(app);
     let base = state
         .headquarters
         .as_ref()
         .ok_or("headquarters lost")?
         .position;
-    let offsets = [
-        (6.0, 6.0),
-        (-6.0, -6.0),
-        (-8.0, 0.0),
-        (0.0, -8.0),
-        (-8.0, 6.0),
-        (6.0, -8.0),
-        (8.0, 6.0),
-    ];
+    let offsets = if mission_index == 4 {
+        [
+            (2.0, 9.0),
+            (5.0, 9.0),
+            (8.0, 8.0),
+            (10.0, 5.0),
+            (10.0, 2.0),
+            (-2.0, 10.0),
+            (0.0, 12.0),
+        ]
+    } else {
+        [
+            (6.0, 6.0),
+            (-6.0, -6.0),
+            (-8.0, 0.0),
+            (0.0, -8.0),
+            (-8.0, 6.0),
+            (6.0, -8.0),
+            (8.0, 6.0),
+        ]
+    };
     let staging = offsets
         .into_iter()
         .map(|(x, z)| base + Vec3::new(x, 0.0, z))
@@ -515,6 +576,7 @@ fn rally_to_safe_staging(app: &mut App, producer: &str) -> Result<(), String> {
                     .all(|(position, radius)| point.distance(*position) >= radius + 1.2)
         })
         .ok_or("no clear safe staging point near headquarters")?;
+    println!("[capture] campaign {producer} rally staging {staging:?}");
     if !select_producer(app, producer)? {
         return Err(format!("{producer} not selectable for rally"));
     }
@@ -590,7 +652,7 @@ pub(super) fn run(
         // Factory-first gets real armor onto the battlefield before the Hard
         // opening attack. Production continues while infantry/defenses build.
         build(app, &mut watch, "VehicleFactory")?;
-        rally_to_safe_staging(app, "VehicleFactory")?;
+        rally_to_safe_staging(app, "VehicleFactory", index)?;
         queue_to_quota(app, "VehicleFactory", "Tank", 6)?;
         build(app, &mut watch, "Barracks")?;
         queue_to_quota(app, "Barracks", "HeavyMachinegunTrooper", 3)?;
@@ -601,7 +663,7 @@ pub(super) fn run(
         build(app, &mut watch, "AntiAirTurret")?;
         queue_to_quota(app, "VehicleFactory", "Tank", 9)?;
         build(app, &mut watch, "RadarUplink")?;
-        rally_to_safe_staging(app, "Barracks")?;
+        rally_to_safe_staging(app, "Barracks", index)?;
         train_to_count(app, &mut watch, "Barracks", "RocketInfantry", 3)?;
         refresh_groups(app)?;
         watch.checkpoint(app, "early-air-defense-ready")?;
@@ -630,6 +692,9 @@ pub(super) fn run(
             ensure_harvesting(app)?;
             refresh_groups(app)?;
             hold_arrived_defenders(app)?;
+            if index == 4 {
+                maintain_twin_defense(app)?;
+            }
             queue_to_quota(app, "CommandCenter", "Worker", 4)?;
             queue_to_quota(app, "Barracks", "HeavyMachinegunTrooper", 3)?;
             queue_to_quota(app, "Barracks", "RocketInfantry", 5)?;
