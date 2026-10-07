@@ -178,16 +178,16 @@ Generated outputs:
 
 ## Controls
 
-- The game opens on the Godot-style command menu. Click `开始游戏` to enter
-  skirmish setup. In setup, press 1-4 to choose a map, H/D/C to choose the
-  player slot, Z/X/V to cycle each slot's faction, 9/0 to choose 1v1 or
-  free-for-all, J/K/L to cycle team ids, Q/W/E to cycle player controllers,
-  U/I/O to cycle player colors, F1-F4 to choose AI difficulty, 5-8 to choose
-  starting resources, then Enter or click `开始对战`.
-- Left click selects a visible unit or structure.
-- Right click orders selected mobile units to move or attack.
-- Drag the mouse near the viewport edge, or use WASD, to pan the camera.
-- Mouse wheel zooms.
+- Start with **Boot Camp** for guided play, **Campaign** for missions, or
+  **Skirmish** to choose your map, players, factions and difficulty.
+- Left-click a visible unit or structure; drag a box to select a group.
+- Right-click terrain to move, an enemy to attack, or a deposit to gather.
+- Command cards show their current shortcut keys. Hover an icon for its
+  action, cost, prerequisites and availability; **Attack-Move** uses the key
+  shown on the selected army's card.
+- Move the pointer to the viewport edge to pan; the mouse wheel zooms.
+- In an offline match, **F5** saves, **F9** loads and **F10** toggles tactical
+  pause. Match saves and campaign completion use your per-user data directory.
 
 ## Model Harness
 

@@ -1015,6 +1015,7 @@ pub(crate) fn build_target_product(action: BuildAction) -> &'static str {
 pub(crate) fn update_construct_orders(
     mut commands: Commands,
     time: Res<Time>,
+    grid: Res<NavGrid>,
     mut constructors: Query<
         (
             Entity,
@@ -1024,10 +1025,11 @@ pub(crate) fn update_construct_orders(
             &Unit,
             &ConstructOrder,
             Option<&MoveOrder>,
+            Option<&PlannedPath>,
             Option<&EmpDisabled>,
             &Health,
         ),
-        (With<Unit>, Without<Structure>),
+        (With<Unit>, With<ConstructOrder>, Without<Structure>),
     >,
     mut structures: Query<
         (
@@ -1039,7 +1041,31 @@ pub(crate) fn update_construct_orders(
         ),
         (With<Structure>, Without<Unit>),
     >,
+    obstacles: Query<
+        (&Transform, &Selectable),
+        (
+            Or<(With<Structure>, With<ResourceNode>, With<TerrainWall>)>,
+            Without<Unit>,
+        ),
+    >,
+    other_units: Query<(&Transform, &Selectable, &Health), (With<Unit>, Without<ConstructOrder>)>,
 ) {
+    let static_obstacles: Vec<_> = obstacles
+        .iter()
+        .map(|(transform, selectable)| (transform.translation, selectable.radius))
+        .collect();
+    let constructor_positions: Vec<_> = constructors
+        .iter()
+        .filter(|(_, _, _, _, _, _, _, _, _, health)| health.current > 0.0)
+        .map(|(entity, _, transform, selectable, ..)| {
+            (entity, transform.translation, selectable.radius)
+        })
+        .collect();
+    let other_positions: Vec<_> = other_units
+        .iter()
+        .filter(|(_, _, health)| health.current > 0.0)
+        .map(|(transform, selectable, _)| (transform.translation, selectable.radius))
+        .collect();
     for (
         constructor_entity,
         constructor_team,
@@ -1048,6 +1074,7 @@ pub(crate) fn update_construct_orders(
         constructor_unit,
         order,
         move_order,
+        planned_path,
         emp,
         constructor_health,
     ) in &mut constructors
@@ -1103,20 +1130,66 @@ pub(crate) fn update_construct_orders(
                     .try_remove::<MoveOrder>();
                 continue;
             }
-            if !move_order_targets_contact(
+            let occupied: Vec<_> = other_positions
+                .iter()
+                .copied()
+                .chain(
+                    constructor_positions
+                        .iter()
+                        .filter(|(entity, ..)| *entity != constructor_entity)
+                        .map(|(_, position, radius)| (*position, *radius)),
+                )
+                .collect();
+            let approach_still_clear = move_order_targets_contact(
                 move_order,
                 target_transform.translation,
                 constructor_selectable.radius,
                 target_selectable.radius,
-            ) {
-                commands.entity(constructor_entity).try_insert(MoveOrder {
-                    target: unit_contact_move_target_position(
-                        constructor_transform.translation,
-                        constructor_selectable.radius,
-                        target_transform.translation,
-                        target_selectable.radius,
-                    ),
-                });
+            ) && move_order.is_some_and(|order| {
+                contact_position_is_clear(
+                    order.target,
+                    constructor_selectable.radius,
+                    &static_obstacles,
+                    &occupied,
+                ) && contact_route_is_open(
+                    &grid,
+                    constructor_transform.translation,
+                    order.target,
+                    planned_path,
+                )
+            });
+            if !approach_still_clear {
+                if let Some(approach) = reachable_unit_contact_approach(
+                    constructor_transform.translation,
+                    constructor_selectable.radius,
+                    target_transform.translation,
+                    target_selectable.radius,
+                    &grid,
+                    &static_obstacles,
+                    &occupied,
+                ) {
+                    commands.entity(constructor_entity).try_insert(MoveOrder {
+                        target: approach.target,
+                    });
+                    if approach.waypoints.is_empty() {
+                        commands
+                            .entity(constructor_entity)
+                            .try_remove::<PlannedPath>();
+                    } else {
+                        commands.entity(constructor_entity).try_insert(PlannedPath {
+                            goal: approach.target,
+                            waypoints: approach.waypoints,
+                            next: 0,
+                        });
+                    }
+                } else {
+                    // Preserve the construction task and wait for a real route;
+                    // never walk into an occupied side or advance build time.
+                    commands
+                        .entity(constructor_entity)
+                        .try_remove::<MoveOrder>()
+                        .try_remove::<PlannedPath>();
+                }
             }
             continue;
         }
@@ -2009,3 +2082,6 @@ pub(crate) fn process_build_queue(
         }
     }
 }
+
+#[cfg(test)]
+mod construction_tests;

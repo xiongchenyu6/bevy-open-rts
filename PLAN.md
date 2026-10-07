@@ -5,19 +5,23 @@
 The full acceptance matrix is in `docs/RELEASE_READINESS.md`. It remains open:
 green library tests and the earlier art pass do not establish release readiness.
 
-- [ ] Verify Boot Camp from menu entry through graduation with normal inputs.
-  Seven lessons pass in `logs/steam-boot-camp-current.log`, with screenshots in
-  `screenshots/steam-quality/boot-camp`. Skip/replay and native profile remain.
+- [x] Verify Boot Camp entry, skip, seven lessons, graduation and fresh replay.
+  Native sandbox persistence and restart were verified separately; current
+  full flow is in `logs/steam-training-flow.log` and its screenshot directory.
 - [ ] Verify all six campaign missions, persistent completion and continuation.
 - [ ] Verify save continuity, corruption recovery and player-facing feedback.
 - [ ] Complete desktop delivery, balance/performance, art/audio and provenance gates.
 
-Current verification: 160 library tests pass; formatting, type/build checks and
+Current verification: 164 library tests pass; formatting, type/build checks and
 12-second native launch pass with no error output. Boot Camp passes with actual
-profile writes; current missions 1, 4 and 6 pass normal-input capture and
-continuation. Mission 2's former infantry strategy passed, but the current
-factory recipe hit an unfinished foundation; missions 3 and 5 still lose.
+profile writes; missions 1, 2, 4 and 6 pass normal-input capture and continuation.
+The previously blocked factory now completes by approaching an accessible side.
+Missions 3 and 5 still need acceptance.
 These failures remain open, not accepted as release-ready behavior.
+
+Current video proof is `screenshots/result/12` (450 frames,15s,30fps).
+Windows GNU dependency build is live in an isolated container/target; execution
+under Wine and clean Windows remain unproven. Missions3/5 still need acceptance.
 
 Compact icon cards and disabled tooltips/queues are verified at 1280x720 and
 900x720. Linux development packaging launches without /nix from /tmp on a

@@ -4,6 +4,26 @@
 
 ### Current verified state and next work
 
+Latest construction checkpoint:
+- `logs/steam-contact-full-tests.log`:164 passed,0 failed (58.63s).
+- Worker contact selection checks actual static/unit clearance and a worker-sized
+  routing grid, tries alternate sides, and preserves still-valid routes. Exact
+  captured Power/idle-worker obstruction is covered by four real-system tests
+  in `src/production/construction_tests.rs`; no teleport/cost/timeout changes.
+- `logs/steam-contact-runtime.log` now completes the same factory(-28,-16),
+  produces8 paid tanks and wins/continues mission index1. Evidence screenshots
+  in `screenshots/steam-quality/contact-fixed`.
+- `logs/steam-training-flow.log` verifies normal-input skip→Campaign→Back,
+  seven lessons, graduation→Replay Boot Camp and a fresh first lesson with no
+  surviving combat army. Screenshots in `screenshots/steam-quality/training-flow`.
+- Current proof bundle is `screenshots/result/12`,450 frames,15s,30fps.
+- Windows GNU build is genuinely running in Docker `bevy-windows-cross`,
+  owned by art_audit, isolated `target/windows-cross` and Wine prefix
+  `target/windows-wine-prefix`. Logs/windows-cross-build.log; no Windows success
+  until executable actually runs. Do not restart a live build merely for silence.
+- Release audit is writing docs/CAMPAIGN_QA.md for indices2/4 failures; current
+  all-army attack may abandon HQ. Do not weaken missions to satisfy that bot.
+
 - `logs/steam-final-quality-tests.log`: 160 passed, 0 failed (65.27s).
 - Compact icon command cards (352px) pass worker selection, disabled tooltip
   and real production queue at 1280x720 and 900x720; screenshots under

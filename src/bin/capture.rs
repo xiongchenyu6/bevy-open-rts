@@ -32,9 +32,10 @@ use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 
 use bevy_open_rts::{
     CaptureTarget, build_capture_app, build_model_harness_capture_app, capture_active_mission,
-    capture_art_combat_evidence, capture_boot_camp_button, capture_build_button_center,
-    capture_build_options_count, capture_campaign_completed, capture_campaign_continue_button,
-    capture_campaign_menu_open, capture_construction_diagnostics, capture_dismiss_match_briefing,
+    capture_art_combat_evidence, capture_boot_camp_button, capture_boot_camp_label,
+    capture_build_button_center, capture_build_options_count, capture_campaign_back_button,
+    capture_campaign_completed, capture_campaign_continue_button, capture_campaign_menu_open,
+    capture_construction_diagnostics, capture_dismiss_match_briefing,
     capture_enabled_build_hotkey_for, capture_enabled_train_hotkey_for,
     capture_enemy_structure_position, capture_entity_is_selected,
     capture_first_enabled_attack_move_hotkey, capture_first_enabled_build_hotkey,
@@ -2208,6 +2209,27 @@ fn render_boot_camp(dir: &Path) -> Result<(), String> {
         app.update();
     }
     shoot(&mut app, &handle, dir.join("01_select_worker.png"));
+    let skip = bevy_open_rts::capture_skip_training_button(&mut app)
+        .ok_or("Skip training button missing")?;
+    capture_click_screen(&mut app, skip, MouseButton::Left);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    if !capture_campaign_menu_open(&app) || bevy_open_rts::capture_tutorial_active(&app) {
+        return Err("Skip training did not leave the lesson for the campaign map".into());
+    }
+    shoot(&mut app, &handle, dir.join("01_skipped.png"));
+    let back = capture_campaign_back_button(&mut app).ok_or("campaign Back button missing")?;
+    capture_click_screen(&mut app, back, MouseButton::Left);
+    for _ in 0..12 {
+        app.update();
+    }
+    let point = capture_boot_camp_button(&mut app).ok_or("Boot Camp menu missing after skip")?;
+    capture_click_screen(&mut app, point, MouseButton::Left);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    require_tutorial_stage(&app, 0)?;
     let worker = capture_player_worker_position(&mut app).ok_or("training worker missing")?;
     capture_focus_camera_on(&mut app, worker);
     for _ in 0..12 {
@@ -2263,8 +2285,37 @@ fn render_boot_camp(dir: &Path) -> Result<(), String> {
         ));
     }
     shoot(&mut app, &handle, dir.join("06_graduated.png"));
+    let point =
+        capture_campaign_continue_button(&mut app).ok_or("graduate Campaign Map button missing")?;
+    capture_click_screen(&mut app, point, MouseButton::Left);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    let back = capture_campaign_back_button(&mut app)
+        .ok_or("campaign Back button missing after graduation")?;
+    capture_click_screen(&mut app, back, MouseButton::Left);
+    for _ in 0..12 {
+        app.update();
+    }
+    let label = capture_boot_camp_label(&mut app).ok_or("training menu label missing")?;
+    if !label.contains("Replay") {
+        return Err(format!("completed training menu still says {label}"));
+    }
+    shoot(&mut app, &handle, dir.join("07_replay_menu.png"));
+    let point = capture_boot_camp_button(&mut app).ok_or("Replay Boot Camp button missing")?;
+    capture_click_screen(&mut app, point, MouseButton::Left);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    require_tutorial_stage(&app, 0)?;
+    if !bevy_open_rts::capture_tutorial_active(&app)
+        || capture_player_army_unit_count(&mut app) != 0
+    {
+        return Err("replay did not start a fresh lesson and army".into());
+    }
+    shoot(&mut app, &handle, dir.join("08_replayed.png"));
     println!(
-        "[capture] boot camp: all seven lessons completed through normal menu/worker/build/train/move/attack inputs"
+        "[capture] boot camp: skip, seven lessons, graduation and fresh replay verified through normal inputs"
     );
     Ok(())
 }

@@ -2093,6 +2093,40 @@ pub fn capture_tutorial_stage(app: &App) -> usize {
     app.world().resource::<TutorialState>().stage as usize
 }
 
+pub fn capture_tutorial_active(app: &App) -> bool {
+    app.world().resource::<TutorialState>().active
+}
+
+pub fn capture_skip_training_button(app: &mut App) -> Option<Vec2> {
+    let world = app.world_mut();
+    let mut query = world.query_filtered::<&UiGlobalTransform, With<SkipTutorial>>();
+    query
+        .iter(world)
+        .next()
+        .map(|transform| transform.translation)
+}
+
+pub fn capture_campaign_back_button(app: &mut App) -> Option<Vec2> {
+    let world = app.world_mut();
+    let mut query = world.query::<(&CampaignMenuAction, &UiGlobalTransform)>();
+    query
+        .iter(world)
+        .find(|(action, _)| matches!(action, CampaignMenuAction::Back))
+        .map(|(_, transform)| transform.translation)
+}
+
+pub fn capture_boot_camp_label(app: &mut App) -> Option<String> {
+    let world = app.world_mut();
+    let mut query = world.query::<(&FrontMenuButton, &Children)>();
+    let children = query
+        .iter(world)
+        .find(|(button, _)| button.action == FrontMenuAction::Training)?
+        .1;
+    children
+        .iter()
+        .find_map(|child| world.get::<Text>(child).map(|text| text.0.clone()))
+}
+
 /// Read-only campaign observations for the normal-input acceptance harness.
 pub fn capture_campaign_completed(app: &App, index: usize) -> bool {
     app.world().resource::<CampaignProgress>().completed(index)
