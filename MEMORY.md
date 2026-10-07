@@ -195,3 +195,15 @@
 - Historical screenshots/art-before.png uses an older capture binary and shadow
   settings, so it is an art reference rather than a controlled lighting comparison.
 - No web publication was performed by this art pass.
+
+## Compact selection feedback — 2026-10-07
+
+- Worker display radius 0.34 replaces the old 0.78 full ring; four short arcs
+  hug the footprint. Infantry also gets compact markers. Vehicles retain a
+  suitable footprint; aircraft use a small ground cross rather than a duplicate ring.
+- Small-unit health bars use display size; hit-testing, nav and combat radii are unchanged.
+- Build/check/fmt and 2 selection tests pass. Real input captures verify move 3.87m,
+  ore 32→44, training and completed construction. Worker close-up:
+  screenshots/selection-compact/harvest/03_collecting_closeup.png.
+- Final media: screenshots/result/8, 450 raw frames and 15s at 30fps.
+  Logs: logs/selection-{build-all,check-final,tests,play,harvest,proof}.log.

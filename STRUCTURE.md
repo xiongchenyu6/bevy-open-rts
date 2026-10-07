@@ -245,3 +245,8 @@ The proof script accepts `CAPTURE_BIN` for a prebuilt capture executable. This
 allows verification to pin a build while other workspace builds run. Without
 it, the script uses `cargo run --bin capture`. Material recoloring works without
 a renderer; only texture loading and decorative roof geometry need RenderDevice.
+
+Unit selection feedback uses `unit_selection_marker_radius` in selection.rs
+independently of Selectable's click/nav radius. Short corner arcs replace full
+unit rings, aircraft project a compact cross, and small-unit health bars follow
+the visual footprint. Structure brackets and resource markers keep their own sizes.

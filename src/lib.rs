@@ -6528,12 +6528,22 @@ pub(crate) fn draw_world_overlays(
         faction_shield,
     ) in &selected
     {
-        let selected_color = Color::srgb(0.62, 0.95, 0.64);
+        let marker_radius = unit
+            .map(|unit| unit_selection_marker_radius(unit, selectable.radius))
+            .unwrap_or(selectable.radius);
+        let selected_color = Color::srgba(0.62, 0.95, 0.64, 0.72);
         if structure.is_some() && unit.is_none() {
             draw_structure_selection_brackets(
                 &mut gizmos,
                 transform.translation,
                 selectable.radius,
+                selected_color,
+            );
+        } else if unit.is_some() {
+            draw_unit_selection_marker(
+                &mut gizmos,
+                transform.translation,
+                marker_radius,
                 selected_color,
             );
         } else {
@@ -6548,7 +6558,7 @@ pub(crate) fn draw_world_overlays(
             draw_air_to_terrain_marker(
                 &mut gizmos,
                 transform.translation,
-                selectable.radius,
+                marker_radius,
                 *team,
                 visible_team,
             );
@@ -6556,7 +6566,7 @@ pub(crate) fn draw_world_overlays(
         draw_health_bar(
             &mut hud,
             transform.translation,
-            selectable.radius,
+            marker_radius,
             *health,
             faction_shield.copied(),
             bar_right,
@@ -6629,7 +6639,8 @@ pub(crate) fn draw_world_overlays(
             draw_health_bar(
                 &mut hud,
                 transform.translation,
-                selectable.radius,
+                unit.map(|unit| unit_selection_marker_radius(unit, selectable.radius))
+                    .unwrap_or(selectable.radius),
                 *health,
                 faction_shield.copied(),
                 bar_right,
@@ -7030,7 +7041,17 @@ pub(crate) fn draw_air_to_terrain_marker(
         return;
     };
     let ground_position = Vec3::new(position.x, 0.04, position.z);
-    draw_ring(gizmos, ground_position, radius + 0.24, color);
+    let half = (radius * 0.2).clamp(0.06, 0.16);
+    gizmos.line(
+        ground_position - Vec3::X * half,
+        ground_position + Vec3::X * half,
+        color,
+    );
+    gizmos.line(
+        ground_position - Vec3::Z * half,
+        ground_position + Vec3::Z * half,
+        color,
+    );
     gizmos.line(
         ground_position,
         position + Vec3::Y * 0.08,

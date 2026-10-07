@@ -1080,3 +1080,38 @@ mod tests {
         );
     }
 }
+
+/// Display footprint only: click tolerance and navigation keep their own radius.
+pub(crate) fn unit_selection_marker_radius(unit: &Unit, pick_radius: f32) -> f32 {
+    if unit.id == "Worker" || is_infantry_id(unit.id) {
+        (pick_radius * 0.5 + 0.04).clamp(0.18, 0.42)
+    } else {
+        (pick_radius + 0.1).max(0.22)
+    }
+}
+
+pub(crate) fn draw_unit_selection_marker(
+    gizmos: &mut Gizmos,
+    position: Vec3,
+    radius: f32,
+    color: Color,
+) {
+    let center = Vec3::new(position.x, 0.05, position.z);
+    // Four short corner arcs leave the footprint readable without a debug disc.
+    for quadrant in 0..4 {
+        let middle = std::f32::consts::FRAC_PI_4 + quadrant as f32 * std::f32::consts::FRAC_PI_2;
+        let half_arc = 0.24;
+        let mut previous = center
+            + Vec3::new(
+                (middle - half_arc).cos() * radius,
+                0.0,
+                (middle - half_arc).sin() * radius,
+            );
+        for segment in 1..=6 {
+            let angle = middle - half_arc + half_arc * 2.0 * segment as f32 / 6.0;
+            let next = center + Vec3::new(angle.cos() * radius, 0.0, angle.sin() * radius);
+            gizmos.line(previous, next, color);
+            previous = next;
+        }
+    }
+}

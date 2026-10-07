@@ -96,3 +96,11 @@ Evidence: `logs/art-tests-fixed.log`, `logs/art-build-checked.log`,
 `logs/art-check-fixed.log`, `logs/art-final-factions.log`, and
 `logs/art-proof-verified.log`. Native launch ran on Wayland for 12 seconds
 without error output; final capture verifies 4.24m movement and 113 siege damage.
+
+## Compact selection markers
+
+- [x] Separate visual selection size from click/nav radius.
+- [x] Tighten worker/infantry markers; replace full circles with four short arcs.
+- [x] Remove the duplicate aircraft ground ring and reduce small-unit health-bar width.
+- [x] Verify selected worker, movement/harvest input and battle footage (`screenshots/selection-compact`, `screenshots/result/8`).
+- [x] Formatting, type/build checks and 2 existing selection tests pass.

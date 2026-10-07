@@ -2840,7 +2840,7 @@ pub(crate) fn draw_health_bar(
     // Capped width: big structures (command center radius ~4m) otherwise get
     // a bar spanning half the screen; raised clear of tall roofs instead of
     // slicing through them.
-    let width = (radius * 1.8).clamp(0.9, 3.6);
+    let width = (radius * 1.8).clamp(0.42, 3.6);
     let lift = 1.25 + (radius - 0.9).max(0.0) * 0.5;
     let center = Vec3::new(position.x, position.y + lift, position.z);
     // Chaos energy shield: a cyan strip riding just above the health bar,
