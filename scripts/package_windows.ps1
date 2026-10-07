@@ -32,7 +32,13 @@ try {
 New-Item -ItemType Directory -Path $Stage -Force | Out-Null
 Copy-Item -LiteralPath $Binary -Destination (Join-Path $Stage 'bevy-open-rts.exe')
 Copy-Item -LiteralPath (Join-Path $Root 'assets') -Destination $Stage -Recurse
+# Full-font sources are local subset-generation inputs, not game runtime assets.
+Get-ChildItem -LiteralPath (Join-Path $Stage 'assets') -Filter '*.full.ttf' -Recurse -File | Remove-Item
 Copy-Item -LiteralPath (Join-Path $Root 'docs/WINDOWS_DELIVERY.md') -Destination (Join-Path $Stage 'README.md')
+foreach ($Notice in @('ASSET_PROVENANCE.md', 'asset-source-hashes.json')) {
+    Copy-Item -LiteralPath (Join-Path $Root "docs/$Notice") -Destination (Join-Path $Stage $Notice)
+}
+Copy-Item -LiteralPath (Join-Path $Root 'ASSETS.md') -Destination (Join-Path $Stage 'ASSETS.md')
 Get-ChildItem -LiteralPath $Root -Filter 'LICENSE*' -File | Copy-Item -Destination $Stage
 # The install can be read-only. Save/config paths are also independently
 # resolved by the game from LOCALAPPDATA, rather than from this working directory.
