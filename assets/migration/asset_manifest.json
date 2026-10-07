@@ -1,10 +1,9 @@
 {
-  "asset_count": 526,
+  "asset_count": 525,
   "assets": [
     "fonts/wqy-microhei-ui.ttf",
     "logos/LOGO_LICENSES.md",
     "logos/godot_logo_vertical_monochrome_dark_312x357.png",
-    "logos/lampe_games_white.svg",
     "models/kenney-spacekit/alien.glb",
     "models/kenney-spacekit/astronautA.glb",
     "models/kenney-spacekit/astronautB.glb",
@@ -530,7 +529,7 @@
   ],
   "categories": {
     "fonts": 1,
-    "logos": 3,
+    "logos": 2,
     "models": 154,
     "music": 1,
     "sfx": 19,

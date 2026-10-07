@@ -1,0 +1,44 @@
+name: Build Windows desktop package
+
+# Produces reviewable artifacts only; does not publish a release or deploy.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-desktop-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      CARGO_BUILD_JOBS: 2
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98.0'
+          targets: x86_64-pc-windows-msvc
+      - uses: Swatinem/rust-cache@v2
+      - name: Build locked native release with audio
+        run: |
+          cargo build --locked --release --target x86_64-pc-windows-msvc --bin bevy-open-rts
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Package executable and assets
+        run: ./scripts/package_windows.ps1
+      - name: Retain package for download and runtime verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-desktop-x86_64
+          path: |
+            dist/*.zip
+            dist/*.sha256
+          if-no-files-found: error
+          retention-days: 14

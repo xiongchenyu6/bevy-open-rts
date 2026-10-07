@@ -1,0 +1,3688 @@
+{
+  "schema": 1,
+  "audit_date": "2026-10-08",
+  "scope": "Existing tracked asset files, excluding notice documents. Comparison proves bytes/source membership, not third-party license clearance. The unavailable customized Godot source checkout is not represented by the official archive.",
+  "upstream": {
+    "repository": "https://github.com/lampe-games/godot-open-rts",
+    "revision": "a628ad3bb6a9a903587a181a7ee3300dbf735e81",
+    "revision_date": "2025-01-07T19:49:13Z",
+    "archive_url": "https://codeload.github.com/lampe-games/godot-open-rts/tar.gz/a628ad3bb6a9a903587a181a7ee3300dbf735e81",
+    "archive_sha256": "97a43db32a3f1d15da5da4714dbb1d671770f538d287f7cc19659b15448e9494"
+  },
+  "notice_evidence": [
+    {
+      "path": "LICENSE",
+      "sha256": "9492c88f55b77322f0399d43733ec82aa22e776c2e70978c84c56bae3d6d088d",
+      "url": "https://github.com/lampe-games/godot-open-rts/blob/a628ad3bb6a9a903587a181a7ee3300dbf735e81/LICENSE"
+    },
+    {
+      "path": "LOGO_LICENSES.md",
+      "sha256": "935e2eacf0b88aab043d1a8ed98c9935dcfcc767d352c3321e0030595a3373c5",
+      "url": "https://github.com/lampe-games/godot-open-rts/blob/a628ad3bb6a9a903587a181a7ee3300dbf735e81/LOGO_LICENSES.md"
+    },
+    {
+      "path": "assets/logos/LOGO_LICENSES.md",
+      "sha256": "a9de50c637a0e9d7d532db08ac9cf581fe90698e90a17ac667a49d7908425180",
+      "url": "https://github.com/lampe-games/godot-open-rts/blob/a628ad3bb6a9a903587a181a7ee3300dbf735e81/assets/logos/LOGO_LICENSES.md"
+    }
+  ],
+  "notice_scan": {
+    "method": "Inspect all archive file names for LICENSE/COPYING/COPYRIGHT/CREDITS/NOTICE, and inspect Credits.gd/Credits.tscn/README.",
+    "result": "Project MIT license and explicit logo exceptions found. Credits identify Kenney Space Kit. No audio-specific permission or generation terms found. No standalone notices for SFX/music/VFX because those families are absent."
+  },
+  "summary_by_directory": {
+    "campaign": {
+      "absent_from_upstream": 6
+    },
+    "data": {
+      "absent_from_upstream": 1
+    },
+    "fonts": {
+      "absent_from_upstream": 1
+    },
+    "logos": {
+      "identical": 1
+    },
+    "migration": {
+      "absent_from_upstream": 3
+    },
+    "models": {
+      "identical": 154
+    },
+    "music": {
+      "absent_from_upstream": 1
+    },
+    "sfx": {
+      "absent_from_upstream": 19
+    },
+    "textures": {
+      "absent_from_upstream": 1
+    },
+    "translations": {
+      "different": 2,
+      "absent_from_upstream": 6
+    },
+    "ui": {
+      "different": 3,
+      "absent_from_upstream": 110,
+      "identical": 210
+    },
+    "vfx": {
+      "absent_from_upstream": 6
+    },
+    "voice": {
+      "absent_from_upstream": 16,
+      "identical": 14
+    }
+  },
+  "assets": [
+    {
+      "path": "assets/campaign/mission_01.jpg",
+      "sha256": "e4a2b091cdec26d2bcbdf94c5d8e28bc7fbac32b5d3e73eea9b97616607c5ab8",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/campaign/mission_02.jpg",
+      "sha256": "2de39fe754b8a142214f5b61211e476f9d4ef57b7d71ccc1056a863810381490",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/campaign/mission_03.jpg",
+      "sha256": "d220c2a5651bdc581885890958926fb4c184f22f81c2e0bd1d225b71ee4e1d7d",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/campaign/mission_04.jpg",
+      "sha256": "466e95440827f4206b9ce60999890d041edeb5ad23def4a184e934a34b2fe158",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/campaign/mission_05.jpg",
+      "sha256": "14ce02e3111826a9ea34ccedee986d3e807ddb3eefbef73a5f3f75e90e49c4ab",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/campaign/mission_06.jpg",
+      "sha256": "e25c270ade94593929078aadb54e82ccccddc252656c1b37109a0f51e97cd791",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/data/godot_model_map.model_map.ron",
+      "sha256": "e1674c86f38d6c358ab768581b6280df02ab14344f5c9ec834ac539a93dc0e3c",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/fonts/wqy-microhei-ui.ttf",
+      "sha256": "e4be13e4f6c1f226175906922777d5aeede8408601dbd7cdd92480ba5773c0af",
+      "comparison": "absent_from_upstream",
+      "pinned_font_source": {
+        "source_url": "https://deb.debian.org/debian/pool/main/f/fonts-wqy-microhei/fonts-wqy-microhei_0.2.0-beta.orig.tar.gz",
+        "archive_sha256": "2802ac8023aa36a66ea6e7445854e3a078d377ffff42169341bd237871f7213e",
+        "ttc_sha256": "e4bca8df123ce01b104780f576ea1a58b9a5ff1662a91124b6d3180cb6c88212",
+        "face": 0,
+        "fonttools_version": "4.61.1",
+        "converted_ttf_sha256": "272435f569f3e7ffa7cea299d0b175346738b5922eccaedb168eadb63f8123da",
+        "subset_sha256": "e4be13e4f6c1f226175906922777d5aeede8408601dbd7cdd92480ba5773c0af",
+        "requested_supported_codepoints": 1213,
+        "subset_codepoints": 1213,
+        "translation_locales": [
+          "en",
+          "zh_CN"
+        ],
+        "translation_sources": [
+          {
+            "path": "assets/translations/main_menu.csv",
+            "sha256": "9c055461359116583d440e8a2fdcb628a52c94cfe1ffcbbd405e10f3cfc6a1fa"
+          },
+          {
+            "path": "assets/translations/match.csv",
+            "sha256": "faa314a9fab2f208598ce7734109b2b27fdc4954074b76a9449aaae8078cfcd6"
+          }
+        ],
+        "translation_codepoints": 616,
+        "missing_translation_codepoints": [],
+        "retained_historical_cjk": [
+          "U+4E22",
+          "U+951A",
+          "U+8D1F"
+        ],
+        "ascii_complete": true,
+        "missing_required_cjk": [],
+        "source_unsupported_requested_symbols": [],
+        "output_bytes": 214352,
+        "script": "scripts/subset_font.sh",
+        "script_sha256": "d19738efb114380097772b75dc4e90088f0d42a2024cb133c6686eb22e43ec78",
+        "repeat_runs_identical": true,
+        "previous_cjk_coverage_retained": true,
+        "current_requested_cjk_complete": true,
+        "previous_subset_codepoints_no_longer_requested": [],
+        "common_glyph_advance_width_changes": 0
+      }
+    },
+    {
+      "path": "assets/logos/godot_logo_vertical_monochrome_dark_312x357.png",
+      "sha256": "cfc3b2b4ff41f0e693794b676511083a7a046c3fbbccdb402ec0d84e4ebd26e9",
+      "comparison": "identical",
+      "upstream_sha256": "cfc3b2b4ff41f0e693794b676511083a7a046c3fbbccdb402ec0d84e4ebd26e9"
+    },
+    {
+      "path": "assets/migration/asset_manifest.json",
+      "sha256": "cf171eb08e7ab1ad43ea2a6c864619e114307dc72094212a79b55ff0ad24ff90",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/migration/gameplay_registry.json",
+      "sha256": "13cb914a6ea7485ca34dfb179c337aac1723499696ab69c2abca9ecf49a07b82",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/migration/migration_report.md",
+      "sha256": "9bbeea4f9e3a992dfdc5733cca6dbc8b11e9add9de50ecb8a78dca43adb91e6b",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/alien.glb",
+      "sha256": "c041e8ed0eff82f0b25b944a8107f1268ddbec9c2c93afedc4ee0e8b047d983d",
+      "comparison": "identical",
+      "upstream_sha256": "c041e8ed0eff82f0b25b944a8107f1268ddbec9c2c93afedc4ee0e8b047d983d"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/astronautA.glb",
+      "sha256": "9db62dd9790beadc1b8e45cf9623e99ade21751bb23f16dfe1b8cfb05a54f3b5",
+      "comparison": "identical",
+      "upstream_sha256": "9db62dd9790beadc1b8e45cf9623e99ade21751bb23f16dfe1b8cfb05a54f3b5"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/astronautB.glb",
+      "sha256": "6fa5b3e11cb3d117b28a0794b261ad9107f16ca6ce886b288493e22493d74d2d",
+      "comparison": "identical",
+      "upstream_sha256": "6fa5b3e11cb3d117b28a0794b261ad9107f16ca6ce886b288493e22493d74d2d"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/barrel.glb",
+      "sha256": "8a95781be23b35ebb39ad90278affc03140c75d4d055027e98be0313de084451",
+      "comparison": "identical",
+      "upstream_sha256": "8a95781be23b35ebb39ad90278affc03140c75d4d055027e98be0313de084451"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/barrels.glb",
+      "sha256": "5eefdb7cb192863ac6b6709293e196ae97e7cceb29c6ab754850a738f3b2379b",
+      "comparison": "identical",
+      "upstream_sha256": "5eefdb7cb192863ac6b6709293e196ae97e7cceb29c6ab754850a738f3b2379b"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/barrels_rail.glb",
+      "sha256": "7483f36869ee61c67653a16f6d584d9d5340afc123d1539728062088407aa3ec",
+      "comparison": "identical",
+      "upstream_sha256": "7483f36869ee61c67653a16f6d584d9d5340afc123d1539728062088407aa3ec"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/bones.glb",
+      "sha256": "d42d859e91beb903a09c4eecf4ccb169ae77b84e475a6b773d6ecf30644371be",
+      "comparison": "identical",
+      "upstream_sha256": "d42d859e91beb903a09c4eecf4ccb169ae77b84e475a6b773d6ecf30644371be"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/chimney.glb",
+      "sha256": "92db1a53b46eea2f2f045fe1dcc1493b4674309f76909e4ecf1078576070b14b",
+      "comparison": "identical",
+      "upstream_sha256": "92db1a53b46eea2f2f045fe1dcc1493b4674309f76909e4ecf1078576070b14b"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/chimney_detailed.glb",
+      "sha256": "2b7b4950f5a1430ccf7d3469c21b837dc52ec61538dcdbcf875529767d68d752",
+      "comparison": "identical",
+      "upstream_sha256": "2b7b4950f5a1430ccf7d3469c21b837dc52ec61538dcdbcf875529767d68d752"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor.glb",
+      "sha256": "1e3a98e6e0b8f34a7b16b60e7f8d655c920b78881285d05e091893acf91fc6b9",
+      "comparison": "identical",
+      "upstream_sha256": "1e3a98e6e0b8f34a7b16b60e7f8d655c920b78881285d05e091893acf91fc6b9"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_corner.glb",
+      "sha256": "950a19d62d5ae438f8ccc782d3710167740ccc33b615c48a8e7c2d558360a5ce",
+      "comparison": "identical",
+      "upstream_sha256": "950a19d62d5ae438f8ccc782d3710167740ccc33b615c48a8e7c2d558360a5ce"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_cornerRound.glb",
+      "sha256": "7079e7f01d73dd108f698e8108b3b47f182c0e45c28494112409d0d62410091f",
+      "comparison": "identical",
+      "upstream_sha256": "7079e7f01d73dd108f698e8108b3b47f182c0e45c28494112409d0d62410091f"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_cornerRoundWindow.glb",
+      "sha256": "fbed2f3cd4148df4ca273a8f3b42990151ffad79b61846cc6a440a6772fd0692",
+      "comparison": "identical",
+      "upstream_sha256": "fbed2f3cd4148df4ca273a8f3b42990151ffad79b61846cc6a440a6772fd0692"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_cross.glb",
+      "sha256": "90240853cd0011cd1be261cca6080d72001d101f3bcd17ef37a21d3cdfc52d7e",
+      "comparison": "identical",
+      "upstream_sha256": "90240853cd0011cd1be261cca6080d72001d101f3bcd17ef37a21d3cdfc52d7e"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_detailed.glb",
+      "sha256": "676a58e8085f3c5766a9dda6ba521f06a48d2d431379745bbf608e04ae34fb4b",
+      "comparison": "identical",
+      "upstream_sha256": "676a58e8085f3c5766a9dda6ba521f06a48d2d431379745bbf608e04ae34fb4b"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_end.glb",
+      "sha256": "1290594fac010f5d69c0b2d3f4e54c81c5496a2024d9a4a54498608a95d91d41",
+      "comparison": "identical",
+      "upstream_sha256": "1290594fac010f5d69c0b2d3f4e54c81c5496a2024d9a4a54498608a95d91d41"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_open.glb",
+      "sha256": "3daa61355656e812bcd6c1246e061a5269f0a99ffcbecebf0b7904f9ccb81625",
+      "comparison": "identical",
+      "upstream_sha256": "3daa61355656e812bcd6c1246e061a5269f0a99ffcbecebf0b7904f9ccb81625"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_roof.glb",
+      "sha256": "678e7c56c9aab35eddc88dc66727f59f90caffe6dc48ee8270d76611a650291e",
+      "comparison": "identical",
+      "upstream_sha256": "678e7c56c9aab35eddc88dc66727f59f90caffe6dc48ee8270d76611a650291e"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_split.glb",
+      "sha256": "2b7488949c5fa08af21a693a27f132774efef48e9446ef56f6ea7c5802389e54",
+      "comparison": "identical",
+      "upstream_sha256": "2b7488949c5fa08af21a693a27f132774efef48e9446ef56f6ea7c5802389e54"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_wall.glb",
+      "sha256": "de47b981f8b29d3f36cab58fd71dc407f60977cd337f30782f7bf66ea1e338fd",
+      "comparison": "identical",
+      "upstream_sha256": "de47b981f8b29d3f36cab58fd71dc407f60977cd337f30782f7bf66ea1e338fd"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_wallCorner.glb",
+      "sha256": "fad3456c3d903cecb200f87ac34fc583b767bb98c6fe90bbccdab1e12ea69e56",
+      "comparison": "identical",
+      "upstream_sha256": "fad3456c3d903cecb200f87ac34fc583b767bb98c6fe90bbccdab1e12ea69e56"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_window.glb",
+      "sha256": "53a97fe47cd6c04436531ce1046cd97464c3ed4fe8936d7c73ac09f7f0cdb221",
+      "comparison": "identical",
+      "upstream_sha256": "53a97fe47cd6c04436531ce1046cd97464c3ed4fe8936d7c73ac09f7f0cdb221"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/corridor_windowClosed.glb",
+      "sha256": "e6b243b873d99e04c6cc5caa8eb28d1a133b08d90d39e4af1ebfd42da851c783",
+      "comparison": "identical",
+      "upstream_sha256": "e6b243b873d99e04c6cc5caa8eb28d1a133b08d90d39e4af1ebfd42da851c783"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/craft_cargoA.glb",
+      "sha256": "b9676e838c605699e164c4c1779262bf47db1562a1504ceb29764828cbaa80c2",
+      "comparison": "identical",
+      "upstream_sha256": "b9676e838c605699e164c4c1779262bf47db1562a1504ceb29764828cbaa80c2"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/craft_cargoB.glb",
+      "sha256": "8da33a720ed3b208938a969864d6b0a64a51b7715f71d102ecad0a5f71412b8c",
+      "comparison": "identical",
+      "upstream_sha256": "8da33a720ed3b208938a969864d6b0a64a51b7715f71d102ecad0a5f71412b8c"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/craft_miner.glb",
+      "sha256": "de32320578886d2e73b1cd24b6161c9bd855e3a172bc2abcc8cb7bdd46352348",
+      "comparison": "identical",
+      "upstream_sha256": "de32320578886d2e73b1cd24b6161c9bd855e3a172bc2abcc8cb7bdd46352348"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/craft_racer.glb",
+      "sha256": "bce8cb3d037a67e151ea6b68bba5876f53f4c77dfd43892c1c72892d5ab1c5aa",
+      "comparison": "identical",
+      "upstream_sha256": "bce8cb3d037a67e151ea6b68bba5876f53f4c77dfd43892c1c72892d5ab1c5aa"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/craft_speederA.glb",
+      "sha256": "dc48652fa5c59088a5e3902abce7598199f32e0dcb8c91bac25e17bb8ce15876",
+      "comparison": "identical",
+      "upstream_sha256": "dc48652fa5c59088a5e3902abce7598199f32e0dcb8c91bac25e17bb8ce15876"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/craft_speederB.glb",
+      "sha256": "146aa14e340bf3d1884d184fe58dc65d367a8a8974faa8a953b8680abc310314",
+      "comparison": "identical",
+      "upstream_sha256": "146aa14e340bf3d1884d184fe58dc65d367a8a8974faa8a953b8680abc310314"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/craft_speederC.glb",
+      "sha256": "ed009e13d8ef649d26ec0215f20c2f600cc35dc4b52deea1cb8cfe5bd11ee084",
+      "comparison": "identical",
+      "upstream_sha256": "ed009e13d8ef649d26ec0215f20c2f600cc35dc4b52deea1cb8cfe5bd11ee084"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/craft_speederD.glb",
+      "sha256": "a5780b9f6cc40d6f348f4211bb43c9501fa199729197361be6bfb522a42c56ad",
+      "comparison": "identical",
+      "upstream_sha256": "a5780b9f6cc40d6f348f4211bb43c9501fa199729197361be6bfb522a42c56ad"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/crater.glb",
+      "sha256": "8b872ebe7358e1d5f08c600ed43f61d4d0dbbd03274a718424c599778915b175",
+      "comparison": "identical",
+      "upstream_sha256": "8b872ebe7358e1d5f08c600ed43f61d4d0dbbd03274a718424c599778915b175"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/craterLarge.glb",
+      "sha256": "703f86c085371d5e53e39029a0c74e51cefccd02697ea5e00eb2b4235ed9011b",
+      "comparison": "identical",
+      "upstream_sha256": "703f86c085371d5e53e39029a0c74e51cefccd02697ea5e00eb2b4235ed9011b"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/desk_chair.glb",
+      "sha256": "978e7f4b3b18a684b3a63b9b171cb7bee0ebf80124fa800fa873ae73f710aadb",
+      "comparison": "identical",
+      "upstream_sha256": "978e7f4b3b18a684b3a63b9b171cb7bee0ebf80124fa800fa873ae73f710aadb"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/desk_chairArms.glb",
+      "sha256": "7564e5ce5bbb209242eb57128ed53356bbeee2806168923486f3ecd049a3fdcc",
+      "comparison": "identical",
+      "upstream_sha256": "7564e5ce5bbb209242eb57128ed53356bbeee2806168923486f3ecd049a3fdcc"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/desk_chairStool.glb",
+      "sha256": "69c08bff6697b6cd373c2c18c1b638c2f88cf93fe02d2e2a62b598aff50f1cba",
+      "comparison": "identical",
+      "upstream_sha256": "69c08bff6697b6cd373c2c18c1b638c2f88cf93fe02d2e2a62b598aff50f1cba"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/desk_computer.glb",
+      "sha256": "a2a6c536db930352553d56833870956ec2790e8c6a71d4a2f93358cce36d12e3",
+      "comparison": "identical",
+      "upstream_sha256": "a2a6c536db930352553d56833870956ec2790e8c6a71d4a2f93358cce36d12e3"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/desk_computerCorner.glb",
+      "sha256": "e98f3547cebacede85a72b429f6326a8326d815adaabe6c4271ca02226bee4e1",
+      "comparison": "identical",
+      "upstream_sha256": "e98f3547cebacede85a72b429f6326a8326d815adaabe6c4271ca02226bee4e1"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/desk_computerScreen.glb",
+      "sha256": "3a7526fff69a29bd1c793cea34c2bf9d6a96dcc7ef0c7b3c1286f691b8835074",
+      "comparison": "identical",
+      "upstream_sha256": "3a7526fff69a29bd1c793cea34c2bf9d6a96dcc7ef0c7b3c1286f691b8835074"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/gate_complex.glb",
+      "sha256": "6c0914bd5886928760fab54fc602aafd1441314a7c08c9cd30fad2a3f9191b90",
+      "comparison": "identical",
+      "upstream_sha256": "6c0914bd5886928760fab54fc602aafd1441314a7c08c9cd30fad2a3f9191b90"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/gate_simple.glb",
+      "sha256": "9ed530a12b9bfc2da091dc1725010c9c54debf99ec261320119e2db2dc8d5cff",
+      "comparison": "identical",
+      "upstream_sha256": "9ed530a12b9bfc2da091dc1725010c9c54debf99ec261320119e2db2dc8d5cff"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/hangar_largeA.glb",
+      "sha256": "cae233b3e53aa5004bc8d7d43bd00763a919064af6b5249f354a71cae5fbf29a",
+      "comparison": "identical",
+      "upstream_sha256": "cae233b3e53aa5004bc8d7d43bd00763a919064af6b5249f354a71cae5fbf29a"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/hangar_largeB.glb",
+      "sha256": "c78ab6ed17adf2f2ffa860046d92e1ea30fc84a2dd35377382dad04b48064817",
+      "comparison": "identical",
+      "upstream_sha256": "c78ab6ed17adf2f2ffa860046d92e1ea30fc84a2dd35377382dad04b48064817"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/hangar_roundA.glb",
+      "sha256": "cf64a33cc795f897971990433c46097d43529ae3ef0dce8ba719761c54dd6a3d",
+      "comparison": "identical",
+      "upstream_sha256": "cf64a33cc795f897971990433c46097d43529ae3ef0dce8ba719761c54dd6a3d"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/hangar_roundB.glb",
+      "sha256": "66dfd1e692f3951a0a4ceaf167f72e9d02e145c285ee53ebddc33fc3dea1c435",
+      "comparison": "identical",
+      "upstream_sha256": "66dfd1e692f3951a0a4ceaf167f72e9d02e145c285ee53ebddc33fc3dea1c435"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/hangar_roundGlass.glb",
+      "sha256": "6b6346d95b90b8c012880832cef3969a108ae2b153bef8e2106b27997e33d601",
+      "comparison": "identical",
+      "upstream_sha256": "6b6346d95b90b8c012880832cef3969a108ae2b153bef8e2106b27997e33d601"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/hangar_smallA.glb",
+      "sha256": "66cc1f91e0db1dd2c7ec79fa8cf3f3adf703291679c33c293ebd19da45bd53f7",
+      "comparison": "identical",
+      "upstream_sha256": "66cc1f91e0db1dd2c7ec79fa8cf3f3adf703291679c33c293ebd19da45bd53f7"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/hangar_smallB.glb",
+      "sha256": "fbdeea5073f90584851e2a2c389e481392da8c06db928330f92533771db6adcd",
+      "comparison": "identical",
+      "upstream_sha256": "fbdeea5073f90584851e2a2c389e481392da8c06db928330f92533771db6adcd"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/machine_barrel.glb",
+      "sha256": "ecd46823928292bbb01718966bd4602a71e37a09320f3ba232d9044e909ce4ed",
+      "comparison": "identical",
+      "upstream_sha256": "ecd46823928292bbb01718966bd4602a71e37a09320f3ba232d9044e909ce4ed"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/machine_barrelLarge.glb",
+      "sha256": "3c156127373395cd45bfb7772936c56b06e4bcf33101da7a5030f17e5d8acae5",
+      "comparison": "identical",
+      "upstream_sha256": "3c156127373395cd45bfb7772936c56b06e4bcf33101da7a5030f17e5d8acae5"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/machine_generator.glb",
+      "sha256": "98e8ac6aceada3b2483ed1eceb59bff7190ee774edac799350ccc11ad140f7f3",
+      "comparison": "identical",
+      "upstream_sha256": "98e8ac6aceada3b2483ed1eceb59bff7190ee774edac799350ccc11ad140f7f3"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/machine_generatorLarge.glb",
+      "sha256": "bbfa33a2e7c7eff7d9ee12f64255249b7e2f5d4b2ada2d681aa35cf38ba599bc",
+      "comparison": "identical",
+      "upstream_sha256": "bbfa33a2e7c7eff7d9ee12f64255249b7e2f5d4b2ada2d681aa35cf38ba599bc"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/machine_wireless.glb",
+      "sha256": "9d49e70d51515bc38628fb0d6e43f4eda7f9cd5326882fd02e8815e61f2259d7",
+      "comparison": "identical",
+      "upstream_sha256": "9d49e70d51515bc38628fb0d6e43f4eda7f9cd5326882fd02e8815e61f2259d7"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/machine_wirelessCable.glb",
+      "sha256": "b38770b6d1a40e2afd8a5f535e6a962f07cf18a8345e9b940bf3843bcf938a6b",
+      "comparison": "identical",
+      "upstream_sha256": "b38770b6d1a40e2afd8a5f535e6a962f07cf18a8345e9b940bf3843bcf938a6b"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/meteor.glb",
+      "sha256": "83c75071d3a48955ff3f719992f7d69dc13e915da988878bff441fd3dbb472f8",
+      "comparison": "identical",
+      "upstream_sha256": "83c75071d3a48955ff3f719992f7d69dc13e915da988878bff441fd3dbb472f8"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/meteor_detailed.glb",
+      "sha256": "f30379abd7d772a2fdc52ebb72ad2b5fc94768343cb8f6788614820f632c5e63",
+      "comparison": "identical",
+      "upstream_sha256": "f30379abd7d772a2fdc52ebb72ad2b5fc94768343cb8f6788614820f632c5e63"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/meteor_half.glb",
+      "sha256": "ef611f9d1de4196023686a9977ea32cd15858f626d0d7dbb1240450edb92c4c2",
+      "comparison": "identical",
+      "upstream_sha256": "ef611f9d1de4196023686a9977ea32cd15858f626d0d7dbb1240450edb92c4c2"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/monorail_trackCornerLarge.glb",
+      "sha256": "4e8dd653707e27fe6dc293ffad5055a2376c6dbf85d905a2ee1bf902f119374f",
+      "comparison": "identical",
+      "upstream_sha256": "4e8dd653707e27fe6dc293ffad5055a2376c6dbf85d905a2ee1bf902f119374f"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/monorail_trackCornerSmall.glb",
+      "sha256": "32383cc5c0a5e2b50bcd6e12a8ef7388de70247920289f18eb09822a0e29ca46",
+      "comparison": "identical",
+      "upstream_sha256": "32383cc5c0a5e2b50bcd6e12a8ef7388de70247920289f18eb09822a0e29ca46"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/monorail_trackSlope.glb",
+      "sha256": "f6e10b5621c9caf2cc7b04d8b7d822a5e92e0d0bf0f25e417b38a3cd6498dbcb",
+      "comparison": "identical",
+      "upstream_sha256": "f6e10b5621c9caf2cc7b04d8b7d822a5e92e0d0bf0f25e417b38a3cd6498dbcb"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/monorail_trackStraight.glb",
+      "sha256": "0e56d1390dcc8767f0486a1e695208e082a803d3e5210fe8b094a1afdae3462b",
+      "comparison": "identical",
+      "upstream_sha256": "0e56d1390dcc8767f0486a1e695208e082a803d3e5210fe8b094a1afdae3462b"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/monorail_trackSupport.glb",
+      "sha256": "368af81dac43c6a678c855e17de2b20a7384e630d8ca1e1ef559a8dbe1c71cad",
+      "comparison": "identical",
+      "upstream_sha256": "368af81dac43c6a678c855e17de2b20a7384e630d8ca1e1ef559a8dbe1c71cad"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/monorail_trackSupportCorner.glb",
+      "sha256": "8469cd6adb41a1f3a4d42e6c9358025e848aa05eb6f9412e669c1cb30fbfd2f9",
+      "comparison": "identical",
+      "upstream_sha256": "8469cd6adb41a1f3a4d42e6c9358025e848aa05eb6f9412e669c1cb30fbfd2f9"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/monorail_trainBox.glb",
+      "sha256": "78d0a6b6616f6a4fce3f2c75d05c1e96afa2cce4e51d12fbe58f65c1abe4224a",
+      "comparison": "identical",
+      "upstream_sha256": "78d0a6b6616f6a4fce3f2c75d05c1e96afa2cce4e51d12fbe58f65c1abe4224a"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/monorail_trainCargo.glb",
+      "sha256": "cd8fabcc862ed1d517225082df1a6e32090ca0211cd1cf5d16db4ec9e460057f",
+      "comparison": "identical",
+      "upstream_sha256": "cd8fabcc862ed1d517225082df1a6e32090ca0211cd1cf5d16db4ec9e460057f"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/monorail_trainEnd.glb",
+      "sha256": "6f254e6793df0671ca2e711cc85ecf33cc7a39803d2a3e36d78c4ccedbe95d7b",
+      "comparison": "identical",
+      "upstream_sha256": "6f254e6793df0671ca2e711cc85ecf33cc7a39803d2a3e36d78c4ccedbe95d7b"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/monorail_trainFlat.glb",
+      "sha256": "9267e20feebfb09bd2a56ee87f670b7fff52e5d717b5b535a3be2caf78875e60",
+      "comparison": "identical",
+      "upstream_sha256": "9267e20feebfb09bd2a56ee87f670b7fff52e5d717b5b535a3be2caf78875e60"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/monorail_trainFront.glb",
+      "sha256": "7291b45dedec952daf0e2188235518757953f82df616f7d6029a2ce5f08102f9",
+      "comparison": "identical",
+      "upstream_sha256": "7291b45dedec952daf0e2188235518757953f82df616f7d6029a2ce5f08102f9"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/monorail_trainPassenger.glb",
+      "sha256": "1d18442a9f11fb2af12acdc035743bbebc9abd77e458650f3ccdfff706e9a024",
+      "comparison": "identical",
+      "upstream_sha256": "1d18442a9f11fb2af12acdc035743bbebc9abd77e458650f3ccdfff706e9a024"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_corner.glb",
+      "sha256": "49a91fcf92d22aa54858a3172f1bbe77040a8a6f63903570361efdd665738615",
+      "comparison": "identical",
+      "upstream_sha256": "49a91fcf92d22aa54858a3172f1bbe77040a8a6f63903570361efdd665738615"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_cornerDiagonal.glb",
+      "sha256": "1d4918d019dc182127e7c84042ea403b4aa79779b70bc0327a6aeb005af0ad09",
+      "comparison": "identical",
+      "upstream_sha256": "1d4918d019dc182127e7c84042ea403b4aa79779b70bc0327a6aeb005af0ad09"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_cornerRound.glb",
+      "sha256": "27a93f4c6069c21c577eac57415455b6ad04316267fb7bdcb8ae8cf7cf29cd40",
+      "comparison": "identical",
+      "upstream_sha256": "27a93f4c6069c21c577eac57415455b6ad04316267fb7bdcb8ae8cf7cf29cd40"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_cornerRoundLarge.glb",
+      "sha256": "bcdfd4e449fa94f1902b2e85d4f5a37bfe7e117361a9fcfa5983e684ab5d2693",
+      "comparison": "identical",
+      "upstream_sha256": "bcdfd4e449fa94f1902b2e85d4f5a37bfe7e117361a9fcfa5983e684ab5d2693"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_cross.glb",
+      "sha256": "9550af4d18bd747fddfca37439c9b46264dd588b68401f3b3cbf9d41a878c33c",
+      "comparison": "identical",
+      "upstream_sha256": "9550af4d18bd747fddfca37439c9b46264dd588b68401f3b3cbf9d41a878c33c"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_end.glb",
+      "sha256": "a6aee974cca1cb8d5e7e2b2bb2233ef7b0fa43a4983798dfcd08ee6ae67bfffa",
+      "comparison": "identical",
+      "upstream_sha256": "a6aee974cca1cb8d5e7e2b2bb2233ef7b0fa43a4983798dfcd08ee6ae67bfffa"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_entrance.glb",
+      "sha256": "9c76d3412f5665cf50bcb3510ef4bc2105c44bd39d54b8fe15f5a5a95948ec91",
+      "comparison": "identical",
+      "upstream_sha256": "9c76d3412f5665cf50bcb3510ef4bc2105c44bd39d54b8fe15f5a5a95948ec91"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_open.glb",
+      "sha256": "88ae6bdb2882a6c652226343b66d2f5b451f1c2f0c5af36c55fccb93cdbf715e",
+      "comparison": "identical",
+      "upstream_sha256": "88ae6bdb2882a6c652226343b66d2f5b451f1c2f0c5af36c55fccb93cdbf715e"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_rampLarge.glb",
+      "sha256": "9bc109789a795013455d8ca4a85003213312ecb9867e49468f12a2eee93bc269",
+      "comparison": "identical",
+      "upstream_sha256": "9bc109789a795013455d8ca4a85003213312ecb9867e49468f12a2eee93bc269"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_rampSmall.glb",
+      "sha256": "199d06cc4c544ba6279c55c02de6ca5ed21efb26dbba41da3054f8781b113b41",
+      "comparison": "identical",
+      "upstream_sha256": "199d06cc4c544ba6279c55c02de6ca5ed21efb26dbba41da3054f8781b113b41"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_ring.glb",
+      "sha256": "5b5700b08e9decc638ec025b3d77cb1923cd7d0255588dde2fb130f9bd5e30f3",
+      "comparison": "identical",
+      "upstream_sha256": "5b5700b08e9decc638ec025b3d77cb1923cd7d0255588dde2fb130f9bd5e30f3"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_ringHigh.glb",
+      "sha256": "9091694f93359e720150b85c6f576485beb888cc43d80b020b391263f5b047f1",
+      "comparison": "identical",
+      "upstream_sha256": "9091694f93359e720150b85c6f576485beb888cc43d80b020b391263f5b047f1"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_ringHighEnd.glb",
+      "sha256": "3ea39f5f2061944cca30e6eac579594e4de3c6a1a768bc2798095ca22e73757f",
+      "comparison": "identical",
+      "upstream_sha256": "3ea39f5f2061944cca30e6eac579594e4de3c6a1a768bc2798095ca22e73757f"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_ringSupport.glb",
+      "sha256": "a13f28528920158a5dfa8182a6d3bdb97c947bc0a15d979e6c415ae243aeead2",
+      "comparison": "identical",
+      "upstream_sha256": "a13f28528920158a5dfa8182a6d3bdb97c947bc0a15d979e6c415ae243aeead2"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_split.glb",
+      "sha256": "e8a8f5ee14f61407eb874276f077818f706f8eaaafd71f205fb83b1763b73cb3",
+      "comparison": "identical",
+      "upstream_sha256": "e8a8f5ee14f61407eb874276f077818f706f8eaaafd71f205fb83b1763b73cb3"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_straight.glb",
+      "sha256": "3386146dbfa9a9f2c7bcc5a6599a3c9d43a9e029c26f61b345ff6b16df80e6a1",
+      "comparison": "identical",
+      "upstream_sha256": "3386146dbfa9a9f2c7bcc5a6599a3c9d43a9e029c26f61b345ff6b16df80e6a1"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_supportHigh.glb",
+      "sha256": "3645938c7da5d579c12f278e2dc4c31ee92f9b435ec04052783eb0b7ab28c267",
+      "comparison": "identical",
+      "upstream_sha256": "3645938c7da5d579c12f278e2dc4c31ee92f9b435ec04052783eb0b7ab28c267"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/pipe_supportLow.glb",
+      "sha256": "2edbb5ddbf1194a6e1fbcdaa255e08b58bd146533812f6feca7274e2c7a5f7d7",
+      "comparison": "identical",
+      "upstream_sha256": "2edbb5ddbf1194a6e1fbcdaa255e08b58bd146533812f6feca7274e2c7a5f7d7"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_center.glb",
+      "sha256": "f5c640862e9729224ad49a288f7998b404a5705eaeecf95b71dcd05bc97bb0ea",
+      "comparison": "identical",
+      "upstream_sha256": "f5c640862e9729224ad49a288f7998b404a5705eaeecf95b71dcd05bc97bb0ea"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_corner.glb",
+      "sha256": "45419d060b17700ce3709b05fa5dbdf08eee0b69f452d2c99cf1063ad7580cb7",
+      "comparison": "identical",
+      "upstream_sha256": "45419d060b17700ce3709b05fa5dbdf08eee0b69f452d2c99cf1063ad7580cb7"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_cornerOpen.glb",
+      "sha256": "892e7aeb18aa9f9ad7bb7edf96fd3c158a844d1b3bdedb3fc244e590a2bdcc93",
+      "comparison": "identical",
+      "upstream_sha256": "892e7aeb18aa9f9ad7bb7edf96fd3c158a844d1b3bdedb3fc244e590a2bdcc93"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_cornerRound.glb",
+      "sha256": "316bd340cc72fc20cbcc9eb23be82cab9ff3fdedea2a6043339634f4a7c181a7",
+      "comparison": "identical",
+      "upstream_sha256": "316bd340cc72fc20cbcc9eb23be82cab9ff3fdedea2a6043339634f4a7c181a7"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_end.glb",
+      "sha256": "494396c97a1966944061ee6874fc05474457b132cbd47639f39b854281c51619",
+      "comparison": "identical",
+      "upstream_sha256": "494396c97a1966944061ee6874fc05474457b132cbd47639f39b854281c51619"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_high.glb",
+      "sha256": "92e3285e7994d923ae3a3692eb8c3a72548691b5be148e845968d49a90c47103",
+      "comparison": "identical",
+      "upstream_sha256": "92e3285e7994d923ae3a3692eb8c3a72548691b5be148e845968d49a90c47103"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_large.glb",
+      "sha256": "aa1fba20818bc1d623953794146d9f9ff0e0f025463b013e325b373deb9be6c4",
+      "comparison": "identical",
+      "upstream_sha256": "aa1fba20818bc1d623953794146d9f9ff0e0f025463b013e325b373deb9be6c4"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_long.glb",
+      "sha256": "610eefdee5b4c5c91bbd8fe24c34444fee48cd8553665751e9c0c3502af8dad4",
+      "comparison": "identical",
+      "upstream_sha256": "610eefdee5b4c5c91bbd8fe24c34444fee48cd8553665751e9c0c3502af8dad4"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_low.glb",
+      "sha256": "394be79e0dcb2babb882889b5466d9178db08090818d7548f5428785e06bb747",
+      "comparison": "identical",
+      "upstream_sha256": "394be79e0dcb2babb882889b5466d9178db08090818d7548f5428785e06bb747"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_side.glb",
+      "sha256": "87c1789bf4b5ba1a962e230212be30bef030749413dbe6e70bcbab8e80a10f7c",
+      "comparison": "identical",
+      "upstream_sha256": "87c1789bf4b5ba1a962e230212be30bef030749413dbe6e70bcbab8e80a10f7c"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_small.glb",
+      "sha256": "c4aebdfe660289a0e004f5ec20eaba3ade043ed5bd889f11465680926f8c5368",
+      "comparison": "identical",
+      "upstream_sha256": "c4aebdfe660289a0e004f5ec20eaba3ade043ed5bd889f11465680926f8c5368"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_smallDiagonal.glb",
+      "sha256": "79e028265345acab5c11e7293666fd327f7d7cb76a99ecc42adcbc82bc399e77",
+      "comparison": "identical",
+      "upstream_sha256": "79e028265345acab5c11e7293666fd327f7d7cb76a99ecc42adcbc82bc399e77"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/platform_straight.glb",
+      "sha256": "acf271a4db9af11bef2422e5351c04f93baa46f00baee225f8b87ec320e9c61a",
+      "comparison": "identical",
+      "upstream_sha256": "acf271a4db9af11bef2422e5351c04f93baa46f00baee225f8b87ec320e9c61a"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rail.glb",
+      "sha256": "ce9c3ece35b86e97c21463f491acbe824e4af4220e621db5d7a8f067bc2868fb",
+      "comparison": "identical",
+      "upstream_sha256": "ce9c3ece35b86e97c21463f491acbe824e4af4220e621db5d7a8f067bc2868fb"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rail_corner.glb",
+      "sha256": "2b1f172c03594f4c50485d0bbd24ead48b056bd9964416442f5fde95f130a00a",
+      "comparison": "identical",
+      "upstream_sha256": "2b1f172c03594f4c50485d0bbd24ead48b056bd9964416442f5fde95f130a00a"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rail_end.glb",
+      "sha256": "4f7650f3abf47055e0fcbbacc264d2d1872f2af483c0707b33248a08c792fc15",
+      "comparison": "identical",
+      "upstream_sha256": "4f7650f3abf47055e0fcbbacc264d2d1872f2af483c0707b33248a08c792fc15"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rail_middle.glb",
+      "sha256": "b878570f913e81e8eca95d4517fe2679a88e8b6e654fda262f281640bb995922",
+      "comparison": "identical",
+      "upstream_sha256": "b878570f913e81e8eca95d4517fe2679a88e8b6e654fda262f281640bb995922"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rock.glb",
+      "sha256": "dbc02af619e176d10676ceb0e788d0bf8838731bef0d50972f11c7bf5d1f4922",
+      "comparison": "identical",
+      "upstream_sha256": "dbc02af619e176d10676ceb0e788d0bf8838731bef0d50972f11c7bf5d1f4922"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rock_crystals.glb",
+      "sha256": "fbe5ce9cf6a036594b0eb4fc475633753bcd05780bf60bd82aa9c63fcbfd4e76",
+      "comparison": "identical",
+      "upstream_sha256": "fbe5ce9cf6a036594b0eb4fc475633753bcd05780bf60bd82aa9c63fcbfd4e76"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rock_crystalsLargeA.glb",
+      "sha256": "cfe8f339f6be4a321e5f3822237002b6a70f9c5d03596a7c347adabd5247fbd9",
+      "comparison": "identical",
+      "upstream_sha256": "cfe8f339f6be4a321e5f3822237002b6a70f9c5d03596a7c347adabd5247fbd9"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rock_crystalsLargeB.glb",
+      "sha256": "3fe54711b8d0fbeaebcc055409f256bf414ad7493e7f97adba4b213e44f11117",
+      "comparison": "identical",
+      "upstream_sha256": "3fe54711b8d0fbeaebcc055409f256bf414ad7493e7f97adba4b213e44f11117"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rock_largeA.glb",
+      "sha256": "13b2bf393fcd7ca8c73d8a2a731da0be6c2c2b4e67ef0ae826e816c0d8733f2f",
+      "comparison": "identical",
+      "upstream_sha256": "13b2bf393fcd7ca8c73d8a2a731da0be6c2c2b4e67ef0ae826e816c0d8733f2f"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rock_largeB.glb",
+      "sha256": "9ad6aafcbdf3a813d3ab5ca59d6d6eb41d8cb38d07897b2c4d24c3206f33c759",
+      "comparison": "identical",
+      "upstream_sha256": "9ad6aafcbdf3a813d3ab5ca59d6d6eb41d8cb38d07897b2c4d24c3206f33c759"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rocket_baseA.glb",
+      "sha256": "cd1e61105d70a6d8ae4d5245b7c8655e6f13c879af9e4db7195191d64f01e2bd",
+      "comparison": "identical",
+      "upstream_sha256": "cd1e61105d70a6d8ae4d5245b7c8655e6f13c879af9e4db7195191d64f01e2bd"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rocket_baseB.glb",
+      "sha256": "a83b3c4db4c9ed5a367032e393433c815062b21faf1fc7b0075f73c3f60c6642",
+      "comparison": "identical",
+      "upstream_sha256": "a83b3c4db4c9ed5a367032e393433c815062b21faf1fc7b0075f73c3f60c6642"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rocket_finsA.glb",
+      "sha256": "656c530940f3a50a1ea9107a67452252ea6b00a8a3d24bbe84faed1f9f086e01",
+      "comparison": "identical",
+      "upstream_sha256": "656c530940f3a50a1ea9107a67452252ea6b00a8a3d24bbe84faed1f9f086e01"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rocket_finsB.glb",
+      "sha256": "61d9a66dc0665a91d3f12922566894b91a325a7642f9f31105ec825eeb2b4952",
+      "comparison": "identical",
+      "upstream_sha256": "61d9a66dc0665a91d3f12922566894b91a325a7642f9f31105ec825eeb2b4952"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rocket_fuelA.glb",
+      "sha256": "093c94f292a974d4765224d7704c948d4b33d8e7e891489d4c66eb4b0b263868",
+      "comparison": "identical",
+      "upstream_sha256": "093c94f292a974d4765224d7704c948d4b33d8e7e891489d4c66eb4b0b263868"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rocket_fuelB.glb",
+      "sha256": "50fc3cbf21b76235201b368b5b1186633edb8ef0a087fc05195dd446b0754a07",
+      "comparison": "identical",
+      "upstream_sha256": "50fc3cbf21b76235201b368b5b1186633edb8ef0a087fc05195dd446b0754a07"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rocket_sidesA.glb",
+      "sha256": "1cc151d0abffb106c1761dcf2e9c2bab5a6157bd180ed9e5d80f9ee34a2269f4",
+      "comparison": "identical",
+      "upstream_sha256": "1cc151d0abffb106c1761dcf2e9c2bab5a6157bd180ed9e5d80f9ee34a2269f4"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rocket_sidesB.glb",
+      "sha256": "b9570c2976c83be637630a70b8c8384d77eb91d7868b1eac20bfc93769f24d93",
+      "comparison": "identical",
+      "upstream_sha256": "b9570c2976c83be637630a70b8c8384d77eb91d7868b1eac20bfc93769f24d93"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rocket_topA.glb",
+      "sha256": "29cd77e5f86546e46947781cec63dcb29b56b8f4cc66262bf1b52928eecc2c19",
+      "comparison": "identical",
+      "upstream_sha256": "29cd77e5f86546e46947781cec63dcb29b56b8f4cc66262bf1b52928eecc2c19"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rocket_topB.glb",
+      "sha256": "341ef05f146cf0dc0fd8749b63334ebe4cedb8fbb442e816a4a5c5a6f0586169",
+      "comparison": "identical",
+      "upstream_sha256": "341ef05f146cf0dc0fd8749b63334ebe4cedb8fbb442e816a4a5c5a6f0586169"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rocks_smallA.glb",
+      "sha256": "4c56d53f1da96654ed02041c0cb493c30de266f0d273d528e5ac92b92e6edb8b",
+      "comparison": "identical",
+      "upstream_sha256": "4c56d53f1da96654ed02041c0cb493c30de266f0d273d528e5ac92b92e6edb8b"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rocks_smallB.glb",
+      "sha256": "d59c89345555850d1c6240f2ab7347d8befeeea1ddc4413e54acee9b2d52cccf",
+      "comparison": "identical",
+      "upstream_sha256": "d59c89345555850d1c6240f2ab7347d8befeeea1ddc4413e54acee9b2d52cccf"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/rover.glb",
+      "sha256": "9784549775017e540ab84e6fc0eb8a1902dbeff9ba4285cecb97c086d2937fa5",
+      "comparison": "identical",
+      "upstream_sha256": "9784549775017e540ab84e6fc0eb8a1902dbeff9ba4285cecb97c086d2937fa5"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/satelliteDish.glb",
+      "sha256": "db27a561b66fabda45a6ce2bcf41d650852e89e15bb9f63b68133ad1293aed8b",
+      "comparison": "identical",
+      "upstream_sha256": "db27a561b66fabda45a6ce2bcf41d650852e89e15bb9f63b68133ad1293aed8b"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/satelliteDish_detailed.glb",
+      "sha256": "143dd36b2c427e3201110967a18fd836bc7aa8002dbf3e44efa42c75fbb44ae5",
+      "comparison": "identical",
+      "upstream_sha256": "143dd36b2c427e3201110967a18fd836bc7aa8002dbf3e44efa42c75fbb44ae5"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/satelliteDish_large.glb",
+      "sha256": "8fe696a37081a0a6f1c56ab867f447f33a498ef9f1daabb5aabc62b1ce09277e",
+      "comparison": "identical",
+      "upstream_sha256": "8fe696a37081a0a6f1c56ab867f447f33a498ef9f1daabb5aabc62b1ce09277e"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/stairs.glb",
+      "sha256": "882aa6dfcef829638863f232181d82fda48c800cf508265314a6aade7f53f429",
+      "comparison": "identical",
+      "upstream_sha256": "882aa6dfcef829638863f232181d82fda48c800cf508265314a6aade7f53f429"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/stairs_corner.glb",
+      "sha256": "d5ac84da6811e50d50d000bd6fde0f18f9b2ad9b1dc2f127282e2a14ab717b82",
+      "comparison": "identical",
+      "upstream_sha256": "d5ac84da6811e50d50d000bd6fde0f18f9b2ad9b1dc2f127282e2a14ab717b82"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/stairs_short.glb",
+      "sha256": "ffc2ae1b8df143ee8afcba19c8079925db47e00d101fe1e834c9c8b46640ae54",
+      "comparison": "identical",
+      "upstream_sha256": "ffc2ae1b8df143ee8afcba19c8079925db47e00d101fe1e834c9c8b46640ae54"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/structure.glb",
+      "sha256": "0cd503971ffb2773c9f7f5e54526612b08a625d518be3aac927d993f532d27f7",
+      "comparison": "identical",
+      "upstream_sha256": "0cd503971ffb2773c9f7f5e54526612b08a625d518be3aac927d993f532d27f7"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/structure_closed.glb",
+      "sha256": "1020c2f86d3653caf475690c632838ac54e4adc963abc7831c6056f71499bff3",
+      "comparison": "identical",
+      "upstream_sha256": "1020c2f86d3653caf475690c632838ac54e4adc963abc7831c6056f71499bff3"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/structure_detailed.glb",
+      "sha256": "e0bbdfca04b9e645f0b7feec5a7a5096dc6701b744b42103fe437db06b345a4b",
+      "comparison": "identical",
+      "upstream_sha256": "e0bbdfca04b9e645f0b7feec5a7a5096dc6701b744b42103fe437db06b345a4b"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/structure_diagonal.glb",
+      "sha256": "f2770ef772687d364291c185c9a54adcf0b3396b2b2429d6c7061adfcf3ffa9a",
+      "comparison": "identical",
+      "upstream_sha256": "f2770ef772687d364291c185c9a54adcf0b3396b2b2429d6c7061adfcf3ffa9a"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/supports_high.glb",
+      "sha256": "48a8aa7818e0f3731aa7bd825f2030089bc16340fcebdf2a4bf60ef4a933a4da",
+      "comparison": "identical",
+      "upstream_sha256": "48a8aa7818e0f3731aa7bd825f2030089bc16340fcebdf2a4bf60ef4a933a4da"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/supports_low.glb",
+      "sha256": "e1c9df6a3c85df038673699114665736030614e31fedb04b3c71b380f5adc432",
+      "comparison": "identical",
+      "upstream_sha256": "e1c9df6a3c85df038673699114665736030614e31fedb04b3c71b380f5adc432"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain.glb",
+      "sha256": "c0daef0a3c92cf52b6d5a3f64288e50e41d3008397ae25b46ab55dd3e1630288",
+      "comparison": "identical",
+      "upstream_sha256": "c0daef0a3c92cf52b6d5a3f64288e50e41d3008397ae25b46ab55dd3e1630288"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_ramp.glb",
+      "sha256": "9171061212ee5aa9a74393c9f657a89a5b19d675766a43c88d5d91df6e507dea",
+      "comparison": "identical",
+      "upstream_sha256": "9171061212ee5aa9a74393c9f657a89a5b19d675766a43c88d5d91df6e507dea"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_rampLarge.glb",
+      "sha256": "4655300cfdfb74242437010f45818ed953a368b5d2ca7524b0f80875ba14af2f",
+      "comparison": "identical",
+      "upstream_sha256": "4655300cfdfb74242437010f45818ed953a368b5d2ca7524b0f80875ba14af2f"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_rampLarge_detailed.glb",
+      "sha256": "0710913a3c40fedecc4e9e5e60f1474fee450567757107c8f7094b784d1f0cf2",
+      "comparison": "identical",
+      "upstream_sha256": "0710913a3c40fedecc4e9e5e60f1474fee450567757107c8f7094b784d1f0cf2"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_roadCorner.glb",
+      "sha256": "514dc0b203df79c5e215c842bae75617e1d7d1268808fbfa2101d8965750ed3d",
+      "comparison": "identical",
+      "upstream_sha256": "514dc0b203df79c5e215c842bae75617e1d7d1268808fbfa2101d8965750ed3d"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_roadCross.glb",
+      "sha256": "e021f216f0dc9171dc04b1ac0fa671526074d977eb746017d812bf0538f75bc9",
+      "comparison": "identical",
+      "upstream_sha256": "e021f216f0dc9171dc04b1ac0fa671526074d977eb746017d812bf0538f75bc9"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_roadEnd.glb",
+      "sha256": "9464131a2c825346fc427fb37f2e17aaa44b3a26e4090325b3dd69a67ace66f4",
+      "comparison": "identical",
+      "upstream_sha256": "9464131a2c825346fc427fb37f2e17aaa44b3a26e4090325b3dd69a67ace66f4"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_roadSplit.glb",
+      "sha256": "22274ab3802c7383a3804efef61c68d4f6a081aeedf9f86aef9fce1f4c469a92",
+      "comparison": "identical",
+      "upstream_sha256": "22274ab3802c7383a3804efef61c68d4f6a081aeedf9f86aef9fce1f4c469a92"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_roadStraight.glb",
+      "sha256": "39f404bf0141c1028ee14a0757de812e381edf47a1fd4f830ff89125959b0cc0",
+      "comparison": "identical",
+      "upstream_sha256": "39f404bf0141c1028ee14a0757de812e381edf47a1fd4f830ff89125959b0cc0"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_side.glb",
+      "sha256": "f51223639675ae5d95581b11061c92494a0cf1a1960b65b8cc890a671986a15a",
+      "comparison": "identical",
+      "upstream_sha256": "f51223639675ae5d95581b11061c92494a0cf1a1960b65b8cc890a671986a15a"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_sideCliff.glb",
+      "sha256": "888d6845cfcd6d21a08cca29f15185d0ed478c003746f0f46e2526bb0f8b0298",
+      "comparison": "identical",
+      "upstream_sha256": "888d6845cfcd6d21a08cca29f15185d0ed478c003746f0f46e2526bb0f8b0298"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_sideCorner.glb",
+      "sha256": "5161bbc51bb130f92d39a4f51abf874b18dcade8c84f34dbcff79c63c24f7738",
+      "comparison": "identical",
+      "upstream_sha256": "5161bbc51bb130f92d39a4f51abf874b18dcade8c84f34dbcff79c63c24f7738"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_sideCornerInner.glb",
+      "sha256": "13da95a3ebb598e191c10acc95d72e692efd23f7e1ad8709a0953b30d3f76767",
+      "comparison": "identical",
+      "upstream_sha256": "13da95a3ebb598e191c10acc95d72e692efd23f7e1ad8709a0953b30d3f76767"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/terrain_sideEnd.glb",
+      "sha256": "beb6c686f265afc7df892751a16f91e97ee850d06de817343365433c689ec097",
+      "comparison": "identical",
+      "upstream_sha256": "beb6c686f265afc7df892751a16f91e97ee850d06de817343365433c689ec097"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/turret_double.glb",
+      "sha256": "a707823a86f895f6418df2340f2e231d7d88be6c2069d3245433299cec1f9f9c",
+      "comparison": "identical",
+      "upstream_sha256": "a707823a86f895f6418df2340f2e231d7d88be6c2069d3245433299cec1f9f9c"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/turret_single.glb",
+      "sha256": "ef27f43718c846297f90a0b20446b13c6a1f092cd995ea730f27d6e003efd1e0",
+      "comparison": "identical",
+      "upstream_sha256": "ef27f43718c846297f90a0b20446b13c6a1f092cd995ea730f27d6e003efd1e0"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/weapon_gun.glb",
+      "sha256": "f8e0edea00355789f9fac087e40c7a710468cf6a6c1c22a86426d44883f438b5",
+      "comparison": "identical",
+      "upstream_sha256": "f8e0edea00355789f9fac087e40c7a710468cf6a6c1c22a86426d44883f438b5"
+    },
+    {
+      "path": "assets/models/kenney-spacekit/weapon_rifle.glb",
+      "sha256": "266ffd12306a2afc2638e9a479687adf738fc3cd9e938ce8e3195ccb312a6b31",
+      "comparison": "identical",
+      "upstream_sha256": "266ffd12306a2afc2638e9a479687adf738fc3cd9e938ce8e3195ccb312a6b31"
+    },
+    {
+      "path": "assets/models/primitives/icosphere.obj",
+      "sha256": "c941b3b2b683173e16a9d148194b14f30d098ae7a416e02708de48097bac00a6",
+      "comparison": "identical",
+      "upstream_sha256": "c941b3b2b683173e16a9d148194b14f30d098ae7a416e02708de48097bac00a6"
+    },
+    {
+      "path": "assets/music/rts_battle_loop.ogg",
+      "sha256": "db233cbff077372c20d1e644792c1b5d8d4ff1797294256b0ceeed98dc0068e9",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-14T16:56:56.461Z",
+        "record_line": 2388,
+        "command_sha256": "808120ef4c61c3c950919809e72ecb5e93410bb8abff1f6c1c3bfdfd2c3b039e",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"aevalsrc='0.035*sin(2*PI*55*t)*lt(mod(t,1),0.46)+0.018*sin(2*PI*110*t)*lt(mod(t+0.5,1),0.24)+0.014*sin(2*PI*220*t)+0.010*sin(2*PI*330*t)+0.010*sin(2*PI*660*t)*lt(mod(t,0.5),0.07)+0.008*sin(2*PI*990*t)*lt(mod(t+0.25,0.5),0.05)':d=24:s=44100\" -af \"alimiter=limit=0.85,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=mono\" -c:a libvorbis -q:a 4 assets/music/rts_battle_loop.ogg"
+      },
+      "reproduction": {
+        "reproduction_sha256": "66e4bb4fcb661fa0dffd9db241a05434def5ac414ebab9b9203ec5a1cd4e17ba",
+        "file_identical": false,
+        "decoded_float_pcm_identical": false,
+        "local_decoded_float_pcm_sha256": "f5c2197f0123279a2baa9ff9e68b909e0ea976df6ed228a1ea8f7767b70fea5b"
+      }
+    },
+    {
+      "path": "assets/sfx/command_confirm.wav",
+      "sha256": "ad698d3c27c08b46ad067ba15ec0e1b821c96139833caf94ec58b3f8a7232bb4",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-14T16:54:18.519Z",
+        "record_line": 2336,
+        "command_sha256": "77d2a091ee02897289df6166799e93b0d7b9265c1f1ab6101cbcd3b619f69c7c",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=520:duration=0.16:sample_rate=44100\" -f lavfi -i \"sine=frequency=840:duration=0.09:sample_rate=44100\" -filter_complex \"[0:a]afade=t=out:st=0.06:d=0.08,volume=0.11[a0];[1:a]adelay=70|70,afade=t=out:st=0.04:d=0.05,volume=0.13[a1];[a0][a1]amix=inputs=2:duration=longest,alimiter=limit=0.9,aformat=sample_fmts=s16:sample_rates=44100:channel_layouts=mono\" assets/sfx/command_confirm.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "41448f5ab26a4440302db9c907dae7bf727695f4b8618914c85ac2f8aecd1b9a",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "16a763cce403e861a8bec6e95ba2ae5f9f8ef4cf0d3d36a5444fac663b6e76e4"
+      }
+    },
+    {
+      "path": "assets/sfx/construction_canceled.wav",
+      "sha256": "cd61d9fc3640dfb24e6d36c65d4e03164484acf9a2d35dfeba872ab87f45373f",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-16T23:49:34.473Z",
+        "record_line": 88375,
+        "command_sha256": "f929d8c14fcd10c434269bc94c0a0e24eebb733b4c6c9db8d4c9e8fc16484e7e",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=440:duration=0.10\" -f lavfi -i \"sine=frequency=320:duration=0.14\" -filter_complex \"[0:a][1:a]concat=n=2:v=0:a=1,volume=0.32,afade=t=in:st=0:d=0.01,afade=t=out:st=0.18:d=0.05\" -ar 44100 -ac 1 assets/sfx/construction_canceled.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "c9b127afdd76d6babe039a648d1bb6b6c8d77a3def1eddec94f329b1bc0399fd",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "b2b357e1c1e2e17a17e4a05ba1c2c6ba4768d1d17806472eedc14f40773656a3"
+      }
+    },
+    {
+      "path": "assets/sfx/construction_started.wav",
+      "sha256": "8394d25757ae64356c335f4adafd58673f1e2f35cd77103b6f92aca254ada285",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-16T23:49:34.473Z",
+        "record_line": 88375,
+        "command_sha256": "a662afc77f5e435aebaa12cb58ebf827703c35c4260b49fc8facdfe19c98a758",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=520:duration=0.08\" -f lavfi -i \"sine=frequency=690:duration=0.10\" -f lavfi -i \"sine=frequency=860:duration=0.14\" -filter_complex \"[0:a][1:a][2:a]concat=n=3:v=0:a=1,volume=0.30,afade=t=in:st=0:d=0.01,afade=t=out:st=0.25:d=0.05\" -ar 44100 -ac 1 assets/sfx/construction_started.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "f754f4c33c56fd7513dc61347fde47004905afdb3e0605206f87096dcafc15ad",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "c084d35b98c98116e380b4ae0d96ced6006dbd86499a47f57738d6fa42685cdc"
+      }
+    },
+    {
+      "path": "assets/sfx/error.wav",
+      "sha256": "00b2f41f5fae344994815364ad1f0fa46954948a829ead098ee223222615f2cc",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-14T16:54:18.519Z",
+        "record_line": 2336,
+        "command_sha256": "2e2a68446134d9bc9d494bebbad389eba49a047ebeea2e928c64233467b33d7e",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=180:duration=0.28:sample_rate=44100\" -f lavfi -i \"sine=frequency=120:duration=0.28:sample_rate=44100\" -filter_complex \"[0:a]volume=0.12[a0];[1:a]adelay=80|80,volume=0.12[a1];[a0][a1]amix=inputs=2:duration=longest,afade=t=out:st=0.18:d=0.1,alimiter=limit=0.9,aformat=sample_fmts=s16:sample_rates=44100:channel_layouts=mono\" assets/sfx/error.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "00a5b4e360eb7fb1b3bee2e3ef37ba5f432d165d6c653abb216fc16be3a1af11",
+        "file_identical": false,
+        "pcm_identical": false,
+        "local_pcm_sha256": "f016f1a84f9125d618006dfd8669f2fc837d3a3e83285154fc98f4934c0d2445"
+      }
+    },
+    {
+      "path": "assets/sfx/explosion_small.wav",
+      "sha256": "a44222b362df837ffed04f7f925d1c5f913aa356527f89634174001f566ad7a3",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-14T16:54:18.519Z",
+        "record_line": 2336,
+        "command_sha256": "76125621144e236446256d1e1cc7be30f8184652aedba6175de8221f0dfd2ffc",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"anoisesrc=d=0.55:c=brown:r=44100\" -f lavfi -i \"sine=frequency=74:duration=0.55:sample_rate=44100\" -filter_complex \"[0:a]afade=t=in:st=0:d=0.01,afade=t=out:st=0.12:d=0.38,lowpass=f=2600,volume=0.22[n];[1:a]afade=t=out:st=0.08:d=0.35,volume=0.28[t];[n][t]amix=inputs=2:duration=longest,alimiter=limit=0.95,aformat=sample_fmts=s16:sample_rates=44100:channel_layouts=mono\" assets/sfx/explosion_small.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "edebdd5d78e14722b605ddd326bd49861e4d2a05bd661f30042a4d0f0c694073",
+        "file_identical": false,
+        "pcm_identical": false,
+        "local_pcm_sha256": "d6ea75c08e6d7eb883234a4baf47c9b6e05dd91574314780c4a9f22331ce9a53"
+      }
+    },
+    {
+      "path": "assets/sfx/low_power_warning.wav",
+      "sha256": "4d8ad5762e4f96fccd142f5084f30fa40939c27a63336c9f7844b1a2889bc4c6",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-16T23:09:50.944Z",
+        "record_line": 87945,
+        "command_sha256": "3366d2b7f58e3c3eeb0c66c0b01c4c8882ecdcc05f492f1100d59be09deff77d",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=310:duration=0.18\" -f lavfi -i \"sine=frequency=470:duration=0.18\" -f lavfi -i \"sine=frequency=310:duration=0.22\" -filter_complex \"[0:a][1:a][2:a]concat=n=3:v=0:a=1,volume=0.38,afade=t=in:st=0:d=0.02,afade=t=out:st=0.52:d=0.06\" -ar 44100 -ac 1 assets/sfx/low_power_warning.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "dd9516cebab4a976ada3488b9c6f200fce72555c50dd6d10deca2aad7102d0f0",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "07c40dd1ef6a9bdaf8098e8e46ddd476294644e34abddaeeb0ea2f83dc77bafc"
+      }
+    },
+    {
+      "path": "assets/sfx/production_ready.wav",
+      "sha256": "820ac6bbf81a8b133e2370f6697472bbff7e9869f108f34cfe14b96edf24f27c",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-14T16:54:18.519Z",
+        "record_line": 2336,
+        "command_sha256": "71f12d6d19675bd8c01cec7ba1f9cb0e5d6a3979e31a65ec6f1f2d77230a3c5a",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=620:duration=0.22:sample_rate=44100\" -f lavfi -i \"sine=frequency=930:duration=0.14:sample_rate=44100\" -filter_complex \"[0:a]afade=t=out:st=0.08:d=0.1,volume=0.12[a0];[1:a]adelay=85|85,afade=t=out:st=0.06:d=0.06,volume=0.14[a1];[a0][a1]amix=inputs=2:duration=longest,alimiter=limit=0.9,aformat=sample_fmts=s16:sample_rates=44100:channel_layouts=mono\" assets/sfx/production_ready.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "dc07389da084c67dfa81cd6c182a110b7096bacfb65161055b2beff4c16bf7ee",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "215c06c0a44a8012a5e9a8ca19249f18929114144593aea96e2bf37ef299211d"
+      }
+    },
+    {
+      "path": "assets/sfx/production_start.wav",
+      "sha256": "3399081b10e000df4147ac77526cd512fb4b1e572fd386f890d41d63e326585e",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-14T16:54:18.519Z",
+        "record_line": 2336,
+        "command_sha256": "403d998b99bc9c435efdb5c11a5ae742f893d36f6411c11749c1873be7b2a771",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=360:duration=0.18:sample_rate=44100\" -f lavfi -i \"sine=frequency=720:duration=0.09:sample_rate=44100\" -filter_complex \"[0:a]afade=t=out:st=0.08:d=0.08,volume=0.12[a0];[1:a]adelay=90|90,afade=t=out:st=0.04:d=0.05,volume=0.12[a1];[a0][a1]amix=inputs=2:duration=longest,alimiter=limit=0.9,aformat=sample_fmts=s16:sample_rates=44100:channel_layouts=mono\" assets/sfx/production_start.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "16278b1258b01edcddf3a4cab9ca34d9ae75166fe50ef2b67f947ee426837548",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "65fafb4a94c6a678954d8633ea89a84ed7a606512e1d1cd7b94776cfb2e6214f"
+      }
+    },
+    {
+      "path": "assets/sfx/repair_started.wav",
+      "sha256": "7f963596fd29d4789b76fedb80285c3e8dfd3d399aa742c69a0e510a7757dd63",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-16T23:49:34.473Z",
+        "record_line": 88375,
+        "command_sha256": "f41b2240712ef9e6fa12ce0d3de1a7e41fc617b44ea37d373298df8c9b9d0ea3",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=660:duration=0.05\" -f lavfi -i \"sine=frequency=880:duration=0.05\" -f lavfi -i \"sine=frequency=660:duration=0.10\" -filter_complex \"[0:a][1:a][2:a]concat=n=3:v=0:a=1,volume=0.24,afade=t=in:st=0:d=0.005,afade=t=out:st=0.15:d=0.04\" -ar 44100 -ac 1 assets/sfx/repair_started.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "2e42d03ef5c82cbae408eb3bd4ad9f7251dfc3bd5de41282932826016f010a73",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "6b2db1ecccfb5baeefaf0225022c99aac8df5adcc4305632d9c4d83d8855fe5f"
+      }
+    },
+    {
+      "path": "assets/sfx/structure_captured.wav",
+      "sha256": "e529b99bd8978d06d10fc3188e974803d16f61d3fd6f9dee1df95258568c0530",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-16T23:42:45.559Z",
+        "record_line": 88215,
+        "command_sha256": "0f59900bdbb5ac16dbb59aa8fe9cecec815d8d7ec1f8c11e28287a89fea5dc61",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=620:duration=0.08\" -f lavfi -i \"sine=frequency=930:duration=0.10\" -f lavfi -i \"sine=frequency=1240:duration=0.18\" -filter_complex \"[0:a][1:a][2:a]concat=n=3:v=0:a=1,volume=0.34,afade=t=in:st=0:d=0.01,afade=t=out:st=0.30:d=0.06\" -ar 44100 -ac 1 assets/sfx/structure_captured.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "dbd001cc9c5597158a93aceafd8cb4ca6992c2cdd7ca2a0092784c6573b6a59b",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "1c6598bd6a794ebf8f7e21f7abe2aef4ec34505dbf6a3489b1e022e19420f519"
+      }
+    },
+    {
+      "path": "assets/sfx/structure_lost.wav",
+      "sha256": "c936910a7de3b20e739cd1a64b70e0844976631236441cfcf553baf7942e5371",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-16T23:42:45.559Z",
+        "record_line": 88215,
+        "command_sha256": "b9d802556bc7f84b197a269ac50ec7183b673d6c90db74621e7190ae71a0828e",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=370:duration=0.14\" -f lavfi -i \"sine=frequency=260:duration=0.18\" -f lavfi -i \"anoisesrc=color=pink:duration=0.08:amplitude=0.10\" -filter_complex \"[0:a][1:a][2:a]concat=n=3:v=0:a=1,volume=0.36,afade=t=in:st=0:d=0.01,afade=t=out:st=0.34:d=0.06\" -ar 44100 -ac 1 assets/sfx/structure_lost.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "a32dd9cc204d47c63656fe3013922666aecd0282c564119939b1c118a3ef1f75",
+        "file_identical": false,
+        "pcm_identical": false,
+        "local_pcm_sha256": "e1c31236d152bec5715c6d4ce5201747fd970e44d20d8e02ec974cc7d4717ac0"
+      }
+    },
+    {
+      "path": "assets/sfx/structure_sold.wav",
+      "sha256": "513e3452600d4c1d98e7742d0eee0da703723c5177a186f545b5e733a5d38cff",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-16T23:49:34.473Z",
+        "record_line": 88375,
+        "command_sha256": "4017ef0a49a998d4dae97c74c3fd8c780080c3110e54fc13dbe933e65e7d22a9",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=760:duration=0.07\" -f lavfi -i \"sine=frequency=580:duration=0.07\" -f lavfi -i \"sine=frequency=430:duration=0.14\" -filter_complex \"[0:a][1:a][2:a]concat=n=3:v=0:a=1,volume=0.32,afade=t=in:st=0:d=0.01,afade=t=out:st=0.21:d=0.05\" -ar 44100 -ac 1 assets/sfx/structure_sold.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "8500802a7e279a5c81be44449d0db239ea29790fd7e58952e6a1662a8bc90da3",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "92c990d5029b3d8753a1af07d1d9901c736cde74a55d1c86a23f15dc0fc396cb"
+      }
+    },
+    {
+      "path": "assets/sfx/superweapon_warning.wav",
+      "sha256": "0f4b83b6bc0e74dc1731d48833279d44737dd14a524fcd5a6085d9e4adef751f",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-16T22:58:48.320Z",
+        "record_line": 87434,
+        "command_sha256": "dcdaab95f75f4c107132d2a9b60b74f4d839efbc1b67815f6608a9e5271fe025",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=420:duration=0.16\" -f lavfi -i \"sine=frequency=620:duration=0.16\" -f lavfi -i \"sine=frequency=420:duration=0.16\" -f lavfi -i \"sine=frequency=620:duration=0.22\" -filter_complex \"[0:a][1:a][2:a][3:a]concat=n=4:v=0:a=1,volume=0.40,afade=t=in:st=0:d=0.02,afade=t=out:st=0.62:d=0.08\" -ar 44100 -ac 1 assets/sfx/superweapon_warning.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "09f05677e6351a190ec58aeb6c7b34929cd2fd34387e5d2b1bf15c6a559222fd",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "bc269a6e142414e4c090b408b88e34e048425d862619df9ce8eec39f1c75f03b"
+      }
+    },
+    {
+      "path": "assets/sfx/supply_crate.wav",
+      "sha256": "a3539fa6d4e4a51411a080f5555d6ee9c421c1ef9f1a7fc324d7820bfb943cc0",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-16T23:42:45.559Z",
+        "record_line": 88215,
+        "command_sha256": "01f232982c893bfdff6bb315cdcb22562353d75870e473c3bd125fba80522638",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=740:duration=0.05\" -f lavfi -i \"sine=frequency=1180:duration=0.07\" -f lavfi -i \"sine=frequency=1480:duration=0.12\" -filter_complex \"[0:a][1:a][2:a]concat=n=3:v=0:a=1,volume=0.30,afade=t=in:st=0:d=0.005,afade=t=out:st=0.18:d=0.04\" -ar 44100 -ac 1 assets/sfx/supply_crate.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "f912c7cea7524ff02d4957e68b0e9779f3961067d46deed51e6f99883287d75c",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "7b2f64c54167e835c110101ac1e8481f44706d0b7b792fc4e3f4ca6c5961823d"
+      }
+    },
+    {
+      "path": "assets/sfx/support_power_fire.wav",
+      "sha256": "9cb109f5ac35ec3453c8c32b088b975859ea886b7ea4b1c3c30d2bd11047efc3",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-16T22:58:48.318Z",
+        "record_line": 87433,
+        "command_sha256": "5424d32f7c3fd83c15bb4fc631cb52323b2668deac6a0ff0c445d52881a70baa",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=260:duration=0.16\" -f lavfi -i \"anoisesrc=color=pink:duration=0.36:amplitude=0.20\" -filter_complex \"[0:a]volume=0.42[a0];[1:a]highpass=f=520,lowpass=f=3600,afade=t=in:st=0:d=0.03,afade=t=out:st=0.27:d=0.09[a1];[a0][a1]amix=inputs=2:duration=longest,volume=0.75\" -ar 44100 -ac 1 assets/sfx/support_power_fire.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "389d7ffc2e0a79f4be4fac5e2c5632773f0f8bdb044e826bf9575fdf8b4471d7",
+        "file_identical": false,
+        "pcm_identical": false,
+        "local_pcm_sha256": "64764f28a34028e7f4468181403135be58e6f5e80546382a7e52a6b678f74e50"
+      }
+    },
+    {
+      "path": "assets/sfx/support_power_ready.wav",
+      "sha256": "eefbabba84dd353de69793a96e5cfe83ba4ae3213ae09696212acf9d254af4ce",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-16T22:58:48.158Z",
+        "record_line": 87432,
+        "command_sha256": "6780d5f333be59cdbd2a0059d02b740fab06d71a7af3070d2b804e399a45adc8",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=740:duration=0.11\" -f lavfi -i \"sine=frequency=980:duration=0.11\" -f lavfi -i \"sine=frequency=1280:duration=0.16\" -filter_complex \"[0:a][1:a][2:a]concat=n=3:v=0:a=1,volume=0.35,afade=t=out:st=0.32:d=0.06\" -ar 44100 -ac 1 assets/sfx/support_power_ready.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "192396f03397d09a6f855a68fcb059070447452588098633fd67b21ec1d57177",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "7e4f18eaca0e604288f7597c58285a0d5826b4393ac0f8599cf3256753adcf3d"
+      }
+    },
+    {
+      "path": "assets/sfx/ui_select.wav",
+      "sha256": "f60eca609c30a78444fd5b23a3f318b504d91fba6b5c5d912184644f36b8ad85",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-14T16:54:18.519Z",
+        "record_line": 2336,
+        "command_sha256": "d53e6bc5395ef39ffc7ff51bdf64db64b32ab8ab7eb787c3194516f8d75f1248",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=920:duration=0.08:sample_rate=44100\" -af \"afade=t=out:st=0.025:d=0.055,volume=0.16,aformat=sample_fmts=s16:sample_rates=44100:channel_layouts=mono\" assets/sfx/ui_select.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "1c6d9c1d6942c500254ac900c33dd56e26f9457445d47bbf00f7284d98dfa46c",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "6e3c74a47074168ff83e0acabf4d71294eebea5205793f636f5905c98a9b1dfa"
+      }
+    },
+    {
+      "path": "assets/sfx/unit_promoted.wav",
+      "sha256": "a414fa426c844120740534ee4b3cf6f2e63ff889d63a62bae8154458bb6d6d1c",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-16T23:42:45.559Z",
+        "record_line": 88215,
+        "command_sha256": "06faaece795dc77503d8b9ad11e58d92376aacfe49fc0bdb3ac4da4f50cf382a",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"sine=frequency=520:duration=0.08\" -f lavfi -i \"sine=frequency=780:duration=0.08\" -f lavfi -i \"sine=frequency=1040:duration=0.16\" -filter_complex \"[0:a][1:a][2:a]concat=n=3:v=0:a=1,volume=0.32,afade=t=in:st=0:d=0.01,afade=t=out:st=0.26:d=0.05\" -ar 44100 -ac 1 assets/sfx/unit_promoted.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "12ac648620938b05002750d0093893e2374f12ac0338015159e2d6246c587d4f",
+        "file_identical": false,
+        "pcm_identical": true,
+        "local_pcm_sha256": "aeed7d1fea128aa60171a989708c6bba1dff1b437ebc7ca6a56e4537371590b0"
+      }
+    },
+    {
+      "path": "assets/sfx/weapon_hit.wav",
+      "sha256": "ef3ef4c8a10770ef9589c10b85e90c8c9659bbad4f4ac8271dc9f2c98da1dde2",
+      "comparison": "absent_from_upstream",
+      "generation_record": {
+        "timestamp": "2026-06-14T16:54:18.519Z",
+        "record_line": 2336,
+        "command_sha256": "43eb4058d9eff8c88cdc1c52128a44b29cbe0db7dfa103923c5aaacafa5e9f87",
+        "recipe": "ffmpeg -y -hide_banner -loglevel error -f lavfi -i \"anoisesrc=d=0.12:c=white:r=44100\" -f lavfi -i \"sine=frequency=170:duration=0.12:sample_rate=44100\" -filter_complex \"[0:a]afade=t=out:st=0.015:d=0.08,highpass=f=900,volume=0.08[n];[1:a]afade=t=out:st=0.02:d=0.08,volume=0.13[t];[n][t]amix=inputs=2:duration=longest,alimiter=limit=0.9,aformat=sample_fmts=s16:sample_rates=44100:channel_layouts=mono\" assets/sfx/weapon_hit.wav"
+      },
+      "reproduction": {
+        "reproduction_sha256": "4bdd7ddabcbf8d6b59c86db262bd5701de8996512389cdf7f256be7d5e6c4918",
+        "file_identical": false,
+        "pcm_identical": false,
+        "local_pcm_sha256": "10269c63c6e0a409c703df9fec1b70792d3168a1a937d6b44a13d114fa2cae88"
+      }
+    },
+    {
+      "path": "assets/textures/armor-painted-steel.png",
+      "sha256": "45ab058733c993262a1d913ebb1c63f7ceedeccd808e53a143a62e4a5d8a7327",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/translations/main_menu.csv",
+      "sha256": "9c055461359116583d440e8a2fdcb628a52c94cfe1ffcbbd405e10f3cfc6a1fa",
+      "comparison": "different",
+      "upstream_sha256": "b8d62f3af6022ed9edfa8f0bd8f9b78ec7ab49e6aa5c5f359433af4bf768ab96"
+    },
+    {
+      "path": "assets/translations/main_menu.en.translation",
+      "sha256": "60d2fb5875115a673137e484ce827ad1850419b4566c69d7314e7c32827ec970",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/translations/main_menu.pl.translation",
+      "sha256": "9016a96e70fba0362e0e44eba735622a0028070c189808d85b3efb18e38faba2",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/translations/main_menu.zh_CN.translation",
+      "sha256": "ef6d8374cc6f801dd3a7ae73d3b213e9fdd0fee68fcd51194942955568026d30",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/translations/match.csv",
+      "sha256": "faa314a9fab2f208598ce7734109b2b27fdc4954074b76a9449aaae8078cfcd6",
+      "comparison": "different",
+      "upstream_sha256": "725f51d111d876b53de0cbcc26acbd3939cb76291ea7d02ac8fd53de1f8c2429"
+    },
+    {
+      "path": "assets/translations/match.en.translation",
+      "sha256": "0e55979dfa7c8ed2c3ebae14606f89acb794888e2d10dfdcf5b1aeae680e46ee",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/translations/match.pl.translation",
+      "sha256": "a40c0819848de73a7afa46b981308387d8e13fc791fa0f4af556e721d8bb0cf9",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/translations/match.zh_CN.translation",
+      "sha256": "4011e4e43d3dde7541e7a82b643ad1493b6a0cf96140bfd8f1b864928bb5eee2",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/background.png",
+      "sha256": "c82eeb871a91e7a259cfb175255430b4498cbfe203859d29cad882eea6f0fd1b",
+      "comparison": "different",
+      "upstream_sha256": "900cfb789d8c85cb0958cc66b1061af5308f4679615d1936cdd45867f49afcdb"
+    },
+    {
+      "path": "assets/ui/cursors/rts_cursor.cur.ron",
+      "sha256": "35048bf4b96fc1e8dc97b92058817ca555b2f1abfc10ca31292f63cd102e4a45",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/cursors/rts_cursor_atlas.png",
+      "sha256": "a41bc41a4f6a324055fdd6b252a780dd5506d6ec341b17b1a0d75d8985c30847",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/factions/alliance_emblem.png",
+      "sha256": "ef8c8c78a4ed56fe4969dc3885a4afc65815fe082d88073cf162a4caa6f19ed9",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/factions/chaos_emblem.png",
+      "sha256": "1aa20711a803ae1150cdcea3948cb789e3047630770314199bfe6cada5e81e48",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/factions/demon_emblem.png",
+      "sha256": "4bf9915cae05b7331fd207ff6fe71fb15a1643a03ca2af5a37f6899c9f471364",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/AdvancedReactorPlant.png",
+      "sha256": "541bae548a80f80e25267c257639830e09e445036d5cc3ef9fd281e888628f6b",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/AircraftFactory.png",
+      "sha256": "34c5802e0841ef9211d8eb7b04f9c135ffa73cf1d91b44358848749b69788751",
+      "comparison": "identical",
+      "upstream_sha256": "34c5802e0841ef9211d8eb7b04f9c135ffa73cf1d91b44358848749b69788751"
+    },
+    {
+      "path": "assets/ui/icons/AmphibiousAssaultAPC.png",
+      "sha256": "4093563915f40c6f3a31e9afc13a10dba4b6e01436d9defbba0dd684864c78af",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/AntiAirTurret.png",
+      "sha256": "57342d57363913d44ba41ea4e0670c7cb50bcbc55a2574d13f31a8db3628f8f3",
+      "comparison": "identical",
+      "upstream_sha256": "57342d57363913d44ba41ea4e0670c7cb50bcbc55a2574d13f31a8db3628f8f3"
+    },
+    {
+      "path": "assets/ui/icons/AntiAirWalker.png",
+      "sha256": "a6cf6f6f2a4b800f88df4be77c0372dbfd15a55d6427656e1ebcd4882b2bbeae",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/AntiGroundTurret.png",
+      "sha256": "beb2ab5074621b977820148bac18094d7679bfa0c555ef0401df1dbd2ccc6fa6",
+      "comparison": "identical",
+      "upstream_sha256": "beb2ab5074621b977820148bac18094d7679bfa0c555ef0401df1dbd2ccc6fa6"
+    },
+    {
+      "path": "assets/ui/icons/ArcCoilDefenseTower.png",
+      "sha256": "7573c42eaf2ea49d320f70baf58a500b0bfdcb330a19e43ce186c301dba5bdaf",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/AttackMove.png",
+      "sha256": "a38b0afee098124b7ce21cad5f5073d9883228fa93af1a29577ad0a94393d359",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/Barracks.png",
+      "sha256": "889489afcf31351b93044d93609037586f7b9d0e36443a55122f8d10749290f1",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/generated/imagegen-rts-expansion-20260615/72/Barracks.png",
+        "timestamp": "2026-06-14T19:05:36.337Z",
+        "record_line": 5113,
+        "command_sha256": "7342c230ffd01ceb91bd85b29324a81a458122908a017ec6fbffd58bd3be611a"
+      }
+    },
+    {
+      "path": "assets/ui/icons/BattleLab.png",
+      "sha256": "1acabda416fdc4ac0a52b77902d515542ee86d3c83a5ac1f81597eba25dd88b1",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/BomberVTOL.png",
+      "sha256": "aacdc88fd2babd3e8273270a1421b61ae3bbfde13dc9a36775245c3ed49184a9",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/BuildQueue.png",
+      "sha256": "347e957436eaf1a483e45f3b5ab0108745f3221957b2621fe4aea86ef1986e31",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/CancelOrder.png",
+      "sha256": "13bc5e254922a9b5e51a868820dbc1111c277f0f7b1830ce23321d6658fdd018",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/ChronoRelay.png",
+      "sha256": "62e28dd205208e9b41c14db47d46413f70c0f64fb9f8e95b9348ba3447218b6c",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/imagegen-rts-support-power-icons-20260615-02/72/ChronoRelay.png",
+        "timestamp": "2026-06-16T19:23:53.172Z",
+        "record_line": 78139,
+        "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      }
+    },
+    {
+      "path": "assets/ui/icons/CombatEngineerTeam.png",
+      "sha256": "6aa1ff316914e9615206f670e19168553325b87bcff48bb9442423b6154932c9",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/CommandCenter.png",
+      "sha256": "0051e77b4604defc49b78c3cc78099984cb796f2f2696985848bead5ecb777b4",
+      "comparison": "identical",
+      "upstream_sha256": "0051e77b4604defc49b78c3cc78099984cb796f2f2696985848bead5ecb777b4"
+    },
+    {
+      "path": "assets/ui/icons/CryoSprayer.png",
+      "sha256": "8972e90bab13183a7f1b3157d8382189d032c9fc32a0df96172d02bde5006e4e",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-techwave-20260615/72/CryoSprayer.png",
+        "timestamp": "2026-06-14T20:18:53.867Z",
+        "record_line": 6786,
+        "command_sha256": "ab7e86a3c52968de43cec3cdc800c5b8cecaf808f87eb6b9ad8d8726027fe0d9"
+      }
+    },
+    {
+      "path": "assets/ui/icons/Defeat.png",
+      "sha256": "da385564f2c1e35cbb8f87d5ca9a1c18a42f4829e6869280ad3d1dc714ae1603",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/DeployMode.png",
+      "sha256": "773174f4843fb2b9b646d0f2477e56fa58ccce80626637c574e52892145d6c9c",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-specialists-20260615/72/UndergroundDrillRig.png",
+        "timestamp": "2026-06-16T19:23:53.172Z",
+        "record_line": 78139,
+        "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      }
+    },
+    {
+      "path": "assets/ui/icons/Drone.png",
+      "sha256": "866fa4b513e7ea5ccea943ac5de66042442be3cf6359e6a5647126411f62af23",
+      "comparison": "identical",
+      "upstream_sha256": "866fa4b513e7ea5ccea943ac5de66042442be3cf6359e6a5647126411f62af23"
+    },
+    {
+      "path": "assets/ui/icons/DroneMineLayer.png",
+      "sha256": "96f1a7266305e7fc03bb4be6bd4bd818796e17936003a943272449e0935b2f6e",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/EmpPulse.png",
+      "sha256": "596c889ae43711e569cdcb62c85e6f21a6a3e71601fb46fd6de2d65b95e04850",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/imagegen-rts-support-power-icons-20260615-01/72/EmpPulse.png",
+        "timestamp": "2026-06-16T19:23:53.172Z",
+        "record_line": 78139,
+        "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      }
+    },
+    {
+      "path": "assets/ui/icons/EngineerDrone.png",
+      "sha256": "98f0435211312fd7fa190feebaa79029454e782f37a1f15a854b4c7fadb9f426",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/FieldMedic.png",
+      "sha256": "e376b9a92d7c49282582fb8356d59e22fa9ba1145fd1f675a96f45b469d5368f",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/FlakHoverTank.png",
+      "sha256": "c490e05ef73207ae15ffd89ce961da27bd9b5796990a95e92ac525d10788a3cf",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/FlakHoverTank.png",
+        "timestamp": "2026-06-14T21:41:53.661Z",
+        "record_line": 8599,
+        "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
+      }
+    },
+    {
+      "path": "assets/ui/icons/FlakRocketTeam.png",
+      "sha256": "100d4e8ef76252cdfb68b7f86a5ab57f25aaae27ca23276a0df37395c3104994",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/FlakRocketTeamMk2.png",
+      "sha256": "988214ffc1c2f0e28805e41d6cf74c390a70e29d29f9adf8ab8ef5dbc98a4aa9",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/FlakTrooper.png",
+      "sha256": "840730f83db2f2f30740dc3848bbc9a12caa1c209e95666ae4346eccd1dcd8f3",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/FlameAssaultBuggy.png",
+      "sha256": "71194dd8ca490e9131a406d6befbaa8af0456cabb5682b3adf1887d0f7bbd6f7",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/GrenadierTrooper.png",
+      "sha256": "3d916f82b4117c63bf5a2c4069a4b4633284a793ddb5cc21fe9b8fbe9b553df8",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/GuardArea.png",
+      "sha256": "491ade02e25022997c92f2889edd98b4edfb2c76dc33fbe477eb81a9f5a866bd",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-command-icons-20260616-01/72/14_patrol_command.png",
+        "timestamp": "2026-06-16T19:23:53.172Z",
+        "record_line": 78139,
+        "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      }
+    },
+    {
+      "path": "assets/ui/icons/HammerSiegeTank.png",
+      "sha256": "2d592623d2bb3a597f1c63e0426c40066eb5045a3ccdbc0d8aba4cabc98011fc",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/HazardSprayerInfantry.png",
+      "sha256": "c11c724915ac6175df7869444eaabe58f8942c211723246d3b1c8d362e1373bb",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/HeavyBombardmentAirship.png",
+      "sha256": "60b6bab70cdda5f03fdb242a650f11f6a6f9cde3253bee276ee6dd50ad85ed13",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/generated/imagegen-rts-techwave-20260615/72/HeavyBombardmentAirship.png",
+        "timestamp": "2026-06-14T21:08:40.643Z",
+        "record_line": 7927,
+        "command_sha256": "a2fef89b7fc119edc1b71883b6608618986674d92b43899d2592a6411206ea8a"
+      }
+    },
+    {
+      "path": "assets/ui/icons/HeavyCargoDropship.png",
+      "sha256": "4cfdbc2444fedc01d1c71a2b36a52b735d657f75d3d33eccdb545fa4cb495ab2",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/HeavyMachinegunTrooper.png",
+      "sha256": "6a5dbe6f06e7624211db8db93129f1170611555fc5abd5593347ccc95a07a86f",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/HeavySiegeWalker.png",
+      "sha256": "951777fca3fb49957d75e0305969f3be5110953b9753cfe918b1ecb902c1da37",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/Helicopter.png",
+      "sha256": "f13558b8c5f107dd6c691d7ef79b2030d7ec1575b04eebc08f3b89588eb7f915",
+      "comparison": "identical",
+      "upstream_sha256": "f13558b8c5f107dd6c691d7ef79b2030d7ec1575b04eebc08f3b89588eb7f915"
+    },
+    {
+      "path": "assets/ui/icons/HoldPosition.png",
+      "sha256": "a5a88f4f1ef54357f00a2708e3da84e7097421cbe78c542d7cfd7a86dc968266",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/InterceptorJetVTOL.png",
+      "sha256": "bbaacfd5297048993bd1839b5162b1ae18d5e09f86b1b5509939750de5786bae",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/InterceptorVTOL.png",
+      "sha256": "f25893fa319f684576d54a53a163be9b6122a55af5e7268dd33fa40d96f90074",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/generated/imagegen-rts-techwave-20260615/72/InterceptorVTOL.png",
+        "timestamp": "2026-06-14T21:08:40.511Z",
+        "record_line": 7926,
+        "command_sha256": "6f8d6eccb5194692cb7fd02ba9fce7031910f9fadb98ddd39145a196b442f4bf"
+      }
+    },
+    {
+      "path": "assets/ui/icons/JammerVehicle.png",
+      "sha256": "f1f30c04133fa7bd875df70d74e0292e85e8b57b3a1450775fac915db13ffba3",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/LanceBeamDefenseTower.png",
+      "sha256": "f7eb0628b51f6261cc2ba3ca4be9187356271e93090b147700048cd5c6941c67",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/LanceBeamTank.png",
+      "sha256": "8f5f3ddc2b635da25039a9013f48526fa497eb1147f8d4d4bc331dc84632e968",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-techwave-20260615/72/LanceBeamTank.png",
+        "timestamp": "2026-06-14T20:18:53.867Z",
+        "record_line": 6786,
+        "command_sha256": "ab7e86a3c52968de43cec3cdc800c5b8cecaf808f87eb6b9ad8d8726027fe0d9"
+      }
+    },
+    {
+      "path": "assets/ui/icons/LightRifleInfantry.png",
+      "sha256": "a085ada1d8911bdc357a20fb8b1da79eb7772affebe36f092cff27a8a2b00d61",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/generated/imagegen-rts-expansion-20260615/72/LightRifleInfantry.png",
+        "timestamp": "2026-06-14T19:05:36.337Z",
+        "record_line": 5113,
+        "command_sha256": "7342c230ffd01ceb91bd85b29324a81a458122908a017ec6fbffd58bd3be611a"
+      }
+    },
+    {
+      "path": "assets/ui/icons/LongbowMissileCrawler.png",
+      "sha256": "873a77098ab88d213fb985c59381800a7392f823b54b66faa3cc6db133960f3a",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/LowPower.png",
+      "sha256": "f93c7d0d48ba1a67e7bf7e144510af06079350d63ffc2e6a87e525f72b005c67",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/MineClearingRover.png",
+      "sha256": "056c9c32d5b45d762c61e57c9b9567ddf9e76b27682959c3fac379c9e5de4b3f",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/MirageScoutTank.png",
+      "sha256": "96ca01d9004b29af110a2280c665c9ef116cfd8f5617c48bc2bcb9955469f3df",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/MobileConstructionVehicle.png",
+      "sha256": "4799729bd5b3e3d86df52ede4e998368b908034672195ad43f7b71ec8c620062",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/MobileRepairCrawler.png",
+      "sha256": "e4a71eca3e2edf6ba3a2f820888f45bd0f8d01c931442a1223ee676964a676f3",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/MobileRepairCrawler.png",
+        "timestamp": "2026-06-14T21:41:53.661Z",
+        "record_line": 8599,
+        "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
+      }
+    },
+    {
+      "path": "assets/ui/icons/MobileSensorJammer.png",
+      "sha256": "60e77fe083b2e76edb4c83041d5f17b5c2307db9af9fbaa125b64ea02c99733c",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/MobileShieldProjector.png",
+      "sha256": "f6cd23627974c0e0cc7587449b2ca88b893dee97c5764fa37046f468156ba74b",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/ModularMissileCarrier.png",
+      "sha256": "fc6ac86309e67dba0e1787e826b36a7b16ea3eb120004ff52b50245d6b1bef8b",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/MortarTeam.png",
+      "sha256": "f73a7bdb0705877633eb79d9cdc74ed86bf0f278470ec31d042af7e4e8766a2a",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/MortarTeam.png",
+        "timestamp": "2026-06-14T21:41:53.661Z",
+        "record_line": 8599,
+        "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
+      }
+    },
+    {
+      "path": "assets/ui/icons/NaniteRepairSwarm.png",
+      "sha256": "ef89200cb34f6bb65d1e0b4cdf941f7b974298d96f44cc2816e6879f4d0cf1d7",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/imagegen-rts-support-power-icons-20260615-02/72/NaniteRepairSwarm.png",
+        "timestamp": "2026-06-16T19:23:53.172Z",
+        "record_line": 78139,
+        "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      }
+    },
+    {
+      "path": "assets/ui/icons/OrbitalStrike.png",
+      "sha256": "892dc5cceba1ed1d7b0c222e476c8f59d63c51354a3a0a5103018c11223eb966",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/OrePurifier.png",
+      "sha256": "c0330105940352498a4d9a79635d8fa72f66ab3102518572406cb757fdec92b0",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/OreRefineryExtension.png",
+      "sha256": "b59615062d72e2371faafed5f98fcbeeff3a1a3c071f74d89b8fe6b9a9c3f9ec",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/Paradrop.png",
+      "sha256": "4fe058855eb40916e4425b74f86554603c827d13f0422e3d9f1612926d99da24",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/Patrol.png",
+      "sha256": "491ade02e25022997c92f2889edd98b4edfb2c76dc33fbe477eb81a9f5a866bd",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-command-icons-20260616-01/72/14_patrol_command.png",
+        "timestamp": "2026-06-16T19:23:53.172Z",
+        "record_line": 78139,
+        "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      }
+    },
+    {
+      "path": "assets/ui/icons/PhaseSaboteur.png",
+      "sha256": "c1ce3d0f579a4d1034865d2164490f0c2d38d8bc3b4d8bdabd0dc54168c5d43c",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/PowerReactor.png",
+      "sha256": "9465cadd13fe245ef4c7c0a0942b540e5d0a494cf76516c39e608ab754412aeb",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/ai-rts/72/PowerReactorConcept.png",
+        "timestamp": "2026-06-14T17:30:11.921Z",
+        "record_line": 2813,
+        "command_sha256": "2a778602cc2f907c0e50f1d3742e67ba809671bc5d665a790d3da50b2576bfdb"
+      }
+    },
+    {
+      "path": "assets/ui/icons/PrismDefenseObelisk.png",
+      "sha256": "87e10b89265234e86a82300c6eb4d4c78e70878973cc173188245ce7e1ec8782",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/PrismLanceTank.png",
+      "sha256": "b1594a404b1c0f1e25cef823c478f7d9c98060ad8f2fbdac40de6f907ac03d53",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/PulseRifleCommando.png",
+      "sha256": "7aeb1503e138e20ac75fef13f295755896bab8a631e705328523b00257c096e3",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/PulseRifleCommando.png",
+        "timestamp": "2026-06-14T21:41:53.661Z",
+        "record_line": 8599,
+        "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
+      }
+    },
+    {
+      "path": "assets/ui/icons/RadarDome.png",
+      "sha256": "1571f9743a21f471d8a85a8762596d173e7fdabc9e3efb97b655389b319ef722",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/RadarSweep.png",
+      "sha256": "d018d01d18a9667f4b6fdc0972aaa482c5e8323fb77242a749d6806fccae5dbc",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/RadarUplink.png",
+      "sha256": "3ae44c20358d76d283bb48fe8c972da25e943ad5d1fa41e8530ddf8a4ba105cb",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/RailArtilleryWalker.png",
+      "sha256": "eafb6424dd2021d21069ad7483003ea649f38b950479b53337425ea27913560f",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-future-pack-20260615/72/RailArtilleryWalker.png",
+        "timestamp": "2026-06-15T03:50:39.246Z",
+        "record_line": 18204,
+        "command_sha256": "b03c0b8d9cae592ba9c633fd47b615856e9e47c9983f5e4ffa34f0f9ce414b81"
+      }
+    },
+    {
+      "path": "assets/ui/icons/RailCannonBunker.png",
+      "sha256": "03d2c68db3363283e7cc536d44167e0ba8ee1d1128b328bb5b76a516002bd176",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/RailSniperTeam.png",
+      "sha256": "d26612428419258aacd93f42862b08c630c979af4cecdae64546ae5edfcd9ab1",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/RailgunCommando.png",
+      "sha256": "fd2f2960ca3ea9bc277f1aef7d7206edbc06c85bbb0344895166cae96c64032c",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/RailgunTank.png",
+      "sha256": "02b3ea530ef82837d75536a3eb542afcfdce6980f6340b3b2f49dd77cadea82a",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/RallyPoint.png",
+      "sha256": "2a2a46880de205ccd6adc7de7a07e4910af9dda2ffafde32047fe24d674f7fd2",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/Refinery.png",
+      "sha256": "a4538550b38ad3abe6b515771fdcd36b8c05667b7f313a2f58a0038d207694b0",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/generated/imagegen-rts-expansion-20260615/72/Refinery.png",
+        "timestamp": "2026-06-14T18:50:12.723Z",
+        "record_line": 4769,
+        "command_sha256": "e20294a86e612383b11188cf4c2b3a478b03684713e8dab0975b7c5eb061258d"
+      }
+    },
+    {
+      "path": "assets/ui/icons/Repair.png",
+      "sha256": "640fd4d5ef141bc039530029adf6af6bc13ec30bb4c61a7d56d0f9a0e4665390",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/RepairPad.png",
+      "sha256": "66ee205d00c1f38056d59199cc65343c386b791ae29f33da646e43597f79259c",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/ResourceA.png",
+      "sha256": "5a2f744da6a53f104bf0f7d9dc3452c6c8c01e9535c68524bef40d670026424a",
+      "comparison": "identical",
+      "upstream_sha256": "5a2f744da6a53f104bf0f7d9dc3452c6c8c01e9535c68524bef40d670026424a"
+    },
+    {
+      "path": "assets/ui/icons/ResourceB.png",
+      "sha256": "c35a685d9f344c13746ad294565849eb278a13d80cf085c5c4d881cce2a0d880",
+      "comparison": "identical",
+      "upstream_sha256": "c35a685d9f344c13746ad294565849eb278a13d80cf085c5c4d881cce2a0d880"
+    },
+    {
+      "path": "assets/ui/icons/ResourceDrop.png",
+      "sha256": "753644f5b9d613a6a7efa70e7bd5cfe39e0dbc48cd2cf7df72e74b1ce15c2ae1",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/RoboticsBay.png",
+      "sha256": "c66718393bb73f651e2562d7f4e107d6bcff0e70a7780b7a7530610bedd11e8f",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/RocketArtilleryCrawler.png",
+      "sha256": "69717d7790591673f468d3629a4285b0185385efad16d272bb5b7d99d3a4085d",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/RocketGunship.png",
+      "sha256": "d58bad87e255fec79c994998b5d7ee70bdd6f82c31a53769589e19646c47b2ee",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/RocketGunship.png",
+        "timestamp": "2026-06-14T21:41:53.661Z",
+        "record_line": 8599,
+        "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
+      }
+    },
+    {
+      "path": "assets/ui/icons/RocketInfantry.png",
+      "sha256": "a0129fcd330a463155e5d0219b2a07a2a0b8b7f070a3b4d18fa19de74073de29",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/generated/imagegen-rts-expansion-20260615/72/RocketInfantry.png",
+        "timestamp": "2026-06-14T19:18:16.899Z",
+        "record_line": 5372,
+        "command_sha256": "9e720b5a082f560b420c523e662e8debc302b389f7b22cd369a13a36d1301baa"
+      }
+    },
+    {
+      "path": "assets/ui/icons/RocketTrooperRobot.png",
+      "sha256": "eae8f867e2d985dc93df1d8cca08a982b878e6e7012ef13836781052a52709d2",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/RosterPreview.png",
+      "sha256": "5f0c8928f2e4242c7107a5fc9077e9849d7f0cbb049e3504a0b58f705a1d117b",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/imagegen-rts-ra2-inspired-roster-20260616-01/preview-72-on-dark.png",
+        "timestamp": "2026-06-16T19:23:53.172Z",
+        "record_line": 78139,
+        "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      }
+    },
+    {
+      "path": "assets/ui/icons/SaboteurInfiltrator.png",
+      "sha256": "218542879f06bbeec67d32c71c711a5c6c283f4fd8b57a728f397732f8f2b30e",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/Scatter.png",
+      "sha256": "ef77cd9be8739714acad0b0a5b347937b1a19287bb26d44d85cd9aa0536db57f",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-command-icons-20260616-01/72/12_move_command.png",
+        "timestamp": "2026-06-16T19:23:53.172Z",
+        "record_line": 78139,
+        "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      }
+    },
+    {
+      "path": "assets/ui/icons/ScoutRover.png",
+      "sha256": "acd7fd778fc118a26baf31c9954e44ed430b8867acfb52c4673ff7914cdeee11",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/SellStructure.png",
+      "sha256": "21fd69e82eaff7e0e5e35b3740bf9446877f6e050c7830f3bfb7d4121ae0fb01",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/ShieldGenerator.png",
+      "sha256": "7f0cbffd7e81fdd72f4e1ec6c78b2d86a5108a21bae9cb81d2587cfe28f9920e",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/ShieldOverdrive.png",
+      "sha256": "301ec4a0ca018676aedce46587ada6cde9337b913aa1878a8e2c39fedf47fa04",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/imagegen-rts-support-power-icons-20260615-02/72/ShieldOverdrive.png",
+        "timestamp": "2026-06-16T19:23:53.172Z",
+        "record_line": 78139,
+        "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      }
+    },
+    {
+      "path": "assets/ui/icons/ShieldTrooper.png",
+      "sha256": "f611b8dcf1630c47b8aa0242408ec942e5e11ca9495cbcb993585773aa490135",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/ShockTrooper.png",
+      "sha256": "26d948c49074ef1cffd25161d534cdafe1b30553688738fe9ec3fd11ed719922",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/rts-techwave-20260615/72/ShockTrooper.png",
+        "timestamp": "2026-06-14T20:18:53.867Z",
+        "record_line": 6786,
+        "command_sha256": "ab7e86a3c52968de43cec3cdc800c5b8cecaf808f87eb6b9ad8d8726027fe0d9"
+      }
+    },
+    {
+      "path": "assets/ui/icons/SiegeAirship.png",
+      "sha256": "eebcf9ebc5038e0546e5ad883cd7062490a8a4d9ac1df6d1768616e14d1ab5c3",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/SiegeArtilleryVehicle.png",
+      "sha256": "a93a09f4acb25bbaf4a94cc77c8f5043132ab0fbec465c5c3fc9d3b34b1f8bfb",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/SiegeDrillTank.png",
+      "sha256": "1dcfc93e2300151305dce671098e312bcf5d255371bfa81f02006582da4968e6",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/SniperScout.png",
+      "sha256": "fe10020e44cde1353f8e1ac7d86925fe32fae0250734a9defe4fd4115a1f66cb",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/StopCommand.png",
+      "sha256": "f75984674c9075b48cc3ddca2e9ffccfc865450dee53b9eb48b8b13e862ad6a2",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/StrategicMissile.png",
+      "sha256": "63ed1539a78b707209c62a54ddf4762f2461993d086bf4110ed31494bce17b45",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/imagegen-rts-ra2-inspired-roster-20260616-01/72/15_strategic_missile_silo.png",
+        "timestamp": "2026-06-16T19:23:53.172Z",
+        "record_line": 78139,
+        "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      }
+    },
+    {
+      "path": "assets/ui/icons/TacticalOfficer.png",
+      "sha256": "dd2a75f0dafcb2f6a0f6a98745ea2678ab9fcc422069e2f61559b4014b02d068",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/Tank.png",
+      "sha256": "f2f67cc5488fa146eb2e13c9626f18c1a5accee7fea56fa9e52e135b6f20c266",
+      "comparison": "identical",
+      "upstream_sha256": "f2f67cc5488fa146eb2e13c9626f18c1a5accee7fea56fa9e52e135b6f20c266"
+    },
+    {
+      "path": "assets/ui/icons/TechHospital.png",
+      "sha256": "37fd66855e0b723e3e8df69a13e921356398017ac24761fd4c352b795270cb2e",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/TechLab.png",
+      "sha256": "68ec9b7fe48d39954f8e08c9f4ac75d55e3d4d68c39d51362ba5928deeb99212",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/TechLocked.png",
+      "sha256": "51fb50be69736cc54b1fe3f5cd12fc7a2cab07f448fc9164b089a9c3d8ef2ce5",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/TechOilDerrick.png",
+      "sha256": "ad80d1d2be637e0a4a810964bedcece0c1cc4234300c4a55294fcb09c4f62902",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/TechRepairDepot.png",
+      "sha256": "a9926348700f38fbd503482a0a839f995e35c0c6267cd025c95a02e6d1eef0dd",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/TeslaCrawlerMk2.png",
+      "sha256": "f98c1fac2099240ec6a16a47775017727311a275abbb535670e462e8237ac717",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/TeslaFenceSegment.png",
+      "sha256": "e840bef87fcf9d4dc717c534e8b8a5d24a6d9585040bd782f9458051105a1546",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/VehicleFactory.png",
+      "sha256": "364fb8dffc97d49a9f260a87208dc9a5594f2f5d7424ab137fcd470200260f2d",
+      "comparison": "identical",
+      "upstream_sha256": "364fb8dffc97d49a9f260a87208dc9a5594f2f5d7424ab137fcd470200260f2d"
+    },
+    {
+      "path": "assets/ui/icons/Victory.png",
+      "sha256": "2ed7f139239fbc29bd008a00887db4540b4f30b863fb63795228ae612188e359",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/Warning.png",
+      "sha256": "af435a2e3ef79c9acf8d4d807bd7d34713d97027badcbe295a79beb3c6fdf42f",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/WeatherControlSpire.png",
+      "sha256": "02bee742b244951dd87321000eff577e8f1e2619c794e7b1b24985fdb04c7345",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/ui/icons/WeatherStorm.png",
+      "sha256": "424a0e24727398a8a64431aa2a58fd0e8c948e628eac06d7ebe5d54d72aec251",
+      "comparison": "absent_from_upstream",
+      "generated_sheet_copy": {
+        "source_artifact": "assets/ui/icons/generated/imagegen-rts-support-power-icons-20260615-02/72/WeatherStorm.png",
+        "timestamp": "2026-06-16T19:23:53.172Z",
+        "record_line": 78139,
+        "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      }
+    },
+    {
+      "path": "assets/ui/icons/Worker.png",
+      "sha256": "6aa1ff316914e9615206f670e19168553325b87bcff48bb9442423b6154932c9",
+      "comparison": "different",
+      "upstream_sha256": "9e8fe94c5e323cba74cdc8305713101924f2d590e1d4bff22d3e5baf691719b7"
+    },
+    {
+      "path": "assets/ui/icons/texture_01.png",
+      "sha256": "bf02026276673b26a05f53bdf4f8b0b2057231d7fa23fe4172d7c5e203b36870",
+      "comparison": "different",
+      "upstream_sha256": "07e28d7a86396fa4f1d7c43040f8e57e2374f6fa35b02bc48e70f9ccd4041c1a"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair001.png",
+      "sha256": "a64f7c948bd783634735cef34ce233126909edcb761b8ce6aa5ce3fb32c81423",
+      "comparison": "identical",
+      "upstream_sha256": "a64f7c948bd783634735cef34ce233126909edcb761b8ce6aa5ce3fb32c81423"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair002.png",
+      "sha256": "15a144325db7a56700d3ad552f41d03992eef915b696bb2da781e71063fc2bb6",
+      "comparison": "identical",
+      "upstream_sha256": "15a144325db7a56700d3ad552f41d03992eef915b696bb2da781e71063fc2bb6"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair003.png",
+      "sha256": "49fe9aa601fdb1cd9601c1da90463bb5b4604160bfd3c46b27e0ec87fffe3467",
+      "comparison": "identical",
+      "upstream_sha256": "49fe9aa601fdb1cd9601c1da90463bb5b4604160bfd3c46b27e0ec87fffe3467"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair004.png",
+      "sha256": "f99a88a89e1f2150e078b02417dd5dab173fe43a274f82a29eb356247b250857",
+      "comparison": "identical",
+      "upstream_sha256": "f99a88a89e1f2150e078b02417dd5dab173fe43a274f82a29eb356247b250857"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair005.png",
+      "sha256": "75354e0296a97f76bba71a78b5fb0a0532411613503cb22203405a9f42650a90",
+      "comparison": "identical",
+      "upstream_sha256": "75354e0296a97f76bba71a78b5fb0a0532411613503cb22203405a9f42650a90"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair006.png",
+      "sha256": "71034fa17bed22dd0505d85d945000788b2d7b2740eaf2b2d6ed7ce59d1b0508",
+      "comparison": "identical",
+      "upstream_sha256": "71034fa17bed22dd0505d85d945000788b2d7b2740eaf2b2d6ed7ce59d1b0508"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair007.png",
+      "sha256": "88c59e5fb5c250ecfd70509b41b8f580a5980dd1d0697ce4a1e54483fa18305d",
+      "comparison": "identical",
+      "upstream_sha256": "88c59e5fb5c250ecfd70509b41b8f580a5980dd1d0697ce4a1e54483fa18305d"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair008.png",
+      "sha256": "a347b49c13bd932db654254eda792ac0e3cf2ddc85145bf89ce0e5d8e4b4ede2",
+      "comparison": "identical",
+      "upstream_sha256": "a347b49c13bd932db654254eda792ac0e3cf2ddc85145bf89ce0e5d8e4b4ede2"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair009.png",
+      "sha256": "e69170944b23fa55a148384c9185f66954aa5e42af09f8171648f52c4199545b",
+      "comparison": "identical",
+      "upstream_sha256": "e69170944b23fa55a148384c9185f66954aa5e42af09f8171648f52c4199545b"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair010.png",
+      "sha256": "6fd343e7d018058b1a80971e97a040ad5ba33f8689fc122db84ca1a22776e8c1",
+      "comparison": "identical",
+      "upstream_sha256": "6fd343e7d018058b1a80971e97a040ad5ba33f8689fc122db84ca1a22776e8c1"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair011.png",
+      "sha256": "bf766e94d9fe55522714f4d76cf878e9c6fdd23305c40fce2716f56363bf19e2",
+      "comparison": "identical",
+      "upstream_sha256": "bf766e94d9fe55522714f4d76cf878e9c6fdd23305c40fce2716f56363bf19e2"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair012.png",
+      "sha256": "00aa07e44ba46988de74383bbe2d065daf97b5af0dcb2ba9de198c79ac9b7653",
+      "comparison": "identical",
+      "upstream_sha256": "00aa07e44ba46988de74383bbe2d065daf97b5af0dcb2ba9de198c79ac9b7653"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair013.png",
+      "sha256": "0fc4a707dc0f25854ee2a6dccd9f4a68dc55bdbabf5ad4d7350e649b2eaeb509",
+      "comparison": "identical",
+      "upstream_sha256": "0fc4a707dc0f25854ee2a6dccd9f4a68dc55bdbabf5ad4d7350e649b2eaeb509"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair014.png",
+      "sha256": "39eacdb6613a97cee2320ffe83173ab05a28fa7d4766c0138cee30d92ee9759f",
+      "comparison": "identical",
+      "upstream_sha256": "39eacdb6613a97cee2320ffe83173ab05a28fa7d4766c0138cee30d92ee9759f"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair015.png",
+      "sha256": "39a95bf97cfaf72da466fbf875b692545d85a9be42e33da8b0fc4da08ba91468",
+      "comparison": "identical",
+      "upstream_sha256": "39a95bf97cfaf72da466fbf875b692545d85a9be42e33da8b0fc4da08ba91468"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair016.png",
+      "sha256": "e4523570674011f63dd2f719a9bbb6fadd17e2dfdf6b296f60ee24b65d486ac5",
+      "comparison": "identical",
+      "upstream_sha256": "e4523570674011f63dd2f719a9bbb6fadd17e2dfdf6b296f60ee24b65d486ac5"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair017.png",
+      "sha256": "78391b142555d5199acf93fe0a28ef6a11987484158e91b097d29c3a41bdaed5",
+      "comparison": "identical",
+      "upstream_sha256": "78391b142555d5199acf93fe0a28ef6a11987484158e91b097d29c3a41bdaed5"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair018.png",
+      "sha256": "a42b19636ce14b530e94176e68245a5187b59495e89029ccc8e5910c59790593",
+      "comparison": "identical",
+      "upstream_sha256": "a42b19636ce14b530e94176e68245a5187b59495e89029ccc8e5910c59790593"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair019.png",
+      "sha256": "8d527d4c4c5fc269dde9bd7d66b7f5be1d459587c32f3206676128b0f46ea6f1",
+      "comparison": "identical",
+      "upstream_sha256": "8d527d4c4c5fc269dde9bd7d66b7f5be1d459587c32f3206676128b0f46ea6f1"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair020.png",
+      "sha256": "1e4838b70ac83494138bf6bb631da85f65ff5df8f025c05293e5c0139821f86e",
+      "comparison": "identical",
+      "upstream_sha256": "1e4838b70ac83494138bf6bb631da85f65ff5df8f025c05293e5c0139821f86e"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair021.png",
+      "sha256": "85fabf49ac30a84060c59d131b1e56f53459b8a40b593c25d58f1fb5ad49e4e4",
+      "comparison": "identical",
+      "upstream_sha256": "85fabf49ac30a84060c59d131b1e56f53459b8a40b593c25d58f1fb5ad49e4e4"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair022.png",
+      "sha256": "f00cc37d234e696a63191cc5c219ed994e1bfe05322cda03c18199390d5fe355",
+      "comparison": "identical",
+      "upstream_sha256": "f00cc37d234e696a63191cc5c219ed994e1bfe05322cda03c18199390d5fe355"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair023.png",
+      "sha256": "4cd7c9e5237ee056f3ca11971b4c65f79b943ad70febad9d1d53f9f487fcd974",
+      "comparison": "identical",
+      "upstream_sha256": "4cd7c9e5237ee056f3ca11971b4c65f79b943ad70febad9d1d53f9f487fcd974"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair024.png",
+      "sha256": "01c5060aab009b81124f665beec7abd8d5d880edd1fdd47119f42bbabc9da7be",
+      "comparison": "identical",
+      "upstream_sha256": "01c5060aab009b81124f665beec7abd8d5d880edd1fdd47119f42bbabc9da7be"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair025.png",
+      "sha256": "482d0421d96ae6cb6a37547726475169994bae64fe32be4affed7453b17d8816",
+      "comparison": "identical",
+      "upstream_sha256": "482d0421d96ae6cb6a37547726475169994bae64fe32be4affed7453b17d8816"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair026.png",
+      "sha256": "4c79d8fd5de4145f6d67282e73941ca536a8e51288547dbf8f2d69eca62d64fc",
+      "comparison": "identical",
+      "upstream_sha256": "4c79d8fd5de4145f6d67282e73941ca536a8e51288547dbf8f2d69eca62d64fc"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair027.png",
+      "sha256": "068f7ca5df449cf74ddbb4ce3405fb2bb397b3e9b9f74f27a63fa8f476467ef7",
+      "comparison": "identical",
+      "upstream_sha256": "068f7ca5df449cf74ddbb4ce3405fb2bb397b3e9b9f74f27a63fa8f476467ef7"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair028.png",
+      "sha256": "f2b93c1640171918af9251d86490fc70cd65f21a124d9dd9b87952b178991639",
+      "comparison": "identical",
+      "upstream_sha256": "f2b93c1640171918af9251d86490fc70cd65f21a124d9dd9b87952b178991639"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair029.png",
+      "sha256": "8e2e99ed72769860d266e5dcc55c070a07c07915e7af7ce1b825bc4989369b04",
+      "comparison": "identical",
+      "upstream_sha256": "8e2e99ed72769860d266e5dcc55c070a07c07915e7af7ce1b825bc4989369b04"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair030.png",
+      "sha256": "041c32b9b7f185e103a50e3600a26c570691ebb2cef9d2dd3192cf790e68dc37",
+      "comparison": "identical",
+      "upstream_sha256": "041c32b9b7f185e103a50e3600a26c570691ebb2cef9d2dd3192cf790e68dc37"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair031.png",
+      "sha256": "b854563f6c4d6295a64df2cce257844599e017f805dfd7270ac900e33b21ca82",
+      "comparison": "identical",
+      "upstream_sha256": "b854563f6c4d6295a64df2cce257844599e017f805dfd7270ac900e33b21ca82"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair032.png",
+      "sha256": "3ec90cd911055067ae3d5e59b8e94280c8e4547dc65e5a67aaffcd6fb4bee6c2",
+      "comparison": "identical",
+      "upstream_sha256": "3ec90cd911055067ae3d5e59b8e94280c8e4547dc65e5a67aaffcd6fb4bee6c2"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair033.png",
+      "sha256": "ac32966d8186c40df4431380c8d3521f9ec018130120e67db53c3873e36cba46",
+      "comparison": "identical",
+      "upstream_sha256": "ac32966d8186c40df4431380c8d3521f9ec018130120e67db53c3873e36cba46"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair034.png",
+      "sha256": "9a80c62f579827cfb715a8a49bc3f7235b7790e81d74d65a6e404ad6c7330e03",
+      "comparison": "identical",
+      "upstream_sha256": "9a80c62f579827cfb715a8a49bc3f7235b7790e81d74d65a6e404ad6c7330e03"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair035.png",
+      "sha256": "e01e7543eb29bec34b5f4274a3427af2b83d5d34ef47d331246150c655ee5cad",
+      "comparison": "identical",
+      "upstream_sha256": "e01e7543eb29bec34b5f4274a3427af2b83d5d34ef47d331246150c655ee5cad"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair036.png",
+      "sha256": "039b1090909746b7d9d08c8d55ede0687e82d6b2f8d1b4e38d67bdaa334651b4",
+      "comparison": "identical",
+      "upstream_sha256": "039b1090909746b7d9d08c8d55ede0687e82d6b2f8d1b4e38d67bdaa334651b4"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair037.png",
+      "sha256": "b40f2ea34379e89e1c1391d90ea1cf7e787730cc4511a5e4ad72d450dfe51109",
+      "comparison": "identical",
+      "upstream_sha256": "b40f2ea34379e89e1c1391d90ea1cf7e787730cc4511a5e4ad72d450dfe51109"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair038.png",
+      "sha256": "a49bbf229cc22ce11c14a8dfea7c8dcb9c5841f6049d40812803b4fab6082b68",
+      "comparison": "identical",
+      "upstream_sha256": "a49bbf229cc22ce11c14a8dfea7c8dcb9c5841f6049d40812803b4fab6082b68"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair039.png",
+      "sha256": "e1bd73ec3a003d73006294285517c178094ca9c272374d015f4a3c59eab52797",
+      "comparison": "identical",
+      "upstream_sha256": "e1bd73ec3a003d73006294285517c178094ca9c272374d015f4a3c59eab52797"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair040.png",
+      "sha256": "441c00d62be4b5305814b5c813fd5cc0538501d63026e480586a6df0b0b668c3",
+      "comparison": "identical",
+      "upstream_sha256": "441c00d62be4b5305814b5c813fd5cc0538501d63026e480586a6df0b0b668c3"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair041.png",
+      "sha256": "a3fa88b48493d88bfb496efea6b2e3d4ffe53b4e2a14e875efa828933e53c2fa",
+      "comparison": "identical",
+      "upstream_sha256": "a3fa88b48493d88bfb496efea6b2e3d4ffe53b4e2a14e875efa828933e53c2fa"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair042.png",
+      "sha256": "2acfea83dab0db0935f181826cc48f35963d25cbf6665c470dc86a364f9e5680",
+      "comparison": "identical",
+      "upstream_sha256": "2acfea83dab0db0935f181826cc48f35963d25cbf6665c470dc86a364f9e5680"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair043.png",
+      "sha256": "61018a0b96c8a3ec2a517be206d98e1d44786b5862f81b786f0d83f6c9354146",
+      "comparison": "identical",
+      "upstream_sha256": "61018a0b96c8a3ec2a517be206d98e1d44786b5862f81b786f0d83f6c9354146"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair044.png",
+      "sha256": "b6d17fb6e705120b858bb94b258755be1c80a70fe144c6ed754bdaf428c8127b",
+      "comparison": "identical",
+      "upstream_sha256": "b6d17fb6e705120b858bb94b258755be1c80a70fe144c6ed754bdaf428c8127b"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair045.png",
+      "sha256": "ec1c19366214cfb638ccf3f3dd7853981f7dcc334145d00ba3834428e5aa19f3",
+      "comparison": "identical",
+      "upstream_sha256": "ec1c19366214cfb638ccf3f3dd7853981f7dcc334145d00ba3834428e5aa19f3"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair046.png",
+      "sha256": "745b4c4fb719cff3abf4067537579910b4b0ca94d4eae602a51711493aea057f",
+      "comparison": "identical",
+      "upstream_sha256": "745b4c4fb719cff3abf4067537579910b4b0ca94d4eae602a51711493aea057f"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair047.png",
+      "sha256": "7247b128fb89ab49fcee3883375e6048727be7fa4d62e778d5ea516ea0c8e1c2",
+      "comparison": "identical",
+      "upstream_sha256": "7247b128fb89ab49fcee3883375e6048727be7fa4d62e778d5ea516ea0c8e1c2"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair048.png",
+      "sha256": "dec9faf29e5452f7cccbc200c0d2316a58b8db872ab281d21bcc5c13b64bfee3",
+      "comparison": "identical",
+      "upstream_sha256": "dec9faf29e5452f7cccbc200c0d2316a58b8db872ab281d21bcc5c13b64bfee3"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair049.png",
+      "sha256": "194c4bbcb3bdc713a0078f3088c02a8aed7c1a9d024a899e69cd498ea8f4bf9c",
+      "comparison": "identical",
+      "upstream_sha256": "194c4bbcb3bdc713a0078f3088c02a8aed7c1a9d024a899e69cd498ea8f4bf9c"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair050.png",
+      "sha256": "74473f87a7a27b84d7fc2d163960ad69d528ee258531f7bc513eb5239ad96ed2",
+      "comparison": "identical",
+      "upstream_sha256": "74473f87a7a27b84d7fc2d163960ad69d528ee258531f7bc513eb5239ad96ed2"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair051.png",
+      "sha256": "d54cc3faaa7ac075ed008ed64deeca628691bcf797052f00f3b22535c000623c",
+      "comparison": "identical",
+      "upstream_sha256": "d54cc3faaa7ac075ed008ed64deeca628691bcf797052f00f3b22535c000623c"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair052.png",
+      "sha256": "e6809ee2b1a4e5f8168a58fcb383a42483453a8ba5d5de810f0e84e13c40658c",
+      "comparison": "identical",
+      "upstream_sha256": "e6809ee2b1a4e5f8168a58fcb383a42483453a8ba5d5de810f0e84e13c40658c"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair053.png",
+      "sha256": "7127f9fd490e856b27302b0ef66efdee862eefc740096ec14bc5e5b05989b1a1",
+      "comparison": "identical",
+      "upstream_sha256": "7127f9fd490e856b27302b0ef66efdee862eefc740096ec14bc5e5b05989b1a1"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair054.png",
+      "sha256": "6a6e07332677df8ee543bc3cc6bc723629773e5a4e95e3ec26b7412b4863e134",
+      "comparison": "identical",
+      "upstream_sha256": "6a6e07332677df8ee543bc3cc6bc723629773e5a4e95e3ec26b7412b4863e134"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair055.png",
+      "sha256": "fe712dc9776450e8eba469c2bbc6ed74aa5bf5c5321d9fa06b47d7214c1cd364",
+      "comparison": "identical",
+      "upstream_sha256": "fe712dc9776450e8eba469c2bbc6ed74aa5bf5c5321d9fa06b47d7214c1cd364"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair056.png",
+      "sha256": "6a488453726c3c26d17d155f1f732c41bd873dd5c962ce3889ee6eb4b0236dd3",
+      "comparison": "identical",
+      "upstream_sha256": "6a488453726c3c26d17d155f1f732c41bd873dd5c962ce3889ee6eb4b0236dd3"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair057.png",
+      "sha256": "946d23214bc95fc90570ddd7f144d1a1060affbf2890cfde943d8326a261f89d",
+      "comparison": "identical",
+      "upstream_sha256": "946d23214bc95fc90570ddd7f144d1a1060affbf2890cfde943d8326a261f89d"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair058.png",
+      "sha256": "df3ec34760a2fc9732030d56f29b78194730b9a8128f8855fd180a540c623e9b",
+      "comparison": "identical",
+      "upstream_sha256": "df3ec34760a2fc9732030d56f29b78194730b9a8128f8855fd180a540c623e9b"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair059.png",
+      "sha256": "a0588bd1b4b74771084d0a58d8178aee84914677ac54a338a79abd88551f8ce0",
+      "comparison": "identical",
+      "upstream_sha256": "a0588bd1b4b74771084d0a58d8178aee84914677ac54a338a79abd88551f8ce0"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair060.png",
+      "sha256": "eeea1eca38e9c3171d108febf8457cd91d4e5c166eb3ecfa9ff6fb5010582ebe",
+      "comparison": "identical",
+      "upstream_sha256": "eeea1eca38e9c3171d108febf8457cd91d4e5c166eb3ecfa9ff6fb5010582ebe"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair061.png",
+      "sha256": "44eca97e830dae3c2cb458112409e016fb0439aaf3f073445355dcb3b892c006",
+      "comparison": "identical",
+      "upstream_sha256": "44eca97e830dae3c2cb458112409e016fb0439aaf3f073445355dcb3b892c006"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair062.png",
+      "sha256": "f8c9eae9e89cef522df2812e651abce69e2818393779851c48c08d248ac4075d",
+      "comparison": "identical",
+      "upstream_sha256": "f8c9eae9e89cef522df2812e651abce69e2818393779851c48c08d248ac4075d"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair063.png",
+      "sha256": "e0f8f04b6d9f74aea057dada3bbe2d0d7d481cccdd569146bb8a267dc369b438",
+      "comparison": "identical",
+      "upstream_sha256": "e0f8f04b6d9f74aea057dada3bbe2d0d7d481cccdd569146bb8a267dc369b438"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair064.png",
+      "sha256": "10dc387fbb5c39279b9e1d257241ae260fe713ab3cd3c4b08edac50d4b7660ea",
+      "comparison": "identical",
+      "upstream_sha256": "10dc387fbb5c39279b9e1d257241ae260fe713ab3cd3c4b08edac50d4b7660ea"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair065.png",
+      "sha256": "5672fb9deb6f31781a743d88b8c8f5c401b3543b734cf4006ff5233b719a9331",
+      "comparison": "identical",
+      "upstream_sha256": "5672fb9deb6f31781a743d88b8c8f5c401b3543b734cf4006ff5233b719a9331"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair066.png",
+      "sha256": "8dbadc1c544c089884dac23b0a54cbf71f5185cc4d2cdc47a6a18f6268097aa4",
+      "comparison": "identical",
+      "upstream_sha256": "8dbadc1c544c089884dac23b0a54cbf71f5185cc4d2cdc47a6a18f6268097aa4"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair067.png",
+      "sha256": "146b21555cc405e2767b2f1cbd917f6b6ed48ca428f7c94f3638637bc9d962b5",
+      "comparison": "identical",
+      "upstream_sha256": "146b21555cc405e2767b2f1cbd917f6b6ed48ca428f7c94f3638637bc9d962b5"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair068.png",
+      "sha256": "d03f32b76fd15f23576e7e6ba169a845f753d5af08c3a7af33567ce4de89c49c",
+      "comparison": "identical",
+      "upstream_sha256": "d03f32b76fd15f23576e7e6ba169a845f753d5af08c3a7af33567ce4de89c49c"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair069.png",
+      "sha256": "58bd609a3eedd9d39827a0db47f74c024db8832d509c2fdda3e05edc41dccdb5",
+      "comparison": "identical",
+      "upstream_sha256": "58bd609a3eedd9d39827a0db47f74c024db8832d509c2fdda3e05edc41dccdb5"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair070.png",
+      "sha256": "93b1a21b22a376feb773129d3f5667bacff3e6fbefe4a59cb6cc0e5329da50ce",
+      "comparison": "identical",
+      "upstream_sha256": "93b1a21b22a376feb773129d3f5667bacff3e6fbefe4a59cb6cc0e5329da50ce"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair071.png",
+      "sha256": "fee50d411eb7cf23c11e623cac348d9f4a01c2a5573fa8df75f11adf670fb80a",
+      "comparison": "identical",
+      "upstream_sha256": "fee50d411eb7cf23c11e623cac348d9f4a01c2a5573fa8df75f11adf670fb80a"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair072.png",
+      "sha256": "f6950ddcc5ffe1105837ffe08f578b50cafa1661e12232a806d4526073c410f8",
+      "comparison": "identical",
+      "upstream_sha256": "f6950ddcc5ffe1105837ffe08f578b50cafa1661e12232a806d4526073c410f8"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair073.png",
+      "sha256": "45f0ab13dd2408ab83fafa01701a3ea27b8a4c8ec190919dd714e24c1991e62a",
+      "comparison": "identical",
+      "upstream_sha256": "45f0ab13dd2408ab83fafa01701a3ea27b8a4c8ec190919dd714e24c1991e62a"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair074.png",
+      "sha256": "671ae459cd359d907b84e53c6fd142079b2ab6ce1c6aec5148d9b5e4af3babfa",
+      "comparison": "identical",
+      "upstream_sha256": "671ae459cd359d907b84e53c6fd142079b2ab6ce1c6aec5148d9b5e4af3babfa"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair075.png",
+      "sha256": "51fb3b422bf9172220c7bf025fbb80821c48d1352bbef2777f877f82acbda899",
+      "comparison": "identical",
+      "upstream_sha256": "51fb3b422bf9172220c7bf025fbb80821c48d1352bbef2777f877f82acbda899"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair076.png",
+      "sha256": "5e9951a053a6d0feacac2b08db6551d67c0ecb8b6c8b746941dd1b04f7bb6e2a",
+      "comparison": "identical",
+      "upstream_sha256": "5e9951a053a6d0feacac2b08db6551d67c0ecb8b6c8b746941dd1b04f7bb6e2a"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair077.png",
+      "sha256": "196e993b84fb2bc33db5d278013b4293a91eaa58173ef9529e1008d84b06e099",
+      "comparison": "identical",
+      "upstream_sha256": "196e993b84fb2bc33db5d278013b4293a91eaa58173ef9529e1008d84b06e099"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair078.png",
+      "sha256": "3d240edcb8436af9c06175fe4a5cebe0a92568a49fb174f9adb056eeca7cc44f",
+      "comparison": "identical",
+      "upstream_sha256": "3d240edcb8436af9c06175fe4a5cebe0a92568a49fb174f9adb056eeca7cc44f"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair079.png",
+      "sha256": "3d9391ab4a3283583e0ecd08d17e4f48ced6a89091231c81a593dd2d663ff90f",
+      "comparison": "identical",
+      "upstream_sha256": "3d9391ab4a3283583e0ecd08d17e4f48ced6a89091231c81a593dd2d663ff90f"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair080.png",
+      "sha256": "48e5d4dab69f84873bae8022a6bad7b1dafa4489e7f55389c51ad96734617a59",
+      "comparison": "identical",
+      "upstream_sha256": "48e5d4dab69f84873bae8022a6bad7b1dafa4489e7f55389c51ad96734617a59"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair081.png",
+      "sha256": "0ab3e4a95f8e9da8c881ceef083d8cd3ff39128aaa293a41a011bc4c1e97deac",
+      "comparison": "identical",
+      "upstream_sha256": "0ab3e4a95f8e9da8c881ceef083d8cd3ff39128aaa293a41a011bc4c1e97deac"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair082.png",
+      "sha256": "a1a15834e88a5c914b872cfe4ff9d6d25b82237b97443bf1230d3765d310bd7a",
+      "comparison": "identical",
+      "upstream_sha256": "a1a15834e88a5c914b872cfe4ff9d6d25b82237b97443bf1230d3765d310bd7a"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair083.png",
+      "sha256": "3cf884400e0e546a576cc93654f51b18894fa7b6b5cbe54f98d9525cde5b4249",
+      "comparison": "identical",
+      "upstream_sha256": "3cf884400e0e546a576cc93654f51b18894fa7b6b5cbe54f98d9525cde5b4249"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair084.png",
+      "sha256": "8a564b9b7a5ca1864919b986d5e1777a9c62632e4429d3fa3d56d9a8342df342",
+      "comparison": "identical",
+      "upstream_sha256": "8a564b9b7a5ca1864919b986d5e1777a9c62632e4429d3fa3d56d9a8342df342"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair085.png",
+      "sha256": "c1dfa34209cc5e7cbe0a3b782b10a30695ef68968c9427d463838c77ab8fd4ab",
+      "comparison": "identical",
+      "upstream_sha256": "c1dfa34209cc5e7cbe0a3b782b10a30695ef68968c9427d463838c77ab8fd4ab"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair086.png",
+      "sha256": "91864c4785fd9748e01173c1dcebbec9994d1718c8ebb9d50f8ae7a44a44016a",
+      "comparison": "identical",
+      "upstream_sha256": "91864c4785fd9748e01173c1dcebbec9994d1718c8ebb9d50f8ae7a44a44016a"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair087.png",
+      "sha256": "fbc901d21a4daa4f76d70d0602dbe63cd728e00bfb6a34492fd1c8ead6e6cdda",
+      "comparison": "identical",
+      "upstream_sha256": "fbc901d21a4daa4f76d70d0602dbe63cd728e00bfb6a34492fd1c8ead6e6cdda"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair088.png",
+      "sha256": "123bdedb8db549888fa6e3862baff3bc30dd199ac0041b63ca25859914f7e891",
+      "comparison": "identical",
+      "upstream_sha256": "123bdedb8db549888fa6e3862baff3bc30dd199ac0041b63ca25859914f7e891"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair089.png",
+      "sha256": "4f5de2f07d313cacae179d2336f5c1194bc1fe5e3fcc795ef82af2b04929b3eb",
+      "comparison": "identical",
+      "upstream_sha256": "4f5de2f07d313cacae179d2336f5c1194bc1fe5e3fcc795ef82af2b04929b3eb"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair090.png",
+      "sha256": "89e449ca095937f72353ac29c262fd2fe445fc4b7df7dad5d98e029678c81981",
+      "comparison": "identical",
+      "upstream_sha256": "89e449ca095937f72353ac29c262fd2fe445fc4b7df7dad5d98e029678c81981"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair091.png",
+      "sha256": "90bfd9763cae14fbe2e600e6b16cd08c6de9253a018abe07bd8f1b809192b52e",
+      "comparison": "identical",
+      "upstream_sha256": "90bfd9763cae14fbe2e600e6b16cd08c6de9253a018abe07bd8f1b809192b52e"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair092.png",
+      "sha256": "d2e9ab9f0e29979b9642134066e3790abb047559d30f7d6aad0c5255e1c337a5",
+      "comparison": "identical",
+      "upstream_sha256": "d2e9ab9f0e29979b9642134066e3790abb047559d30f7d6aad0c5255e1c337a5"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair093.png",
+      "sha256": "75fe0b6623b85652a12d61573d1ca530bede5ecf7d637bed7d91d31a34475cb7",
+      "comparison": "identical",
+      "upstream_sha256": "75fe0b6623b85652a12d61573d1ca530bede5ecf7d637bed7d91d31a34475cb7"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair094.png",
+      "sha256": "bd4ac3da6a6529eb76d3d97faf2b964319a5fbbc125a1468c0f25cffefa283ba",
+      "comparison": "identical",
+      "upstream_sha256": "bd4ac3da6a6529eb76d3d97faf2b964319a5fbbc125a1468c0f25cffefa283ba"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair095.png",
+      "sha256": "380aca9b846123058709d4c658c2a079895c97da0076743f6c225bbbd5944425",
+      "comparison": "identical",
+      "upstream_sha256": "380aca9b846123058709d4c658c2a079895c97da0076743f6c225bbbd5944425"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair096.png",
+      "sha256": "91c17cc980ca882b823cf7c7f063328d74a89b304e531899db5a5aa18d0e351b",
+      "comparison": "identical",
+      "upstream_sha256": "91c17cc980ca882b823cf7c7f063328d74a89b304e531899db5a5aa18d0e351b"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair097.png",
+      "sha256": "a8b011334f61b90830140cedaf3a2d3b8d25fe7978f68501149de554f83cf063",
+      "comparison": "identical",
+      "upstream_sha256": "a8b011334f61b90830140cedaf3a2d3b8d25fe7978f68501149de554f83cf063"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair098.png",
+      "sha256": "85c86ef665a457742f441f52b400fcc682f3a1f1d4d566e3b8fd81cb9cf3d26d",
+      "comparison": "identical",
+      "upstream_sha256": "85c86ef665a457742f441f52b400fcc682f3a1f1d4d566e3b8fd81cb9cf3d26d"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair099.png",
+      "sha256": "3e8567fdcbb1f978c034deffd08d328095de53c32cb8a5c7bec2047648d5bc3d",
+      "comparison": "identical",
+      "upstream_sha256": "3e8567fdcbb1f978c034deffd08d328095de53c32cb8a5c7bec2047648d5bc3d"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair100.png",
+      "sha256": "57ec3a1e436d0c5897e204101d249c3584f4e152884d93a582a61302fc8d0d39",
+      "comparison": "identical",
+      "upstream_sha256": "57ec3a1e436d0c5897e204101d249c3584f4e152884d93a582a61302fc8d0d39"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair101.png",
+      "sha256": "4f73c003b12940e64ffe9e3aaefd5cca49976d2d57c01aa2c0669008c7d399f3",
+      "comparison": "identical",
+      "upstream_sha256": "4f73c003b12940e64ffe9e3aaefd5cca49976d2d57c01aa2c0669008c7d399f3"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair102.png",
+      "sha256": "9706dcd759443a098c52b7b742d0ed4ba3ba235ef61df996ae13a1402284edd4",
+      "comparison": "identical",
+      "upstream_sha256": "9706dcd759443a098c52b7b742d0ed4ba3ba235ef61df996ae13a1402284edd4"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair103.png",
+      "sha256": "aca677a5223d718f7fb1c44d8076f757559a6378ad25e05bfbbc7495accfc691",
+      "comparison": "identical",
+      "upstream_sha256": "aca677a5223d718f7fb1c44d8076f757559a6378ad25e05bfbbc7495accfc691"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair104.png",
+      "sha256": "8fe521b543ffd59a901e7feec60a28d010259cea90ddc586ff3cb4d0f1d26f23",
+      "comparison": "identical",
+      "upstream_sha256": "8fe521b543ffd59a901e7feec60a28d010259cea90ddc586ff3cb4d0f1d26f23"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair105.png",
+      "sha256": "046636e345b7b39170cf2589d2caacc4c42a717cafc577320ff4f8cef737dccb",
+      "comparison": "identical",
+      "upstream_sha256": "046636e345b7b39170cf2589d2caacc4c42a717cafc577320ff4f8cef737dccb"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair106.png",
+      "sha256": "56e85fd574ce9f8e8bd2881698b9ac18f43142c6b0487f4471e0cb8e46b04042",
+      "comparison": "identical",
+      "upstream_sha256": "56e85fd574ce9f8e8bd2881698b9ac18f43142c6b0487f4471e0cb8e46b04042"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair107.png",
+      "sha256": "77cf4bd19d7bda2dc1e1acef83ff97250e2c0834d3e9a0fb7825e4625fda3271",
+      "comparison": "identical",
+      "upstream_sha256": "77cf4bd19d7bda2dc1e1acef83ff97250e2c0834d3e9a0fb7825e4625fda3271"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair108.png",
+      "sha256": "c7a607565d6182f79ddc52c71d3bd3a272701a766c33329940dbf790896320e9",
+      "comparison": "identical",
+      "upstream_sha256": "c7a607565d6182f79ddc52c71d3bd3a272701a766c33329940dbf790896320e9"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair109.png",
+      "sha256": "4333d6e31f8a6b34d5970b11741b505e4affeee218d55be51a606f523801f26f",
+      "comparison": "identical",
+      "upstream_sha256": "4333d6e31f8a6b34d5970b11741b505e4affeee218d55be51a606f523801f26f"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair110.png",
+      "sha256": "45fce22b02da529041352ee00f0d57c325965c73b2b9e53764774e4317882132",
+      "comparison": "identical",
+      "upstream_sha256": "45fce22b02da529041352ee00f0d57c325965c73b2b9e53764774e4317882132"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair111.png",
+      "sha256": "e89e17b83d67ba6dbbba786c1734ed17765b8f9b2f4b0c3c31e2c7783664fe61",
+      "comparison": "identical",
+      "upstream_sha256": "e89e17b83d67ba6dbbba786c1734ed17765b8f9b2f4b0c3c31e2c7783664fe61"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair112.png",
+      "sha256": "0e3b7ef5469187044cc3576d5c7df6d8978faf31188beadf0f15de46fc11840a",
+      "comparison": "identical",
+      "upstream_sha256": "0e3b7ef5469187044cc3576d5c7df6d8978faf31188beadf0f15de46fc11840a"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair113.png",
+      "sha256": "25c11a1091e7a3d30ec582dbcd71fa1ed7a0662836edd78d2fb70b625139e377",
+      "comparison": "identical",
+      "upstream_sha256": "25c11a1091e7a3d30ec582dbcd71fa1ed7a0662836edd78d2fb70b625139e377"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair114.png",
+      "sha256": "b5e34ed44b71e4876019c90e030475363690d70e6c3ca9be506a25ff6f3d20a2",
+      "comparison": "identical",
+      "upstream_sha256": "b5e34ed44b71e4876019c90e030475363690d70e6c3ca9be506a25ff6f3d20a2"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair115.png",
+      "sha256": "4e647a92119826f90177ca6ef5ecfa5c6d794b7d4406291f17bfb0584f709e58",
+      "comparison": "identical",
+      "upstream_sha256": "4e647a92119826f90177ca6ef5ecfa5c6d794b7d4406291f17bfb0584f709e58"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair116.png",
+      "sha256": "40c7f73799ba731ce70e9fbe176b6ccc038b2e1b3c570e11ee12d784f8e6115b",
+      "comparison": "identical",
+      "upstream_sha256": "40c7f73799ba731ce70e9fbe176b6ccc038b2e1b3c570e11ee12d784f8e6115b"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair117.png",
+      "sha256": "1c4506512fdeb511bf5a0d769ea55a5f176c56f2cbfa7b61de671f8e21124f68",
+      "comparison": "identical",
+      "upstream_sha256": "1c4506512fdeb511bf5a0d769ea55a5f176c56f2cbfa7b61de671f8e21124f68"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair118.png",
+      "sha256": "b68f84f1810c6244f0553968d824ece212721f4430f5779af2996bb2fb777e13",
+      "comparison": "identical",
+      "upstream_sha256": "b68f84f1810c6244f0553968d824ece212721f4430f5779af2996bb2fb777e13"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair119.png",
+      "sha256": "c132ae2177694d6fd1d13b0e4a58bbc0f7bb29b83f4db00a5bfd6b61e583724f",
+      "comparison": "identical",
+      "upstream_sha256": "c132ae2177694d6fd1d13b0e4a58bbc0f7bb29b83f4db00a5bfd6b61e583724f"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair120.png",
+      "sha256": "644498292529e59d148a5a4d02f1729c88af580e7b9e385f2044bc87a67aabe1",
+      "comparison": "identical",
+      "upstream_sha256": "644498292529e59d148a5a4d02f1729c88af580e7b9e385f2044bc87a67aabe1"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair121.png",
+      "sha256": "51fddf1b5f7fe51773d107f2d83f700c246e6eb9e59b02ff187afc366df39444",
+      "comparison": "identical",
+      "upstream_sha256": "51fddf1b5f7fe51773d107f2d83f700c246e6eb9e59b02ff187afc366df39444"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair122.png",
+      "sha256": "b80101e646d685d81dda88903c6410ead51338526c0913b59dfb9fd19430d8c6",
+      "comparison": "identical",
+      "upstream_sha256": "b80101e646d685d81dda88903c6410ead51338526c0913b59dfb9fd19430d8c6"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair123.png",
+      "sha256": "5c56f2a5a05a4819db8444220a1f04b6f2977a5a4fdb3e9fec45cf190eec0526",
+      "comparison": "identical",
+      "upstream_sha256": "5c56f2a5a05a4819db8444220a1f04b6f2977a5a4fdb3e9fec45cf190eec0526"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair124.png",
+      "sha256": "7f1c46d977ee47549f8a3a0044d1f76b964a06bdc2d84b585d871b2c87238f41",
+      "comparison": "identical",
+      "upstream_sha256": "7f1c46d977ee47549f8a3a0044d1f76b964a06bdc2d84b585d871b2c87238f41"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair125.png",
+      "sha256": "47c8b8aa7e24032ce30d8a8ab206a40e15586bf6e944f53c8b1e62abcba2c57d",
+      "comparison": "identical",
+      "upstream_sha256": "47c8b8aa7e24032ce30d8a8ab206a40e15586bf6e944f53c8b1e62abcba2c57d"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair126.png",
+      "sha256": "4d865e4de47cd812e7d40b11aed0a95f932132a0f5a1eaf501ec229017e030ad",
+      "comparison": "identical",
+      "upstream_sha256": "4d865e4de47cd812e7d40b11aed0a95f932132a0f5a1eaf501ec229017e030ad"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair127.png",
+      "sha256": "86bfabe338e7253de5ca17ee8d1ce5333d65ef4173d9f0434a1e1c93543ad21a",
+      "comparison": "identical",
+      "upstream_sha256": "86bfabe338e7253de5ca17ee8d1ce5333d65ef4173d9f0434a1e1c93543ad21a"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair128.png",
+      "sha256": "601a9a57088428b8825f7d95dcb01aa853c216720d8844e3d1b9b9b707a807fb",
+      "comparison": "identical",
+      "upstream_sha256": "601a9a57088428b8825f7d95dcb01aa853c216720d8844e3d1b9b9b707a807fb"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair129.png",
+      "sha256": "163da09274f0e3d44e02c3b33e2619862d2836abe7035d7d50cec93d31e4fca7",
+      "comparison": "identical",
+      "upstream_sha256": "163da09274f0e3d44e02c3b33e2619862d2836abe7035d7d50cec93d31e4fca7"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair130.png",
+      "sha256": "4665bc631f78f60ed511b5bdd39c539739ba6acbc5ceea7f9f64bedde1a1d1a3",
+      "comparison": "identical",
+      "upstream_sha256": "4665bc631f78f60ed511b5bdd39c539739ba6acbc5ceea7f9f64bedde1a1d1a3"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair131.png",
+      "sha256": "1d5e70b1cf36a9c9658dce105cb27eeb73d365b5c5696ef512ec6354440fea1a",
+      "comparison": "identical",
+      "upstream_sha256": "1d5e70b1cf36a9c9658dce105cb27eeb73d365b5c5696ef512ec6354440fea1a"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair132.png",
+      "sha256": "026a4bd341f5bf5684a56e6da167a88aa9de1299389b6c562b547380b9aa25f2",
+      "comparison": "identical",
+      "upstream_sha256": "026a4bd341f5bf5684a56e6da167a88aa9de1299389b6c562b547380b9aa25f2"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair133.png",
+      "sha256": "6189e53e54b197de1060d95f215f0184fadfc93509ecf3d7a4e564e9df7869e1",
+      "comparison": "identical",
+      "upstream_sha256": "6189e53e54b197de1060d95f215f0184fadfc93509ecf3d7a4e564e9df7869e1"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair134.png",
+      "sha256": "a3f9866781107d72937e2c86f52144863d3be240eb762363709edf037fa6f88a",
+      "comparison": "identical",
+      "upstream_sha256": "a3f9866781107d72937e2c86f52144863d3be240eb762363709edf037fa6f88a"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair135.png",
+      "sha256": "72ed0064712d41d85a10d8a2b29921b0626936efc83f8538c599284764841c22",
+      "comparison": "identical",
+      "upstream_sha256": "72ed0064712d41d85a10d8a2b29921b0626936efc83f8538c599284764841c22"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair136.png",
+      "sha256": "ac809eee93a8928d3dd7421c411c4b7996a37b7bf7fa77f0668567b9a2831918",
+      "comparison": "identical",
+      "upstream_sha256": "ac809eee93a8928d3dd7421c411c4b7996a37b7bf7fa77f0668567b9a2831918"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair137.png",
+      "sha256": "5a778b4de308f7e8c1e322f05b736648c8f87ce6806af9d98dd9283d8f145718",
+      "comparison": "identical",
+      "upstream_sha256": "5a778b4de308f7e8c1e322f05b736648c8f87ce6806af9d98dd9283d8f145718"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair138.png",
+      "sha256": "36260908c0ffac3f40815325d541314d61b86c24557f10df03f7ebd9380ff4cc",
+      "comparison": "identical",
+      "upstream_sha256": "36260908c0ffac3f40815325d541314d61b86c24557f10df03f7ebd9380ff4cc"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair139.png",
+      "sha256": "8762ceeb59345ffbbf3ebb344164c8afdedfb27728b9474c42d57ac99f4568a5",
+      "comparison": "identical",
+      "upstream_sha256": "8762ceeb59345ffbbf3ebb344164c8afdedfb27728b9474c42d57ac99f4568a5"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair140.png",
+      "sha256": "0b1d471e1b10b235f21b47f6a169757f82c620b0e477b35ccaf689e51edd9a47",
+      "comparison": "identical",
+      "upstream_sha256": "0b1d471e1b10b235f21b47f6a169757f82c620b0e477b35ccaf689e51edd9a47"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair141.png",
+      "sha256": "e8865f0311008f3d067e6382f60832a705e8b8dd9776a3453fab5bc05889a3c0",
+      "comparison": "identical",
+      "upstream_sha256": "e8865f0311008f3d067e6382f60832a705e8b8dd9776a3453fab5bc05889a3c0"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair142.png",
+      "sha256": "9177fdb3191197c6cefea46f3430a666f2c3ea5a694bd7dcda086e2ad04c9384",
+      "comparison": "identical",
+      "upstream_sha256": "9177fdb3191197c6cefea46f3430a666f2c3ea5a694bd7dcda086e2ad04c9384"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair143.png",
+      "sha256": "51fe7bdff26c6e86fcb2bbb0ec1c269743745cece3a7cec559ff3ebc8d531a2c",
+      "comparison": "identical",
+      "upstream_sha256": "51fe7bdff26c6e86fcb2bbb0ec1c269743745cece3a7cec559ff3ebc8d531a2c"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair144.png",
+      "sha256": "af2349ce4ed8ce9d8dd897574765b21fc130bb2e5721025580340b04f8f4a2ef",
+      "comparison": "identical",
+      "upstream_sha256": "af2349ce4ed8ce9d8dd897574765b21fc130bb2e5721025580340b04f8f4a2ef"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair145.png",
+      "sha256": "0ef46bfcc4eea41ec2b30f05d2808c4e5fd7354d27b963e61fde01adbe30d3a7",
+      "comparison": "identical",
+      "upstream_sha256": "0ef46bfcc4eea41ec2b30f05d2808c4e5fd7354d27b963e61fde01adbe30d3a7"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair146.png",
+      "sha256": "699ca64ac8142867b229bf6d93ed32d07e4ad0a435b4a8edd9c30798fa4b63ee",
+      "comparison": "identical",
+      "upstream_sha256": "699ca64ac8142867b229bf6d93ed32d07e4ad0a435b4a8edd9c30798fa4b63ee"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair147.png",
+      "sha256": "112c304af7ad2c6ea2e3b3752aa2b47589d9ab8807b6de9ab9f26c00bdfae291",
+      "comparison": "identical",
+      "upstream_sha256": "112c304af7ad2c6ea2e3b3752aa2b47589d9ab8807b6de9ab9f26c00bdfae291"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair148.png",
+      "sha256": "5c3b03922b22b4a21d4dafff54af2c22b75419a9a9d621053f5612e39d7ad29d",
+      "comparison": "identical",
+      "upstream_sha256": "5c3b03922b22b4a21d4dafff54af2c22b75419a9a9d621053f5612e39d7ad29d"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair149.png",
+      "sha256": "e352c7fbe4db723881726ee041bcf485e09a14147c7535610a1529382b87a7de",
+      "comparison": "identical",
+      "upstream_sha256": "e352c7fbe4db723881726ee041bcf485e09a14147c7535610a1529382b87a7de"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair150.png",
+      "sha256": "e7626da4de6673ec42616a3703cad425dbfb53c3235e7119051bc4243892020e",
+      "comparison": "identical",
+      "upstream_sha256": "e7626da4de6673ec42616a3703cad425dbfb53c3235e7119051bc4243892020e"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair151.png",
+      "sha256": "5a1b80d97dde932fa9241380050588e6fde174f3f2f49b4533899529dacbeed6",
+      "comparison": "identical",
+      "upstream_sha256": "5a1b80d97dde932fa9241380050588e6fde174f3f2f49b4533899529dacbeed6"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair152.png",
+      "sha256": "e0c1f20b84ad9ad0b023f55afcf2a8e476b88682e8209c319f1e7b242971d5c0",
+      "comparison": "identical",
+      "upstream_sha256": "e0c1f20b84ad9ad0b023f55afcf2a8e476b88682e8209c319f1e7b242971d5c0"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair153.png",
+      "sha256": "75a753e85f9126d6857de5fb907eb3a77914884f273f247f8e9696b80db9da77",
+      "comparison": "identical",
+      "upstream_sha256": "75a753e85f9126d6857de5fb907eb3a77914884f273f247f8e9696b80db9da77"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair154.png",
+      "sha256": "46e245c5f2ab11d1becf50c8a5079622211a98026dd718ca4cad5c137bf84ee5",
+      "comparison": "identical",
+      "upstream_sha256": "46e245c5f2ab11d1becf50c8a5079622211a98026dd718ca4cad5c137bf84ee5"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair155.png",
+      "sha256": "db54121e8ff241e32dfbaec3c50733b6c62e20ca9dbd36265f06878fd2eab750",
+      "comparison": "identical",
+      "upstream_sha256": "db54121e8ff241e32dfbaec3c50733b6c62e20ca9dbd36265f06878fd2eab750"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair156.png",
+      "sha256": "4050d136df05aa5127249158a6c63149918854fa09da4ff45ccbfe76aac1aa04",
+      "comparison": "identical",
+      "upstream_sha256": "4050d136df05aa5127249158a6c63149918854fa09da4ff45ccbfe76aac1aa04"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair157.png",
+      "sha256": "945c2aa3fe2306405aec9e45657a5ce8b0685646ad1f2f5787746ccdcb43cf4f",
+      "comparison": "identical",
+      "upstream_sha256": "945c2aa3fe2306405aec9e45657a5ce8b0685646ad1f2f5787746ccdcb43cf4f"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair158.png",
+      "sha256": "fff0d11acb3962cfafa38b7da5bc54745294d127fa015faf2d2f6743fe70a2ff",
+      "comparison": "identical",
+      "upstream_sha256": "fff0d11acb3962cfafa38b7da5bc54745294d127fa015faf2d2f6743fe70a2ff"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair159.png",
+      "sha256": "a461b52e6ea31bbb85138f255187f1178e87299292489862c016a978494faeb5",
+      "comparison": "identical",
+      "upstream_sha256": "a461b52e6ea31bbb85138f255187f1178e87299292489862c016a978494faeb5"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair160.png",
+      "sha256": "7c92f731175d3762dcddc8aedb9e868bcec2ccbfa5a928dd12dfd41cda5f382c",
+      "comparison": "identical",
+      "upstream_sha256": "7c92f731175d3762dcddc8aedb9e868bcec2ccbfa5a928dd12dfd41cda5f382c"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair161.png",
+      "sha256": "2e315ff528dd517f6ca0e864047dd56a83f011df297e95bf34ef92e0cb08dcca",
+      "comparison": "identical",
+      "upstream_sha256": "2e315ff528dd517f6ca0e864047dd56a83f011df297e95bf34ef92e0cb08dcca"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair162.png",
+      "sha256": "15539f87cd2835e02baffb6850289a70a5e89e1a92eb9259e9b08c93956cf4e3",
+      "comparison": "identical",
+      "upstream_sha256": "15539f87cd2835e02baffb6850289a70a5e89e1a92eb9259e9b08c93956cf4e3"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair163.png",
+      "sha256": "eb58d8371b555becd9bd1d2b34c744d58032198b6fa590b3398fe6da01c89fe4",
+      "comparison": "identical",
+      "upstream_sha256": "eb58d8371b555becd9bd1d2b34c744d58032198b6fa590b3398fe6da01c89fe4"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair164.png",
+      "sha256": "93b2f2fdf3c9977f3ee0541b81e1b5a6f104f2257c8ab949a83cdd1bb3eb5440",
+      "comparison": "identical",
+      "upstream_sha256": "93b2f2fdf3c9977f3ee0541b81e1b5a6f104f2257c8ab949a83cdd1bb3eb5440"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair165.png",
+      "sha256": "ca7d94b04e124d72c46334d1f080b5fc5f3cd6b6bad48f7c0a80c9a9d8733162",
+      "comparison": "identical",
+      "upstream_sha256": "ca7d94b04e124d72c46334d1f080b5fc5f3cd6b6bad48f7c0a80c9a9d8733162"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair166.png",
+      "sha256": "cece55bb8da5b776f09900259245cc6b28ffff5a1452feddf2db170c7c3b5a0c",
+      "comparison": "identical",
+      "upstream_sha256": "cece55bb8da5b776f09900259245cc6b28ffff5a1452feddf2db170c7c3b5a0c"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair167.png",
+      "sha256": "bb0c6968888a2cfd605894da02d88762c4f874fb84e9c1e05e18708dba3138fc",
+      "comparison": "identical",
+      "upstream_sha256": "bb0c6968888a2cfd605894da02d88762c4f874fb84e9c1e05e18708dba3138fc"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair168.png",
+      "sha256": "db4bfb3f3e4d91822bdc92011f6ba343742e24f87256d35327c8d98ea7808cd0",
+      "comparison": "identical",
+      "upstream_sha256": "db4bfb3f3e4d91822bdc92011f6ba343742e24f87256d35327c8d98ea7808cd0"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair169.png",
+      "sha256": "c6d29d6c9bc04214e4fd1efaf0b995e8212fb54c7278261422646087fa160f05",
+      "comparison": "identical",
+      "upstream_sha256": "c6d29d6c9bc04214e4fd1efaf0b995e8212fb54c7278261422646087fa160f05"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair170.png",
+      "sha256": "0316fecad0aaba430a32871ca0f368c5e67cb698d955b03a166a9ef53c39b0e9",
+      "comparison": "identical",
+      "upstream_sha256": "0316fecad0aaba430a32871ca0f368c5e67cb698d955b03a166a9ef53c39b0e9"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair171.png",
+      "sha256": "a06b8e58c003c5ed94ccd7babde0b544fbff7690042ae39c4889e7b53ee7661c",
+      "comparison": "identical",
+      "upstream_sha256": "a06b8e58c003c5ed94ccd7babde0b544fbff7690042ae39c4889e7b53ee7661c"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair172.png",
+      "sha256": "3e944bcfe03fb9b918e0c8b056a4cffa9ba797df20d5290789c324a57787b88e",
+      "comparison": "identical",
+      "upstream_sha256": "3e944bcfe03fb9b918e0c8b056a4cffa9ba797df20d5290789c324a57787b88e"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair173.png",
+      "sha256": "8959185868d7ed835d1168e0844e83c96bff0a0759f413d1128b03bc01566c76",
+      "comparison": "identical",
+      "upstream_sha256": "8959185868d7ed835d1168e0844e83c96bff0a0759f413d1128b03bc01566c76"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair174.png",
+      "sha256": "3cfcc577d7f18158244d7714a199bc426fbd0d535505e60baf43a55efa301c8e",
+      "comparison": "identical",
+      "upstream_sha256": "3cfcc577d7f18158244d7714a199bc426fbd0d535505e60baf43a55efa301c8e"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair175.png",
+      "sha256": "e60f6095c16f978c4a95126fcee9d231121049135c3a5bc8a521a626096a7723",
+      "comparison": "identical",
+      "upstream_sha256": "e60f6095c16f978c4a95126fcee9d231121049135c3a5bc8a521a626096a7723"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair176.png",
+      "sha256": "9b239406966a103ecb786753939e33b385f6bcb2fa05b9393d3da5f7aea51650",
+      "comparison": "identical",
+      "upstream_sha256": "9b239406966a103ecb786753939e33b385f6bcb2fa05b9393d3da5f7aea51650"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair177.png",
+      "sha256": "7718478fe051119f894e27988823783c9956be110a68a851c1dafea5346a7ce5",
+      "comparison": "identical",
+      "upstream_sha256": "7718478fe051119f894e27988823783c9956be110a68a851c1dafea5346a7ce5"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair178.png",
+      "sha256": "fd1166d338ad4566e11a5b1ffe98cce96fc09b0f5185a63cf5e7dcf577bdac0b",
+      "comparison": "identical",
+      "upstream_sha256": "fd1166d338ad4566e11a5b1ffe98cce96fc09b0f5185a63cf5e7dcf577bdac0b"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair179.png",
+      "sha256": "3d44e196763d17720ea2a25a802de763931b0fa6b938be58cef0719a4f0a413f",
+      "comparison": "identical",
+      "upstream_sha256": "3d44e196763d17720ea2a25a802de763931b0fa6b938be58cef0719a4f0a413f"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair180.png",
+      "sha256": "7dc6afcc5bb1e9f5d6d76f8f71e0ecf1d26f8ceaa63e2541c2dd0534b3b0b926",
+      "comparison": "identical",
+      "upstream_sha256": "7dc6afcc5bb1e9f5d6d76f8f71e0ecf1d26f8ceaa63e2541c2dd0534b3b0b926"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair181.png",
+      "sha256": "3258fb41d087956f29e101587303515b2b1a46fe4304f1c04d49f13765902588",
+      "comparison": "identical",
+      "upstream_sha256": "3258fb41d087956f29e101587303515b2b1a46fe4304f1c04d49f13765902588"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair182.png",
+      "sha256": "7708645ac8542cd6c68b824db24d1b3b01857c26df06e3ad7d4c5b676a4cab50",
+      "comparison": "identical",
+      "upstream_sha256": "7708645ac8542cd6c68b824db24d1b3b01857c26df06e3ad7d4c5b676a4cab50"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair183.png",
+      "sha256": "3f7dbd8789d21bff4ff64e5c468d79465c55014888d719607c07b0f3daa2d9ff",
+      "comparison": "identical",
+      "upstream_sha256": "3f7dbd8789d21bff4ff64e5c468d79465c55014888d719607c07b0f3daa2d9ff"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair184.png",
+      "sha256": "9dc7c9e79eacf1c207eacd107a5a9ebbf150d6fcdc3026c83aca38dd8608fb02",
+      "comparison": "identical",
+      "upstream_sha256": "9dc7c9e79eacf1c207eacd107a5a9ebbf150d6fcdc3026c83aca38dd8608fb02"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair185.png",
+      "sha256": "098dccc22f1e8ab6f2e60e95beb6660f5afeb4f66a688e424bb4fce70bc54ff1",
+      "comparison": "identical",
+      "upstream_sha256": "098dccc22f1e8ab6f2e60e95beb6660f5afeb4f66a688e424bb4fce70bc54ff1"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair186.png",
+      "sha256": "13ef186b23655597d739c316ba2f261c28d540a895c3987544d0e895554a2287",
+      "comparison": "identical",
+      "upstream_sha256": "13ef186b23655597d739c316ba2f261c28d540a895c3987544d0e895554a2287"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair187.png",
+      "sha256": "00afa8515a37676792037d533a193c0d485458298de12f5d2a5909b674cd4f54",
+      "comparison": "identical",
+      "upstream_sha256": "00afa8515a37676792037d533a193c0d485458298de12f5d2a5909b674cd4f54"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair188.png",
+      "sha256": "8052778eaa521fef4eb78d75eb5bfbb5655bed857322f4d82659a7db9c74c00d",
+      "comparison": "identical",
+      "upstream_sha256": "8052778eaa521fef4eb78d75eb5bfbb5655bed857322f4d82659a7db9c74c00d"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair189.png",
+      "sha256": "3b1b3c761ab43998025db8d85aa1c9365f32a2f66a5a9ffa687f96554eee5502",
+      "comparison": "identical",
+      "upstream_sha256": "3b1b3c761ab43998025db8d85aa1c9365f32a2f66a5a9ffa687f96554eee5502"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair190.png",
+      "sha256": "c97a443896f053d6fa1740319ce67f4e06b5e9aceb4c9b9a9755493953e87f3d",
+      "comparison": "identical",
+      "upstream_sha256": "c97a443896f053d6fa1740319ce67f4e06b5e9aceb4c9b9a9755493953e87f3d"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair191.png",
+      "sha256": "cdf01bc1c6a40fb26c09ebae97827217301afc28301a791a7b57764209c03112",
+      "comparison": "identical",
+      "upstream_sha256": "cdf01bc1c6a40fb26c09ebae97827217301afc28301a791a7b57764209c03112"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair192.png",
+      "sha256": "030691d1a2c6b55b7178f57fab89cbe24594be7c043e99a26ea9a54ecae70ecb",
+      "comparison": "identical",
+      "upstream_sha256": "030691d1a2c6b55b7178f57fab89cbe24594be7c043e99a26ea9a54ecae70ecb"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair193.png",
+      "sha256": "0a4fc5904f6ed6b9955250ffc3291049b340a7d9c2e5badd9a43102663a6c199",
+      "comparison": "identical",
+      "upstream_sha256": "0a4fc5904f6ed6b9955250ffc3291049b340a7d9c2e5badd9a43102663a6c199"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair194.png",
+      "sha256": "b204aefff9196675d6df8414b66c0b98fa9d95665061c27b65a1a2d15ab641d6",
+      "comparison": "identical",
+      "upstream_sha256": "b204aefff9196675d6df8414b66c0b98fa9d95665061c27b65a1a2d15ab641d6"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair195.png",
+      "sha256": "9e3d23c640c58dd9033d573282a1e302f3d520406521e58b5e3fe45cfda035cc",
+      "comparison": "identical",
+      "upstream_sha256": "9e3d23c640c58dd9033d573282a1e302f3d520406521e58b5e3fe45cfda035cc"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair196.png",
+      "sha256": "7eb9cf8b770658a37cb9b46d392b824bcb6caf5ebf2b33189b147c0248d81b5f",
+      "comparison": "identical",
+      "upstream_sha256": "7eb9cf8b770658a37cb9b46d392b824bcb6caf5ebf2b33189b147c0248d81b5f"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair197.png",
+      "sha256": "add5b9f4ae22201e33d68ed98aeb41310f58cb98d9ef46151e53b3ceac37c64f",
+      "comparison": "identical",
+      "upstream_sha256": "add5b9f4ae22201e33d68ed98aeb41310f58cb98d9ef46151e53b3ceac37c64f"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair198.png",
+      "sha256": "dac7cf605d3cecb43ca5f4c50a6a3e8f94c16d5e41dcb0ef8958c2a85c2b4669",
+      "comparison": "identical",
+      "upstream_sha256": "dac7cf605d3cecb43ca5f4c50a6a3e8f94c16d5e41dcb0ef8958c2a85c2b4669"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair199.png",
+      "sha256": "21b531b024ea1d704e3af478735e4484e3b5d6d2173e33ae908c41648e6e3f7f",
+      "comparison": "identical",
+      "upstream_sha256": "21b531b024ea1d704e3af478735e4484e3b5d6d2173e33ae908c41648e6e3f7f"
+    },
+    {
+      "path": "assets/ui/kenney-crosshairs/crosshair200.png",
+      "sha256": "89cf7516cea7d04369922ddb0e60697a8c6fdd87abb9cb46c5b104cbd8f97b58",
+      "comparison": "identical",
+      "upstream_sha256": "89cf7516cea7d04369922ddb0e60697a8c6fdd87abb9cb46c5b104cbd8f97b58"
+    },
+    {
+      "path": "assets/vfx/exhaust_puff.png",
+      "sha256": "de4294a4e1fcc45525846199494649a29b7a42ccf1f907a7bff8f0d1fa699ac9",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/vfx/fireball.png",
+      "sha256": "1c8496f49163a2d5794e223854fffa1960087632f618d7a85d8695f27bc496f2",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/vfx/impact_smoke.png",
+      "sha256": "bc2c101d501eaea3a2498cc56152790a02ae1fe59929383064bcf9bcb6a393dc",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/vfx/impact_spark.png",
+      "sha256": "fbefca5d71de26ff1429ff798c7129610fecf7c7a90094e151a14fe609d28a35",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/vfx/muzzle_flash.png",
+      "sha256": "500877e577df21747c7250c2e7a3001b1ce92be726db08e7ed8b5a712bff9ab5",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/vfx/shockwave_ring.png",
+      "sha256": "167654cb1c380d5663657e7f354a548628830acb06aad62f118846756a20a7a2",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/base_under_attack.ogg",
+      "sha256": "0af2018d1323844fc69bc8dfd8698cbee27075136973da4941ceedda7a91eb4f",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/construction_complete.ogg",
+      "sha256": "98e7ecb1ea9103f53e53103c745462984d74f1c34b8e4f4f2c69b63afa18be3f",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/defeat.ogg",
+      "sha256": "aec3708de2f2ea44671dfe8521c2e66a05feab804a12595750a647f13c2829a9",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/enemy_superweapon_launched.ogg",
+      "sha256": "034597e99f1c61c909c21bdaf43e9bcb9164c04d89d25b3f99e2890b78449409",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/enemy_superweapon_ready.ogg",
+      "sha256": "adbc67ae93e680ff8c1ebab6874d2b98f77840e7eac26bab2a797cb49b580b78",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/enemy_support_power.ogg",
+      "sha256": "680f2312dd8dd4d718a1b2fa1af697602e517b1e04e3a6d138701169995d0d6f",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/not_enough_resources.ogg",
+      "sha256": "315d9676134800eecd1202a402ba08780d82c3169089053e8f7eaccb60ca8645",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/support_power_ready.ogg",
+      "sha256": "0fcf79b7cccdea7597ca9e09cfa9eed0fd00de547d3c6b9c3c01b188a4efbdab",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/training.ogg",
+      "sha256": "e4ef22d31a6efc9b086e6448c2cefcd840baee41e8c174f5d4667dafe2a90b2e",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/unit_lost.ogg",
+      "sha256": "a22ce9ad915b9cbfe8f7e42260a57875652b3773b4640b6de973a20cc242cf04",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/unit_ready.ogg",
+      "sha256": "3fc3c8f10eb5b2c89f877fc50e4fb10e0513dc22f455b00b8ed2a2d6e2ab6ae7",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/unit_under_attack.ogg",
+      "sha256": "4cd6e90e1ab72e1d93e2b62cae6fb38c690194199a47f2a49b39983f6ba25146",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/victory.ogg",
+      "sha256": "c509b9d14027919d8d1a840b9e7a25537a576e0be8c02a0b4441a4e483c441ee",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-yunxi/acknowledged.ogg",
+      "sha256": "a5667e38fc32abce160e293b566ae028b825a3987b728e704056a4974b68885c",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-yunxi/sir.ogg",
+      "sha256": "973e92e284048062ecb19d43f2cb044d88a502f1e9d801e3f9999df819982407",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/chinese/edge-yunxi/yes_sir.ogg",
+      "sha256": "f3f9796d0623febdfbd783b7a378fdc14873cc0cfe64195810bcdceb1ece7c17",
+      "comparison": "absent_from_upstream"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/battle_control_offline.ogg",
+      "sha256": "5adf4d2e6d98324f21b6e553e6f4ba39dbc1ccd7a95b41d600d2cea0159daa6a",
+      "comparison": "identical",
+      "upstream_sha256": "5adf4d2e6d98324f21b6e553e6f4ba39dbc1ccd7a95b41d600d2cea0159daa6a"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/battle_control_online.ogg",
+      "sha256": "a04a732a576597e7e26c0887b760c796d6f96d96b2d6402d9e811d52a71f1bb6",
+      "comparison": "identical",
+      "upstream_sha256": "a04a732a576597e7e26c0887b760c796d6f96d96b2d6402d9e811d52a71f1bb6"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/construction_complete.ogg",
+      "sha256": "53a1f915b3ad21fed70ad630e3d206daa37e103cfcbaa3e44655b709f2dc0acb",
+      "comparison": "identical",
+      "upstream_sha256": "53a1f915b3ad21fed70ad630e3d206daa37e103cfcbaa3e44655b709f2dc0acb"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/not_enough_resources.ogg",
+      "sha256": "b5255f69ec44e21f58b9f194756319555f498cc9d78a24a792b9bbe457d38238",
+      "comparison": "identical",
+      "upstream_sha256": "b5255f69ec44e21f58b9f194756319555f498cc9d78a24a792b9bbe457d38238"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/training.ogg",
+      "sha256": "b4caf625632b77319ec7312b8ee18e3e0306c2ebc02f61f68f0c46009b6bc337",
+      "comparison": "identical",
+      "upstream_sha256": "b4caf625632b77319ec7312b8ee18e3e0306c2ebc02f61f68f0c46009b6bc337"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/unit_lost.ogg",
+      "sha256": "f1c66e4e266a2f22f0f9e62d9e2f986b0fd05f84966904e479f9ab45cfeae234",
+      "comparison": "identical",
+      "upstream_sha256": "f1c66e4e266a2f22f0f9e62d9e2f986b0fd05f84966904e479f9ab45cfeae234"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/unit_ready.ogg",
+      "sha256": "325ae3cebdb3e2b5ee21e54f591effcb527b6fda24ec45cf8d370cef9c671f81",
+      "comparison": "identical",
+      "upstream_sha256": "325ae3cebdb3e2b5ee21e54f591effcb527b6fda24ec45cf8d370cef9c671f81"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/unit_under_attack.ogg",
+      "sha256": "ff2ae52bb323b5ca83b239c54838cde8b53ed9bb8516d81dd7fff79cba5c754f",
+      "comparison": "identical",
+      "upstream_sha256": "ff2ae52bb323b5ca83b239c54838cde8b53ed9bb8516d81dd7fff79cba5c754f"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/you_are_victorious.ogg",
+      "sha256": "88b3714abd74f911ad163eb59e30e10c211d7de2fd3e7d0d1c8e0028a4eedbbf",
+      "comparison": "identical",
+      "upstream_sha256": "88b3714abd74f911ad163eb59e30e10c211d7de2fd3e7d0d1c8e0028a4eedbbf"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/you_have_lost.ogg",
+      "sha256": "64f9163d4d92d0f221ae46ebb9f4b60d1a220634cfb6fab5a8fbdd7c4e6ebd87",
+      "comparison": "identical",
+      "upstream_sha256": "64f9163d4d92d0f221ae46ebb9f4b60d1a220634cfb6fab5a8fbdd7c4e6ebd87"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/your_base_is_under_attack.ogg",
+      "sha256": "9877325b20d99991bede5c08e8dcb13969e79870dea7248e1fe0fd5a32518e72",
+      "comparison": "identical",
+      "upstream_sha256": "9877325b20d99991bede5c08e8dcb13969e79870dea7248e1fe0fd5a32518e72"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-2704-jackson-us/acknowledged.ogg",
+      "sha256": "36051c4d4c724042a96030abb0c1563c7c74be6e06f10ffe8ca7bcae546a0bd9",
+      "comparison": "identical",
+      "upstream_sha256": "36051c4d4c724042a96030abb0c1563c7c74be6e06f10ffe8ca7bcae546a0bd9"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-2704-jackson-us/sir.ogg",
+      "sha256": "85b8ee23c90274255d7e4077076b04e8051026880ace9e8c8bf63feb2d6d7413",
+      "comparison": "identical",
+      "upstream_sha256": "85b8ee23c90274255d7e4077076b04e8051026880ace9e8c8bf63feb2d6d7413"
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-2704-jackson-us/yes_sir.ogg",
+      "sha256": "1c6b5f9485822e5ff1df9ef7ecdbe2fa73a471a9d8124d752bc2b19c716d44a6",
+      "comparison": "identical",
+      "upstream_sha256": "1c6b5f9485822e5ff1df9ef7ecdbe2fa73a471a9d8124d752bc2b19c716d44a6"
+    }
+  ],
+  "historical_generation_evidence": {
+    "origin_project": "godot-open-rts",
+    "local_session_id": "019ebc09-41a5-7313-9ab7-90a4d4f94578",
+    "scope": "Only named repository asset creation/copy records; no unrelated transcript content or credentials retained.",
+    "audio_inputs": "FFmpeg lavfi sine/anoisesrc/aevalsrc only; no external audio files in recovered recipes.",
+    "audio_reproduction": "Re-run into /tmp with current FFmpeg. Fourteen SFX match decoded integer PCM exactly; container bytes differ. Four random-noise SFX and error.wav do not match PCM exactly. Music generation recipe recovered, but current decoded float PCM does not match resynthesis.",
+    "icon_copy_records": "27 current icon paths have explicit copies from named generated sheets. Recipe/path records do not establish service terms or exact transformed-image lineage.",
+    "vfx": "No creation records recovered in the scoped project histories; six files remain unresolved."
+  }
+}
