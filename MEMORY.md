@@ -342,3 +342,25 @@ Latest construction checkpoint:
 - Two campaign2 invocations omitted BEVY_ASSET_ROOT and searched target/debug/assets,
   hitting the30s startup limit before gameplay. Corrected invocation supplies the
   absolute repo asset root; no timeout padding or gameplay changes were needed.
+
+### Verified desktop artifacts and next campaign action
+
+- Linux corrected archive: /tmp/rts-linux-clean-checkpoint-20261008/bevy-open-rts-linux-x86_64.tar.gz,
+  SHA3131ca76b1665e3d1868ded36fe2f2ab383a66af66fcb6ac05d4b887488bb245.
+  Exact no-Nix/read-only /tmp startup and matching separate save-load harness
+  passed; audio device absent in container, so audio acceptance remains open.
+- Windows GNU DEBUG archive: dist/bevy-open-rts-windows-gnu-x86_64-debug.zip,
+  SHA23819149bf202a08eaa29ba7e43dd76804c129b3d8773a80ce090997d8d62bcb.
+  CRC/provenance inventory equality pass; Wine menu/read-only save recovery pass.
+  Actual native Windows/MSVC/release performance remain unverified.
+- Commits: b8113d6 source/save/hotkeys;1c03ecd Linux packager;
+  c577845 cross-platform evidence;47bf770 Windows delivery.
+- Campaign2 correctly rooted run reached real Barracks/turrets/factory completion,
+  then bot failed selecting HMG2176v4 at63.5s. Tall AABB-center click selected a
+  neighboring infantryman in crowded defense. Bot-only patch now clicks unit
+  and producer ground projections. No product/AI/economy changes.
+  Agent release_audit owns that uncommitted patch and live capture-only build
+  session39831/logs/steam-campaign-foot-selection-build.log, then campaign2/4 runs.
+  That build accidentally uses default rustc1.98.1; it is live and must not be
+  restarted because observation times out. Future builds should reuse1.95 cache.
+  Do not claim either remaining mission passed until actual result/continuation.
