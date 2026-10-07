@@ -14,7 +14,7 @@ build. Previous visual fixes and green unit tests do not establish that goal.
 | Interface | English default, coherent icons/tooltips, no clipping at supported desktop sizes; small browser viewport inspected | Compact cards, locked tooltip and queue captured at1280x720/900x720; browser, remaining screens/overlays pending |
 | Art/audio | Fresh menu, base, economy, combat, defeat/victory captures; readable silhouettes; commands/music/volume controls verified | Prior material pass only; further review required |
 | Skirmish/balance | All shipped maps/factions/difficulties playable; reproducible multi-seed difficulty and faction sweeps; no indefinite matches | Partial old evidence; full sweep required |
-| Delivery | Windows and Linux archives launch from arbitrary working directories without Rust/Nix; writable user saves/config | Linux development archive starts in no-Nix Ubuntu container; Windows GNU checkpoint compiles and creates a Vulkan window under Wine; final package/visual proof/release profile/Steam Runtime/hardware pending |
+| Delivery | Windows and Linux archives launch from arbitrary working directories without Rust/Nix; writable user saves/config | Corrected Linux development archive starts in no-Nix/read-only Ubuntu; matching separate harness passes save recovery; Windows GNU compiles and Wine menu/save recovery render correctly; native Windows/release profile/Steam Runtime/hardware pending |
 | Reliability | Full tests, packaged-build smoke, long matches and measured performance on supported hardware | 166 library tests pass; no-Nix/read-only Linux startup passes; release/gameplay/performance gates outstanding |
 | Distribution | Accurate feature/system-requirement copy, asset provenance/licenses and generated-content inventory; store-ready media | Restricted logo removed; upstream/font notices added; unresolved art/audio provenance in ASSET_PROVENANCE.md |
 
@@ -72,3 +72,21 @@ other grid bindings collided with Guard, Hold, Scatter and numbered groups.
 Grid keys now reserve all those shortcuts. The library regression rejects
 duplicate/reserved bindings. Campaign macros observe actual tab keys rather
 than assuming fixed T/Y positions; complete mission acceptance is still pending.
+
+## Desktop checkpoint limits
+
+The corrected Linux archive and exact-source executable hashes are recorded in
+`docs/DESKTOP_DELIVERY.md`. Its read-only installation launches from `/tmp`
+without Nix. A separate stripped/patched validation harness uses an asset
+snapshot matching all 560 archive files and passes ordinary save/load and
+missing/corrupt file recovery. `container-save-load-result.txt` beside that
+archive records exit 0. Container ALSA has no audio device; this proves neither
+audible sound nor physical GPU compatibility.
+
+Windows GNU game and capture binaries compile. The menu and ordinary save/load
+flow render under Wine with a read-only installation and separate user sandbox:
+`screenshots/windows-wine/menu.png`, `save-load/02_restored.png` and
+`save-load/observations.json`. Both images were inspected. This is useful Windows
+executable evidence, but clean native Windows, MSVC distribution, release
+performance and audible playback remain open. Both packagers exclude ignored
+full-font source files and preserve the original user file.
