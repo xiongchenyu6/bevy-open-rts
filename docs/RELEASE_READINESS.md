@@ -285,3 +285,14 @@ only; the full growing-prefix campaign sweep is separate and still active.
 The first systemd launch omitted development library paths and could not load a
 GPU; the corrected retry inherited LD_LIBRARY_PATH and succeeds. Both logs and
 exact executable/profile metadata are retained alongside the screenshots.
+
+## Canonical faction matrix
+
+All72 Normal/Normal configurations (8 maps ×9 ordered faction pairs, starts0/1)
+finish with an authoritative single winner and exit0 on pinned executable8ceee.
+Root verified each raw configuration/result/status, initial HQ count, resources,
+anchors and no timeout flags. Duration76.399–284.819 sim seconds. This establishes
+resolution for those configurations, not general balance: Chaos wins only4 of
+the48 non-mirror configurations, so AI/faction diagnosis is active. The144
+same-faction adjacent-difficulty cases now run separately; alternate spawn pairs,
+repeatability, independent seeds and release-artifact performance remain open.

@@ -106,7 +106,7 @@ also passed. Plain & Simple Alliance Normal versus Demon Hard completed at
 88.79899 seconds with exit 0, active anchors [false,true] and authoritative
 winning team [1]. Evidence is under `target/skirmish-audit-validation/`, with
 build log `logs/skirmish-joint-build.log`. These are bounded pilot cases; the
-full matrix remains unrun.
+canonical faction matrix is now complete; difficulty and full-slot expansions remain pending.
 
 ## Current bounded evidence
 
@@ -133,8 +133,22 @@ python3 scripts/skirmish_matrix.py --matrix factions --seconds 600 \
 
 Dry plans verify72 canonical faction cases,144 canonical adjacent-difficulty
 cases and1,242 faction cases across all legal ordered spawn pairs. These counts
-are planned configurations, not passing results. The first real72-case run is
-live under `rts-skirmish-factions-canonical-20261008.service`; its log is
-`logs/skirmish-factions-canonical-20261008.log`. The first three reports have
-matching configurations, authoritative MatchFinished outcomes and exit0. The
-remaining cases and difficulty/full-slot expansions are still pending.
+are planned configurations until their actual reports pass verification.
+
+The canonical faction matrix completed72/72 with exit0 and no simulation or
+wall-clock timeouts. Root verified every report against the manifest:8 maps,
+9 ordered faction pairs each, Normal/Normal, physical starts0/1,32/16 resources,
+exact requested settings, one authoritative winner and MatchFinished. Simulated
+durations range76.399–284.819 seconds. Executable SHA256:
+`8ceee2b626b013474b3d31842653f2dcf26ccf0deb367ec96491563e20e3c7e2`.
+Evidence is `target/skirmish-factions-canonical-20261008/{manifest,summary,
+verification}.json` plus all72 raw reports/statuses and the corresponding log.
+
+Among48 non-mirror configurations, Demon wins24, Alliance20 and Chaos4. These
+are configuration observations, not statistical win rates. Chaos weakness
+requires diagnosis; match resolution alone does not establish balance.
+
+The144 same-faction adjacent-difficulty cases are running serially on the same
+pinned executable under `rts-skirmish-difficulty-canonical-20261008.service`, log
+`logs/skirmish-difficulty-canonical-20261008.log`. Other legal spawn pairs,
+repeatability and independent-seed coverage remain unverified.
