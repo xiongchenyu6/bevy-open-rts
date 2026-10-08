@@ -170,6 +170,14 @@ fn main() {
                 .unwrap_or_else(|| PathBuf::from("screenshots/boot-camp"));
             render_boot_camp(&dir)
         }
+        Some("save-resume") => {
+            let evidence = args.next().map(PathBuf::from);
+            let output = args.next().map(PathBuf::from);
+            match (evidence, output) {
+                (Some(evidence), Some(output)) => save_flow::render_resume(&evidence, &output),
+                _ => Err("save-resume needs <saved-evidence-directory> <output-directory>".into()),
+            }
+        }
         Some("play") => {
             let dir = args
                 .next()

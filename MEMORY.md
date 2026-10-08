@@ -492,3 +492,9 @@ Latest construction checkpoint:
   AI Easy: obsolete global difficulty differedfromper-slot controllers. Removed
   redundant summaryfield; UI current/setup-summary-fixed.png inspected; fmt,
   check/build/capture exit0. Optimized6d8candidatepredates thissourcefix.
+
+- save-resume capture-onlyfreshprocess load passed /tmp/rts-save-resume-runtime.log;
+  evidence save-mission-fresh-process observations+image inspected. Sourcefirst-
+  wave save copiedtoisolatedtarget/save-resume-41ns_5he; bytesunchanged. Ninealive,
+  flags/6222fog/41ore22crystal/onepaidjob restored, .267snormalframes. Broader
+  mines/orders/effects/support runtimegates remain. No game/librarysource change.

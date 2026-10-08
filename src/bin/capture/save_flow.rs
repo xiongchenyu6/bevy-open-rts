@@ -237,3 +237,82 @@ fn render_with_input(dir: &Path, menu: bool, width: u32, mission: bool) -> Resul
     );
     Ok(())
 }
+
+/// Restore a previously saved match in a newly launched capture process using
+/// the same mouse menu as a player. The caller supplies an isolated save sandbox.
+pub(super) fn render_resume(evidence_dir: &Path, dir: &Path) -> Result<(), String> {
+    let sandbox = std::env::var_os("XDG_DATA_HOME")
+        .map(PathBuf::from)
+        .filter(|path| path.is_absolute())
+        .ok_or("save-resume requires an explicit absolute sandbox XDG_DATA_HOME")?;
+    let save_file = sandbox.join("bevy-open-rts/quicksave.ron");
+    let original_bytes = std::fs::read(&save_file).map_err(|error| error.to_string())?;
+    let evidence: serde_json::Value = serde_json::from_slice(
+        &std::fs::read(evidence_dir.join("observations.json"))
+            .map_err(|error| error.to_string())?,
+    )
+    .map_err(|error| error.to_string())?;
+    let expected: bevy_open_rts::CaptureSaveObservation =
+        serde_json::from_value(evidence["expected"].clone()).map_err(|error| error.to_string())?;
+    let expected_living = evidence["living_units_before"]
+        .as_u64()
+        .ok_or("saved evidence has no living-unit count")? as usize;
+    std::fs::create_dir_all(dir).map_err(|error| error.to_string())?;
+    let mut app = build_capture_app(WIDTH, HEIGHT);
+    wait_for_startup(&mut app)?;
+    start_shared_match_scene_with_current_setup(&mut app);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    capture_dismiss_match_briefing(&mut app);
+    let handle = capture_handle(&app);
+    invoke(&mut app, true, true, &handle, dir)?;
+    if !wait_until(&mut app, 120, |app| capture_save_restore_ready(app)) {
+        return Err("fresh-process mouse load did not finish".into());
+    }
+    let actual = capture_save_observation(&mut app).ok_or("restored match unavailable")?;
+    let actual_living = living_units(&mut app);
+    let same_jobs = actual.jobs.len() == expected.jobs.len()
+        && actual
+            .jobs
+            .iter()
+            .zip(&expected.jobs)
+            .all(|(actual, saved)| {
+                actual.0 == saved.0 && actual.2 == saved.2 && (actual.1 - saved.1).abs() < 0.3
+            });
+    if (actual.ore, actual.crystal, actual.units, actual.structures)
+        != (
+            expected.ore,
+            expected.crystal,
+            expected.units,
+            expected.structures,
+        )
+        || !same_jobs
+        || actual.mission != expected.mission
+        || actual.fired_triggers != expected.fired_triggers
+        || actual_living != expected_living
+        || actual.explored_cells < expected.explored_cells
+        || (actual.clock - expected.clock).abs() > 0.3
+        || bevy_open_rts::capture_match_briefing_visible(&app)
+    {
+        return Err(format!(
+            "fresh-process continuity mismatch: expected={expected:?}, actual={actual:?}"
+        ));
+    }
+    if std::fs::read(&save_file).map_err(|error| error.to_string())? != original_bytes {
+        return Err("fresh-process load modified the save file".into());
+    }
+    shoot(&mut app, &handle, dir.join("00_resumed.png"));
+    std::fs::write(
+        dir.join("observations.json"),
+        serde_json::to_vec_pretty(
+            &serde_json::json!({"input":"fresh-process mouse Load","process_id":std::process::id(),
+            "expected":expected,"actual":actual,"living_units_before":expected_living,
+            "living_units_restored":actual_living,"save_bytes_unchanged":true}),
+        )
+        .map_err(|error| error.to_string())?,
+    )
+    .map_err(|error| error.to_string())?;
+    println!("[capture] fresh-process mouse Load restored campaign, triggers, paid queue and fog");
+    Ok(())
+}

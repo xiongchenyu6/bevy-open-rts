@@ -241,3 +241,16 @@ The balance-harness audit also found that existing difficulty duels keep
 Alliance/Demon default factions, so difficulty and faction effects are confounded.
 They use one default map/spawn pairing and return success even on timeouts;
 those diagnostic outputs do not satisfy the all-map/faction/difficulty gate.
+
+## Fresh-process campaign save restoration
+
+`capture save-resume <original-evidence-directory> <output-directory>` loads
+existing bytes through the actual mouse match menu in a newly launched process.
+It requires an explicit isolated absolute XDG data directory and preserves the
+save file. Check/build/fmt and runtime exit0 pass. Root inspected
+`save-mission-fresh-process/00_resumed.png` and observations: first-wave flags
+remain `[true,true,false,false,false]`, living units9→9, ore/crystal41/22,
+6,222 explored cells, mission `hold_the_line`, and one paid infantry job.
+The clock46.666→46.933 and job3.0→2.733 advance only by normal UI/load frames.
+This closes fresh-process restoration for that first-wave snapshot; later
+orders, mines, effects and support powers still require runtime acceptance.
