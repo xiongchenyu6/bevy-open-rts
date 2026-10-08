@@ -14,8 +14,8 @@ rights manifest. Runtime references are in `src/audio.rs`, the generated registr
 
 | Group | Verified evidence | Remaining work |
 | --- | --- | --- |
-| 153 Space Kit GLBs | All 153 files are byte-identical to pinned official Open RTS revision `a628ad3`; credits identify Kenney and the [official Space Kit page](https://kenney.nl/assets/space-kit) specifies CC0. | Preserve notice/source records; direct correspondence with a versioned Kenney archive remains unverified. |
-| 200 crosshair images | All 200 are byte-identical to that official revision. The [official Crosshair Pack](https://kenney.nl/assets/crosshair-pack) specifies CC0 and 200 files. | Retain source/license records; direct Kenney archive correspondence remains unverified. |
+| 153 Space Kit GLBs | All 153 GLBs byte-match the directly downloaded official Kenney Space Kit archive; its embedded notice identifies version 2.0 and CC0/commercial use. Original Open RTS hash correspondence is retained. | Preserve pinned archive/member/license hashes and notices. The page update label says 1.0; archive notice says 2.0, so those source labels remain distinct. |
+| 200 crosshair images | All 200 byte-match pinned Open RTS. Of those, 57 also byte-match members of the directly downloaded official Kenney archive 1.1 (2026-08-05), whose notice specifies CC0/commercial use. | The other 143 have no exact byte or same-dimension decoded-pixel match in the current archive. Obtain an officially documented older archive or stronger transformation evidence; do not assume current 1.1 equals the import-era version. |
 | Godot logo | [Local notice](../assets/logos/LOGO_LICENSES.md) identifies Andrea Calabró, 2017, CC-BY-4.0. | Include required attribution/license and modification information if distributed. |
 | Lampe Games logo | The same local notice explicitly prohibits use in projects derived from Open RTS. | Removed from the asset tree and migration inventory; retain the restriction notice. Verify final packages contain no copy. |
 | WenQuanYi subset font | Regenerated directly from SHA-verified official 0.2.0-beta TTC face 0 with fontTools 4.61.1. Two runs reproduce identical bytes; 1,219 codepoints cover Rust text, full ASCII, English/Chinese CSV catalogs and all prior glyphs with unchanged advance widths. [Font notices/source hashes](../assets/fonts/WQY-LICENSE-PROVENANCE.md) are retained. | Verify fresh gameplay/menu rendering and include notices in packages. The ignored local full TTF is untouched and no longer an input. |
@@ -35,6 +35,34 @@ This proves 379 byte matches, including 14 English voices and 210 UI files.
 Source membership does not prove provider rights. The notice scan found project
 MIT terms and explicit logo exceptions, with no audio-specific permission records.
 The import-era customized checkout named by the migration manifest remains unavailable.
+
+## Direct official Kenney archives
+
+On 2026-10-08, the download links were read from the official asset pages; only
+those linked Kenney-hosted ZIPs were fetched. Cached downloads remain under
+ignored `target/kenney-source-audit/`. The original pinned Open RTS comparison
+and all its hashes remain intact in the JSON inventory.
+
+- [Space Kit archive](https://kenney.nl/media/pages/assets/space-kit/20874c75ac-1677698978/kenney_space-kit.zip):
+  SHA-256 `d5d7cdf2635ed5a43a9187deaf409b6f47484e402321128341d3c3698e9ef4d9`.
+  All 153 shipped GLBs exactly match members under `Models/GLTF format/`.
+  `License.txt` identifies **Space Kit 2.0**, creation 2020-08-27, Kenney, CC0,
+  and permission for commercial use. The current page's 1.0 update label is not
+  used to override that embedded version. No semantic approximation was needed.
+- [Crosshair Pack archive](https://kenney.nl/media/pages/assets/crosshair-pack/5ef74bd405-1785950072/kenney_crosshair-pack.zip):
+  SHA-256 `26cf8f3e135f8c9a3354a8a6e6c2576e78bd8e2db01c841f93ab43ad3205a78f`.
+  `License.txt` identifies **1.1**, creation 2026-08-05, Kenney and CC0 with
+  commercial-use permission. Content-hash lookup across all 1,609 PNG members
+  finds **57 exact matches**, despite renamed/reordered files. Exact RGBA8
+  comparisons, normalizing invisible RGB, find no additional same-size matches.
+  The 143 remaining images retain their upstream-source evidence but an explicit
+  direct-archive correspondence gap. The current official page exposes no 1.0
+  ZIP link; current 1.1 postdates the 2025 upstream pin.
+
+Per-file archive member mappings, unmatched paths, license hashes and retrieval
+metadata are recorded under `official_kenney_archives` and
+`official_kenney_correspondence` in `asset-source-hashes.json`. No assets were
+replaced and no commercial permission was inferred for unrelated asset families.
 
 ## Generated content
 
