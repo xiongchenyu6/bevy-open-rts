@@ -500,6 +500,7 @@ pub(crate) fn update_campaign_continue_button(
     active: Res<ActiveMission>,
     tutorial: Res<TutorialState>,
     mut buttons: Query<&mut Node, With<CampaignContinueButton>>,
+    mut other_buttons: Query<(&MatchEndButton, &mut Node), Without<CampaignContinueButton>>,
     mut labels: Query<&mut Text, With<CampaignContinueLabel>>,
     mut return_labels: Query<&mut Text, (With<MatchReturnLabel>, Without<CampaignContinueLabel>)>,
 ) {
@@ -511,6 +512,18 @@ pub(crate) fn update_campaign_continue_button(
         } else {
             Display::None
         };
+    }
+    // The finale continuation already returns to the campaign map.
+    // Keep a single map action while retaining the normal return on defeat.
+    let finale_victory = available && active.0.is_some_and(|i| i + 1 == CAMPAIGN_MISSIONS.len());
+    for (button, mut node) in &mut other_buttons {
+        if button.action == MatchEndAction::ReturnToSetup {
+            node.display = if finale_victory {
+                Display::None
+            } else {
+                Display::Flex
+            };
+        }
     }
     let text = if active.0.is_some_and(|i| i + 1 < CAMPAIGN_MISSIONS.len()) {
         t("下一关", "Next Mission")

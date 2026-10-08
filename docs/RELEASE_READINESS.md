@@ -272,3 +272,16 @@ The online-default thin candidate finished in11m22s with exit0 under
 `rts-native-thin-online-candidate-20261008.service`. Its source checkpoint
 predates the skirmish-summary correction. New archive hashes and exact-package
 runtime checks are required before extending this old artifact's acceptance.
+
+## Finale return action
+
+The actual normal-input finale victory exposed two identical Campaign Map
+buttons. The redundant ordinary return action is now hidden on the final
+campaign victory; the continuation action remains. Check/build pass, and a
+fresh normal-input finale again wins at1:22/HQ20 with exit0. Root inspected
+`finale-single-map-button/02_victory.png` (one map button) and `03_continue.png`
+(actual return to campaign selection). This isolated run persists the finale
+only; the full growing-prefix campaign sweep is separate and still active.
+The first systemd launch omitted development library paths and could not load a
+GPU; the corrected retry inherited LD_LIBRARY_PATH and succeeds. Both logs and
+exact executable/profile metadata are retained alongside the screenshots.

@@ -498,3 +498,10 @@ Latest construction checkpoint:
   wave save copiedtoisolatedtarget/save-resume-41ns_5he; bytesunchanged. Ninealive,
   flags/6222fog/41ore22crystal/onepaidjob restored, .267snormalframes. Broader
   mines/orders/effects/support runtimegates remain. No game/librarysource change.
+
+- Finale duplicate CampaignMap removed: finalHumanVictory hides ordinary
+  ReturnToSetup, retainsContinueCampaign; other returnstates unchanged. Fresh
+  normal-input finale1:22/HQ20 exit0, oneMapbutton+realMapreturn inspected in
+  finale-single-map-button. Pin2e472b5f, isolated6-onlyprofile; fullcoherent3
+  separate. Systemd capture requires devLD_LIBRARY_PATH for Vulkanloader;
+  firstfailedGPUstartup preserved, retryservice success. Windowsbuildactive.
