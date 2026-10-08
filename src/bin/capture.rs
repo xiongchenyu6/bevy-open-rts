@@ -156,6 +156,13 @@ fn main() {
                 .unwrap_or(WIDTH);
             save_flow::render_menu(&dir, width)
         }
+        Some("save-mission") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/save-mission"));
+            save_flow::render_mission(&dir)
+        }
         Some("boot-camp") => {
             let dir = args
                 .next()

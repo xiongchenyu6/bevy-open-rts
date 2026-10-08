@@ -65,14 +65,30 @@ fn rejected_load(
 }
 
 pub(super) fn render(dir: &Path) -> Result<(), String> {
-    render_with_input(dir, false, WIDTH)
+    render_with_input(dir, false, WIDTH, false)
 }
 
 pub(super) fn render_menu(dir: &Path, width: u32) -> Result<(), String> {
-    render_with_input(dir, true, width)
+    render_with_input(dir, true, width, false)
 }
 
-fn render_with_input(dir: &Path, menu: bool, width: u32) -> Result<(), String> {
+pub(super) fn render_mission(dir: &Path) -> Result<(), String> {
+    render_with_input(dir, true, WIDTH, true)
+}
+
+fn living_units(app: &mut App) -> usize {
+    let snapshot = bevy_open_rts::capture_construction_contact_debug(app);
+    snapshot["entities"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|entity| {
+            entity["unit"].is_string() && entity["health"].as_f64().is_some_and(|hp| hp > 0.0)
+        })
+        .count()
+}
+
+fn render_with_input(dir: &Path, menu: bool, width: u32, mission: bool) -> Result<(), String> {
     let sandbox = std::env::var_os("XDG_DATA_HOME")
         .map(PathBuf::from)
         .filter(|path| path.is_absolute())
@@ -84,7 +100,13 @@ fn render_with_input(dir: &Path, menu: bool, width: u32) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|error| error.to_string())?;
     let mut app = build_capture_app(width, HEIGHT);
     wait_for_startup(&mut app)?;
-    start_shared_match_scene_with_current_setup(&mut app);
+    if mission {
+        if !capture_start_mission(&mut app, 0) {
+            return Err("save acceptance mission missing".into());
+        }
+    } else {
+        start_shared_match_scene_with_current_setup(&mut app);
+    }
     for _ in 0..MATCH_SETTLE_TICKS {
         app.update();
     }
@@ -95,6 +117,21 @@ fn render_with_input(dir: &Path, menu: bool, width: u32) -> Result<(), String> {
     tap_key(&mut app, KeyCode::F10);
     build_structure_via_real_input(&mut app, "PowerReactor")?;
     let barracks = build_structure_via_real_input(&mut app, "Barracks")?;
+    if mission {
+        let before_wave = living_units(&mut app);
+        if !wait_until(&mut app, 1800, |app| {
+            capture_save_observation(app).is_some_and(|state| state.clock >= 46.0)
+        }) {
+            return Err("mission did not reach its first normal timed wave".into());
+        }
+        let observed = capture_save_observation(&mut app).unwrap();
+        if observed.mission.as_deref() != Some("hold_the_line")
+            || observed.fired_triggers.get(1) != Some(&true)
+            || living_units(&mut app) < before_wave + 3
+        {
+            return Err("authored first wave was not observed before saving".into());
+        }
+    }
     capture_focus_camera_on(&mut app, barracks);
     for _ in 0..12 {
         app.update();
@@ -106,6 +143,7 @@ fn render_with_input(dir: &Path, menu: bool, width: u32) -> Result<(), String> {
         .ok_or("infantry training command unavailable")?;
     tap_key(&mut app, train);
     let expected = capture_save_observation(&mut app).ok_or("running snapshot unavailable")?;
+    let expected_living_units = living_units(&mut app);
     if expected.jobs.len() != 1 {
         return Err("expected one paid queued unit before saving".into());
     }
@@ -125,6 +163,7 @@ fn render_with_input(dir: &Path, menu: bool, width: u32) -> Result<(), String> {
         return Err("Ctrl+L did not finish the real restart/load flow".into());
     }
     let restored = capture_save_observation(&mut app).ok_or("restored snapshot unavailable")?;
+    let restored_living_units = living_units(&mut app);
     if bevy_open_rts::capture_match_briefing_visible(&app) {
         return Err("loading replayed the opening briefing".into());
     }
@@ -149,6 +188,7 @@ fn render_with_input(dir: &Path, menu: bool, width: u32) -> Result<(), String> {
     ) || !same_jobs
         || restored.mission != expected.mission
         || restored.fired_triggers != expected.fired_triggers
+        || restored_living_units != expected_living_units
         || restored.explored_cells < expected.explored_cells
         || (restored.clock - expected.clock).abs() > 0.3
     {
@@ -168,7 +208,7 @@ fn render_with_input(dir: &Path, menu: bool, width: u32) -> Result<(), String> {
         return Err("failed load modified the corrupt save".into());
     }
     std::fs::write(&save_file, valid_bytes).map_err(|error| error.to_string())?;
-    let evidence = serde_json::json!({"input": if menu { "mouse menu" } else { "keyboard" }, "width":width,"expected":expected,"changed":changed,"restored":restored});
+    let evidence = serde_json::json!({"input": if menu { "mouse menu" } else { "keyboard" }, "width":width,"expected":expected,"changed":changed,"restored":restored,"living_units_before":expected_living_units,"living_units_restored":restored_living_units});
     std::fs::write(
         dir.join("observations.json"),
         serde_json::to_string_pretty(&evidence).unwrap(),

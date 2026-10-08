@@ -138,3 +138,32 @@ were inspected. Standard release fat LTO failed with host OOM, so no current
 release executable/package is claimed. Its preserved evidence is under
 `/tmp/rts-standard-release-failed-20261008`; retry keeps the profile unchanged
 and requires source/memory gates. Human audio/performance/hardware remain open.
+
+## First-wave campaign save acceptance
+
+`capture save-mission <directory>` starts Hold the Line with authored settings,
+uses normal construction, waits through its45s wave, then clicks Save/Load in a
+fresh explicit XDG sandbox. `logs/steam-save-mission-runtime.log` exits0 and
+`screenshots/steam-quality/save-mission/observations.json` records mission identity,
+trigger flags `[true,true,false,false,false]`, nine living units before/after,
+6,222 explored cells, restored41ore/22crystal and the original one paid job.
+The changed state had40ore/two jobs. Clock/production advance eight normal frames
+through UI/restart; no wave duplication or opening briefing replay was observed.
+The restored screenshot was inspected. This covers the first-wave scenario;
+mines/support/effect and long post-load campaign behavior remain separate gates.
+
+## Current profile sweep and compiler constraints
+
+The fresh persisted-profile baseline uncovered an actual first-mission loss at
+3:18. Mission2 persists successfully; Mission3 persists its observed victory.
+Mission4 reaches authored5:00 victory and writes completion, but the legacy
+capture incorrectly reports a Tank quota failure before clicking Next Mission.
+These are incomplete sequence results, not a closed full-campaign/profile gate.
+The remaining baseline is supervised separately; next coherent sequence will pin
+one binary and correct normal-input survival replacement/terminal handling.
+
+The unchanged fat-LTO release retry also suffered global OOM, despite resource
+pauses; no standard release executable exists. A separately identified native
+thin-LTO candidate reuses cached dependencies and changes only final compiler
+LTO/codegen/thread flags. It is still unproven and retains all runtime, hardware,
+performance and packaging acceptance requirements.

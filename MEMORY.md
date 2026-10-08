@@ -436,3 +436,27 @@ Latest construction checkpoint:
   and other agent tasks are terminal; all owned files committed. Six current
   mission recipes have wins at recorded revisions; final persistent/current
   complete sequence, balance/performance/audio/art/provider/browser gates remain.
+
+## Campaign save and current profile sweep — 2026-10-08
+
+- Capture-only save-mission added (no product/library edits). Actualmouse first-
+  wave save/load passed exit0, restored screenshot inspected; observations.json
+  retains hold_the_line/fired[true,true,false,false,false]/9livingunits/6222fog,
+  41ore22crystal/one paid job vs changed40ore/twojobs.8normalUI/restartframes
+  elapsed, no duplicated wave/briefing. Logs steam-save-mission-{check,build,runtime}.
+- Currentprofile baseline0 failedactual198s (legacy no armor/refills);1 won110s
+  and actualcampaign.ron strike_the_outpost;2 observedvictory+persistedcanyon_siege
+  before wrapperSIGTERM143 (exitambiguity preserved);3 actuallysurvived300s and
+  persistedhighland_bastion_stand but helperfalseerrored armyquota13/14 and skipped
+  continuation. Remaining4/5 baseline supervised current-campaign-profile-baseline
+  service; release_audit owns survival type-quota/terminal correction after sweep.
+  Fresh sandbox target/current-campaign-profile-lium377c. Nextcoherent0→5mustpin
+  executable andverifycomplete restart/menuunlocks; directentrybypass acknowledged.
+- Standardfat retry1 also OOM-killed (whilepausedresidentIR); preserved at
+  /tmp/rts-standard-release-retry1-failed-20261008, no executable. No thirdblind
+  standardretry. hud_polish authorized final-bin-only thin candidate after actual
+  Rust1.95flagprobe acceptedfat→thin/cgu1→8/LLVMthreads1. Currentunit
+  rts-native-thin-candidate-20261008.service PID2300414/rustc2300470, actualargs
+  captured. Cargoprofile/coresource unchanged; candidate is NOT standardfat proof.
+  Samefeature/perf/hardware/packagegates stay open. sg-officeunreachable, no creds
+  orsourcecopy. Userflake.lock remainsunstaged/unmodified.
