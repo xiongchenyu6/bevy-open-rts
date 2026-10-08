@@ -116,3 +116,25 @@ Hard with 18 units/10 structures versus player 0 with 2 units/4 structures.
 Evidence: `logs/skirmish-audit-normal-hard-120.log`. The printed winner remains
 heuristic; the factions differ, and this is one default-map checkpoint rather
 than current-release or full-matrix acceptance.
+
+## Serial matrix runner
+
+`scripts/skirmish_matrix.py` pins a copy of the executable and its SHA256,
+records exact configurations, and runs one case at a time with both simulation
+and wall-clock limits. Each case retains runtime log, raw authoritative report
+and classified status. Simulation/wall timeouts remain failures; the overall
+command exits2 if any case does not complete. Existing matching manifests can
+resume recorded cases; changed executable/configuration is rejected.
+
+```sh
+python3 scripts/skirmish_matrix.py --matrix factions --seconds 600 \
+  --wall-seconds 180 --output target/skirmish-factions-canonical-20261008
+```
+
+Dry plans verify72 canonical faction cases,144 canonical adjacent-difficulty
+cases and1,242 faction cases across all legal ordered spawn pairs. These counts
+are planned configurations, not passing results. The first real72-case run is
+live under `rts-skirmish-factions-canonical-20261008.service`; its log is
+`logs/skirmish-factions-canonical-20261008.log`. The first three reports have
+matching configurations, authoritative MatchFinished outcomes and exit0. The
+remaining cases and difficulty/full-slot expansions are still pending.
