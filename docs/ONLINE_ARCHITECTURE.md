@@ -172,6 +172,36 @@ separate simulation rewrite rather than a safe shortcut.
   snapshot preserves connected players, clears readiness, and reclaims stale
   player slots.
 
+## Client production default
+
+Fresh clients use `https://open-bevy-signaling.xiongchenyu6.workers.dev`, the
+public endpoint pinned in the Worker deployment configuration and CI verification.
+Existing explicit build/environment overrides, browser verification URL parameters
+and custom lobby service addresses retain their existing behavior. The native,
+cross-platform and browser smoke scripts use this same public fallback. Local
+signaling servers remain available through explicit configuration.
+
+A read-only acceptance check constructs a fresh default lobby session and invokes
+the same validated `OpenBevyGameClient` HTTP path used by normal play:
+
+```sh
+env -u OPEN_BEVY_SIGNALING_URL cargo test --locked --lib \
+  online::tests::public_default_service_bootstrap_uses_actual_client_http_path \
+  -- --ignored --nocapture
+```
+
+It checks compatible session protocol, WSS and issued TURN fields without creating
+rooms or printing credentials. This establishes bootstrap availability only;
+multiplayer synchronization and selected TURN relay traffic still require the
+full product verification below. Old release binaries retain their compiled
+configuration until rebuilt; changing scripts does not update an existing binary.
+
+Verified on 2026-10-08: existing online tests passed (31 passed, one ignored),
+and the isolated no-override bootstrap passed through the actual native client
+HTTP implementation. Logs: `logs/steam-online-default-unit-tests.log` and
+`logs/steam-online-default-bootstrap.log`. No room operations or credential
+output occurred. Multiplayer/relay traffic is not established by this check.
+
 ## Production Network Requirements
 
 ### Native target

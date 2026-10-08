@@ -31,7 +31,7 @@ use uuid::Uuid;
 use crate::*;
 
 const RTS_ONLINE_PROTOCOL: u16 = 4;
-const ONLINE_DEFAULT_SERVICE_URL: &str = "http://127.0.0.1:3536";
+const ONLINE_DEFAULT_SERVICE_URL: &str = "https://open-bevy-signaling.xiongchenyu6.workers.dev";
 const ONLINE_MAX_STATUS_BYTES: usize = 180;
 const ONLINE_PLAYER_RECONNECT_GRACE_SECONDS: f32 = 30.0;
 const ONLINE_SNAPSHOT_HZ: f32 = 10.0;
@@ -6322,6 +6322,53 @@ fn truncate_utf8(value: &mut String, max_bytes: usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    #[ignore = "read-only production bootstrap; requires Internet access"]
+    fn public_default_service_bootstrap_uses_actual_client_http_path() {
+        assert!(
+            std::env::var_os("OPEN_BEVY_SIGNALING_URL").is_none(),
+            "run this acceptance check without an explicit service override"
+        );
+        assert!(
+            option_env!("OPEN_BEVY_SIGNALING_URL").is_none_or(|value| value.is_empty()),
+            "build this acceptance check without a compiled service override"
+        );
+        let mut session = OnlineSession::default();
+        let (client, _) = validated_online_request(&mut session)
+            .expect("fresh lobby defaults must construct the normal game client");
+        let config = bevy::tasks::block_on(client.service_config())
+            .expect("default client must fetch production configuration");
+        assert_eq!(config.service, "open-bevy-signaling");
+        assert!(config.websocket_base_url.starts_with("wss://"));
+        let protocol = open_bevy_protocol::SESSION_PROTOCOL_VERSION;
+        assert!(config.min_session_protocol <= protocol && protocol <= config.max_session_protocol);
+        let turn_servers: Vec<_> = config
+            .ice_servers
+            .iter()
+            .filter(|server| {
+                server
+                    .urls
+                    .iter()
+                    .any(|url| url.starts_with("turn:") || url.starts_with("turns:"))
+            })
+            .collect();
+        assert!(!turn_servers.is_empty(), "production must advertise TURN");
+        assert!(turn_servers.iter().all(|server| {
+            server
+                .username
+                .as_ref()
+                .is_some_and(|value| !value.is_empty())
+                && server
+                    .credential
+                    .as_ref()
+                    .is_some_and(|value| !value.is_empty())
+        }));
+        println!(
+            "read-only default bootstrap: compatible session protocol, WSS and TURN credentials present; no rooms created"
+        );
+    }
 
     fn replay_test_transient_event(
         mut commands: Commands,

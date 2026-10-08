@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SERVICE_URL="${OPEN_BEVY_SIGNALING_URL:-https://signal.101.78.126.6.sslip.io}"
+SERVICE_URL="${OPEN_BEVY_SIGNALING_URL:-https://open-bevy-signaling.xiongchenyu6.workers.dev}"
 RUN_ID="${OPEN_BEVY_ONLINE_VERIFY_RUN:-native-$(date +%s)-$RANDOM}"
 TIMEOUT_SECONDS="${OPEN_BEVY_ONLINE_VERIFY_TIMEOUT:-180}"
 OUTPUT_DIR="${OPEN_BEVY_ONLINE_VERIFY_OUTPUT:-/tmp/open-bevy-native-online-$RUN_ID}"

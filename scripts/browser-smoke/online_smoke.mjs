@@ -5,7 +5,7 @@ import { chromium } from "playwright-core";
 const gameUrl = process.env.OPEN_BEVY_GAME_URL
   ?? "https://xiongchenyu6.github.io/bevy-open-rts/";
 const signalingUrl = process.env.OPEN_BEVY_SIGNALING_URL
-  ?? "https://signal.101.78.126.6.sslip.io";
+  ?? "https://open-bevy-signaling.xiongchenyu6.workers.dev";
 const outputDir = resolve(
   process.env.GITHUB_WORKSPACE ?? process.cwd(),
   process.env.OPEN_BEVY_BROWSER_OUTPUT
