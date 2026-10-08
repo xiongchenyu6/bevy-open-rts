@@ -26,7 +26,7 @@ Before distributing bundled libraries, complete their license notices and corres
 
 A Windows package remains unverified. Build a native Windows release, include assets beside the executable, resolve assets from the installation directory, and store saves under `%LOCALAPPDATA%/bevy-open-rts`. Test a clean Windows machine without Rust/Nix, a non-repository calling directory, read-only installation, fresh profile, saving/loading, audio, and supported GPUs. Linux success does not prove Windows or Steam Deck compatibility.
 
-## Current evidence (2026-10-08)
+## Historical development evidence (2026-10-08)
 
 The development executable was packaged and extracted under `/tmp`, then launched from `/tmp` in `rogue-commander-linux-smoke:ubuntu24` with no `/nix` directory or mount. The bundled loader resolved every direct dependency from the extracted package. Mesa 25.2.8 / llvmpipe LLVM 20 initialized Vulkan, and the native game created its window under headless Weston. An intentional timeout stopped the smoke run. This proves native startup outside the build machine's Nix store, not full gameplay, audio, GPU hardware coverage, or release readiness.
 
@@ -43,3 +43,27 @@ The packager excludes `*.full.ttf`: these are ignored source-font files, not run
 A separate development capture harness also passed ordinary save/load input in a clean no-Nix Ubuntu container (`SAVE_LOAD_EXIT=0`). It built a reactor and barracks, paid for one queued infantry unit, saved with Ctrl+S, paid for a second unit, and restored with Ctrl+L. The restored state recovered 25 ore, 14 crystal, three units, three structures, and the original single paid job; the clock differed by one simulation tick. Missing and corrupt saves preserved the paused match and produced visible feedback. Five screenshots, `observations.json`, and the sandbox `quicksave.ron` are under `container-save-load/` beside the corrected archive.
 
 This harness is not included in the player archive. Its source executable SHA256 is `4b4eb52b9ff32e35305b14a805fdefe732be584799cde585ef5aeb005fc68386`; the stripped/patched validation executable is `/tmp/rts-linux-integration-harness-20261008/capture`, SHA256 `86bfaa2078e2343c81df15793ff832530bb41a53733cdca4237cc50e3772a9a1`. It uses the same completed source build as the native game and a read-only runtime asset snapshot matching every one of the corrected archive's 560 file hashes (`capture-asset-snapshot-equality.json`). This proves that input flow under the recorded software-rendering configuration, not release-profile, Steam Runtime, Windows, physical GPU/audio, or broad gameplay readiness.
+
+## Optimized Linux checkpoints (2026-10-08)
+
+Two unchanged standard release builds terminated in kernel global OOM; neither produced a release executable. Evidence is retained in `/tmp/rts-standard-release-failed-20261008/` and `/tmp/rts-standard-release-retry1-failed-20261008/`. These failures are not successful standard-profile builds.
+
+A separately labeled native candidate preserves the existing dependency profile and overrides only final-executable compilation:
+
+```sh
+RUSTC=/nix/store/yhmi70ln28n1j6wn82h61b8r8q4g562i-rustc-1.95.0/bin/rustc \
+  cargo rustc --locked --release --jobs 1 --bin bevy-open-rts -- \
+  -C lto=thin -C codegen-units=8 -C llvm-args=-threads=1
+```
+
+The online-default candidate completed in 11m22s with exit 0 and 2.8 GiB peak memory. Build log: `logs/steam-native-thin-online-candidate-20261008.log`. Its compile-start context is `/tmp/rts-native-thin-online-candidate-build-context-20261008.json`. The context records commit `6d8a0672dca7ed908552f114dbdecddd59129756`, dirty helper state, and later source differences. This checkpoint includes the verified online-default fix but predates the subsequent setup-summary UI fix; it must not be called the latest source build.
+
+Source executable SHA256: `cd0574925412bd8a0184ee0de484d5f30ce0aaacfcfaa42a1f0e5f6d30c33129`. Archive: `/tmp/rts-linux-native-thin-online-checkpoint-20261008/bevy-open-rts-linux-x86_64.tar.gz`, SHA256 `bebd49e3cbe409b0e02ede5f8e966912b853f0c7766e7b8f6776740587eb5596`. `BUILD_INFO.json` labels it `native-thin-online-default-pre-summary-fix-checkpoint`. The packaged README matches `docs/PLAYER_GUIDE.md` byte-for-byte; the ignored full font and restricted logo are absent, and the original user font hash guard passes.
+
+The exact extracted archive ran through its shipped launcher from `/tmp`, mounted read-only, in Ubuntu 24.04 without `/nix`. An isolated Sway compositor used physical AMD Radeon Graphics (RADV RENOIR), Mesa 25.2.8, Vulkan, at 1280×720. Persistent Wayland virtual devices sent ordinary physical Enter/F10 keys and mouse clicks: skirmish started, tactical pause appeared, and a selected worker moved after a right-click order and resume. No private game state was modified. The launcher now defaults `XLOCALEDIR` to host X11 locale data while preserving an explicit user override; this test supplied no override and emitted no Compose/XKB errors.
+
+Evidence: `/tmp/rts-native-thin-validation-20261008/perf/online-checkpoint/runtime.log`, `01-menu.png`, `02-physical-f10.png`, `03-worker-moved.png`, and `readonly-error.txt`. The installation write probe failed with “Read-only file system”. Audio hardware was absent.
+
+Earlier offline checkpoint source SHA `fadde65718e2dc0f9aac3207e62e57ab1efe517aa55f0a7db52226e3d636e01d` and archive SHA `370755ccb228ac8103f244253c6dfe60dc940e2eb327385a2c64b96cebdb2007` remain preserved under `/tmp/rts-linux-native-thin-offline-b416-20261008/`. That executable retained the old online default, and its input test required an explicit locale override.
+
+MangoHUD 0.8.4 recorded raw frame-time CSVs for the offline checkpoint under `/tmp/rts-native-thin-validation-20261008/perf/`. The idle-menu sample averaged 62.4 FPS; separate samples cover setup and a small opening match with worker movement. They do not establish representative combat performance. Present mode/vsync were not overridden. Combat workload, broader GPU coverage, audible output, Steam Runtime, Windows, and multiplayer-session validation remain separate gates. Optimized compilation and these runtime checks do not establish commercial release readiness.

@@ -76,6 +76,7 @@ export BEVY_ASSET_ROOT="$INSTALL_DIR"
 # Bundled Nix libc has no distro defaults: include the host driver locations.
 HOST_LIB_DIRS=/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu:/usr/lib64:/lib64:/usr/lib:/lib
 export XKB_CONFIG_ROOT="${XKB_CONFIG_ROOT:-/usr/share/X11/xkb}"
+export XLOCALEDIR="${XLOCALEDIR:-/usr/share/X11/locale}"
 export ALSA_CONFIG_PATH="${ALSA_CONFIG_PATH:-/usr/share/alsa/alsa.conf}"
 export ALSA_CONFIG_DIR="${ALSA_CONFIG_DIR:-/usr/share/alsa}"
 export ALSA_PLUGIN_DIR="${ALSA_PLUGIN_DIR:-/usr/lib/x86_64-linux-gnu/alsa-lib}"
@@ -102,6 +103,8 @@ for license_file in root.glob('LICENSE*'):
 (stage / 'BUILD_INFO.json').write_text(json.dumps({
     'source_binary': str(binary), 'source_sha256': hashlib.file_digest(binary.open('rb'), 'sha256').hexdigest(),
     'binary_profile': 'development' if 'debug' in binary.parts else 'release',
+    'build_variant': os.environ.get('BEVY_OPEN_RTS_BUILD_VARIANT', 'unrecorded'),
+    'build_context': json.loads(pathlib.Path(os.environ['BEVY_OPEN_RTS_BUILD_CONTEXT']).read_text()) if os.environ.get('BEVY_OPEN_RTS_BUILD_CONTEXT') else None,
     'bundled_libraries': provenance,
     'note': 'Library provenance is recorded for auditing; distribution license/source obligations remain a release gate.'
 }, indent=2) + '\n')
