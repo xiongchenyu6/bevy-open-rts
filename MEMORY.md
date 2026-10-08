@@ -460,3 +460,24 @@ Latest construction checkpoint:
   captured. Cargoprofile/coresource unchanged; candidate is NOT standardfat proof.
   Samefeature/perf/hardware/packagegates stay open. sg-officeunreachable, no creds
   orsourcecopy. Userflake.lock remainsunstaged/unmodified.
+
+## Native optimized checkpoint and online default — 2026-10-08
+
+- Thin final-bin candidate PASSED8m58s,99MB ELF; fadde65718e2dc0f9aac3207e62e57ab1efe517aa55f0a7db52226e3d636e01d.
+  Standardfat failedtwice; candidatevariant explicitlyrecorded, no feature loss.
+  Offlineb416 archive/tmp/rts-linux-native-thin-offline-b416-20261008 SHA370755ccb228ac8103f244253c6dfe60dc940e2eb327385a2c64b96cebdb2007.
+- ExactarchiveactualmenuAMD RADVRENOIR Mesa25.2.8 Vulkan/noNix/:ro nativewindow,
+  rootinspected /tmp/rts-native-thin-validation-20261008/perf/01_initial.png.
+  Missingaudio device +Compose localeerrors remain; inputinjectionnotyetworks,
+  noFPS/gameplayclaim. hud_polish ownsisolatedSway+localMangoHUD/performance.
+- e4fa01a fixesrealOnlineDefaultlocalhost→documentedpublicWorker, alignsnative/
+  browser/cross/forced-relay smokes, preserveuseroverrides.31onlinetests+actual
+  freshdefaultclientHTTPbootstrap pass(WSS/protocol/TURNfields, no rooms/secrets).
+  Oldb416candidateOFFLINEcheckpoint stillolddefault; nextincrementalthincandidate
+  neededaftercurrente4orlatestfrozenproductsource. No serverdeploy/externalwrites.
+- Correctedcoherentprofile0 failedRadarbudget: screenshotNotEnoughResources,
+  ore0/crystal29. Botqueuedarmor beforeRadarplacement; release_audit reordered
+  Radarbeforequeues, currentlycheck/build+pin/fresh0→5retry. Baseline1/2/4wins,
+  3actualvictorybutfalsequotaerrorcorrected;5factorylikelydestroyedunderattack,
+  AAearlier+verifiedbuildercandidateunproven untilfreshfinalerun. Allgameplay/core
+  changesfrozen; bot/harnessonly. Preservecurrentprofileprefix/resultsfailures.

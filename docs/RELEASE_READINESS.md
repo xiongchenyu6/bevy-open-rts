@@ -167,3 +167,30 @@ pauses; no standard release executable exists. A separately identified native
 thin-LTO candidate reuses cached dependencies and changes only final compiler
 LTO/codegen/thread flags. It is still unproven and retains all runtime, hardware,
 performance and packaging acceptance requirements.
+
+## Optimized native checkpoint and public online bootstrap
+
+A final-bin-only thin-LTO candidate built successfully in8m58s with cached
+release dependencies and full features. Its explicit flags override final LTO
+and codegen/thread counts; it is distinct from the two failed standard fat-LTO
+attempts. Source executable SHA256:
+`fadde65718e2dc0f9aac3207e62e57ab1efe517aa55f0a7db52226e3d636e01d`.
+The offline b416 checkpoint archive is under
+`/tmp/rts-linux-native-thin-offline-b416-20261008`, SHA256
+`370755ccb228ac8103f244253c6dfe60dc940e2eb327385a2c64b96cebdb2007`.
+It retains the player guide, provenance/build context and excludes full fonts.
+
+The exact read-only archive renders the actual1280x720 menu without Nix on AMD
+RADV RENOIR/Mesa25.2.8/Vulkan. Root inspected
+`/tmp/rts-native-thin-validation-20261008/perf/01_initial.png` and adapter/window
+logs. This is hardware startup/rendering evidence, not input or combat FPS.
+The isolated environment has no audio device and logs missing Compose locales;
+keyboard/pointer/data-path and performance acceptance remain open.
+
+Online source and smoke defaults now use the documented, healthy public Worker
+(e4fa01a), retaining explicit overrides and custom service fields.31 existing
+online tests pass. An isolated no-override test through the actual client HTTP
+path passes compatible session protocol/WSS/TURN-configuration checks without
+room writes or credential logging. Logs: steam-online-default-{unit-tests,
+bootstrap}.log. The old b416 artifact has the previous default; a new candidate
+and real multiplayer/forced-TURN traffic are still required.
