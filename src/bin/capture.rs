@@ -44,31 +44,31 @@ use bevy_open_rts::{
     capture_first_enabled_attack_move_hotkey, capture_first_enabled_build_hotkey,
     capture_first_enabled_rally_hotkey, capture_first_enabled_train_hotkey,
     capture_focus_camera_on, capture_frame_whole_map, capture_key, capture_match_phase_label,
-    capture_model_harness_manifest, capture_model_harness_page_count, capture_mouse_button,
-    capture_nearest_enemy_anchor_position, capture_nearest_visible_resource_click_position_to,
-    capture_nearest_visible_resource_position, capture_onscreen_resource_model_center,
-    capture_placement_is_valid, capture_player_army_average_position,
-    capture_player_army_unit_count, capture_player_build_queue_len,
-    capture_player_combat_order_count, capture_player_combat_unit_position,
-    capture_player_command_center, capture_player_completed_structure_count,
-    capture_player_completed_structure_count_for, capture_player_completed_structure_position,
-    capture_player_completed_structure_position_near, capture_player_constructing_count,
-    capture_player_harvesting_count, capture_player_in_placement_mode,
-    capture_player_onscreen_unit_position, capture_player_onscreen_worker_position,
-    capture_player_producer_position, capture_player_resources, capture_player_structure_count,
-    capture_player_unit_count, capture_player_worker_position, capture_run_ai_duel,
-    capture_run_ai_match_until_resolved, capture_run_arena, capture_run_faction_duel,
-    capture_select_map, capture_selected_player_unit_average_position,
-    capture_selected_player_unit_count, capture_selected_player_unit_ids, capture_set_all_factions,
-    capture_set_cursor, capture_set_structure_rally, capture_set_weather,
-    capture_show_campaign_menu, capture_show_credits_menu, capture_show_main_menu,
-    capture_show_options_menu, capture_show_skirmish_setup_menu,
-    capture_show_skirmish_setup_with_dropdown, capture_spawn_construction_showcase,
-    capture_spawn_model_harness_page, capture_stage_art_combat, capture_stage_deployed_siege,
-    capture_stage_player_radar, capture_stage_worker_collecting, capture_start_mission,
-    capture_startup_ready, capture_tutorial_stage, capture_world_to_screen,
-    capture_worst_model_alignment_offset, capture_zoom_camera_closest,
-    start_shared_match_scene_with_current_setup,
+    capture_mission_briefing_complete, capture_model_harness_manifest,
+    capture_model_harness_page_count, capture_mouse_button, capture_nearest_enemy_anchor_position,
+    capture_nearest_visible_resource_click_position_to, capture_nearest_visible_resource_position,
+    capture_onscreen_resource_model_center, capture_placement_is_valid,
+    capture_player_army_average_position, capture_player_army_unit_count,
+    capture_player_build_queue_len, capture_player_combat_order_count,
+    capture_player_combat_unit_position, capture_player_command_center,
+    capture_player_completed_structure_count, capture_player_completed_structure_count_for,
+    capture_player_completed_structure_position, capture_player_completed_structure_position_near,
+    capture_player_constructing_count, capture_player_harvesting_count,
+    capture_player_in_placement_mode, capture_player_onscreen_unit_position,
+    capture_player_onscreen_worker_position, capture_player_producer_position,
+    capture_player_resources, capture_player_structure_count, capture_player_unit_count,
+    capture_player_worker_position, capture_run_ai_duel, capture_run_ai_match_until_resolved,
+    capture_run_arena, capture_run_faction_duel, capture_select_map,
+    capture_selected_player_unit_average_position, capture_selected_player_unit_count,
+    capture_selected_player_unit_ids, capture_set_all_factions, capture_set_cursor,
+    capture_set_structure_rally, capture_set_weather, capture_show_campaign_menu,
+    capture_show_credits_menu, capture_show_main_menu, capture_show_options_menu,
+    capture_show_skirmish_setup_menu, capture_show_skirmish_setup_with_dropdown,
+    capture_spawn_construction_showcase, capture_spawn_model_harness_page,
+    capture_stage_art_combat, capture_stage_deployed_siege, capture_stage_player_radar,
+    capture_stage_worker_collecting, capture_start_mission, capture_startup_ready,
+    capture_tutorial_stage, capture_world_to_screen, capture_worst_model_alignment_offset,
+    capture_zoom_camera_closest, start_shared_match_scene_with_current_setup,
 };
 
 #[path = "capture/campaign_bot.rs"]
@@ -2022,8 +2022,14 @@ fn render_mission_cutscene(index: usize, dir: &Path) -> Result<(), String> {
     if !capture_start_mission(&mut app, index) {
         return Err(format!("mission {index} not found"));
     }
-    for _ in 0..MATCH_SETTLE_TICKS + 60 {
+    for _ in 0..180 {
         app.update();
+        if capture_mission_briefing_complete(&mut app) {
+            break;
+        }
+    }
+    if !capture_mission_briefing_complete(&mut app) {
+        return Err(format!("mission {index} briefing did not finish revealing"));
     }
     let handle = capture_handle(&app);
     app.world_mut()

@@ -1288,6 +1288,20 @@ pub fn capture_save_restore_ready(app: &App) -> bool {
         && !app.world().contains_resource::<LoadedMatchMarker>()
 }
 
+/// Whether the opening cutscene has revealed its entire briefing.
+/// Reads the real typewriter state without skipping its animation.
+pub fn capture_mission_briefing_complete(app: &mut App) -> bool {
+    let mut writers = app.world_mut().query::<&CutsceneTypewriter>();
+    let mut found = false;
+    for writer in writers.iter(app.world()) {
+        found = true;
+        if writer.shown < writer.full.chars().count() {
+            return false;
+        }
+    }
+    found
+}
+
 pub fn capture_match_briefing_visible(app: &App) -> bool {
     app.world().resource::<MatchBriefingState>().visible
 }

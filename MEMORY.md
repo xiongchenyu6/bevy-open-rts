@@ -481,3 +481,9 @@ Latest construction checkpoint:
   3actualvictorybutfalsequotaerrorcorrected;5factorylikelydestroyedunderattack,
   AAearlier+verifiedbuildercandidateunproven untilfreshfinalerun. Allgameplay/core
   changesfrozen; bot/harnessonly. Preservecurrentprofileprefix/resultsfailures.
+
+- Briefing screenshot audit: campaign continuation waited60ticks (2s), while
+  cutscene reveals28chars/sec. Apparent mid-sentence truncation was unfinished
+  animation, not clipping. Read-only capture_mission_briefing_complete plus
+  bounded180tick wait verifies full text; Mission3 longest English and Mission4
+  full defense sentence inspected at1280x720, both capture exit0.

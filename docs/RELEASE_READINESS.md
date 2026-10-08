@@ -194,3 +194,28 @@ path passes compatible session protocol/WSS/TURN-configuration checks without
 room writes or credential logging. Logs: steam-online-default-{unit-tests,
 bootstrap}.log. The old b416 artifact has the previous default; a new candidate
 and real multiplayer/forced-TURN traffic are still required.
+
+## Current campaign and packaged-input audit
+
+The coherent current-profile run `current-campaign-profile-coherent-2` passed
+missions 1–3 through normal input and recorded the exact growing completion
+prefix after each successful process exit. Mission 4 then lost its headquarters
+around 274 seconds; the sequence stopped. This is a real defense failure, so
+older isolated wins do not close the current campaign acceptance gate.
+
+The exact offline thin-LTO archive now also enters Skirmish setup and launches
+a match through a persistent virtual pointer on the isolated AMD/Ubuntu desktop.
+Root inspected `/tmp/rts-native-thin-validation-20261008/perf/07_match_mouse.png`.
+This extends startup evidence to mouse navigation and match rendering. Keyboard
+mapping, combat performance and audible playback remain unverified. The Compose
+locale fix is being incorporated into the next package.
+
+Apparent truncated continuation briefings were captured after only two seconds
+of the real 28-character/second typewriter animation. Capture acceptance must
+wait for the actual complete-text state before reviewing wrapping and clipping;
+these early frames alone do not prove a UI truncation bug.
+
+The complete-text predicate and bounded wait pass compilation and fresh mission
+3/4 captures. Root inspected `briefing-complete-{2,3}/00_cutscene.png`: the
+longest English briefing and the full five-minute defense sentence fit at
+1280×720. Both capture processes exit 0 with ordinary Enter dismissal.
