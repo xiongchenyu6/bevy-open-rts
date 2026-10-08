@@ -12,10 +12,13 @@ import zipfile
 
 root = pathlib.Path(__file__).resolve().parent.parent
 profile = sys.argv[1]
+package_tag = sys.argv[2] if len(sys.argv) > 2 else ''
+if not re.fullmatch(r'[a-zA-Z0-9_-]*', package_tag):
+    raise SystemExit('Package tag must contain letters, numbers, underscores or hyphens')
 if profile not in ('debug', 'release'):
     raise SystemExit('Profile must be debug or release')
 binary = root / 'target/windows-cross/x86_64-pc-windows-gnu' / profile / 'bevy-open-rts.exe'
-name = f'bevy-open-rts-windows-gnu-x86_64-{profile}'
+name = f'bevy-open-rts-windows-gnu-x86_64-{profile}' + (f'-{package_tag}' if package_tag else '')
 stage = root / 'dist' / name
 archive = stage.with_suffix('.zip')
 if stage.exists() or archive.exists():
@@ -74,6 +77,7 @@ exit /b %errorlevel%
 commit = subprocess.check_output(['git', '-c', f'safe.directory={root}', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
 (stage / 'BUILD_INFO.json').write_text(json.dumps({
     'target': 'x86_64-pc-windows-gnu', 'profile': profile,
+    'package_tag': package_tag,
     'rust_version': subprocess.check_output(['rustc', '--version'], text=True).strip(),
     'source_commit': commit,
     'source_worktree_dirty': bool(subprocess.check_output(['git', '-c', f'safe.directory={root}', '-C', str(root), 'status', '--porcelain'])),

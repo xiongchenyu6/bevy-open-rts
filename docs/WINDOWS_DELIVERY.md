@@ -35,14 +35,17 @@ working folder.
 ## Linux cross-build
 
 ```sh
-./scripts/package_windows_cross.sh debug
+./scripts/package_windows_cross.sh debug finalui-20261008
 # Release candidate: ./scripts/package_windows_cross.sh release
 ```
 
 This uses Docker `rust:1.96.1-bookworm`, Windows GNU standard libraries and
-MinGW POSIX GCC. It builds with two jobs into `target/windows-cross`, separately
+MinGW POSIX GCC. It builds with one job into `target/windows-cross`, separately
 from Linux builds. Logs are `logs/windows-cross-debug.log` or `-release.log`.
-The debug command also builds `capture.exe` for runtime verification.
+The debug command also builds `capture.exe` for runtime verification. The optional
+second argument adds a checkpoint tag to the directory, archive, and log names;
+only letters, numbers, underscores, and hyphens are accepted. Existing packages
+are never replaced.
 
 GNU packages explicitly identify their target/profile. Debug sections are
 stripped from the copied executable; the original remains intact. Required GNU
@@ -77,6 +80,51 @@ The real save was written under `target/windows-save-sandbox/bevy-open-rts`.
 Wine filters host XDG variables and supplies its own LOCALAPPDATA, so the proof
 runner set matching Windows-absolute XDG_DATA_HOME and LOCALAPPDATA **inside a
 Windows batch file**, before launching the save/load harness.
+
+## Refreshed debug checkpoint — 2026-10-08
+
+The one-job cached Rust 1.96.1 GNU refresh completed in 3m00s (exit 0), with
+unchanged default features/profile. Durable unit:
+`rts-windows-finalui-20261008.service`; log:
+`logs/windows-cross-debug-finalui-20261008.log`. Compile-start source hashes,
+dirty state, and four later capture-only file differences are recorded in
+`logs/windows-refresh-finalui-20261008-context.json`. The game source includes
+the setup-summary and finale duplicate-Map fixes. Windows finale victory behavior
+has not been exercised; source inclusion alone does not prove that UI gate.
+
+Archive: `dist/bevy-open-rts-windows-gnu-x86_64-debug-finalui-20261008.zip`,
+SHA256 `90f340fd7287e3de9c1a6b1f91452d4ccefd265d1a84a46af602ffad66844624`.
+Source executable SHA256:
+`20f1c8f4b397ad8db9e64c4afbd3e157ec46b15ad0ba3ce163e721cc741afe60`;
+packaged executable SHA256:
+`b89bc3551cf14836f6c5cccc87b9f14f9203b6f20b1884cd11e4bd125c00aa83`.
+The earlier untagged archive remains untouched (SHA256
+`23819149bf202a08eaa29ba7e43dd76804c129b3d8773a80ce090997d8d62bcb`).
+The refreshed README equals the player guide byte-for-byte; ignored full-font
+sources and the restricted logo are absent.
+
+The exact packaged player executable also launched through its shipped `launch.cmd`,
+selected NVIDIA RTX 3070 Laptop GPU / driver 615.71.09 / Vulkan, and created
+its window (`logs/windows-finalui-player.log`; intentional timeout exit 124).
+DXGI initialization failed before Vulkan fallback. Xvfb root-window readback
+was black (`player-menu.png`); it is not visual player-menu proof.
+
+Wine 11.0 ran serially on isolated Xvfb `:95`, without host desktop input.
+The separate capture helper (not shipped) rendered the full English command menu
+and passed ordinary mouse Save/Load, including paid queue/resource/time/fog
+continuity and missing/corrupt-save feedback. A second process loaded the same
+save using the mouse menu, verified continuity, and preserved save bytes.
+The exact archive was extracted under `/tmp` and made non-writable;
+the write probe failed with Permission denied. User data used a separate sandbox.
+
+Inspected evidence: `screenshots/windows-finalui-20261008/menu.png`,
+`save-menu/save_menu.png`, `save-menu/observations.json`, and
+`resume/00_resumed.png` / `resume/observations.json` below the same directory.
+Logs: `logs/windows-finalui-menu.log`, `windows-finalui-save-menu.log`,
+and `windows-finalui-resume.log` (all exit 0).
+Helper SHA256: `1b08cdabd07ad6d2087cca44c1559570a3c42d20d29327ad7a1aa1accb25a8da`.
+These are debug/Wine functional checks; they do not establish native Windows,
+MSVC, release performance, audible output, or multiplayer interoperability.
 
 ## Remaining release gate
 
