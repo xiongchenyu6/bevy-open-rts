@@ -346,7 +346,15 @@ fn main() {
                 .next()
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("screenshots/mission"));
-            render_mission_cutscene(index, &dir)
+            let width = args
+                .next()
+                .and_then(|value| value.parse().ok())
+                .unwrap_or(WIDTH);
+            let height = args
+                .next()
+                .and_then(|value| value.parse().ok())
+                .unwrap_or(HEIGHT);
+            render_mission_cutscene(index, &dir, width, height)
         }
         Some("base") => {
             let path = args
@@ -2015,9 +2023,14 @@ fn render_campaign_play(index: usize, dir: &Path) -> Result<(), String> {
     result
 }
 
-fn render_mission_cutscene(index: usize, dir: &Path) -> Result<(), String> {
+fn render_mission_cutscene(
+    index: usize,
+    dir: &Path,
+    width: u32,
+    height: u32,
+) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
-    let mut app = build_capture_app(WIDTH, HEIGHT);
+    let mut app = build_capture_app(width, height);
     wait_for_startup(&mut app)?;
     if !capture_start_mission(&mut app, index) {
         return Err(format!("mission {index} not found"));

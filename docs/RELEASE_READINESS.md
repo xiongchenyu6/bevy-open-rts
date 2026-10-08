@@ -219,3 +219,11 @@ The complete-text predicate and bounded wait pass compilation and fresh mission
 3/4 captures. Root inspected `briefing-complete-{2,3}/00_cutscene.png`: the
 longest English briefing and the full five-minute defense sentence fit at
 1280×720. Both capture processes exit 0 with ordinary Enter dismissal.
+
+`capture mission <index> <directory> [width] [height]` now accepts explicit
+viewport dimensions. Check/build/fmt pass; fresh longest-English Mission3 and
+Mission4 captures exit0 at900×720. Root inspected full text and continuation
+hints in `briefing-complete-{2,3}-900/00_cutscene.png`; neither is clipped.
+The online-default thin-LTO candidate is running under
+`rts-native-thin-online-candidate-20261008.service` with its exact launch context
+recorded in the build log; completion and packaged-runtime acceptance are pending.
