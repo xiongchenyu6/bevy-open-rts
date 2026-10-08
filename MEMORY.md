@@ -487,3 +487,8 @@ Latest construction checkpoint:
   animation, not clipping. Read-only capture_mission_briefing_complete plus
   bounded180tick wait verifies full text; Mission3 longest English and Mission4
   full defense sentence inspected at1280x720, both capture exit0.
+
+- Fresh1280setup screenshot exposed Operation summary AI Normal vs actualrow
+  AI Easy: obsolete global difficulty differedfromper-slot controllers. Removed
+  redundant summaryfield; UI current/setup-summary-fixed.png inspected; fmt,
+  check/build/capture exit0. Optimized6d8candidatepredates thissourcefix.

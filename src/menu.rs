@@ -2390,22 +2390,19 @@ pub(crate) fn main_menu_brief_status_text(selection: SkirmishMenuSelection) -> S
 }
 
 pub(crate) fn main_menu_summary_text(selection: SkirmishMenuSelection) -> String {
-    let map = selection.map();
     let resources = selection.starting_resources();
     let focus_label = if selection.human_team().is_none() {
         t("观战焦点", "Spectate Focus")
     } else {
         t("我方出生槽", "My Spawn Slot")
     };
-    let _ = &map;
     // Concise status line — the per-slot control/team/faction/color detail is
     // already visible in the players panel, so this stays a compact confirmation
     // that fits the dialog on a 720p screen instead of a verbose dev dump.
     format!(
-        "{}: {}  ·  AI: {}  ·  {}: {}\n{}: {}/{}  ·  {}: {}/{}  ·  {}",
+        "{}: {}  ·  {}: {}\n{}: {}/{}  ·  {}: {}/{}  ·  {}",
         t("模式", "Mode"),
         selection.match_mode.label(),
-        selection.ai_difficulty.short_label(),
         focus_label,
         selection.focus_team().label(),
         t("参战玩家", "Players"),

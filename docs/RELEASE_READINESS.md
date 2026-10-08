@@ -227,3 +227,17 @@ hints in `briefing-complete-{2,3}-900/00_cutscene.png`; neither is clipped.
 The online-default thin-LTO candidate is running under
 `rts-native-thin-online-candidate-20261008.service` with its exact launch context
 recorded in the build log; completion and packaged-runtime acceptance are pending.
+
+## Skirmish setup summary correction
+
+Fresh current UI screenshots cover Options, Credits and Skirmish setup at
+1280×720. The setup exposed a stale global difficulty in Operation summary:
+AI Normal contradicted the actual AI Easy player row. The redundant aggregate
+was removed; individual player rows remain the displayed difficulty source.
+Check/build/fmt pass and `ui-current/setup-summary-fixed.png` was inspected
+after a successful capture. The live optimized candidate predates this UI fix.
+
+The balance-harness audit also found that existing difficulty duels keep
+Alliance/Demon default factions, so difficulty and faction effects are confounded.
+They use one default map/spawn pairing and return success even on timeouts;
+those diagnostic outputs do not satisfy the all-map/faction/difficulty gate.
