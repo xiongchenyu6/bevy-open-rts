@@ -27,11 +27,15 @@ The same AA(-22,-13) completes through normal input; Mission3 wins3:03/HQ20,
 Mission5 wins4:17/HQ20/no building losses. Other four recipes have prior wins;
 repeat the whole current campaign/profile sequence before closing its gate.
 
-Mouse Save/Load and actual Main Menu return pass1280x720/900x720. Existing Linux
-and Windows development archives identify earlier checkpoints. Standard Linux
-release fat LTO was OOM-killed; failed logs/unit are preserved. A warm-cache
-unchanged-profile retry awaits verified source freeze and memory headroom under
-`rts-linux-standard-release-20261008.service`; no release artifact exists yet.
+Mouse Save/Load and Main Menu return pass1280x720/900x720. Fresh-process first-
+wave campaign Load also restores flags, paid queue, resources and fog without
+wave duplication. Broader orders/mines/effects/support runtime coverage remains.
+
+Standard Linux fat LTO failed twice with OOM; logs are preserved. The separately
+labeled thin-LTO candidate builds with full features. Its exact offline archive
+passes no-Nix/read-only AMD startup and real Enter/F10/select/right-move input.
+The online-default candidate finished11m22s/exit0; packaging and runtime checks
+are next. Windows development evidence remains an older checkpoint.
 
 Six authored audio mismatches now regenerate deterministically and pass actual
 Bevy loading/decoding; human listening remains open. Packagers use PLAYER_GUIDE

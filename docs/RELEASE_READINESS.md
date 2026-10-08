@@ -254,3 +254,21 @@ remain `[true,true,false,false,false]`, living units9→9, ore/crystal41/22,
 The clock46.666→46.933 and job3.0→2.733 advance only by normal UI/load frames.
 This closes fresh-process restoration for that first-wave snapshot; later
 orders, mines, effects and support powers still require runtime acceptance.
+
+## Packaged physical keyboard and pointer evidence
+
+The offline b416 thin-LTO archive now passes real Enter-to-start, physical F10
+pause/resume, left-click worker selection and right-click movement in isolated
+Ubuntu/Sway on AMD RADV RENOIR. Root inspected `11_evdev_f10_pause.png` and
+`13_worker_moved.png` in `/tmp/rts-native-thin-validation-20261008/perf`.
+The old wtype attempt mapped the requested F10 to physical Escape and is not
+used as evidence. A persistent evdev keyboard/pointer supplies correct keycodes.
+The locale override removes Compose errors; the old archive needed that test
+override, while the prepared launcher preserves user overrides and supplies a
+host-locale default. This proves the recorded input paths on that exact archive,
+not broad combat performance or audible playback.
+
+The online-default thin candidate finished in11m22s with exit0 under
+`rts-native-thin-online-candidate-20261008.service`. Its source checkpoint
+predates the skirmish-summary correction. New archive hashes and exact-package
+runtime checks are required before extending this old artifact's acceptance.
