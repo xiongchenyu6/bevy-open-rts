@@ -73,6 +73,41 @@ simulated elapsed time, surviving units/structures, economy and pending construc
 A timeout must remain explicit even when the diagnostic process exits normally.
 Keep a wall-clock cap and run sequentially while release compilation is active.
 
+## Joint acceptance executable
+
+The new `skirmish_audit` binary accepts all scenario inputs together:
+
+```sh
+cargo build --locked --bin skirmish_audit
+BEVY_ASSET_ROOT="$PWD" timeout 180s target/debug/skirmish_audit \
+  plain_and_simple alliance normal 0 demon hard 1 120 \
+  /tmp/skirmish-normal-hard.json
+```
+
+Arguments are map ID or shipped map path, faction/difficulty/spawn for player A,
+then faction/difficulty/spawn for B, simulation limit (1–3600 seconds), and a new
+JSON evidence path. Slots must be distinct and legal for that map. Other players
+are inactive; economy is 32/16, minimal normal startup, Annihilation victory and
+1/30-second steps. No synthetic seed or resource grants are introduced.
+
+The report preserves actual match clock, original setup, resolved map, initially
+spawned command-center coordinates, authoritative active anchors and winning
+teams, phase/reason, surviving counts, economy and pending construction. Winners
+are never inferred from army size. Completed matches exit 0; simulation timeouts
+write their report and exit 2; invalid inputs/I/O fail with exit 1. Existing
+evidence is never overwritten. External wall-clock expiry remains distinct from
+an in-game timeout and may leave no completed report.
+
+Compile/runtime acceptance passed on 2026-10-08. Eight invalid-config/overwrite
+checks passed (`logs/skirmish-joint-invalid-config.json`). A swapped-slot Canyon
+case timed out at actual clock 1.00000036 seconds with exit 2 and preserved JSON:
+player 0 spawned at [18,0,0], player 1 at [-18,0,0]. The shipped map-path alias
+also passed. Plain & Simple Alliance Normal versus Demon Hard completed at
+88.79899 seconds with exit 0, active anchors [false,true] and authoritative
+winning team [1]. Evidence is under `target/skirmish-audit-validation/`, with
+build log `logs/skirmish-joint-build.log`. These are bounded pilot cases; the
+full matrix remains unrun.
+
 ## Current bounded evidence
 
 The cached debug executable completed `ai-duel normal hard 120` without compilation

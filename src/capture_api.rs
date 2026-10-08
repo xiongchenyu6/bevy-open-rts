@@ -10,6 +10,9 @@ use bevy_rts_camera::RtsCamera as RtsCam;
 
 use crate::*;
 
+mod skirmish_audit;
+pub use skirmish_audit::{SkirmishAuditConfig, run_skirmish_audit};
+
 /// Returns true once startup assets have loaded and the front menu is active.
 ///
 /// The capture binary drives Bevy faster than wall-clock time. Polling this

@@ -1,0 +1,177 @@
+//! Joint configuration and authoritative outcomes for real headless skirmishes.
+use super::*;
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SkirmishAuditConfig {
+    pub map: String,
+    pub factions: [String; 2],
+    pub difficulties: [String; 2],
+    pub spawn_slots: [usize; 2],
+    pub max_seconds: u32,
+}
+
+impl SkirmishAuditConfig {
+    fn validate(
+        &self,
+    ) -> Result<
+        (
+            &'static SkirmishMapDef,
+            [SkirmishFaction; 2],
+            [AiDifficulty; 2],
+        ),
+        String,
+    > {
+        let map = SKIRMISH_MAPS
+            .iter()
+            .find(|map| map.id == self.map || map.godot_path == self.map)
+            .ok_or_else(|| format!("unknown shipped map '{}'", self.map))?;
+        if self.max_seconds == 0 || self.max_seconds > 3600 {
+            return Err("simulation limit must be 1..3600 seconds".into());
+        }
+        if self.spawn_slots[0] == self.spawn_slots[1]
+            || self.spawn_slots.iter().any(|slot| *slot >= map.players)
+        {
+            return Err(format!(
+                "spawn slots must be distinct and within 0..{}",
+                map.players
+            ));
+        }
+        Ok((
+            map,
+            [
+                capture_parse_faction(&self.factions[0])?,
+                capture_parse_faction(&self.factions[1])?,
+            ],
+            [
+                capture_parse_ai_difficulty(&self.difficulties[0])?,
+                capture_parse_ai_difficulty(&self.difficulties[1])?,
+            ],
+        ))
+    }
+}
+
+/// Runs the shipped economy, AI, navigation, combat and victory systems.
+/// No random seeds, grants or substitute simulation are introduced.
+pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Value, String> {
+    let (map, factions, difficulties) = config.validate()?;
+    let mut app = build_game_app(GameAppMode::Headless);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
+    ));
+    {
+        let mut settings = app.world_mut().resource_mut::<MatchSetupSettings>();
+        settings.map_path = map.godot_path;
+        settings.starting_resources = StartingResources::new(32, 16);
+        settings.startup_loadout = StartupLoadoutMode::GodotSkirmish;
+        settings.victory_condition = VictoryCondition::Annihilation;
+        settings.visible_player = VisiblePlayer::all_players(Team::Player(0));
+        settings.active_teams = vec![false; MAX_SKIRMISH_LOBBY_SLOTS];
+        settings.player_controllers =
+            vec![SkirmishPlayerController::None; MAX_SKIRMISH_LOBBY_SLOTS];
+        settings.player_factions = vec![SkirmishFaction::Alliance; MAX_SKIRMISH_LOBBY_SLOTS];
+        settings.player_spawn_slots = default_player_spawn_slots();
+        settings.team_relations = TeamRelations::default();
+        for player in 0..2 {
+            settings.active_teams[player] = true;
+            settings.player_controllers[player] =
+                SkirmishPlayerController::Ai(difficulties[player]);
+            settings.player_factions[player] = factions[player];
+            settings.player_spawn_slots[player] = config.spawn_slots[player];
+            settings
+                .ai_difficulties
+                .set_difficulty(Team::Player(player), difficulties[player]);
+        }
+    }
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::InMatch);
+    let mut initial_positions = None;
+    let mut updates = 0;
+    let max_updates = config.max_seconds * 30 + 60;
+    loop {
+        app.update();
+        updates += 1;
+        if initial_positions.is_none() {
+            let world = app.world_mut();
+            let mut query = world.query::<(&Team, &Structure, &Transform)>();
+            let mut positions: Vec<_> = query.iter(world).filter_map(|(team, structure, transform)| {
+                if structure.id != "CommandCenter" { return None; }
+                let Team::Player(player) = team else { return None; };
+                (*player < 2).then(|| serde_json::json!({"player":player,"position":transform.translation.to_array()}))
+            }).collect();
+            if positions.len() == 2 {
+                positions.sort_by_key(|value| value["player"].as_u64().unwrap());
+                initial_positions = Some(positions);
+            }
+        }
+        let state = app.world().resource::<MatchState>();
+        if !state.is_running()
+            || state.start_time_sec >= config.max_seconds as f32
+            || updates >= max_updates
+        {
+            break;
+        }
+    }
+    let world = app.world_mut();
+    let state = world.resource::<MatchState>();
+    let completed = !state.is_running();
+    let phase = match_phase_label(state.phase);
+    let clock = state.start_time_sec;
+    let result_reason = state.result_reason;
+    let active_anchors = state.active_anchor_teams.clone();
+    let remaining_anchors = state.remaining_anchors;
+    let winners: Vec<usize> = if completed {
+        active_anchors
+            .iter()
+            .enumerate()
+            .filter_map(|(index, active)| active.then_some(index))
+            .collect()
+    } else {
+        Vec::new()
+    };
+    let mut teams = vec![
+        serde_json::json!({"player":0,"units":0,"structures":0,"pending_construction":0}),
+        serde_json::json!({"player":1,"units":0,"structures":0,"pending_construction":0}),
+    ];
+    let mut units = world.query::<(&Team, &Health, &Unit)>();
+    for (team, health, _) in units.iter(world) {
+        if let Team::Player(index) = team
+            && *index < 2
+            && health.current > 0.0
+        {
+            let count = teams[*index]["units"].as_u64().unwrap();
+            teams[*index]["units"] = (count + 1).into();
+        }
+    }
+    let mut structures = world.query::<(&Team, &Health, &Structure, Option<&UnderConstruction>)>();
+    for (team, health, _, construction) in structures.iter(world) {
+        if let Team::Player(index) = team
+            && *index < 2
+            && health.current > 0.0
+        {
+            let count = teams[*index]["structures"].as_u64().unwrap();
+            teams[*index]["structures"] = (count + 1).into();
+            if construction.is_some() {
+                let count = teams[*index]["pending_construction"].as_u64().unwrap();
+                teams[*index]["pending_construction"] = (count + 1).into();
+            }
+        }
+    }
+    let economies = world.resource::<Economies>();
+    for (index, team) in teams.iter_mut().enumerate() {
+        let economy = economies.get(Team::Player(index));
+        team["ore"] = economy.ore.into();
+        team["crystal"] = economy.crystal.into();
+    }
+    Ok(serde_json::json!({
+        "schema":1, "config":config, "resolved_map_id":map.id, "resolved_map_path":map.godot_path,
+        "active_player_slots":[0,1], "starting_resources":{"ore":32,"crystal":16},
+        "startup_loadout":"GodotSkirmish", "victory_condition":"Annihilation",
+        "timestep_seconds":1.0/30.0, "updates":updates, "clock_seconds":clock,
+        "phase":phase, "result_reason":result_reason, "completed":completed, "timeout":!completed,
+        "initial_command_center_positions":initial_positions,
+        "winning_teams":winners, "active_anchor_teams":active_anchors,
+        "remaining_anchors":remaining_anchors, "teams":teams,
+    }))
+}
