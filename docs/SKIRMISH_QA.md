@@ -152,3 +152,17 @@ The144 same-faction adjacent-difficulty cases are running serially on the same
 pinned executable under `rts-skirmish-difficulty-canonical-20261008.service`, log
 `logs/skirmish-difficulty-canonical-20261008.log`. Other legal spawn pairs,
 repeatability and independent-seed coverage remain unverified.
+
+## Interrupted-run recovery
+
+The difficulty run stopped after23 recorded cases. Resume exposed damaged JSON
+in cases20–22 and an interrupted case23. Those directories are preserved under
+`target/skirmish-difficulty-canonical-20261008/interrupted/`; none were counted
+as passing without valid matching raw evidence. The runner now checks cached
+status/result consistency, preserves interrupted directories and replays their
+cases. Metadata uses synchronized atomic replacement; new launches also sync
+raw reports and runtime logs. Actual recovery has completed those four cases
+and advanced beyond them. The original72 canonical faction reports were
+rechecked: all72 remain valid. The resumed144-case run is live under
+`rts-skirmish-difficulty-recover-20261009.service`, with its own recovery log.
+It still uses the old fixed binary; new AI behavior requires a new matrix.

@@ -42,8 +42,46 @@ def scenarios(kind, all_slots):
 
 def write_json(path, value):
     pending = path.with_suffix(path.suffix + ".pending")
-    pending.write_text(json.dumps(value, indent=2) + "\n")
+    with pending.open("w") as stream:
+        stream.write(json.dumps(value, indent=2) + "\n")
+        stream.flush()
+        os.fsync(stream.fileno())
     pending.replace(path)
+    if os.name == "posix":
+        descriptor = os.open(path.parent, os.O_RDONLY)
+        try:
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+
+
+def cached_status(case_dir, case):
+    """Keep valid observations; preserve interrupted files before replaying."""
+    if not case_dir.exists():
+        return None
+    try:
+        status = json.loads((case_dir / "status.json").read_text())
+        if status.get("config") != case:
+            raise ValueError("cached configuration differs")
+        kind = status.get("classification")
+        if kind in ("completed", "simulation_timeout"):
+            report = json.loads((case_dir / "result.json").read_text())
+            expected_complete = kind == "completed"
+            if (report.get("config") != case
+                    or report.get("completed") is not expected_complete
+                    or report.get("timeout") is not (not expected_complete)
+                    or status.get("exit_code") != (0 if expected_complete else 2)):
+                raise ValueError("cached result does not match status")
+        elif kind not in ("wall_timeout", "process_error"):
+            raise ValueError("unknown cached status")
+        return status
+    except (OSError, ValueError, AttributeError):
+        preserved = case_dir.parent / "interrupted"
+        preserved.mkdir(exist_ok=True)
+        destination = preserved / f"{case_dir.name}-{time.time_ns()}"
+        case_dir.rename(destination)
+        print(f"Preserved interrupted evidence {destination}; replaying case", flush=True)
+        return None
 
 
 def main():
@@ -92,14 +130,13 @@ def main():
     results = []
     for index, case in enumerate(cases):
         case_dir = output / f"{index:04d}"
+        cached = cached_status(case_dir, case)
+        if cached is not None:
+            results.append(cached)
+            continue
         case_dir.mkdir(exist_ok=True)
         status_path = case_dir / "status.json"
-        if status_path.exists():
-            results.append(json.loads(status_path.read_text()))
-            continue
         evidence = case_dir / "result.json"
-        if evidence.exists():
-            parser.error(f"unfinished case already has evidence: {case_dir}; inspect before retry")
         factions, difficulties, slots = case["factions"], case["difficulties"], case["spawn_slots"]
         command = [str(pinned), case["map"], factions[0], difficulties[0], str(slots[0]),
                    factions[1], difficulties[1], str(slots[1]), str(args.seconds), str(evidence)]
@@ -111,7 +148,15 @@ def main():
                 classification = "process_error"
             except subprocess.TimeoutExpired:
                 code, classification = None, "wall_timeout"
-        report = json.loads(evidence.read_text()) if evidence.is_file() else None
+            log.flush()
+            os.fsync(log.fileno())
+        try:
+            report = json.loads(evidence.read_text()) if evidence.is_file() else None
+        except (OSError, ValueError):
+            report = None
+        if evidence.is_file():
+            with evidence.open("rb") as stream:
+                os.fsync(stream.fileno())
         if report is not None and report.get("config") == case:
             if code == 0 and report.get("completed") is True and report.get("timeout") is False:
                 classification = "completed"
