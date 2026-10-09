@@ -166,3 +166,18 @@ and advanced beyond them. The original72 canonical faction reports were
 rechecked: all72 remain valid. The resumed144-case run is live under
 `rts-skirmish-difficulty-recover-20261009.service`, with its own recovery log.
 It still uses the old fixed binary; new AI behavior requires a new matrix.
+
+## Baseline difficulty failures requiring followup
+
+The old fixed-binary difficulty run has recorded three real600-second simulation
+timeouts so far: case0049 TechDivide ChaosEasy/ChaosBeginner, and cases0054/0055
+BigArena AllianceBeginner/Easy in both assignments. Raw reports preserve both
+active sides. BigArena0055 has no remaining enemy structures but two surviving
+workers, so unresolved worker elimination must be investigated. No cause or fix
+is established by the aggregate counters alone. These remain failed cases.
+
+The read-only audit report is being extended with typed unit/structure counts
+and timeout-only surviving positions, orders, attack targets and remaining path
+waypoints. Its compilation/runtime validation is pending the shared capture
+build. The post-fix targeted comparison will repeat these exact configurations;
+it will not substitute different difficulty caps or resource grants.
