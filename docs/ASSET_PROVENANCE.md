@@ -131,8 +131,11 @@ provenance links the unchanged PNG to its runtime path/hash, and
 `art/campaign/runtime-derivatives-20261010.json` retains exact encoding commands.
 All six source/provenance/runtime hash triples were rechecked on2026-10-10.
 The360-record source inventory and366-file runtime tree have different scopes.
-Mission5's native briefing has been inspected; the other current briefings,
-small-screen/browser layouts and complete presentation remain unverified.
+Current native1280×720 briefings for missions1,2,3 and5 have been inspected.
+Mission1/2 result panels are readable with no visible clipping; root capture
+hashes/notes are in `current-campaign-chain-live-response/root-visual-review-01.json`
+under `screenshots/steam-quality/`. Missions4/6, small-screen/browser layouts and
+complete presentation remain unverified.
 
 Six legacy campaign JPEGs are retained only for older sealed QA programs and
 are excluded by all four current packaging entry points. Linux, GNU Windows
