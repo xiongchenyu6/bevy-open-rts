@@ -100,8 +100,12 @@ attack a living PowerReactor within range, with active cooldowns and no EMP.
 Its HP is approximately5.0. A new read-only trace observes the same Reactor for400s:161 repair starts,
 HP3.20–8.70, repeated manual repair and no kill. See
 `logs/big-arena-repair-trace-summary-20261009.json`. The force includes one
-ground-incapable AA unit; force composition is being corrected and must be
-replayed. A simple chase explanation is contradicted by the report. See
+ground-incapable AA unit. The default armed production pass now requires
+ground capability unless the explicit air-threat branch is needed. Four AI
+regressions pass (`target/ai-ground-force-focused-02.log`), including the exact
+case0103 victory at323.476s with normal resources/costs, actual air-threat AA
+selection and Human-controller protection. Full suite and fresh216 matrix
+revalidation remain open; this does not erase the old failure. A simple chase explanation is contradicted by the report. See
 `target/big-arena-timeout-diagnostic-20261009`. Both audit pins predate the global
 EMP fix. Alternate starts, repeated runs, independent seeds and final-package
 performance are separate requirements.
