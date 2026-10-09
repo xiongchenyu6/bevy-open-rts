@@ -34,7 +34,7 @@ with binary.open('rb') as stream:
 stage.mkdir(parents=True)
 shutil.copy2(binary, stage / binary.name)
 subprocess.run(['x86_64-w64-mingw32-strip', '--strip-debug', str(stage / binary.name)], check=True)
-shutil.copytree(root / 'assets', stage / 'assets', ignore=shutil.ignore_patterns('*.full.ttf', *(f'mission_{i:02}.jpg' for i in range(1, 7))))
+shutil.copytree(root / 'assets', stage / 'assets', ignore=shutil.ignore_patterns('*.full.ttf'))
 shutil.copy2(root / 'docs/PLAYER_GUIDE.md', stage / 'README.md')
 shutil.copy2(root / 'docs/WINDOWS_DELIVERY.md', stage / 'BUILD_NOTES.md')
 for notice in ('ASSET_PROVENANCE.md', 'asset-source-hashes.json'):

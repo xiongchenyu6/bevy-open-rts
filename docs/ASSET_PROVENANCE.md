@@ -137,14 +137,15 @@ hashes/notes are in `current-campaign-chain-live-response/root-visual-review-01.
 under `screenshots/steam-quality/`. Missions4/6, small-screen/browser layouts and
 complete presentation remain unverified.
 
-Six legacy campaign JPEGs are retained only for older sealed QA programs and
-are excluded by all four current packaging entry points. Linux, GNU Windows
-and web asset-copy dry runs each produce exactly360 files, preserve all six
-new-image hashes and exclude full-font sources; evidence is
-`target/runtime-stage-filter-rmn506du/result.json`. PowerShell exclusion was
-reviewed but not executed because pwsh is unavailable. These copy checks do
-not prove final package launch. Their historical generation gaps do
-not describe the current six original derivatives. Other icon, VFX and voice
+Six obsolete campaign JPEGs were removed on2026-10-10 after confirming all
+six current code paths use the original v2 derivatives and verifying their
+source/runtime hashes. Removed hashes remain in `retired_campaign_art` in the
+source inventory; older sealed archives are unchanged. Current packaging no
+longer needs legacy filename exclusions. Current runtime has336 files (plus
+the ignored full-font source); the330-record source inventory has a different
+scope. Independent336-asset package startup passed before this repository
+cleanup because all six obsolete files were already excluded from that package.
+Other icon, VFX and voice
 rights gaps remain open; these generation records do not establish blanket
 commercial clearance for unrelated assets.
 

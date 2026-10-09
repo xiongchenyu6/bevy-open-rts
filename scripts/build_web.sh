@@ -149,5 +149,5 @@ echo "Stamped web build id: ${BUILD_ID}"
 # Runtime fonts are subsets; preserve full source fonts in the repository only.
 python3 - <<'PY_ASSETS'
 import shutil
-shutil.copytree("assets", "web/assets", ignore=shutil.ignore_patterns("*.full.ttf", *(f"mission_{i:02}.jpg" for i in range(1, 7))))
+shutil.copytree("assets", "web/assets", ignore=shutil.ignore_patterns("*.full.ttf"))
 PY_ASSETS

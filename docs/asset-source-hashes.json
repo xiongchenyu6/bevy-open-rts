@@ -32,7 +32,6 @@
   },
   "summary_by_directory": {
     "campaign": {
-      "absent_from_upstream": 6,
       "generated_original": 6
     },
     "data": {
@@ -77,36 +76,6 @@
     }
   },
   "assets": [
-    {
-      "path": "assets/campaign/mission_01.jpg",
-      "sha256": "e4a2b091cdec26d2bcbdf94c5d8e28bc7fbac32b5d3e73eea9b97616607c5ab8",
-      "comparison": "absent_from_upstream"
-    },
-    {
-      "path": "assets/campaign/mission_02.jpg",
-      "sha256": "2de39fe754b8a142214f5b61211e476f9d4ef57b7d71ccc1056a863810381490",
-      "comparison": "absent_from_upstream"
-    },
-    {
-      "path": "assets/campaign/mission_03.jpg",
-      "sha256": "d220c2a5651bdc581885890958926fb4c184f22f81c2e0bd1d225b71ee4e1d7d",
-      "comparison": "absent_from_upstream"
-    },
-    {
-      "path": "assets/campaign/mission_04.jpg",
-      "sha256": "466e95440827f4206b9ce60999890d041edeb5ad23def4a184e934a34b2fe158",
-      "comparison": "absent_from_upstream"
-    },
-    {
-      "path": "assets/campaign/mission_05.jpg",
-      "sha256": "14ce02e3111826a9ea34ccedee986d3e807ddb3eefbef73a5f3f75e90e49c4ab",
-      "comparison": "absent_from_upstream"
-    },
-    {
-      "path": "assets/campaign/mission_06.jpg",
-      "sha256": "e25c270ade94593929078aadb54e82ccccddc252656c1b37109a0f51e97cd791",
-      "comparison": "absent_from_upstream"
-    },
     {
       "path": "assets/data/godot_model_map.model_map.ron",
       "sha256": "e1674c86f38d6c358ab768581b6280df02ab14344f5c9ec834ac539a93dc0e3c",
@@ -4298,5 +4267,35 @@
         "upstream_sha256": "07e28d7a86396fa4f1d7c43040f8e57e2374f6fa35b02bc48e70f9ccd4041c1a"
       }
     ]
+  },
+  "retired_campaign_art": {
+    "date": "2026-10-10",
+    "records": [
+      {
+        "path": "assets/campaign/mission_01.jpg",
+        "sha256": "e4a2b091cdec26d2bcbdf94c5d8e28bc7fbac32b5d3e73eea9b97616607c5ab8"
+      },
+      {
+        "path": "assets/campaign/mission_02.jpg",
+        "sha256": "2de39fe754b8a142214f5b61211e476f9d4ef57b7d71ccc1056a863810381490"
+      },
+      {
+        "path": "assets/campaign/mission_03.jpg",
+        "sha256": "d220c2a5651bdc581885890958926fb4c184f22f81c2e0bd1d225b71ee4e1d7d"
+      },
+      {
+        "path": "assets/campaign/mission_04.jpg",
+        "sha256": "466e95440827f4206b9ce60999890d041edeb5ad23def4a184e934a34b2fe158"
+      },
+      {
+        "path": "assets/campaign/mission_05.jpg",
+        "sha256": "14ce02e3111826a9ea34ccedee986d3e807ddb3eefbef73a5f3f75e90e49c4ab"
+      },
+      {
+        "path": "assets/campaign/mission_06.jpg",
+        "sha256": "e25c270ade94593929078aadb54e82ccccddc252656c1b37109a0f51e97cd791"
+      }
+    ],
+    "scope": "obsolete runtime paths; original6current derivatives preserved"
   }
 }
