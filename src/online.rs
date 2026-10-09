@@ -1080,6 +1080,7 @@ struct OnlineSnapshotBroadcastParams<'w, 's> {
     session: ResMut<'w, OnlineSession>,
     transport: ResMut<'w, OnlineTransport>,
     replication: ResMut<'w, OnlineMatchReplication>,
+    verification: ResMut<'w, OnlineVerificationHarness>,
     entities: Query<'w, 's, OnlineSnapshotSource<'static>>,
     network_entities: Query<'w, 's, (Entity, &'static NetworkEntityId)>,
     economies: Res<'w, Economies>,
@@ -1668,7 +1669,9 @@ fn online_verification_config() -> Option<OnlineVerificationConfig> {
         role,
         run_id,
         service_url,
-        human_ai_control: false,
+        human_ai_control: params
+            .get("online_mode")
+            .is_some_and(|mode| mode == "human-ai"),
     })
 }
 
@@ -3376,6 +3379,7 @@ fn poll_online_transport(
     mut lifecycle: ResMut<OnlineLifecycleControl>,
     mut setup: ResMut<MatchSetupSettings>,
     mut next_state: ResMut<NextState<AppScreen>>,
+    mut verification: ResMut<OnlineVerificationHarness>,
 ) {
     let Some(socket) = transport.socket.as_mut() else {
         return;
@@ -3489,7 +3493,11 @@ fn poll_online_transport(
                 let Ok(frame) = postcard::from_bytes::<OnlineWorldFrame>(&decoded) else {
                     continue;
                 };
-                queue_online_world_frame(&mut replication, frame);
+                if queue_online_world_frame(&mut replication, frame)
+                    && let Some(snapshot) = replication.pending_snapshot.as_ref()
+                {
+                    control_verification::record_snapshot(&mut verification, snapshot);
+                }
             }
         }
     }
@@ -4832,6 +4840,7 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
         mut session,
         mut transport,
         mut replication,
+        mut verification,
         entities,
         network_entities,
         economies,
@@ -5060,6 +5069,7 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
     };
     match socket.broadcast_snapshot(&payload) {
         Ok(()) => {
+            control_verification::record_snapshot(&mut verification, &snapshot);
             if let Some(baseline) = new_baseline {
                 replication.send_baseline = Some(baseline);
             }

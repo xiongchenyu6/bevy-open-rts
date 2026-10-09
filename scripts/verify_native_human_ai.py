@@ -42,6 +42,7 @@ def main():
     parser.add_argument("--run-id", default=f"human-ai-{int(time.time())}-{os.getpid()}")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--timeout", type=int, default=240)
+    parser.add_argument("--browser-url", help="local freshly built bundle; player becomes real browser peer")
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -63,6 +64,7 @@ def main():
         raise RuntimeError("public provider configuration is incompatible")
     processes = []
     logs = []
+    snapshot_logs = {}
     reports = {}
     host_snapshots = {}
     player_snapshots = {}
@@ -70,6 +72,8 @@ def main():
     cleanup = {"disconnected": False, "room_expired": False}
     room = None
     matched_ticks = []
+    common_ticks = []
+    mismatched_ticks = []
     try:
         for role in ("host", "player"):
             env = os.environ.copy()
@@ -81,8 +85,13 @@ def main():
                        BEVY_ASSET_ROOT=str(ROOT), RUST_LOG="warn")
             log = (output / f"{role}.log").open("w")
             logs.append(log)
+            snapshot_logs[role] = (output / f"{role}-snapshots.jsonl").open("w")
+            command = [str(ROOT / "scripts/native_runner.sh"), str(binary)]
+            if role == "player" and args.browser_url:
+                env["OPEN_BEVY_GAME_URL"] = args.browser_url
+                command = ["node", str(ROOT / "scripts/browser-smoke/control_player.mjs")]
             processes.append(subprocess.Popen(
-                [str(ROOT / "scripts/native_runner.sh"), str(binary)],
+                command,
                 cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT,
                 start_new_session=True))
         deadline = time.monotonic() + args.timeout
@@ -94,18 +103,27 @@ def main():
                 reports[role] = value
                 room = value.get("room_code") or room
                 for snapshot in (value.get("control") or {}).get("snapshots", []):
-                    store[snapshot["tick"]] = snapshot
+                    tick = snapshot["tick"]
+                    if tick in store:
+                        if store[tick] != snapshot:
+                            raise RuntimeError(f"{role} changed an already observed snapshot tick {tick}")
+                        continue
+                    if len(store) >= 1024:
+                        raise RuntimeError(f"{role} exceeded bounded QA snapshot capture (1024)")
+                    store[tick] = snapshot
+                    snapshot_logs[role].write(json.dumps(snapshot, separators=(",", ":")) + "\n")
+                snapshot_logs[role].flush()
             if len(reports) == 2 and all(r.get("terminal") for r in reports.values()):
                 break
             if any(p.poll() is not None for p in processes):
-                raise RuntimeError("a native client exited before terminal proof")
+                raise RuntimeError("a client exited before terminal proof")
             time.sleep(0.1)
         if len(reports) != 2 or not all(r.get("passed") for r in reports.values()):
-            raise RuntimeError("native control proof failed or timed out; inspect local reports")
+            raise RuntimeError("control proof failed or timed out; inspect local reports")
         if any(r.get("run_id") != args.run_id or not r.get("human_ai_control") or r.get("connected_humans") != 2 for r in reports.values()):
             raise RuntimeError("wrong verification scenario or connected peer count")
         if reports["host"].get("room_code") != reports["player"].get("room_code"):
-            raise RuntimeError("native clients joined different rooms")
+            raise RuntimeError("clients joined different rooms")
         host = reports["host"]["control"]
         player = reports["player"]["control"]
         if not host["queue_seen_on_host"] or not host["queue_preserved_on_host"]:
@@ -114,15 +132,18 @@ def main():
             raise RuntimeError("normal orders or AI development were not observed")
         common = sorted(tick for tick in host_snapshots.keys() & player_snapshots.keys()
                         if host_snapshots[tick].get("clock", 0) >= 30.0)
-        if len(common) < 3:
-            raise RuntimeError("fewer than three same-tick authoritative snapshots observed")
         mismatches = [tick for tick in common if host_snapshots[tick] != player_snapshots[tick]]
+        common_ticks = common
+        mismatched_ticks = mismatches
+        matched_ticks = [tick for tick in common if tick not in mismatches]
+        atomic_json(output / "snapshot_agreement.json", {
+            "matched_ticks": matched_ticks, "count": len(matched_ticks),
+            "observed_common_ticks": common_ticks, "mismatched_ticks": mismatched_ticks,
+            "host_queue_only": True, "unit_queues_not_in_snapshot_protocol": True})
+        if len(common) < 20:
+            raise RuntimeError("fewer than twenty same-tick authoritative snapshots observed")
         if mismatches:
             raise RuntimeError(f"same-tick snapshot summaries differ at {mismatches[:5]}")
-        matched_ticks = common
-        atomic_json(output / "snapshot_agreement.json", {
-            "matched_ticks": common, "count": len(common),
-            "host_queue_only": True, "unit_queues_not_in_snapshot_protocol": True})
     except Exception as exc:
         error = str(exc)
     finally:
@@ -136,6 +157,8 @@ def main():
                 os.killpg(process.pid, signal.SIGKILL)
                 process.wait()
         for log in logs:
+            log.close()
+        for log in snapshot_logs.values():
             log.close()
         cleanup["disconnected"] = True
         if room:
@@ -154,10 +177,23 @@ def main():
                 time.sleep(2)
     if room and not cleanup["room_expired"]:
         error = error or "own QA room did not expire after normal host disconnect"
+    common_ticks = sorted(tick for tick in host_snapshots.keys() & player_snapshots.keys()
+                          if host_snapshots[tick].get("clock", 0) >= 30.0)
+    mismatched_ticks = [tick for tick in common_ticks if host_snapshots[tick] != player_snapshots[tick]]
+    matched_ticks = [tick for tick in common_ticks if tick not in mismatched_ticks]
+    atomic_json(output / "snapshot_agreement.json", {
+        "matched_ticks": matched_ticks, "count": len(matched_ticks),
+        "observed_common_ticks": common_ticks, "mismatched_ticks": mismatched_ticks,
+        "host_queue_only": True, "unit_queues_not_in_snapshot_protocol": True})
     result = {"passed": error is None, "error": error, "run_id": args.run_id,
               "room_code": room, "binary_sha256": binary_hash,
-              "roles": ["host", "player"], "ai_slots": 1,
+              "roles": ["native-host", "browser-player" if args.browser_url else "native-player"], "ai_slots": 1,
               "same_tick_snapshot_count": len(matched_ticks),
+              "observed_common_same_tick_count": len(common_ticks),
+              "snapshot_mismatched_ticks": mismatched_ticks,
+              "raw_snapshot_counts": {"host": len(host_snapshots), "player": len(player_snapshots)},
+              "raw_snapshot_files": ["host-snapshots.jsonl", "player-snapshots.jsonl"],
+              "raw_snapshot_cap_per_role": 1024,
               "host_queue_only": True, "cleanup": cleanup}
     atomic_json(output / "result.json", result)
     print(json.dumps(result, indent=2))

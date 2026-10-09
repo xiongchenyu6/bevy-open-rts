@@ -5,6 +5,12 @@ use super::*;
 #[derive(Default, Debug)]
 pub(super) struct ControlState {
     initialized: bool,
+    tracked_worker_id: Option<u64>,
+    command_trace: Vec<serde_json::Value>,
+    host_order_trace: Vec<serde_json::Value>,
+    last_host_orders: Option<serde_json::Value>,
+    max_worker_queue: usize,
+    offending_order: Option<serde_json::Value>,
     initial_human_ids: Vec<u64>,
     initial_ai_ids: Vec<u64>,
     origin: Option<Vec3>,
@@ -58,6 +64,26 @@ fn goals(bounds: MapBounds, origin: Vec3) -> Vec<Vec3> {
     vec![first, second, origin]
 }
 
+fn queued_order_summary(order: &UnitQueuedOrder) -> serde_json::Value {
+    if let UnitQueuedOrder::Move(destination) = order {
+        return serde_json::json!({"kind": "Move", "destination": destination.to_array()});
+    }
+    let kind = match order {
+        UnitQueuedOrder::Move(_) => unreachable!(),
+        UnitQueuedOrder::Attack(_) => "Attack",
+        UnitQueuedOrder::Capture(_) => "Capture",
+        UnitQueuedOrder::Garrison(_) => "Garrison",
+        UnitQueuedOrder::Harvest { .. } => "Harvest",
+        UnitQueuedOrder::Repair(_) => "Repair",
+        UnitQueuedOrder::Construct(_) => "Construct",
+        UnitQueuedOrder::Follow { .. } => "Follow",
+        UnitQueuedOrder::AttackMove(_) => "AttackMove",
+        UnitQueuedOrder::Patrol { .. } => "Patrol",
+        UnitQueuedOrder::ForceFollow { .. } => "ForceFollow",
+    };
+    serde_json::json!({"kind": kind})
+}
+
 pub(super) fn drive(
     params: &mut OnlineVerificationParams,
     role: OnlineVerificationRole,
@@ -91,6 +117,7 @@ fn observe(
             return Ok(());
         };
         state.origin = Some(position.translation);
+        state.tracked_worker_id = Some(id.0);
         state.goals = goals(*params.map_bounds, position.translation);
         harness.tracked_unit_id = Some(id.0);
         harness.tracked_unit_origin = Some(position.translation);
@@ -121,17 +148,29 @@ fn observe(
             && clock >= 30.0
             && (state.sent_steps == 0 || (moved && harness.elapsed >= state.next_command_at))
         {
-            let step = state.sent_steps;
-            params.outbox.submit(OnlinePlayerCommand::UnitOrders {
-                orders: vec![OnlineUnitOrderCommand {
-                    unit_id: worker_id,
-                    order: OnlineUnitOrderKind::Move {
-                        destination: state.goals[step].to_array(),
-                    },
-                }],
-                queue: step != 0,
-            });
-            state.sent_steps += 1;
+            // After real movement, send two distinct ordinary Shift-click packets
+            // together so a slow renderer does not space them beyond the first move.
+            let end = if state.sent_steps == 0 {
+                1
+            } else {
+                state.goals.len()
+            };
+            for step in state.sent_steps..end {
+                params.outbox.submit(OnlinePlayerCommand::UnitOrders {
+                    orders: vec![OnlineUnitOrderCommand {
+                        unit_id: worker_id,
+                        order: OnlineUnitOrderKind::Move {
+                            destination: state.goals[step].to_array(),
+                        },
+                    }],
+                    queue: step != 0,
+                });
+                state.command_trace.push(serde_json::json!({
+                    "clock": clock, "elapsed": harness.elapsed, "unit_id": worker_id,
+                    "step": step, "queue": step != 0, "destination": state.goals[step].to_array(),
+                }));
+                state.sent_steps += 1;
+            }
             state.next_command_at = harness.elapsed + 1.0;
             harness.command_sent = true;
             harness.stage = OnlineVerificationStage::CommandSent;
@@ -141,6 +180,25 @@ fn observe(
             && verification_unit_position(&params.units, &params.interpolations, worker_id)
                 .is_some_and(|p| p.distance(state.origin.unwrap()) < 1.5);
     } else {
+        let mut orders = params.control.units.iter()
+            .filter(|(_, team, ..)| **team == human)
+            .map(|(id, _, unit, _, _, _, movement, queue, harvest, construction)| {
+                serde_json::json!({"unit_id": id.0, "kind": unit.id,
+                    "move": movement.map(|order| order.target.to_array()),
+                    "queue": queue.map(|q| q.orders.iter().map(queued_order_summary).collect::<Vec<_>>()).unwrap_or_default(),
+                    "harvest": harvest.is_some(), "construction": construction.is_some()})
+            }).collect::<Vec<_>>();
+        orders.sort_unstable_by_key(|row| row["unit_id"].as_u64().unwrap_or_default());
+        let orders = serde_json::Value::Array(orders);
+        if state.last_host_orders.as_ref() != Some(&orders) {
+            state
+                .host_order_trace
+                .push(serde_json::json!({"clock": clock, "orders": orders}));
+            if state.host_order_trace.len() > 64 {
+                state.host_order_trace.remove(0);
+            }
+            state.last_host_orders = Some(orders);
+        }
         let economy = params.control.economies.get(human);
         if (economy.ore, economy.crystal) != (32, 16) {
             return Err(
@@ -148,7 +206,7 @@ fn observe(
             );
         }
         let mut ids = Vec::new();
-        for (id, team, _, position, health, _, movement, queue, harvest, construction) in
+        for (id, team, unit, position, health, _, movement, queue, harvest, construction) in
             &params.control.units
         {
             if *team != human {
@@ -164,7 +222,15 @@ fn observe(
             if id.0 != worker_id
                 && (movement.is_some() || queue.is_some_and(|q| !q.orders.is_empty()))
             {
-                return Err("untouched remote Human unit acquired an order".into());
+                state.offending_order = Some(serde_json::json!({
+                    "clock": clock, "tracked_worker_id": worker_id, "unit_id": id.0,
+                    "kind": unit.id, "move": movement.map(|order| order.target.to_array()),
+                    "queue": queue.map(|q| q.orders.iter().map(queued_order_summary).collect::<Vec<_>>()).unwrap_or_default(),
+                }));
+                return Err(format!(
+                    "untouched remote Human {} {} acquired an order (tracked Worker {})",
+                    unit.id, id.0, worker_id
+                ));
             }
             if id.0 != worker_id {
                 continue;
@@ -172,6 +238,7 @@ fn observe(
             let queued = queue
                 .map(|q| q.orders.iter().collect::<Vec<_>>())
                 .unwrap_or_default();
+            state.max_worker_queue = state.max_worker_queue.max(queued.len());
             state.queue_seen |= queued.len() == 2;
             let mut active = movement.map(|m| vec![m.target]).unwrap_or_default();
             for order in queued {
@@ -225,19 +292,8 @@ fn observe(
                         && !state.initial_ai_ids.contains(&id.0)
                 });
     }
-    let snapshot = if role == OnlineVerificationRole::Host {
-        params.replication.send_baseline.as_ref()
-    } else {
-        params.replication.receive_baseline.as_ref()
-    };
-    if let Some(snapshot) = snapshot {
-        state
-            .snapshots
-            .insert(snapshot.tick, summary(snapshot, worker_id));
-        while state.snapshots.len() > 40 {
-            state.snapshots.pop_first();
-        }
-        if role == OnlineVerificationRole::Player {
+    if role == OnlineVerificationRole::Player {
+        if let Some(snapshot) = params.replication.receive_baseline.as_ref() {
             state.ai_factory |= snapshot.entities.iter().any(|e| {
                 e.team.to_game() == ai
                     && matches!(&e.kind, OnlineEntityKind::Structure{id} if id == "VehicleFactory")
@@ -256,6 +312,31 @@ fn observe(
         harness.pass("human_control_preserved");
     }
     Ok(())
+}
+
+/// Observe actual successful sends/accepted frames, including decoded deltas.
+/// Keyframe baselines alone miss snapshots when rendering is slower than networking.
+pub(super) fn record_snapshot(
+    harness: &mut OnlineVerificationHarness,
+    snapshot: &OnlineWorldSnapshot,
+) {
+    if !harness
+        .config
+        .as_ref()
+        .is_some_and(|config| config.human_ai_control)
+    {
+        return;
+    }
+    let Some(worker) = harness.control.tracked_worker_id else {
+        return;
+    };
+    harness
+        .control
+        .snapshots
+        .insert(snapshot.tick, summary(snapshot, worker));
+    while harness.control.snapshots.len() > 40 {
+        harness.control.snapshots.pop_first();
+    }
 }
 
 fn summary(snapshot: &OnlineWorldSnapshot, worker: u64) -> serde_json::Value {
@@ -277,12 +358,15 @@ fn summary(snapshot: &OnlineWorldSnapshot, worker: u64) -> serde_json::Value {
         })
         .collect::<Vec<_>>();
     ai.sort_unstable_by_key(|e| e.0);
-    serde_json::json!({"tick":snapshot.tick,"clock":snapshot.match_state.start_time_sec,"worker":snapshot.entities.iter().find(|e| e.id==worker).map(|e|e.translation),
+    serde_json::json!({"tick":snapshot.tick,"clock":snapshot.match_state.start_time_sec,"dto":snapshot,"worker":snapshot.entities.iter().find(|e| e.id==worker).map(|e|e.translation),
         "human_economy":snapshot.economies.get(1).map(|e|[e.ore,e.crystal]),"ai_entities":ai})
 }
 
 pub(super) fn report(state: &ControlState) -> serde_json::Value {
     serde_json::json!({"sent_steps":state.sent_steps,"queue_seen_on_host":state.queue_seen,
+        "tracked_worker_id":state.tracked_worker_id,"command_trace":state.command_trace,
+        "host_order_trace":state.host_order_trace,"max_worker_queue":state.max_worker_queue,
+        "offending_order":state.offending_order,
         "queue_preserved_on_host":state.queue_preserved,"route_completed":state.completed_route,
         "ai_factory_completed":state.ai_factory,"ai_armed_produced":state.ai_trained,
         "goals":state.goals.iter().map(|p|p.to_array()).collect::<Vec<_>>(),"snapshots":state.snapshots.values().collect::<Vec<_>>()})
