@@ -157,5 +157,8 @@ only HP earned by actual construction work, and never revives dead sites.
 Nine construction regressions pass (`logs/foundation-damage-focused-01.log`),
 including real weapon destruction of an unworked foundation, retained damage
 through completion and no healing of stalled/dead sites. Full-suite passes178/0/1 in313.94s (`logs/foundation-damage-full-01.log`).
-Shared-build and exact case0050 replay are running or pending; the frozen788 audit continues
+All three shared native binaries build successfully (6m37s). Exact case0050
+replay completes at88.866s with Normal slot1 winning; configuration and normal
+starting resources match the failed600s baseline (`target/four-corners-foundation-replay-20261010`).
+Full matrix revalidation remains open; the frozen788 audit continues
 unchanged, and no all-configurations completion is claimed.
