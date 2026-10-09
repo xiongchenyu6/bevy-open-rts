@@ -10,13 +10,13 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Area | Required evidence | Accepted evidence and remaining work |
 | --- | --- | --- |
 | First session | Fresh profile completes gathering, power, barracks, training, movement, attack and victory; skip/replay work | Seven lessons and sandbox persistence pass at recorded checkpoints; normal-input skip/return/graduation/replay captured. Revalidate final package. |
-| Campaign | All six missions through normal controls in one App; correct objectives, retry/next/finale; persistent completion | Older separate-process six-mission prefix and pre-reset four-mission chain pass. Isolated M5 wins04:49/HQ20. AI/economy fresh-reset tests pass; corrected chain stops in M3 construction aftertwo valid prefixes. Paid-queue lifecycle, construction recovery and full chain/final menu remain open. |
+| Campaign | All six missions through normal controls in one App; correct objectives, retry/next/finale; persistent completion | Older separate-process six-mission prefix and pre-reset four-mission chain pass. Isolated M5 wins04:49/HQ20. Fresh lifecycle/atomic-queue tests pass; visible-only isolatedM5 wins05:32/HQ20 on8d391. Corrected six-mission same-App chain is live; full chain/final menu remain open. |
 | Save continuity | Fresh-process restoration of campaign triggers, orders, paid jobs, economy, fog, mines, temporary effects and support; safe missing/corrupt loads | First-wave campaign, paid jobs/fog/economy, harvest references, queued moves and F1/F5 effects pass in bounded runtime proofs. Fresh Mine11 mouseSave/newPIDLoad passes exact4HP, source/timer/index remap and unchanged bytes on reset-core pin. Broader effects, weather and final-format/package revalidation remain open. |
 | Interface | English default; coherent icons/tooltips; no clipping at supported sizes; browser inspected | Native cards/tooltips/save menu inspected at1280x720 and900x720; compact unit markers and single finale-map action captured. Fresh browser menu/setup/start/select/move inspected at1280x720/900x720 using software compositor; remaining overlays/final artifacts require review. |
 | Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Six original encoded illustrations are wired; native briefings1/2/3/5 and bounded result panels inspected. Remaining layouts, full presentation and audio remain open. |
 | Skirmish/balance | All maps/factions/difficulties/starts playable; reproducible repeated/independent-seed sweeps; no indefinite matches | Foundation-fix pin completes216/216 canonical cases with validated outcomes. Combat-damage checkpoint completes216/216 canonical cases, independently validated. Reset-core pin runs full3,726 ordered-start cases;27 overlapping fresh reports match the previous pin. Wider repetition, independent seeds and broad balance remain open. |
 | Delivery | Windows/Linux release archives launch without Rust/Nix from arbitrary directories; writable user data | Earlier optimized Linux package passes bounded hardware/input smoke. Windows GNU/Wine harness evidence exists. Current release packages, native Windows/MSVC and Steam Runtime remain open. |
-| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Real EMP application regressions pass3/3; prior full suite178/0/1. Three new combat-damage regressions pass; fresh/load transition regressions2/2 and updated full suite183/0/1 pass; shared native build passes; final-package/runtime acceptance remains incomplete. No representative combat performance or long-session acceptance yet. |
+| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Real EMP application regressions pass3/3; prior full suite178/0/1. Three new combat-damage regressions pass; fresh/load transition regressions2/2 and updated full suite196/0/1 pass; shared native build passes; final-package/runtime acceptance remains incomplete. No representative combat performance or long-session acceptance yet. |
 | Distribution | Accurate store copy, provenance/licenses/generated inventory and store-ready media | Unpublished store draft and partial provenance audit exist. Art/audio rights gaps and final media remain open. |
 
 ## Verification policy
@@ -257,3 +257,18 @@ output/log/result paths and terminates timed-out children with exit124. Negative
 checks in `target/mine-runner-check-n5ex9f8z` verify child1 propagation, missing
 observations failure2, existing-file preservation and real child timeout/reaping.
 Asynchronous service launch success is never proof success.
+
+## Visible-only mission5 checkpoint
+
+Capture8d391 on the updated original semantic-icon asset set completes actual
+mission5 at332.774s with HumanVictory/HQ20, actual child exit0 and normal Next
+Mission. Root inspected `current-campaign-twin-visible-crystal-cover/02_victory.png`.
+Targets come only from actual visible enemy roots; unexplored sectors use ordinary
+map scouting. Paid production and crystal-field protection preserve the economy.
+The single-App six-mission supervisor is now live as
+`rts-campaign-chain-visible-only-01`; no complete campaign claim is made yet.
+
+The current Linux thin-LTO candidate is compiling with explicit Rust1.95,
+locked dependencies and one Cargo job. It records all source hashes and actual
+exit under `target/linux-current-release-20261010/`. It is not yet built,
+packaged or runtime-accepted. Existing release archives remain older checkpoints.
