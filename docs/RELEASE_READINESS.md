@@ -10,7 +10,7 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Area | Required evidence | Accepted evidence and remaining work |
 | --- | --- | --- |
 | First session | Fresh profile completes gathering, power, barracks, training, movement, attack and victory; skip/replay work | Seven lessons and sandbox persistence pass at recorded checkpoints; normal-input skip/return/graduation/replay captured. Revalidate final package. |
-| Campaign | All six missions through normal controls in one App; correct objectives, retry/next/finale; persistent completion | Older fresh-process six-mission prefix and current four-mission chain pass. Actual Restart resets/replays triggers. Current M5 counter-artillery recipe wins at289.1s with HQ20HP; six-mission same-App chain and final persistence/menu remain pending. |
+| Campaign | All six missions through normal controls in one App; correct objectives, retry/next/finale; persistent completion | Older fresh-process six-mission prefix and current four-mission chain pass. Actual Restart resets/replays triggers. Current M5 counter-artillery recipe wins at289.1s with HQ20HP; same-App chain completesfour exact prefixes then losesM5; AI cross-match reset regression/fix and final chain/menu remain pending. |
 | Save continuity | Fresh-process restoration of campaign triggers, orders, paid jobs, economy, fog, mines, temporary effects and support; safe missing/corrupt loads | First-wave campaign, paid jobs/fog/economy, harvest references, queued moves and F1/F5 effects pass in bounded runtime proofs. Real older-save→current-core mine migration passes exact4HP triggering; fresh-current creation and broader status/damage effects remain open. |
 | Interface | English default; coherent icons/tooltips; no clipping at supported sizes; browser inspected | Native cards/tooltips/save menu inspected at1280x720 and900x720; compact unit markers and single finale-map action captured. Fresh browser menu/setup/start/select/move inspected at1280x720/900x720 using software compositor; remaining overlays/final artifacts require review. |
 | Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Six original encoded illustrations are wired; mission5 native briefing inspected. Other images/layouts/audio remain open. |
@@ -58,6 +58,24 @@ Earlier stationary-Hold pin `ac27f9ff` loses at106.8s despite completed defenses
 adequate power and correctly held combat units. Its ground-artillery defeat is
 preserved, not reclassified. No mission stats, enemy waves or costs have been
 weakened. See [campaign QA](CAMPAIGN_QA.md).
+
+## Cross-match state regression
+
+The current same-App chain completes missions1–4 with exact on-disk prefixes,
+then loses mission5 at117.8s (`current-campaign-chain-live-response` actual
+process exit1). The isolated mission5 victory remains a distinct bounded proof.
+AI director state is initialized once and omitted from fresh-match entry reset;
+opening-grace flags/cursors/timers therefore carry across matches. A regression
+using the actual RestartingMatch→InMatch transition fails before the fix and
+retains the seeded previous director (`logs/campaign-ai-reset-red.log`).
+
+The initial loaded-state test also differs after Update because disabled AI
+capabilities normalize their timers to profile intervals even at zero delta.
+That fixture observation does not prove a serializer defect. Exact restoration
+must be checked at the actual load boundary before normal AI updates. Economy
+startup likewise resets only ore/crystal, leaving sabotage and producer veterancy;
+these are being included in fresh/load transition regressions. No fix is accepted
+yet. Wasm04 was deliberately stopped and retains its stop/provenance records.
 
 ## Save and combat continuity
 
