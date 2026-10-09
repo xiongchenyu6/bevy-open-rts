@@ -1496,6 +1496,8 @@ enum OnlineAsyncResult {
     TransportStopped(String),
 }
 
+mod control_verification;
+
 #[cfg(target_arch = "wasm32")]
 const ONLINE_VERIFICATION_STATUS_ELEMENT_ID: &str = "open-bevy-online-verification";
 const ONLINE_VERIFICATION_TIMEOUT_SECONDS: f32 = 240.0;
@@ -1556,6 +1558,7 @@ struct OnlineVerificationConfig {
     role: OnlineVerificationRole,
     run_id: String,
     service_url: String,
+    human_ai_control: bool,
     #[cfg(not(target_arch = "wasm32"))]
     status_path: Option<String>,
 }
@@ -1574,6 +1577,7 @@ struct OnlineVerificationHarness {
     result: Option<String>,
     error: Option<String>,
     last_report: String,
+    control: control_verification::ControlState,
 }
 
 impl Default for OnlineVerificationHarness {
@@ -1596,6 +1600,7 @@ impl Default for OnlineVerificationHarness {
             result: None,
             error: None,
             last_report: String::new(),
+            control: default(),
         }
     }
 }
@@ -1634,6 +1639,8 @@ fn online_verification_config() -> Option<OnlineVerificationConfig> {
             .ok()
             .filter(|url| !url.trim().is_empty())
             .unwrap_or_else(|| ONLINE_DEFAULT_SERVICE_URL.to_string()),
+        human_ai_control: std::env::var("OPEN_BEVY_ONLINE_VERIFY_MODE")
+            .is_ok_and(|mode| mode == "human-ai"),
         status_path: std::env::var("OPEN_BEVY_ONLINE_VERIFY_STATUS")
             .ok()
             .filter(|path| !path.trim().is_empty()),
@@ -1662,6 +1669,7 @@ fn online_verification_config() -> Option<OnlineVerificationConfig> {
         role,
         run_id,
         service_url,
+        human_ai_control: false,
     })
 }
 
@@ -1679,6 +1687,7 @@ struct OnlineVerificationParams<'w, 's> {
     replication: Res<'w, OnlineMatchReplication>,
     map_bounds: Res<'w, MapBounds>,
     match_state: Res<'w, MatchState>,
+    control: control_verification::ControlQueries<'w, 's>,
     units: Query<
         'w,
         's,
@@ -2826,11 +2835,27 @@ fn drive_online_verification(params: &mut OnlineVerificationParams) -> Result<()
                     .room
                     .as_ref()
                     .map(|room| room.room_code.to_string());
-                submit_lobby_command(
-                    &mut params.session,
-                    &mut params.transport,
-                    OnlineLobbyCommand::VictoryCondition(1),
-                );
+                if config.human_ai_control {
+                    submit_lobby_command(
+                        &mut params.session,
+                        &mut params.transport,
+                        OnlineLobbyCommand::SlotOccupant {
+                            slot: 2,
+                            occupant: OnlineSlotOccupant::Ai(OnlineAiDifficulty::Normal),
+                        },
+                    );
+                    submit_lobby_command(
+                        &mut params.session,
+                        &mut params.transport,
+                        OnlineLobbyCommand::StartingResources(DEFAULT_STARTING_RESOURCE_INDEX),
+                    );
+                } else {
+                    submit_lobby_command(
+                        &mut params.session,
+                        &mut params.transport,
+                        OnlineLobbyCommand::VictoryCondition(1),
+                    );
+                }
                 params.harness.stage = OnlineVerificationStage::WaitingForPlayers;
             }
         }
@@ -2918,6 +2943,14 @@ fn drive_online_verification_match(
         return Ok(());
     }
 
+    if params
+        .harness
+        .config
+        .as_ref()
+        .is_some_and(|config| config.human_ai_control)
+    {
+        return control_verification::drive(params, role);
+    }
     let local_player_id = params
         .session
         .local_player_id
@@ -3133,6 +3166,9 @@ fn publish_online_verification_status(params: &mut OnlineVerificationParams) {
         "match_phase": format!("{:?}", params.match_state.phase),
         "result": params.harness.result,
         "error": params.harness.error,
+        "game_clock": params.match_state.start_time_sec,
+        "human_ai_control": config.human_ai_control,
+        "control": config.human_ai_control.then(|| control_verification::report(&params.harness.control)),
     });
     let Ok(report) = serde_json::to_string(&report) else {
         return;
