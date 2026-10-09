@@ -44,14 +44,41 @@ The original missing-technology failure is preserved in
 regression **passes (1/0)** in 1.61 seconds, verifying saved mission orders,
 production and fired-trigger continuity.
 
-## Remaining acceptance
+## Full suite and exact configuration comparisons
 
-The full library suite and ten exact baseline configurations are still pending.
-The comparison manifest is `target/ai-tech-targeted-20261009/cases.json`: five
-Plain & Simple Normal faction pairings and all five actual 600-second timeouts
-from the older canonical difficulty sweep. Typed unit/structure counts and
-remaining order/path evidence will be checked. These focused regressions do
-not establish general faction balance or Steam release readiness.
+`target/ai-tech-full-tests.log`: **170 passed, 0 failed, 1 ignored**,
+96.30 seconds. The existing ignored test is the read-only production HTTP
+bootstrap, which requires Internet access.
+
+`target/ai-tech-targeted-20261009/comparison.json` and `status.json`:
+**10/10 completed, 0 simulation timeouts, 0 validation failures**, 139.28 wall
+seconds. Every result preserves the baseline configuration, normal 32/16
+resources, GodotSkirmish loadout and initial headquarters positions. Typed
+unit and structure counts sum to their respective totals.
+
+All five actual 600-second timeouts in the older canonical difficulty sweep
+resolve in this exact-configuration rerun:
+
+| Baseline case | Map / factions | Difficulty order | New game seconds | Winner |
+| --- | --- | --- | ---: | --- |
+| 0049 | Tech Divide / Chaos | Easy, Beginner | 272.655 | Easy, player 0 |
+| 0054 | Big Arena / Alliance | Beginner, Easy | 202.514 | Easy, player 1 |
+| 0055 | Big Arena / Alliance | Easy, Beginner | 204.715 | Easy, player 0 |
+| 0084 | Canyon Pass / Chaos | Beginner, Easy | 251.391 | Easy, player 1 |
+| 0085 | Canyon Pass / Chaos | Easy, Beginner | 249.924 | Easy, player 0 |
+
+The five Plain & Simple Normal comparisons also resolve. Chaos versus Demon
+with Chaos in slot 1 changes from a Demon victory to a Chaos victory; the Chaos
+mirror changes winning slot. Those individual outcomes do not establish a
+faction win rate. Raw typed rosters are retained in each case's `result.json`.
+
+The pinned audit executable is
+`target/ai-tech-targeted-20261009/skirmish_audit`, SHA256
+`805dbb05e210ab5be9ed73c367bfe0c4a956e49c051ed60bc164e93a41ddf583`.
+The manifest is `target/ai-tech-targeted-20261009/cases.json`.
+The full current 72-faction and 144-difficulty sweeps remain separate acceptance
+work. This focused proof does not establish general balance or Steam release
+readiness.
 
 All compiler commands use locked dependencies, one Cargo job, Rust 1.95 and the
 same restricted systemd compiler environment. Runtime asset roots are absolute.
