@@ -10,13 +10,13 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Area | Required evidence | Accepted evidence and remaining work |
 | --- | --- | --- |
 | First session | Fresh profile completes gathering, power, barracks, training, movement, attack and victory; skip/replay work | Seven lessons and sandbox persistence pass at recorded checkpoints; normal-input skip/return/graduation/replay captured. Revalidate final package. |
-| Campaign | All six missions through normal controls in one App; correct objectives, retry/next/finale; persistent completion | Older fresh-process six-mission prefix passes. Current paid-AI same-App chain passes missions1–4. Global EMP fix completes mission5 foundations in isolation; later combat selection harness fails. Full chain remains open. Actual Restart resets/replays triggers. Full current chain remains open. |
+| Campaign | All six missions through normal controls in one App; correct objectives, retry/next/finale; persistent completion | Older fresh-process six-mission prefix and current four-mission chain pass. Actual Restart resets/replays triggers. Current M5/full chain remain incomplete; capture Hold/rally/layout corrections require new runtime proof. |
 | Save continuity | Fresh-process restoration of campaign triggers, orders, paid jobs, economy, fog, mines, temporary effects and support; safe missing/corrupt loads | First-wave campaign, paid jobs/fog/economy, harvest references, queued moves and F1/F5 effects pass in bounded runtime proofs. Mines and broader status/damage effects remain open. |
-| Interface | English default; coherent icons/tooltips; no clipping at supported sizes; browser inspected | Native cards/tooltips/save menu inspected at1280x720 and900x720; compact unit markers and single finale-map action captured. Browser and remaining overlays require current review. |
-| Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Candidate campaign art is not shipped evidence. |
-| Skirmish/balance | All maps/factions/difficulties/starts playable; reproducible repeated/independent-seed sweeps; no indefinite matches | Paid-AI canonical216 ends215 cases with1 timeout. Alternate starts, repeatability, independent seeds and broad balance remain open. |
+| Interface | English default; coherent icons/tooltips; no clipping at supported sizes; browser inspected | Native cards/tooltips/save menu inspected at1280x720 and900x720; compact unit markers and single finale-map action captured. Fresh browser menu/setup/start/select/move inspected at1280x720/900x720 using software compositor; remaining overlays/final artifacts require review. |
+| Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Six original encoded illustrations are wired; mission5 native briefing inspected. Other images/layouts/audio remain open. |
+| Skirmish/balance | All maps/factions/difficulties/starts playable; reproducible repeated/independent-seed sweeps; no indefinite matches | Foundation-fix pin completes216/216 canonical cases with validated outcomes. Latest EMP/damage changes, alternate starts, repeatability, independent seeds and broad balance remain open. |
 | Delivery | Windows/Linux release archives launch without Rust/Nix from arbitrary directories; writable user data | Earlier optimized Linux package passes bounded hardware/input smoke. Windows GNU/Wine harness evidence exists. Current release packages, native Windows/MSVC and Steam Runtime remain open. |
-| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Global EMP full-schedule regressions pass3/3; full current library suite178 passed/0 failed/1 ignored. New runtime acceptance remains open. No representative combat performance or long-session acceptance yet. |
+| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Real EMP application regressions pass3/3; prior full suite178/0/1. Three new combat-damage regressions pass; updated full suite/build is running. No representative combat performance or long-session acceptance yet. |
 | Distribution | Accurate store copy, provenance/licenses/generated inventory and store-ready media | Unpublished store draft and partial provenance audit exist. Art/audio rights gaps and final media remain open. |
 
 ## Verification policy
@@ -209,3 +209,17 @@ despite145/145 assets; a corrected SwiftShader compositor harness displays the
 same unchanged program. Actual English menu/setup/match screens are observed
 at1280×720 and900×720; complete real selection/movement and paired-frame
 inspection remain pending. Software rendering is not a hardware performance claim.
+
+## Combat damage cooldown correction
+
+Mine07 fresh-process restoration correctly remaps its source and preserves
+arming/layer timers and deployment index. The loaded mine actually triggers
+with a pulse from its exact position, but enemyHP6→2.04 fails the unchanged
+4HP assertion: mine damage did not mark RecentDamage, so Demon regeneration
+restored0.04HP in that frame. Commit9d6a666 marks mine, orbital and crushing
+damage consistently and orders faction recovery after non-weapon damage.
+Three full-schedule regressions pass3/3 in3.73s
+(`logs/combat-damage-focused-03.log`), covering exact mine damage, delayed Demon
+regeneration/Chaos recharge and delayed Alliance field repair after a strike.
+Updated full-suite/shared build and strict fresh-process Mine08 remain pending.
+Failed fixture/diagnostic-compilation attempts remain separate evidence.
