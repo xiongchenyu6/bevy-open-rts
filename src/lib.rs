@@ -7367,3 +7367,6 @@ mod match_tests;
 
 #[cfg(test)]
 mod emp_task_tests;
+
+#[cfg(test)]
+mod hold_guard_tests;

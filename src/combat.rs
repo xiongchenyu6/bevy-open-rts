@@ -1765,11 +1765,18 @@ pub(crate) fn update_veterancy_regeneration(
 pub(crate) fn chase_attack_targets(
     mut commands: Commands,
     relations: Res<TeamRelations>,
-    attackers: Query<(Entity, &Transform, &Unit, &Weapon, &AttackOrder)>,
+    attackers: Query<(
+        Entity,
+        &Transform,
+        &Unit,
+        &Weapon,
+        &AttackOrder,
+        Option<&HoldPosition>,
+    )>,
     targets: Query<(&Transform, &Team, &MovementDomain, &Health)>,
     teams: Query<&Team>,
 ) {
-    for (entity, transform, unit, weapon, attack_order) in &attackers {
+    for (entity, transform, unit, weapon, attack_order, hold) in &attackers {
         let Ok(attacker_team) = teams.get(entity) else {
             continue;
         };
@@ -1791,6 +1798,12 @@ pub(crate) fn chase_attack_targets(
             continue;
         }
         let distance = xz_distance(transform.translation, target_transform.translation);
+        if hold.is_some_and(|hold| hold.enabled) {
+            if distance > weapon.range {
+                clear_attack_chase_order(&mut commands, entity);
+            }
+            continue;
+        }
         if distance > weapon.range * 0.9 {
             if unit.speed <= 0.0 {
                 if distance > weapon.range {
@@ -2355,15 +2368,22 @@ pub(crate) fn combat(
         let moving_with_active_order = moving_weapon_fire_blocked(unit, move_order);
         // Deploying forces hold-position (the chassis is anchored), but an
         // anchored siege gun must still auto-engage anything in reach.
-        let auto_target = if ordered_target.is_none()
-            && !moving_with_active_order
-            && (is_deployed || !hold_position.is_some_and(|hold| hold.enabled))
-        {
+        // Hold means stand and fire, never pursue. Ordinary mobile guards
+        // acquire only inside weapon reach; deployed weapons retain their
+        // existing targeting policy.
+        let acquire_vision = VisionRadius(
+            if !is_deployed && hold_position.is_some_and(|hold| hold.enabled) {
+                vision.0.min(weapon.range)
+            } else {
+                vision.0
+            },
+        );
+        let auto_target = if ordered_target.is_none() && !moving_with_active_order {
             nearest_enemy_for_auto_acquire(
                 *team,
                 transform.translation,
                 &weapon,
-                vision,
+                &acquire_vision,
                 unit,
                 &targets,
                 &relations,
