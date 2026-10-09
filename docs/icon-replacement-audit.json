@@ -1,0 +1,1589 @@
+{
+  "audit_date": "2026-10-10",
+  "scope": "read-only current unresolved icon replacement feasibility; no render performed",
+  "unresolved_count": 107,
+  "icons": [
+    {
+      "path": "assets/ui/icons/AdvancedReactorPlant.png",
+      "current_sha256": "541bae548a80f80e25267c257639830e09e445036d5cc3ef9fd281e888628f6b",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:1646"
+      ],
+      "entity": "AdvancedReactorPlant",
+      "render_models": [
+        "models/kenney-spacekit/chimney_detailed.glb",
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/rocket_fuelB.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/AmphibiousAssaultAPC.png",
+      "current_sha256": "4093563915f40c6f3a31e9afc13a10dba4b6e01436d9defbba0dd684864c78af",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/AntiAirWalker.png",
+      "current_sha256": "a6cf6f6f2a4b800f88df4be77c0372dbfd15a55d6427656e1ebcd4882b2bbeae",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:1823"
+      ],
+      "entity": "AntiAirWalker",
+      "render_models": [
+        "models/kenney-spacekit/rover.glb",
+        "models/kenney-spacekit/satelliteDish.glb",
+        "models/kenney-spacekit/turret_double.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/ArcCoilDefenseTower.png",
+      "current_sha256": "7573c42eaf2ea49d320f70baf58a500b0bfdcb330a19e43ce186c301dba5bdaf",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:1953"
+      ],
+      "entity": "ArcCoilDefenseTower",
+      "render_models": [
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/satelliteDish.glb",
+        "models/kenney-spacekit/structure_closed.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/AttackMove.png",
+      "current_sha256": "a38b0afee098124b7ce21cad5f5073d9883228fa93af1a29577ad0a94393d359",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/command_card.rs:610"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/Barracks.png",
+      "current_sha256": "889489afcf31351b93044d93609037586f7b9d0e36443a55122f8d10749290f1",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:2018"
+      ],
+      "entity": "Barracks",
+      "render_models": [
+        "models/kenney-spacekit/gate_simple.glb",
+        "models/kenney-spacekit/hangar_smallB.glb",
+        "models/kenney-spacekit/machine_wireless.glb",
+        "models/kenney-spacekit/platform_large.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/BattleLab.png",
+      "current_sha256": "1acabda416fdc4ac0a52b77902d515542ee86d3c83a5ac1f81597eba25dd88b1",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/BomberVTOL.png",
+      "current_sha256": "aacdc88fd2babd3e8273270a1421b61ae3bbfde13dc9a36775245c3ed49184a9",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:2074"
+      ],
+      "entity": "BomberVTOL",
+      "render_models": [
+        "models/kenney-spacekit/craft_cargoA.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/BuildQueue.png",
+      "current_sha256": "347e957436eaf1a483e45f3b5ab0108745f3221957b2621fe4aea86ef1986e31",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/CancelOrder.png",
+      "current_sha256": "13bc5e254922a9b5e51a868820dbc1111c277f0f7b1830ce23321d6658fdd018",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/ChronoRelay.png",
+      "current_sha256": "62e28dd205208e9b41c14db47d46413f70c0f64fb9f8e95b9348ba3447218b6c",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/support_powers.rs:116"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/CombatEngineerTeam.png",
+      "current_sha256": "6aa1ff316914e9615206f670e19168553325b87bcff48bb9442423b6154932c9",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/CryoSprayer.png",
+      "current_sha256": "8972e90bab13183a7f1b3157d8382189d032c9fc32a0df96172d02bde5006e4e",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:2195"
+      ],
+      "entity": "CryoSprayer",
+      "render_models": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/barrel.glb",
+        "models/kenney-spacekit/machine_barrel.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/Defeat.png",
+      "current_sha256": "da385564f2c1e35cbb8f87d5ca9a1c18a42f4829e6869280ad3d1dc714ae1603",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/DeployMode.png",
+      "current_sha256": "773174f4843fb2b9b646d0f2477e56fa58ccce80626637c574e52892145d6c9c",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/command_card.rs:606"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/DroneMineLayer.png",
+      "current_sha256": "96f1a7266305e7fc03bb4be6bd4bd818796e17936003a943272449e0935b2f6e",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:2316"
+      ],
+      "entity": "DroneMineLayer",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/EmpPulse.png",
+      "current_sha256": "596c889ae43711e569cdcb62c85e6f21a6a3e71601fb46fd6de2d65b95e04850",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/support_powers.rs:115"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/EngineerDrone.png",
+      "current_sha256": "98f0435211312fd7fa190feebaa79029454e782f37a1f15a854b4c7fadb9f426",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:2372"
+      ],
+      "entity": "EngineerDrone",
+      "render_models": [
+        "models/kenney-spacekit/craft_speederA.glb",
+        "models/kenney-spacekit/machine_wireless.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/FieldMedic.png",
+      "current_sha256": "e376b9a92d7c49282582fb8356d59e22fa9ba1145fd1f675a96f45b469d5368f",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:2428"
+      ],
+      "entity": "FieldMedic",
+      "render_models": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/machine_wireless.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/FlakHoverTank.png",
+      "current_sha256": "c490e05ef73207ae15ffd89ce961da27bd9b5796990a95e92ac525d10788a3cf",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:2484"
+      ],
+      "entity": "FlakHoverTank",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/FlakRocketTeam.png",
+      "current_sha256": "100d4e8ef76252cdfb68b7f86a5ab57f25aaae27ca23276a0df37395c3104994",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:2549"
+      ],
+      "entity": "FlakRocketTeam",
+      "render_models": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/FlakRocketTeamMk2.png",
+      "current_sha256": "988214ffc1c2f0e28805e41d6cf74c390a70e29d29f9adf8ab8ef5dbc98a4aa9",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:2614"
+      ],
+      "entity": "FlakRocketTeamMk2",
+      "render_models": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/FlakTrooper.png",
+      "current_sha256": "840730f83db2f2f30740dc3848bbc9a12caa1c209e95666ae4346eccd1dcd8f3",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/FlameAssaultBuggy.png",
+      "current_sha256": "71194dd8ca490e9131a406d6befbaa8af0456cabb5682b3adf1887d0f7bbd6f7",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:2679"
+      ],
+      "entity": "FlameAssaultBuggy",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/GrenadierTrooper.png",
+      "current_sha256": "3d916f82b4117c63bf5a2c4069a4b4633284a793ddb5cc21fe9b8fbe9b553df8",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:2744"
+      ],
+      "entity": "GrenadierTrooper",
+      "render_models": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/barrel.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/GuardArea.png",
+      "current_sha256": "491ade02e25022997c92f2889edd98b4edfb2c76dc33fbe477eb81a9f5a866bd",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/command_card.rs:612"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/HammerSiegeTank.png",
+      "current_sha256": "2d592623d2bb3a597f1c63e0426c40066eb5045a3ccdbc0d8aba4cabc98011fc",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:2809"
+      ],
+      "entity": "HammerSiegeTank",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/HazardSprayerInfantry.png",
+      "current_sha256": "c11c724915ac6175df7869444eaabe58f8942c211723246d3b1c8d362e1373bb",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/HeavyBombardmentAirship.png",
+      "current_sha256": "60b6bab70cdda5f03fdb242a650f11f6a6f9cde3253bee276ee6dd50ad85ed13",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:2874"
+      ],
+      "entity": "HeavyBombardmentAirship",
+      "render_models": [
+        "models/kenney-spacekit/craft_cargoB.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/HeavyCargoDropship.png",
+      "current_sha256": "4cfdbc2444fedc01d1c71a2b36a52b735d657f75d3d33eccdb545fa4cb495ab2",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/HeavyMachinegunTrooper.png",
+      "current_sha256": "6a5dbe6f06e7624211db8db93129f1170611555fc5abd5593347ccc95a07a86f",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:2939"
+      ],
+      "entity": "HeavyMachinegunTrooper",
+      "render_models": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/HeavySiegeWalker.png",
+      "current_sha256": "951777fca3fb49957d75e0305969f3be5110953b9753cfe918b1ecb902c1da37",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:3004"
+      ],
+      "entity": "HeavySiegeWalker",
+      "render_models": [
+        "models/kenney-spacekit/craft_cargoA.glb",
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/supports_low.glb",
+        "models/kenney-spacekit/turret_double.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/HoldPosition.png",
+      "current_sha256": "a5a88f4f1ef54357f00a2708e3da84e7097421cbe78c542d7cfd7a86dc968266",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/command_card.rs:609"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/InterceptorJetVTOL.png",
+      "current_sha256": "bbaacfd5297048993bd1839b5162b1ae18d5e09f86b1b5509939750de5786bae",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/InterceptorVTOL.png",
+      "current_sha256": "f25893fa319f684576d54a53a163be9b6122a55af5e7268dd33fa40d96f90074",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:3134"
+      ],
+      "entity": "InterceptorVTOL",
+      "render_models": [
+        "models/kenney-spacekit/craft_speederD.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/JammerVehicle.png",
+      "current_sha256": "f1f30c04133fa7bd875df70d74e0292e85e8b57b3a1450775fac915db13ffba3",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:3199"
+      ],
+      "entity": "JammerVehicle",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/LanceBeamDefenseTower.png",
+      "current_sha256": "f7eb0628b51f6261cc2ba3ca4be9187356271e93090b147700048cd5c6941c67",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:3264"
+      ],
+      "entity": "LanceBeamDefenseTower",
+      "render_models": [
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/structure_closed.glb",
+        "models/kenney-spacekit/turret_single.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/LanceBeamTank.png",
+      "current_sha256": "8f5f3ddc2b635da25039a9013f48526fa497eb1147f8d4d4bc331dc84632e968",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:3329"
+      ],
+      "entity": "LanceBeamTank",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/LightRifleInfantry.png",
+      "current_sha256": "a085ada1d8911bdc357a20fb8b1da79eb7772affebe36f092cff27a8a2b00d61",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:3450"
+      ],
+      "entity": "LightRifleInfantry",
+      "render_models": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/LongbowMissileCrawler.png",
+      "current_sha256": "873a77098ab88d213fb985c59381800a7392f823b54b66faa3cc6db133960f3a",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:3515"
+      ],
+      "entity": "LongbowMissileCrawler",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/LowPower.png",
+      "current_sha256": "f93c7d0d48ba1a67e7bf7e144510af06079350d63ffc2e6a87e525f72b005c67",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/MineClearingRover.png",
+      "current_sha256": "056c9c32d5b45d762c61e57c9b9567ddf9e76b27682959c3fac379c9e5de4b3f",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/MirageScoutTank.png",
+      "current_sha256": "96ca01d9004b29af110a2280c665c9ef116cfd8f5617c48bc2bcb9955469f3df",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:3580"
+      ],
+      "entity": "MirageScoutTank",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/MobileConstructionVehicle.png",
+      "current_sha256": "4799729bd5b3e3d86df52ede4e998368b908034672195ad43f7b71ec8c620062",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/MobileRepairCrawler.png",
+      "current_sha256": "e4a71eca3e2edf6ba3a2f820888f45bd0f8d01c931442a1223ee676964a676f3",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:3645"
+      ],
+      "entity": "MobileRepairCrawler",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/MobileSensorJammer.png",
+      "current_sha256": "60e77fe083b2e76edb4c83041d5f17b5c2307db9af9fbaa125b64ea02c99733c",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/MobileShieldProjector.png",
+      "current_sha256": "f6cd23627974c0e0cc7587449b2ca88b893dee97c5764fa37046f468156ba74b",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:3701"
+      ],
+      "entity": "MobileShieldProjector",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/ModularMissileCarrier.png",
+      "current_sha256": "fc6ac86309e67dba0e1787e826b36a7b16ea3eb120004ff52b50245d6b1bef8b",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:3757"
+      ],
+      "entity": "ModularMissileCarrier",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/MortarTeam.png",
+      "current_sha256": "f73a7bdb0705877633eb79d9cdc74ed86bf0f278470ec31d042af7e4e8766a2a",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:3822"
+      ],
+      "entity": "MortarTeam",
+      "render_models": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/barrels.glb",
+        "models/kenney-spacekit/rocket_baseA.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/NaniteRepairSwarm.png",
+      "current_sha256": "ef89200cb34f6bb65d1e0b4cdf941f7b974298d96f44cc2816e6879f4d0cf1d7",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/support_powers.rs:118"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/OrbitalStrike.png",
+      "current_sha256": "892dc5cceba1ed1d7b0c222e476c8f59d63c51354a3a0a5103018c11223eb966",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/support_powers.rs:114"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/OrePurifier.png",
+      "current_sha256": "c0330105940352498a4d9a79635d8fa72f66ab3102518572406cb757fdec92b0",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:3887"
+      ],
+      "entity": "OrePurifier",
+      "render_models": [
+        "models/kenney-spacekit/barrels_rail.glb",
+        "models/kenney-spacekit/machine_barrelLarge.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/structure_detailed.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/OreRefineryExtension.png",
+      "current_sha256": "b59615062d72e2371faafed5f98fcbeeff3a1a3c071f74d89b8fe6b9a9c3f9ec",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/Paradrop.png",
+      "current_sha256": "4fe058855eb40916e4425b74f86554603c827d13f0422e3d9f1612926d99da24",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/support_powers.rs:121"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/Patrol.png",
+      "current_sha256": "491ade02e25022997c92f2889edd98b4edfb2c76dc33fbe477eb81a9f5a866bd",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/command_card.rs:611"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/PhaseSaboteur.png",
+      "current_sha256": "c1ce3d0f579a4d1034865d2164490f0c2d38d8bc3b4d8bdabd0dc54168c5d43c",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:3943"
+      ],
+      "entity": "PhaseSaboteur",
+      "render_models": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/machine_wireless.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/PowerReactor.png",
+      "current_sha256": "9465cadd13fe245ef4c7c0a0942b540e5d0a494cf76516c39e608ab754412aeb",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/lib.rs:2609",
+        "src/generated_registry.rs:4008",
+        "src/hud.rs:1069"
+      ],
+      "entity": "PowerReactor",
+      "render_models": [
+        "models/kenney-spacekit/chimney_detailed.glb",
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/rocket_fuelB.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/PrismDefenseObelisk.png",
+      "current_sha256": "87e10b89265234e86a82300c6eb4d4c78e70878973cc173188245ce7e1ec8782",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:4064"
+      ],
+      "entity": "PrismDefenseObelisk",
+      "render_models": [
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/rock_crystalsLargeA.glb",
+        "models/kenney-spacekit/satelliteDish.glb",
+        "models/kenney-spacekit/structure_closed.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/PrismLanceTank.png",
+      "current_sha256": "b1594a404b1c0f1e25cef823c478f7d9c98060ad8f2fbdac40de6f907ac03d53",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/PulseRifleCommando.png",
+      "current_sha256": "7aeb1503e138e20ac75fef13f295755896bab8a631e705328523b00257c096e3",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:4129"
+      ],
+      "entity": "PulseRifleCommando",
+      "render_models": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/machine_generator.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/RadarDome.png",
+      "current_sha256": "1571f9743a21f471d8a85a8762596d173e7fdabc9e3efb97b655389b319ef722",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/RadarSweep.png",
+      "current_sha256": "d018d01d18a9667f4b6fdc0972aaa482c5e8323fb77242a749d6806fccae5dbc",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/support_powers.rs:113"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/RadarUplink.png",
+      "current_sha256": "3ae44c20358d76d283bb48fe8c972da25e943ad5d1fa41e8530ddf8a4ba105cb",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:4194"
+      ],
+      "entity": "RadarUplink",
+      "render_models": [
+        "models/kenney-spacekit/machine_wirelessCable.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/satelliteDish_large.glb",
+        "models/kenney-spacekit/structure_closed.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/RailArtilleryWalker.png",
+      "current_sha256": "eafb6424dd2021d21069ad7483003ea649f38b950479b53337425ea27913560f",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:4250"
+      ],
+      "entity": "RailArtilleryWalker",
+      "render_models": [
+        "models/kenney-spacekit/craft_cargoA.glb",
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/supports_low.glb",
+        "models/kenney-spacekit/turret_single.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/RailCannonBunker.png",
+      "current_sha256": "03d2c68db3363283e7cc536d44167e0ba8ee1d1128b328bb5b76a516002bd176",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:4315"
+      ],
+      "entity": "RailCannonBunker",
+      "render_models": [
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/structure_closed.glb",
+        "models/kenney-spacekit/turret_double.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/RailSniperTeam.png",
+      "current_sha256": "d26612428419258aacd93f42862b08c630c979af4cecdae64546ae5edfcd9ab1",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:4380"
+      ],
+      "entity": "RailSniperTeam",
+      "render_models": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/RailgunCommando.png",
+      "current_sha256": "fd2f2960ca3ea9bc277f1aef7d7206edbc06c85bbb0344895166cae96c64032c",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/RailgunTank.png",
+      "current_sha256": "02b3ea530ef82837d75536a3eb542afcfdce6980f6340b3b2f49dd77cadea82a",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:4445"
+      ],
+      "entity": "RailgunTank",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/RallyPoint.png",
+      "current_sha256": "2a2a46880de205ccd6adc7de7a07e4910af9dda2ffafde32047fe24d674f7fd2",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/command_card.rs:607"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/Refinery.png",
+      "current_sha256": "a4538550b38ad3abe6b515771fdcd36b8c05667b7f313a2f58a0038d207694b0",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:4510"
+      ],
+      "entity": "Refinery",
+      "render_models": [
+        "models/kenney-spacekit/barrels_rail.glb",
+        "models/kenney-spacekit/chimney.glb",
+        "models/kenney-spacekit/machine_barrelLarge.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/structure_closed.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/Repair.png",
+      "current_sha256": "640fd4d5ef141bc039530029adf6af6bc13ec30bb4c61a7d56d0f9a0e4665390",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/command_card.rs:605"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/RepairPad.png",
+      "current_sha256": "66ee205d00c1f38056d59199cc65343c386b791ae29f33da646e43597f79259c",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:4566"
+      ],
+      "entity": "RepairPad",
+      "render_models": [
+        "models/kenney-spacekit/gate_complex.glb",
+        "models/kenney-spacekit/machine_wirelessCable.glb",
+        "models/kenney-spacekit/platform_large.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/ResourceDrop.png",
+      "current_sha256": "753644f5b9d613a6a7efa70e7bd5cfe39e0dbc48cd2cf7df72e74b1ce15c2ae1",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/RoboticsBay.png",
+      "current_sha256": "c66718393bb73f651e2562d7f4e107d6bcff0e70a7780b7a7530610bedd11e8f",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:4622"
+      ],
+      "entity": "RoboticsBay",
+      "render_models": [
+        "models/kenney-spacekit/barrels.glb",
+        "models/kenney-spacekit/hangar_largeB.glb",
+        "models/kenney-spacekit/platform_large.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/RocketArtilleryCrawler.png",
+      "current_sha256": "69717d7790591673f468d3629a4285b0185385efad16d272bb5b7d99d3a4085d",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/RocketGunship.png",
+      "current_sha256": "d58bad87e255fec79c994998b5d7ee70bdd6f82c31a53769589e19646c47b2ee",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:4678"
+      ],
+      "entity": "RocketGunship",
+      "render_models": [
+        "models/kenney-spacekit/craft_speederC.glb",
+        "models/kenney-spacekit/rocket_finsA.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/RocketInfantry.png",
+      "current_sha256": "a0129fcd330a463155e5d0219b2a07a2a0b8b7f070a3b4d18fa19de74073de29",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:4743"
+      ],
+      "entity": "RocketInfantry",
+      "render_models": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/rocket_fuelA.glb",
+        "models/kenney-spacekit/rocket_topA.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/RocketTrooperRobot.png",
+      "current_sha256": "eae8f867e2d985dc93df1d8cca08a982b878e6e7012ef13836781052a52709d2",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:4808"
+      ],
+      "entity": "RocketTrooperRobot",
+      "render_models": [
+        "models/kenney-spacekit/alien.glb",
+        "models/kenney-spacekit/machine_generator.glb",
+        "models/kenney-spacekit/rocket_topB.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/RosterPreview.png",
+      "current_sha256": "5f0c8928f2e4242c7107a5fc9077e9849d7f0cbb049e3504a0b58f705a1d117b",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/lib.rs:2604",
+        "src/menu.rs:363"
+      ],
+      "render_source": "roster_composite"
+    },
+    {
+      "path": "assets/ui/icons/SaboteurInfiltrator.png",
+      "current_sha256": "218542879f06bbeec67d32c71c711a5c6c283f4fd8b57a728f397732f8f2b30e",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:4873"
+      ],
+      "entity": "SaboteurInfiltrator",
+      "render_models": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/machine_generator.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/Scatter.png",
+      "current_sha256": "ef77cd9be8739714acad0b0a5b347937b1a19287bb26d44d85cd9aa0536db57f",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/command_card.rs:614"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/ScoutRover.png",
+      "current_sha256": "acd7fd778fc118a26baf31c9954e44ed430b8867acfb52c4673ff7914cdeee11",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:4938"
+      ],
+      "entity": "ScoutRover",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/SellStructure.png",
+      "current_sha256": "21fd69e82eaff7e0e5e35b3740bf9446877f6e050c7830f3bfb7d4121ae0fb01",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/command_card.rs:604"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/ShieldGenerator.png",
+      "current_sha256": "7f0cbffd7e81fdd72f4e1ec6c78b2d86a5108a21bae9cb81d2587cfe28f9920e",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/ShieldOverdrive.png",
+      "current_sha256": "301ec4a0ca018676aedce46587ada6cde9337b913aa1878a8e2c39fedf47fa04",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/support_powers.rs:117"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/ShieldTrooper.png",
+      "current_sha256": "f611b8dcf1630c47b8aa0242408ec942e5e11ca9495cbcb993585773aa490135",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:5003"
+      ],
+      "entity": "ShieldTrooper",
+      "render_models": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/machine_generator.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/ShockTrooper.png",
+      "current_sha256": "26d948c49074ef1cffd25161d534cdafe1b30553688738fe9ec3fd11ed719922",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/generated_registry.rs:5068"
+      ],
+      "entity": "ShockTrooper",
+      "render_models": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/machine_generator.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/SiegeAirship.png",
+      "current_sha256": "eebcf9ebc5038e0546e5ad883cd7062490a8a4d9ac1df6d1768616e14d1ab5c3",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:5133"
+      ],
+      "entity": "SiegeAirship",
+      "render_models": [
+        "models/kenney-spacekit/craft_cargoB.glb",
+        "models/kenney-spacekit/machine_barrelLarge.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/SiegeArtilleryVehicle.png",
+      "current_sha256": "a93a09f4acb25bbaf4a94cc77c8f5043132ab0fbec465c5c3fc9d3b34b1f8bfb",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:5198"
+      ],
+      "entity": "SiegeArtilleryVehicle",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/SiegeDrillTank.png",
+      "current_sha256": "1dcfc93e2300151305dce671098e312bcf5d255371bfa81f02006582da4968e6",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:5263"
+      ],
+      "entity": "SiegeDrillTank",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/SniperScout.png",
+      "current_sha256": "fe10020e44cde1353f8e1ac7d86925fe32fae0250734a9defe4fd4115a1f66cb",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:5328"
+      ],
+      "entity": "SniperScout",
+      "render_models": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/StopCommand.png",
+      "current_sha256": "f75984674c9075b48cc3ddca2e9ffccfc865450dee53b9eb48b8b13e862ad6a2",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/command_card.rs:613"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/StrategicMissile.png",
+      "current_sha256": "63ed1539a78b707209c62a54ddf4762f2461993d086bf4110ed31494bce17b45",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/support_powers.rs:120"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/TacticalOfficer.png",
+      "current_sha256": "dd2a75f0dafcb2f6a0f6a98745ea2678ab9fcc422069e2f61559b4014b02d068",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:5393"
+      ],
+      "entity": "TacticalOfficer",
+      "render_models": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/satelliteDish.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/TechHospital.png",
+      "current_sha256": "37fd66855e0b723e3e8df69a13e921356398017ac24761fd4c352b795270cb2e",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:5644"
+      ],
+      "entity": "TechHospital",
+      "render_models": [
+        "models/kenney-spacekit/hangar_roundGlass.glb",
+        "models/kenney-spacekit/machine_wireless.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/satelliteDish.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/TechLab.png",
+      "current_sha256": "68ec9b7fe48d39954f8e08c9f4ac75d55e3d4d68c39d51362ba5928deeb99212",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:5700"
+      ],
+      "entity": "TechLab",
+      "render_models": [
+        "models/kenney-spacekit/hangar_roundGlass.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/satelliteDish_detailed.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/TechLocked.png",
+      "current_sha256": "51fb50be69736cc54b1fe3f5cd12fc7a2cab07f448fc9164b089a9c3d8ef2ce5",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/lib.rs:2610",
+        "src/menu.rs:2526"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/TechOilDerrick.png",
+      "current_sha256": "ad80d1d2be637e0a4a810964bedcece0c1cc4234300c4a55294fcb09c4f62902",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:5756"
+      ],
+      "entity": "TechOilDerrick",
+      "render_models": [
+        "models/kenney-spacekit/chimney_detailed.glb",
+        "models/kenney-spacekit/machine_barrelLarge.glb",
+        "models/kenney-spacekit/pipe_ringHighEnd.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/rocket_fuelA.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/TechRepairDepot.png",
+      "current_sha256": "a9926348700f38fbd503482a0a839f995e35c0c6267cd025c95a02e6d1eef0dd",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:5812"
+      ],
+      "entity": "TechRepairDepot",
+      "render_models": [
+        "models/kenney-spacekit/machine_barrelLarge.glb",
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/machine_wireless.glb",
+        "models/kenney-spacekit/pipe_ring.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/rail_middle.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/TeslaCrawlerMk2.png",
+      "current_sha256": "f98c1fac2099240ec6a16a47775017727311a275abbb535670e462e8237ac717",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:5868"
+      ],
+      "entity": "TeslaCrawlerMk2",
+      "render_models": [],
+      "role": "Unit",
+      "render_source": "authored_procedural_tank",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/TeslaFenceSegment.png",
+      "current_sha256": "e840bef87fcf9d4dc717c534e8b8a5d24a6d9585040bd782f9458051105a1546",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:5933"
+      ],
+      "entity": "TeslaFenceSegment",
+      "render_models": [],
+      "role": "Structure",
+      "render_source": "authored_procedural_entity",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/Victory.png",
+      "current_sha256": "2ed7f139239fbc29bd008a00887db4540b4f30b863fb63795228ae612188e359",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/Warning.png",
+      "current_sha256": "af435a2e3ef79c9acf8d4d807bd7d34713d97027badcbe295a79beb3c6fdf42f",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/WeatherControlSpire.png",
+      "current_sha256": "02bee742b244951dd87321000eff577e8f1e2619c794e7b1b24985fdb04c7345",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:6054"
+      ],
+      "entity": "WeatherControlSpire",
+      "render_models": [
+        "models/kenney-spacekit/chimney_detailed.glb",
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/pipe_ringHighEnd.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/satelliteDish_large.glb"
+      ],
+      "role": "Structure",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/WeatherStorm.png",
+      "current_sha256": "424a0e24727398a8a64431aa2a58fd0e8c948e628eac06d7ebe5d54d72aec251",
+      "source_comparison": "absent_from_upstream",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": true,
+      "runtime_references": [
+        "src/support_powers.rs:119"
+      ],
+      "render_source": "non_entity_semantic_icon"
+    },
+    {
+      "path": "assets/ui/icons/Worker.png",
+      "current_sha256": "6aa1ff316914e9615206f670e19168553325b87bcff48bb9442423b6154932c9",
+      "source_comparison": "different",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [
+        "src/generated_registry.rs:6110"
+      ],
+      "entity": "Worker",
+      "render_models": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/machine_wireless.glb"
+      ],
+      "role": "Unit",
+      "render_source": "kenney_parts",
+      "model_rights_verified": true
+    },
+    {
+      "path": "assets/ui/icons/texture_01.png",
+      "current_sha256": "bf02026276673b26a05f53bdf4f8b0b2057231d7fa23fe4172d7c5e203b36870",
+      "source_comparison": "different",
+      "matches_audited_bytes": true,
+      "generated_sheet_record": false,
+      "runtime_references": [],
+      "render_source": "non_entity_semantic_icon"
+    }
+  ],
+  "source_sha256": {
+    "src/generated_registry.rs": "7bc9faa95bc2faf861f102907bf56e553e1b67e7a0b416425692a4db1090aa34",
+    "src/capture_api.rs": "b8e4f5f9d578216b53cef820e36a0ef92008cdb9a0d5dd87cf825d2b5351cd1e",
+    "src/spawn.rs": "9640a6417da641c0b5407e94c2691255bdad6f1c0f5b83243989a49ccaf7ad40",
+    "src/tank_models.rs": "80a42f51cac57ff203351fa0e1ad3831210c0a565e82e9f054fe1526b8cf0ac0",
+    "docs/asset-source-hashes.json": "9227921fb4b913ee1b47d4163dcac52b9978733545e9b661bdb3f9c65a82998a"
+  },
+  "counts": {
+    "kenney_parts": 45,
+    "non_entity_semantic_icon": 44,
+    "authored_procedural_tank": 16,
+    "roster_composite": 1,
+    "authored_procedural_entity": 1
+  },
+  "referenced_count": 83
+}
