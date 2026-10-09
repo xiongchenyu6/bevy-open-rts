@@ -23,7 +23,7 @@ output.mkdir(parents=True, exist_ok=True)
 subprocess.run(['patchelf', '--print-interpreter', str(binary)], check=True, capture_output=True)
 (stage / 'bin').mkdir(parents=True)
 (stage / 'lib').mkdir()
-shutil.copytree(root / 'assets', stage / 'assets', ignore=shutil.ignore_patterns('*.full.ttf'))
+shutil.copytree(root / 'assets', stage / 'assets', ignore=shutil.ignore_patterns('*.full.ttf', *(f'mission_{i:02}.jpg' for i in range(1, 7))))
 exe = stage / 'bin' / 'bevy-open-rts'
 shutil.copy2(binary, exe)
 exe.chmod(0o755)

@@ -135,7 +135,12 @@ Mission5's native briefing has been inspected; the other current briefings,
 small-screen/browser layouts and complete presentation remain unverified.
 
 Six legacy campaign JPEGs are retained only for older sealed QA programs and
-must be retired before final packaging. Their historical generation gaps do
+are excluded by all four current packaging entry points. Linux, GNU Windows
+and web asset-copy dry runs each produce exactly360 files, preserve all six
+new-image hashes and exclude full-font sources; evidence is
+`target/runtime-stage-filter-rmn506du/result.json`. PowerShell exclusion was
+reviewed but not executed because pwsh is unavailable. These copy checks do
+not prove final package launch. Their historical generation gaps do
 not describe the current six original derivatives. Other icon, VFX and voice
 rights gaps remain open; these generation records do not establish blanket
 commercial clearance for unrelated assets.
