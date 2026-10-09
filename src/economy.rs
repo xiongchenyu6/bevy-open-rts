@@ -234,8 +234,7 @@ impl Economies {
 
     pub(crate) fn apply_starting_resources(&mut self, resources: StartingResources) {
         for economy in &mut self.players {
-            economy.ore = resources.ore;
-            economy.crystal = resources.crystal;
+            *economy = TeamEconomy::new(resources.ore, resources.crystal);
         }
     }
 }

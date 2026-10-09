@@ -2481,6 +2481,7 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
                 reset_next_spawn_id,
                 begin_match_from_setup,
                 reset_mission_triggers,
+                reset_ai_director,
                 setup_support_cooldowns,
                 setup,
                 start_battle_music,

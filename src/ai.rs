@@ -291,6 +291,11 @@ impl AiDirector {
     }
 }
 
+/// Fresh matches restart AI opening timers; saved matches restore their state afterward.
+pub(crate) fn reset_ai_director(mut director: ResMut<AiDirector>) {
+    *director = AiDirector::default();
+}
+
 impl Default for AiDirector {
     fn default() -> Self {
         Self {
@@ -2971,3 +2976,7 @@ pub(crate) fn next_ai_defense_for_faction(
 #[cfg(test)]
 #[path = "ai/tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "ai/match_reset_tests.rs"]
+mod match_reset_tests;
