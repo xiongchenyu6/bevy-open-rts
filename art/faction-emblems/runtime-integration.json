@@ -23,5 +23,19 @@
       "svg_sha256": "4187bc945cbb1ebd34517cfe23284eec221eb1298cb3322f216c7b260ac01c95"
     }
   ],
-  "legacy_backup": "target/faction-emblem-legacy-originals-20261010"
+  "legacy_backup": "target/faction-emblem-legacy-originals-20261010",
+  "browser_visual_review": {
+    "evidence": "screenshots/steam-quality/original-faction-emblems-browser-02/visual-review.json",
+    "dimensions": [
+      [
+        1280,
+        720
+      ],
+      [
+        900,
+        720
+      ]
+    ],
+    "scope": "glyph presentation only: immutable oldWasm07 code/new3originalasset stage, ordinarymenu/dropdown mouse clicks; not final-core gameplay/performance acceptance"
+  }
 }

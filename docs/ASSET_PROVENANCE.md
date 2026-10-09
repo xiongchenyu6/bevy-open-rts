@@ -205,7 +205,11 @@ Evidence: `screenshots/steam-quality/original-faction-emblems-01/visual-review.j
 The three inspected original crests now replace the same runtime paths. Their
 installed bytes match the isolated menu-review assets; exact old/new/source
 hashes are recorded in `art/faction-emblems/runtime-integration.json`.
-Small-window/browser review remains open.
+Browser setup/dropdown glyph presentation passes1280x720 and900x720
+(actual child0, no page errors, inspected pictures) in an isolated oldWasm07/
+new-glyph stage. Evidence: `original-faction-emblems-browser-02/visual-review.json`
+under `screenshots/steam-quality/`. Final-core browser and wider layout review
+remain open.
 
 `target/voice-full-event-candidates-20261010/` contains32 CPU-only candidate
 WAVs for16 complete event texts in each language. Generation uses the retained
