@@ -97,8 +97,11 @@ configuration winners are Alliance17/Demon16/Chaos15; these are not win rates.
 Case0103 is BigArena, ChaosEasy slot0 versus ChaosBeginner slot1 at600s.
 Diagnostic pin4967e56 reproduces the same state: ScoutRover and RocketTrooperRobot
 attack a living PowerReactor within range, with active cooldowns and no EMP.
-Its HP is approximately5.0. Repair/healing and force composition need tracing;
-a simple chase explanation is contradicted by the report. See
+Its HP is approximately5.0. A new read-only trace observes the same Reactor for400s:161 repair starts,
+HP3.20–8.70, repeated manual repair and no kill. See
+`logs/big-arena-repair-trace-summary-20261009.json`. The force includes one
+ground-incapable AA unit; force composition is being corrected and must be
+replayed. A simple chase explanation is contradicted by the report. See
 `target/big-arena-timeout-diagnostic-20261009`. Both audit pins predate the global
 EMP fix. Alternate starts, repeated runs, independent seeds and final-package
 performance are separate requirements.
