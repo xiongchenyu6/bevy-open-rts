@@ -1,0 +1,100 @@
+{
+  "scope": "Exact source license texts for six dynamic-library providers in current Linux candidate; full source/build distribution remains open",
+  "components": [
+    {
+      "component": "glibc",
+      "packaged_store_path": "/nix/store/h4wfwic161kxrr74jlzla5lsm28hgary-glibc-2.44-25",
+      "build_derivation": "/nix/store/09d60qm2zsaynsl70arr35zj055zdzl3-glibc-2.44-25.drv",
+      "source_path": "/nix/store/jq00nlpdcxgcj5xwx25jibn61a611234-glibc-2.44.tar.xz",
+      "source_archive_sha256": "37f600f2bef3c5e8300147059568b2a2e40a7ad6ccc65ce942556d49429cc667",
+      "notices": {
+        "COPYING.LESSERv2": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+        "COPYINGv2": "edaef632cbb643e4e7a221717a6c441a4c1a7c918e6e4d56debc3d8739b233f6",
+        "COPYINGv3": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "LICENSES": "b22a69aa3f80a5201818c66cb0df0f25f9fa13cf5861b0093a058dbd12d50dce"
+      },
+      "build_patches": [
+        "/nix/store/xb11mg2vxj0al4gvh3hfy9wwz0kb1if0-2.44-master.patch",
+        "/nix/store/nc5hqqizlj7042vvhvx121kzf4nwh35p-nix-locale-archive.patch",
+        "/nix/store/43lp683anlywwy1m6rv0mrw9m2iv681q-dont-use-system-ld-so-cache.patch",
+        "/nix/store/mnglr8rr7nl444h7p50ysyq8qd0fm1lm-dont-use-system-ld-so-preload.patch",
+        "/nix/store/llr530f1l6c470xkl2w80k2kkfqddmpm-fix_path_attribute_in_getconf.patch",
+        "/nix/store/7kw224hdyxd7115lrqh9a4dv2x8msq2s-fix-x64-abi.patch",
+        "/nix/store/001gp43bjqzx60cg345n2slzg7131za8-nix-nss-open-files.patch",
+        "/nix/store/ywdz7fsdiff19745v59snscar3qsgd79-0001-Revert-Remove-all-usage-of-BASH-or-BASH-in-installed.patch",
+        "/nix/store/sj0qllprnrmk1cqnnk57vvn2cqgjynbx-reenable_DT_HASH.patch",
+        "/nix/store/f1qmmr4f6mi99xr5bvfrqmynjx9j038p-0001-localedata-allow-reproducible-parallel-install-of-lo.patch",
+        "/nix/store/62qh08ij1zvw5lxj69n98lzv0byda0di-0002-Makeconfig-make-inst_complocaledir-overridable.patch"
+      ]
+    },
+    {
+      "component": "wayland",
+      "packaged_store_path": "/nix/store/li1008zymvj7sz8jkdk9brkslfq9jy8w-wayland-1.26.0",
+      "build_derivation": "/nix/store/9bdrmmpn4w8hsdczpmwyzdyd5i3b09az-wayland-1.26.0.drv",
+      "source_path": "/nix/store/rijg1aq6qigncb2cx9kzjp8a6nbhrprn-wayland-1.26.0.tar.xz",
+      "source_archive_sha256": "64176eaa46e4969903e286f8e5ef8331affc17fdf03ac9b58381d2b23162b7a3",
+      "notices": {
+        "COPYING": "6eefcb023622a463168a5c20add95fd24a38c7482622a9254a23b99b7c153061"
+      },
+      "build_patches": []
+    },
+    {
+      "component": "libxkbcommon",
+      "packaged_store_path": "/nix/store/nvrv5w6rhc39h8snrsw03nqs679cf7rh-libxkbcommon-1.13.2",
+      "build_derivation": "/nix/store/2fp05kq9rznfqgyiydy1ghhmxwf99nnh-libxkbcommon-1.13.2.drv",
+      "source_path": "/nix/store/j59gh2hrsflxda2csxfbdkzfm3dj8400-source",
+      "source_archive_sha256": null,
+      "notices": {
+        "LICENSE": "967e97b28658f0037bbe164a237bdfb0c3ec790e67f6c29372ea5b09306f61f3"
+      },
+      "build_patches": []
+    },
+    {
+      "component": "libffi",
+      "packaged_store_path": "/nix/store/pi2b23y3gv6zgcziwbgnihf8gam1cmlp-libffi-3.8.0",
+      "build_derivation": "/nix/store/lz0kkmp5nkrhyvymqqsmanbzwmkm1bwb-libffi-3.8.0.drv",
+      "source_path": "/nix/store/dqf00wji22has9zizagfqxmcknvv64wr-libffi-3.8.0.tar.gz",
+      "source_archive_sha256": "7da3e2d9a171eb0a038f592ecad3ff2bb2550f3496d87b3b29ad0cf4430c0db4",
+      "notices": {
+        "LICENSE-BUILDTOOLS": "e67978cd18816c0cb7d29aaaacde7b7447402c2fb321a051698890a8eaedda94",
+        "LICENSE": "17b64dc60f3b6897a60f971e288b973f655c2edcdf08b25f3c3dd5549857881c"
+      },
+      "build_patches": [
+        "/nix/store/8dsrka2c5kz5ziz9cq94ybzrvhjw5rdq-freebsd-tsan-pthread.patch"
+      ]
+    },
+    {
+      "component": "gcc",
+      "packaged_store_path": "/nix/store/q2mkz6ca1alqfqf750dygvakmq8kjrwz-gcc-16.2.0-libgcc",
+      "build_derivation": "/nix/store/rr1j9pyykfsi6rpvg29g41w4gg1j0k48-gcc-16.2.0.drv",
+      "source_path": "/nix/store/chw5kxp89wq3wkc37f6fr8wiw4yc7paj-gcc-16.2.0.tar.xz",
+      "source_archive_sha256": "e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e",
+      "notices": {
+        "COPYING.RUNTIME": "9d6b43ce4d8de0c878bf16b54d8e7a10d9bd42b75178153e3af6a815bdc90f74",
+        "COPYING3": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+        "COPYING.LIB": "a9bdde5616ecdd1e980b44f360600ee8783b1f99b8cc83a2beb163a0a390e861",
+        "COPYING3.LIB": "a853c2ffec17057872340eee242ae4d96cbf2b520ae27d903e1b2fef1a5f9d1c"
+      },
+      "build_patches": [
+        "/nix/store/9577hmdlmhki67cg8ar85cvidyg7xr7p-gcc-12-no-sys-dirs.patch",
+        "/nix/store/7x6bimj6ipi6ag859gi2fc6by87x37j7-no-sys-dirs-riscv.patch",
+        "/nix/store/xpplvxiwb4li2qd5nvhyd2mngrpna0ya-mangle-NIX_STORE-in-__FILE__.patch",
+        "/nix/store/632b0y5mkcdwbsw2g3xh5qznw2vv5axr-ppc-musl.patch",
+        "/nix/store/3cj8qm3xjz1g5f7qnnxlc95i9imkicbk-cfi_startproc-reorder-label-14-1.diff"
+      ]
+    },
+    {
+      "component": "alsa-lib",
+      "packaged_store_path": "/nix/store/xlqm12gx3s3f7dc1a5pnfk4p2niw2lri-alsa-lib-1.2.16.1",
+      "build_derivation": "/nix/store/qzi10bq4n6igdnyanzx82gkhlm1c940h-alsa-lib-1.2.16.1.drv",
+      "source_path": "/nix/store/4cvy22bq1cif02jias7a8h2h94k74wfq-alsa-lib-1.2.16.1.tar.bz2",
+      "source_archive_sha256": "f740db7f488255944ffd4428416ee3390a96742856916433df468c281436480e",
+      "notices": {
+        "COPYING": "32434afcc8666ba060e111d715bfdb6c2d5dd8a35fa4d3ab8ad67d8f850d2f2b"
+      },
+      "build_patches": [
+        "/nix/store/ilsa6dxdcjdpxmpsz7cvflrhcs98czfd-alsa-plugin-conf-multilib.patch"
+      ]
+    }
+  ]
+}

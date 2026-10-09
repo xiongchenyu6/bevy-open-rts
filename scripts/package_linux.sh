@@ -96,6 +96,7 @@ shutil.copy2(root / 'docs' / 'DESKTOP_DELIVERY.md', stage / 'BUILD_NOTES.md')
 (stage / 'docs').mkdir()
 for notice in ['ASSET_PROVENANCE.md', 'asset-source-hashes.json']:
     shutil.copy2(root / 'docs' / notice, stage / 'docs' / notice)
+shutil.copytree(root / 'docs' / 'third-party' / 'linux-runtime', stage / 'docs' / 'third-party' / 'linux-runtime')
 shutil.copy2(root / 'ASSETS.md', stage / 'ASSETS.md')
 for license_file in root.glob('LICENSE*'):
     if license_file.is_file():
