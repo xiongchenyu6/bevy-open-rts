@@ -18,6 +18,8 @@ python3 art/semantic-icons/generate.py candidates-review
 ```
 
 The generator refuses an existing output directory. Original SVG source and
-generated PNGs follow the repository's dual MIT/Apache license. Current game
-assets are unchanged: actual command-card/support-panel rendering, tooltip
-identity and supported-window review must pass before integration.
+generated PNGs follow the repository's dual MIT/Apache license. Twenty PNGs are now installed at the existing runtime paths. Legacy bytes are
+retained outside runtime assets. Actual native review covers RallyPoint,
+AttackMove, SellStructure, RadarSweep, EmpPulse and ShieldOverdrive; normal
+paid F1/F5 save/load/expiry still passes. Other14 icons, tooltip identity and
+supported-window/browser review remain pending. See runtime-integration.json.

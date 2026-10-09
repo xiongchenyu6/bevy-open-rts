@@ -176,3 +176,19 @@ are recorded in [voice-provider-terms-20261010.json](voice-provider-terms-202610
 The direct archive request returned403; no raw-page hash is claimed. Imported
 English file provenance and historical terms still require evidence, and these
 terms do not cover the separate edge-tts Chinese outputs.
+
+## Original runtime semantic icons
+
+Twenty action/support pictograms now use original repository-authored geometric
+SVGs and resvg0.48.1 PNG rasterization. Paths are unchanged; old bytes are kept
+outside runtime assets under `target/semantic-icon-legacy-20261010`. Every128px
+RGBA8 icon reproduces byte-identically and decoded alpha is transparent/nonblank.
+Source, recipe and original/current hashes are in
+`art/semantic-icons/runtime-integration.json` and `candidates-v3/`.
+
+Actual native b843 review covers RallyPoint, AttackMove, SellStructure,
+RadarSweep, EmpPulse and ShieldOverdrive. Paid F1/F5 save/load/expiry and real
+old-format rejection pass with unchanged save bytes. Root inspected the actual
+images; the command-center T button is AttackMove, not Repair. Other14 icons,
+all tooltips, smaller windows and browser rendering remain pending. This does
+not close entity portraits, VFX, cursor, faction-emblem or voice rights gaps.

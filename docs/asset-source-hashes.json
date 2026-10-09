@@ -3093,8 +3093,18 @@
     },
     {
       "path": "assets/ui/icons/AttackMove.png",
-      "sha256": "a38b0afee098124b7ce21cad5f5073d9883228fa93af1a29577ad0a94393d359",
-      "comparison": "absent_from_upstream"
+      "sha256": "7b686b71a4e1e3f0a1985b6ee75cfa6c92157db0cf513f5941f78fb3e86dbc41",
+      "comparison": "absent_from_upstream",
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/AttackMove.png",
+        "previous_sha256": "a38b0afee098124b7ce21cad5f5073d9883228fa93af1a29577ad0a94393d359",
+        "sha256": "7b686b71a4e1e3f0a1985b6ee75cfa6c92157db0cf513f5941f78fb3e86dbc41",
+        "svg": "art/semantic-icons/candidates-v3/AttackMove.svg",
+        "svg_sha256": "c2d02c0de415289cca32b997d8b3fb73cc977caa7336af79e98e7d71a139d1a6",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
+      }
     },
     {
       "path": "assets/ui/icons/Barracks.png",
@@ -3129,13 +3139,23 @@
     },
     {
       "path": "assets/ui/icons/ChronoRelay.png",
-      "sha256": "62e28dd205208e9b41c14db47d46413f70c0f64fb9f8e95b9348ba3447218b6c",
+      "sha256": "8aac3d459c02c383d3fe6a6d1dfb4ee9ad5f4bbe4370561f291a60dc83592732",
       "comparison": "absent_from_upstream",
       "generated_sheet_copy": {
         "source_artifact": "assets/ui/icons/generated/imagegen-rts-support-power-icons-20260615-02/72/ChronoRelay.png",
         "timestamp": "2026-06-16T19:23:53.172Z",
         "record_line": 78139,
         "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      },
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/ChronoRelay.png",
+        "previous_sha256": "62e28dd205208e9b41c14db47d46413f70c0f64fb9f8e95b9348ba3447218b6c",
+        "sha256": "8aac3d459c02c383d3fe6a6d1dfb4ee9ad5f4bbe4370561f291a60dc83592732",
+        "svg": "art/semantic-icons/candidates-v3/ChronoRelay.svg",
+        "svg_sha256": "944fc01c869721004771185b502fb5e5acb8ee4aa4b1f73c63203c9d0cb0b4d5",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
       }
     },
     {
@@ -3167,13 +3187,23 @@
     },
     {
       "path": "assets/ui/icons/DeployMode.png",
-      "sha256": "773174f4843fb2b9b646d0f2477e56fa58ccce80626637c574e52892145d6c9c",
+      "sha256": "4613109ea0afa5d2fe93aed9ce1c491ac6d68766270e37ec7fb9e4d513ee5436",
       "comparison": "absent_from_upstream",
       "generated_sheet_copy": {
         "source_artifact": "assets/ui/icons/generated/rts-specialists-20260615/72/UndergroundDrillRig.png",
         "timestamp": "2026-06-16T19:23:53.172Z",
         "record_line": 78139,
         "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      },
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/DeployMode.png",
+        "previous_sha256": "773174f4843fb2b9b646d0f2477e56fa58ccce80626637c574e52892145d6c9c",
+        "sha256": "4613109ea0afa5d2fe93aed9ce1c491ac6d68766270e37ec7fb9e4d513ee5436",
+        "svg": "art/semantic-icons/candidates-v3/DeployMode.svg",
+        "svg_sha256": "120eecda4cadcb6d5f473a0e66e1d7fe98f74e48bf068f884b7376d585cdc4e9",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
       }
     },
     {
@@ -3189,13 +3219,23 @@
     },
     {
       "path": "assets/ui/icons/EmpPulse.png",
-      "sha256": "596c889ae43711e569cdcb62c85e6f21a6a3e71601fb46fd6de2d65b95e04850",
+      "sha256": "5f16904c25aa47beb27ce1b09ff4c568504d2dd731735297f68881459a21e736",
       "comparison": "absent_from_upstream",
       "generated_sheet_copy": {
         "source_artifact": "assets/ui/icons/generated/imagegen-rts-support-power-icons-20260615-01/72/EmpPulse.png",
         "timestamp": "2026-06-16T19:23:53.172Z",
         "record_line": 78139,
         "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      },
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/EmpPulse.png",
+        "previous_sha256": "596c889ae43711e569cdcb62c85e6f21a6a3e71601fb46fd6de2d65b95e04850",
+        "sha256": "5f16904c25aa47beb27ce1b09ff4c568504d2dd731735297f68881459a21e736",
+        "svg": "art/semantic-icons/candidates-v3/EmpPulse.svg",
+        "svg_sha256": "689412ab47fc79fdda45ad1d2af21570e0be4119bdb1c98fe6a6542baee79395",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
       }
     },
     {
@@ -3246,13 +3286,23 @@
     },
     {
       "path": "assets/ui/icons/GuardArea.png",
-      "sha256": "491ade02e25022997c92f2889edd98b4edfb2c76dc33fbe477eb81a9f5a866bd",
+      "sha256": "55c3037e2635364bbb416a05a8c61be3fd75f830d772f3f7cfebfdf70b2b6360",
       "comparison": "absent_from_upstream",
       "generated_sheet_copy": {
         "source_artifact": "assets/ui/icons/generated/rts-command-icons-20260616-01/72/14_patrol_command.png",
         "timestamp": "2026-06-16T19:23:53.172Z",
         "record_line": 78139,
         "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      },
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/GuardArea.png",
+        "previous_sha256": "491ade02e25022997c92f2889edd98b4edfb2c76dc33fbe477eb81a9f5a866bd",
+        "sha256": "55c3037e2635364bbb416a05a8c61be3fd75f830d772f3f7cfebfdf70b2b6360",
+        "svg": "art/semantic-icons/candidates-v3/GuardArea.svg",
+        "svg_sha256": "aea8472027a5e12a63c0a6fed45ea5f829af4cbe01a92b6eafdd40093fc3d59e",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
       }
     },
     {
@@ -3299,8 +3349,18 @@
     },
     {
       "path": "assets/ui/icons/HoldPosition.png",
-      "sha256": "a5a88f4f1ef54357f00a2708e3da84e7097421cbe78c542d7cfd7a86dc968266",
-      "comparison": "absent_from_upstream"
+      "sha256": "c7c282ec0ff587627ca5b8f2207462ed46ab367ea6c789b7842fba228dd58fd2",
+      "comparison": "absent_from_upstream",
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/HoldPosition.png",
+        "previous_sha256": "a5a88f4f1ef54357f00a2708e3da84e7097421cbe78c542d7cfd7a86dc968266",
+        "sha256": "c7c282ec0ff587627ca5b8f2207462ed46ab367ea6c789b7842fba228dd58fd2",
+        "svg": "art/semantic-icons/candidates-v3/HoldPosition.svg",
+        "svg_sha256": "0473818a61bc27d6c63e1a3eafc1f78203e48a818b2df92946524351070e2350",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
+      }
     },
     {
       "path": "assets/ui/icons/InterceptorJetVTOL.png",
@@ -3414,19 +3474,39 @@
     },
     {
       "path": "assets/ui/icons/NaniteRepairSwarm.png",
-      "sha256": "ef89200cb34f6bb65d1e0b4cdf941f7b974298d96f44cc2816e6879f4d0cf1d7",
+      "sha256": "b8bea792f2011fcd25b5234038d233dfd7934a21537627aba56331a99b539fda",
       "comparison": "absent_from_upstream",
       "generated_sheet_copy": {
         "source_artifact": "assets/ui/icons/generated/imagegen-rts-support-power-icons-20260615-02/72/NaniteRepairSwarm.png",
         "timestamp": "2026-06-16T19:23:53.172Z",
         "record_line": 78139,
         "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      },
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/NaniteRepairSwarm.png",
+        "previous_sha256": "ef89200cb34f6bb65d1e0b4cdf941f7b974298d96f44cc2816e6879f4d0cf1d7",
+        "sha256": "b8bea792f2011fcd25b5234038d233dfd7934a21537627aba56331a99b539fda",
+        "svg": "art/semantic-icons/candidates-v3/NaniteRepairSwarm.svg",
+        "svg_sha256": "46da86c5f71528ccec4bf11d76d0d00d49541c702aacc69d3eaf7cc7703cfbaa",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
       }
     },
     {
       "path": "assets/ui/icons/OrbitalStrike.png",
-      "sha256": "892dc5cceba1ed1d7b0c222e476c8f59d63c51354a3a0a5103018c11223eb966",
-      "comparison": "absent_from_upstream"
+      "sha256": "fa039c4a7ee7b1e2093740f2d7e8ce49acd4c3bde220872bcd9df9c51ce64610",
+      "comparison": "absent_from_upstream",
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/OrbitalStrike.png",
+        "previous_sha256": "892dc5cceba1ed1d7b0c222e476c8f59d63c51354a3a0a5103018c11223eb966",
+        "sha256": "fa039c4a7ee7b1e2093740f2d7e8ce49acd4c3bde220872bcd9df9c51ce64610",
+        "svg": "art/semantic-icons/candidates-v3/OrbitalStrike.svg",
+        "svg_sha256": "d66af5569a65c239c21915cdbfb937e796e82a70595bbd5202a3fdf689c23b70",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
+      }
     },
     {
       "path": "assets/ui/icons/OrePurifier.png",
@@ -3440,18 +3520,38 @@
     },
     {
       "path": "assets/ui/icons/Paradrop.png",
-      "sha256": "4fe058855eb40916e4425b74f86554603c827d13f0422e3d9f1612926d99da24",
-      "comparison": "absent_from_upstream"
+      "sha256": "b4d6018dfeb7cbd953759cc1c3fa3fb4d7f09ac64caa3b0de1c3fd1c397cdd0a",
+      "comparison": "absent_from_upstream",
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/Paradrop.png",
+        "previous_sha256": "4fe058855eb40916e4425b74f86554603c827d13f0422e3d9f1612926d99da24",
+        "sha256": "b4d6018dfeb7cbd953759cc1c3fa3fb4d7f09ac64caa3b0de1c3fd1c397cdd0a",
+        "svg": "art/semantic-icons/candidates-v3/Paradrop.svg",
+        "svg_sha256": "4869f439847ca62e12b9ac2e5a688b151fbf27eac2f57a880b8d40beb01a6d7f",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
+      }
     },
     {
       "path": "assets/ui/icons/Patrol.png",
-      "sha256": "491ade02e25022997c92f2889edd98b4edfb2c76dc33fbe477eb81a9f5a866bd",
+      "sha256": "ff5acdf2a364315131d32cfc2c418b36a6bd88dec61aee09afe6ee4f286b8b1b",
       "comparison": "absent_from_upstream",
       "generated_sheet_copy": {
         "source_artifact": "assets/ui/icons/generated/rts-command-icons-20260616-01/72/14_patrol_command.png",
         "timestamp": "2026-06-16T19:23:53.172Z",
         "record_line": 78139,
         "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      },
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/Patrol.png",
+        "previous_sha256": "491ade02e25022997c92f2889edd98b4edfb2c76dc33fbe477eb81a9f5a866bd",
+        "sha256": "ff5acdf2a364315131d32cfc2c418b36a6bd88dec61aee09afe6ee4f286b8b1b",
+        "svg": "art/semantic-icons/candidates-v3/Patrol.svg",
+        "svg_sha256": "b59292c5dc8d7fcfe8910c3b9de4d7b5b5fba8286b59f9291183d6de2b782b71",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
       }
     },
     {
@@ -3498,8 +3598,18 @@
     },
     {
       "path": "assets/ui/icons/RadarSweep.png",
-      "sha256": "d018d01d18a9667f4b6fdc0972aaa482c5e8323fb77242a749d6806fccae5dbc",
-      "comparison": "absent_from_upstream"
+      "sha256": "293af0c96ccc7dce6e00ffdc8a038b8c15a7fa0961e6c42158d8219f601701b4",
+      "comparison": "absent_from_upstream",
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/RadarSweep.png",
+        "previous_sha256": "d018d01d18a9667f4b6fdc0972aaa482c5e8323fb77242a749d6806fccae5dbc",
+        "sha256": "293af0c96ccc7dce6e00ffdc8a038b8c15a7fa0961e6c42158d8219f601701b4",
+        "svg": "art/semantic-icons/candidates-v3/RadarSweep.svg",
+        "svg_sha256": "71adbd3ac33f9e3532d5bdf34903fac07d48b8e21619eb8b58a1581331de0ac1",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
+      }
     },
     {
       "path": "assets/ui/icons/RadarUplink.png",
@@ -3539,8 +3649,18 @@
     },
     {
       "path": "assets/ui/icons/RallyPoint.png",
-      "sha256": "2a2a46880de205ccd6adc7de7a07e4910af9dda2ffafde32047fe24d674f7fd2",
-      "comparison": "absent_from_upstream"
+      "sha256": "12ecbc54149d049d9534ec940cf25ab66ceddd913e80e32b2fa8dcc28f046717",
+      "comparison": "absent_from_upstream",
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/RallyPoint.png",
+        "previous_sha256": "2a2a46880de205ccd6adc7de7a07e4910af9dda2ffafde32047fe24d674f7fd2",
+        "sha256": "12ecbc54149d049d9534ec940cf25ab66ceddd913e80e32b2fa8dcc28f046717",
+        "svg": "art/semantic-icons/candidates-v3/RallyPoint.svg",
+        "svg_sha256": "002b68e5606819989bda187a56870d34169d3a7b66befe000179e6d13b385b29",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
+      }
     },
     {
       "path": "assets/ui/icons/Refinery.png",
@@ -3555,8 +3675,18 @@
     },
     {
       "path": "assets/ui/icons/Repair.png",
-      "sha256": "640fd4d5ef141bc039530029adf6af6bc13ec30bb4c61a7d56d0f9a0e4665390",
-      "comparison": "absent_from_upstream"
+      "sha256": "406df2d61f13bc7c6bde642d9cb1e03ee0ce21c83c277f5e3fc3ada1e37eb3c5",
+      "comparison": "absent_from_upstream",
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/Repair.png",
+        "previous_sha256": "640fd4d5ef141bc039530029adf6af6bc13ec30bb4c61a7d56d0f9a0e4665390",
+        "sha256": "406df2d61f13bc7c6bde642d9cb1e03ee0ce21c83c277f5e3fc3ada1e37eb3c5",
+        "svg": "art/semantic-icons/candidates-v3/Repair.svg",
+        "svg_sha256": "b35557d76b351fa21afb2b384dbe6129a8b381dec197d16f1d9505ce080f0c04",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
+      }
     },
     {
       "path": "assets/ui/icons/RepairPad.png",
@@ -3635,13 +3765,23 @@
     },
     {
       "path": "assets/ui/icons/Scatter.png",
-      "sha256": "ef77cd9be8739714acad0b0a5b347937b1a19287bb26d44d85cd9aa0536db57f",
+      "sha256": "60f3adcd84c6a4f4ce2a4f0a46067802eacc3cbbe8a0839a21be819d7008b243",
       "comparison": "absent_from_upstream",
       "generated_sheet_copy": {
         "source_artifact": "assets/ui/icons/generated/rts-command-icons-20260616-01/72/12_move_command.png",
         "timestamp": "2026-06-16T19:23:53.172Z",
         "record_line": 78139,
         "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      },
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/Scatter.png",
+        "previous_sha256": "ef77cd9be8739714acad0b0a5b347937b1a19287bb26d44d85cd9aa0536db57f",
+        "sha256": "60f3adcd84c6a4f4ce2a4f0a46067802eacc3cbbe8a0839a21be819d7008b243",
+        "svg": "art/semantic-icons/candidates-v3/Scatter.svg",
+        "svg_sha256": "96b8d0d9b2f8a12681bb1fd16492d8c2175e9b4f67856e216e69559cecc61f83",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
       }
     },
     {
@@ -3651,8 +3791,18 @@
     },
     {
       "path": "assets/ui/icons/SellStructure.png",
-      "sha256": "21fd69e82eaff7e0e5e35b3740bf9446877f6e050c7830f3bfb7d4121ae0fb01",
-      "comparison": "absent_from_upstream"
+      "sha256": "939cf480605179283f9b333c5f04cb78d3d619e5254845c874d09db4eb22c071",
+      "comparison": "absent_from_upstream",
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/SellStructure.png",
+        "previous_sha256": "21fd69e82eaff7e0e5e35b3740bf9446877f6e050c7830f3bfb7d4121ae0fb01",
+        "sha256": "939cf480605179283f9b333c5f04cb78d3d619e5254845c874d09db4eb22c071",
+        "svg": "art/semantic-icons/candidates-v3/SellStructure.svg",
+        "svg_sha256": "9eef651ee11f8e4d64cbf7ca5146081e44d34529023ab3bf72c2e9ff95a8378b",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
+      }
     },
     {
       "path": "assets/ui/icons/ShieldGenerator.png",
@@ -3661,13 +3811,23 @@
     },
     {
       "path": "assets/ui/icons/ShieldOverdrive.png",
-      "sha256": "301ec4a0ca018676aedce46587ada6cde9337b913aa1878a8e2c39fedf47fa04",
+      "sha256": "52d121064773eb44f4169e8e0a213c9c6e8f3a2ac2b823f2e3d4770c4973e073",
       "comparison": "absent_from_upstream",
       "generated_sheet_copy": {
         "source_artifact": "assets/ui/icons/generated/imagegen-rts-support-power-icons-20260615-02/72/ShieldOverdrive.png",
         "timestamp": "2026-06-16T19:23:53.172Z",
         "record_line": 78139,
         "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      },
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/ShieldOverdrive.png",
+        "previous_sha256": "301ec4a0ca018676aedce46587ada6cde9337b913aa1878a8e2c39fedf47fa04",
+        "sha256": "52d121064773eb44f4169e8e0a213c9c6e8f3a2ac2b823f2e3d4770c4973e073",
+        "svg": "art/semantic-icons/candidates-v3/ShieldOverdrive.svg",
+        "svg_sha256": "7ac7b02029f347196c5cde4c64a3f806d502e7b8343edddaa3dc8e7c4be48a2f",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
       }
     },
     {
@@ -3708,18 +3868,38 @@
     },
     {
       "path": "assets/ui/icons/StopCommand.png",
-      "sha256": "f75984674c9075b48cc3ddca2e9ffccfc865450dee53b9eb48b8b13e862ad6a2",
-      "comparison": "absent_from_upstream"
+      "sha256": "acf5bfb654d58c0613eaf12bdf4b0e60791f1f75acf48c6e0f868728c7a256bb",
+      "comparison": "absent_from_upstream",
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/StopCommand.png",
+        "previous_sha256": "f75984674c9075b48cc3ddca2e9ffccfc865450dee53b9eb48b8b13e862ad6a2",
+        "sha256": "acf5bfb654d58c0613eaf12bdf4b0e60791f1f75acf48c6e0f868728c7a256bb",
+        "svg": "art/semantic-icons/candidates-v3/StopCommand.svg",
+        "svg_sha256": "f16e96002251bae9e2e3f6accb4aaa4a7c00af31a797c4f1b771857a3ccc4322",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
+      }
     },
     {
       "path": "assets/ui/icons/StrategicMissile.png",
-      "sha256": "63ed1539a78b707209c62a54ddf4762f2461993d086bf4110ed31494bce17b45",
+      "sha256": "138d64036cab88f1ea416322c1ca1a74aa3235a642fc9e981122d92e10da2750",
       "comparison": "absent_from_upstream",
       "generated_sheet_copy": {
         "source_artifact": "assets/ui/icons/generated/imagegen-rts-ra2-inspired-roster-20260616-01/72/15_strategic_missile_silo.png",
         "timestamp": "2026-06-16T19:23:53.172Z",
         "record_line": 78139,
         "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      },
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/StrategicMissile.png",
+        "previous_sha256": "63ed1539a78b707209c62a54ddf4762f2461993d086bf4110ed31494bce17b45",
+        "sha256": "138d64036cab88f1ea416322c1ca1a74aa3235a642fc9e981122d92e10da2750",
+        "svg": "art/semantic-icons/candidates-v3/StrategicMissile.svg",
+        "svg_sha256": "38e5f3515fbc7144e6399c0b6885e6d01f67e092e804af554e765fab13aafea2",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
       }
     },
     {
@@ -3745,8 +3925,18 @@
     },
     {
       "path": "assets/ui/icons/TechLocked.png",
-      "sha256": "51fb50be69736cc54b1fe3f5cd12fc7a2cab07f448fc9164b089a9c3d8ef2ce5",
-      "comparison": "absent_from_upstream"
+      "sha256": "bd851446f5967990f4fef48e01798ba2225560483496b339794725b9f0686fe6",
+      "comparison": "absent_from_upstream",
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/TechLocked.png",
+        "previous_sha256": "51fb50be69736cc54b1fe3f5cd12fc7a2cab07f448fc9164b089a9c3d8ef2ce5",
+        "sha256": "bd851446f5967990f4fef48e01798ba2225560483496b339794725b9f0686fe6",
+        "svg": "art/semantic-icons/candidates-v3/TechLocked.svg",
+        "svg_sha256": "9eef3e2058fa453c2f5007a5df6f5e9c166822f68c2ea20e510280bc2b380ed9",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
+      }
     },
     {
       "path": "assets/ui/icons/TechOilDerrick.png",
@@ -3791,13 +3981,23 @@
     },
     {
       "path": "assets/ui/icons/WeatherStorm.png",
-      "sha256": "424a0e24727398a8a64431aa2a58fd0e8c948e628eac06d7ebe5d54d72aec251",
+      "sha256": "6c531c2faecc63cae321261569cfb1831fd953b369d349cfb9d86896701707b2",
       "comparison": "absent_from_upstream",
       "generated_sheet_copy": {
         "source_artifact": "assets/ui/icons/generated/imagegen-rts-support-power-icons-20260615-02/72/WeatherStorm.png",
         "timestamp": "2026-06-16T19:23:53.172Z",
         "record_line": 78139,
         "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+      },
+      "authored_vector_replacement": {
+        "path": "assets/ui/icons/WeatherStorm.png",
+        "previous_sha256": "424a0e24727398a8a64431aa2a58fd0e8c948e628eac06d7ebe5d54d72aec251",
+        "sha256": "6c531c2faecc63cae321261569cfb1831fd953b369d349cfb9d86896701707b2",
+        "svg": "art/semantic-icons/candidates-v3/WeatherStorm.svg",
+        "svg_sha256": "ced868316abdc03ddbd21ae30b7a6c2e194b696b036c9461e6f03f51192b0676",
+        "generator": "art/semantic-icons/generate.py",
+        "rasterizer": "resvg0.48.1",
+        "scope": "Original geometric SVG; runtime HUD review pending"
       }
     },
     {
