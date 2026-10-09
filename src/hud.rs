@@ -2160,22 +2160,9 @@ pub(crate) fn minimap_input(
                 target,
                 *order_resources.map_bounds,
             );
-            for (index, (entity, transform, unit, _unit_team, orders, _cargo)) in
+            for (index, (entity, transform, unit, _unit_team, _cargo)) in
                 selected.into_iter().enumerate()
             {
-                let (
-                    move_order,
-                    follow_order,
-                    attack_order,
-                    capture_order,
-                    garrison_order,
-                    harvest_order,
-                    repair_order,
-                    construct_order,
-                    attack_move_order,
-                    patrol_order,
-                    queue,
-                ) = orders;
                 let offset = formation_offsets.get(index).copied().unwrap_or(Vec3::ZERO);
                 let Some(desired) = desired_order_for_selected_unit(
                     unit,
@@ -2202,27 +2189,7 @@ pub(crate) fn minimap_input(
                     continue;
                 };
                 issued_any = true;
-                let has_active = has_active_orders_in_query(
-                    move_order,
-                    follow_order,
-                    attack_order,
-                    capture_order,
-                    garrison_order,
-                    harvest_order,
-                    repair_order,
-                    construct_order,
-                    attack_move_order,
-                    patrol_order,
-                );
-                issue_or_queue_unit_order(
-                    &mut commands,
-                    entity,
-                    desired,
-                    queue_mode,
-                    true,
-                    has_active,
-                    queue,
-                );
+                issue_or_queue_unit_order(&mut commands, entity, desired, queue_mode, true);
                 commands
                     .entity(entity)
                     .try_insert(HoldPosition { enabled: false });

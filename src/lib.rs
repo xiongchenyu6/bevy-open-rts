@@ -611,7 +611,6 @@ pub(crate) type SelectedOrderUnitItem<'a> = (
     &'a Transform,
     &'a Unit,
     &'a Team,
-    CommandOrderStateItem<'a>,
     Option<&'a ResourceCargo>,
 );
 pub(crate) type SelectableOrderTargetItem<'a> = (

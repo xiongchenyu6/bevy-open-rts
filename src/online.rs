@@ -1052,7 +1052,6 @@ type OnlineCommandActor<'a> = (
     &'a Unit,
     &'a Health,
     &'a Transform,
-    CommandOrderStateItem<'a>,
 );
 
 type OnlineCommandTarget<'a> = (
@@ -3817,7 +3816,7 @@ fn apply_online_player_commands(params: OnlineCommandApplyParams) {
                     let Some(entity) = entity_by_network_id.get(&command.unit_id).copied() else {
                         continue;
                     };
-                    let Ok((actor, _network_id, actor_team, unit, health, transform, order_state)) =
+                    let Ok((actor, _network_id, actor_team, unit, health, transform)) =
                         actors.get(entity)
                     else {
                         continue;
@@ -3838,39 +3837,7 @@ fn apply_online_player_commands(params: OnlineCommandApplyParams) {
                     ) else {
                         continue;
                     };
-                    let (
-                        move_order,
-                        follow_order,
-                        attack_order,
-                        capture_order,
-                        garrison_order,
-                        harvest_order,
-                        repair_order,
-                        construct_order,
-                        attack_move_order,
-                        patrol_order,
-                        order_queue,
-                    ) = order_state;
-                    issue_or_queue_unit_order(
-                        &mut commands,
-                        actor,
-                        order,
-                        queue,
-                        true,
-                        has_active_orders_in_query(
-                            move_order,
-                            follow_order,
-                            attack_order,
-                            capture_order,
-                            garrison_order,
-                            harvest_order,
-                            repair_order,
-                            construct_order,
-                            attack_move_order,
-                            patrol_order,
-                        ),
-                        order_queue,
-                    );
+                    issue_or_queue_unit_order(&mut commands, actor, order, queue, true);
                     commands
                         .entity(actor)
                         .try_insert(HoldPosition { enabled: false });
@@ -3936,7 +3903,7 @@ fn apply_online_player_commands(params: OnlineCommandApplyParams) {
                         let scatter_units = units
                             .iter()
                             .filter_map(|entity| {
-                                let (_, _, _, unit, _, transform, _) = actors.get(*entity).ok()?;
+                                let (_, _, _, unit, _, transform) = actors.get(*entity).ok()?;
                                 unit_supports_patrol(unit)
                                     .then_some((*entity, transform.translation))
                             })
@@ -4350,7 +4317,7 @@ fn resolve_owned_online_unit_entities(
             return None;
         }
         let entity = entity_by_network_id.get(network_id).copied()?;
-        let (_, _, unit_team, _, health, _, _) = actors.get(entity).ok()?;
+        let (_, _, unit_team, _, health, _) = actors.get(entity).ok()?;
         if *unit_team != team || health.current <= 0.0 {
             return None;
         }
@@ -4470,7 +4437,7 @@ fn resolve_online_constructors(
             return None;
         }
         let entity = entity_by_network_id.get(network_id).copied()?;
-        let (_, _, constructor_team, unit, health, _, _) = actors.get(entity).ok()?;
+        let (_, _, constructor_team, unit, health, _) = actors.get(entity).ok()?;
         if *constructor_team != team
             || health.current <= 0.0
             || !can_unit_construct_structures(unit)
@@ -4511,10 +4478,10 @@ fn nearest_online_constructor(
 ) -> Option<Entity> {
     actors
         .iter()
-        .filter(|(_, _, actor_team, unit, health, _, _)| {
+        .filter(|(_, _, actor_team, unit, health, _)| {
             **actor_team == team && health.current > 0.0 && can_unit_construct_structures(unit)
         })
-        .map(|(entity, _, _, _, _, transform, _)| {
+        .map(|(entity, _, _, _, _, transform)| {
             (entity, xz_distance(transform.translation, target_position))
         })
         .min_by(|(_, left), (_, right)| left.total_cmp(right))

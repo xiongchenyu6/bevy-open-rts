@@ -430,22 +430,7 @@ pub(crate) fn issue_orders(
 
     let mut issued_any = false;
     let mut online_orders = Vec::with_capacity(selected_unit_count);
-    for (i, (entity, transform, unit, _unit_team, orders, _cargo)) in
-        selected.into_iter().enumerate()
-    {
-        let (
-            move_order,
-            follow_order,
-            attack_order,
-            capture_order,
-            garrison_order,
-            harvest_order,
-            repair_order,
-            construct_order,
-            attack_move,
-            patrol_order,
-            queue,
-        ) = orders;
+    for (i, (entity, transform, unit, _unit_team, _cargo)) in selected.into_iter().enumerate() {
         let offset = formation_offsets.get(i).copied().unwrap_or(Vec3::ZERO);
         let Some(desired) = desired_order_for_selected_unit(
             unit,
@@ -501,27 +486,7 @@ pub(crate) fn issue_orders(
             continue;
         }
         issued_any = true;
-        let has_active = has_active_orders_in_query(
-            move_order,
-            follow_order,
-            attack_order,
-            capture_order,
-            garrison_order,
-            harvest_order,
-            repair_order,
-            construct_order,
-            attack_move,
-            patrol_order,
-        );
-        issue_or_queue_unit_order(
-            &mut commands,
-            entity,
-            desired,
-            queue_mode,
-            true,
-            has_active,
-            queue,
-        );
+        issue_or_queue_unit_order(&mut commands, entity, desired, queue_mode, true);
         commands
             .entity(entity)
             .try_insert(HoldPosition { enabled: false });
@@ -1764,26 +1729,44 @@ pub(crate) fn progress_queued_orders(
 }
 
 pub(crate) fn issue_unit_order(commands: &mut Commands, entity: Entity, order: UnitQueuedOrder) {
-    clear_order_state(commands, entity);
+    commands.queue(move |world: &mut World| {
+        if let Ok(mut actor) = world.get_entity_mut(entity) {
+            apply_unit_order(&mut actor, order);
+        }
+    });
+}
 
+fn apply_unit_order(actor: &mut bevy::ecs::world::EntityWorldMut<'_>, order: UnitQueuedOrder) {
+    actor.remove::<(
+        MoveOrder,
+        FollowOrder,
+        AttackOrder,
+        CaptureOrder,
+        GarrisonOrder,
+        HarvestOrder,
+        RepairOrder,
+        ConstructOrder,
+        AttackMoveOrder,
+        PatrolOrder,
+    )>();
     match order {
         UnitQueuedOrder::Move(target) => {
-            commands.entity(entity).try_insert(MoveOrder { target });
+            actor.insert(MoveOrder { target });
         }
         UnitQueuedOrder::Attack(target) => {
-            commands.entity(entity).try_insert(AttackOrder { target });
+            actor.insert(AttackOrder { target });
         }
         UnitQueuedOrder::Capture(target) => {
-            commands.entity(entity).try_insert(CaptureOrder {
+            actor.insert(CaptureOrder {
                 target,
                 elapsed: 0.0,
             });
         }
         UnitQueuedOrder::Garrison(target) => {
-            commands.entity(entity).try_insert(GarrisonOrder { target });
+            actor.insert(GarrisonOrder { target });
         }
         UnitQueuedOrder::Harvest { target, state } => {
-            commands.entity(entity).try_insert(HarvestOrder {
+            actor.insert(HarvestOrder {
                 resource: Some(target),
                 state,
                 collect_remaining: 0.0,
@@ -1791,37 +1774,33 @@ pub(crate) fn issue_unit_order(commands: &mut Commands, entity: Entity, order: U
             });
         }
         UnitQueuedOrder::Repair(target) => {
-            commands.entity(entity).try_insert(RepairOrder { target });
+            actor.insert(RepairOrder { target });
         }
         UnitQueuedOrder::Construct(target) => {
-            commands
-                .entity(entity)
-                .try_insert(ConstructOrder { target });
+            actor.insert(ConstructOrder { target });
         }
         UnitQueuedOrder::Follow { target, offset } => {
-            commands.entity(entity).try_insert(FollowOrder {
+            actor.insert(FollowOrder {
                 target,
                 allow_enemy: false,
                 offset,
             });
         }
         UnitQueuedOrder::AttackMove(destination) => {
-            commands
-                .entity(entity)
-                .try_insert(AttackMoveOrder { destination });
+            actor.insert(AttackMoveOrder { destination });
         }
         UnitQueuedOrder::Patrol {
             origin,
             destination,
         } => {
-            commands.entity(entity).try_insert(PatrolOrder {
+            actor.insert(PatrolOrder {
                 origin,
                 destination,
                 moving_to_destination: true,
             });
         }
         UnitQueuedOrder::ForceFollow { target, offset } => {
-            commands.entity(entity).try_insert(FollowOrder {
+            actor.insert(FollowOrder {
                 target,
                 allow_enemy: true,
                 offset,
@@ -1836,23 +1815,44 @@ pub(crate) fn issue_or_queue_unit_order(
     order: UnitQueuedOrder,
     queue_mode: bool,
     allow_queue: bool,
-    has_active: bool,
-    queue: Option<&OrderQueue>,
 ) {
-    if should_queue_selected_order(queue_mode, allow_queue, has_active, queue) {
-        let mut queued = VecDeque::from(
-            queue
-                .map(|order_queue| order_queue.orders.clone())
-                .unwrap_or_default(),
+    commands.queue(move |world: &mut World| {
+        let Ok(mut actor) = world.get_entity_mut(entity) else {
+            return;
+        };
+        if !actor.contains::<Unit>() || actor.get::<Health>().is_none_or(|hp| hp.current <= 0.0) {
+            return;
+        }
+        let has_active = has_active_orders_in_query(
+            actor.get::<MoveOrder>(),
+            actor.get::<FollowOrder>(),
+            actor.get::<AttackOrder>(),
+            actor.get::<CaptureOrder>(),
+            actor.get::<GarrisonOrder>(),
+            actor.get::<HarvestOrder>(),
+            actor.get::<RepairOrder>(),
+            actor.get::<ConstructOrder>(),
+            actor.get::<AttackMoveOrder>(),
+            actor.get::<PatrolOrder>(),
         );
-        queued.push_back(order);
-        commands
-            .entity(entity)
-            .try_insert(OrderQueue { orders: queued });
-    } else {
-        issue_unit_order(commands, entity, order);
-        commands.entity(entity).try_remove::<OrderQueue>();
-    }
+        if should_queue_selected_order(
+            queue_mode,
+            allow_queue,
+            has_active,
+            actor.get::<OrderQueue>(),
+        ) {
+            if let Some(mut queue) = actor.get_mut::<OrderQueue>() {
+                queue.orders.push_back(order);
+            } else {
+                actor.insert(OrderQueue {
+                    orders: VecDeque::from([order]),
+                });
+            }
+        } else {
+            apply_unit_order(&mut actor, order);
+            actor.remove::<OrderQueue>();
+        }
+    });
 }
 
 pub(crate) fn should_queue_selected_order(
@@ -3072,3 +3072,6 @@ pub(crate) fn queued_terrain_order_target(order: &UnitQueuedOrder) -> Option<Vec
 pub(crate) fn should_draw_action_queue_path(team: Team, visible_team: Team) -> bool {
     team == visible_team
 }
+
+#[cfg(test)]
+mod queue_burst_tests;
