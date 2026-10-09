@@ -11,5 +11,11 @@
   "sha256": "7b5c356a2ede0ad3a101aa3865660c505aeacfcf31d49a472a4ae6f7b539cf8f",
   "bytes": 2735644,
   "original_output_filename": "exec-0b657034-8ab4-46cf-ba46-fe9a13fbe296.png",
-  "status": "visually inspected candidate; outside shipped assets; not gameplay evidence"
+  "status": "source_for_current_runtime_derivative",
+  "runtime_derivative": {
+    "path": "assets/campaign/mission_04-v2.jpg",
+    "sha256": "eadb68ea555c33410d97147cf106aa76d65f3ccfba75258e16a5ddaa3866cfdd",
+    "manifest": "art/campaign/runtime-derivatives-20261010.json",
+    "transformation": "JPEG encoding only"
+  }
 }

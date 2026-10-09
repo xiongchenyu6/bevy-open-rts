@@ -11,8 +11,14 @@
   "sha256": "a430c113bcc3af6b4d6a08e9155847a32dee3da22e623b993f3db6f97f356351",
   "bytes": 2243920,
   "original_output_filename": "exec-fd327e3f-84ef-41db-b810-cf30df7b9b60.png",
-  "status": "visually inspected candidate; outside shipped assets; not gameplay evidence",
+  "status": "source_for_current_runtime_derivative",
   "intent": "edit original mission02 candidate to remove banners and emblems",
   "reference_image": "mission02-crossfire-v2.png",
-  "reference_sha256": "a303d5fc2e8da601d6dc0d9c4d66aea9c228558dcdd3c7d7fe9414862710141e"
+  "reference_sha256": "a303d5fc2e8da601d6dc0d9c4d66aea9c228558dcdd3c7d7fe9414862710141e",
+  "runtime_derivative": {
+    "path": "assets/campaign/mission_02-v2.jpg",
+    "sha256": "96c214bdd16c7c0bbaa9aa3ab77d4ef37a064bf7ca59a06a4497ff3b41bc825c",
+    "manifest": "art/campaign/runtime-derivatives-20261010.json",
+    "transformation": "JPEG encoding only"
+  }
 }

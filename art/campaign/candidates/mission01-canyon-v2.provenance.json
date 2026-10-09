@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "candidate_not_shipped",
+  "status": "source_for_current_runtime_derivative",
   "artifact": "mission01-canyon-v2.png",
   "artifact_sha256": "b623baca89414e894998f87987b0a453b98610d4cd7f0662b31b4a963ac116e7",
   "dimensions": [
@@ -19,5 +19,11 @@
     "quiet_lower_briefing_band": true,
     "usage": "original campaign illustration; not a gameplay screenshot"
   },
-  "original_saved_output": "/home/freeman.xiong/.codex/generated_images/01a11195-2f38-7de0-be8d-0b9e80b3698a/exec-57724662-bacd-497b-b95f-4b19e3b2a286.png"
+  "original_saved_output": "/home/freeman.xiong/.codex/generated_images/01a11195-2f38-7de0-be8d-0b9e80b3698a/exec-57724662-bacd-497b-b95f-4b19e3b2a286.png",
+  "runtime_derivative": {
+    "path": "assets/campaign/mission_01-v2.jpg",
+    "sha256": "6cd02c15357fef191b1c3368a676a1d60be1c22f8703b44be8a1f0c6370b9222",
+    "manifest": "art/campaign/runtime-derivatives-20261010.json",
+    "transformation": "JPEG encoding only"
+  }
 }
