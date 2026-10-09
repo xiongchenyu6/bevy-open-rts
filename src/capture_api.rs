@@ -11,6 +11,11 @@ use bevy_rts_camera::RtsCamera as RtsCam;
 use crate::*;
 
 #[cfg(not(target_arch = "wasm32"))]
+mod portrait_export;
+#[cfg(not(target_arch = "wasm32"))]
+pub use portrait_export::export_portrait_stage;
+
+#[cfg(not(target_arch = "wasm32"))]
 mod semantic_ui;
 #[cfg(not(target_arch = "wasm32"))]
 pub use semantic_ui::{
