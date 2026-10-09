@@ -10,6 +10,8 @@ Generate into a new directory with `python3 art/faction-emblems/generate.py
 three PNGs byte-identically; alpha checks confirm transparent and opaque pixels.
 The review sheet shows16/24/32px samples on light and dark backgrounds.
 
-These are staged candidates. Current runtime emblems remain unchanged until
-actual skirmish/lobby menu inspection passes. Manifest and verification files
+The original candidates are installed after actual1280px skirmish setup and
+dropdown inspection passed. `runtime-integration.json` records old/new/source
+hashes; old bytes remain outside runtime assets in the local audit backup.
+Small-window/browser inspection remains open. Manifest and verification files
 retain exact source, tool and output hashes.

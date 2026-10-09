@@ -202,7 +202,10 @@ runs reproduce the PNGs byte-identically, and decoded alpha has0/255 pixels.
 Root inspected16/24/32px sheets and actual1280px shared skirmish setup/dropdown
 using isolated candidate assets; both children exit0 and all three read clearly.
 Evidence: `screenshots/steam-quality/original-faction-emblems-01/visual-review.json`.
-Current repository runtime emblems are still unchanged.
+The three inspected original crests now replace the same runtime paths. Their
+installed bytes match the isolated menu-review assets; exact old/new/source
+hashes are recorded in `art/faction-emblems/runtime-integration.json`.
+Small-window/browser review remains open.
 
 `target/voice-full-event-candidates-20261010/` contains32 CPU-only candidate
 WAVs for16 complete event texts in each language. Generation uses the retained

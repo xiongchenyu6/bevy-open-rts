@@ -1,0 +1,27 @@
+{
+  "scope": "Original3vectorcrest replacements, unchanged runtime paths; actual1280sharedmenu reviewed; broader layouts/browser pending",
+  "changes": [
+    {
+      "path": "assets/ui/factions/alliance_emblem.png",
+      "old_sha256": "ef8c8c78a4ed56fe4969dc3885a4afc65815fe082d88073cf162a4caa6f19ed9",
+      "sha256": "329168e1a8b97425422e7d26bd9ecf0f0af297971e48ad206ceadbe9a7c20984",
+      "svg": "art/faction-emblems/candidates-v1/alliance.svg",
+      "svg_sha256": "89aaa13fa88b50b13461fe8b985d89dc546bd59cae590f433726b79e86751af5"
+    },
+    {
+      "path": "assets/ui/factions/demon_emblem.png",
+      "old_sha256": "4bf9915cae05b7331fd207ff6fe71fb15a1643a03ca2af5a37f6899c9f471364",
+      "sha256": "548d63f76181b88fc65df6040d82432c960577596d965a66ac5506ab61897da2",
+      "svg": "art/faction-emblems/candidates-v1/demon.svg",
+      "svg_sha256": "c3df4e1da16a57e974e7981cc3bb5474a60d483872c011f85f231ddfd659bef5"
+    },
+    {
+      "path": "assets/ui/factions/chaos_emblem.png",
+      "old_sha256": "1aa20711a803ae1150cdcea3948cb789e3047630770314199bfe6cada5e81e48",
+      "sha256": "6c909058accd77d1f6c6a8608bb66adbcc6d3dbdda669ec7b94e5c93cad4a91c",
+      "svg": "art/faction-emblems/candidates-v1/chaos.svg",
+      "svg_sha256": "4187bc945cbb1ebd34517cfe23284eec221eb1298cb3322f216c7b260ac01c95"
+    }
+  ],
+  "legacy_backup": "target/faction-emblem-legacy-originals-20261010"
+}
