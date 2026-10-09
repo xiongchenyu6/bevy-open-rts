@@ -20,6 +20,16 @@ fn step(app: &mut App) {
     app.update();
 }
 
+fn apply_emp(app: &mut App, entities: &[Entity], duration: f32) {
+    {
+        let mut commands = app.world_mut().commands();
+        for &entity in entities {
+            queue_apply_emp_disabled(&mut commands, entity, duration);
+        }
+    }
+    app.world_mut().flush();
+}
+
 fn worker() -> Unit {
     Unit {
         id: "Worker",
@@ -65,9 +75,9 @@ fn emp_pauses_construction_then_completes_after_actual_status_expiry() {
                 ))]),
             },
             MoveOrder { target: Vec3::X },
-            EmpDisabled { remaining: 0.5 },
         ))
         .id();
+    apply_emp(&mut app, &[builder], 0.5);
     for _ in 0..3 {
         step(&mut app);
         assert_eq!(
@@ -87,7 +97,21 @@ fn emp_pauses_construction_then_completes_after_actual_status_expiry() {
             0.5
         );
     }
-    for _ in 0..20 {
+    apply_emp(&mut app, &[builder], 0.4);
+    apply_emp(&mut app, &[builder], 0.1);
+    assert_eq!(
+        app.world().get::<EmpDisabled>(builder).unwrap().remaining,
+        0.4
+    );
+    assert_eq!(
+        app.world().get::<ConstructOrder>(builder).unwrap().target,
+        target
+    );
+    assert_eq!(
+        app.world().get::<OrderQueue>(builder).unwrap().orders.len(),
+        1
+    );
+    for _ in 0..30 {
         step(&mut app);
     }
     assert!(app.world().get::<EmpDisabled>(builder).is_none());
@@ -138,9 +162,9 @@ fn emp_preserves_harvest_target_cargo_and_progress_then_collects_after_expiry() 
                 last_kind: Some(ResourceKind::Ore),
             },
             MoveOrder { target: Vec3::X },
-            EmpDisabled { remaining: 0.5 },
         ))
         .id();
+    apply_emp(&mut app, &[collector], 0.5);
     for _ in 0..3 {
         step(&mut app);
         let order = app.world().get::<HarvestOrder>(collector).unwrap();
@@ -203,7 +227,6 @@ fn live_schedule_pauses_capture_garrison_repair_and_idle_queue_until_emp_expires
                 target: enemy_hq,
                 elapsed,
             },
-            EmpDisabled { remaining: 0.5 },
         ))
         .id();
     let bunker = app
@@ -235,7 +258,6 @@ fn live_schedule_pauses_capture_garrison_repair_and_idle_queue_until_emp_expires
             Selectable { radius: 0.6 },
             Health::new(7.0),
             GarrisonOrder { target: bunker },
-            EmpDisabled { remaining: 0.5 },
         ))
         .id();
     let damaged = app
@@ -270,7 +292,6 @@ fn live_schedule_pauses_capture_garrison_repair_and_idle_queue_until_emp_expires
             Selectable { radius: 0.6 },
             Health::new(6.0),
             RepairOrder { target: damaged },
-            EmpDisabled { remaining: 0.5 },
         ))
         .id();
     let queued = app
@@ -286,9 +307,9 @@ fn live_schedule_pauses_capture_garrison_repair_and_idle_queue_until_emp_expires
                     5.0, 0.0, 0.0,
                 ))]),
             },
-            EmpDisabled { remaining: 0.5 },
         ))
         .id();
+    apply_emp(&mut app, &[capturer, infantry, repairer, queued], 0.5);
     for _ in 0..3 {
         step(&mut app);
         assert_eq!(

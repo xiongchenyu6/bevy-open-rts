@@ -23,19 +23,8 @@ pub(crate) fn queue_apply_emp_disabled(commands: &mut Commands, entity: Entity, 
         let Ok(mut entity_mut) = world.get_entity_mut(entity) else {
             return;
         };
-        entity_mut.remove::<(
-            MoveOrder,
-            FollowOrder,
-            AttackOrder,
-            CaptureOrder,
-            GarrisonOrder,
-            HarvestOrder,
-            RepairOrder,
-            ConstructOrder,
-            AttackMoveOrder,
-            PatrolOrder,
-            OrderQueue,
-        )>();
+        // EMP pauses the existing task and command queue. Their systems resume
+        // them after expiry; applying or extending the effect must not cancel them.
         if let Some(mut disabled) = entity_mut.get_mut::<EmpDisabled>() {
             disabled.remaining = disabled.remaining.max(duration);
             return;
