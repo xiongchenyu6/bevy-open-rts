@@ -131,27 +131,33 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
         Vec::new()
     };
     let mut teams = vec![
-        serde_json::json!({"player":0,"units":0,"structures":0,"pending_construction":0}),
-        serde_json::json!({"player":1,"units":0,"structures":0,"pending_construction":0}),
+        serde_json::json!({"player":0,"units":0,"structures":0,"pending_construction":0,"unit_types":{},"structure_types":{}}),
+        serde_json::json!({"player":1,"units":0,"structures":0,"pending_construction":0,"unit_types":{},"structure_types":{}}),
     ];
     let mut units = world.query::<(&Team, &Health, &Unit)>();
-    for (team, health, _) in units.iter(world) {
+    for (team, health, unit) in units.iter(world) {
         if let Team::Player(index) = team
             && *index < 2
             && health.current > 0.0
         {
             let count = teams[*index]["units"].as_u64().unwrap();
             teams[*index]["units"] = (count + 1).into();
+            let count = teams[*index]["unit_types"][unit.id].as_u64().unwrap_or(0);
+            teams[*index]["unit_types"][unit.id] = (count + 1).into();
         }
     }
     let mut structures = world.query::<(&Team, &Health, &Structure, Option<&UnderConstruction>)>();
-    for (team, health, _, construction) in structures.iter(world) {
+    for (team, health, structure, construction) in structures.iter(world) {
         if let Team::Player(index) = team
             && *index < 2
             && health.current > 0.0
         {
             let count = teams[*index]["structures"].as_u64().unwrap();
             teams[*index]["structures"] = (count + 1).into();
+            let count = teams[*index]["structure_types"][structure.id]
+                .as_u64()
+                .unwrap_or(0);
+            teams[*index]["structure_types"][structure.id] = (count + 1).into();
             if construction.is_some() {
                 let count = teams[*index]["pending_construction"].as_u64().unwrap();
                 teams[*index]["pending_construction"] = (count + 1).into();
@@ -164,6 +170,38 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
         team["ore"] = economy.ore.into();
         team["crystal"] = economy.crystal.into();
     }
+    let timeout_units = if completed {
+        None
+    } else {
+        let mut query = world.query::<(
+            Entity,
+            &Team,
+            &Unit,
+            &Health,
+            &Transform,
+            Option<&MoveOrder>,
+            Option<&AttackOrder>,
+            Option<&AttackMoveOrder>,
+            Option<&PlannedPath>,
+            Option<&HarvestOrder>,
+        )>();
+        Some(query.iter(world).filter(|(_, _, _, health, ..)| health.current > 0.0)
+            .map(|(entity, team, unit, health, position, movement, attack, attack_move, path, harvest)| {
+                serde_json::json!({
+                    "entity":entity.to_bits(), "team":team.economy_index(), "unit":unit.id,
+                    "health":health.current, "position":position.translation.to_array(),
+                    "move_target":movement.map(|order|order.target.to_array()),
+                    "attack_target":attack.map(|order|order.target.to_bits()),
+                    "attack_target_position":attack.and_then(|order|world.get::<Transform>(order.target))
+                        .map(|target|target.translation.to_array()),
+                    "attack_move_target":attack_move.map(|order|order.destination.to_array()),
+                    "path_goal":path.map(|path|path.goal.to_array()),
+                    "remaining_waypoints":path.map(|path|path.waypoints.iter().skip(path.next)
+                        .map(|point|point.to_array()).collect::<Vec<_>>()),
+                    "harvest_resource":harvest.and_then(|order|order.resource).map(|resource|resource.to_bits()),
+                })
+            }).collect::<Vec<_>>())
+    };
     Ok(serde_json::json!({
         "schema":1, "config":config, "resolved_map_id":map.id, "resolved_map_path":map.godot_path,
         "active_player_slots":[0,1], "starting_resources":{"ore":32,"crystal":16},
@@ -172,6 +210,6 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
         "phase":phase, "result_reason":result_reason, "completed":completed, "timeout":!completed,
         "initial_command_center_positions":initial_positions,
         "winning_teams":winners, "active_anchor_teams":active_anchors,
-        "remaining_anchors":remaining_anchors, "teams":teams,
+        "remaining_anchors":remaining_anchors, "teams":teams, "timeout_units":timeout_units,
     }))
 }

@@ -178,8 +178,8 @@ is established by the aggregate counters alone. These remain failed cases.
 
 The read-only audit report is being extended with typed unit/structure counts
 and timeout-only surviving positions, orders, attack targets and remaining path
-waypoints. Its compilation/runtime validation is pending the shared capture
-build. The post-fix targeted comparison will repeat these exact configurations;
+waypoints. Its shared-library compilation passes; standalone audit runtime
+validation remains pending the targeted comparison. The post-fix targeted comparison will repeat these exact configurations;
 it will not substitute different difficulty caps or resource grants.
 
 ## Completed baseline difficulty matrix
