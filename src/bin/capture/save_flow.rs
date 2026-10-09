@@ -316,3 +316,59 @@ pub(super) fn render_resume(evidence_dir: &Path, dir: &Path) -> Result<(), Strin
     println!("[capture] fresh-process mouse Load restored campaign, triggers, paid queue and fog");
     Ok(())
 }
+
+/// Reject an actual older full save through the player's mouse menu.
+#[cfg(not(target_arch = "wasm32"))]
+pub(super) fn render_reject_old(dir: &Path) -> Result<(), String> {
+    let sandbox = std::env::var_os("XDG_DATA_HOME")
+        .map(PathBuf::from)
+        .filter(|path| path.is_absolute())
+        .ok_or("save-reject requires an absolute isolated XDG_DATA_HOME")?;
+    let file = sandbox.join("bevy-open-rts/quicksave.ron");
+    let original = std::fs::read(&file).map_err(|e| e.to_string())?;
+    #[derive(serde::Deserialize)]
+    struct Header {
+        version: u32,
+    }
+    let header: Header = ron::from_str(std::str::from_utf8(&original).map_err(|e| e.to_string())?)
+        .map_err(|e| e.to_string())?;
+    if header.version != 2 {
+        return Err("save-reject requires the real prior format2 save".into());
+    }
+    std::fs::create_dir(dir).map_err(|e| e.to_string())?;
+    let mut app = build_capture_app(WIDTH, HEIGHT);
+    wait_for_startup(&mut app)?;
+    start_shared_match_scene_with_current_setup(&mut app);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    capture_dismiss_match_briefing(&mut app);
+    let handle = capture_handle(&app);
+    tap_key(&mut app, KeyCode::F10);
+    let before = capture_save_observation(&mut app).ok_or("paused match unavailable")?;
+    rejected_load(&mut app, &handle, dir.join("unsupported_save.png"), true)?;
+    let messages = bevy_open_rts::capture_battle_log_messages(&app);
+    if !messages
+        .iter()
+        .any(|m| m.contains("This save is incompatible with this game version. Start a new match."))
+    {
+        return Err("old full save omitted clear unsupported-version feedback".into());
+    }
+    let unchanged = std::fs::read(&file).map_err(|e| e.to_string())? == original;
+    if !unchanged {
+        return Err("rejected old save changed its bytes".into());
+    }
+    let after = capture_save_observation(&mut app).ok_or("rejected load discarded match")?;
+    std::fs::write(
+        dir.join("observations.json"),
+        serde_json::to_vec_pretty(&serde_json::json!({
+            "process_id":std::process::id(), "old_save_version":header.version,
+            "before":before, "after":after, "messages":messages,
+            "save_bytes_unchanged":unchanged, "match_unchanged":true
+        }))
+        .unwrap(),
+    )
+    .map_err(|e| e.to_string())?;
+    println!("[capture] actual old full-schema save rejected without changing match or bytes");
+    Ok(())
+}

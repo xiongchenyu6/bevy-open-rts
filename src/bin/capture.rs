@@ -211,7 +211,7 @@ fn main() {
             let dir = args
                 .next()
                 .map(PathBuf::from)
-                .ok_or("save-reject needs an output directory");
+                .ok_or_else(|| "save-reject needs an output directory".to_string());
             dir.and_then(|dir| save_flow::render_reject_old(&dir))
         }
         Some("save-load") => {
