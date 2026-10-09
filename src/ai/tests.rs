@@ -284,3 +284,98 @@ fn configured_remote_human_keeps_control_while_ai_slot_develops() {
         "[ai-human-control] Human0/Human1/AI2: human1 resources={initial_human_resources:?}, original units retained with no orders; AI2 completed factory and trained armed units"
     );
 }
+
+#[test]
+fn easy_chaos_ground_force_finishes_big_arena_repair_defense() {
+    let config = SkirmishAuditConfig {
+        map: "big_arena".to_string(),
+        factions: ["chaos".to_string(), "chaos".to_string()],
+        difficulties: ["easy".to_string(), "beginner".to_string()],
+        spawn_slots: [0, 1],
+        max_seconds: 600,
+    };
+    let result = run_skirmish_audit(&config).unwrap();
+    eprintln!("[ai-ground-force] {result}");
+    assert_eq!(
+        result["starting_resources"],
+        serde_json::json!({"ore":32,"crystal":16})
+    );
+    assert_eq!(result["startup_loadout"], "GodotSkirmish");
+    assert_eq!(
+        result["timeout"], false,
+        "actual paid skirmish remained at repair equilibrium"
+    );
+    assert_eq!(result["winning_teams"], serde_json::json!([0]));
+    assert_eq!(
+        result["teams"][0]["unit_types"].get("AntiAirWalker"),
+        None,
+        "no enemy flying units existed, but AA-only unit consumed the small ground-force cap"
+    );
+}
+
+#[test]
+fn available_aa_only_product_is_reserved_for_an_actual_air_threat() {
+    // Isolated production-decision fixture: registry costs, faction products,
+    // normal profile, prerequisites and actual threat detection are exercised.
+    // The real paid startup/economy/combat acceptance is the test above.
+    use bevy::ecs::system::SystemState;
+    let mut world = World::new();
+    let team = Team::Player(1);
+    for id in [
+        "CommandCenter",
+        "VehicleFactory",
+        "RadarUplink",
+        "RoboticsBay",
+    ] {
+        world.spawn((Structure { id }, team, Transform::default()));
+    }
+    let mut state = SystemState::<Query<StructurePrereqItem<'_>>>::new(&mut world);
+    let structures = state.get(&world).unwrap();
+    let profile = faction_ai_profile_for_difficulty(SkirmishFaction::Chaos, AiDifficulty::Normal);
+    let economy = TeamEconomy::new(32, 16);
+    let counts = AiProductionCounts {
+        workers: 3,
+        battle_units: 0,
+    };
+    let start = profile
+        .production_priority
+        .iter()
+        .position(|id| *id == "AntiAirWalker")
+        .unwrap();
+    let mut cursor = start;
+    let ground = next_ai_train(
+        team,
+        SkirmishFaction::Chaos,
+        &profile,
+        &structures,
+        &economy,
+        &mut cursor,
+        counts,
+        false,
+    )
+    .unwrap();
+    assert!(
+        registry::entity(ground)
+            .unwrap()
+            .weapon
+            .unwrap()
+            .can_attack_ground
+    );
+    assert_ne!(ground, "AntiAirWalker");
+    let need_air = ai_needs_more_anti_air_units(team, [("Drone", Team::Player(0))]);
+    assert!(need_air);
+    cursor = start;
+    assert_eq!(
+        next_ai_train(
+            team,
+            SkirmishFaction::Chaos,
+            &profile,
+            &structures,
+            &economy,
+            &mut cursor,
+            counts,
+            need_air
+        ),
+        Some("AntiAirWalker")
+    );
+}

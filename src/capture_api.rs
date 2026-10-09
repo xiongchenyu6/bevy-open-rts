@@ -10,6 +10,7 @@ use bevy_rts_camera::RtsCamera as RtsCam;
 
 use crate::*;
 
+mod repair_trace;
 mod skirmish_audit;
 pub use skirmish_audit::{SkirmishAuditConfig, run_skirmish_audit};
 

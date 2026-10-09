@@ -2764,7 +2764,7 @@ pub(crate) fn next_ai_train(
         economy,
         cursor,
         counts,
-        |def| def.weapon.is_some(),
+        |def| def.weapon.is_some_and(|weapon| weapon.can_attack_ground),
     )
     .or_else(|| {
         next_ai_train_matching(

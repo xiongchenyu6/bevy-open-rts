@@ -86,11 +86,15 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
     app.world_mut()
         .resource_mut::<NextState<AppScreen>>()
         .set(AppScreen::InMatch);
+    let mut repair_trace = super::repair_trace::RepairTrace::open()?;
     let mut initial_positions = None;
     let mut updates = 0;
     let max_updates = config.max_seconds * 30 + 60;
     loop {
         app.update();
+        if let Some(trace) = repair_trace.as_mut() {
+            trace.observe(app.world_mut())?;
+        }
         updates += 1;
         if initial_positions.is_none() {
             let world = app.world_mut();
@@ -112,6 +116,9 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
         {
             break;
         }
+    }
+    if let Some(trace) = repair_trace {
+        trace.finish()?;
     }
     let world = app.world_mut();
     let state = world.resource::<MatchState>();
