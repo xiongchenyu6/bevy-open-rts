@@ -95,7 +95,8 @@ exit **0**, saved completion and real Next Mission continuation. Evidence is
 `current-campaign-twin-live-ground-response/`; the previous losing run remains
 preserved. A fresh same-App six-mission chain is running as
 `rts-campaign-chain-live-response-01` with evidence
-`current-campaign-chain-live-response/`. Its acceptance is still **pending**. No unit spawns, resource grants, enemy/stat/trigger nerfs or direct
+`current-campaign-chain-live-response/`. Its acceptance is still **pending**.
+No unit spawns, resource grants, enemy/stat/trigger nerfs or direct
 combat-state/time injection are used by these recipes.
 
 The ignored supervisor `target/run-campaign-chain-supervised.py` watches the real
@@ -120,15 +121,31 @@ to reveal the full text.
 
 ## Reproducible acceptance
 
-Pin the compiled capture executable in an ignored `target/` directory before a
-sweep. Record its SHA256, source revision and recipe changes. Use a new profile
-directory and run indices 0 through 5 sequentially. After each process, verify that
-`bevy-open-rts/campaign.ron` contains exactly the completed prefix:
+Pin the compiled capture executable in an ignored `target/` directory before the
+run. Record its SHA256, source revision and recipe changes. Create a fresh absolute
+`XDG_DATA_HOME`, set the absolute `BEVY_ASSET_ROOT` and
+`OPEN_RTS_CAPTURE_PLAYER_PROFILE=1`, and run the supervised **single**
+`capture campaign-chain <evidence-directory>` process. The same App must win all
+six missions; Missions 2–6 start through the real Next Mission buttons.
+
+During that process, observe the actual `bevy-open-rts/campaign.ron` file and copy
+it after each victory. Require exactly the growing ordered prefix, with no
+regressions or extra completed IDs:
 
 `hold_the_line`, `strike_the_outpost`, `canyon_siege`,
 `highland_bastion_stand`, `twin_front`, `thunder_decapitation`.
 
-Inspect every victory and continuation image, then start a fresh `menu-campaign`
-process with the same profile and inspect all six unlocked cards. No unit spawning,
-resource grants, clock jumps, AI changes or level nerfs are permitted. Existing
-authored reinforcements and supply deliveries remain normal mission behavior.
+Require the actual child exit zero, all six disk-prefix checkpoints and the
+same-App chain result. Inspect every victory and continuation image. Then start
+a seventh fresh `menu-campaign` process with the same profile, require its actual
+exit zero and inspect all six unlocked cards. The current supervisor implements
+these process and persistence checks; screenshots still require visual review.
+
+Separate `campaign-play <index>` processes are **diagnostic only**: they can
+reproduce a mission recipe and its continuation, but cannot establish that all
+six missions complete in one App. Preserve their failures and clearly label
+historical separate-process checkpoints.
+
+No unit spawning, resource grants, clock jumps, AI changes or level nerfs are
+permitted. Existing authored reinforcements and supply deliveries remain normal
+mission behavior.
