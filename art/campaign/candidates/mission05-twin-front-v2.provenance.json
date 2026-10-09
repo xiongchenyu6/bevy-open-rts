@@ -1,0 +1,15 @@
+{
+  "asset": "mission05-twin-front-v2.png",
+  "tool": "image_gen.imagegen (built-in)",
+  "recorded_at_utc": "2026-10-09 15:49:48 UTC",
+  "model_version": "not exposed by tool",
+  "seed": "not exposed by tool",
+  "prompt": "Original wide landscape 16:9 campaign briefing illustration for mission 5 of a robot RTS: a two-front battle across four corners of a canyon battlefield. Match polished painterly industrial science-fiction concept art with chunky gray and olive-green tracked tanks, squat utility robots, angular mechanical infantry and low modular concrete-and-steel bases. Elevated cinematic view of a branching four-way ochre canyon intersection. Foreground-left a clearly readable green-accent industrial command base with power reactors, radar dish and practical anti-air turret; a friendly armored column heads toward the far upper-right enemy command base. Two smaller restrained red-accent ambush positions occupy the other flanks, creating a visible tactical split. Small angular aircraft near one flank show the need for air defense. Clear faction colors, coherent battlefield geography, readable strong silhouettes, warm amber late-afternoon light, cool gray armor and sparse atmospheric dust. Keep the bottom 22 percent as a quiet darker rocky foreground for briefing overlay. No humans, fantasy creatures, recognizable franchise designs, flags, banners, insignia, logos, letters, numbers, baked UI or watermarks. Original illustration, not a gameplay screenshot.",
+  "transparent_background": false,
+  "width": 1672,
+  "height": 941,
+  "sha256": "7866db145026f89fae5f467eb7b97e5158c25b761b00b8c437cfe04d86587ac1",
+  "bytes": 2744961,
+  "original_output_filename": "exec-5f576ee5-8c99-4481-9eba-b89e9f012f64.png",
+  "status": "visually inspected candidate; outside shipped assets; not gameplay evidence"
+}
