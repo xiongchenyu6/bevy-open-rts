@@ -118,20 +118,24 @@ Older checkpoint archives still contain the old assets and remain distinct;
 new packages must be staged from the cleaned current tree. Other unresolved
 icon, voice and generated-content evidence above remains open.
 
-## New campaign illustration candidates
+## Current original campaign illustrations
 
-Original built-in imagegen candidates for missions1 and2 are under
-`art/campaign/candidates/`, each with the exact prompt, unchanged output hash,
-recorded time and explicit unavailable model-version/seed fields. Both were
-visually inspected. They are illustrations, not gameplay screenshots, and are
-not referenced by the shipped game. A coherent six-image set, banner consistency
-and actual briefing UI presentation remain required before integration. These
-new records do not resolve the historical campaign art or other asset gaps.
+Six original built-in imagegen illustrations are retained under
+`art/campaign/candidates/`, with exact prompts, original output hashes, recorded
+times and explicit unavailable model-version/seed fields. Each source has been
+visually inspected. They are mission illustrations, not gameplay screenshots.
+Mission2 uses its revised flagless v3 source; the other missions use v2 sources.
 
-The six new runtime derivatives are now wired in the current campaign source.
-Raw original PNGs and complete records remain outside runtime assets; JPEG
-encoding records identify every derivative. Mission2's revised source removes
-the inconsistent geometric banners. All360 current inventory entries hash-check
-correctly. Fresh UI presentation remains pending; legacy campaign JPEGs are
-retained only for older sealed QA programs and require retirement before final
-packaging. Historical generation gaps and other icon/voice gaps remain explicit.
+All six JPEG derivatives are wired in current campaign code. Per-image
+provenance links the unchanged PNG to its runtime path/hash, and
+`art/campaign/runtime-derivatives-20261010.json` retains exact encoding commands.
+All six source/provenance/runtime hash triples were rechecked on2026-10-10.
+The360-record source inventory and366-file runtime tree have different scopes.
+Mission5's native briefing has been inspected; the other current briefings,
+small-screen/browser layouts and complete presentation remain unverified.
+
+Six legacy campaign JPEGs are retained only for older sealed QA programs and
+must be retired before final packaging. Their historical generation gaps do
+not describe the current six original derivatives. Other icon, VFX and voice
+rights gaps remain open; these generation records do not establish blanket
+commercial clearance for unrelated assets.
