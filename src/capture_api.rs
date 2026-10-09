@@ -13,6 +13,11 @@ use crate::*;
 mod skirmish_audit;
 pub use skirmish_audit::{SkirmishAuditConfig, run_skirmish_audit};
 
+#[cfg(not(target_arch = "wasm32"))]
+mod save_orders;
+#[cfg(not(target_arch = "wasm32"))]
+pub use save_orders::{capture_disk_order_state, capture_live_order_state};
+
 /// Returns true once startup assets have loaded and the front menu is active.
 ///
 /// The capture binary drives Bevy faster than wall-clock time. Polling this

@@ -33,6 +33,9 @@ use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 #[path = "capture/save_flow.rs"]
 mod save_flow;
 
+#[cfg(not(target_arch = "wasm32"))]
+#[path = "capture/save_orders.rs"]
+mod save_orders;
 
 use bevy_open_rts::{
     CaptureTarget, build_capture_app, build_model_harness_capture_app, capture_active_mission,
@@ -138,6 +141,26 @@ fn main() {
                 .and_then(|value| value.parse().ok())
                 .unwrap_or(HEIGHT);
             render_hud_card(&dir, width, height)
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        Some("save-orders") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/save-orders"));
+            save_orders::create(&dir)
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        Some("save-orders-resume") => {
+            match (
+                args.next().map(PathBuf::from),
+                args.next().map(PathBuf::from),
+            ) {
+                (Some(evidence), Some(dir)) => save_orders::resume(&evidence, &dir),
+                _ => Err(
+                    "save-orders-resume needs <saved-evidence-directory> <output-directory>".into(),
+                ),
+            }
         }
         Some("save-load") => {
             let dir = args
