@@ -30,6 +30,10 @@ use std::time::{Duration, Instant};
 use bevy::prelude::*;
 use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 
+#[cfg(not(target_arch = "wasm32"))]
+#[path = "capture/semantic_ui.rs"]
+mod semantic_ui;
+
 #[path = "capture/save_flow.rs"]
 mod save_flow;
 
@@ -135,6 +139,16 @@ fn main() {
                 .and_then(|count| render_proof_frames(Path::new(&dir), count, &faction)),
             _ => Err("proof-frames needs <dir> <count> <human|demon|chaos>".into()),
         },
+        #[cfg(not(target_arch = "wasm32"))]
+        Some("semantic-ui") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .ok_or_else(|| "semantic-ui needs output".to_string());
+            let width = args.next().and_then(|v| v.parse().ok()).unwrap_or(1280);
+            let height = args.next().and_then(|v| v.parse().ok()).unwrap_or(720);
+            dir.and_then(|dir| semantic_ui::render(&dir, width, height))
+        }
         Some("hud-card") => {
             let dir = args
                 .next()
@@ -1413,8 +1427,7 @@ fn issue_player_attack_move_to_nearest_anchor(
     };
     tap_key(app, attack_key);
 
-    let target =
-        capture_nearest_enemy_anchor_position(app).ok_or("no living enemy anchor target")?;
+    let target = campaign_bot::visible_anchor_or_own_map_scout(app)?;
     capture_focus_camera_on(app, target);
     for _ in 0..20 {
         app.update();
@@ -2357,6 +2370,7 @@ fn play_campaign_mission(mut app: &mut App, index: usize, dir: &Path) -> Result<
                 train_army_via_real_input(&mut app, factory, 8, "Tank")?;
             }
             shoot(&mut app, &handle, dir.join("01_army.png"));
+            let mut mission_one_scout_cursor = 0;
             for round in 0..80 {
                 if capture_match_phase_label(&mut app) != "Running" {
                     break;
@@ -2377,7 +2391,7 @@ fn play_campaign_mission(mut app: &mut App, index: usize, dir: &Path) -> Result<
                     }
                 }
                 if !survival {
-                    issue_player_attack_move_to_nearest_anchor(&mut app)?;
+                    campaign_bot::mission_one_assault(&mut app, &mut mission_one_scout_cursor)?;
                 } else if index == 3 {
                     campaign_bot::maintain_survival_defense(&mut app)?;
                 } else {

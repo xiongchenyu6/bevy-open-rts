@@ -10,6 +10,13 @@ use bevy_rts_camera::RtsCamera as RtsCam;
 
 use crate::*;
 
+#[cfg(not(target_arch = "wasm32"))]
+mod semantic_ui;
+#[cfg(not(target_arch = "wasm32"))]
+pub use semantic_ui::{
+    capture_semantic_ui_targets, capture_semantic_ui_tooltip, capture_setup_semantic_ui,
+};
+
 mod repair_trace;
 mod skirmish_audit;
 pub use skirmish_audit::{SkirmishAuditConfig, run_skirmish_audit};
