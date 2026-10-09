@@ -125,31 +125,31 @@ const MODELS_ADVANCEDREACTORPLANT: &[&str] = &[
 const PARTS_ADVANCEDREACTORPLANT: &[RenderPart] = &[
     RenderPart {
         model: "models/kenney-spacekit/platform_large.glb",
-        translation: [0.0, 0.0, 0.0],
+        translation: [-3.7, 0.0, -2.775],
         rotation: [0.0, 0.0, 0.0, 1.0],
-        scale: [1.55, 0.8, 1.55],
+        scale: [1.85, 0.8, 1.85],
     },
     RenderPart {
         model: "models/kenney-spacekit/machine_generatorLarge.glb",
-        translation: [-0.25, 0.36, 0.0],
+        translation: [-4.3, 0.08, -2.65],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [2.0, 2.0, 2.0],
     },
     RenderPart {
         model: "models/kenney-spacekit/rocket_fuelB.glb",
-        translation: [1.15, 0.36, -0.7],
+        translation: [-0.55, 0.08, -2.0],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [0.9, 0.9, 0.9],
     },
     RenderPart {
         model: "models/kenney-spacekit/rocket_fuelB.glb",
-        translation: [1.15, 0.36, 0.7],
+        translation: [-0.55, 0.08, -0.7],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [0.9, 0.9, 0.9],
     },
     RenderPart {
         model: "models/kenney-spacekit/chimney_detailed.glb",
-        translation: [-1.15, 0.36, -0.85],
+        translation: [-3.35, 0.08, -2.675],
         rotation: [0.0, 0.0, 0.0, 1.0],
         scale: [0.95, 0.95, 0.95],
     },

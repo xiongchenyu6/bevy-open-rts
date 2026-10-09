@@ -55,6 +55,7 @@ impl SkirmishAuditConfig {
 /// No random seeds, grants or substitute simulation are introduced.
 pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Value, String> {
     let (map, factions, difficulties) = config.validate()?;
+    let mut progress = super::audit_progress::AuditProgress::open()?;
     let mut app = build_game_app(GameAppMode::Headless);
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
@@ -91,7 +92,12 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
     let mut updates = 0;
     let max_updates = config.max_seconds * 30 + 60;
     loop {
+        if let Some(progress) = progress.as_mut() {
+            progress.before_update(app.world(), updates)?;
+        }
+        let update_started = std::time::Instant::now();
         app.update();
+        let update_elapsed = update_started.elapsed();
         if let Some(trace) = repair_trace.as_mut() {
             trace.observe(app.world_mut())?;
         }
@@ -110,10 +116,13 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
             }
         }
         let state = app.world().resource::<MatchState>();
-        if !state.is_running()
+        let finished = !state.is_running()
             || state.start_time_sec >= config.max_seconds as f32
-            || updates >= max_updates
-        {
+            || updates >= max_updates;
+        if let Some(progress) = progress.as_mut() {
+            progress.after_update(app.world_mut(), updates, update_elapsed, finished)?;
+        }
+        if finished {
             break;
         }
     }

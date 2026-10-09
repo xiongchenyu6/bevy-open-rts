@@ -117,3 +117,25 @@ separated/floating authored parts in both independent signatures; the exporter
 preserves that existing geometry rather than inventing a body. Actual live-match
 Tank/HQ comparison, advanced-building gameplay reference, final visual approval,
 and all62 exports/runtime replacement remain open. No runtime icons changed.
+
+## Grounded reactor correction
+
+The first stage matched existing geometry but its reactor was visually rejected:
+all imported industrial GLBs have a mesh-node offset (2,0,1.5), and the original
+per-part transforms did not compensate different scales. The chimney lay outside
+the platform and its base was 0.28m above the platform top; generator/tanks also
+floated. Only the AdvancedReactorPlant render-part transforms were corrected.
+The existing platform widened from 3.1m to 3.7m, all four industrial part bases
+now sit at y0.08, and every footprint lies inside it. Meshes, materials, details,
+selection/gameplay stats and camera fitting are preserved.
+
+`target/portrait-grounded-three-01` exited 0 in 9.31 seconds using sealed exporter
+SHA `4cdcaed53c1d168723d5c651e5d18c609c51026405014d53aa9b5eee20488f66`.
+Independent full-game asset-reference parity still passes with16 meshes. Its
+retained `support-verification.json` checks actual transformed contact/containment.
+Both fresh reactor PNGs match SHA
+`89860f4f033a14b3f05b47e0956a9b81074b6a965b3c9acf01c42d59b0674a29`,
+with genuine alpha bounds [51,97,461,417]. HQ/Tank outputs remain byte-identical
+to the first stage. The corrected light/dark512px/72px review sheet was inspected;
+the chimney is grounded and the assembly is recognizable. Runtime icon replacement
+and live-match reference remain open, and no runtime image files changed.
