@@ -146,6 +146,11 @@ AI placement uses deterministic IDs as geometric seeds; Random Map uses a cursor
 to select among authored maps. Do not relabel repeated runs as independent random
 seeds. Random-map selection and wider repeated-run coverage remain unverified.
 
+The first27 overlapping fresh-App configurations on the new reset-core pin have
+complete raw reports identical to the prior combat checkpoint
+(`logs/skirmish-fresh-reset-report-comparison-01.json`). This is bounded
+cross-version evidence, not a substitute for the current3,726-case sweep.
+
 ## Browser and online
 
 Wasm02 builds and renders actual English menu/setup/match/selection/movement
