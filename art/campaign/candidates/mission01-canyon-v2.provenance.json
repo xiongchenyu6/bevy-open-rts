@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "status": "candidate_not_shipped",
+  "artifact": "mission01-canyon-v2.png",
+  "artifact_sha256": "b623baca89414e894998f87987b0a453b98610d4cd7f0662b31b4a963ac116e7",
+  "dimensions": [
+    1672,
+    941
+  ],
+  "recorded_at_utc": "2026-10-09 12:58:36 UTC",
+  "generation_tool": "image_gen.imagegen (built-in)",
+  "prompt": "Create one original wide 16:9 campaign briefing illustration for a stylized science-fiction real-time strategy game. Scene: an ochre desert canyon with a compact industrial outpost holding the canyon entrance. A few squat gray armored tracked vehicles with muted olive-green panels defend gray modular hangars, a chunky command center and a small reactor; tiny utility robots reinforce the construction line. Distant hostile vehicles approach through the canyon, with subtle dust and small amber flashes. Art direction: polished low-poly 3D cinematic key art, clean faceted silhouettes and restrained materials consistent with a readable toy-scale RTS battlefield, convincing sunlight and shadows, not photorealistic military photography. Show a broad tactical landscape with the base and vehicles clearly recognizable, rather than a medieval fortress. Leave the lower fifth comparatively quiet and dark enough for a separate briefing text band. No baked-in text, letters, logos, UI, health bars, selection rings, fantasy castles, human portraits, or recognizable franchise designs. This is an original mission illustration candidate, not a gameplay screenshot. Opaque background.",
+  "reference_images": [],
+  "model_version": "not exposed by tool",
+  "seed": "not exposed by tool",
+  "inspection": {
+    "subject": "gray/olive sci-fi canyon outpost, tracked vehicles and utility robots",
+    "no_baked_text_or_ui": true,
+    "quiet_lower_briefing_band": true,
+    "usage": "original campaign illustration; not a gameplay screenshot"
+  },
+  "original_saved_output": "/home/freeman.xiong/.codex/generated_images/01a11195-2f38-7de0-be8d-0b9e80b3698a/exec-57724662-bacd-497b-b95f-4b19e3b2a286.png"
+}

@@ -23,3 +23,14 @@
 - Tool, script and final-output hashes are in `docs/asset-source-hashes.json`.
   All six pass the actual Bevy asset loader/decoder; native match startup passed.
   Human listening on release hardware remains unverified.
+
+## Campaign illustration candidate (2026-10-09)
+
+`art/campaign/candidates/mission01-canyon-v2.png` is an original built-in
+imagegen candidate: gray/olive industrial outpost, utility robots and tracked
+vehicles defending an ochre canyon. It was visually inspected for clear
+silhouettes, no baked text/UI and a quiet lower briefing band. The1672×941
+RGB8 output is copied unchanged; prompt/tool/time/hash details are in the
+sibling provenance JSON. It is not referenced by the game or shipped assets,
+and it is an illustration rather than a gameplay screenshot. Existing mission
+art remains unchanged until a coherent set and actual UI presentation pass.
