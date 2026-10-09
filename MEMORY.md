@@ -167,9 +167,9 @@ Latest construction checkpoint:
   charged costs drive cancellation refunds, and authoritative build queues are
   mirrored in snapshots for client HUD progress.
 - Remote human teams must never be inferred as AI merely because they are not
-  the locally controlled team. Automatic construction now checks the configured
-  slot controller explicitly, so only real AI slots progress foundations
-  without an assigned Worker.
+  the locally controlled team. AI automation checks the configured controller
+  table. Every foundation needs actual Worker contact and paid construction;
+  automatic self-construction was removed. Human slots retain their orders.
 - RTS wire protocol v3 is command-complete for current player-facing match
   controls. Stop/hold/guard/scatter/deploy, sell/repair/cancel-construction, and
   all support powers use the reliable host inbox. The host validates stable-ID

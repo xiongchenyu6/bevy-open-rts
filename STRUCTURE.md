@@ -83,7 +83,9 @@ domains live in modules, each re-exported into the crate root
   supply crates.
 - `src/ai.rs` — difficulty tiers, AI director (economy/training/waves/support),
   in-match AI systems (repair/scouting/garrisons/capture/saboteur), profiles,
-  target scoring, support-power defs.
+  target scoring, support-power defs, paid power/technology progression and
+  configured-controller guards. `src/ai/tests.rs` verifies actual worker contact,
+  costs, armed production and nonlocal Human control protection.
 - `src/production.rs` — build queue/training, construction, manual placement.
 - `src/orders.rs` — unit orders + order queue, rally points, targeting modes,
   per-order-type update systems.
@@ -197,7 +199,8 @@ domains live in modules, each re-exported into the crate root
 - `bevy_fluent::FluentPlugin` is registered in the shared game scene so future `.ftl` localization bundles can load through Bevy assets. The existing `Locale` / `t()` path remains the active text source until screens are migrated incrementally.
 - AI drones have an active scouting controller: idle AI `Drone` units pick living enemy units, move to their positions, avoid repeating the previous target when possible, and retarget after a short 0.5-1.0s delay.
 - AI defense profiles follow the godot difficulty targets: Beginner/Easy do not inherit Normal advanced-defense construction, Normal targets one standard defense layer plus 2 Tesla fence segments where the faction supports them, and Hard scales standard defenses to 2 plus 4 Tesla fence segments.
-- Easy AI is tuned as a build-up opponent: it trains a small defensive force but does not launch active attack waves, giving default human starts enough time to build a Barracks and form an army. Normal/Hard keep active offense.
+- Beginner is passive. Easy trains a small force and launches limited waves after
+  a150-second opening grace; Normal/Hard retain stronger active offense.
 - The minimal `GodotSkirmish` opening remains one `CommandCenter` plus two `Worker` economy units, but each faction gets a distinct starter combat/scout unit (`ScoutRover`, `RocketInfantry`, `ShieldTrooper`) so the default `cargo run` start is not visually identical across races.
 - Godot render-part mapping is audited separately from gameplay generation. `assets/data/godot_model_map.model_map.ron` is a Bevy-loadable baseline asset generated from Godot `*.tscn` scenes, and `scripts/audit_model_mapping.py` compares it against `src/generated_registry.rs` without regenerating or overwriting the hand-expanded registry. The baseline is reference data, not permission to keep poor Bevy silhouettes.
 - `Worker` now uses a distinct field-engineer model composition (`astronautB` plus equipment) instead of sharing `ScoutRover`'s `rover.glb`. Critical unit silhouettes are protected by tests and by `scripts/audit_model_quality.py`.
