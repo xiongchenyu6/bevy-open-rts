@@ -181,3 +181,16 @@ and timeout-only surviving positions, orders, attack targets and remaining path
 waypoints. Its compilation/runtime validation is pending the shared capture
 build. The post-fix targeted comparison will repeat these exact configurations;
 it will not substitute different difficulty caps or resource grants.
+
+## Completed baseline difficulty matrix
+
+The fixed old executable8ceee completed all144 canonical-start observations:
+139 MatchFinished/exit0 and5 Running/600-second timeout/exit2. Root verified
+every requested configuration against its raw result/status and authoritative
+anchor outcome. Failing indices are0049,0054,0055,0084,0085; their exact setup,
+clock and surviving counts are consolidated in
+`target/skirmish-difficulty-canonical-20261008/verification.json`.
+The service ends with exit2 as intended. This is a failed baseline acceptance
+result, not a balanced-difficulty claim. Current AI repairs require a fresh
+executable and exact-configuration reruns. Full-slot and independent-seed
+coverage remain open.

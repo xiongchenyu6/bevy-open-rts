@@ -312,3 +312,14 @@ block in an isolated directory: all560 runtime file hashes match, the3,347,880-
 byte source font is excluded, and the original font hash is unchanged. Evidence:
 `logs/web-assets-subset-qa.json`; shell syntax passes. Full Wasm compilation and
 browser runtime acceptance are still pending.
+
+The old canonical adjacent-difficulty matrix is now fully observed:139 completed
+and5 real timeouts across144 configurations. All raw reports/statuses were
+revalidated. The failed cases remain open for the new AI implementation; current
+source is still compiling. Cleaned web staging also passes360 file-by-file
+hash checks, with full source fonts and unused crosshairs excluded
+(`logs/web-clean-assets-qa-20261009.json`).
+
+Reviewable player-facing store copy is in `docs/STEAM_STORE_DRAFT.md`; internal
+claim evidence is separate, and no unmeasured system-requirement numbers or
+unverified platform/Steam integration badges are asserted. It is not published.
