@@ -1558,12 +1558,9 @@ pub(crate) fn spawn_structure_under_construction_with_visual_faction(
 pub(crate) fn progress_under_construction_structures(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    time: Res<Time>,
     mut next_id: ResMut<NextSpawnId>,
     map_bounds: Res<MapBounds>,
     visible_player: Option<Res<VisiblePlayer>>,
-    match_setup: Option<Res<MatchSetupSettings>>,
-    online_session: Option<Res<OnlineSession>>,
     mut audio_feedback: ResMut<AudioFeedback>,
     mut battle_log: ResMut<BattleLog>,
     mut structures: Query<(
@@ -1577,25 +1574,9 @@ pub(crate) fn progress_under_construction_structures(
     )>,
 ) {
     let player_team = visible_player_team(visible_player.as_deref());
-    let controlled_team = controlled_player_team(visible_player.as_deref());
-    let online_match = online_match_uses_command_transport(online_session.as_deref());
-    for (entity, structure, team, transform, visual_faction, mut health, mut construction) in
+    for (entity, structure, team, transform, visual_faction, mut health, construction) in
         &mut structures
     {
-        // AI-controlled structures self-construct. Online remote humans are
-        // still human players even though this process is the simulation host,
-        // so derive this from the match controller table instead of visibility.
-        let auto_construct = team_uses_automatic_construction(
-            *team,
-            controlled_team,
-            match_setup.as_deref(),
-            online_match,
-        );
-        if auto_construct && construction.remaining > 0.0 {
-            construction.remaining = (construction.remaining
-                - STRUCTURE_CONSTRUCTION_PROGRESS_PER_SECOND * time.delta_secs())
-            .max(0.0);
-        }
         let progress = structure_construction_progress(*construction);
         health.current = structure_construction_health(health.max, progress);
         if construction.remaining > 0.0 {
@@ -1641,22 +1622,6 @@ pub(crate) fn progress_under_construction_structures(
             );
         }
     }
-}
-
-pub(crate) fn team_uses_automatic_construction(
-    team: Team,
-    controlled_team: Option<Team>,
-    match_setup: Option<&MatchSetupSettings>,
-    online_match: bool,
-) -> bool {
-    if !online_match {
-        return controlled_team != Some(team);
-    }
-    match_setup.is_some_and(|setup| {
-        team.economy_index()
-            .and_then(|index| setup.player_controllers.get(index))
-            .is_some_and(|controller| matches!(controller, SkirmishPlayerController::Ai(_)))
-    })
 }
 
 #[allow(dead_code)]

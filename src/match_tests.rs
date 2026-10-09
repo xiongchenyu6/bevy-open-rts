@@ -2119,6 +2119,9 @@ fn diag_match_economy_and_ai_progress() {
         std::time::Duration::from_secs_f32(1.0 / 30.0),
     ));
     app.world_mut()
+        .resource_mut::<MatchSetupSettings>()
+        .player_controllers[0] = SkirmishPlayerController::Ai(AiDifficulty::Normal);
+    app.world_mut()
         .resource_mut::<NextState<AppScreen>>()
         .set(AppScreen::InMatch);
     for _ in 0..20 {
@@ -2213,6 +2216,7 @@ fn diag_all_three_factions_playable() {
         ));
         {
             let mut settings = app.world_mut().resource_mut::<MatchSetupSettings>();
+            settings.player_controllers[0] = SkirmishPlayerController::Ai(AiDifficulty::Normal);
             for slot in settings.player_factions.iter_mut() {
                 *slot = faction;
             }

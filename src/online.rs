@@ -7112,30 +7112,12 @@ mod tests {
         assert_eq!(host.team_relations, client.team_relations);
         assert_eq!(host.visible_player.team, Team::Player(0));
         assert_eq!(client.visible_player.team, Team::Player(1));
-        assert!(!team_uses_automatic_construction(
-            Team::Player(0),
-            Some(Team::Player(0)),
-            Some(&host),
-            true,
-        ));
-        assert!(!team_uses_automatic_construction(
-            Team::Player(1),
-            Some(Team::Player(0)),
-            Some(&host),
-            true,
-        ));
-        assert!(team_uses_automatic_construction(
-            Team::Player(2),
-            Some(Team::Player(0)),
-            Some(&host),
-            true,
-        ));
-        assert!(team_uses_automatic_construction(
-            Team::Player(0),
-            None,
-            Some(&host),
-            false,
-        ));
+        assert_eq!(host.player_controllers[0], SkirmishPlayerController::Human);
+        assert_eq!(host.player_controllers[1], SkirmishPlayerController::Human);
+        assert_eq!(
+            host.player_controllers[2],
+            SkirmishPlayerController::Ai(AiDifficulty::Normal)
+        );
     }
 
     #[test]

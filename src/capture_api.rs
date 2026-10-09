@@ -1717,6 +1717,9 @@ pub fn capture_run_ai_match_until_resolved(max_seconds: u32) -> Option<(u32, &'s
         std::time::Duration::from_secs_f32(1.0 / 30.0),
     ));
     app.world_mut()
+        .resource_mut::<MatchSetupSettings>()
+        .player_controllers[0] = SkirmishPlayerController::Ai(AiDifficulty::Normal);
+    app.world_mut()
         .resource_mut::<NextState<AppScreen>>()
         .set(AppScreen::InMatch);
     for _ in 0..20 {

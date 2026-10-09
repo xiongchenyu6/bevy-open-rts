@@ -813,6 +813,7 @@ pub(crate) fn auto_assign_idle_resource_collectors(
     mut commands: Commands,
     active_teams: Option<Res<ActiveTeams>>,
     visible_player: Option<Res<VisiblePlayer>>,
+    match_setup: Option<Res<MatchSetupSettings>>,
     units: Query<
         (
             Entity,
@@ -843,7 +844,7 @@ pub(crate) fn auto_assign_idle_resource_collectors(
     // worker, right-click an ore node) so their workers never wander off alone.
     let player_team = controlled_player_team(visible_player.as_deref());
     for (entity, team, unit, transform, health, cargo, order_queue) in &units {
-        if player_team == Some(*team)
+        if !team_is_ai_controlled(*team, player_team, match_setup.as_deref())
             || !team_is_active(*team, active_teams.as_deref())
             || !can_unit_collect_resources(unit)
             || health.current <= 0.0

@@ -356,6 +356,7 @@ pub(crate) struct AiDirectorResources<'w> {
     pub(crate) ai_settings: Res<'w, AiDifficultySettings>,
     pub(crate) player_factions: Res<'w, PlayerFactions>,
     pub(crate) active_teams: Option<Res<'w, ActiveTeams>>,
+    pub(crate) match_setup: Option<Res<'w, MatchSetupSettings>>,
     pub(crate) relations: Res<'w, TeamRelations>,
     pub(crate) support_cooldowns: ResMut<'w, SupportCooldowns>,
     pub(crate) battle_log: ResMut<'w, BattleLog>,
@@ -731,7 +732,11 @@ pub(crate) fn ai_director(
     let delta = time.delta_secs();
     let player_team = visible_player_team(visible_player.as_deref());
     let controlled_team = controlled_player_team(visible_player.as_deref());
-    for team in active_ai_teams(controlled_team, resources.active_teams.as_deref()) {
+    for team in ai_controlled_teams(
+        controlled_team,
+        resources.active_teams.as_deref(),
+        resources.match_setup.as_deref(),
+    ) {
         let Some(idx) = resources.director.ensure_team(team) else {
             continue;
         };
@@ -820,9 +825,20 @@ pub(crate) fn ai_director(
                 production_counts,
             )
             .map(|id| (id, AiStructureBuildKind::Economy))
-            // Build production (offense) structures before defense, so the AI
-            // always has a Barracks/VehicleFactory to train an army from instead
-            // of spending its whole economy on turrets.
+            // Establish a basic producer, then unlock its technology before
+            // filling the army limit with only opening units.
+            .or_else(|| {
+                profile
+                    .active_offense_enabled
+                    .then(|| next_ai_offense_structure_for_faction(team, faction, &structures))
+                    .flatten()
+                    .filter(|id| *id == "VehicleFactory")
+                    .map(|id| (id, AiStructureBuildKind::Offense))
+            })
+            .or_else(|| {
+                next_ai_technology_structure(team, faction, &structures)
+                    .map(|id| (id, AiStructureBuildKind::Economy))
+            })
             .or_else(|| {
                 profile
                     .active_offense_enabled
@@ -834,6 +850,14 @@ pub(crate) fn ai_director(
                 next_ai_defense_for_faction(team, faction, &profile, &structures)
                     .map(|id| (id, AiStructureBuildKind::Defense))
             });
+            let next_structure = next_ai_power_structure(
+                team,
+                faction,
+                &structures,
+                next_structure.map(|(id, _)| id),
+            )
+            .map(|id| (id, AiStructureBuildKind::Economy))
+            .or(next_structure);
             if let Some((id, build_kind)) = next_structure
                 && let Some(def) = registry::entity(id)
                 && requirements_met(def, team, &structures)
@@ -1682,6 +1706,7 @@ pub(crate) fn repair_ai_damaged_structures(
 pub(crate) fn update_ai_vehicle_deploy_mode(
     mut commands: Commands,
     visible_player: Option<Res<VisiblePlayer>>,
+    match_setup: Option<Res<MatchSetupSettings>>,
     mut drills: Query<
         (
             Entity,
@@ -1710,7 +1735,7 @@ pub(crate) fn update_ai_vehicle_deploy_mode(
         (With<Structure>, Without<Unit>),
     >,
 ) {
-    let player_team = visible_player_team(visible_player.as_deref());
+    let controlled_team = controlled_player_team(visible_player.as_deref());
     for (
         entity,
         team,
@@ -1725,7 +1750,9 @@ pub(crate) fn update_ai_vehicle_deploy_mode(
         attack_order,
     ) in &mut drills
     {
-        if *team == player_team || !is_deployable_vehicle(unit.id) {
+        if !team_is_ai_controlled(*team, controlled_team, match_setup.as_deref())
+            || !is_deployable_vehicle(unit.id)
+        {
             continue;
         }
         let desired_deployed = ai_vehicle_should_deploy(
@@ -1762,6 +1789,7 @@ pub(crate) fn auto_assign_ai_construction_workers(
     time: Res<Time>,
     mut director: ResMut<AiDirector>,
     visible_player: Option<Res<VisiblePlayer>>,
+    match_setup: Option<Res<MatchSetupSettings>>,
     active_teams: Option<Res<ActiveTeams>>,
     workers: Query<
         (
@@ -1771,8 +1799,9 @@ pub(crate) fn auto_assign_ai_construction_workers(
             &Unit,
             &Health,
             Option<&OrderQueue>,
+            Option<&HarvestOrder>,
         ),
-        (With<Unit>, IdleUnitOrderFilter),
+        (With<Unit>, Without<ConstructOrder>),
     >,
     active_constructors: Query<(&Team, &Health), (With<Unit>, With<ConstructOrder>)>,
     structures: Query<
@@ -1782,7 +1811,11 @@ pub(crate) fn auto_assign_ai_construction_workers(
 ) {
     let delta = time.delta_secs();
     let controlled_team = controlled_player_team(visible_player.as_deref());
-    for team in active_ai_teams(controlled_team, active_teams.as_deref()) {
+    for team in ai_controlled_teams(
+        controlled_team,
+        active_teams.as_deref(),
+        match_setup.as_deref(),
+    ) {
         let Some(idx) = director.ensure_team(team) else {
             continue;
         };
@@ -1799,6 +1832,7 @@ pub(crate) fn auto_assign_ai_construction_workers(
         }
 
         let mut idle_workers = Vec::new();
+        let mut harvesting_workers = Vec::new();
         for (
             worker_entity,
             worker_team,
@@ -1806,6 +1840,7 @@ pub(crate) fn auto_assign_ai_construction_workers(
             worker_unit,
             worker_health,
             order_queue,
+            harvest_order,
         ) in &workers
         {
             if *worker_team != team
@@ -1815,7 +1850,14 @@ pub(crate) fn auto_assign_ai_construction_workers(
             {
                 continue;
             }
-            idle_workers.push((worker_entity, worker_transform.translation));
+            if harvest_order.is_some() {
+                harvesting_workers.push((worker_entity, worker_transform.translation));
+            } else {
+                idle_workers.push((worker_entity, worker_transform.translation));
+            }
+        }
+        if idle_workers.is_empty() {
+            idle_workers = harvesting_workers;
         }
         let unfinished_structures = structures
             .iter()
@@ -1842,6 +1884,7 @@ pub(crate) fn auto_assign_ai_construction_workers(
 pub(crate) fn auto_assign_ai_supply_crate_collectors(
     mut commands: Commands,
     visible_player: Option<Res<VisiblePlayer>>,
+    match_setup: Option<Res<MatchSetupSettings>>,
     active_teams: Option<Res<ActiveTeams>>,
     crates: Query<(Entity, &Transform, &SupplyCrate)>,
     team_anchors: Query<(&Team, &Transform), Or<(With<Unit>, With<Structure>)>>,
@@ -1871,9 +1914,10 @@ pub(crate) fn auto_assign_ai_supply_crate_collectors(
         return;
     }
 
-    for team in active_ai_teams(
+    for team in ai_controlled_teams(
         controlled_player_team(visible_player.as_deref()),
         active_teams.as_deref(),
+        match_setup.as_deref(),
     ) {
         let mut assignments = 0usize;
         let mut assigned_units = Vec::new();
@@ -1937,6 +1981,7 @@ pub(crate) fn update_ai_drone_scouting(
     mut commands: Commands,
     time: Res<Time>,
     visible_player: Option<Res<VisiblePlayer>>,
+    match_setup: Option<Res<MatchSetupSettings>>,
     active_teams: Option<Res<ActiveTeams>>,
     relations: Res<TeamRelations>,
     mut drones: Query<
@@ -1959,7 +2004,7 @@ pub(crate) fn update_ai_drone_scouting(
     {
         if drone_unit.id != "Drone"
             || drone_health.current <= 0.0
-            || controlled_team == Some(*drone_team)
+            || !team_is_ai_controlled(*drone_team, controlled_team, match_setup.as_deref())
             || !team_is_active(*drone_team, active_teams.as_deref())
             || order_queue.is_some_and(|queue| !queue.orders.is_empty())
         {
@@ -2034,6 +2079,7 @@ pub(crate) fn update_ai_tech_bunker_garrisons(
     mut commands: Commands,
     time: Res<Time>,
     visible_player: Option<Res<VisiblePlayer>>,
+    match_setup: Option<Res<MatchSetupSettings>>,
     active_teams: Option<Res<ActiveTeams>>,
     mut refresh_timer: Local<Vec<f32>>,
     bunkers: Query<AiOpenBunkerItem<'_>, (With<Structure>, Without<Unit>)>,
@@ -2041,7 +2087,11 @@ pub(crate) fn update_ai_tech_bunker_garrisons(
 ) {
     let delta = time.delta_secs();
     let controlled_team = controlled_player_team(visible_player.as_deref());
-    for team in active_ai_teams(controlled_team, active_teams.as_deref()) {
+    for team in ai_controlled_teams(
+        controlled_team,
+        active_teams.as_deref(),
+        match_setup.as_deref(),
+    ) {
         let idx = team.index();
         if refresh_timer.len() <= idx {
             refresh_timer.resize(idx + 1, 0.0);
@@ -2160,6 +2210,7 @@ pub(crate) fn restore_ai_attack_wave_orders(
     ai_settings: Res<AiDifficultySettings>,
     player_factions: Option<Res<PlayerFactions>>,
     visible_player: Option<Res<VisiblePlayer>>,
+    match_setup: Option<Res<MatchSetupSettings>>,
     active_teams: Option<Res<ActiveTeams>>,
     units: Query<
         (
@@ -2183,9 +2234,10 @@ pub(crate) fn restore_ai_attack_wave_orders(
     support_units: Query<(Entity, &Team, &Transform, &Selectable, &Health, &Unit), With<Unit>>,
     targets: Query<(Entity, &Team, &Transform), With<Health>>,
 ) {
-    for team in active_ai_teams(
+    for team in ai_controlled_teams(
         controlled_player_team(visible_player.as_deref()),
         active_teams.as_deref(),
+        match_setup.as_deref(),
     ) {
         let profile = faction_ai_profile_for_difficulty(
             slot_faction_from_option(player_factions.as_deref(), team),
@@ -2643,6 +2695,28 @@ pub(crate) fn active_ai_teams(
         .filter(move |team| team_is_active(*team, active_teams))
 }
 
+pub(crate) fn team_is_ai_controlled(
+    team: Team,
+    controlled_team: Option<Team>,
+    setup: Option<&MatchSetupSettings>,
+) -> bool {
+    Some(team) != controlled_team
+        && setup.is_some_and(|setup| {
+            team.economy_index()
+                .and_then(|index| setup.player_controllers.get(index))
+                .is_some_and(|controller| matches!(controller, SkirmishPlayerController::Ai(_)))
+        })
+}
+
+pub(crate) fn ai_controlled_teams<'a>(
+    controlled_team: Option<Team>,
+    active_teams: Option<&'a ActiveTeams>,
+    setup: Option<&'a MatchSetupSettings>,
+) -> impl Iterator<Item = Team> + 'a {
+    active_ai_teams(controlled_team, active_teams)
+        .filter(move |team| team_is_ai_controlled(*team, controlled_team, setup))
+}
+
 pub(crate) fn next_ai_train(
     team: Team,
     faction: SkirmishFaction,
@@ -2690,8 +2764,20 @@ pub(crate) fn next_ai_train(
         economy,
         cursor,
         counts,
-        |_| true,
+        |def| def.weapon.is_some(),
     )
+    .or_else(|| {
+        next_ai_train_matching(
+            team,
+            faction,
+            profile,
+            structures,
+            economy,
+            cursor,
+            counts,
+            |def| def.weapon.is_none() && ai_battle_unit_id(def.id),
+        )
+    })
 }
 
 pub(crate) fn next_ai_train_matching(
@@ -2810,6 +2896,49 @@ pub(crate) fn next_ai_offense_structure_for_faction(
     None
 }
 
+pub(crate) fn next_ai_technology_structure(
+    team: Team,
+    faction: SkirmishFaction,
+    structures: &Query<StructurePrereqItem<'_>>,
+) -> Option<&'static str> {
+    let faction = faction_def(faction)?;
+    ["RadarUplink", "RoboticsBay", "TechLab"]
+        .into_iter()
+        .find(|id| {
+            faction.can_construct(id)
+                && ai_structure_count(team, id, structures, false) == 0
+                && registry::entity(id).is_some_and(|def| requirements_met(def, team, structures))
+        })
+}
+
+pub(crate) fn next_ai_power_structure(
+    team: Team,
+    faction: SkirmishFaction,
+    structures: &Query<StructurePrereqItem<'_>>,
+    next_structure: Option<&str>,
+) -> Option<&'static str> {
+    if !faction_def(faction)?.can_construct("PowerReactor")
+        || structures
+            .iter()
+            .any(|(structure, owner, _, construction)| {
+                *owner == team && structure.id == "PowerReactor" && construction.is_some()
+            })
+    {
+        return None;
+    }
+    // Include committed construction, so pending consumers reserve capacity.
+    let committed_power: i32 = structures
+        .iter()
+        .filter(|(_, owner, _, _)| **owner == team)
+        .filter_map(|(structure, _, _, _)| registry::entity(structure.id))
+        .map(|def| def.power_delta)
+        .sum();
+    let next_power = next_structure
+        .and_then(registry::entity)
+        .map_or(0, |def| def.power_delta);
+    (committed_power + next_power < 0).then_some("PowerReactor")
+}
+
 #[allow(dead_code)]
 pub(crate) fn next_ai_defense(
     team: Team,
@@ -2838,3 +2967,7 @@ pub(crate) fn next_ai_defense_for_faction(
     }
     None
 }
+
+#[cfg(test)]
+#[path = "ai/tests.rs"]
+mod tests;
