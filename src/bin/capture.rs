@@ -33,6 +33,7 @@ use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 #[path = "capture/save_flow.rs"]
 mod save_flow;
 
+
 use bevy_open_rts::{
     CaptureTarget, build_capture_app, build_model_harness_capture_app, capture_active_mission,
     capture_art_combat_evidence, capture_boot_camp_button, capture_boot_camp_label,
@@ -1365,7 +1366,7 @@ fn build_structure_via_real_input(
     app: &mut App,
     structure_id: &'static str,
 ) -> Result<Vec3, String> {
-    build_structure_with_input_mode(app, structure_id, false, None)
+    build_structure_with_input_mode(app, structure_id, false, None, None)
 }
 
 fn build_campaign_structure_via_real_input(
@@ -1373,7 +1374,16 @@ fn build_campaign_structure_via_real_input(
     structure_id: &'static str,
     observer: &mut dyn FnMut(&mut App),
 ) -> Result<Vec3, String> {
-    build_structure_with_input_mode(app, structure_id, true, Some(observer))
+    build_structure_with_input_mode(app, structure_id, true, Some(observer), None)
+}
+
+fn build_campaign_structure_with_offsets(
+    app: &mut App,
+    structure_id: &'static str,
+    offsets: [Vec3; 5],
+    observer: &mut dyn FnMut(&mut App),
+) -> Result<Vec3, String> {
+    build_structure_with_input_mode(app, structure_id, true, Some(observer), Some(offsets))
 }
 
 fn observed_capture_step(app: &mut App, observer: &mut Option<&mut dyn FnMut(&mut App)>) {
@@ -1388,6 +1398,7 @@ fn build_structure_with_input_mode(
     structure_id: &'static str,
     observed_tab_keys: bool,
     mut observer: Option<&mut dyn FnMut(&mut App)>,
+    placement_override: Option<[Vec3; 5]>,
 ) -> Result<Vec3, String> {
     let worker = if observed_tab_keys {
         // Campaign builders use the same verified, click-safe selection as
@@ -1461,7 +1472,9 @@ fn build_structure_with_input_mode(
     let placement_origin = capture_player_command_center(app)
         .map(|(_, base, _)| base)
         .unwrap_or(worker);
-    let placement_offsets = if observed_tab_keys && structure_id == "AntiAirTurret" {
+    let placement_offsets = if let Some(offsets) = placement_override {
+        offsets
+    } else if observed_tab_keys && structure_id == "AntiAirTurret" {
         [
             Vec3::new(0.0, 0.0, 9.0),
             Vec3::new(3.0, 0.0, 9.0),
@@ -1908,6 +1921,12 @@ fn render_campaign_play(index: usize, dir: &Path) -> Result<(), String> {
     tap_key(&mut app, KeyCode::Enter);
     capture_dismiss_match_briefing(&mut app);
     let result = (|| {
+        let checked_build = |app: &mut App, id: &'static str| {
+            build_campaign_structure_via_real_input(app, id, &mut |_| {})
+        };
+        let mut legacy_factory = None;
+        let mut legacy_trace = std::fs::File::create(dir.join("legacy-telemetry.jsonl"))
+            .map_err(|error| error.to_string())?;
         let worker = capture_player_worker_position(&mut app).ok_or("mission worker missing")?;
         capture_focus_camera_on(&mut app, worker);
         for _ in 0..12 {
@@ -1923,16 +1942,18 @@ fn render_campaign_play(index: usize, dir: &Path) -> Result<(), String> {
         }
         let point = capture_world_to_screen(&mut app, ore).ok_or("deposit outside view")?;
         capture_click_screen(&mut app, point, MouseButton::Right);
-        if matches!(index, 2 | 4) {
+        if index == 5 {
+            campaign_bot::run_finale(&mut app, &handle, dir)?;
+        } else if matches!(index, 2 | 4) {
             campaign_bot::run(&mut app, &handle, dir, index)?;
         } else {
-            build_structure_via_real_input(&mut app, "PowerReactor")?;
+            checked_build(&mut app, "PowerReactor")?;
             let survival = index == 0 || index == 3;
             if survival {
-                build_structure_via_real_input(&mut app, "AntiGroundTurret")?;
-                build_structure_via_real_input(&mut app, "AntiGroundTurret")?;
+                checked_build(&mut app, "AntiGroundTurret")?;
+                checked_build(&mut app, "AntiGroundTurret")?;
             }
-            let barracks = build_structure_via_real_input(&mut app, "Barracks")?;
+            let barracks = checked_build(&mut app, "Barracks")?;
             if survival {
                 capture_focus_camera_on(&mut app, barracks);
                 for _ in 0..12 {
@@ -1957,11 +1978,17 @@ fn render_campaign_play(index: usize, dir: &Path) -> Result<(), String> {
                 defend_headquarters_via_real_input(&mut app)?;
             }
             if survival {
-                train_army_via_real_input(&mut app, barracks, 8, "HeavyMachinegunTrooper")?;
-                build_structure_via_real_input(&mut app, "RadarUplink")?;
-                train_army_via_real_input(&mut app, barracks, 12, "RocketInfantry")?;
+                // Armor produces while infantry/radar setup continues. Reserve
+                // Radar's actual cost before committing the larger paid queues.
+                checked_build(&mut app, "PowerReactor")?;
+                legacy_factory = Some(checked_build(&mut app, "VehicleFactory")?);
+                checked_build(&mut app, "RadarUplink")?;
+                campaign_bot::ensure_harvesting(&mut app)?;
+                campaign_bot::queue_to_quota(&mut app, "VehicleFactory", "Tank", 6)?;
+                campaign_bot::queue_to_quota(&mut app, "Barracks", "HeavyMachinegunTrooper", 8)?;
+                campaign_bot::queue_to_quota(&mut app, "Barracks", "RocketInfantry", 4)?;
             } else {
-                let factory = build_structure_via_real_input(&mut app, "VehicleFactory")?;
+                let factory = checked_build(&mut app, "VehicleFactory")?;
                 train_army_via_real_input(&mut app, factory, 3, "Tank")?;
                 defend_headquarters_via_real_input(&mut app)?;
                 train_army_via_real_input(&mut app, factory, 8, "Tank")?;
@@ -1971,19 +1998,29 @@ fn render_campaign_play(index: usize, dir: &Path) -> Result<(), String> {
                 if capture_match_phase_label(&mut app) != "Running" {
                     break;
                 }
-                if index == 3 && round == 6 {
-                    build_structure_via_real_input(&mut app, "PowerReactor")?;
-                    let factory = build_structure_via_real_input(&mut app, "VehicleFactory")?;
-                    let target = capture_player_army_unit_count(&mut app) + 4;
-                    train_army_via_real_input(&mut app, factory, target, "Tank")?;
-                    shoot(&mut app, &handle, dir.join("01_armour_reserve.png"));
+                if survival {
+                    campaign_bot::log_state(&mut app, &mut legacy_trace, "survival-before-orders")?;
+                    campaign_bot::ensure_harvesting(&mut app)?;
+                    campaign_bot::queue_to_quota(&mut app, "CommandCenter", "Worker", 4)?;
+                    campaign_bot::queue_to_quota(
+                        &mut app,
+                        "Barracks",
+                        "HeavyMachinegunTrooper",
+                        8,
+                    )?;
+                    campaign_bot::queue_to_quota(&mut app, "Barracks", "RocketInfantry", 4)?;
+                    if legacy_factory.is_some() {
+                        campaign_bot::queue_to_quota(&mut app, "VehicleFactory", "Tank", 6)?;
+                    }
                 }
                 if !survival {
                     issue_player_attack_move_to_nearest_anchor(&mut app)?;
+                } else if index == 3 {
+                    campaign_bot::maintain_survival_defense(&mut app)?;
                 } else {
                     defend_headquarters_via_real_input(&mut app)?;
                 }
-                for _ in 0..450 {
+                for _ in 0..if index == 3 { 150 } else { 450 } {
                     app.update();
                 }
                 if round % 8 == 0 {
@@ -1996,36 +2033,58 @@ fn render_campaign_play(index: usize, dir: &Path) -> Result<(), String> {
                 }
             }
         }
-        for _ in 0..8 {
-            app.update();
-        }
-        let phase = capture_match_phase_label(&mut app);
-        if phase != "HumanVictory" {
-            return Err(format!("mission {index} did not win: {phase}"));
-        }
-        if !capture_campaign_completed(&app, index) {
-            return Err(format!("mission {index} victory did not record completion"));
-        }
-        shoot(&mut app, &handle, dir.join("02_victory.png"));
-        let point =
-            capture_campaign_continue_button(&mut app).ok_or("campaign continue button missing")?;
-        capture_click_screen(&mut app, point, MouseButton::Left);
-        for _ in 0..MATCH_SETTLE_TICKS {
-            app.update();
-        }
-        if index < 5 && capture_active_mission(&app) != Some(index + 1) {
-            return Err("Next Mission did not launch the following mission".into());
-        }
-        if index == 5 && !capture_campaign_menu_open(&app) {
-            return Err("campaign finale did not return to the campaign map".into());
-        }
-        shoot(&mut app, &handle, dir.join("03_continue.png"));
-        println!(
-            "[capture] mission {index}: normal-input victory, completion recorded, continuation verified"
-        );
         Ok(())
     })();
+    let result = if result.is_ok() || capture_match_phase_label(&mut app) == "HumanVictory" {
+        (|| {
+            for _ in 0..8 {
+                app.update();
+            }
+            let phase = capture_match_phase_label(&mut app);
+            if phase != "HumanVictory" {
+                return Err(format!("mission {index} did not win: {phase}"));
+            }
+            if !capture_campaign_completed(&app, index) {
+                return Err(format!("mission {index} victory did not record completion"));
+            }
+            shoot(&mut app, &handle, dir.join("02_victory.png"));
+            let point = capture_campaign_continue_button(&mut app)
+                .ok_or("campaign continue button missing")?;
+            capture_click_screen(&mut app, point, MouseButton::Left);
+            for _ in 0..MATCH_SETTLE_TICKS {
+                app.update();
+            }
+            if index < 5 && capture_active_mission(&app) != Some(index + 1) {
+                return Err("Next Mission did not launch the following mission".into());
+            }
+            if index == 5 && !capture_campaign_menu_open(&app) {
+                return Err("campaign finale did not return to the campaign map".into());
+            }
+            if index < 5
+                && !wait_until(
+                    &mut app,
+                    180,
+                    bevy_open_rts::capture_mission_briefing_complete,
+                )
+            {
+                return Err("following mission briefing did not finish revealing".into());
+            }
+            shoot(&mut app, &handle, dir.join("03_continue.png"));
+            println!(
+                "[capture] mission {index}: normal-input victory, completion recorded, continuation verified"
+            );
+            Ok(())
+        })()
+    } else {
+        result
+    };
     if result.is_err() {
+        let snapshot = bevy_open_rts::capture_construction_contact_debug(&mut app);
+        std::fs::write(
+            dir.join("failure-contact.json"),
+            serde_json::to_vec_pretty(&snapshot).map_err(|error| error.to_string())?,
+        )
+        .map_err(|error| error.to_string())?;
         shoot(&mut app, &handle, dir.join("failure.png"));
     }
     result

@@ -9,6 +9,13 @@ use bevy_open_rts::{
 use std::collections::{BTreeMap, HashSet};
 use std::io::Write;
 
+#[path = "campaign_bot/finale.rs"]
+mod finale;
+
+pub(super) fn run_finale(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Result<(), String> {
+    finale::run(app, handle, dir)
+}
+
 const DEFENSE: usize = 0;
 const ASSAULT: usize = 1;
 const GROUP_KEYS: [KeyCode; 2] = [KeyCode::Digit1, KeyCode::Digit2];
@@ -295,7 +302,7 @@ fn select_producer(app: &mut App, id: &str) -> Result<bool, String> {
     advance(app, 10);
     Ok(capture_entity_is_selected(app, entity))
 }
-fn queue_to_quota(
+pub(super) fn queue_to_quota(
     app: &mut App,
     producer: &str,
     product: &'static str,
@@ -356,7 +363,7 @@ fn train_to_count(
     ))
 }
 
-fn ensure_harvesting(app: &mut App) -> Result<(), String> {
+pub(super) fn ensure_harvesting(app: &mut App) -> Result<(), String> {
     let mut workers: Vec<_> = capture_campaign_units(app)
         .into_iter()
         .filter(|unit| unit.id == "Worker")
@@ -487,7 +494,7 @@ fn hold_arrived_defenders(app: &mut App) -> Result<(), String> {
     Ok(())
 }
 
-fn maintain_twin_defense(app: &mut App) -> Result<(), String> {
+fn maintain_home_defense(app: &mut App, perimeter: f32, staging_offset: f32) -> Result<(), String> {
     let state = capture_campaign_state(app);
     let Some(base) = state.headquarters.map(|hq| hq.position) else {
         return Ok(());
@@ -510,18 +517,20 @@ fn maintain_twin_defense(app: &mut App) -> Result<(), String> {
     let units = capture_campaign_units(app);
     let away: Vec<_> = units
         .iter()
-        .filter(|unit| unit.groups.contains(&DEFENSE) && unit.position.distance(base) > 12.0)
+        .filter(|unit| unit.groups.contains(&DEFENSE) && unit.position.distance(base) > perimeter)
         .map(|unit| unit.entity)
         .collect();
     if !select_units(app, &away)?.is_empty() {
-        ground_order(app, base + Vec3::new(8.0, 0.0, 0.0), false)?;
+        ground_order(app, base + Vec3::new(staging_offset, 0.0, 0.0), false)?;
     }
     // Hold immediately inside the home perimeter, including units pursuing a
     // retreating enemy. Waiting for idle lets guards chase across the map.
     let home: Vec<_> = capture_campaign_units(app)
         .into_iter()
         .filter(|unit| {
-            unit.groups.contains(&DEFENSE) && !unit.holding && unit.position.distance(base) <= 12.0
+            unit.groups.contains(&DEFENSE)
+                && !unit.holding
+                && unit.position.distance(base) <= perimeter
         })
         .map(|unit| unit.entity)
         .collect();
@@ -530,6 +539,16 @@ fn maintain_twin_defense(app: &mut App) -> Result<(), String> {
         tap_key(app, key);
     }
     Ok(())
+}
+
+pub(super) fn maintain_survival_defense(app: &mut App) -> Result<(), String> {
+    let newcomers: Vec<_> = capture_campaign_units(app)
+        .into_iter()
+        .filter(|unit| unit.combat && !unit.groups.contains(&DEFENSE))
+        .map(|unit| unit.entity)
+        .collect();
+    append_group(app, DEFENSE, &newcomers)?;
+    maintain_home_defense(app, 7.0, 3.5)
 }
 
 fn rally_to_safe_staging(
@@ -593,7 +612,11 @@ fn attack(app: &mut App) -> Result<(), String> {
     ground_order(app, target, true)
 }
 
-fn log_state(app: &mut App, trace: &mut std::fs::File, stage: &str) -> Result<(), String> {
+pub(super) fn log_state(
+    app: &mut App,
+    trace: &mut std::fs::File,
+    stage: &str,
+) -> Result<(), String> {
     let state = capture_campaign_state(app);
     let units = capture_campaign_units(app);
     let mut types = BTreeMap::new();
@@ -693,7 +716,7 @@ pub(super) fn run(
             refresh_groups(app)?;
             hold_arrived_defenders(app)?;
             if index == 4 {
-                maintain_twin_defense(app)?;
+                maintain_home_defense(app, 12.0, 8.0)?;
             }
             queue_to_quota(app, "CommandCenter", "Worker", 4)?;
             queue_to_quota(app, "Barracks", "HeavyMachinegunTrooper", 3)?;
