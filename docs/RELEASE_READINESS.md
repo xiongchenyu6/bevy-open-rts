@@ -16,7 +16,7 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Six original encoded illustrations are wired; mission5 native briefing inspected. Other images/layouts/audio remain open. |
 | Skirmish/balance | All maps/factions/difficulties/starts playable; reproducible repeated/independent-seed sweeps; no indefinite matches | Foundation-fix pin completes216/216 canonical cases with validated outcomes. Latest EMP/damage changes, alternate starts, repeatability, independent seeds and broad balance remain open. |
 | Delivery | Windows/Linux release archives launch without Rust/Nix from arbitrary directories; writable user data | Earlier optimized Linux package passes bounded hardware/input smoke. Windows GNU/Wine harness evidence exists. Current release packages, native Windows/MSVC and Steam Runtime remain open. |
-| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Real EMP application regressions pass3/3; prior full suite178/0/1. Three new combat-damage regressions pass; updated full suite/build is running. No representative combat performance or long-session acceptance yet. |
+| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Real EMP application regressions pass3/3; prior full suite178/0/1. Three new combat-damage regressions pass; updated full suite181/0/1 passes, shared build/runtime acceptance pending. No representative combat performance or long-session acceptance yet. |
 | Distribution | Accurate store copy, provenance/licenses/generated inventory and store-ready media | Unpublished store draft and partial provenance audit exist. Art/audio rights gaps and final media remain open. |
 
 ## Verification policy
@@ -221,5 +221,6 @@ damage consistently and orders faction recovery after non-weapon damage.
 Three full-schedule regressions pass3/3 in3.73s
 (`logs/combat-damage-focused-03.log`), covering exact mine damage, delayed Demon
 regeneration/Chaos recharge and delayed Alliance field repair after a strike.
-Updated full-suite/shared build and strict fresh-process Mine08 remain pending.
+Updated full suite passes181/0/1 in167.04s (`logs/combat-damage-full-01.log`).
+Shared build and strict fresh-process Mine08 remain pending.
 Failed fixture/diagnostic-compilation attempts remain separate evidence.
