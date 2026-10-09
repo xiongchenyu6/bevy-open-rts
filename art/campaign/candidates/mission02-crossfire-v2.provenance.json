@@ -1,0 +1,15 @@
+{
+  "asset": "mission02-crossfire-v2.png",
+  "tool": "image_gen.imagegen (built-in)",
+  "recorded_at_utc": "2026-10-09 15:20:54 UTC",
+  "model_version": "not exposed by tool",
+  "seed": "not exposed by tool",
+  "prompt": "Generate an original wide landscape 16:9 campaign briefing illustration for an indie robot real-time strategy game. Mission 2: a precision assault against an enemy command center through two crossfire choke points in a dry orange canyon. Art direction: polished painterly hard-surface game concept art, recognizable chunky gray and olive-green industrial command buildings, compact gray tracked tanks, small angular robot infantry, functional satellite dishes and power reactors. Foreground a small green-accent robot/tank strike force advancing along a rocky pass, midground two enemy red-accent defensive emplacements on opposite canyon ridges creating crossing firing lanes, background the angular enemy command center as a clearly readable objective. Warm amber canyon light, cool gray armored surfaces, restrained red enemy accents, fine atmospheric dust, selective cinematic action rather than visual noise. Carefully composed with strong clear silhouettes and believable industrial architecture; no humans, no fantasy creatures, no recognizable franchise designs. Keep bottom 22 percent quieter and darker for briefing readability; no text, letters, numbers, UI, logos or watermarks. This is a new original scene, not a gameplay screenshot. Landscape composition.",
+  "transparent_background": false,
+  "width": 1672,
+  "height": 941,
+  "sha256": "a303d5fc2e8da601d6dc0d9c4d66aea9c228558dcdd3c7d7fe9414862710141e",
+  "bytes": 2365916,
+  "original_output_filename": "exec-7b1cd45f-44b1-4ef9-9b44-62432e83d3fc.png",
+  "status": "visually inspected candidate; outside shipped assets; not a gameplay screenshot; no blanket rights clearance asserted"
+}
