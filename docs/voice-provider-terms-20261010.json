@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "checked_utc": "2026-10-09T18:59:16.730297+00:00",
+  "url": "https://ttsmaker.com/copyright_and_commercial_license_terms",
+  "retrieval": "Official page successfully read through web browsing tool; direct urllib archive request returned HTTP403, so no raw-page hash is claimed",
+  "scope": "Current provider terms only; not generation-time terms or provenance of a specific imported voice",
+  "summary": "Current terms permit commercial use and distribution of service-generated audio, including games. Provider technology remains provider-owned; users remain responsible for third-party rights. No historical voice grant is inferred."
+}
