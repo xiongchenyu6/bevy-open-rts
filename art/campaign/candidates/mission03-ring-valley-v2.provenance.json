@@ -1,0 +1,15 @@
+{
+  "asset": "mission03-ring-valley-v2.png",
+  "tool": "image_gen.imagegen (built-in)",
+  "recorded_at_utc": "2026-10-09 15:31:29 UTC",
+  "model_version": "not exposed by tool",
+  "seed": "not exposed by tool",
+  "prompt": "Original wide landscape 16:9 briefing illustration for mission 3 of a robot RTS: breaking an encirclement in a ring-shaped rocky valley and securing the central mining field. Polished painterly hard-surface industrial science-fiction concept art consistent with gray and olive-green chunky tracked tanks, squat utility robots and angular mechanical infantry. A small gray-green armored force pushes through a gap in the circular orange canyon ridges; the central open basin contains a clearly readable mining outpost, green faceted ore and red crystal deposits, conveyors and a compact industrial command building. Distant restrained red-accent enemy emplacements on the surrounding ring show the siege, and small angular aircraft patrol the far skyline. Strong readable silhouettes, cinematic warm amber canyon light, cool armored steel, sparse dust, a carefully composed clear objective and advance route. Keep the bottom 22 percent darker and quiet for briefing text overlay. No humans, fantasy creatures, recognizable franchise designs, banners, insignia, logos, baked text, numbers, UI or watermarks. Original illustration, not a gameplay screenshot.",
+  "transparent_background": false,
+  "width": 1672,
+  "height": 941,
+  "sha256": "3ca3a820674f8242065372428c96c4bf00197779298ec438937edd9d3173d182",
+  "bytes": 2732254,
+  "original_output_filename": "exec-73d56289-b10a-48e8-a240-52d457f8b600.png",
+  "status": "visually inspected candidate; outside shipped assets; not gameplay evidence"
+}
