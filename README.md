@@ -189,6 +189,8 @@ Generated outputs:
 - In a desktop offline match, press **Esc** for the **Save / Load** buttons,
   or use **Ctrl+S / Ctrl+L**. **F10** toggles tactical pause. Match saves and
   campaign completion use your per-user data directory.
+- Radar Sweep reveals, Shield Overdrive buffs and their cooldowns resume
+  with their remaining time when an offline desktop match is loaded.
 
 ## Model Harness
 

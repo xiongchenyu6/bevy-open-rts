@@ -18,6 +18,13 @@ mod save_orders;
 #[cfg(not(target_arch = "wasm32"))]
 pub use save_orders::{capture_disk_order_state, capture_live_order_state};
 
+#[cfg(not(target_arch = "wasm32"))]
+mod save_effects;
+#[cfg(not(target_arch = "wasm32"))]
+pub use save_effects::{
+    capture_disk_effect_state, capture_effect_setup_button, capture_live_effect_state,
+};
+
 /// Returns true once startup assets have loaded and the front menu is active.
 ///
 /// The capture binary drives Bevy faster than wall-clock time. Polling this

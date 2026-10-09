@@ -351,7 +351,9 @@ The ten exact configuration comparisons in
 `target/ai-tech-targeted-20261009` complete, including all five old600-second
 timeouts. The pinned current canonical216-case sweep is running under
 `rts-skirmish-current-canonical-all-20261009.service`; its terminal summary must
-be inspected before acceptance. These are configuration resolution checks,
+be inspected before acceptance. Current checkpoint:112 completed/216, with
+1 unresolved600-second case0103 (Big Arena, Chaos Easy0 versus Beginner1).
+These are configuration resolution checks,
 not statistical win rates, independent seed coverage or alternate-start proof.
 
 Real unit-order save creation and fresh-process restoration both exit0:
@@ -361,9 +363,36 @@ loaded mineral entity reference remaps correctly, both queued targets survive,
 the worker finishes its route, ore32→38 and mineral240→234. Original save bytes
 remain unchanged; Saved and resumed screenshots were inspected. Earlier failed
 inputs landed on the command HUD, so they did not constitute a serializer bug.
-Mines, temporary effects and support cooldowns still need separate runtime proof.
+Mine deployment/trigger continuity and other status effects or delayed support
+strikes still need separate runtime proof. Radar Sweep and Shield Overdrive
+now have the bounded fresh-process proof below.
 
 The current same-App campaign reaches four victories, then fails mission5 with
 an unfinished foundation. Diagnostic traces are gathering assignment/cancellation
 history; a reachable path at the failure snapshot alone does not prove correct
 initial assignment. No current six-mission same-App completion is claimed.
+
+## Fresh-process Radar Sweep and Shield Overdrive
+
+`capture save-effects <directory>` uses actual Play, Chaos faction, AI Beginner
+and Start Match clicks. Four physically built, normally paid prerequisites
+(Power Reactor, Radar Uplink, Robotics Bay and Tech Lab) debit19 ore and16
+crystal from the normal32/16 budget, leaving13/0 with sufficient power. Actual
+F1/F5 plus target clicks create a Radar reveal and a Worker shield; the match
+menu saves while both effects are active. `capture save-effects-resume
+<evidence-directory> <output-directory>` loads through the mouse menu in a
+separate process and leaves the original save bytes unchanged.
+
+`screenshots/steam-quality/save-effects-{create,resume}-01/observations.json`
+and Saved/Restored/Expired screenshots were inspected. The shield target remaps
+from8589934089 to12884900480. Over the real0.267-second load advance, shield
+remaining7.80→7.53 and reveal7.47→7.20; shield damage scale remains0.25.
+Cooldowns18/55 continue from17.47/54.80 to17.20/54.53, then9.63/46.97 after
+ordinary simulation removes both effects. Logs
+`logs/save-effects-{check,build}-02.log` and
+`logs/save-effects-{create,resume}-01.log` exit0. Pinned capture SHA256 is
+`659f56be747d78ad9f29d0ae18435c0e58f90e121b8bde9acb4b209a4f453620`.
+
+This proves Radar reveal, one Worker Shield Overdrive buff, their timers and
+cooldowns. Shield combat mitigation, other buffs, delayed strikes and mines
+are separate acceptance gates; this capture does not establish them.
