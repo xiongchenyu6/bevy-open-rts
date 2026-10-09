@@ -145,3 +145,17 @@ campaign-image candidate is outside shipped assets and is not a gameplay capture
 Keep the user-modified `flake.lock` and original ignored full-font source intact.
 Use the canonical compiler environment for shared builds, one compiler at a
 time, and supervised jobs for long validation. Compilation is not gameplay proof.
+
+## Construction damage regression
+
+The fresh ground-force sweep preserves another timeout: case0050, FourCorners
+ChaosEasy slot0 versus ChaosNormal slot1 at600s. Eight ground attackers are
+in range of a7.05HP Reactor while two foundations remain unfinished. A source
+audit identifies unconditional construction HP overwrites, which erase damage
+each frame and again on completion. The fix preserves received damage, awards
+only HP earned by actual construction work, and never revives dead sites.
+Nine construction regressions pass (`logs/foundation-damage-focused-01.log`),
+including real weapon destruction of an unworked foundation, retained damage
+through completion and no healing of stalled/dead sites. Full-suite, shared-build
+and exact case0050 replay are running or pending; the frozen788 audit continues
+unchanged, and no all-configurations completion is claimed.
