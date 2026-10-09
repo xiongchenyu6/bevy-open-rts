@@ -1285,26 +1285,6 @@ pub(crate) fn nearest_enemy_position(
     nearest
 }
 
-pub(crate) fn nearest_enemy_entity(
-    team: Team,
-    origin: Vec3,
-    targets: &Query<(Entity, &Team, &Transform), With<Health>>,
-) -> Option<Entity> {
-    let mut nearest = None;
-    let mut distance = f32::MAX;
-    for (entity, target_team, transform) in targets {
-        if *target_team == team || *target_team == Team::Neutral {
-            continue;
-        }
-        let d = xz_distance(origin, transform.translation);
-        if d < distance {
-            nearest = Some(entity);
-            distance = d;
-        }
-    }
-    nearest
-}
-
 pub(crate) fn update_mine_layers(
     mut commands: Commands,
     time: Res<Time>,

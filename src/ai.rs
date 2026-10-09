@@ -733,6 +733,8 @@ pub(crate) fn ai_director(
     capture_structures: Query<CaptureStructureTargetItem<'_>, With<Structure>>,
     ai_repair_structures: Query<AiRepairStructureItem<'_>, With<Structure>>,
     targets: Query<(Entity, &Team, &Transform), With<Health>>,
+    wave_targets: Query<(Entity, &Team, &Transform, &Health, &MovementDomain)>,
+    weapons: Query<&Weapon>,
 ) {
     let delta = time.delta_secs();
     let player_team = visible_player_team(visible_player.as_deref());
@@ -932,52 +934,59 @@ pub(crate) fn ai_director(
         resources.director.attack_timer[idx] -= delta;
         if profile.active_offense_enabled && resources.director.attack_timer[idx] <= 0.0 {
             resources.director.attack_timer[idx] = profile.attack_interval;
-            if let Some(target) = nearest_enemy_entity(team, team_home(team), &targets) {
-                for (
+            for (
+                entity,
+                unit,
+                unit_team,
+                _transform,
+                order_queue,
+                move_order,
+                follow_order,
+                attack_order,
+                capture_order,
+                garrison_order,
+                harvest_order,
+                repair_order,
+                construct_order,
+                attack_move_order,
+                patrol_order,
+            ) in &units
+            {
+                if *unit_team != team
+                    || !ai_battle_unit_id(unit.id)
+                    || order_queue.is_some_and(|queue| !queue.orders.is_empty())
+                    || has_active_orders_in_query(
+                        move_order,
+                        follow_order,
+                        attack_order,
+                        capture_order,
+                        garrison_order,
+                        harvest_order,
+                        repair_order,
+                        construct_order,
+                        attack_move_order,
+                        patrol_order,
+                    )
+                {
+                    continue;
+                }
+                let Some(target) = nearest_ai_wave_enemy(
+                    team,
+                    team_home(team),
+                    weapons.get(entity).ok(),
+                    &resources.relations,
+                    &wave_targets,
+                ) else {
+                    continue;
+                };
+                assign_ai_attack_wave_order(
+                    &mut commands,
+                    team,
                     entity,
                     unit,
-                    unit_team,
-                    _transform,
-                    order_queue,
-                    move_order,
-                    follow_order,
-                    attack_order,
-                    capture_order,
-                    garrison_order,
-                    harvest_order,
-                    repair_order,
-                    construct_order,
-                    attack_move_order,
-                    patrol_order,
-                ) in &units
-                {
-                    if *unit_team != team
-                        || !ai_battle_unit_id(unit.id)
-                        || order_queue.is_some_and(|queue| !queue.orders.is_empty())
-                        || has_active_orders_in_query(
-                            move_order,
-                            follow_order,
-                            attack_order,
-                            capture_order,
-                            garrison_order,
-                            harvest_order,
-                            repair_order,
-                            construct_order,
-                            attack_move_order,
-                            patrol_order,
-                        )
-                    {
-                        continue;
-                    }
-                    assign_ai_attack_wave_order(
-                        &mut commands,
-                        team,
-                        entity,
-                        unit,
-                        target,
-                        &support_units,
-                    );
-                }
+                    target,
+                    &support_units,
+                );
             }
         } else if !profile.active_offense_enabled {
             resources.director.attack_timer[idx] = profile.attack_interval;
@@ -2180,6 +2189,29 @@ pub(crate) fn best_available_ai_garrison_unit(
     best
 }
 
+fn nearest_ai_wave_enemy(
+    team: Team,
+    origin: Vec3,
+    weapon: Option<&Weapon>,
+    relations: &TeamRelations,
+    targets: &Query<(Entity, &Team, &Transform, &Health, &MovementDomain)>,
+) -> Option<Entity> {
+    targets
+        .iter()
+        .filter(|(_, target_team, _, health, domain)| {
+            if let Some(weapon) = weapon {
+                attack_order_target_valid(&team, target_team, **domain, health, weapon, relations)
+            } else {
+                health.current > 0.0 && relations.are_enemies(team, **target_team)
+            }
+        })
+        .min_by(|left, right| {
+            xz_distance(origin, left.2.translation)
+                .total_cmp(&xz_distance(origin, right.2.translation))
+        })
+        .map(|(entity, ..)| entity)
+}
+
 pub(crate) fn assign_ai_attack_wave_order(
     commands: &mut Commands,
     team: Team,
@@ -2211,6 +2243,7 @@ pub(crate) fn assign_ai_attack_wave_order(
 }
 
 pub(crate) fn restore_ai_attack_wave_orders(
+    relations: Res<TeamRelations>,
     mut commands: Commands,
     ai_settings: Res<AiDifficultySettings>,
     player_factions: Option<Res<PlayerFactions>>,
@@ -2237,7 +2270,8 @@ pub(crate) fn restore_ai_attack_wave_orders(
         (With<AiAttackWaveMember>, With<Unit>, Without<Selected>),
     >,
     support_units: Query<(Entity, &Team, &Transform, &Selectable, &Health, &Unit), With<Unit>>,
-    targets: Query<(Entity, &Team, &Transform), With<Health>>,
+    targets: Query<(Entity, &Team, &Transform, &Health, &MovementDomain)>,
+    weapons: Query<&Weapon>,
 ) {
     for team in ai_controlled_teams(
         controlled_player_team(visible_player.as_deref()),
@@ -2251,9 +2285,6 @@ pub(crate) fn restore_ai_attack_wave_orders(
         if !profile.active_offense_enabled {
             continue;
         }
-        let Some(target) = nearest_enemy_entity(team, team_home(team), &targets) else {
-            continue;
-        };
         for (
             entity,
             unit,
@@ -2289,6 +2320,15 @@ pub(crate) fn restore_ai_attack_wave_orders(
             {
                 continue;
             }
+            let Some(target) = nearest_ai_wave_enemy(
+                team,
+                team_home(team),
+                weapons.get(entity).ok(),
+                &relations,
+                &targets,
+            ) else {
+                continue;
+            };
             assign_ai_attack_wave_order(&mut commands, team, entity, unit, target, &support_units);
         }
     }

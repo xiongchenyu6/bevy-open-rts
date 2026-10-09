@@ -379,3 +379,110 @@ fn available_aa_only_product_is_reserved_for_an_actual_air_threat() {
         Some("AntiAirWalker")
     );
 }
+
+#[test]
+fn easy_ground_wave_finishes_alternate_spawn_with_enemy_scout() {
+    let config = SkirmishAuditConfig {
+        map: "plain_and_simple".into(),
+        factions: ["alliance".into(), "alliance".into()],
+        difficulties: ["easy".into(), "beginner".into()],
+        spawn_slots: [1, 3],
+        max_seconds: 600,
+    };
+    let result = run_skirmish_audit(&config).unwrap();
+    if let Ok(path) = std::env::var("OPEN_BEVY_AI_WAVE_TEST_RESULT") {
+        let mut file = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(path)
+            .unwrap();
+        use std::io::Write;
+        file.write_all(&serde_json::to_vec_pretty(&result).unwrap())
+            .unwrap();
+    }
+    eprintln!(
+        "[ai-domain] phase={} clock={} winners={:?}",
+        result["phase"], result["clock_seconds"], result["winning_teams"]
+    );
+    assert_eq!(
+        result["starting_resources"],
+        serde_json::json!({"ore":32,"crystal":16})
+    );
+    assert_eq!(result["startup_loadout"], "GodotSkirmish");
+    assert!(
+        result["completed"].as_bool().unwrap(),
+        "armed Easy wave stalled despite normal ground anchors"
+    );
+    assert_eq!(result["winning_teams"], serde_json::json!([0]));
+}
+
+#[test]
+fn ai_wave_target_respects_runtime_ground_and_air_capabilities() {
+    let mut app = build_game_app(GameAppMode::Headless);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
+    ));
+    {
+        let mut settings = app.world_mut().resource_mut::<MatchSetupSettings>();
+        settings.player_factions[0] = SkirmishFaction::Alliance;
+        settings.player_factions[1] = SkirmishFaction::Alliance;
+        settings.player_controllers[1] = SkirmishPlayerController::Ai(AiDifficulty::Beginner);
+        settings
+            .ai_difficulties
+            .set_difficulty(Team::Player(1), AiDifficulty::Beginner);
+    }
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::InMatch);
+    for _ in 0..20 {
+        app.update();
+    }
+    let (air_target, origin) = {
+        let world = app.world_mut();
+        let mut units =
+            world.query::<(Entity, &Team, &Transform, &MovementDomain, Option<&Weapon>)>();
+        let (target, _, position, _, _) = units
+            .iter(world)
+            .find(|(_, team, _, domain, _)| {
+                **team == Team::Player(1) && matches!(domain, MovementDomain::Air)
+            })
+            .unwrap();
+        (target, position.translation)
+    };
+    let spec = registry::entity("ScoutRover").unwrap().weapon.unwrap();
+    let mut weapon = Weapon::new(
+        spec.range,
+        spec.damage,
+        spec.cooldown,
+        spec.splash_radius,
+        spec.splash_damage_multiplier,
+        spec.structure_damage_multiplier,
+        spec.can_attack_air,
+        spec.can_attack_ground,
+    );
+    let relations = app.world().resource::<TeamRelations>().clone();
+    let mut state = bevy::ecs::system::SystemState::<
+        Query<(Entity, &Team, &Transform, &Health, &MovementDomain)>,
+    >::new(app.world_mut());
+    let targets = state.get(app.world()).unwrap();
+    // Vary only local test values, never the live normal-start world or registry.
+    weapon.can_attack_ground = true;
+    weapon.can_attack_air = false;
+    let ground =
+        nearest_ai_wave_enemy(Team::Player(0), origin, Some(&weapon), &relations, &targets)
+            .unwrap();
+    assert_ne!(ground, air_target);
+    let (_, team, _, health, domain) = targets.get(ground).unwrap();
+    assert!(health.current > 0.0 && relations.are_enemies(Team::Player(0), *team));
+    assert_eq!(*domain, MovementDomain::Terrain);
+    weapon.can_attack_air = true;
+    assert_eq!(
+        nearest_ai_wave_enemy(Team::Player(0), origin, Some(&weapon), &relations, &targets),
+        Some(air_target)
+    );
+    weapon.can_attack_ground = false;
+    assert_eq!(
+        nearest_ai_wave_enemy(Team::Player(0), origin, Some(&weapon), &relations, &targets),
+        Some(air_target)
+    );
+}
