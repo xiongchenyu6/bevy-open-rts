@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "audit_date": "2026-10-09",
+  "audit_date": "2026-10-10",
   "scope": "Existing tracked asset files, excluding notice documents. Comparison proves bytes/source membership, not third-party license clearance. The unavailable customized Godot source checkout is not represented by the official archive.",
   "upstream": {
     "repository": "https://github.com/lampe-games/godot-open-rts",
@@ -32,7 +32,8 @@
   },
   "summary_by_directory": {
     "campaign": {
-      "absent_from_upstream": 6
+      "absent_from_upstream": 6,
+      "generated_original": 6
     },
     "data": {
       "absent_from_upstream": 1
@@ -4004,6 +4005,42 @@
       "sha256": "1c6b5f9485822e5ff1df9ef7ecdbe2fa73a471a9d8124d752bc2b19c716d44a6",
       "comparison": "identical",
       "upstream_sha256": "1c6b5f9485822e5ff1df9ef7ecdbe2fa73a471a9d8124d752bc2b19c716d44a6"
+    },
+    {
+      "path": "assets/campaign/mission_01-v2.jpg",
+      "sha256": "6cd02c15357fef191b1c3368a676a1d60be1c22f8703b44be8a1f0c6370b9222",
+      "comparison": "generated_original",
+      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+    },
+    {
+      "path": "assets/campaign/mission_02-v2.jpg",
+      "sha256": "96c214bdd16c7c0bbaa9aa3ab77d4ef37a064bf7ca59a06a4497ff3b41bc825c",
+      "comparison": "generated_original",
+      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+    },
+    {
+      "path": "assets/campaign/mission_03-v2.jpg",
+      "sha256": "ec75ee9ee9e5f2e5c2134efbb34dcaf6f3b51aecc24a78d8700262f15b41f110",
+      "comparison": "generated_original",
+      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+    },
+    {
+      "path": "assets/campaign/mission_04-v2.jpg",
+      "sha256": "eadb68ea555c33410d97147cf106aa76d65f3ccfba75258e16a5ddaa3866cfdd",
+      "comparison": "generated_original",
+      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+    },
+    {
+      "path": "assets/campaign/mission_05-v2.jpg",
+      "sha256": "e8e49b0c7c5dd7a78bc90af38975793552b1abb024aecae73ad3414be1c26b7c",
+      "comparison": "generated_original",
+      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+    },
+    {
+      "path": "assets/campaign/mission_06-v2.jpg",
+      "sha256": "45032cf3846cd12f1709d68ea045599dcc157353980e57e63ae385abc3c31c06",
+      "comparison": "generated_original",
+      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
     }
   ],
   "historical_generation_evidence": {

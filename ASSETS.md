@@ -48,3 +48,14 @@ the final supply-starved assault. Each image was individually generated and
 visually inspected; unchanged PNGs and complete per-image prompts/hashes are
 under `art/campaign/candidates/`. Current game assets remain unchanged; actual
 briefing integration and presentation verification are still required.
+
+## Original campaign art integration (2026-10-10)
+
+All six campaign entries now reference `campaign/mission_01-v2.jpg` through
+`mission_06-v2.jpg`. These are JPEG encodings of the inspected original PNGs;
+mission2 uses the banner-freev3 source. FFmpeg9.0.1 scalar/single-thread commands
+and input/output hashes are in `art/campaign/runtime-derivatives-20261010.json`.
+The six runtime files total3.28MB, decode successfully and resolve from every
+campaign entry. Source PNGs remain unchanged. Actual native/browser briefing
+presentation is still pending. Legacy JPEGs are temporarily retained for sealed
+older validation programs and must be removed before final distribution.

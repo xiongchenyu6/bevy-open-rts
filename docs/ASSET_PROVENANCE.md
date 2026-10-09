@@ -127,3 +127,11 @@ visually inspected. They are illustrations, not gameplay screenshots, and are
 not referenced by the shipped game. A coherent six-image set, banner consistency
 and actual briefing UI presentation remain required before integration. These
 new records do not resolve the historical campaign art or other asset gaps.
+
+The six new runtime derivatives are now wired in the current campaign source.
+Raw original PNGs and complete records remain outside runtime assets; JPEG
+encoding records identify every derivative. Mission2's revised source removes
+the inconsistent geometric banners. All360 current inventory entries hash-check
+correctly. Fresh UI presentation remains pending; legacy campaign JPEGs are
+retained only for older sealed QA programs and require retirement before final
+packaging. Historical generation gaps and other icon/voice gaps remain explicit.

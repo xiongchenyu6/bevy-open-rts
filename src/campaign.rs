@@ -123,7 +123,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 },
             },
         ],
-        art: "campaign/mission_01.jpg",
+        art: "campaign/mission_01-v2.jpg",
     },
     MissionDef {
         id: "strike_the_outpost",
@@ -156,7 +156,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 },
             },
         ],
-        art: "campaign/mission_02.jpg",
+        art: "campaign/mission_02-v2.jpg",
     },
     MissionDef {
         id: "canyon_siege",
@@ -196,7 +196,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 },
             },
         ],
-        art: "campaign/mission_03.jpg",
+        art: "campaign/mission_03-v2.jpg",
     },
     MissionDef {
         id: "highland_bastion_stand",
@@ -262,7 +262,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 },
             },
         ],
-        art: "campaign/mission_04.jpg",
+        art: "campaign/mission_04-v2.jpg",
     },
     MissionDef {
         id: "twin_front",
@@ -327,7 +327,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 },
             },
         ],
-        art: "campaign/mission_05.jpg",
+        art: "campaign/mission_05-v2.jpg",
     },
     MissionDef {
         id: "thunder_decapitation",
@@ -382,7 +382,7 @@ pub(crate) const CAMPAIGN_MISSIONS: &[MissionDef] = &[
                 },
             },
         ],
-        art: "campaign/mission_06.jpg",
+        art: "campaign/mission_06-v2.jpg",
     },
 ];
 
