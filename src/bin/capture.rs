@@ -206,6 +206,14 @@ fn main() {
                 _ => Err("save-mines-resume needs evidence and output directories".into()),
             }
         }
+        #[cfg(not(target_arch = "wasm32"))]
+        Some("save-reject") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .ok_or("save-reject needs an output directory");
+            dir.and_then(|dir| save_flow::render_reject_old(&dir))
+        }
         Some("save-load") => {
             let dir = args
                 .next()
@@ -1506,6 +1514,86 @@ fn trace_campaign_construction(app: &mut App, id: &str, stage: &str) -> Result<(
     trace.write_all(b"\n").map_err(|error| error.to_string())
 }
 
+fn recover_abandoned_campaign_foundation(
+    app: &mut App,
+    structure_id: &str,
+    placed_at: Vec3,
+    observer: &mut Option<&mut dyn FnMut(&mut App)>,
+) -> Result<bool, String> {
+    let snapshot = bevy_open_rts::capture_construction_contact_debug(app);
+    let entities = snapshot["entities"]
+        .as_array()
+        .ok_or("missing construction entities")?;
+    let Some(site) = entities.iter().find(|entity| {
+        entity["team"].as_str() == Some("Player(0)")
+            && entity["structure"].as_str() == Some(structure_id)
+            && entity["construction_remaining"].as_f64().is_some()
+            && entity["health"].as_f64().is_some_and(|hp| hp > 0.0)
+            && entity["position"].as_array().is_some_and(|position| {
+                let x = position[0].as_f64().unwrap_or(f64::MAX) as f32;
+                let z = position[2].as_f64().unwrap_or(f64::MAX) as f32;
+                Vec3::new(x, 0.0, z).distance(placed_at) < 0.25
+            })
+    }) else {
+        return Ok(false);
+    };
+    let target = site["entity"].as_u64().ok_or("foundation entity missing")?;
+    if entities.iter().any(|entity| {
+        entity["team"].as_str() == Some("Player(0)")
+            && entity["unit"].as_str() == Some("Worker")
+            && entity["health"].as_f64().is_some_and(|hp| hp > 0.0)
+            && (entity["construct_target"].as_u64() == Some(target)
+                || entity["queued_construct_targets"]
+                    .as_array()
+                    .is_some_and(|targets| {
+                        targets.iter().any(|queued| queued.as_u64() == Some(target))
+                    }))
+    }) {
+        return Ok(false);
+    }
+    if !bevy_open_rts::capture_campaign_units(app)
+        .iter()
+        .any(|unit| unit.id == "Worker" && !unit.constructing)
+    {
+        return Ok(false);
+    }
+    campaign_bot::select_builder(app)?;
+    let builder = bevy_open_rts::capture_campaign_units(app)
+        .into_iter()
+        .find(|unit| unit.id == "Worker" && unit.selected)
+        .ok_or("recovery builder selection vanished")?
+        .entity
+        .to_bits();
+    println!("[capture] abandoned-foundation-recovery target={target} builder={builder}");
+    trace_campaign_construction(app, structure_id, "before-recovery-right-click")?;
+    capture_focus_camera_on(app, placed_at);
+    for _ in 0..8 {
+        observed_capture_step(app, observer);
+    }
+    let screen = capture_world_to_screen(app, placed_at).ok_or("recovery foundation offscreen")?;
+    capture_set_cursor(app, screen);
+    capture_mouse_button(app, MouseButton::Right, true);
+    observed_capture_step(app, observer);
+    capture_mouse_button(app, MouseButton::Right, false);
+    for _ in 0..6 {
+        observed_capture_step(app, observer);
+    }
+    let after = bevy_open_rts::capture_construction_contact_debug(app);
+    let current = after["entities"].as_array().and_then(|entities| {
+        entities
+            .iter()
+            .find(|entity| entity["entity"].as_u64() == Some(builder))
+    });
+    let assigned =
+        current.is_some_and(|entity| entity["construct_target"].as_u64() == Some(target));
+    println!(
+        "[capture] abandoned-foundation-recovery result target={target} builder={builder} alive={} assigned={assigned}",
+        current.is_some()
+    );
+    trace_campaign_construction(app, structure_id, "after-recovery-right-click")?;
+    Ok(true)
+}
+
 fn build_structure_with_input_mode(
     app: &mut App,
     structure_id: &'static str,
@@ -1669,6 +1757,14 @@ fn build_structure_with_input_mode(
             );
             continue;
         }
+        if observed_tab_keys {
+            let builders: Vec<_> = bevy_open_rts::capture_campaign_units(app)
+                .into_iter()
+                .filter(|unit| unit.id == "Worker" && unit.selected)
+                .map(|unit| unit.entity.to_bits())
+                .collect();
+            println!("[capture] placement-builder {structure_id}: {builders:?}");
+        }
         trace_campaign_construction(app, structure_id, "before-placement-click")?;
         capture_mouse_button(app, MouseButton::Left, true);
         observed_capture_step(app, &mut observer);
@@ -1697,6 +1793,7 @@ fn build_structure_with_input_mode(
     let completed = if observed_tab_keys {
         let mut complete =
             capture_player_completed_structure_count_for(app, structure_id) > completed_before;
+        let mut recovery_attempts = 0;
         for tick in 0..BUILD_COMPLETION_WAIT_TICKS {
             if complete || capture_match_phase_label(app) != "Running" {
                 break;
@@ -1708,6 +1805,23 @@ fn build_structure_with_input_mode(
                     structure_id,
                     &format!("construction-wait-{tick}"),
                 )?;
+                if recovery_attempts < 3 {
+                    match recover_abandoned_campaign_foundation(
+                        app,
+                        structure_id,
+                        placed_at,
+                        &mut observer,
+                    ) {
+                        Ok(true) => recovery_attempts += 1,
+                        Ok(false) => {}
+                        Err(error) => {
+                            recovery_attempts += 1;
+                            println!(
+                                "[capture] abandoned-foundation-recovery attempt failed: {error}"
+                            );
+                        }
+                    }
+                }
             }
             complete =
                 capture_player_completed_structure_count_for(app, structure_id) > completed_before;

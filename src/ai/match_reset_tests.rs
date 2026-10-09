@@ -150,3 +150,108 @@ fn loaded_match_transition_restores_all_saved_ai_director_state() {
         "loading must restore every saved timer, production cursor and opening-grace flag"
     );
 }
+
+fn enqueue_actual_paid_worker(app: &mut App) -> registry::Cost {
+    let world = app.world_mut();
+    let (entity, position) = world
+        .query::<(Entity, &Structure, &Team, &Transform)>()
+        .iter(world)
+        .find(|(_, structure, team, _)| {
+            structure.id == "CommandCenter" && **team == Team::Player(0)
+        })
+        .map(|(entity, _, _, transform)| (entity, transform.translation))
+        .unwrap();
+    let def = registry::entity("Worker").unwrap();
+    let faction = world
+        .resource::<PlayerFactions>()
+        .slot_faction(Team::Player(0));
+    let before = {
+        let economy = world.resource::<Economies>().get(Team::Player(0));
+        (economy.ore, economy.crystal)
+    };
+    world.resource_scope(|world, mut queue: Mut<BuildQueue>| {
+        let result = enqueue_build_jobs_for_producers(
+            Team::Player(0),
+            faction,
+            BuildAction::Train("Worker"),
+            def,
+            &[(entity, "CommandCenter", position)],
+            false,
+            &mut world.resource_mut::<Economies>(),
+            &mut queue,
+        );
+        assert!(matches!(result, EnqueueBuildActionResult::Enqueued));
+    });
+    let cost = world.resource::<BuildQueue>().0.last().unwrap().cost;
+    let economy = world.resource::<Economies>().get(Team::Player(0));
+    assert_eq!(
+        (economy.ore, economy.crystal),
+        (before.0 - cost.ore, before.1 - cost.crystal)
+    );
+    cost
+}
+
+#[test]
+fn fresh_match_transition_discards_previous_paid_queue_without_refunding() {
+    let mut app = started_app();
+    let baseline = {
+        let economy = app.world().resource::<Economies>().get(Team::Player(0));
+        (economy.ore, economy.crystal)
+    };
+    assert_eq!(baseline, (32, 16));
+    enqueue_actual_paid_worker(&mut app);
+    app.world_mut().resource_mut::<LatestBattleEvent>().focus = Some(Vec3::new(99.0, 0.0, 99.0));
+    restart_through_shared_scene(&mut app);
+    assert!(app.world().resource::<BuildQueue>().0.is_empty());
+    let economy = app.world().resource::<Economies>().get(Team::Player(0));
+    assert_eq!(
+        (economy.ore, economy.crystal),
+        baseline,
+        "previous match production must not refund into a new match"
+    );
+    assert!(app.world().resource::<LatestBattleEvent>().focus.is_none());
+}
+
+#[test]
+fn loaded_match_transition_restores_paid_queue_and_remaps_producer() {
+    let mut app = started_app();
+    let cost = enqueue_actual_paid_worker(&mut app);
+    let old_producer = app.world().resource::<BuildQueue>().0[0].producer_entity;
+    let save = collect_save_game(app.world_mut()).unwrap();
+    validate_save(&save).unwrap();
+    let balance = (save.economies[0].ore, save.economies[0].crystal);
+    let remaining = save.build_jobs[0].timer;
+    app.world_mut().resource_mut::<PendingLoadedSave>().0 = Some(save);
+    restart_through_shared_scene(&mut app);
+    let queue = app.world().resource::<BuildQueue>();
+    assert_eq!(queue.0.len(), 1);
+    let job = queue.0[0];
+    assert_ne!(job.producer_entity, old_producer);
+    assert_eq!(
+        app.world()
+            .get::<Structure>(job.producer_entity)
+            .unwrap()
+            .id,
+        "CommandCenter"
+    );
+    assert_eq!(job.cost.ore, cost.ore);
+    assert_eq!(job.cost.crystal, cost.crystal);
+    assert_eq!(job.timer, remaining);
+    let economy = app.world().resource::<Economies>().get(Team::Player(0));
+    assert_eq!(
+        (economy.ore, economy.crystal),
+        balance,
+        "restored job was already paid and must not charge or refund again"
+    );
+}
+
+#[test]
+fn fresh_match_transition_clears_previous_battle_event_focus() {
+    let mut app = started_app();
+    app.world_mut().resource_mut::<LatestBattleEvent>().focus = Some(Vec3::new(99.0, 0.0, 99.0));
+    restart_through_shared_scene(&mut app);
+    assert!(
+        app.world().resource::<LatestBattleEvent>().focus.is_none(),
+        "Space must not focus a battle event from the previous map"
+    );
+}

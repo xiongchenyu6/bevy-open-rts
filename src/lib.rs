@@ -2482,6 +2482,8 @@ pub fn add_shared_match_scene(app: &mut App) -> &mut App {
                 begin_match_from_setup,
                 reset_mission_triggers,
                 reset_ai_director,
+                reset_match_transient_resources,
+                reset_weather,
                 setup_support_cooldowns,
                 setup,
                 start_battle_music,
@@ -4036,6 +4038,15 @@ pub(crate) fn apply_match_setup_settings(
         setup_settings.player_faction(setup_settings.visible_player.team),
         setup_settings.startup_loadout,
     ));
+}
+
+/// Previous-match jobs must not refund into the new economy or retain old map focus.
+pub(crate) fn reset_match_transient_resources(
+    mut build_queue: ResMut<BuildQueue>,
+    mut latest_battle_event: ResMut<LatestBattleEvent>,
+) {
+    *build_queue = BuildQueue::default();
+    *latest_battle_event = LatestBattleEvent::default();
 }
 
 pub(crate) fn begin_match_from_setup(
