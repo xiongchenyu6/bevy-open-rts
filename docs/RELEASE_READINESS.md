@@ -10,12 +10,12 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Area | Required evidence | Accepted evidence and remaining work |
 | --- | --- | --- |
 | First session | Fresh profile completes gathering, power, barracks, training, movement, attack and victory; skip/replay work | Seven lessons and sandbox persistence pass at recorded checkpoints; normal-input skip/return/graduation/replay captured. Revalidate final package. |
-| Campaign | All six missions through normal controls in one App; correct objectives, retry/next/finale; persistent completion | Older separate-process six-mission prefix and pre-reset four-mission chain pass. Isolated M5 wins04:49/HQ20. Fresh lifecycle/atomic-queue tests pass; visible-only isolatedM5 wins05:32/HQ20 on8d391. Corrected six-mission same-App chain is live; full chain/final menu remain open. |
+| Campaign | All six missions through normal controls in one App; correct objectives, retry/next/finale; persistent completion | Older separate-process six-mission prefix and pre-reset four-mission chain pass. Isolated M5 wins04:49/HQ20. Fresh lifecycle/atomic-queue tests pass; visible-only isolatedM5 wins05:32/HQ20 on8d391. Visible-only same-App chain failed mission1; isolated visible-HQ/scouting retry also loses at172.8s. Full chain/final menu remain open. |
 | Save continuity | Fresh-process restoration of campaign triggers, orders, paid jobs, economy, fog, mines, temporary effects and support; safe missing/corrupt loads | First-wave campaign, paid jobs/fog/economy, harvest references, queued moves and F1/F5 effects pass in bounded runtime proofs. Fresh Mine11 mouseSave/newPIDLoad passes exact4HP, source/timer/index remap and unchanged bytes on reset-core pin. Broader effects, weather and final-format/package revalidation remain open. |
-| Interface | English default; coherent icons/tooltips; no clipping at supported sizes; browser inspected | Native cards/tooltips/save menu inspected at1280x720 and900x720; compact unit markers and single finale-map action captured. Fresh browser menu/setup/start/select/move inspected at1280x720/900x720 using software compositor; remaining overlays/final artifacts require review. |
+| Interface | English default; coherent icons/tooltips; no clipping at supported sizes; browser inspected | Native cards/tooltips/save menu inspected at1280x720 and900x720; compact unit markers and single finale-map action captured. Fresh browser menu/setup/start/select/move inspected at1280x720/900x720 using software compositor; All20 original semantic glyphs have bounded visual coverage:10 actual gameplay/menu and10 shared-UI presentation fixture at1280x720/900x650. Remaining overlays/final artifacts require review. |
 | Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Six original encoded illustrations are wired; native briefings1/2/3/5 and bounded result panels inspected. Remaining layouts, full presentation and audio remain open. |
-| Skirmish/balance | All maps/factions/difficulties/starts playable; reproducible repeated/independent-seed sweeps; no indefinite matches | Foundation-fix pin completes216/216 canonical cases with validated outcomes. Combat-damage checkpoint completes216/216 canonical cases, independently validated. Reset-core pin runs full3,726 ordered-start cases;27 overlapping fresh reports match the previous pin. Wider repetition, independent seeds and broad balance remain open. |
-| Delivery | Windows/Linux release archives launch without Rust/Nix from arbitrary directories; writable user data | Earlier optimized Linux package passes bounded hardware/input smoke. Windows GNU/Wine harness evidence exists. Current release packages, native Windows/MSVC and Steam Runtime remain open. |
+| Skirmish/balance | All maps/factions/difficulties/starts playable; reproducible repeated/independent-seed sweeps; no indefinite matches | Foundation-fix pin completes216/216 canonical cases with validated outcomes. Combat-damage checkpoint completes216/216 canonical cases, independently validated. The AI-compatible checkpoint runs3,726 ordered-start cases; prior reset-core run stopped after two timeouts, both standalone compatible-target rechecks now finish.27 overlapping fresh reset reports match the previous pin. Wider repetition, independent seeds and broad balance remain open. |
+| Delivery | Windows/Linux release archives launch without Rust/Nix from arbitrary directories; writable user data | Earlier optimized Linux package passes bounded hardware/input smoke. Windows GNU/Wine harness evidence exists. Current Linux candidate builds/packages with360 exact asset hashes and enters normal32/16 skirmish via real pointer in a read-only no-Nix Ubuntu/AMD environment. Pause/save/load, native Windows/MSVC and Steam Runtime remain open. |
 | Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Real EMP application regressions pass3/3; prior full suite178/0/1. Three new combat-damage regressions pass; fresh/load transition regressions2/2 and updated full suite196/0/1 pass; shared native build passes; final-package/runtime acceptance remains incomplete. No representative combat performance or long-session acceptance yet. |
 | Distribution | Accurate store copy, provenance/licenses/generated inventory and store-ready media | Unpublished store draft and partial provenance audit exist. Art/audio rights gaps and final media remain open. |
 
@@ -268,8 +268,10 @@ map scouting. Paid production and crystal-field protection preserve the economy.
 The single-App six-mission run `rts-campaign-chain-visible-only-01` failed
 in mission1 after completing mission0. Its strategic target selection returned
 to incidental visible units instead of continuing unexplored-sector scouting.
-The next capture-only fix targets visible Command Centers and advances scouting
-from own-army arrival; a complete six-mission pass remains unproven.
+The capture-only fix targets visible Command Centers and advances scouting
+from own-army arrival. Its isolated retry also fails at172.8s: no Tanks remain
+and enemy HQ retains20HP. Both failures are preserved; no core balance defect
+is established, and a complete six-mission pass remains unproven.
 
 The current Linux thin-LTO candidate completed with explicit Rust1.95, locked
 dependencies and one Cargo job: actual exit0 in23m22s, source hashes unchanged.
@@ -280,7 +282,10 @@ records archive SHA256 and all360 runtime assets passing exact-set/hash checks.
 Actual package launch renders its main menu on AMD RADV RENOIR/Mesa25.2.8
 in read-only Ubuntu24.04 without a Nix mount. GLES Sway retry exits0; the
 initial pixman compositor attempt failed surface creation and remains retained.
-Screenshot review shows Enter/F10 remained at the main menu, so match input,
-audio and combat-performance acceptance have not passed. Evidence:
-`target/linux-current-runtime-gles-20261010/visual-review.json`. Windows, Steam Runtime and distribution-library obligations remain
+Initial screenshot review showed short-lived keyboard input did not activate
+Enter/F10. A persistent virtual pointer then clicked Skirmish and Start Match:
+actual normal32/16 gameplay, Command Center and Workers render correctly.
+`target/linux-current-runtime-pointer-match-20261010/visual-review.json` records
+this bounded release-package startup evidence. Pause/save/load, audible output
+and combat-performance acceptance remain open. Windows, Steam Runtime and distribution-library obligations remain
 open; building and packaging alone do not close delivery.
