@@ -6,14 +6,14 @@ use bevy_open_rts::{
 };
 use serde_json::Value;
 
-fn sandbox_save() -> Result<PathBuf, String> {
+pub(super) fn sandbox_save() -> Result<PathBuf, String> {
     let root = env::var_os("XDG_DATA_HOME")
         .map(PathBuf::from)
         .filter(|p| p.is_absolute())
         .ok_or("save-effects requires isolated absolute XDG_DATA_HOME")?;
     Ok(root.join("bevy-open-rts/quicksave.ron"))
 }
-fn menu(app: &mut App, load: bool) -> Result<(), String> {
+pub(super) fn menu(app: &mut App, load: bool) -> Result<(), String> {
     tap_key(app, KeyCode::Escape);
     for _ in 0..8 {
         app.update();
@@ -36,7 +36,7 @@ fn setup_click(app: &mut App, action: &str) -> Result<(), String> {
     }
     Ok(())
 }
-fn start() -> Result<App, String> {
+pub(super) fn start() -> Result<App, String> {
     let mut app = build_capture_app(WIDTH, HEIGHT);
     wait_for_startup(&mut app)?;
     for action in ["play", "faction", "chaos", "opponent", "beginner", "start"] {
@@ -72,7 +72,7 @@ fn reveal(state: &Value) -> Option<&Value> {
 fn number(value: &Value) -> f64 {
     value.as_f64().unwrap()
 }
-fn focus(app: &mut App, at: Vec3) {
+pub(super) fn focus(app: &mut App, at: Vec3) {
     capture_set_cursor(app, Vec2::new(WIDTH as f32 * 0.5, HEIGHT as f32 * 0.5));
     capture_focus_camera_on(app, at.with_y(0.0));
     for _ in 0..2 {

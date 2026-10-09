@@ -26,6 +26,11 @@ pub use save_effects::{
     capture_disk_effect_state, capture_effect_setup_button, capture_live_effect_state,
 };
 
+#[cfg(not(target_arch = "wasm32"))]
+mod save_mines;
+#[cfg(not(target_arch = "wasm32"))]
+pub use save_mines::{capture_disk_mine_state, capture_live_mine_state};
+
 /// Returns true once startup assets have loaded and the front menu is active.
 ///
 /// The capture binary drives Bevy faster than wall-clock time. Polling this

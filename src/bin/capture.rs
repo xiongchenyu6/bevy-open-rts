@@ -41,6 +41,10 @@ mod save_orders;
 #[path = "capture/save_effects.rs"]
 mod save_effects;
 
+#[cfg(not(target_arch = "wasm32"))]
+#[path = "capture/save_mines.rs"]
+mod save_mines;
+
 use bevy_open_rts::{
     CaptureTarget, build_capture_app, build_model_harness_capture_app, capture_active_mission,
     capture_art_combat_evidence, capture_boot_camp_button, capture_boot_camp_label,
@@ -182,6 +186,24 @@ fn main() {
             ) {
                 (Some(evidence), Some(dir)) => save_effects::resume(&evidence, &dir),
                 _ => Err("save-effects-resume needs evidence and output directories".into()),
+            }
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        Some("save-mines") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/save-mines"));
+            save_mines::create(&dir)
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        Some("save-mines-resume") => {
+            match (
+                args.next().map(PathBuf::from),
+                args.next().map(PathBuf::from),
+            ) {
+                (Some(evidence), Some(dir)) => save_mines::resume(&evidence, &dir),
+                _ => Err("save-mines-resume needs evidence and output directories".into()),
             }
         }
         Some("save-load") => {
