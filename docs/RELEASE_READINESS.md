@@ -15,7 +15,7 @@ build. Previous visual fixes and green unit tests do not establish that goal.
 | Art/audio | Fresh menu, base, economy, combat, defeat/victory captures; readable silhouettes; commands/music/volume controls verified | Prior material pass only; further review required |
 | Skirmish/balance | All shipped maps/factions/difficulties playable; reproducible multi-seed difficulty and faction sweeps; no indefinite matches | Old canonical72 complete; old difficulty144 has5 timeouts. Current paid-AI targeted10 complete, including all5 former timeouts; current216 sweep active. Alternate starts/seeds remain open |
 | Delivery | Windows and Linux archives launch from arbitrary working directories without Rust/Nix; writable user saves/config | Corrected Linux development archive starts in no-Nix/read-only Ubuntu; matching separate harness passes save recovery; Windows GNU compiles and Wine menu/save recovery render correctly; native Windows/release profile/Steam Runtime/hardware pending |
-| Reliability | Full tests, packaged-build smoke, long matches and measured performance on supported hardware | Current library suite170 passed/0 failed/1 network-dependent ignored; earlier packaged startup passes; standard release OOM retained; current release/performance gates outstanding |
+| Reliability | Full tests, packaged-build smoke, long matches and measured performance on supported hardware | Current library suite172 passed/0 failed/1 network-dependent ignored; earlier packaged startup passes; standard release OOM retained; current release/performance gates outstanding |
 | Distribution | Accurate feature/system-requirement copy, asset provenance/licenses and generated-content inventory; store-ready media | Restricted logo removed; upstream/font notices added; unresolved art/audio provenance in ASSET_PROVENANCE.md |
 
 ## Verification policy
@@ -396,3 +396,16 @@ ordinary simulation removes both effects. Logs
 This proves Radar reveal, one Worker Shield Overdrive buff, their timers and
 cooldowns. Shield combat mitigation, other buffs, delayed strikes and mines
 are separate acceptance gates; this capture does not establish them.
+
+## EMP task preservation regression
+
+The mission5 first-frame trace proves that the selected Worker is temporarily
+EMP-disabled when the AA foundation is placed. The old construction update
+deleted its task immediately; harvesting had the same cancellation behavior.
+Both systems now pause while EMP is active and retain the task.
+`logs/emp-task-focused.log` passes two actual-status-expiry regressions: paid
+construction completes after expiry, and harvesting retains its mineral, cargo
+and progress before resuming collection. The full current library suite passes
+172 tests,0 failures,1 ignored in96.76s (`logs/emp-task-full.log`).
+The initial failed compile is preserved separately. Current mission5 gameplay
+and the full same-App campaign still require new-build runtime acceptance.
