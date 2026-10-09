@@ -92,7 +92,9 @@ weather checks pass, including actual mid-fade save/load/advance and real restar
 the coordinated full suite passes190/0/1. Older format2 saves are rejected with
 a clear incompatibility message and require a new match. No migration layer is
 provided. The runtime proofs below belong to their historical format2 binary
-checkpoints; current format3 actual orders/effects/mines revalidation is pending.
+checkpoints. Current format3 actual orders/effects/mines revalidation passes on
+the sealed f58e08 capture checkpoint; this is bounded functional evidence, not
+acceptance of subsequent HUD contrast changes.
 
 Actual mouse Save and new-process Load preserve harvest references, two queued
 moves, economy and mineral depletion (`save-orders-{create,resume}-06`). Paid
@@ -115,6 +117,26 @@ Fresh-current Mine11 now passes normal paid creation, mouse Save and new-PID
 mouse Load, preserving source/timers/index and unchanged bytes before exact
 4HP damage. This closes the bounded Chaos LandMine continuity gate, not every
 status effect or final-package acceptance.
+
+Current format3 normal mouse Save/new-process Load passes all three bounded
+flows (`save-{orders,effects,mines}-schema3-{create,resume}-01`). All six child
+results are0 with valid observations, distinct creator/loader PIDs, unchanged
+save bytes and inspected screenshots. Orders remap harvest targets, consume
+two queued waypoints and advance ore32→38. F1 RadarSweep/F5 ShieldOverdrive
+remap target17179868665→12884900677, preserve timers/cooldowns and expire
+normally. Mines remap source446676596757→12884901309 and mine73014442576→
+12884900726; arming0.150000→0.116667 and cooldown2.133333→2.100000 preserve
+index7 over0.033340s, followed by exact player pulse and WorkerHP6→2.
+Capture SHA256 is `f58e08a3054eda63952b847238de9b2a98a547fcbf1c03ebcb05a18e4a555e3f`;
+result JSONs and observations are under `logs/` and `screenshots/steam-quality/`.
+Broader status effects, shield combat mitigation and final-package acceptance
+remain open.
+
+The actual full format2 Mine11 file also passes normal mouse Load rejection
+(`save-schema-reject-01`): clear incompatibility feedback is visible, the paused
+match is unchanged, and original/copied SHA256 remains
+`858d007e09d85996cf6ac92a035ebbc1ff8ba52d75c666b51d4d03e8d7b46a07`.
+The screenshot was inspected; child3504123 returns0 with valid observations.
 
 ## Skirmish and AI
 
