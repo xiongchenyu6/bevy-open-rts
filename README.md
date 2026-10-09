@@ -190,7 +190,8 @@ Generated outputs:
   or use **Ctrl+S / Ctrl+L**. **F10** toggles tactical pause. Match saves and
   campaign completion use your per-user data directory.
 - Radar Sweep reveals, Shield Overdrive buffs and their cooldowns resume
-  with their remaining time when an offline desktop match is loaded.
+  with their remaining time when an offline desktop match is loaded. Paid
+  Chaos mines also retain their source, arming time and deployment progress.
 
 ## Model Harness
 

@@ -101,8 +101,11 @@ Current-core migration09 loads the unchanged real Mine07 save in an isolated
 profile/new PID, remaps source and mine, preserves timers/index7, and observes
 that exact mine disappear with its player pulse and enemyHP6→2.0. Original and
 copied bytes remain identical. This proves the causal damage fix and older-save
-migration. Fresh-current creation08 fails eligibility after normal mines kill
-the target Worker; complete fresh-current Save/Load acceptance remains open.
+migration. Failed fresh creation08 and resource-snapped Rally10 remain recorded.
+Fresh-current Mine11 now passes normal paid creation, mouse Save and new-PID
+mouse Load, preserving source/timers/index and unchanged bytes before exact
+4HP damage. This closes the bounded Chaos LandMine continuity gate, not every
+status effect or final-package acceptance.
 
 ## Skirmish and AI
 
@@ -186,35 +189,35 @@ rights gaps remain open; source membership alone is not commercial permission.
 Preserve user-modified `flake.lock`, original AGENTS.md and ignored full-font
 source. No Steam upload or external publication has occurred.
 
-## Bounded real-save migration and mine damage regression
+## Paid mine Save/Load evidence
 
-The actual normally paid Mine07 save, produced by mouse controls, is copied
-byte-for-byte into a new isolated XDG sandbox and loaded through the mouse menu
-in a fresh process on the corrected core. This is an old-real-save→new-core
-migration and causal damage regression; it does not replace failed current
-creation08 or close the full fresh-save gate.
+Fresh Mine11 uses normal Chaos resources plus real6crystal harvesting, paid
+prerequisites, a forward relay/factory and two MineLayers (total29ore16crystal;
+saved economy3ore6crystal). Real ShieldTrooper scouting/attack and displayed
+Rally controls reach a visible healthy Ore Worker. Mouse Save and fresh-process
+mouse Load use distinct PIDs3443650/3447197; both runner results are child0 with
+valid schema (`logs/save-mines-{create,resume}-11-result.json`). Capture SHA256:
+`7fe3cb8024e48b7557df1695a917c5bc47a5e0a47c434840edee32bf8140933e`.
 
-`logs/save-mines-migration-resume-09-result.json` records child0, valid schema,
-PID3364171 versus real creator3264555, and capture SHA256
-`ac27f9ff0e99d276c36b4759a238347ed944590f7b4d3757a5760f09f08aed23`.
-`screenshots/steam-quality/save-mines-migration-resume-09/observations.json`
-records layer206158428216→12884901309 and mine867583392440→12884900465.
-Across the real0.033333-second first load frame, arming0.183333→0.150000 and
-layer cooldown2.133333→2.100000 retain deployment index7. The restored mine
-then disappears and emits a player pulse from its exact location to the enemy
-Worker, whose HP changes6→2. The strict4HP assertion passes unchanged.
-Restored and triggered screenshots were inspected.
+Layer206158428900→12884901309 and mine622770255756→12884900726 remap. Over
+the first0.033340-second load frame, arming0.150000→0.116667 and source
+cooldown2.133333→2.100000 preserve index7. The loaded mine disappears with
+a player pulse from its exact position to the Worker, whose HP changes6→2;
+the strict4HP assertion passes. Observations and inspected Saved/Restored/
+Triggered PNGs are in `screenshots/steam-quality/save-mines-{create,resume}-11`.
+Original quicksave bytes remain SHA256
+`858d007e09d85996cf6ac92a035ebbc1ff8ba52d75c666b51d4d03e8d7b46a07`.
 
-The original and copied quicksave remain SHA256
-`a78b22b1a38e6e8deea0844f84b0395e257e805311975ad7d59ded6a8d168b50` after
-loading. Provenance is in
-`target/save-mines-migration-sandbox-20261010-09/original-save-provenance.json`.
-No save editing, injected resources/units/timers, or compatibility layer is used.
+Earlier failures remain recorded, including creation08 eligibility and Rally10
+resource snapping. Migration09 independently loads the unchanged real Mine07
+save on the corrected core and passes exact4HP damage; its observations/logs
+remain under `save-mines-migration-resume-09`. No save editing, injected
+resources/units/orders/timers, or compatibility layer is used. This evidence
+covers Chaos LandMine continuity alongside F1/F5 and order proofs; broader
+status effects and final-package acceptance remain open.
 
-The native proof runner persists the actual child return code, PID, executable
-hash and observation-schema outcome. It refuses existing output/log/result
-paths and terminates a timed-out child with recorded exit124. Negative checks
-retain evidence in `target/mine-runner-check-n5ex9f8z`: child1 propagates1;
-child0 without observations fails2; existing paths preserve their original
-bytes; an actual hanging child is terminated and reaped. Asynchronous service
-launch success is never treated as proof success.
+The native runner records actual child code/PID/hash/schema, refuses existing
+output/log/result paths and terminates timed-out children with exit124. Negative
+checks in `target/mine-runner-check-n5ex9f8z` verify child1 propagation, missing
+observations failure2, existing-file preservation and real child timeout/reaping.
+Asynchronous service launch success is never proof success.

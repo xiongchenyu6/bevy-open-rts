@@ -276,12 +276,115 @@ pub(super) fn prepare(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Resu
     }) {
         return Err("paid mine-layer did not finish training".into());
     }
-    let layer = capture_campaign_units(app)
+    let first_layer = capture_campaign_units(app)
         .into_iter()
         .find(|u| u.id == "DroneMineLayer")
         .unwrap()
         .entity
         .to_bits();
+    if !wait_until(app, 300, |a| {
+        capture_live_mine_state(a).is_ok_and(|s| {
+            actor(&s, first_layer)
+                .is_some_and(|u| u["layer"][1].as_u64().is_some_and(|index| index >= 4))
+        })
+    }) {
+        return Err("first paid Layer did not deploy its normal opening mines".into());
+    }
+    let first_deployment = capture_live_mine_state(app)?;
+    write(
+        dir,
+        "04_first_layer_deployment.json",
+        first_deployment.clone(),
+    )?;
+    let ore_worker = first_deployment["units"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|u| {
+            u["team"] == 1
+                && u["id"] == "Worker"
+                && u["visible"] == true
+                && u["health"].as_f64().is_some_and(|hp| hp >= 5.99)
+        })
+        .max_by(|a, b| point(&a["position"]).x.total_cmp(&point(&b["position"]).x))
+        .ok_or("visible healthy Ore Worker unavailable for second paid Layer")?;
+    let ore_position = point(&ore_worker["position"]).with_y(0.0);
+    let ore_node = capture_campaign_resources(app)
+        .into_iter()
+        .filter(|r| r.kind == "ore" && r.position.x > 0.0)
+        .min_by(|a, b| {
+            distance(a.position, ore_position).total_cmp(&distance(b.position, ore_position))
+        })
+        .ok_or("visible Ore node approach unavailable")?;
+    // The outermost visible Ore Worker has open terrain to its east. Avoid
+    // clicking inside the nearby resource cluster, which correctly snaps the
+    // rally to a resource target rather than accepting the ground waypoint.
+    let corridor = ore_position + Vec3::X * 1.5;
+    if capture_campaign_resources(app)
+        .iter()
+        .any(|r| distance(r.position, corridor) < 1.7)
+    {
+        return Err(
+            "second Layer terrain approach still overlaps visible resource click radius".into(),
+        );
+    }
+    println!("[capture] second Layer open-terrain Rally east of visible Ore Worker");
+    save_effects::focus(app, factory.position);
+    let factory_screen = capture_world_to_screen(app, factory.click_position)
+        .ok_or("factory offscreen for second training")?;
+    capture_click_screen(app, factory_screen, MouseButton::Left);
+    if !capture_entity_is_selected(app, factory.entity) {
+        return Err("second paid Layer factory selection failed".into());
+    }
+    let rally = bevy_open_rts::capture_first_enabled_rally_hotkey(app)
+        .ok_or("second Layer Rally shortcut unavailable")?;
+    tap_key(app, rally);
+    click(app, corridor, MouseButton::Right)?;
+    let second_rally = capture_live_mine_state(app)?;
+    let factory_rally = second_rally["structures"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|u| u["key"].as_u64() == Some(factory.entity.to_bits()))
+        .unwrap();
+    write(
+        dir,
+        "05_second_rally_attempt.json",
+        serde_json::json!({"wanted":corridor.to_array(),"visible_ore_node":ore_node.position.to_array(),"observed":factory_rally["rally"],"factory_selected":capture_entity_is_selected(app,factory.entity),"state":second_rally}),
+    )?;
+    if factory_rally["rally"]
+        .as_array()
+        .is_none_or(|r| distance(point(&r[0]), corridor) > 0.1)
+    {
+        return Err("second Layer real Rally did not match Ore approach".into());
+    }
+    let second_train = capture_enabled_train_hotkey_for(app, "DroneMineLayer")
+        .ok_or("second paid Layer training shortcut unavailable")?;
+    let before_second_train = capture_live_mine_state(app)?;
+    tap_key(app, second_train);
+    let paid_second_train = capture_live_mine_state(app)?;
+    if before_second_train["ore"].as_i64().unwrap() - paid_second_train["ore"].as_i64().unwrap()
+        != 4
+        || before_second_train["crystal"].as_i64().unwrap()
+            - paid_second_train["crystal"].as_i64().unwrap()
+            != 3
+    {
+        return Err("second Layer did not pay normal4ore3crystal".into());
+    }
+    if !wait_until(app, 600, |a| {
+        capture_campaign_units(a)
+            .iter()
+            .any(|u| u.id == "DroneMineLayer" && u.entity.to_bits() != first_layer)
+    }) {
+        return Err("second paid Layer did not complete".into());
+    }
+    let layer = capture_campaign_units(app)
+        .into_iter()
+        .find(|u| u.id == "DroneMineLayer" && u.entity.to_bits() != first_layer)
+        .unwrap()
+        .entity
+        .to_bits();
+    println!("[capture] second paid Layer targets visible healthy Ore Worker");
     if !wait_until(app, 1500, |a| {
         capture_live_mine_state(a).is_ok_and(|s| pending_mine(&s, layer, corridor).is_some())
     }) {
@@ -314,6 +417,6 @@ pub(super) fn prepare(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Resu
         .ok_or("selected mine triggered before mouse Save")?;
     let mine_key = saved["key"].as_u64().unwrap();
     Ok(
-        serde_json::json!({"process_id":std::process::id(),"initial":initial,"harvested":harvested,"scouted":scouted,"before_relay":before_relay,"paid_relay":paid_relay,"before_factory":before_factory,"paid_factory":paid_factory,"before_train":before_train,"paid_train":paid_train,"layer_key":layer,"mine_key":mine_key,"corridor":corridor.to_array(),"expected":expected}),
+        serde_json::json!({"process_id":std::process::id(),"initial":initial,"harvested":harvested,"scouted":scouted,"before_relay":before_relay,"paid_relay":paid_relay,"before_factory":before_factory,"paid_factory":paid_factory,"before_train":before_train,"paid_train":paid_train,"first_layer_key":first_layer,"first_deployment":first_deployment,"second_rally":second_rally,"before_second_train":before_second_train,"paid_second_train":paid_second_train,"layer_key":layer,"mine_key":mine_key,"corridor":corridor.to_array(),"expected":expected}),
     )
 }
