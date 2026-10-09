@@ -1572,21 +1572,18 @@ pub(crate) fn progress_under_construction_structures(
         &Team,
         &Transform,
         Option<&VisualFaction>,
-        &mut Health,
-        &mut UnderConstruction,
+        &Health,
+        &UnderConstruction,
     )>,
 ) {
     let player_team = visible_player_team(visible_player.as_deref());
-    for (entity, structure, team, transform, visual_faction, mut health, construction) in
+    for (entity, structure, team, transform, visual_faction, health, construction) in
         &mut structures
     {
-        let progress = structure_construction_progress(*construction);
-        health.current = structure_construction_health(health.max, progress);
-        if construction.remaining > 0.0 {
+        if construction.remaining > 0.0 || health.current <= 0.0 {
             continue;
         }
 
-        health.current = health.max;
         commands.entity(entity).try_remove::<UnderConstruction>();
         spawn_construction_complete_flash(
             &mut commands,

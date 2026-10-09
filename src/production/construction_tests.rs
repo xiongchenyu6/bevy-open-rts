@@ -446,3 +446,149 @@ fn constructor_walks_past_allied_army_and_completes_without_crossing_static_foot
     assert!(app.world().get::<ConstructOrder>(worker).is_none());
     assert_eq!(app.world().get::<Health>(foundation).unwrap().current, 8.0);
 }
+
+#[test]
+fn stalled_foundation_retains_damage_and_does_not_revive() {
+    let mut app = construction_test_app();
+    let mut sites = Vec::new();
+    for current in [4.0, 0.0] {
+        sites.push(
+            app.world_mut()
+                .spawn((
+                    Structure { id: "PowerReactor" },
+                    Team::Player(0),
+                    Transform::default(),
+                    Health { current, max: 12.0 },
+                    UnderConstruction {
+                        remaining: 0.5,
+                        total: 1.0,
+                        cost: registry::Cost { ore: 3, crystal: 1 },
+                        free_worker_origin: None,
+                    },
+                ))
+                .id(),
+        );
+    }
+    for _ in 0..30 {
+        app.update();
+    }
+    assert_eq!(app.world().get::<Health>(sites[0]).unwrap().current, 4.0);
+    assert_eq!(app.world().get::<Health>(sites[1]).unwrap().current, 0.0);
+    for site in sites {
+        assert_eq!(
+            app.world()
+                .get::<UnderConstruction>(site)
+                .unwrap()
+                .remaining,
+            0.5
+        );
+    }
+}
+
+#[test]
+fn construction_growth_and_completion_preserve_received_damage() {
+    let mut construction = UnderConstruction {
+        remaining: 0.5,
+        total: 1.0,
+        cost: registry::Cost { ore: 3, crystal: 1 },
+        free_worker_origin: None,
+    };
+    // Half-built cap is 6.5 HP. A previous hit removed 2.5 HP.
+    let mut health = Health {
+        current: 4.0,
+        max: 12.0,
+    };
+    apply_structure_construction_progress(&mut construction, &mut health, 10.0);
+    assert_eq!(construction.remaining, 0.0);
+    assert_eq!(health.current, 9.5);
+    let mut app = construction_test_app();
+    let site = app
+        .world_mut()
+        .spawn((
+            Structure { id: "PowerReactor" },
+            Team::Player(0),
+            Transform::default(),
+            health,
+            construction,
+        ))
+        .id();
+    app.update();
+    assert!(app.world().get::<UnderConstruction>(site).is_none());
+    assert_eq!(app.world().get::<Health>(site).unwrap().current, 9.5);
+}
+
+#[test]
+fn live_weapons_destroy_an_unworked_foundation() {
+    let mut app = build_game_app(GameAppMode::Headless);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
+    ));
+    app.world_mut()
+        .resource_mut::<MatchSetupSettings>()
+        .player_controllers
+        .fill(SkirmishPlayerController::Human);
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::InMatch);
+    for _ in 0..8 {
+        app.update();
+    }
+    let site = app
+        .world_mut()
+        .spawn((
+            Structure { id: "PowerReactor" },
+            Team::Player(1),
+            Transform::default(),
+            Selectable { radius: 1.45 },
+            MovementDomain::Terrain,
+            Health {
+                current: 6.5,
+                max: 12.0,
+            },
+            UnderConstruction {
+                remaining: 0.5,
+                total: 1.0,
+                cost: registry::Cost { ore: 3, crystal: 1 },
+                free_worker_origin: None,
+            },
+        ))
+        .id();
+    let def = registry::entity("ScoutRover").unwrap();
+    let w = def.weapon.unwrap();
+    app.world_mut().spawn((
+        Unit {
+            id: def.id,
+            speed: def.speed,
+            can_crush: def.can_crush,
+            can_be_crushed: def.can_be_crushed,
+        },
+        Team::Player(0),
+        Transform::from_xyz(3.0, 0.05, 0.0),
+        Selectable { radius: def.radius },
+        MovementDomain::Terrain,
+        Health::new(def.health),
+        VisionRadius(8.0),
+        Weapon::new(
+            w.range,
+            w.damage,
+            w.cooldown,
+            w.splash_radius,
+            w.splash_damage_multiplier,
+            w.structure_damage_multiplier,
+            w.can_attack_air,
+            w.can_attack_ground,
+        ),
+        HoldPosition { enabled: true },
+        AttackOrder { target: site },
+    ));
+    for _ in 0..600 {
+        app.update();
+        if app.world().get::<Health>(site).is_none() {
+            return;
+        }
+    }
+    panic!(
+        "ordinary repeated weapon hits did not destroy the idle foundation: HP {:?}",
+        app.world().get::<Health>(site).map(|health| health.current)
+    );
+}

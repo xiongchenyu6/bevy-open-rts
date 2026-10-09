@@ -4730,11 +4730,18 @@ pub(crate) fn apply_structure_construction_progress(
     health: &mut Health,
     delta_seconds: f32,
 ) {
+    if health.current <= 0.0 {
+        return;
+    }
+    let previous_cap =
+        structure_construction_health(health.max, structure_construction_progress(*construction));
+    let damage = (previous_cap - health.current).max(0.0);
     construction.remaining = (construction.remaining
         - STRUCTURE_CONSTRUCTION_PROGRESS_PER_SECOND * delta_seconds)
         .max(0.0);
     let progress = structure_construction_progress(*construction);
-    health.current = structure_construction_health(health.max, progress);
+    health.current =
+        (structure_construction_health(health.max, progress) - damage).clamp(0.0, health.max);
 }
 
 pub(crate) fn structure_is_constructed(under_construction: Option<&UnderConstruction>) -> bool {

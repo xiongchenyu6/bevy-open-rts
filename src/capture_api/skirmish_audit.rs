@@ -205,6 +205,8 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
                         "unit":world.get::<Unit>(order.target).map(|target|target.id),
                         "structure":world.get::<Structure>(order.target).map(|target|target.id),
                         "health":world.get::<Health>(order.target).map(|target|target.current),
+                        "construction":world.get::<UnderConstruction>(order.target).map(|site|
+                            serde_json::json!({"remaining":site.remaining,"total":site.total})),
                         "team":world.get::<Team>(order.target).map(|team|team.economy_index()),
                     })),
                     "weapon":world.get::<Weapon>(entity).map(|weapon|serde_json::json!({
