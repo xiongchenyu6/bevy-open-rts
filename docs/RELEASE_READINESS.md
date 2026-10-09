@@ -10,7 +10,7 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Area | Required evidence | Accepted evidence and remaining work |
 | --- | --- | --- |
 | First session | Fresh profile completes gathering, power, barracks, training, movement, attack and victory; skip/replay work | Seven lessons and sandbox persistence pass at recorded checkpoints; normal-input skip/return/graduation/replay captured. Revalidate final package. |
-| Campaign | All six missions through normal controls in one App; correct objectives, retry/next/finale; persistent completion | Older fresh-process six-mission prefix and current four-mission chain pass. Actual Restart resets/replays triggers. Current M5 loses at106.8s despite verified persistent Hold and completed defenses; normal counter-artillery tactics and full chain remain incomplete. |
+| Campaign | All six missions through normal controls in one App; correct objectives, retry/next/finale; persistent completion | Older fresh-process six-mission prefix and current four-mission chain pass. Actual Restart resets/replays triggers. Current M5 counter-artillery recipe wins at289.1s with HQ20HP; six-mission same-App chain and final persistence/menu remain pending. |
 | Save continuity | Fresh-process restoration of campaign triggers, orders, paid jobs, economy, fog, mines, temporary effects and support; safe missing/corrupt loads | First-wave campaign, paid jobs/fog/economy, harvest references, queued moves and F1/F5 effects pass in bounded runtime proofs. Real older-save→current-core mine migration passes exact4HP triggering; fresh-current creation and broader status/damage effects remain open. |
 | Interface | English default; coherent icons/tooltips; no clipping at supported sizes; browser inspected | Native cards/tooltips/save menu inspected at1280x720 and900x720; compact unit markers and single finale-map action captured. Fresh browser menu/setup/start/select/move inspected at1280x720/900x720 using software compositor; remaining overlays/final artifacts require review. |
 | Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Six original encoded illustrations are wired; mission5 native briefing inspected. Other images/layouts/audio remain open. |
@@ -46,13 +46,18 @@ prefixes. They do not prove the required same-App chain. Current paid-AI runs
 complete missions1–4. Real menu Restart resets clock45.066→0.033, enemy HMG3→0
 and fired flags; the normal wave replays at45.066.
 
-Current capture pin `ac27f9ff` loses mission5 at106.8s. All nine sites complete
-by79.0s, power44/use27, and the army reaches9 Tanks/3 HMG/3 Rockets/4 Workers.
-Hold remains active on surviving combat units; no accidental toggle causes the
-loss. Enemy ground artillery outranges the stationary Tanks, destroys defenses
-and workers, then HQ. A normal input counter-artillery recipe is being prepared;
-no mission stats, enemy waves or costs have been weakened. See
-[campaign QA](CAMPAIGN_QA.md) for raw failed attempts.
+Current capture pin `f6069ba1` wins mission5 at289.117s through normal inputs,
+paid production and live attack-move responses to ground artillery/Jammers.
+HQ remains20HP and all four Workers survive. The actual child exits0,
+telemetry records HumanVictory, and `02_victory.png` displays04:49 and Next Mission
+under `screenshots/steam-quality/current-campaign-twin-live-ground-response`.
+This is isolated mission5 evidence; the six-mission same-App chain, six exact
+persisted prefixes and fresh final menu remain pending.
+
+Earlier stationary-Hold pin `ac27f9ff` loses at106.8s despite completed defenses,
+adequate power and correctly held combat units. Its ground-artillery defeat is
+preserved, not reclassified. No mission stats, enemy waves or costs have been
+weakened. See [campaign QA](CAMPAIGN_QA.md).
 
 ## Save and combat continuity
 
