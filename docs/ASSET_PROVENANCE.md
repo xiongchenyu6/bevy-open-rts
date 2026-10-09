@@ -117,3 +117,13 @@ manifest changed. Evidence: `logs/unused-crosshairs-removal.json`.
 Older checkpoint archives still contain the old assets and remain distinct;
 new packages must be staged from the cleaned current tree. Other unresolved
 icon, voice and generated-content evidence above remains open.
+
+## New campaign illustration candidates
+
+Original built-in imagegen candidates for missions1 and2 are under
+`art/campaign/candidates/`, each with the exact prompt, unchanged output hash,
+recorded time and explicit unavailable model-version/seed fields. Both were
+visually inspected. They are illustrations, not gameplay screenshots, and are
+not referenced by the shipped game. A coherent six-image set, banner consistency
+and actual briefing UI presentation remain required before integration. These
+new records do not resolve the historical campaign art or other asset gaps.

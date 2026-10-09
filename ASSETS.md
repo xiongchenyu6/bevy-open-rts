@@ -34,3 +34,10 @@ RGB8 output is copied unchanged; prompt/tool/time/hash details are in the
 sibling provenance JSON. It is not referenced by the game or shipped assets,
 and it is an illustration rather than a gameplay screenshot. Existing mission
 art remains unchanged until a coherent set and actual UI presentation pass.
+
+`art/campaign/candidates/mission02-crossfire-v2.png` adds an original1672×941
+built-in imagegen illustration of two canyon crossfire positions and an enemy
+command center. The lower band is quiet; robot/tank silhouettes and faction
+colors were inspected. Fictional geometric banners require consistency review
+before integration. Full prompt, tool limitations and SHA256 are in its sibling
+provenance JSON. It remains outside shipped assets, without changing legacy art.
