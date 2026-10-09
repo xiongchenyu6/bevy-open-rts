@@ -56,6 +56,8 @@ All six campaign entries now reference `campaign/mission_01-v2.jpg` through
 mission2 uses the banner-freev3 source. FFmpeg9.0.1 scalar/single-thread commands
 and input/output hashes are in `art/campaign/runtime-derivatives-20261010.json`.
 The six runtime files total3.28MB, decode successfully and resolve from every
-campaign entry. Source PNGs remain unchanged. Actual native/browser briefing
-presentation is still pending. Legacy JPEGs are temporarily retained for sealed
+campaign entry. Source PNGs remain unchanged. Mission5 native briefing was inspected at1280×720 in
+`screenshots/steam-quality/current-campaign-twin-early-cover-2/00_briefing.png`: art
+loads, title/copy are readable and no clipping appears. Remaining mission images,
+smaller layouts and browser presentation still require verification. Legacy JPEGs are temporarily retained for sealed
 older validation programs and must be removed before final distribution.

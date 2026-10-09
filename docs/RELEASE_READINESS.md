@@ -162,3 +162,12 @@ replay completes at88.866s with Normal slot1 winning; configuration and normal
 starting resources match the failed600s baseline (`target/four-corners-foundation-replay-20261010`).
 Full matrix revalidation remains open; the frozen788 audit continues
 unchanged, and no all-configurations completion is claimed.
+
+The new mission5 native briefing is visually inspected at1280×720
+(`current-campaign-twin-early-cover-2/00_briefing.png`): original artwork loads
+and the title, objective copy and continue prompt are readable without clipping.
+Other mission images/resolutions and browser presentation remain open. Revised
+mission5 gameplay still loses HQ before AA preparation completes; this is not
+a campaign pass. The new foundation-fix canonical216 audit is running on pin
+8c0c4438 under `rts-skirmish-foundation-canonical-all-20261010.service`; the
+previous788 sweep finishes215/216 with the preserved FourCorners timeout.
