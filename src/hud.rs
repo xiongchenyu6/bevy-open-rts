@@ -1504,12 +1504,15 @@ pub(crate) fn spawn_battle_log_entry(
             });
     } else {
         parent
-            .spawn(Node {
-                max_width: px(BATTLE_LOG_WIDTH_PX),
-                padding: UiRect::axes(px(6), px(2)),
-                justify_content: JustifyContent::FlexEnd,
-                ..default()
-            })
+            .spawn((
+                Node {
+                    max_width: px(BATTLE_LOG_WIDTH_PX),
+                    padding: UiRect::axes(px(6), px(2)),
+                    justify_content: JustifyContent::FlexEnd,
+                    ..default()
+                },
+                BackgroundColor(Color::srgba(0.025, 0.035, 0.045, 0.9)),
+            ))
             .with_children(|node| {
                 node.spawn(text);
             });
@@ -1518,7 +1521,7 @@ pub(crate) fn spawn_battle_log_entry(
 
 pub(crate) fn battle_log_entry_text(font: Handle<Font>, entry: &BattleLogEntry) -> impl Bundle {
     (
-        Text::new(format!("> {}", entry.message)),
+        Text::new(entry.message.clone()),
         TextFont {
             font: font.into(),
             font_size: FontSize::Px(15.0),
@@ -1527,16 +1530,16 @@ pub(crate) fn battle_log_entry_text(font: Handle<Font>, entry: &BattleLogEntry) 
         TextColor(if entry.focus.is_some() {
             Color::srgb(1.0, 0.92, 0.6)
         } else {
-            Color::srgb(0.78, 0.84, 0.78)
+            Color::srgb(0.94, 0.96, 0.94)
         }),
     )
 }
 
 pub(crate) fn battle_log_entry_button_color(interaction: Interaction) -> Color {
     match interaction {
-        Interaction::Pressed => Color::srgba(0.18, 0.24, 0.16, 0.62),
-        Interaction::Hovered => Color::srgba(0.13, 0.17, 0.12, 0.5),
-        Interaction::None => Color::srgba(0.0, 0.0, 0.0, 0.0),
+        Interaction::Pressed => Color::srgba(0.18, 0.24, 0.16, 0.98),
+        Interaction::Hovered => Color::srgba(0.13, 0.17, 0.12, 0.96),
+        Interaction::None => Color::srgba(0.025, 0.035, 0.045, 0.9),
     }
 }
 
