@@ -101,6 +101,19 @@ configurations and the same executable hash. Neither sweep is complete yet.
 Repeated/independent-seed outcomes, statistical win rates and representative
 hardware performance remain unverified.
 
+## Repeatability evidence
+
+The canonical and all-start sweeps independently execute27 overlapping exact
+configurations on the same immutable current binary. Comparing their complete
+raw reports finds27 identical reports and zero winner differences
+(`logs/skirmish-current-repeat-comparison-01.json`). This is bounded repeated-
+process evidence, not statistical balance or independently seeded matches.
+
+The audit exposes explicit maps/starts rather than a stochastic match seed.
+AI placement uses deterministic IDs as geometric seeds; Random Map uses a cursor
+to select among authored maps. Do not relabel repeated runs as independent random
+seeds. Random-map selection and wider repeated-run coverage remain unverified.
+
 ## Browser and online
 
 Wasm02 builds and renders actual English menu/setup/match/selection/movement
