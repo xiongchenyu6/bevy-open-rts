@@ -16,10 +16,11 @@ not unknown icon PNGs. This establishes viable inputs, not finished readability
 or distribution acceptance. RosterPreview can be composed from those renders.
 20 referenced action/support/status icons now use original geometric SVGs
 rasterized byresvg0.48.1. All20 reproduce byte-identically and have validated
-128px transparent RGBA output. Ten are reviewed in actual native UI; other10
-remain pending presentation review. See `art/semantic-icons/runtime-integration.json`
+128px transparent RGBA output. Ten are reviewed in actual gameplay/menu UI. The remaining10 pass a shared
+UI-only fixture at1280x720 and900x650, with actual hover tooltips. This closes
+glyph presentation coverage only, not paid unlocking or combat effects. See `art/semantic-icons/runtime-integration.json`
 and `screenshots/steam-quality/semantic-icons-native-review-03.json` plus
-`semantic-icons-native-review-04.json`.The24 unreferenced paths are now removed; their original hashes remain in
+`semantic-icons-native-review-04.json` and `semantic-icons-native-review-07.json`.The24 unreferenced paths are now removed; their original hashes remain in
 `removed_unused_icons` in the JSON. The independent336-asset package enters
 normal skirmish (actual exit0, inspected screenshot); evidence is
 `target/unused-icon-removal-result-20261010.json`.
