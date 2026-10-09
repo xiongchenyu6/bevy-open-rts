@@ -10,7 +10,7 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Area | Required evidence | Accepted evidence and remaining work |
 | --- | --- | --- |
 | First session | Fresh profile completes gathering, power, barracks, training, movement, attack and victory; skip/replay work | Seven lessons and sandbox persistence pass at recorded checkpoints; normal-input skip/return/graduation/replay captured. Revalidate final package. |
-| Campaign | All six missions through normal controls in one App; correct objectives, retry/next/finale; persistent completion | Older fresh-process six-mission prefix passes. Current paid-AI same-App chain passes missions1–4, then fails mission5 construction. Actual Restart resets/replays triggers. Full current chain remains open. |
+| Campaign | All six missions through normal controls in one App; correct objectives, retry/next/finale; persistent completion | Older fresh-process six-mission prefix passes. Current paid-AI same-App chain passes missions1–4. Global EMP fix completes mission5 foundations in isolation; later combat selection harness fails. Full chain remains open. Actual Restart resets/replays triggers. Full current chain remains open. |
 | Save continuity | Fresh-process restoration of campaign triggers, orders, paid jobs, economy, fog, mines, temporary effects and support; safe missing/corrupt loads | First-wave campaign, paid jobs/fog/economy, harvest references, queued moves and F1/F5 effects pass in bounded runtime proofs. Mines and broader status/damage effects remain open. |
 | Interface | English default; coherent icons/tooltips; no clipping at supported sizes; browser inspected | Native cards/tooltips/save menu inspected at1280x720 and900x720; compact unit markers and single finale-map action captured. Browser and remaining overlays require current review. |
 | Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Candidate campaign art is not shipped evidence. |
@@ -45,7 +45,10 @@ The older d569 campaign checkpoint completes six recipes with growing persisted
 prefixes and a fresh all-unlocked menu. It does not prove same-App play.
 Current paid-AI recipes include an eastern AA defense against EngineerDrone HQ
 capture; mission3 wins in isolation and in the four-mission chain. Mission5
-still leaves an AA foundation unfinished. See [campaign QA](CAMPAIGN_QA.md).
+previously left an AA foundation unfinished. The global EMP fix now completes
+AA at65.5s and Radar at86.9s in the unchanged actual recipe. At91s the capture
+helper fails to select a Tank during combat; HQ remains20HP and the match is
+not terminal defeat. This is not a mission victory. See [campaign QA](CAMPAIGN_QA.md).
 
 The first trace shows a selected Worker under EMP when placement occurs.
 Construction and harvesting updates deleted their tasks during temporary EMP.
