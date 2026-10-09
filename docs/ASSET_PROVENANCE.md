@@ -193,3 +193,22 @@ old-format rejection pass with unchanged save bytes. Root inspected the actual
 images; the command-center T button is AttackMove, not Repair. Other14 icons,
 all tooltips, smaller windows and browser rendering remain pending. This does
 not close entity portraits, VFX, cursor, faction-emblem or voice rights gaps.
+
+## Original faction and speech candidates
+
+`art/faction-emblems/generate.py` authors three original SVG faction crests
+without imported images or fonts. resvg0.48.1 renders128px RGBA8; two fresh
+runs reproduce the PNGs byte-identically, and decoded alpha has0/255 pixels.
+Root inspected16/24/32px sheets and actual1280px shared skirmish setup/dropdown
+using isolated candidate assets; both children exit0 and all three read clearly.
+Evidence: `screenshots/steam-quality/original-faction-emblems-01/visual-review.json`.
+Current repository runtime emblems are still unchanged.
+
+`target/voice-full-event-candidates-20261010/` contains32 CPU-only candidate
+WAVs for16 complete event texts in each language. Generation uses the retained
+commit-pinned official Kokoro82M model and stock voice files; exact model/voice
+hashes and authored texts are in its manifest. Actual generation exits0, and
+independent PCM checks verify all32 mono24kHz16-bit files are nonempty and
+unclipped. Listening quality/pronunciation/content transcription remain unverified;
+no runtime audio is replaced. This candidate set supplies distinct English
+support/superweapon warning texts that existing runtime fallback audio lacks.
