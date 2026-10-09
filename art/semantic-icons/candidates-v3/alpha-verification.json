@@ -1,0 +1,105 @@
+{
+  "scope": "Read-only decoded-alpha verification; actual HUD acceptance pending",
+  "checks": [
+    {
+      "id": "AttackMove",
+      "transparent_background": true,
+      "visible_pixels": 1722
+    },
+    {
+      "id": "ChronoRelay",
+      "transparent_background": true,
+      "visible_pixels": 2934
+    },
+    {
+      "id": "DeployMode",
+      "transparent_background": true,
+      "visible_pixels": 2324
+    },
+    {
+      "id": "EmpPulse",
+      "transparent_background": true,
+      "visible_pixels": 3562
+    },
+    {
+      "id": "GuardArea",
+      "transparent_background": true,
+      "visible_pixels": 2913
+    },
+    {
+      "id": "HoldPosition",
+      "transparent_background": true,
+      "visible_pixels": 2110
+    },
+    {
+      "id": "NaniteRepairSwarm",
+      "transparent_background": true,
+      "visible_pixels": 3236
+    },
+    {
+      "id": "OrbitalStrike",
+      "transparent_background": true,
+      "visible_pixels": 2618
+    },
+    {
+      "id": "Paradrop",
+      "transparent_background": true,
+      "visible_pixels": 3304
+    },
+    {
+      "id": "Patrol",
+      "transparent_background": true,
+      "visible_pixels": 2224
+    },
+    {
+      "id": "RadarSweep",
+      "transparent_background": true,
+      "visible_pixels": 3906
+    },
+    {
+      "id": "RallyPoint",
+      "transparent_background": true,
+      "visible_pixels": 2381
+    },
+    {
+      "id": "Repair",
+      "transparent_background": true,
+      "visible_pixels": 2267
+    },
+    {
+      "id": "Scatter",
+      "transparent_background": true,
+      "visible_pixels": 2420
+    },
+    {
+      "id": "SellStructure",
+      "transparent_background": true,
+      "visible_pixels": 2645
+    },
+    {
+      "id": "ShieldOverdrive",
+      "transparent_background": true,
+      "visible_pixels": 2760
+    },
+    {
+      "id": "StopCommand",
+      "transparent_background": true,
+      "visible_pixels": 3168
+    },
+    {
+      "id": "StrategicMissile",
+      "transparent_background": true,
+      "visible_pixels": 2486
+    },
+    {
+      "id": "TechLocked",
+      "transparent_background": true,
+      "visible_pixels": 2758
+    },
+    {
+      "id": "WeatherStorm",
+      "transparent_background": true,
+      "visible_pixels": 2498
+    }
+  ]
+}

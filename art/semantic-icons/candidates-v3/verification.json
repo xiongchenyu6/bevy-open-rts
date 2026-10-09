@@ -1,0 +1,125 @@
+{
+  "checks": [
+    {
+      "id": "AttackMove",
+      "sha256": "7b686b71a4e1e3f0a1985b6ee75cfa6c92157db0cf513f5941f78fb3e86dbc41",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "ChronoRelay",
+      "sha256": "8aac3d459c02c383d3fe6a6d1dfb4ee9ad5f4bbe4370561f291a60dc83592732",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "DeployMode",
+      "sha256": "4613109ea0afa5d2fe93aed9ce1c491ac6d68766270e37ec7fb9e4d513ee5436",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "EmpPulse",
+      "sha256": "5f16904c25aa47beb27ce1b09ff4c568504d2dd731735297f68881459a21e736",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "GuardArea",
+      "sha256": "55c3037e2635364bbb416a05a8c61be3fd75f830d772f3f7cfebfdf70b2b6360",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "HoldPosition",
+      "sha256": "c7c282ec0ff587627ca5b8f2207462ed46ab367ea6c789b7842fba228dd58fd2",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "NaniteRepairSwarm",
+      "sha256": "b8bea792f2011fcd25b5234038d233dfd7934a21537627aba56331a99b539fda",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "OrbitalStrike",
+      "sha256": "fa039c4a7ee7b1e2093740f2d7e8ce49acd4c3bde220872bcd9df9c51ce64610",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "Paradrop",
+      "sha256": "b4d6018dfeb7cbd953759cc1c3fa3fb4d7f09ac64caa3b0de1c3fd1c397cdd0a",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "Patrol",
+      "sha256": "ff5acdf2a364315131d32cfc2c418b36a6bd88dec61aee09afe6ee4f286b8b1b",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "RadarSweep",
+      "sha256": "293af0c96ccc7dce6e00ffdc8a038b8c15a7fa0961e6c42158d8219f601701b4",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "RallyPoint",
+      "sha256": "12ecbc54149d049d9534ec940cf25ab66ceddd913e80e32b2fa8dcc28f046717",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "Repair",
+      "sha256": "406df2d61f13bc7c6bde642d9cb1e03ee0ce21c83c277f5e3fc3ada1e37eb3c5",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "Scatter",
+      "sha256": "60f3adcd84c6a4f4ce2a4f0a46067802eacc3cbbe8a0839a21be819d7008b243",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "SellStructure",
+      "sha256": "939cf480605179283f9b333c5f04cb78d3d619e5254845c874d09db4eb22c071",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "ShieldOverdrive",
+      "sha256": "52d121064773eb44f4169e8e0a213c9c6e8f3a2ac2b823f2e3d4770c4973e073",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "StopCommand",
+      "sha256": "acf5bfb654d58c0613eaf12bdf4b0e60791f1f75acf48c6e0f868728c7a256bb",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "StrategicMissile",
+      "sha256": "138d64036cab88f1ea416322c1ca1a74aa3235a642fc9e981122d92e10da2750",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "TechLocked",
+      "sha256": "bd851446f5967990f4fef48e01798ba2225560483496b339794725b9f0686fe6",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    },
+    {
+      "id": "WeatherStorm",
+      "sha256": "6c531c2faecc63cae321261569cfb1831fd953b369d349cfb9d86896701707b2",
+      "repeat_byte_identity": true,
+      "128px_rgba8": true
+    }
+  ],
+  "scope": "20 original vector-derived candidates; actual HUD acceptance remains pending"
+}
