@@ -14,7 +14,7 @@ pub(crate) use continuity::*;
 
 // Web builds keep saves in memory only — the disk path is native-only.
 #[cfg_attr(target_arch = "wasm32", allow(dead_code))]
-pub(crate) const SAVE_VERSION: u32 = 2;
+pub(crate) const SAVE_VERSION: u32 = 3;
 
 /// Save loaded from disk, consumed by `apply_loaded_save` right after the match
 /// world is (re)built by the normal InMatch setup chain.
@@ -302,6 +302,7 @@ pub(crate) fn collect_save_game(world: &mut World) -> Option<SaveGame> {
     let support_entities = collect_support_entities(world);
     let structures_lost = world.resource::<MatchState>().structures_lost;
     Some(SaveGame {
+        weather: world.resource::<WeatherState>().clone(),
         tutorial,
         ai,
         support_entities,
@@ -406,20 +407,26 @@ pub(crate) fn read_save_file(path: impl AsRef<std::path::Path>) -> Result<SaveGa
         }
         .to_string()
     })?;
-    let save: SaveGame = ron::from_str(&raw).map_err(|_| {
+    #[derive(Deserialize)]
+    struct SaveHeader {
+        version: u32,
+    }
+    let damaged = || {
         t(
             "存档已损坏，无法载入。当前对局未受影响。",
             "The saved game is damaged and cannot be loaded. Your current match is unchanged.",
         )
         .to_string()
-    })?;
-    if save.version != SAVE_VERSION {
+    };
+    let header: SaveHeader = ron::from_str(&raw).map_err(|_| damaged())?;
+    if header.version != SAVE_VERSION {
         return Err(t(
             "此存档与当前版本不兼容。请开始新对局。",
             "This save is incompatible with this game version. Start a new match.",
         )
         .to_string());
     }
+    let save: SaveGame = ron::from_str(&raw).map_err(|_| damaged())?;
     validate_save(&save).map_err(|_| {
         t(
             "存档已损坏，无法载入。当前对局未受影响。",
@@ -529,6 +536,7 @@ pub(crate) fn apply_loaded_save(world: &mut World) {
         );
         return;
     }
+    *world.resource_mut::<WeatherState>() = save.weather.clone();
     // A resumed match already passed its opening instructions. Keep the
     // optional Objectives button, but do not replay the startup overlay.
     world.resource_mut::<MatchBriefingState>().dismiss();

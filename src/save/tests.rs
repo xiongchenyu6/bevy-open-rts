@@ -156,6 +156,7 @@ fn targeted_orders_remap_entities_instead_of_reusing_runtime_ids() {
 
 fn sample_save() -> SaveGame {
     SaveGame {
+        weather: WeatherState::default(),
         version: SAVE_VERSION,
         ai: SavedAiDirector::default(),
         support_entities: vec![],
@@ -580,4 +581,111 @@ fn sparse_runtime_settings_save_the_effective_defaults_without_changing_colors()
         restored.ai_difficulties.difficulty(Team::Player(0)),
         AiDifficulty::Normal
     );
+}
+
+fn weather_transition_app() -> App {
+    let mut app = build_game_app(GameAppMode::Headless);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(0.25),
+    ));
+    let settings = app.world_mut().resource_mut::<MatchSetupSettings>();
+    settings.into_inner().player_controllers = vec![SkirmishPlayerController::Human; 2];
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::InMatch);
+    for _ in 0..600 {
+        app.update();
+        let weather = app.world().resource::<WeatherState>();
+        if weather.current != WeatherKind::Clear && weather.blend > 0.2 && weather.blend < 0.8 {
+            return app;
+        }
+    }
+    panic!("actual weather cycle never reached a mid-fade transition");
+}
+
+#[test]
+fn weather_midfade_save_restores_exactly_and_advances_normally() {
+    let mut app = weather_transition_app();
+    let before = app.world().resource::<WeatherState>().clone();
+    assert_eq!(before.previous, WeatherKind::Clear);
+    assert_eq!(before.step, 1);
+    let save = collect_save_game(app.world_mut()).unwrap();
+    let decoded: SaveGame = ron::from_str(&ron::to_string(&save).unwrap()).unwrap();
+    assert_eq!(decoded.weather, before);
+    validate_save(&decoded).unwrap();
+    // A normal new match resets ambient state before the pending load applies.
+    app.world_mut().resource_mut::<PendingLoadedSave>().0 = Some(decoded);
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::RestartingMatch);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::ZERO,
+    ));
+    for _ in 0..4 {
+        app.update();
+    }
+    assert_eq!(*app.world().resource::<WeatherState>(), before);
+    assert!(app.world().resource::<PendingLoadedSave>().0.is_none());
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(0.25),
+    ));
+    app.update();
+    let after = app.world().resource::<WeatherState>();
+    assert_eq!(after.current, before.current);
+    assert_eq!(after.previous, before.previous);
+    assert_eq!(after.step, before.step);
+    assert!((after.phase_remaining - (before.phase_remaining - 0.25)).abs() < 0.0001);
+    assert!((after.blend - (before.blend + 0.25 / 9.0)).abs() < 0.0001);
+}
+
+#[test]
+fn weather_real_restart_resets_previous_match_transition() {
+    let mut app = weather_transition_app();
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::ZERO,
+    ));
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::RestartingMatch);
+    for _ in 0..4 {
+        app.update();
+    }
+    assert_eq!(
+        *app.world().resource::<WeatherState>(),
+        WeatherState::default()
+    );
+}
+
+#[test]
+fn weather_save_validation_rejects_nonfinite_and_out_of_range_fields() {
+    let mut save = sample_save();
+    for value in [f32::NAN, f32::INFINITY, -0.01, 1.01] {
+        save.weather.blend = value;
+        assert!(validate_save(&save).is_err(), "invalid blend {value}");
+    }
+    save.weather.blend = 0.5;
+    for value in [f32::NAN, f32::INFINITY, -0.01, 170.01] {
+        save.weather.phase_remaining = value;
+        assert!(validate_save(&save).is_err(), "invalid phase {value}");
+    }
+    save.weather.phase_remaining = 170.0;
+    validate_save(&save).unwrap();
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn weather_schema_rejects_old_header_without_modifying_file() {
+    let path =
+        std::env::temp_dir().join(format!("rts-old-weather-schema-{}.ron", std::process::id()));
+    let bytes = b"(version:2)";
+    std::fs::write(&path, bytes).unwrap();
+    assert_eq!(
+        read_save_file(&path).unwrap_err(),
+        t(
+            "此存档与当前版本不兼容。请开始新对局。",
+            "This save is incompatible with this game version. Start a new match."
+        )
+    );
+    assert_eq!(std::fs::read(&path).unwrap(), bytes);
+    std::fs::remove_file(path).unwrap();
 }

@@ -69,6 +69,7 @@ pub(crate) struct SavedEconomy {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub(crate) struct SaveGame {
+    pub(crate) weather: WeatherState,
     pub(crate) version: u32,
     pub(crate) settings: SavedSettings,
     pub(crate) clock_sec: f32,
@@ -790,6 +791,9 @@ pub(crate) fn validate_save(save: &SaveGame) -> Result<(), String> {
             "This save uses unsupported format {}",
             save.version
         ));
+    }
+    if !save.weather.is_valid() {
+        return Err("Invalid saved weather".to_string());
     }
     if !save.clock_sec.is_finite() || save.clock_sec < 0.0 {
         return Err("Invalid match clock".to_string());

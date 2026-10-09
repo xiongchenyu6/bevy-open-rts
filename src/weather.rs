@@ -6,10 +6,11 @@
 
 use bevy::pbr::{DistanceFog, FogFalloff};
 use bevy::prelude::*;
+use serde::{Deserialize, Serialize};
 
 use crate::*;
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub(crate) enum WeatherKind {
     Clear,
     Overcast,
@@ -86,7 +87,7 @@ const WEATHER_PHASE_MIN_SECONDS: f32 = 100.0;
 const WEATHER_PHASE_VARIANCE_SECONDS: f32 = 70.0;
 const WEATHER_FADE_SECONDS: f32 = 9.0;
 
-#[derive(Resource)]
+#[derive(Resource, Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub(crate) struct WeatherState {
     pub(crate) previous: WeatherKind,
     pub(crate) current: WeatherKind,
@@ -108,7 +109,18 @@ impl Default for WeatherState {
     }
 }
 
+pub(crate) fn reset_weather(mut weather: ResMut<WeatherState>) {
+    *weather = WeatherState::default();
+}
+
 impl WeatherState {
+    pub(crate) fn is_valid(&self) -> bool {
+        self.blend.is_finite()
+            && (0.0..=1.0).contains(&self.blend)
+            && self.phase_remaining.is_finite()
+            && (0.0..=WEATHER_PHASE_MIN_SECONDS + WEATHER_PHASE_VARIANCE_SECONDS)
+                .contains(&self.phase_remaining)
+    }
     /// The blended environment parameters for this frame.
     pub(crate) fn blended(&self) -> WeatherParams {
         let (a, b, t) = (

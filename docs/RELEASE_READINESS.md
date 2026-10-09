@@ -85,6 +85,15 @@ stop/provenance records.
 
 ## Save and combat continuity
 
+Current save format3 adds mandatory weather continuity: previous/current
+weather, blend, phase timer and deterministic step. Fresh match/restart resets
+weather before loading; an accepted save restores it exactly. Five focused
+weather checks pass, including actual mid-fade save/load/advance and real restart;
+the coordinated full suite passes190/0/1. Older format2 saves are rejected with
+a clear incompatibility message and require a new match. No migration layer is
+provided. The runtime proofs below belong to their historical format2 binary
+checkpoints; current format3 actual orders/effects/mines revalidation is pending.
+
 Actual mouse Save and new-process Load preserve harvest references, two queued
 moves, economy and mineral depletion (`save-orders-{create,resume}-06`). Paid
 Chaos F1 RadarSweep and F5 ShieldOverdrive restore/remap, advance and expire
