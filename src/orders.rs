@@ -1717,6 +1717,7 @@ pub(crate) fn progress_queued_orders(
             Option<&AttackMoveOrder>,
             Option<&PatrolOrder>,
             &mut OrderQueue,
+            Option<&EmpDisabled>,
         ),
         With<Unit>,
     >,
@@ -1734,8 +1735,12 @@ pub(crate) fn progress_queued_orders(
         attack_move_order,
         patrol_order,
         mut queue,
+        emp,
     ) in &mut units
     {
+        if emp.is_some_and(|emp| emp.remaining > 0.0) {
+            continue;
+        }
         if move_order.is_some()
             || follow_order.is_some()
             || attack_order.is_some()
@@ -1755,34 +1760,6 @@ pub(crate) fn progress_queued_orders(
         if queue.orders.is_empty() {
             commands.entity(entity).try_remove::<OrderQueue>();
         }
-    }
-}
-
-pub(crate) fn clear_emp_disabled_orders(
-    mut commands: Commands,
-    units: Query<
-        Entity,
-        (
-            With<EmpDisabled>,
-            Or<(
-                With<MoveOrder>,
-                With<FollowOrder>,
-                With<AttackOrder>,
-                With<CaptureOrder>,
-                With<GarrisonOrder>,
-                With<HarvestOrder>,
-                With<RepairOrder>,
-                With<ConstructOrder>,
-                With<AttackMoveOrder>,
-                With<PatrolOrder>,
-                With<OrderQueue>,
-            )>,
-        ),
-    >,
-) {
-    for entity in &units {
-        clear_order_state(&mut commands, entity);
-        commands.entity(entity).try_remove::<OrderQueue>();
     }
 }
 
@@ -2221,6 +2198,7 @@ pub(crate) fn update_capture_orders(
             &Selectable,
             &Unit,
             &mut CaptureOrder,
+            Option<&EmpDisabled>,
         ),
         (With<Unit>, Without<Structure>),
     >,
@@ -2245,8 +2223,12 @@ pub(crate) fn update_capture_orders(
         capturer_selectable,
         unit,
         mut order,
+        emp,
     ) in &mut capturers
     {
+        if emp.is_some_and(|emp| emp.remaining > 0.0) {
+            continue;
+        }
         if !can_unit_capture(unit) {
             commands
                 .entity(capturer_entity)
@@ -2369,6 +2351,7 @@ pub(crate) fn update_garrison_orders(
             &Selectable,
             &Unit,
             &GarrisonOrder,
+            Option<&EmpDisabled>,
         ),
         (With<Unit>, Without<Structure>),
     >,
@@ -2385,7 +2368,10 @@ pub(crate) fn update_garrison_orders(
         (With<Structure>, Without<Unit>),
     >,
 ) {
-    for (unit_entity, unit_team, unit_transform, unit_selectable, unit, order) in &units {
+    for (unit_entity, unit_team, unit_transform, unit_selectable, unit, order, emp) in &units {
+        if emp.is_some_and(|emp| emp.remaining > 0.0) {
+            continue;
+        }
         if !can_unit_garrison(unit) {
             commands
                 .entity(unit_entity)
@@ -2897,6 +2883,7 @@ pub(crate) fn update_attack_move_and_patrol_orders(
         Option<&AttackMoveOrder>,
         Option<&PatrolOrder>,
         Option<&MoveOrder>,
+        Option<&EmpDisabled>,
     )>,
     targets: Query<
         (
@@ -2928,7 +2915,12 @@ pub(crate) fn update_attack_move_and_patrol_orders(
         )
         .collect();
 
-    for (entity, transform, team, weapon, vision, unit, attack_move, patrol, move_order) in &units {
+    for (entity, transform, team, weapon, vision, unit, attack_move, patrol, move_order, emp) in
+        &units
+    {
+        if emp.is_some_and(|emp| emp.remaining > 0.0) {
+            continue;
+        }
         if unit.is_some_and(|unit| unit.speed <= 0.0) {
             commands
                 .entity(entity)

@@ -930,14 +930,16 @@ pub(crate) fn update_harvest_orders(
         emp,
     ) in &mut collectors
     {
-        if cargo.capacity <= 0
-            || health.current <= 0.0
-            || emp.is_some_and(|emp| emp.remaining > 0.0)
-        {
+        if cargo.capacity <= 0 || health.current <= 0.0 {
             commands
                 .entity(unit_entity)
                 .try_remove::<HarvestOrder>()
                 .try_remove::<MoveOrder>();
+            continue;
+        }
+
+        // Preserve cargo, mineral choice and progress during temporary EMP.
+        if emp.is_some_and(|emp| emp.remaining > 0.0) {
             continue;
         }
 

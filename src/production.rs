@@ -1079,14 +1079,17 @@ pub(crate) fn update_construct_orders(
         constructor_health,
     ) in &mut constructors
     {
-        if constructor_health.current <= 0.0
-            || emp.is_some_and(|emp| emp.remaining > 0.0)
-            || !can_unit_construct_structures(constructor_unit)
-        {
+        if constructor_health.current <= 0.0 || !can_unit_construct_structures(constructor_unit) {
             commands
                 .entity(constructor_entity)
                 .try_remove::<ConstructOrder>()
                 .try_remove::<MoveOrder>();
+            continue;
+        }
+
+        // EMP temporarily disables work; preserve the task and approach so it
+        // resumes when the status expires rather than orphaning a paid site.
+        if emp.is_some_and(|emp| emp.remaining > 0.0) {
             continue;
         }
 

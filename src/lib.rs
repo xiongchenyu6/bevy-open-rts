@@ -3160,23 +3160,6 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
     )
     .add_systems(
         Update,
-        clear_emp_disabled_orders
-            .in_set(SimulationPhase::Combat)
-            .before(update_attack_move_and_patrol_orders)
-            .before(update_ai_vehicle_deploy_mode)
-            .before(chase_attack_targets)
-            .before(update_capture_orders)
-            .before(update_garrison_orders)
-            .before(update_harvest_orders)
-            .before(update_follow_orders)
-            .before(update_repair_orders)
-            .before(update_construct_orders)
-            .before(move_units)
-            .before(progress_queued_orders)
-            .run_if(match_in_progress),
-    )
-    .add_systems(
-        Update,
         (
             update_attack_move_and_patrol_orders
                 .in_set(SimulationPhase::Combat)
@@ -7314,3 +7297,6 @@ pub(crate) fn free_position_in_bounds(
 
 #[cfg(test)]
 mod match_tests;
+
+#[cfg(test)]
+mod emp_task_tests;
