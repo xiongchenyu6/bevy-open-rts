@@ -187,3 +187,25 @@ to EMP in that particular run; no cancellation timestamp is asserted. Current
 mission5 and mine runtime acceptance remain open. The original Wasm build was
 stopped for this semantic correction, preserving logs/dependency cache, and
 unit02 resumes with refreshed source provenance.
+
+## Completed foundation-fix canonical audit
+
+Pin8c0c4438 finishes all216 canonical configurations with216 normal completions
+and no timeouts. Independent validation checks every raw config/status/outcome
+and normal32ore/16crystal baseline with zero errors
+(`logs/skirmish-foundation-canonical-validation-20261010.json`). This pin
+predates the final real-EMP-application correction, and neither alternate starts
+nor seeds, eight-peer capacity or performance are covered by this result.
+
+Mine creation06 passes real harvesting, paid expansion/training and mouse Save
+on verified helper pin4866d13. Fresh-process restoration passes its early source
+reference/arming/layer-state assertions, but the saved mine remains outside the
+miner's route and strict causal triggering fails. Mine continuity is not accepted
+yet. Retries must confirm the exact helper strings in the sealed executable;
+an earlier source change occurred after compiler input and produced a stale bin.
+
+Fresh Wasm e576b058 builds successfully. Initial headless captures were black
+despite145/145 assets; a corrected SwiftShader compositor harness displays the
+same unchanged program. Actual English menu/setup/match screens are observed
+at1280×720 and900×720; complete real selection/movement and paired-frame
+inspection remain pending. Software rendering is not a hardware performance claim.
