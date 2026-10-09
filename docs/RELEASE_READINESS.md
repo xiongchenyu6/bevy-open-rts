@@ -16,7 +16,7 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Six original encoded illustrations are wired; mission5 native briefing inspected. Other images/layouts/audio remain open. |
 | Skirmish/balance | All maps/factions/difficulties/starts playable; reproducible repeated/independent-seed sweeps; no indefinite matches | Foundation-fix pin completes216/216 canonical cases with validated outcomes. Latest damage pin is running canonical216 and full ordered-start3,726 sweeps; repeatability, independent seeds and broad balance remain open. |
 | Delivery | Windows/Linux release archives launch without Rust/Nix from arbitrary directories; writable user data | Earlier optimized Linux package passes bounded hardware/input smoke. Windows GNU/Wine harness evidence exists. Current release packages, native Windows/MSVC and Steam Runtime remain open. |
-| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Real EMP application regressions pass3/3; prior full suite178/0/1. Three new combat-damage regressions pass; fresh/load transition regressions2/2 and updated full suite183/0/1 pass; shared native build and final-package/runtime acceptance remain incomplete. No representative combat performance or long-session acceptance yet. |
+| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Real EMP application regressions pass3/3; prior full suite178/0/1. Three new combat-damage regressions pass; fresh/load transition regressions2/2 and updated full suite183/0/1 pass; shared native build passes; final-package/runtime acceptance remains incomplete. No representative combat performance or long-session acceptance yet. |
 | Distribution | Accurate store copy, provenance/licenses/generated inventory and store-ready media | Unpublished store draft and partial provenance audit exist. Art/audio rights gaps and final media remain open. |
 
 ## Verification policy
@@ -78,8 +78,9 @@ the expanded actual-transition regression reproduces this leakage while exact
 saved-state restoration passes. The minimal correction resets AiDirector before
 apply_loaded_save and creates fresh TeamEconomy values at new-match setup.
 Focused fresh/load regressions pass2/2 in1.67s; full suite passes183/0/1 in78.24s
-(`logs/campaign-ai-reset-{green,full}.log`). Shared native build and corrected
-same-App chain remain pending. Wasm04 was deliberately stopped and retains its
+(`logs/campaign-ai-reset-{green,full}.log`). Shared native build passes2m39s with actual full/build exits0/0; sealed hashes
+and source revision are in `target/ai-match-reset-shared-20261010/artifact.json`.
+Corrected same-App chain remains pending. Wasm04 was deliberately stopped and retains its
 stop/provenance records.
 
 ## Save and combat continuity
@@ -113,16 +114,21 @@ regressions use the real application helper and complete shared schedule.
 Foundation-fix pin8c0c4438 completes216/216 canonical map/faction/difficulty
 configurations; independent raw config/status/outcome validation reports zero
 errors (`logs/skirmish-foundation-canonical-validation-20261010.json`). Older
-BigArena and FourCorners timeout artifacts remain preserved. Current damage
-pin `cbb2d6eb` runs a fresh216-case sweep in
-`target/skirmish-combat-canonical-all-20261010`; its live summary records progress and failures. A separate immutable-pin full
-ordered-start sweep is now running under
-`rts-skirmish-combat-all-starts-20261010.service`, output
-`target/skirmish-combat-all-starts-20261010`, log
-`logs/skirmish-combat-all-starts-20261010.log`. Its manifest verifies3,726 exact
-configurations and the same executable hash. Neither sweep is complete yet.
-Repeated/independent-seed outcomes, statistical win rates and representative
-hardware performance remain unverified.
+BigArena and FourCorners timeout artifacts remain preserved. Combat-damage pin `cbb2d6eb` also completes216/216 canonical cases with zero
+independent validation errors
+(`logs/skirmish-combat-canonical-final-validation-20261010.json`). This remains a
+checkpoint before fresh-match reset3478190.
+
+Its full ordered-start sweep was deliberately stopped after127 successful cases
+when superseded; partial evidence and reason remain under
+`target/skirmish-combat-all-starts-20261010/semantic-stop.json`. It is not a
+completed3,726-case acceptance. The new reset-core audit pin `9dcd4c80` runs the
+full3,726 configurations in `target/skirmish-match-reset-all-starts-20261010`,
+unit `rts-skirmish-match-reset-all-starts-20261010`, log
+`logs/skirmish-match-reset-all-starts-20261010.log`. Its manifest and sealed binary
+hash are independently verified; the sweep is still live. Wider repetition,
+independent-seed outcomes, statistical win rates and representative hardware
+performance remain unverified.
 
 ## Repeatability evidence
 
