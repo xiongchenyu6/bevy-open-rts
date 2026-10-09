@@ -15,9 +15,10 @@ not unknown icon PNGs. This establishes viable inputs, not finished readability
 or distribution acceptance. RosterPreview can be composed from those renders.
 20 referenced action/support/status icons now use original geometric SVGs
 rasterized byresvg0.48.1. All20 reproduce byte-identically and have validated
-128px transparent RGBA output. Six are reviewed in actual native UI; other14
-remain pending actual HUD review. See `art/semantic-icons/runtime-integration.json`
-and `screenshots/steam-quality/semantic-icons-native-review-03.json`.24 unresolved files have no current Rust
+128px transparent RGBA output. Ten are reviewed in actual native UI; other10
+remain pending presentation review. See `art/semantic-icons/runtime-integration.json`
+and `screenshots/steam-quality/semantic-icons-native-review-03.json` plus
+`semantic-icons-native-review-04.json`.24 unresolved files have no current Rust
 literal reference or registry icon entry; check package exclusion before removal.
 
 ## Existing native rendering path
