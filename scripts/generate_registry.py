@@ -1291,6 +1291,7 @@ def write_reports(registry: dict[str, object]) -> None:
         if path.is_file()
         and path.suffix != ".import"
         and str(path.relative_to(GODOT_ROOT / "assets")) not in removed_asset_paths
+        and not str(path.relative_to(GODOT_ROOT / "assets")).startswith("ui/kenney-crosshairs/")
     )
     asset_categories: dict[str, int] = {}
     for asset in source_assets:
