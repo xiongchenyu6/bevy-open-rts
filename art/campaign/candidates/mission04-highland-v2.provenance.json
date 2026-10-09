@@ -1,0 +1,15 @@
+{
+  "asset": "mission04-highland-v2.png",
+  "tool": "image_gen.imagegen (built-in)",
+  "recorded_at_utc": "2026-10-09 15:47:14 UTC",
+  "model_version": "not exposed by tool",
+  "seed": "not exposed by tool",
+  "prompt": "Create an original wide landscape 16:9 campaign briefing illustration for a robot RTS, mission 4: defending a western ramp onto a high plateau while a supply airlift approaches. Painterly polished industrial science-fiction concept art matching chunky gray and olive-green tracked tanks, angular utility robots and compact modular industrial buildings. The left foreground and middle show a fortified gray-green base on an orange rocky plateau, low command center with satellite dishes, power reactors and two practical gun turrets protecting a clear winding west ramp. Small robot infantry and tracked tanks hold the ramp; distant red-accent enemy armored vehicles ascend below. In the upper-right sky, two small industrial cargo aircraft approach with suspended supply containers, without flags or insignia. Strong readable silhouettes, warm late-afternoon amber canyon light, cool gray metal, restrained green friendly and red enemy accents, cinematic dust and a coherent grounded battlefield. Compose the main action above the bottom 22 percent, leaving a darker quiet rocky lower band for briefing overlay. No humans, fantasy creatures, recognizable franchise designs, banners, insignia, logos, letters, numbers, baked UI or watermarks. This is an original illustration, not a gameplay screenshot.",
+  "transparent_background": false,
+  "width": 1672,
+  "height": 941,
+  "sha256": "7b5c356a2ede0ad3a101aa3865660c505aeacfcf31d49a472a4ae6f7b539cf8f",
+  "bytes": 2735644,
+  "original_output_filename": "exec-0b657034-8ab4-46cf-ba46-fe9a13fbe296.png",
+  "status": "visually inspected candidate; outside shipped assets; not gameplay evidence"
+}
