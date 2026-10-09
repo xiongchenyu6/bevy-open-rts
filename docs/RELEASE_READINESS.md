@@ -286,6 +286,37 @@ Initial screenshot review showed short-lived keyboard input did not activate
 Enter/F10. A persistent virtual pointer then clicked Skirmish and Start Match:
 actual normal32/16 gameplay, Command Center and Workers render correctly.
 `target/linux-current-runtime-pointer-match-20261010/visual-review.json` records
-this bounded release-package startup evidence. Pause/save/load, audible output
-and combat-performance acceptance remain open. Windows, Steam Runtime and distribution-library obligations remain
+this bounded360-asset release-package startup evidence. Current pruned-archive
+controls are verified below; audible output and combat performance remain open.
+Windows, Steam Runtime and distribution-library obligations remain
 open; building and packaging alone do not close delivery.
+
+## Current unused-icon cleanup package
+
+Commit c4a25fa removes24 unused legacy PNGs after source-reference checks and
+a normal skirmish startup in an independent336-asset QA copy (actual exit0,
+inspected screenshot). Original hashes and removed records remain in the audit.
+`target/linux-current-package-pruned-20261010/verified-package.json` pins the
+new archive, verifies all336 assets and exact equality of358 extracted files.
+The executable is the existing thin-LTO checkpoint. Exact extracted archive
+SHA256 `da292f12500f6685e681cfad4a03e55a651990b5630be52c5c3e684f4b209ab8`
+passes basic controls/Save/Load UI on AMD RADV RENOIR in read-only Ubuntu24.04,
+without a Nix mount. `target/linux-release-keyboard-20261010-01` records actual
+container0, standard-US persistent keyboard/pointer on seat0, focused Bevy
+window, F10 pause, Ctrl+S Save, Ctrl+L Load and Escape menu. Shared physical
+key codes must be emitted; prior wtype custom-map logical symbols were not a
+valid physical-hotkey test.
+
+`target/linux-release-mouse-load-20261010-02` records container0 and inspected
+normal mouse Save/two Load screenshots, including loading an unchanged real
+release save copied into a fresh isolated profile. Both loads preserve file
+bytes; the original source save is untouched. The menu is reopened after Save
+before clicking Load. These are basic release input/Save/Load UI proofs, not
+acceptance of all saved state, combat, performance, long sessions or audio.
+
+The apparent distant-unit selection mismatch is diagnosed: the worker click
+was swallowed by the selection HUD (actual client298,620). Ordinary empty-ground
+deselection followed by the same click selects Worker; diagnostics report
+ground distance0.24/screen distance24.916 with both pick tests passing. A model
+projection defect is not established. Review JSONs retain images, seat/focus
+records, archive/executable identities and save hashes.
