@@ -70,7 +70,14 @@ impl SetupWatch {
         {
             self.first_damage = true;
             Some("first-hq-damage")
-        } else if !self.first_threat && !state.threats.is_empty() {
+        } else if !self.first_threat
+            && visible_enemy_contacts(app).is_ok_and(|c| {
+                state
+                    .threats
+                    .iter()
+                    .any(|t| contact_is_visible(&c, t.id, t.position))
+            })
+        {
             self.first_threat = true;
             Some("first-nearby-threat")
         } else if !self.first_low_power && state.low_power {
@@ -95,6 +102,40 @@ impl SetupWatch {
             }
         }
     }
+}
+
+struct VisibleEnemyContact {
+    id: String,
+    position: Vec3,
+}
+fn visible_enemy_contacts(app: &mut App) -> Result<Vec<VisibleEnemyContact>, String> {
+    let view = bevy_open_rts::capture_live_mine_state(app)?;
+    let mut result = Vec::new();
+    for kind in ["units", "structures"] {
+        for e in view[kind].as_array().ok_or("actor metadata missing")? {
+            if e["visible"].as_bool() != Some(true)
+                || e["team"].as_u64() != Some(1)
+                || !e["health"].as_f64().is_some_and(|h| h > 0.0)
+            {
+                continue;
+            }
+            let p = e["position"].as_array().ok_or("visible position missing")?;
+            result.push(VisibleEnemyContact {
+                id: e["id"].as_str().ok_or("visible id missing")?.into(),
+                position: Vec3::new(
+                    p[0].as_f64().ok_or("x missing")? as f32,
+                    p[1].as_f64().ok_or("y missing")? as f32,
+                    p[2].as_f64().ok_or("z missing")? as f32,
+                ),
+            });
+        }
+    }
+    Ok(result)
+}
+fn contact_is_visible(contacts: &[VisibleEnemyContact], id: &str, point: Vec3) -> bool {
+    contacts
+        .iter()
+        .any(|c| c.id == id && c.position.distance_squared(point) < 0.0001)
 }
 
 fn running(app: &mut App) -> Result<(), String> {
@@ -126,6 +167,88 @@ fn grouped(units: &[CaptureCampaignUnit], slot: usize) -> Vec<Entity> {
 
 /// Verify the actual click selection, including accidental double-click/type
 /// expansion. Never insert Selected or write a control-group resource.
+fn clear_selection_with_empty_ground_input(app: &mut App) -> Result<(), String> {
+    let base = capture_campaign_state(app)
+        .headquarters
+        .ok_or("headquarters lost while clearing selection")?
+        .position;
+    let initial = bevy_open_rts::capture_construction_contact_debug(app);
+    let origin_x = initial["grid"]["origin_x"]
+        .as_f64()
+        .ok_or("map grid origin missing")? as f32;
+    let origin_z = initial["grid"]["origin_z"]
+        .as_f64()
+        .ok_or("map grid origin missing")? as f32;
+    for (dx, dz) in [
+        (-12.0, -12.0),
+        (-12.0, 12.0),
+        (12.0, -12.0),
+        (12.0, 12.0),
+        (-18.0, -8.0),
+        (-18.0, 8.0),
+        (18.0, -8.0),
+        (18.0, 8.0),
+        (-8.0, -18.0),
+        (8.0, -18.0),
+        (-8.0, 18.0),
+        (8.0, 18.0),
+    ] {
+        let point = Vec3::new(
+            (base.x + dx).clamp(origin_x + 2.0, -origin_x - 2.0),
+            0.0,
+            (base.z + dz).clamp(origin_z + 2.0, -origin_z - 2.0),
+        );
+        capture_key(app, KeyCode::ShiftLeft, false);
+        capture_key(app, KeyCode::ControlLeft, false);
+        capture_set_cursor(app, Vec2::new(WIDTH as f32 * 0.5, HEIGHT as f32 * 0.5));
+        capture_focus_camera_on(app, point);
+        advance(app, 12);
+        running(app)?;
+        let screen =
+            capture_world_to_screen(app, point).ok_or("empty-ground selection point offscreen")?;
+        let snapshot = bevy_open_rts::capture_construction_contact_debug(app);
+        let positions: Vec<_> = snapshot["entities"]
+            .as_array()
+            .ok_or("selection entities missing")?
+            .iter()
+            .filter_map(|entity| {
+                let p = entity["position"].as_array()?;
+                Some((
+                    Vec3::new(
+                        p[0].as_f64()? as f32,
+                        p[1].as_f64()? as f32,
+                        p[2].as_f64()? as f32,
+                    ),
+                    entity["radius"].as_f64()? as f32,
+                ))
+            })
+            .collect();
+        if positions.iter().any(|(position, radius)| {
+            position.distance(point) <= radius + 2.0
+                || capture_world_to_screen(app, *position)
+                    .is_some_and(|other| other.distance(screen) < 140.0)
+        }) {
+            continue;
+        }
+        capture_click_screen(app, screen, MouseButton::Left);
+        let after = bevy_open_rts::capture_construction_contact_debug(app);
+        let selected: Vec<_> = after["entities"]
+            .as_array()
+            .ok_or("selection entities missing")?
+            .iter()
+            .filter(|entity| entity["selected"].as_bool() == Some(true))
+            .map(|entity| entity["entity"].clone())
+            .collect();
+        println!(
+            "[capture] dead-target ordinary empty-ground click at {point:?}: selected {selected:?}"
+        );
+        if selected.is_empty() {
+            return Ok(());
+        }
+    }
+    Err("could not clear dead-target selection through verified empty-ground clicks".into())
+}
+
 fn select_units(app: &mut App, ids: &[Entity]) -> Result<Vec<Entity>, String> {
     running(app)?;
     let initial = capture_campaign_units(app);
@@ -135,6 +258,10 @@ fn select_units(app: &mut App, ids: &[Entity]) -> Result<Vec<Entity>, String> {
         .filter(|id| initial.iter().any(|unit| unit.entity == *id))
         .collect();
     if live.is_empty() {
+        if !ids.is_empty() {
+            println!("[capture] selection targets already dead: requested {ids:?}");
+            clear_selection_with_empty_ground_input(app)?;
+        }
         return Ok(Vec::new());
     }
     let result = (|| {
@@ -151,12 +278,19 @@ fn select_units(app: &mut App, ids: &[Entity]) -> Result<Vec<Entity>, String> {
                 // HUD. Center this particular unit and neutralize edge scrolling
                 // while settling, then read its updated ground position.
                 capture_set_cursor(app, Vec2::new(WIDTH as f32 * 0.5, HEIGHT as f32 * 0.5));
+                println!(
+                    "[capture] selection camera settle: requested {ids:?}, target {id:?}, hp {}",
+                    before.health
+                );
                 capture_focus_camera_on(app, before.position);
                 advance(app, 12);
                 let Some(unit) = capture_campaign_units(app)
                     .into_iter()
                     .find(|unit| unit.entity == id)
                 else {
+                    println!(
+                        "[capture] selection target {id:?} died during camera settle before click"
+                    );
                     break;
                 };
                 let point = capture_world_to_screen(app, unit.position)
@@ -218,6 +352,17 @@ fn select_units(app: &mut App, ids: &[Entity]) -> Result<Vec<Entity>, String> {
         .filter(|unit| unit.selected)
         .map(|unit| unit.entity)
         .collect();
+    if expected.is_empty()
+        && ids
+            .iter()
+            .all(|id| !units.iter().any(|unit| unit.entity == *id))
+    {
+        println!(
+            "[capture] all requested selection targets died: requested {ids:?}, clicked {clicked:?}, remaining selected {selected:?}"
+        );
+        clear_selection_with_empty_ground_input(app)?;
+        return Ok(Vec::new());
+    }
     if expected != selected {
         let missing: Vec<_> = expected.difference(&selected).copied().collect();
         let unexpected: Vec<_> = selected.difference(&expected).copied().collect();
@@ -236,33 +381,42 @@ fn select_units(app: &mut App, ids: &[Entity]) -> Result<Vec<Entity>, String> {
             })
             .collect();
         return Err(format!(
-            "campaign selection mismatch: expected {expected:?}, actual {selected:?}, missing {missing:?}, unexpected {unexpected:?}; current units {current:?}"
+            "campaign selection mismatch: requested {ids:?}, clicked {clicked:?}, expected {expected:?}, actual {selected:?}, missing {missing:?}, unexpected {unexpected:?}; current units {current:?}"
         ));
     }
     Ok(expected.into_iter().collect())
 }
 
 pub(super) fn select_builder(app: &mut App) -> Result<Vec3, String> {
-    let base = capture_campaign_state(app)
-        .headquarters
-        .ok_or("headquarters lost")?
-        .position;
-    let unit = capture_campaign_units(app)
-        .into_iter()
-        .filter(|unit| unit.id == "Worker" && !unit.constructing)
-        .min_by(|a, b| {
-            let score = |unit: &CaptureCampaignUnit| {
-                unit.position.distance_squared(base) + (6.0 - unit.health).max(0.0) * 100.0
-            };
-            score(a).total_cmp(&score(b))
-        })
-        .ok_or("no living available campaign builder")?;
-    select_units(app, &[unit.entity])?;
-    capture_campaign_units(app)
-        .into_iter()
-        .find(|current| current.entity == unit.entity && current.selected)
-        .map(|current| current.position)
-        .ok_or_else(|| "campaign builder click was not verified".to_string())
+    for attempt in 0..3 {
+        let base = capture_campaign_state(app)
+            .headquarters
+            .ok_or("headquarters lost")?
+            .position;
+        let unit = capture_campaign_units(app)
+            .into_iter()
+            .filter(|unit| unit.id == "Worker" && !unit.constructing)
+            .min_by(|a, b| {
+                let score = |unit: &CaptureCampaignUnit| {
+                    unit.position.distance_squared(base) + (6.0 - unit.health).max(0.0) * 100.0
+                };
+                score(a).total_cmp(&score(b))
+            })
+            .ok_or("no living available campaign builder")?;
+        if select_units(app, &[unit.entity])?.is_empty() {
+            println!(
+                "[capture] builder died during selection; requery living candidate {}",
+                attempt + 1
+            );
+            continue;
+        }
+        return capture_campaign_units(app)
+            .into_iter()
+            .find(|current| current.entity == unit.entity && current.selected)
+            .map(|current| current.position)
+            .ok_or_else(|| "campaign builder click was not verified".to_string());
+    }
+    Err("campaign builders kept dying during ordinary selection".into())
 }
 
 fn append_group(app: &mut App, slot: usize, ids: &[Entity]) -> Result<(), String> {
@@ -431,7 +585,9 @@ pub(super) fn ensure_harvesting(app: &mut App) -> Result<(), String> {
         else {
             continue;
         };
-        select_units(app, &[worker.entity])?;
+        if select_units(app, &[worker.entity])?.is_empty() {
+            continue;
+        }
         ground_order(app, resource.click_position, false)?;
     }
     Ok(())
@@ -540,10 +696,13 @@ fn maintain_home_defense(app: &mut App, perimeter: f32, staging_offset: f32) -> 
     let Some(base) = state.headquarters.map(|hq| hq.position) else {
         return Ok(());
     };
+    let contacts = visible_enemy_contacts(app)?;
     if let Some(threat) = state
         .threats
         .iter()
-        .filter(|threat| threat.domain == "ground")
+        .filter(|threat| {
+            threat.domain == "ground" && contact_is_visible(&contacts, threat.id, threat.position)
+        })
         .min_by(|a, b| {
             a.position
                 .distance_squared(base)
@@ -644,12 +803,86 @@ fn rally_to_safe_staging(
     tap_key(app, key);
     ground_order(app, staging, false)
 }
-fn attack(app: &mut App) -> Result<(), String> {
+pub(super) fn visible_anchor_or_own_map_scout(app: &mut App) -> Result<Vec3, String> {
+    let base = capture_campaign_state(app)
+        .headquarters
+        .ok_or("HQ lost while scouting")?
+        .position;
+    let contacts = visible_enemy_contacts(app)?;
+    if let Some(contact) = contacts.iter().min_by(|a, b| {
+        a.position
+            .distance_squared(base)
+            .total_cmp(&b.position.distance_squared(base))
+    }) {
+        println!(
+            "[capture] visible-only mission-one anchor {} at {:?}",
+            contact.id, contact.position
+        );
+        return Ok(contact.position);
+    }
+    let target = Vec3::new(-base.x, 0.0, -base.z);
+    println!("[capture] visible-only mission-one own-map scouting at {target:?}");
+    Ok(target)
+}
+
+fn attack(app: &mut App, cursor: &mut usize) -> Result<(), String> {
     if !recall(app, ASSAULT)? {
         return Ok(());
     }
-    let target =
-        capture_nearest_enemy_anchor_position(app).ok_or("no living enemy remains for assault")?;
+    let units = capture_campaign_units(app);
+    let army: Vec<_> = units
+        .iter()
+        .filter(|u| u.groups.contains(&ASSAULT))
+        .collect();
+    if army.is_empty() {
+        return Ok(());
+    }
+    let centre = army.iter().map(|u| u.position).sum::<Vec3>() / army.len() as f32;
+    let contacts = visible_enemy_contacts(app)?;
+    if let Some(c) = contacts.iter().min_by(|a, b| {
+        (a.id != "CommandCenter")
+            .cmp(&(b.id != "CommandCenter"))
+            .then_with(|| {
+                a.position
+                    .distance_squared(centre)
+                    .total_cmp(&b.position.distance_squared(centre))
+            })
+    }) {
+        println!(
+            "[capture] visible-only assault anchor {} at {:?}",
+            c.id, c.position
+        );
+        return ground_order(app, c.position, true);
+    }
+    let base = capture_campaign_state(app)
+        .headquarters
+        .ok_or("HQ lost while scouting")?
+        .position;
+    let map = capture_construction_contact_debug(app);
+    let x = -map["grid"]["origin_x"]
+        .as_f64()
+        .ok_or("map width missing")? as f32
+        * 0.7;
+    let z = -map["grid"]["origin_z"]
+        .as_f64()
+        .ok_or("map height missing")? as f32
+        * 0.7;
+    let route = [
+        Vec3::new(-base.x, 0.0, -base.z),
+        Vec3::new(x, 0.0, z),
+        Vec3::new(-x, 0.0, z),
+        Vec3::new(-x, 0.0, -z),
+        Vec3::new(x, 0.0, -z),
+        Vec3::ZERO,
+    ];
+    if centre.distance(route[*cursor % route.len()]) < 6.0 {
+        *cursor += 1;
+    }
+    let target = route[*cursor % route.len()];
+    println!(
+        "[capture] visible-only map scouting leg {} at {target:?}",
+        *cursor
+    );
     ground_order(app, target, true)
 }
 
@@ -768,6 +1001,7 @@ pub(super) fn run(
         }
         let mut launched = false;
         let mut last_attack_clock = -20.0;
+        let mut scout_cursor = 0;
         let mut last_hq_health = capture_campaign_state(app)
             .headquarters
             .map(|hq| hq.health)
@@ -792,7 +1026,12 @@ pub(super) fn run(
             let Some(hq) = state.headquarters.as_ref() else {
                 return Err("campaign headquarters eliminated".into());
             };
-            let pressure = !state.threats.is_empty() || hq.health + 0.1 < last_hq_health;
+            let contacts = visible_enemy_contacts(app)?;
+            let pressure = state
+                .threats
+                .iter()
+                .any(|t| contact_is_visible(&contacts, t.id, t.position))
+                || hq.health + 0.1 < last_hq_health;
             if pressure && state.clock - last_threat_capture > 15.0 {
                 capture_focus_camera_on(app, hq.position);
                 shoot(
@@ -824,14 +1063,14 @@ pub(super) fn run(
                 && tanks >= 6
                 && (!launched || state.clock - last_attack_clock >= 15.0)
             {
-                attack(app)?;
+                attack(app, &mut scout_cursor)?;
                 if !launched {
                     shoot(app, handle, dir.join("02_assault.png"));
                 }
                 launched = true;
                 last_attack_clock = state.clock;
             } else if launched && state.clock - last_attack_clock >= 15.0 && !attackers.is_empty() {
-                attack(app)?;
+                attack(app, &mut scout_cursor)?;
                 last_attack_clock = state.clock;
             }
             log_state(

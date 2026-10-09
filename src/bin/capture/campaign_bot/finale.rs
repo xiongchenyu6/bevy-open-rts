@@ -31,10 +31,10 @@ fn guard_north(app: &mut App) -> Result<(), String> {
     let Some(base) = state.headquarters.map(|hq| hq.position) else {
         return Err("finale headquarters lost".into());
     };
-    let threats = state
-        .threats
-        .iter()
-        .filter(|threat| threat.domain == "ground");
+    let contacts = visible_enemy_contacts(app)?;
+    let threats = state.threats.iter().filter(|threat| {
+        threat.domain == "ground" && contact_is_visible(&contacts, threat.id, threat.position)
+    });
     if let Some(threat) = threats.min_by(|a, b| {
         a.position
             .distance_squared(base)
@@ -103,6 +103,7 @@ pub(super) fn run(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Result<(
         build_campaign_structure_with_offsets(app, "AntiGroundTurret", offsets, &mut observer)?;
         watch.checkpoint(app, "after-build-north-ground-turret")?;
         let mut last_attack = -20.0;
+        let mut scout_cursor = 0;
         let mut launched = false;
         for round in 0..240 {
             if capture_match_phase_label(app) != "Running" {
@@ -118,8 +119,11 @@ pub(super) fn run(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Result<(
                 .headquarters
                 .as_ref()
                 .ok_or("finale headquarters eliminated")?;
+            let contacts = visible_enemy_contacts(app)?;
             let near_ground = state.threats.iter().any(|threat| {
-                threat.domain == "ground" && threat.position.distance(hq.position) < 10.0
+                threat.domain == "ground"
+                    && threat.position.distance(hq.position) < 10.0
+                    && contact_is_visible(&contacts, threat.id, threat.position)
             });
             let assault_tanks = units
                 .iter()
@@ -131,7 +135,7 @@ pub(super) fn run(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Result<(
                 }
                 launched = false;
             } else if assault_tanks >= 3 && !near_ground && state.clock - last_attack >= 15.0 {
-                attack(app)?;
+                attack(app, &mut scout_cursor)?;
                 launched = true;
                 last_attack = state.clock;
             }

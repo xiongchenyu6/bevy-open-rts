@@ -123,23 +123,33 @@ pub(super) fn opening(app: &mut App, watch: &mut SetupWatch) -> Result<(), Strin
         .headquarters
         .ok_or("headquarters lost")?
         .position;
+    println!("[capture] Twin crystal-field guard staging HQ+6.5,6 and visible ground response16m");
     select_all_player_army(app);
-    ground_order(app, base + Vec3::new(6.5, 0.0, 0.0), false)?;
+    ground_order(app, base + Vec3::new(6.5, 0.0, 6.0), false)?;
     watch.advance(app, 90);
     hold_army(app)?;
     watch.checkpoint(app, "opening-whole-army-held")?;
     for _ in 0..180 {
         running(app)?;
-        let state = capture_campaign_state(app);
-        if state.clock >= 110.0 && state.threats.is_empty() {
-            break;
-        }
         refill(app, false)?;
         let state = capture_campaign_state(app);
+        let contacts = visible_enemy_contacts(app)?;
+        if state.clock >= 110.0
+            && !state
+                .threats
+                .iter()
+                .any(|t| contact_is_visible(&contacts, t.id, t.position))
+        {
+            break;
+        }
         let threat = state
             .threats
             .iter()
-            .filter(|threat| threat.domain == "ground" && threat.position.distance(base) <= 12.0)
+            .filter(|threat| {
+                threat.domain == "ground"
+                    && threat.position.distance(base) <= 16.0
+                    && contact_is_visible(&contacts, threat.id, threat.position)
+            })
             .min_by(|a, b| {
                 let priority = |id: &str| match id {
                     "ModularMissileCarrier" => 0,
@@ -169,7 +179,7 @@ pub(super) fn opening(app: &mut App, watch: &mut SetupWatch) -> Result<(), Strin
                 .any(|unit| unit.combat && unit.position.distance(base) > 9.0)
             {
                 select_all_player_army(app);
-                ground_order(app, base + Vec3::new(6.5, 0.0, 0.0), false)?;
+                ground_order(app, base + Vec3::new(6.5, 0.0, 6.0), false)?;
                 watch.advance(app, 30);
             } else {
                 hold_army(app)?;
@@ -194,8 +204,11 @@ pub(super) fn opening(app: &mut App, watch: &mut SetupWatch) -> Result<(), Strin
     refresh_groups(app)?;
     hold_arrived_defenders(app)?;
     maintain_home_defense(app, 10.0, 3.5)?;
-    train_to_count(app, watch, "Barracks", "RocketInfantry", 3)?;
-    train_to_count(app, watch, "VehicleFactory", "Tank", 6)?;
+    // Replacements remain paid queue targets. Do not wait for a unit quota
+    // while another live wave is attacking: the common battle loop keeps
+    // harvesting, replenishing and responding to nearby threats.
+    refill(app, false)?;
+    println!("[capture] Twin defense ready with nonblocking paid replenishment");
     log_state(app, &mut watch.trace, "defense_ready")?;
     shoot(app, &watch.handle, watch.dir.join("01_defense.png"));
     Ok(())
