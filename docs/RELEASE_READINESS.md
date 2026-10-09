@@ -265,10 +265,22 @@ mission5 at332.774s with HumanVictory/HQ20, actual child exit0 and normal Next
 Mission. Root inspected `current-campaign-twin-visible-crystal-cover/02_victory.png`.
 Targets come only from actual visible enemy roots; unexplored sectors use ordinary
 map scouting. Paid production and crystal-field protection preserve the economy.
-The single-App six-mission supervisor is now live as
-`rts-campaign-chain-visible-only-01`; no complete campaign claim is made yet.
+The single-App six-mission run `rts-campaign-chain-visible-only-01` failed
+in mission1 after completing mission0. Its strategic target selection returned
+to incidental visible units instead of continuing unexplored-sector scouting.
+The next capture-only fix targets visible Command Centers and advances scouting
+from own-army arrival; a complete six-mission pass remains unproven.
 
-The current Linux thin-LTO candidate is compiling with explicit Rust1.95,
-locked dependencies and one Cargo job. It records all source hashes and actual
-exit under `target/linux-current-release-20261010/`. It is not yet built,
-packaged or runtime-accepted. Existing release archives remain older checkpoints.
+The current Linux thin-LTO candidate completed with explicit Rust1.95, locked
+dependencies and one Cargo job: actual exit0 in23m22s, source hashes unchanged.
+`target/linux-current-release-20261010/result.json` pins executable SHA256
+`b86918e67a239d3f047fed437a6e27213ab597f83c3c53e68053bfa55550761e`.
+Packaging exited0; `target/linux-current-package-20261010/verified-package.json`
+records archive SHA256 and all360 runtime assets passing exact-set/hash checks.
+Actual package launch renders its main menu on AMD RADV RENOIR/Mesa25.2.8
+in read-only Ubuntu24.04 without a Nix mount. GLES Sway retry exits0; the
+initial pixman compositor attempt failed surface creation and remains retained.
+Screenshot review shows Enter/F10 remained at the main menu, so match input,
+audio and combat-performance acceptance have not passed. Evidence:
+`target/linux-current-runtime-gles-20261010/visual-review.json`. Windows, Steam Runtime and distribution-library obligations remain
+open; building and packaging alone do not close delivery.
