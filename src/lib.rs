@@ -2566,7 +2566,7 @@ pub(crate) fn configure_scene_lighting(app: &mut App) {
         brightness: 1000.0,
         affects_lightmapped_meshes: true,
     });
-    app.insert_resource(bevy::light::DirectionalLightShadowMap { size: 4096 });
+    app.insert_resource(bevy::light::DirectionalLightShadowMap { size: 2048 });
 }
 
 pub(crate) fn queue_startup_loading_assets(
