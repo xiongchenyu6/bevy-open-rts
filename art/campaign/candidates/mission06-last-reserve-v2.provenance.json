@@ -1,0 +1,15 @@
+{
+  "asset": "mission06-last-reserve-v2.png",
+  "tool": "image_gen.imagegen (built-in)",
+  "recorded_at_utc": "2026-10-09 15:52:05 UTC",
+  "model_version": "not exposed by tool",
+  "seed": "not exposed by tool",
+  "prompt": "Original wide landscape 16:9 campaign briefing illustration for the finale of a robot RTS: supply lines have been cut, and a small armored force makes a decisive assault on an enemy command center while a logistics convoy approaches. Match painterly polished industrial science-fiction concept art: chunky gray and olive-green tracked tanks, squat utility robots, angular mechanical infantry and practical modular industrial buildings. Foreground-left a limited friendly armored column advances through a dry ochre canyon toward a large gray concrete-and-steel enemy headquarters in the upper-right midground, with restrained red enemy lights and gun emplacements. A damaged roadway and abandoned empty supply containers convey interrupted logistics without human casualties. On a distant left ridge a small green-accent convoy of cargo trucks approaches, secondary to the assault. Clear visual route and command-center objective, strong silhouettes, cinematic warm dusk light, cool armored steel, restrained smoke and dust, focused action rather than chaos. Keep bottom 22 percent darker and quiet for briefing overlay. No humans, fantasy creatures, recognizable franchise designs, flags, banners, insignia, logos, letters, numbers, baked UI or watermarks. Original illustration, not a gameplay screenshot.",
+  "transparent_background": false,
+  "width": 1672,
+  "height": 941,
+  "sha256": "51d0c2c8f1290a25217ba3d8aae12a8964a795a73f233b32f7a2764456eff948",
+  "bytes": 2585962,
+  "original_output_filename": "exec-2850169f-8237-4dcf-9104-c94e79c4ecd4.png",
+  "status": "visually inspected candidate; outside shipped assets; not gameplay evidence"
+}
