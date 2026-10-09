@@ -2403,6 +2403,17 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
 }
 
 pub(crate) fn add_main_menu_scene(app: &mut App) -> &mut App {
+    #[cfg(target_arch = "wasm32")]
+    app.add_systems(
+        OnEnter(AppScreen::AssetLoading),
+        reset_web_asset_readiness.before(queue_startup_loading_assets),
+    )
+    .add_systems(
+        OnExit(AppScreen::AssetLoading),
+        publish_web_asset_readiness
+            .before(clear_global_progress::<AppScreen>)
+            .before(assets_loading_reset::<AppScreen>),
+    );
     app.add_systems(
         OnEnter(AppScreen::AssetLoading),
         (queue_startup_loading_assets, setup_asset_loading_screen).chain(),
@@ -2740,6 +2751,8 @@ pub(crate) fn update_asset_loading_screen(
     mut text_q: Query<&mut Text, With<StartupLoadingText>>,
 ) {
     let progress = tracker.get_global_progress();
+    #[cfg(target_arch = "wasm32")]
+    publish_web_asset_counts(progress.done, progress.total);
     let ratio = if progress.total == 0 {
         1.0
     } else {
@@ -2755,6 +2768,38 @@ pub(crate) fn update_asset_loading_screen(
     };
     for mut text in &mut text_q {
         **text = label.clone();
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+fn web_canvas_attribute(name: &str, value: &str) {
+    if let Some(canvas) = web_sys::window()
+        .and_then(|window| window.document())
+        .and_then(|document| document.get_element_by_id("bevy-canvas"))
+        && canvas.get_attribute(name).as_deref() != Some(value)
+    {
+        let _ = canvas.set_attribute(name, value);
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+fn reset_web_asset_readiness() {
+    web_canvas_attribute("data-game-assets-ready", "false");
+    publish_web_asset_counts(0, 0);
+}
+
+#[cfg(target_arch = "wasm32")]
+fn publish_web_asset_counts(done: u32, total: u32) {
+    web_canvas_attribute("data-assets-done", &done.to_string());
+    web_canvas_attribute("data-assets-total", &total.to_string());
+}
+
+#[cfg(target_arch = "wasm32")]
+fn publish_web_asset_readiness(tracker: Res<ProgressTracker<AppScreen>>) {
+    let progress = tracker.get_global_progress();
+    if progress.total > 0 && tracker.is_ready() {
+        publish_web_asset_counts(progress.done, progress.total);
+        web_canvas_attribute("data-game-assets-ready", "true");
     }
 }
 

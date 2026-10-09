@@ -1,0 +1,76 @@
+{
+  "1280": [
+    {
+      "kind": "click",
+      "x": 1040,
+      "y": 238,
+      "name": "01-setup",
+      "waitMs": 6000
+    },
+    {
+      "kind": "key",
+      "key": "Enter",
+      "name": "02-match",
+      "waitMs": 12000
+    },
+    {
+      "kind": "click",
+      "x": 416,
+      "y": 135,
+      "name": "02-briefing-dismissed",
+      "waitMs": 1500
+    },
+    {
+      "kind": "click",
+      "x": 300,
+      "y": 585,
+      "name": "03-unit-selected",
+      "waitMs": 1500
+    },
+    {
+      "kind": "click",
+      "button": "right",
+      "x": 450,
+      "y": 500,
+      "name": "04-unit-moved",
+      "waitMs": 5000
+    }
+  ],
+  "900": [
+    {
+      "kind": "click",
+      "x": 660,
+      "y": 238,
+      "name": "01-setup",
+      "waitMs": 6000
+    },
+    {
+      "kind": "key",
+      "key": "Enter",
+      "name": "02-match",
+      "waitMs": 12000
+    },
+    {
+      "kind": "click",
+      "x": 416,
+      "y": 135,
+      "name": "02-briefing-dismissed",
+      "waitMs": 1500
+    },
+    {
+      "kind": "click",
+      "x": 265,
+      "y": 122,
+      "name": "03-unit-selected",
+      "waitMs": 1500
+    },
+    {
+      "kind": "click",
+      "button": "right",
+      "x": 200,
+      "y": 450,
+      "name": "04-unit-moved",
+      "waitMs": 10000
+    }
+  ]
+}
