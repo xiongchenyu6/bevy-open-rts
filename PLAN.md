@@ -8,12 +8,14 @@ remains open. Current evidence must match the source/artifact being claimed.
 - [x] Boot Camp entry, skip, seven lessons, graduation and fresh replay;
   native sandbox persistence/restart verified separately.
 - [x] Remaining missions3/5 now win through ordinary input and continue.
-- [ ] Complete current six-mission sequence, restart persistence, retry/finale audit.
+- [x] Six missions complete in pinned separate-process sequence; exact growing
+  progress prefix and fresh-process all-unlocked menu verified.
+- [ ] Same-App campaign/retry audit and revalidation after current AI changes.
 - [x] Keyboard and mouse save/recovery in skirmish, including missing/corrupt files.
 - [ ] Campaign-runtime save continuity, full UI/browser and audio review.
 - [ ] Release delivery, balance/performance, provenance and store-media gates.
 
-Current source passes168 library tests, fmt/check/bins build and a12-second
+The b416 construction checkpoint passed168 library tests, fmt/check/bins build and a12-second
 native launch with no error output. Proof is `screenshots/result/15`:450frames,
 15seconds/30fps, inspected opening/movement/combat/ending. Unit motion4.24m,
 siege113damage and94effectframes are recorded in its log.
@@ -24,8 +26,8 @@ unit-aware routing now falls back to worker-sized static routing; endpoint
 occupancy and normal movement collisions remain enforced. Six construction
 regressions cover walking/yielding, physical clearance, speed bounds and cost.
 The same AA(-22,-13) completes through normal input; Mission3 wins3:03/HQ20,
-Mission5 wins4:17/HQ20/no building losses. Other four recipes have prior wins;
-repeat the whole current campaign/profile sequence before closing its gate.
+Mission5 wins4:17/HQ20/no building losses. Pin d569 subsequently completes all
+six with persisted prefixes; same-App/restart and new AI behavior remain pending.
 
 Mouse Save/Load and Main Menu return pass1280x720/900x720. Fresh-process first-
 wave campaign Load also restores flags, paid queue, resources and fog without
@@ -34,8 +36,10 @@ wave duplication. Broader orders/mines/effects/support runtime coverage remains.
 Standard Linux fat LTO failed twice with OOM; logs are preserved. The separately
 labeled thin-LTO candidate builds with full features. Its exact offline archive
 passes no-Nix/read-only AMD startup and real Enter/F10/select/right-move input.
-The online-default candidate finished11m22s/exit0; packaging and runtime checks
-are next. Windows development evidence remains an older checkpoint.
+The online-default candidate finished11m22s/exit0 and its exact Linux package
+passes AMD read-only/no-Nix input checks. Tagged Windows debug refresh passes
+Wine menu, mouse save/load and fresh-process restoration; native Windows remains
+unverified. Both packages predate the current AI construction changes.
 
 Six authored audio mismatches now regenerate deterministically and pass actual
 Bevy loading/decoding; human listening remains open. Packagers use PLAYER_GUIDE

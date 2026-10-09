@@ -94,7 +94,7 @@ resolve_wasm_opt() {
 WASM_OPT_BIN="$(resolve_wasm_opt || true)"
 [ -n "$WASM_OPT_BIN" ] && echo ">> wasm-opt: $("$WASM_OPT_BIN" --version)"
 
-cargo build --release --target wasm32-unknown-unknown --features webgpu
+cargo build --locked --release --target wasm32-unknown-unknown --features webgpu --bin bevy-open-rts
 
 rm -rf web/pkg web/assets
 mkdir -p web/pkg
@@ -146,4 +146,8 @@ BUILD_ID="$(scripts/stamp_web_build_id.py \
   web/pkg/bevy_open_rts_bg.wasm)"
 echo "Stamped web build id: ${BUILD_ID}"
 
-cp -R assets web/assets
+# Runtime fonts are subsets; preserve full source fonts in the repository only.
+python3 - <<'PY_ASSETS'
+import shutil
+shutil.copytree("assets", "web/assets", ignore=shutil.ignore_patterns("*.full.ttf"))
+PY_ASSETS

@@ -296,3 +296,19 @@ resolution for those configurations, not general balance: Chaos wins only4 of
 the48 non-mirror configurations, so AI/faction diagnosis is active. The144
 same-faction adjacent-difficulty cases now run separately; alternate spawn pairs,
 repeatability, independent seeds and release-artifact performance remain open.
+
+## Current source revalidation and web staging
+
+The d569 campaign checkpoint completes all six in order with exact persisted
+prefixes and a fresh-process all-unlocked menu. Same-App play and pause-menu
+Restart are separate checks: a retained trigger-state defect is being corrected
+in the common new-match initializer, before saved state restoration. Current
+AI technology/worker-construction changes require new behavioral acceptance;
+earlier campaign and balance results identify their older executable hashes.
+
+Web staging now builds only the shipped game with the lockfile and excludes
+`*.full.ttf`, retaining the runtime subset. Root executed the actual staging
+block in an isolated directory: all560 runtime file hashes match, the3,347,880-
+byte source font is excluded, and the original font hash is unchanged. Evidence:
+`logs/web-assets-subset-qa.json`; shell syntax passes. Full Wasm compilation and
+browser runtime acceptance are still pending.
