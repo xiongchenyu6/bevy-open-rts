@@ -1,0 +1,29 @@
+# Rust dependency source and notice materials
+
+The locked/offline Cargo metadata audit for Linux x86_64 default features finds
+635 reachable external packages through normal/build dependencies. Development
+edges are excluded. This is a dependency graph, not an exact linker input list;
+other platforms require their own graph review.
+
+All635 local `.crate` source archives match their Cargo.lock checksums. The
+published-source companion is retained locally at
+`target/linux-rust-source-companion-20261010.tar` (78,766,080 bytes), SHA256
+`987d7be1f870d69e1e5d87866a05fec94005106d4ad1cac72e65f0f433a8a207`.
+It contains the exact source archives, declared license metadata and collected
+notice files. It has not been published or included in a player archive yet.
+
+The audit copies1,102 top-level notice files from608 packages and verifies each
+copied hash. For23 additional packages, original notices were fetched from the
+precise Git commit recorded in the published crate, including ancestor-directory
+licenses where applicable. URLs, commits and hashes remain in
+`target/linux-resolved-dependency-metadata-20261010/`.
+
+Four packages have no matching upstream notice file found: constgebra0.1.4,
+crc-catalog2.5.0, hexf-parse0.2.1 and simd_helpers0.1.0. Their published source
+archives and license declarations are retained. Do not invent copyright notices
+or describe generic license terms as retrieved package originals. Complete
+license applicability, attribution and distribution review remains open.
+
+Keep these Rust materials separate from the six bundled dynamic-library source
+providers documented in `LINUX_RUNTIME_SOURCE_MATERIALS.md`. Neither inventory
+establishes rights for game art, models, fonts, effects or voices.
