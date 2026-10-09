@@ -1,0 +1,22 @@
+{
+  "scope": "Original repository-authored vector candidates, not runtime replacements",
+  "authoring_sha256": "4740a94e7da0ab5bd07add91934e4bfeb5fc8787112eb3ffbf9f5a13fe166ce4",
+  "rasterizer": "0.48.1",
+  "records": [
+    {
+      "faction": "alliance",
+      "svg_sha256": "89aaa13fa88b50b13461fe8b985d89dc546bd59cae590f433726b79e86751af5",
+      "png_sha256": "329168e1a8b97425422e7d26bd9ecf0f0af297971e48ad206ceadbe9a7c20984"
+    },
+    {
+      "faction": "demon",
+      "svg_sha256": "c3df4e1da16a57e974e7981cc3bb5474a60d483872c011f85f231ddfd659bef5",
+      "png_sha256": "548d63f76181b88fc65df6040d82432c960577596d965a66ac5506ab61897da2"
+    },
+    {
+      "faction": "chaos",
+      "svg_sha256": "4187bc945cbb1ebd34517cfe23284eec221eb1298cb3322f216c7b260ac01c95",
+      "png_sha256": "6c909058accd77d1f6c6a8608bb66adbcc6d3dbdda669ec7b94e5c93cad4a91c"
+    }
+  ]
+}

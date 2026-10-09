@@ -1,0 +1,32 @@
+{
+  "scope": "candidate generation and16/24/32px review-sheet only; actual menu review pending",
+  "records": [
+    {
+      "faction": "alliance",
+      "byte_reproduction_equal": true,
+      "width": 128,
+      "height": 128,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "sha256": "329168e1a8b97425422e7d26bd9ecf0f0af297971e48ad206ceadbe9a7c20984"
+    },
+    {
+      "faction": "demon",
+      "byte_reproduction_equal": true,
+      "width": 128,
+      "height": 128,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "sha256": "548d63f76181b88fc65df6040d82432c960577596d965a66ac5506ab61897da2"
+    },
+    {
+      "faction": "chaos",
+      "byte_reproduction_equal": true,
+      "width": 128,
+      "height": 128,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "sha256": "6c909058accd77d1f6c6a8608bb66adbcc6d3dbdda669ec7b94e5c93cad4a91c"
+    }
+  ]
+}

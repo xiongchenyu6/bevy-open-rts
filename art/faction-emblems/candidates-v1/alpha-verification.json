@@ -1,0 +1,23 @@
+[
+  {
+    "faction": "alliance",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "opaque_pixels": 5964,
+    "transparent_pixels": 10208
+  },
+  {
+    "faction": "demon",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "opaque_pixels": 4762,
+    "transparent_pixels": 11284
+  },
+  {
+    "faction": "chaos",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "opaque_pixels": 3837,
+    "transparent_pixels": 11976
+  }
+]
