@@ -93,9 +93,69 @@ when local threats clear. Sealed capture SHA256
 passed actual isolated Twin Front in **04:49**, with HQ **20/20**, actual child
 exit **0**, saved completion and real Next Mission continuation. Evidence is
 `current-campaign-twin-live-ground-response/`; the previous losing run remains
-preserved. A fresh same-App six-mission chain is running as
-`rts-campaign-chain-live-response-01` with evidence
-`current-campaign-chain-live-response/`. Its acceptance is still **pending**.
+preserved. The fresh same-App run `rts-campaign-chain-live-response-01`, evidence
+`current-campaign-chain-live-response/`, completed Missions 1–4 and verified all
+four exact disk prefixes, then lost Twin Front at 117.8 seconds. Its actual child
+exited **1**; acceptance is **incomplete**. This failure exposed retained
+`AiDirector` timers, production cursors and opening-grace flags across match
+transitions. Two actual shared restart/load regressions reproduced the leak and now pass:
+fresh matches reset the AI director plus economy sabotage/veterancy, while loads
+restore all ten saved AI vectors and saved economy state exactly before Update.
+Commit `3478190` passed the full suite (183 passed, zero failures, one ignored)
+and all three native builds. Sealed current capture SHA256
+`7fe3cb8024e48b7557df1695a917c5bc47a5e0a47c434840edee32bf8140933e`
+ran `current-campaign-chain-fresh-match-reset/`: Missions 1–2 won with both
+exact saved prefixes verified; Canyon Siege then stopped at an unfinished second
+ground turret at 118.7 seconds, HQ still 20/20. Actual child exit **1** and
+`accepted: false` are preserved. One worker disappeared during that construction;
+the remaining worker was idle and had a verified reachable contact to the site.
+The initial selected-builder trace was not enabled, so the precise death/order
+transition is not yet proven. Normal-input abandoned-foundation recovery and
+additional paid-queue lifecycle regressions are prepared for the next build.
+Full same-App campaign acceptance remains **incomplete**.
+
+The next lifecycle pass reproduced an old paid job refunding into a new match
+(32 starting ore became 34) and an old battle-event camera target persisting.
+Commit `648beff` resets both before loaded-save restoration and adds ordinary
+RMB recovery for a living foundation without an active or queued constructor.
+Recovery is bounded to three attempts and reads the actual builder/target before
+and after input. Weather save version 3 preserves the actual transition state;
+fresh entry resets it before loading. Five lifecycle regressions and five weather
+checks passed, followed by **190 passed, zero failures, one ignored**.
+
+Current capture SHA256
+`f58e08a3054eda63952b847238de9b2a98a547fcbf1c03ebcb05a18e4a555e3f`
+ran `current-campaign-chain-lifecycle-final/` in one App with a fresh profile.
+Missions 1–4 won (04:00, 01:55, 02:29, 05:00), with four exact saved prefixes
+and all four victory/continuation pairs inspected. Twin Front survived its
+opening but lost at 244.7 seconds while a blocking six-tank training quota waited
+with zero crystal; the actual child exited **1**. The constructor recovery branch
+did not run, so its input behavior is compiled but not yet verified by that run.
+The construction trace and failed four-mission prefix remain preserved.
+
+The capture recipe now leaves replacement quotas in normal paid queues and
+immediately enters the common harvesting/defense/assault loop after the opening.
+The next pin also needs the independently diagnosed AI compatible-target fix.
+All six victories, each exact saved prefix, and the seventh fresh campaign menu
+remain required before acceptance.
+
+The compatible-target AI build passed 192 tests, zero failures, one ignored.
+Its capture SHA256 `4a56196766e0f3dc9ce7c72fe3ea03cc4fba8682708e9f276b10511ee47163eb`
+passed the actual pause-menu Restart check (`current-campaign-restart-compatible-ai/`):
+45.066 seconds/three HMG/flags TTFFF, reset to 0.033 seconds/zero HMG/all flags
+false, then the same wave again at 45.066 seconds. Menu/reset/replayed images were
+inspected. Isolated M5 stopped at 122.8 seconds on a selection mismatch, HQ20;
+the log lacked enough identity detail to classify the precise target-death frame.
+
+Capture-only SHA256 `b8438329396aec3ff81633a5afa09cc7003535d5254f9395240e8d39aaee2f33`
+adds requested/clicked/dead diagnostics, ordinary empty-ground selection recovery
+when all requested targets die, and caller guards that skip subsequent controls
+on an empty selection. Its M5 attempt (`current-campaign-twin-dead-selection/`)
+stopped at 171.1 seconds with HQ20, Factory16, no combat units and zero crystal;
+actual child exit1. The empty-selection branch did not occur, so that branch
+remains compiled-only. The crystal collector's observed field was outside the
+original army staging/range. An ordinary paid-input staging change toward that
+field is prepared; no additional resource grants or stat changes are used.
 No unit spawns, resource grants, enemy/stat/trigger nerfs or direct
 combat-state/time injection are used by these recipes.
 
@@ -149,3 +209,70 @@ historical separate-process checkpoints.
 No unit spawning, resource grants, clock jumps, AI changes or level nerfs are
 permitted. Existing authored reinforcements and supply deliveries remain normal
 mission behavior.
+
+## Latest visible-only attempt
+
+Capture SHA256 `8d391c35c44e2d2778e604c8991b1e2e5d4e5077d55f113d1f63c7cc7870ffdf`
+uses the actual visibility boolean for all campaign maintenance/pressure/assault
+decisions. Unknown enemy sectors are explored through ordinary attack-move using
+only own HQ and known map geometry. Raw enemy data remains diagnostic only.
+Updated runtime-icon hashes are archived alongside the process artifacts.
+
+`current-campaign-twin-visible-crystal-cover/` passed isolated M5 in **05:32**,
+HQ20/20, zero building losses, saved completion and actual Next Mission verified.
+Victory and continuation screenshots were inspected. This does not establish a
+full campaign chain.
+
+`current-campaign-chain-visible-only/` won M0 and verified its exact saved prefix,
+then lost M1 with **HumanDefeat**, actual child exit1/acceptedfalse. The generic
+visible anchor selected a local ScoutRover and RocketGunship, redirecting the
+whole army away from the headquarters objective. The first single-sector scout
+was not sufficient. An objective-focused visible-HQ-only helper with persistent
+clockwise known-map scouting is prepared outside Rust source while the Linux
+release build is frozen. It needs an actual isolated M1 victory before another
+six-mission chain. Current-source campaign acceptance remains **incomplete**.
+
+## Hold correction and remaining M1 counterplay
+
+Held guards previously suppressed automatic acquisition entirely, and an existing
+attack target could make them pursue despite Hold. Commit `3c7c0d1` fixes both:
+held mobile units acquire compatible enemies only within weapon reach, keep
+their position, and stop pursuing a target that leaves range. Four full-schedule
+regressions reproduced three failures before the fix and all passed afterward.
+The full suite passed **200 tests, zero failures, one ignored**, and all three
+native binaries built successfully.
+
+Capture SHA256 `373886ba9cc2dfe08499b092dfdcfb7ea89b711cc1107d1fa0a930756eb4648b`
+ran `current-campaign-m1-hold-fixed/`. Actual child exit1/HumanDefeat at238.9
+seconds remains a failed mission proof. Gunship HP fell17→14.8 and it was absent
+from the final global contact snapshot, confirming actual air firing. Repeated
+new Tank entity births demonstrate continuing production; the five-job queue
+does not prove a production stall. Factory stayed16HP, no EMP/construction,
+normal power, and substantial ore/crystal remained. The later heavy airship
+retained27HP while rocket guards and AA cover were lost.
+
+That run also exercised requested-target death during camera settling: the
+normal empty-ground click cleared selection and actual selected[] was verified.
+The helper then skipped subsequent controls for the empty result.
+
+The next capture-only plan adds two paid AntiAirWalkers and visible-air
+interception with air-capable home guards, prioritizing counter replacements
+before more Tanks. It is prepared outside source while the constructor diagnostic
+build is frozen. No enemy stats, timers, resource grants or direct queue edits are
+used. Isolated M1 and the full same-App campaign remain **unaccepted**.
+
+## Paid AA Walker attempt
+
+Capture SHA256 `a7d68de26f8ae90fd366f7f8d0839d776857ba6652bdc720efc700835dc9b849`
+ran `current-campaign-m1-aa-counter/` with two normally paid AntiAirWalkers.
+Walker jobs appeared at34/44 seconds; the first live walker appeared64.1 seconds
+and both were present77 seconds, assigned to home defense. Actual visible-air
+interception reduced the heavy airship from27 to2HP at201.9 seconds. HQ remained
+20/20 and home defense survived substantially longer.
+
+The run nevertheless ended **HumanDefeat at443.7 seconds**, actual child exit1.
+Enemy HQ remained20HP. The assault repeatedly lost units before reaching that
+objective. Late stock308ore/78crystal, Factory16HP and normal power exclude an
+observed resource shortage or destroyed-factory explanation. The counter proof
+is useful but **does not accept M1 or the full campaign**. The exact failed
+telemetry, construction trace and contact snapshot remain preserved.

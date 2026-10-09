@@ -638,6 +638,9 @@ fn defense_point(app: &mut App, ordinal: usize) -> Result<Vec3, String> {
 fn refresh_groups(app: &mut App) -> Result<(), String> {
     let units = capture_campaign_units(app);
     let mut quotas: BTreeMap<&str, usize> = DEFENSE_QUOTAS.into_iter().collect();
+    if capture_active_mission(app) == Some(1) {
+        quotas.insert("AntiAirWalker", 2);
+    }
     for unit in units.iter().filter(|unit| unit.groups.contains(&DEFENSE)) {
         if let Some(quota) = quotas.get_mut(unit.id) {
             *quota = quota.saturating_sub(1);
@@ -741,6 +744,43 @@ fn maintain_home_defense(app: &mut App, perimeter: f32, staging_offset: f32) -> 
     Ok(())
 }
 
+fn maintain_m1_visible_air_defense(app: &mut App) -> Result<(), String> {
+    let state = capture_campaign_state(app);
+    let contacts = visible_enemy_contacts(app)?;
+    let Some(base) = state.headquarters.map(|headquarters| headquarters.position) else {
+        return Ok(());
+    };
+    let Some(threat) = state
+        .threats
+        .iter()
+        .filter(|threat| {
+            threat.domain == "air" && contact_is_visible(&contacts, threat.id, threat.position)
+        })
+        .min_by(|a, b| {
+            a.position
+                .distance_squared(base)
+                .total_cmp(&b.position.distance_squared(base))
+        })
+    else {
+        return Ok(());
+    };
+    let guards: Vec<_> = capture_campaign_units(app)
+        .iter()
+        .filter(|unit| {
+            unit.groups.contains(&DEFENSE) && matches!(unit.id, "RocketInfantry" | "AntiAirWalker")
+        })
+        .map(|unit| unit.entity)
+        .collect();
+    if select_units(app, &guards)?.is_empty() {
+        return Ok(());
+    }
+    println!(
+        "[capture] M1 visible-air guard intercept {} hp={} at {:?}",
+        threat.id, threat.health, threat.position
+    );
+    ground_order(app, threat.position, true)
+}
+
 pub(super) fn maintain_survival_defense(app: &mut App) -> Result<(), String> {
     let newcomers: Vec<_> = capture_campaign_units(app)
         .into_iter()
@@ -825,7 +865,7 @@ pub(super) fn visible_anchor_or_own_map_scout(app: &mut App) -> Result<Vec3, Str
     Ok(target)
 }
 
-fn attack(app: &mut App, cursor: &mut usize) -> Result<(), String> {
+fn attack(app: &mut App, cursor: &mut usize, headquarters_only: bool) -> Result<(), String> {
     if !recall(app, ASSAULT)? {
         return Ok(());
     }
@@ -839,15 +879,19 @@ fn attack(app: &mut App, cursor: &mut usize) -> Result<(), String> {
     }
     let centre = army.iter().map(|u| u.position).sum::<Vec3>() / army.len() as f32;
     let contacts = visible_enemy_contacts(app)?;
-    if let Some(c) = contacts.iter().min_by(|a, b| {
-        (a.id != "CommandCenter")
-            .cmp(&(b.id != "CommandCenter"))
-            .then_with(|| {
-                a.position
-                    .distance_squared(centre)
-                    .total_cmp(&b.position.distance_squared(centre))
-            })
-    }) {
+    if let Some(c) = contacts
+        .iter()
+        .filter(|contact| !headquarters_only || contact.id == "CommandCenter")
+        .min_by(|a, b| {
+            (a.id != "CommandCenter")
+                .cmp(&(b.id != "CommandCenter"))
+                .then_with(|| {
+                    a.position
+                        .distance_squared(centre)
+                        .total_cmp(&b.position.distance_squared(centre))
+                })
+        })
+    {
         println!(
             "[capture] visible-only assault anchor {} at {:?}",
             c.id, c.position
@@ -867,14 +911,25 @@ fn attack(app: &mut App, cursor: &mut usize) -> Result<(), String> {
         .as_f64()
         .ok_or("map height missing")? as f32
         * 0.7;
-    let route = [
-        Vec3::new(-base.x, 0.0, -base.z),
-        Vec3::new(x, 0.0, z),
-        Vec3::new(-x, 0.0, z),
-        Vec3::new(-x, 0.0, -z),
-        Vec3::new(x, 0.0, -z),
-        Vec3::ZERO,
-    ];
+    let route = if headquarters_only {
+        [
+            Vec3::new(-base.x, 0.0, base.z),
+            Vec3::new(-base.x, 0.0, -base.z),
+            Vec3::new(base.x, 0.0, -base.z),
+            Vec3::ZERO,
+            Vec3::new(x, 0.0, z),
+            Vec3::new(-x, 0.0, z),
+        ]
+    } else {
+        [
+            Vec3::new(-base.x, 0.0, -base.z),
+            Vec3::new(x, 0.0, z),
+            Vec3::new(-x, 0.0, z),
+            Vec3::new(-x, 0.0, -z),
+            Vec3::new(x, 0.0, -z),
+            Vec3::ZERO,
+        ]
+    };
     if centre.distance(route[*cursor % route.len()]) < 6.0 {
         *cursor += 1;
     }
@@ -954,14 +1009,26 @@ pub(super) fn run(
             build(app, &mut watch, "VehicleFactory")?;
             rally_to_safe_staging(app, "VehicleFactory", index)?;
             queue_to_quota(app, "VehicleFactory", "Tank", 6)?;
+            if index == 1 {
+                println!("[capture] M1 paid mixed-role early air-ground opening");
+                build(app, &mut watch, "RadarUplink")?;
+                println!("[capture] M1 prioritize two paid AA Walkers before tank refill");
+                queue_to_quota(app, "VehicleFactory", "AntiAirWalker", 2)?;
+            }
             build(app, &mut watch, "Barracks")?;
+            if index == 1 {
+                queue_to_quota(app, "Barracks", "RocketInfantry", 3)?;
+            }
             queue_to_quota(app, "Barracks", "HeavyMachinegunTrooper", 3)?;
+            if index == 1 {
+                queue_to_quota(app, "VehicleFactory", "AntiAirWalker", 2)?;
+            }
             build(app, &mut watch, "AntiGroundTurret")?;
             refresh_groups(app)?;
             // Canyon Siege also sends an EngineerDrone straight from the east.
             // Cover its route into HQ instead of placing AA nine metres north,
             // outside the turret's eight-metre weapon range from that approach.
-            if index == 2 {
+            if matches!(index, 1 | 2) {
                 watch.checkpoint(app, "before-build-east-AA")?;
                 let offsets = [
                     Vec3::new(6.0, 0.0, 0.0),
@@ -981,17 +1048,26 @@ pub(super) fn run(
             } else {
                 build(app, &mut watch, "AntiAirTurret")?;
             }
+            if index == 1 {
+                queue_to_quota(app, "VehicleFactory", "AntiAirWalker", 2)?;
+            }
             queue_to_quota(app, "VehicleFactory", "Tank", 9)?;
-            build(app, &mut watch, "RadarUplink")?;
+            if index != 1 {
+                build(app, &mut watch, "RadarUplink")?;
+            }
             rally_to_safe_staging(app, "Barracks", index)?;
             train_to_count(app, &mut watch, "Barracks", "RocketInfantry", 3)?;
             refresh_groups(app)?;
             watch.checkpoint(app, "early-air-defense-ready")?;
-            if capture_campaign_state(app).low_power {
+            if index == 1 || capture_campaign_state(app).low_power {
                 build(app, &mut watch, "PowerReactor")?;
             }
             build(app, &mut watch, "AntiGroundTurret")?;
-            train_to_count(app, &mut watch, "VehicleFactory", "Tank", 6)?;
+            if index == 1 {
+                queue_to_quota(app, "VehicleFactory", "Tank", 9)?;
+            } else {
+                train_to_count(app, &mut watch, "VehicleFactory", "Tank", 6)?;
+            }
             queue_to_quota(app, "CommandCenter", "Worker", 4)?;
             ensure_harvesting(app)?;
             refresh_groups(app)?;
@@ -1014,8 +1090,13 @@ pub(super) fn run(
             ensure_harvesting(app)?;
             refresh_groups(app)?;
             hold_arrived_defenders(app)?;
-            if index == 4 {
+            if matches!(index, 1 | 4) {
                 maintain_home_defense(app, 12.0, 8.0)?;
+            }
+            if index == 1 {
+                queue_to_quota(app, "VehicleFactory", "AntiAirWalker", 2)?;
+                queue_to_quota(app, "Barracks", "RocketInfantry", 5)?;
+                maintain_m1_visible_air_defense(app)?;
             }
             queue_to_quota(app, "CommandCenter", "Worker", 4)?;
             queue_to_quota(app, "Barracks", "HeavyMachinegunTrooper", 3)?;
@@ -1063,14 +1144,14 @@ pub(super) fn run(
                 && tanks >= 6
                 && (!launched || state.clock - last_attack_clock >= 15.0)
             {
-                attack(app, &mut scout_cursor)?;
+                attack(app, &mut scout_cursor, index == 1)?;
                 if !launched {
                     shoot(app, handle, dir.join("02_assault.png"));
                 }
                 launched = true;
                 last_attack_clock = state.clock;
             } else if launched && state.clock - last_attack_clock >= 15.0 && !attackers.is_empty() {
-                attack(app, &mut scout_cursor)?;
+                attack(app, &mut scout_cursor, index == 1)?;
                 last_attack_clock = state.clock;
             }
             log_state(

@@ -2320,7 +2320,7 @@ fn play_campaign_mission(mut app: &mut App, index: usize, dir: &Path) -> Result<
         capture_click_screen(&mut app, point, MouseButton::Right);
         if index == 5 {
             campaign_bot::run_finale(&mut app, &handle, dir)?;
-        } else if matches!(index, 2 | 4) {
+        } else if matches!(index, 1 | 2 | 4) {
             campaign_bot::run(&mut app, &handle, dir, index)?;
         } else {
             checked_build(&mut app, "PowerReactor")?;
@@ -2363,14 +2363,8 @@ fn play_campaign_mission(mut app: &mut App, index: usize, dir: &Path) -> Result<
                 campaign_bot::queue_to_quota(&mut app, "VehicleFactory", "Tank", 6)?;
                 campaign_bot::queue_to_quota(&mut app, "Barracks", "HeavyMachinegunTrooper", 8)?;
                 campaign_bot::queue_to_quota(&mut app, "Barracks", "RocketInfantry", 4)?;
-            } else {
-                let factory = checked_build(&mut app, "VehicleFactory")?;
-                train_army_via_real_input(&mut app, factory, 3, "Tank")?;
-                defend_headquarters_via_real_input(&mut app)?;
-                train_army_via_real_input(&mut app, factory, 8, "Tank")?;
             }
             shoot(&mut app, &handle, dir.join("01_army.png"));
-            let mut mission_one_scout_cursor = 0;
             for round in 0..80 {
                 if capture_match_phase_label(&mut app) != "Running" {
                     break;
@@ -2390,9 +2384,7 @@ fn play_campaign_mission(mut app: &mut App, index: usize, dir: &Path) -> Result<
                         campaign_bot::queue_to_quota(&mut app, "VehicleFactory", "Tank", 6)?;
                     }
                 }
-                if !survival {
-                    campaign_bot::mission_one_assault(&mut app, &mut mission_one_scout_cursor)?;
-                } else if index == 3 {
+                if index == 3 {
                     campaign_bot::maintain_survival_defense(&mut app)?;
                 } else {
                     defend_headquarters_via_real_input(&mut app)?;

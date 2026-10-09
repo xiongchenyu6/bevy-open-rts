@@ -135,7 +135,7 @@ pub(super) fn run(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Result<(
                 }
                 launched = false;
             } else if assault_tanks >= 3 && !near_ground && state.clock - last_attack >= 15.0 {
-                attack(app, &mut scout_cursor)?;
+                attack(app, &mut scout_cursor, true)?;
                 launched = true;
                 last_attack = state.clock;
             }
