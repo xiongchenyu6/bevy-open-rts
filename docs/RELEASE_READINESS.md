@@ -16,7 +16,7 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Six original encoded illustrations are wired; mission5 native briefing inspected. Other images/layouts/audio remain open. |
 | Skirmish/balance | All maps/factions/difficulties/starts playable; reproducible repeated/independent-seed sweeps; no indefinite matches | Foundation-fix pin completes216/216 canonical cases with validated outcomes. Latest damage pin is running canonical216 and full ordered-start3,726 sweeps; repeatability, independent seeds and broad balance remain open. |
 | Delivery | Windows/Linux release archives launch without Rust/Nix from arbitrary directories; writable user data | Earlier optimized Linux package passes bounded hardware/input smoke. Windows GNU/Wine harness evidence exists. Current release packages, native Windows/MSVC and Steam Runtime remain open. |
-| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Real EMP application regressions pass3/3; prior full suite178/0/1. Three new combat-damage regressions pass; updated full suite181/0/1 and shared native build pass; final-package/runtime acceptance remains incomplete. No representative combat performance or long-session acceptance yet. |
+| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Real EMP application regressions pass3/3; prior full suite178/0/1. Three new combat-damage regressions pass; fresh/load transition regressions2/2 and updated full suite183/0/1 pass; shared native build and final-package/runtime acceptance remain incomplete. No representative combat performance or long-session acceptance yet. |
 | Distribution | Accurate store copy, provenance/licenses/generated inventory and store-ready media | Unpublished store draft and partial provenance audit exist. Art/audio rights gaps and final media remain open. |
 
 ## Verification policy
@@ -74,8 +74,13 @@ capabilities normalize their timers to profile intervals even at zero delta.
 That fixture observation does not prove a serializer defect. Exact restoration
 must be checked at the actual load boundary before normal AI updates. Economy
 startup likewise resets only ore/crystal, leaving sabotage and producer veterancy;
-these are being included in fresh/load transition regressions. No fix is accepted
-yet. Wasm04 was deliberately stopped and retains its stop/provenance records.
+the expanded actual-transition regression reproduces this leakage while exact
+saved-state restoration passes. The minimal correction resets AiDirector before
+apply_loaded_save and creates fresh TeamEconomy values at new-match setup.
+Focused fresh/load regressions pass2/2 in1.67s; full suite passes183/0/1 in78.24s
+(`logs/campaign-ai-reset-{green,full}.log`). Shared native build and corrected
+same-App chain remain pending. Wasm04 was deliberately stopped and retains its
+stop/provenance records.
 
 ## Save and combat continuity
 
