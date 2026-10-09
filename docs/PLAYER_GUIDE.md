@@ -21,7 +21,8 @@ differ.
 Send Workers to nearby deposits, build power and keep training replacements.
 Protect your Command Center and power supply. Tanks attack ground targets;
 Rocket Infantry and Anti-Air Turrets counter aircraft. Place defenses where
-enemy approaches enter their range.
+enemy approaches enter their range. Engineer Drones can capture your Command
+Center; cover their flight paths with anti-air before they reach it.
 
 ## Controls
 
