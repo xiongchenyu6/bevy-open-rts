@@ -41,3 +41,10 @@ command center. The lower band is quiet; robot/tank silhouettes and faction
 colors were inspected. Fictional geometric banners require consistency review
 before integration. Full prompt, tool limitations and SHA256 are in its sibling
 provenance JSON. It remains outside shipped assets, without changing legacy art.
+
+The original candidate set now covers all six missions. Missions3–6 depict
+Ring Valley mining/siege, highland defense/airlift, four-corner pressure and
+the final supply-starved assault. Each image was individually generated and
+visually inspected; unchanged PNGs and complete per-image prompts/hashes are
+under `art/campaign/candidates/`. Current game assets remain unchanged; actual
+briefing integration and presentation verification are still required.

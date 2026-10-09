@@ -16,7 +16,7 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Candidate campaign art is not shipped evidence. |
 | Skirmish/balance | All maps/factions/difficulties/starts playable; reproducible repeated/independent-seed sweeps; no indefinite matches | Paid-AI canonical216 ends215 cases with1 timeout. Alternate starts, repeatability, independent seeds and broad balance remain open. |
 | Delivery | Windows/Linux release archives launch without Rust/Nix from arbitrary directories; writable user data | Earlier optimized Linux package passes bounded hardware/input smoke. Windows GNU/Wine harness evidence exists. Current release packages, native Windows/MSVC and Steam Runtime remain open. |
-| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Global EMP full-schedule regressions pass3/3; full current library suite175 passed/0 failed/1 ignored. New runtime acceptance remains open. No representative combat performance or long-session acceptance yet. |
+| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Global EMP full-schedule regressions pass3/3; full current library suite178 passed/0 failed/1 ignored. New runtime acceptance remains open. No representative combat performance or long-session acceptance yet. |
 | Distribution | Accurate store copy, provenance/licenses/generated inventory and store-ready media | Unpublished store draft and partial provenance audit exist. Art/audio rights gaps and final media remain open. |
 
 ## Verification policy
@@ -156,6 +156,6 @@ each frame and again on completion. The fix preserves received damage, awards
 only HP earned by actual construction work, and never revives dead sites.
 Nine construction regressions pass (`logs/foundation-damage-focused-01.log`),
 including real weapon destruction of an unworked foundation, retained damage
-through completion and no healing of stalled/dead sites. Full-suite, shared-build
-and exact case0050 replay are running or pending; the frozen788 audit continues
+through completion and no healing of stalled/dead sites. Full-suite passes178/0/1 in313.94s (`logs/foundation-damage-full-01.log`).
+Shared-build and exact case0050 replay are running or pending; the frozen788 audit continues
 unchanged, and no all-configurations completion is claimed.
