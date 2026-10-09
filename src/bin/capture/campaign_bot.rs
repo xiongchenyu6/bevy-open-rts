@@ -11,6 +11,8 @@ use std::io::Write;
 
 #[path = "campaign_bot/finale.rs"]
 mod finale;
+#[path = "campaign_bot/twin.rs"]
+mod twin;
 
 pub(super) fn run_finale(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Result<(), String> {
     finale::run(app, handle, dir)
@@ -138,50 +140,67 @@ fn select_units(app: &mut App, ids: &[Entity]) -> Result<Vec<Entity>, String> {
     let result = (|| {
         let mut clicked = Vec::new();
         for id in live {
-            let Some(before) = capture_campaign_units(app)
-                .into_iter()
-                .find(|unit| unit.entity == id)
-            else {
-                continue;
-            };
-            // Being projected is not enough: a unit can be behind the bottom
-            // HUD. Center this particular unit and neutralize edge scrolling
-            // while settling, then read its updated ground position.
-            capture_set_cursor(app, Vec2::new(WIDTH as f32 * 0.5, HEIGHT as f32 * 0.5));
-            capture_focus_camera_on(app, before.position);
-            advance(app, 12);
-            let Some(unit) = capture_campaign_units(app)
-                .into_iter()
-                .find(|unit| unit.entity == id)
-            else {
-                continue;
-            };
-            let point = capture_world_to_screen(app, unit.position)
-                .ok_or("campaign unit could not be brought into view")?;
-            if point.x < 24.0
-                || point.x > WIDTH as f32 - 24.0
-                || point.y < 90.0
-                || point.y > HEIGHT as f32 - 180.0
-            {
-                return Err(format!(
-                    "campaign unit is still outside click-safe field after centering: {id:?} at {point:?}"
-                ));
-            }
-            capture_key(app, KeyCode::ShiftLeft, !clicked.is_empty());
-            capture_click_screen(app, point, MouseButton::Left);
-            // Per-unit camera settling already exceeds double-click timing.
-            if !capture_entity_is_selected(app, id) {
-                let selected = capture_campaign_units(app)
+            for attempt in 0..3 {
+                let Some(before) = capture_campaign_units(app)
                     .into_iter()
-                    .filter(|unit| unit.selected)
-                    .map(|unit| (unit.entity, unit.id, unit.position))
-                    .collect::<Vec<_>>();
-                return Err(format!(
-                    "campaign foot click did not select {id:?} ({}) at {point:?}; selected {selected:?}",
-                    unit.id
-                ));
+                    .find(|unit| unit.entity == id)
+                else {
+                    break;
+                };
+                // Being projected is not enough: a unit can be behind the bottom
+                // HUD. Center this particular unit and neutralize edge scrolling
+                // while settling, then read its updated ground position.
+                capture_set_cursor(app, Vec2::new(WIDTH as f32 * 0.5, HEIGHT as f32 * 0.5));
+                capture_focus_camera_on(app, before.position);
+                advance(app, 12);
+                let Some(unit) = capture_campaign_units(app)
+                    .into_iter()
+                    .find(|unit| unit.entity == id)
+                else {
+                    break;
+                };
+                let point = capture_world_to_screen(app, unit.position)
+                    .ok_or("campaign unit could not be brought into view")?;
+                if point.x < 24.0
+                    || point.x > WIDTH as f32 - 24.0
+                    || point.y < 90.0
+                    || point.y > HEIGHT as f32 - 180.0
+                {
+                    return Err(format!(
+                        "campaign unit is still outside click-safe field after centering: {id:?} at {point:?}"
+                    ));
+                }
+                capture_key(app, KeyCode::ShiftLeft, !clicked.is_empty());
+                capture_click_screen(app, point, MouseButton::Left);
+                // Per-unit camera settling already exceeds double-click timing.
+                if !capture_entity_is_selected(app, id) {
+                    let current = capture_campaign_units(app);
+                    if !current.iter().any(|unit| unit.entity == id) {
+                        println!(
+                            "[capture] campaign selection target {id:?} died during ordinary click; continuing with survivors"
+                        );
+                        break;
+                    }
+                    if attempt < 2 {
+                        println!(
+                            "[capture] campaign selection retry {} for living {id:?}; reprojecting current position",
+                            attempt + 1
+                        );
+                        continue;
+                    }
+                    let selected = current
+                        .into_iter()
+                        .filter(|unit| unit.selected)
+                        .map(|unit| (unit.entity, unit.id, unit.position))
+                        .collect::<Vec<_>>();
+                    return Err(format!(
+                        "campaign foot click did not select {id:?} ({}) at {point:?}; selected {selected:?}",
+                        unit.id
+                    ));
+                }
+                clicked.push(id);
+                break;
             }
-            clicked.push(id);
         }
         Ok(clicked)
     })();
@@ -200,7 +219,25 @@ fn select_units(app: &mut App, ids: &[Entity]) -> Result<Vec<Entity>, String> {
         .map(|unit| unit.entity)
         .collect();
     if expected != selected {
-        return Err("campaign selection included units outside the requested group".into());
+        let missing: Vec<_> = expected.difference(&selected).copied().collect();
+        let unexpected: Vec<_> = selected.difference(&expected).copied().collect();
+        let current: Vec<_> = units
+            .iter()
+            .filter(|unit| expected.contains(&unit.entity) || selected.contains(&unit.entity))
+            .map(|unit| {
+                (
+                    unit.entity,
+                    unit.id,
+                    unit.health,
+                    unit.position,
+                    unit.selected,
+                    unit.groups.clone(),
+                )
+            })
+            .collect();
+        return Err(format!(
+            "campaign selection mismatch: expected {expected:?}, actual {selected:?}, missing {missing:?}, unexpected {unexpected:?}; current units {current:?}"
+        ));
     }
     Ok(expected.into_iter().collect())
 }
@@ -425,7 +462,11 @@ fn defense_point(app: &mut App, ordinal: usize) -> Result<Vec3, String> {
             base + Vec3::new(
                 1.5 + (slot % 4) as f32 * 1.8,
                 0.0,
-                7.5 + (slot / 4) as f32 * 1.8,
+                (if capture_active_mission(app) == Some(4) {
+                    4.5
+                } else {
+                    7.5
+                }) + (slot / 4) as f32 * 1.8,
             )
         })
         .find(|point| {
@@ -564,13 +605,13 @@ fn rally_to_safe_staging(
         .position;
     let offsets = if mission_index == 4 {
         [
-            (2.0, 9.0),
-            (5.0, 9.0),
-            (8.0, 8.0),
-            (10.0, 5.0),
-            (10.0, 2.0),
-            (-2.0, 10.0),
-            (0.0, 12.0),
+            (6.0, 5.0),
+            (5.0, 6.0),
+            (1.0, 4.5),
+            (1.0, 7.5),
+            (4.5, 7.5),
+            (-3.0, 4.5),
+            (-3.0, 7.5),
         ]
     } else {
         [
@@ -671,36 +712,60 @@ pub(super) fn run(
     };
     let result = (|| {
         log_state(app, &mut watch.trace, "opening")?;
-        build(app, &mut watch, "PowerReactor")?;
-        // Factory-first gets real armor onto the battlefield before the Hard
-        // opening attack. Production continues while infantry/defenses build.
-        build(app, &mut watch, "VehicleFactory")?;
-        rally_to_safe_staging(app, "VehicleFactory", index)?;
-        queue_to_quota(app, "VehicleFactory", "Tank", 6)?;
-        build(app, &mut watch, "Barracks")?;
-        queue_to_quota(app, "Barracks", "HeavyMachinegunTrooper", 3)?;
-        build(app, &mut watch, "AntiGroundTurret")?;
-        refresh_groups(app)?;
-        // The opening contains helicopters. AA has no radar prerequisite;
-        // build it while tanks train instead of waiting for six ground units.
-        build(app, &mut watch, "AntiAirTurret")?;
-        queue_to_quota(app, "VehicleFactory", "Tank", 9)?;
-        build(app, &mut watch, "RadarUplink")?;
-        rally_to_safe_staging(app, "Barracks", index)?;
-        train_to_count(app, &mut watch, "Barracks", "RocketInfantry", 3)?;
-        refresh_groups(app)?;
-        watch.checkpoint(app, "early-air-defense-ready")?;
-        if capture_campaign_state(app).low_power {
+        if index == 4 {
+            twin::opening(app, &mut watch)?;
+        } else {
             build(app, &mut watch, "PowerReactor")?;
+            // Factory-first gets real armor onto the battlefield before the Hard
+            // opening attack. Production continues while infantry/defenses build.
+            build(app, &mut watch, "VehicleFactory")?;
+            rally_to_safe_staging(app, "VehicleFactory", index)?;
+            queue_to_quota(app, "VehicleFactory", "Tank", 6)?;
+            build(app, &mut watch, "Barracks")?;
+            queue_to_quota(app, "Barracks", "HeavyMachinegunTrooper", 3)?;
+            build(app, &mut watch, "AntiGroundTurret")?;
+            refresh_groups(app)?;
+            // Canyon Siege also sends an EngineerDrone straight from the east.
+            // Cover its route into HQ instead of placing AA nine metres north,
+            // outside the turret's eight-metre weapon range from that approach.
+            if index == 2 {
+                watch.checkpoint(app, "before-build-east-AA")?;
+                let offsets = [
+                    Vec3::new(6.0, 0.0, 0.0),
+                    Vec3::new(6.0, 0.0, -3.0),
+                    Vec3::new(9.0, 0.0, 0.0),
+                    Vec3::new(9.0, 0.0, -3.0),
+                    Vec3::new(4.0, 0.0, -3.0),
+                ];
+                let mut observer = |app: &mut App| watch.observe(app);
+                build_campaign_structure_with_offsets(
+                    app,
+                    "AntiAirTurret",
+                    offsets,
+                    &mut observer,
+                )?;
+                watch.checkpoint(app, "after-build-east-AA")?;
+            } else {
+                build(app, &mut watch, "AntiAirTurret")?;
+            }
+            queue_to_quota(app, "VehicleFactory", "Tank", 9)?;
+            build(app, &mut watch, "RadarUplink")?;
+            rally_to_safe_staging(app, "Barracks", index)?;
+            train_to_count(app, &mut watch, "Barracks", "RocketInfantry", 3)?;
+            refresh_groups(app)?;
+            watch.checkpoint(app, "early-air-defense-ready")?;
+            if capture_campaign_state(app).low_power {
+                build(app, &mut watch, "PowerReactor")?;
+            }
+            build(app, &mut watch, "AntiGroundTurret")?;
+            train_to_count(app, &mut watch, "VehicleFactory", "Tank", 6)?;
+            queue_to_quota(app, "CommandCenter", "Worker", 4)?;
+            ensure_harvesting(app)?;
+            refresh_groups(app)?;
+            hold_arrived_defenders(app)?;
+            log_state(app, &mut watch.trace, "defense_ready")?;
+            shoot(app, handle, dir.join("01_defense.png"));
         }
-        build(app, &mut watch, "AntiGroundTurret")?;
-        train_to_count(app, &mut watch, "VehicleFactory", "Tank", 6)?;
-        queue_to_quota(app, "CommandCenter", "Worker", 4)?;
-        ensure_harvesting(app)?;
-        refresh_groups(app)?;
-        hold_arrived_defenders(app)?;
-        log_state(app, &mut watch.trace, "defense_ready")?;
-        shoot(app, handle, dir.join("01_defense.png"));
         let mut launched = false;
         let mut last_attack_clock = -20.0;
         let mut last_hq_health = capture_campaign_state(app)

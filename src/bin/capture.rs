@@ -408,6 +408,20 @@ fn main() {
                 .unwrap_or_else(|| PathBuf::from(format!("screenshots/weather/{kind}.png")));
             render_weather(&kind, &path)
         }
+        Some("campaign-restart") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/campaign-restart"));
+            render_campaign_restart(&dir)
+        }
+        Some("campaign-chain") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/campaign-chain"));
+            render_campaign_chain(&dir)
+        }
         Some("campaign-play") => {
             let index: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(0);
             let dir = args
@@ -1433,7 +1447,7 @@ fn build_structure_via_real_input(
     app: &mut App,
     structure_id: &'static str,
 ) -> Result<Vec3, String> {
-    build_structure_with_input_mode(app, structure_id, false, None, None)
+    build_structure_with_input_mode(app, structure_id, false, None, None, true)
 }
 
 fn build_campaign_structure_via_real_input(
@@ -1441,7 +1455,7 @@ fn build_campaign_structure_via_real_input(
     structure_id: &'static str,
     observer: &mut dyn FnMut(&mut App),
 ) -> Result<Vec3, String> {
-    build_structure_with_input_mode(app, structure_id, true, Some(observer), None)
+    build_structure_with_input_mode(app, structure_id, true, Some(observer), None, true)
 }
 
 fn build_campaign_structure_with_offsets(
@@ -1450,7 +1464,23 @@ fn build_campaign_structure_with_offsets(
     offsets: [Vec3; 5],
     observer: &mut dyn FnMut(&mut App),
 ) -> Result<Vec3, String> {
-    build_structure_with_input_mode(app, structure_id, true, Some(observer), Some(offsets))
+    build_structure_with_input_mode(app, structure_id, true, Some(observer), Some(offsets), true)
+}
+
+fn place_campaign_structure_with_offsets(
+    app: &mut App,
+    structure_id: &'static str,
+    offsets: [Vec3; 5],
+    observer: &mut dyn FnMut(&mut App),
+) -> Result<Vec3, String> {
+    build_structure_with_input_mode(
+        app,
+        structure_id,
+        true,
+        Some(observer),
+        Some(offsets),
+        false,
+    )
 }
 
 fn observed_capture_step(app: &mut App, observer: &mut Option<&mut dyn FnMut(&mut App)>) {
@@ -1460,12 +1490,29 @@ fn observed_capture_step(app: &mut App, observer: &mut Option<&mut dyn FnMut(&mu
     }
 }
 
+fn trace_campaign_construction(app: &mut App, id: &str, stage: &str) -> Result<(), String> {
+    let Some(path) = env::var_os("OPEN_RTS_CAPTURE_CONSTRUCTION_TRACE") else {
+        return Ok(());
+    };
+    let mut trace = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path)
+        .map_err(|error| error.to_string())?;
+    let value = serde_json::json!({"stage":stage,"structure":id,
+        "snapshot":bevy_open_rts::capture_construction_contact_debug(app)});
+    use std::io::Write;
+    serde_json::to_writer(&mut trace, &value).map_err(|error| error.to_string())?;
+    trace.write_all(b"\n").map_err(|error| error.to_string())
+}
+
 fn build_structure_with_input_mode(
     app: &mut App,
     structure_id: &'static str,
     observed_tab_keys: bool,
     mut observer: Option<&mut dyn FnMut(&mut App)>,
     placement_override: Option<[Vec3; 5]>,
+    wait_for_completion: bool,
 ) -> Result<Vec3, String> {
     let worker = if observed_tab_keys {
         // Campaign builders use the same verified, click-safe selection as
@@ -1527,7 +1574,9 @@ fn build_structure_with_input_mode(
             capture_selected_player_unit_ids(app)
         );
     }
+    trace_campaign_construction(app, structure_id, "before-build-hotkey")?;
     tap_key(app, build_key);
+    trace_campaign_construction(app, structure_id, "after-build-hotkey")?;
     if !capture_player_in_placement_mode(app) {
         return Err(format!(
             "{structure_id} build hotkey did not enter placement mode"
@@ -1607,13 +1656,27 @@ fn build_structure_with_input_mode(
             observed_capture_step(app, &mut observer);
         }
         if !capture_placement_is_valid(app) {
+            let world = app.world_mut();
+            let mut labels = world.query::<&Text>();
+            let feedback: Vec<_> = labels
+                .iter(world)
+                .filter(|text| text.0.starts_with("Place:"))
+                .map(|text| text.0.clone())
+                .collect();
+            println!(
+                "[capture] invalid {structure_id} candidate ({:.1},{:.1}): actual placement UI {feedback:?}",
+                candidate.x, candidate.z
+            );
             continue;
         }
+        trace_campaign_construction(app, structure_id, "before-placement-click")?;
         capture_mouse_button(app, MouseButton::Left, true);
         observed_capture_step(app, &mut observer);
+        trace_campaign_construction(app, structure_id, "placement-pressed")?;
         capture_mouse_button(app, MouseButton::Left, false);
-        for _ in 0..20 {
+        for tick in 0..20 {
             observed_capture_step(app, &mut observer);
+            trace_campaign_construction(app, structure_id, &format!("placement-released-{tick}"))?;
         }
         if capture_player_structure_count(app) > structures_before {
             placed_at = Some(candidate);
@@ -1627,14 +1690,25 @@ fn build_structure_with_input_mode(
         placed_at.x, placed_at.z
     );
 
+    if !wait_for_completion {
+        return Ok(placed_at);
+    }
+
     let completed = if observed_tab_keys {
         let mut complete =
             capture_player_completed_structure_count_for(app, structure_id) > completed_before;
-        for _ in 0..BUILD_COMPLETION_WAIT_TICKS {
+        for tick in 0..BUILD_COMPLETION_WAIT_TICKS {
             if complete || capture_match_phase_label(app) != "Running" {
                 break;
             }
             observed_capture_step(app, &mut observer);
+            if tick % 30 == 0 {
+                trace_campaign_construction(
+                    app,
+                    structure_id,
+                    &format!("construction-wait-{tick}"),
+                )?;
+            }
             complete =
                 capture_player_completed_structure_count_for(app, structure_id) > completed_before;
         }
@@ -1982,6 +2056,114 @@ fn render_campaign_play(index: usize, dir: &Path) -> Result<(), String> {
     }
     for _ in 0..MATCH_SETTLE_TICKS {
         app.update();
+    }
+    play_campaign_mission(&mut app, index, dir)
+}
+
+/// Reuses one application; only the first mission is launched directly.
+/// Subsequent missions must arrive through the actual victory-screen Next click.
+fn render_campaign_chain(dir: &Path) -> Result<(), String> {
+    let mut app = build_capture_app(WIDTH, HEIGHT);
+    wait_for_startup(&mut app)?;
+    if !capture_start_mission(&mut app, 0) {
+        return Err("first campaign mission not found".into());
+    }
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    let mut checkpoints = Vec::new();
+    for index in 0..6 {
+        play_campaign_mission(&mut app, index, &dir.join(index.to_string()))?;
+        let completed: Vec<_> = (0..6)
+            .map(|mission| capture_campaign_completed(&app, mission))
+            .collect();
+        if completed
+            .iter()
+            .enumerate()
+            .any(|(mission, &done)| done != (mission <= index))
+        {
+            return Err(format!(
+                "mission {index}: campaign completion prefix is invalid"
+            ));
+        }
+        checkpoints.push(serde_json::json!({"index": index, "completed": completed}));
+        std::fs::write(
+            dir.join("chain-result.json"),
+            serde_json::to_vec_pretty(&checkpoints).map_err(|error| error.to_string())?,
+        )
+        .map_err(|error| error.to_string())?;
+    }
+    Ok(())
+}
+
+/// Clicks the pause-menu Restart after the first authored wave, then waits for
+/// that wave to fire again on the new clock. All observations are read-only.
+fn render_campaign_restart(dir: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|error| error.to_string())?;
+    let mut app = build_capture_app(WIDTH, HEIGHT);
+    wait_for_startup(&mut app)?;
+    if !capture_start_mission(&mut app, 0) {
+        return Err("first campaign mission not found".into());
+    }
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    tap_key(&mut app, KeyCode::Enter);
+    let handle = capture_handle(&app);
+    let wave_fired =
+        |app: &mut App| bevy_open_rts::capture_mission_trigger_observation(app)["fired"][1] == true;
+    if !wait_until(&mut app, 1800, wave_fired) {
+        return Err("first timed wave did not fire before restart".into());
+    }
+    let before = bevy_open_rts::capture_mission_trigger_observation(&mut app);
+    shoot(&mut app, &handle, dir.join("00_before_restart.png"));
+    tap_key(&mut app, KeyCode::Escape);
+    for _ in 0..8 {
+        app.update();
+    }
+    let point = bevy_open_rts::capture_match_menu_button_center(&mut app, "restart")
+        .ok_or("pause-menu Restart button missing")?;
+    shoot(&mut app, &handle, dir.join("01_restart_menu.png"));
+    capture_click_screen(&mut app, point, MouseButton::Left);
+    for _ in 0..MATCH_SETTLE_TICKS {
+        app.update();
+    }
+    let reset = bevy_open_rts::capture_mission_trigger_observation(&mut app);
+    if reset["clock"].as_f64().is_none_or(|clock| clock >= 5.0)
+        || reset["fired"]
+            .as_array()
+            .is_some_and(|flags| flags.iter().any(|flag| flag == true))
+        || capture_active_mission(&app) != Some(0)
+    {
+        return Err(format!(
+            "pause-menu Restart did not reset mission state: {reset}"
+        ));
+    }
+    shoot(&mut app, &handle, dir.join("02_reset_briefing.png"));
+    tap_key(&mut app, KeyCode::Enter);
+    if !wait_until(&mut app, 1800, wave_fired) {
+        return Err("first timed wave did not fire again after restart".into());
+    }
+    let after = bevy_open_rts::capture_mission_trigger_observation(&mut app);
+    if after["enemy_hmg"].as_u64().unwrap_or(0) < 3 {
+        return Err("replayed timed wave has no three living enemy HMG units".into());
+    }
+    shoot(&mut app, &handle, dir.join("03_wave_replayed.png"));
+    std::fs::write(
+        dir.join("result.json"),
+        serde_json::to_vec_pretty(
+            &serde_json::json!({"before": before, "reset": reset, "after": after}),
+        )
+        .map_err(|error| error.to_string())?,
+    )
+    .map_err(|error| error.to_string())?;
+    Ok(())
+}
+
+fn play_campaign_mission(mut app: &mut App, index: usize, dir: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|error| error.to_string())?;
+    if capture_active_mission(&app) != Some(index) {
+        return Err(format!("campaign chain expected mission {index}"));
     }
     let handle = capture_handle(&app);
     shoot(&mut app, &handle, dir.join("00_briefing.png"));

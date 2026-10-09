@@ -1359,10 +1359,83 @@ pub fn capture_construction_contact_debug(app: &mut App) -> serde_json::Value {
             "resource_amount": resource.map(|resource| resource.amount), "wall": wall.is_some(),
             "construct_target": constructing.map(|order| order.target.to_bits()),
             "health": health.map(|health| health.current),
+            "team": world.get::<Team>(entity).map(|team| format!("{team:?}")),
+            "selected": world.get::<Selected>(entity).is_some(),
+            "move_target": world.get::<MoveOrder>(entity).map(|order| order.target.to_array()),
+            "path_goal": world.get::<PlannedPath>(entity).map(|path| path.goal.to_array()),
+            "path_next": world.get::<PlannedPath>(entity).map(|path| path.next),
+            "emp_remaining": world.get::<EmpDisabled>(entity).map(|emp| emp.remaining),
+            "construction_remaining": world.get::<UnderConstruction>(entity).map(|site| site.remaining),
+            "queued_count": world.get::<OrderQueue>(entity).map(|queue| queue.orders.len()).unwrap_or(0),
+            "queued_construct_targets": world.get::<OrderQueue>(entity).map(|queue| queue.orders.iter().filter_map(|order| {
+                if let UnitQueuedOrder::Construct(target) = order { Some(target.to_bits()) } else { None }
+            }).collect::<Vec<_>>()).unwrap_or_default(),
         })
     }).collect();
     let grid = world.resource::<NavGrid>();
-    serde_json::json!({ "entities":entities, "grid": {
+    let static_obstacles: Vec<_> = query
+        .iter(world)
+        .filter(|(_, _, _, _, structure, resource, wall, _, _)| {
+            structure.is_some() || resource.is_some() || wall.is_some()
+        })
+        .map(|(_, transform, selectable, ..)| (transform.translation, selectable.radius))
+        .collect();
+    let workers: Vec<_> = query
+        .iter(world)
+        .filter(|(entity, _, _, unit, _, _, _, _, hp)| {
+            unit.is_some_and(|u| u.id == "Worker")
+                && world.get::<Team>(*entity) == Some(&Team::Player(0))
+                && hp.is_some_and(|hp| hp.current > 0.0)
+        })
+        .map(|(entity, transform, selectable, ..)| {
+            (entity, transform.translation, selectable.radius)
+        })
+        .collect();
+    let foundations: Vec<_> = query
+        .iter(world)
+        .filter(|(entity, _, _, _, structure, _, _, _, _)| {
+            structure.is_some()
+                && world.get::<UnderConstruction>(*entity).is_some()
+                && world.get::<Team>(*entity) == Some(&Team::Player(0))
+        })
+        .map(|(entity, transform, selectable, ..)| {
+            (entity, transform.translation, selectable.radius)
+        })
+        .collect();
+    let units: Vec<_> = query
+        .iter(world)
+        .filter(|(_, _, _, unit, _, _, _, _, hp)| {
+            unit.is_some() && hp.is_some_and(|hp| hp.current > 0.0)
+        })
+        .map(|(entity, transform, selectable, ..)| {
+            (entity, transform.translation, selectable.radius)
+        })
+        .collect();
+    let mut contacts = Vec::new();
+    for (worker, position, radius) in workers {
+        let occupied: Vec<_> = units
+            .iter()
+            .filter(|(entity, ..)| *entity != worker)
+            .map(|(_, position, radius)| (*position, *radius))
+            .collect();
+        for &(target, target_position, target_radius) in &foundations {
+            let approach = reachable_unit_contact_approach(
+                position,
+                radius,
+                target_position,
+                target_radius,
+                grid,
+                &static_obstacles,
+                &occupied,
+            );
+            contacts.push(serde_json::json!({"worker":worker.to_bits(),"target":target.to_bits(),
+                "reachable":approach.is_some(),"contact_target":approach.as_ref().map(|a| a.target.to_array()),
+                "waypoint_count":approach.as_ref().map(|a| a.waypoints.len())}));
+        }
+    }
+    serde_json::json!({ "entities":entities, "contacts":contacts,
+        "clock":world.resource::<MatchState>().start_time_sec,
+        "pending_placement":format!("{:?}", world.resource::<CommandMode>().pending_structure_placement), "grid": {
         "version": grid.version, "origin_x": grid.origin_x, "origin_z": grid.origin_z,
         "width": grid.width, "height": grid.height,
         "blocked_indices": grid.blocked.iter().enumerate().filter_map(|(index, blocked)| blocked.then_some(index)).collect::<Vec<_>>(),
@@ -2310,6 +2383,7 @@ pub fn capture_match_menu_button_center(app: &mut App, action: &str) -> Option<V
     }
     let requested = match action {
         "load" => MatchMenuAction::Load,
+        "restart" => MatchMenuAction::Restart,
         "save" => MatchMenuAction::Save,
         "return" => MatchMenuAction::ReturnToSetup,
         _ => return None,
@@ -2320,6 +2394,21 @@ pub fn capture_match_menu_button_center(app: &mut App, action: &str) -> Option<V
         .iter(world)
         .find(|(button, _)| button.action == requested)
         .map(|(_, transform)| transform.translation)
+}
+
+/// Read-only authored-wave evidence for the real restart input harness.
+pub fn capture_mission_trigger_observation(app: &mut App) -> serde_json::Value {
+    let world = app.world_mut();
+    let clock = world.resource::<MatchState>().start_time_sec;
+    let fired = world.resource::<MissionTriggerState>().fired.clone();
+    let mut query = world.query::<(&Unit, &Team, &Health)>();
+    let enemy_hmg = query
+        .iter(world)
+        .filter(|(unit, team, health)| {
+            unit.id == "HeavyMachinegunTrooper" && **team == Team::Player(1) && health.current > 0.0
+        })
+        .count();
+    serde_json::json!({"clock": clock, "fired": fired, "enemy_hmg": enemy_hmg})
 }
 
 pub fn capture_player_combat_unit_position(app: &mut App) -> Option<Vec3> {

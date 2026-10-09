@@ -396,6 +396,11 @@ pub(crate) struct MissionTriggerState {
     pub(crate) fired: Vec<bool>,
 }
 
+/// A fresh match must replay authored triggers; loaded saves restore their flags later.
+pub(crate) fn reset_mission_triggers(mut state: ResMut<MissionTriggerState>) {
+    *state = MissionTriggerState::default();
+}
+
 pub(crate) fn mission_by_index(index: usize) -> Option<&'static MissionDef> {
     CAMPAIGN_MISSIONS.get(index)
 }
