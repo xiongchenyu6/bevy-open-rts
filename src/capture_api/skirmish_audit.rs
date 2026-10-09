@@ -194,6 +194,19 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
                     "attack_target":attack.map(|order|order.target.to_bits()),
                     "attack_target_position":attack.and_then(|order|world.get::<Transform>(order.target))
                         .map(|target|target.translation.to_array()),
+                    "attack_target_state":attack.map(|order|serde_json::json!({
+                        "unit":world.get::<Unit>(order.target).map(|target|target.id),
+                        "structure":world.get::<Structure>(order.target).map(|target|target.id),
+                        "health":world.get::<Health>(order.target).map(|target|target.current),
+                        "team":world.get::<Team>(order.target).map(|team|team.economy_index()),
+                    })),
+                    "weapon":world.get::<Weapon>(entity).map(|weapon|serde_json::json!({
+                        "range":weapon.range, "damage":weapon.damage,
+                        "cooldown_left":weapon.cooldown_left,
+                        "can_attack_ground":weapon.can_attack_ground,
+                        "can_attack_air":weapon.can_attack_air,
+                    })),
+                    "emp_remaining":world.get::<EmpDisabled>(entity).map(|emp|emp.remaining),
                     "attack_move_target":attack_move.map(|order|order.destination.to_array()),
                     "path_goal":path.map(|path|path.goal.to_array()),
                     "remaining_waypoints":path.map(|path|path.waypoints.iter().skip(path.next)
