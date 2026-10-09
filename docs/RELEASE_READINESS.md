@@ -16,7 +16,7 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Candidate campaign art is not shipped evidence. |
 | Skirmish/balance | All maps/factions/difficulties/starts playable; reproducible repeated/independent-seed sweeps; no indefinite matches | Paid-AI canonical216 ends215 cases with1 timeout. Alternate starts, repeatability, independent seeds and broad balance remain open. |
 | Delivery | Windows/Linux release archives launch without Rust/Nix from arbitrary directories; writable user data | Earlier optimized Linux package passes bounded hardware/input smoke. Windows GNU/Wine harness evidence exists. Current release packages, native Windows/MSVC and Steam Runtime remain open. |
-| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Global EMP full-schedule regressions pass3/3; full library suite173 passed/0 failed/1 ignored. New runtime acceptance remains open. No representative combat performance or long-session acceptance yet. |
+| Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Global EMP full-schedule regressions pass3/3; full current library suite175 passed/0 failed/1 ignored. New runtime acceptance remains open. No representative combat performance or long-session acceptance yet. |
 | Distribution | Accurate store copy, provenance/licenses/generated inventory and store-ready media | Unpublished store draft and partial provenance audit exist. Art/audio rights gaps and final media remain open. |
 
 ## Verification policy
@@ -104,7 +104,8 @@ ground-incapable AA unit. The default armed production pass now requires
 ground capability unless the explicit air-threat branch is needed. Four AI
 regressions pass (`target/ai-ground-force-focused-02.log`), including the exact
 case0103 victory at323.476s with normal resources/costs, actual air-threat AA
-selection and Human-controller protection. Full suite and fresh216 matrix
+selection and Human-controller protection. The full current library suite passes175/0/1 in87.55s
+(`target/ai-ground-force-full.log`). Fresh216 matrix and current runtime
 revalidation remain open; this does not erase the old failure. A simple chase explanation is contradicted by the report. See
 `target/big-arena-timeout-diagnostic-20261009`. Both audit pins predate the global
 EMP fix. Alternate starts, repeated runs, independent seeds and final-package
