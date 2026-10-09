@@ -423,3 +423,11 @@ ChaosEasy slot0 versus ChaosBeginner slot1, case0103, at600 sim seconds.
 Its raw report remains available for new target/weapon diagnostics and replay.
 This immutable pin predates the EMP task preservation fix. Alternate starts,
 repeatability, independent-seed coverage and release performance remain open.
+
+The post-fix mission5 replay (`current-campaign-twin-emp-paused`) still fails
+with an unfinished AA foundation at82.1s. Root identifies a second cancellation
+path: `clear_emp_disabled_orders` globally clears all active and queued orders
+in the actual Combat schedule. The two isolated regressions did not include
+this system. Full-schedule EMP preservation, including capture/garrison pause
+semantics, must pass before claiming the campaign defect fixed. The failed
+runtime trace and original logs remain intact.
