@@ -431,3 +431,23 @@ in the actual Combat schedule. The two isolated regressions did not include
 this system. Full-schedule EMP preservation, including capture/garrison pause
 semantics, must pass before claiming the campaign defect fixed. The failed
 runtime trace and original logs remain intact.
+
+## Real-peer Human/AI control acceptance
+
+`rts-online-human-ai-live-01.service` exits0 on main pinf2a0d3cf after
+two native Human peers join a normal public QA room with AI slot2. Both reports
+pass at gameclock50.01365: the remote Human Worker executes three validated
+Move commands, its two queued moves remain on the authoritative host, untouched
+Human units/resources remain unchanged, and AI completes a Factory and produces
+a new armed unit. Twenty same-tick host/client snapshot summaries agree.
+Evidence is under `target/online-human-ai-live-20261009-01`; normal disconnect
+and room expiry both pass. The wire snapshots omit unit queues, so queue
+preservation is host evidence and replicated movement is client evidence.
+This does not establish browser peers, forced relay, eight-player capacity,
+long-session reliability, performance or final-package acceptance.
+
+The fresh diagnostic audit pin4967e56 reproduces BigArena case0103 at600s with
+the same positions and resources. Two ground-capable units target a living
+PowerReactor within weapon range, with active cooldowns and no EMP; its HP is
+about5.0. This contradicts a simple out-of-range chase explanation. Repair or
+healing and AI force composition require further tracing before a behavior fix.
