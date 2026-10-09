@@ -773,6 +773,9 @@ pub(crate) fn update_support_effects(
             }
             let damage = impact_damage * support_damage_scale(shield, passive_shield);
             target_health.current -= damage;
+            commands
+                .entity(target_entity)
+                .try_insert(RecentDamage::fresh());
             if relations.are_allied(*target_team, player_team) && damage > 0.0 {
                 push_under_attack_log(
                     &mut battle_log,
@@ -1534,6 +1537,7 @@ pub(crate) fn update_mines(
             }
             let applied_damage = damage * support_damage_scale(shield, passive_shield);
             health.current -= applied_damage;
+            commands.entity(target).try_insert(RecentDamage::fresh());
             commands.spawn((
                 ShotPulse {
                     from: from + Vec3::Y * 0.45,
@@ -2036,6 +2040,7 @@ pub(crate) fn move_units(
             }
             let damage = CRUSH_DAMAGE * support_damage_scale(shield, passive_shield);
             health.current -= damage;
+            commands.entity(target).try_insert(RecentDamage::fresh());
             commands.spawn((
                 ShotPulse {
                     from: from + Vec3::Y * 0.45,
@@ -2871,3 +2876,6 @@ pub(crate) fn draw_health_bar(
         gizmos.line(left, fill, fill_color);
     }
 }
+
+#[cfg(test)]
+mod damage_tests;

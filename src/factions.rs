@@ -39,7 +39,7 @@ pub(crate) struct FactionShield {
     pub(crate) max: f32,
 }
 
-/// The unit or structure took weapon damage recently — suppresses shield
+/// The unit or structure took combat damage recently — suppresses shield
 /// recharge, demon regeneration and alliance structure field repair.
 #[derive(Component, Clone, Copy)]
 pub(crate) struct RecentDamage {

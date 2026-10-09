@@ -3272,6 +3272,9 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                     alliance_structure_field_repair,
                 )
                     .chain()
+                    .after(update_mines)
+                    .after(move_units)
+                    .after(update_support_effects)
                     .before(combat),
             )
                 .in_set(SimulationPhase::Combat)
