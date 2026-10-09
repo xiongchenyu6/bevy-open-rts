@@ -13,7 +13,7 @@ build. Previous visual fixes and green unit tests do not establish that goal.
 | Save continuity | Mid-mission save/restart/load preserves triggers, orders, paid production, fog, mines, effects and support; missing/corrupt files recover | 14 save tests pass; real Ctrl+S/Ctrl+L restores paid queue/economy/fog and suppresses opening briefing; missing/corrupt loads preserve current match and show revised player-facing feedback; broader campaign runtime pending |
 | Interface | English default, coherent icons/tooltips, no clipping at supported desktop sizes; small browser viewport inspected | Compact cards, locked tooltip and queue captured at1280x720/900x720; browser, remaining screens/overlays pending |
 | Art/audio | Fresh menu, base, economy, combat, defeat/victory captures; readable silhouettes; commands/music/volume controls verified | Prior material pass only; further review required |
-| Skirmish/balance | All shipped maps/factions/difficulties playable; reproducible multi-seed difficulty and faction sweeps; no indefinite matches | Old canonical72 complete; old difficulty144 has5 timeouts. Current paid-AI targeted10 complete, including all5 former timeouts; current216 sweep active. Alternate starts/seeds remain open |
+| Skirmish/balance | All shipped maps/factions/difficulties playable; reproducible multi-seed difficulty and faction sweeps; no indefinite matches | Old canonical72 complete; old difficulty144 has5 timeouts. Current paid-AI targeted10 complete, including all5 former timeouts; current216 sweep finishes215/216 with1 timeout. Alternate starts/seeds remain open |
 | Delivery | Windows and Linux archives launch from arbitrary working directories without Rust/Nix; writable user saves/config | Corrected Linux development archive starts in no-Nix/read-only Ubuntu; matching separate harness passes save recovery; Windows GNU compiles and Wine menu/save recovery render correctly; native Windows/release profile/Steam Runtime/hardware pending |
 | Reliability | Full tests, packaged-build smoke, long matches and measured performance on supported hardware | Current library suite172 passed/0 failed/1 network-dependent ignored; earlier packaged startup passes; standard release OOM retained; current release/performance gates outstanding |
 | Distribution | Accurate feature/system-requirement copy, asset provenance/licenses and generated-content inventory; store-ready media | Restricted logo removed; upstream/font notices added; unresolved art/audio provenance in ASSET_PROVENANCE.md |
@@ -409,3 +409,17 @@ and progress before resuming collection. The full current library suite passes
 172 tests,0 failures,1 ignored in96.76s (`logs/emp-task-full.log`).
 The initial failed compile is preserved separately. Current mission5 gameplay
 and the full same-App campaign still require new-build runtime acceptance.
+
+## Completed current canonical matrix
+
+The paid-AI pin805dbb05 finishes the full216 configurations:215 complete,1
+simulation timeout, overall exit2. Root independently validates every raw report
+against the manifest, status, normal32ore/16crystal baseline and terminal outcome
+with zero validation errors (`logs/skirmish-current-canonical-all-validation-20261009.json`).
+All72 Normal/Normal faction configurations resolve in69.90–228.62 sim seconds.
+The48 non-mirror configurations produce Alliance17/Demon16/Chaos15 winners;
+these counts are not statistical win rates. The remaining timeout is BigArena,
+ChaosEasy slot0 versus ChaosBeginner slot1, case0103, at600 sim seconds.
+Its raw report remains available for new target/weapon diagnostics and replay.
+This immutable pin predates the EMP task preservation fix. Alternate starts,
+repeatability, independent-seed coverage and release performance remain open.
