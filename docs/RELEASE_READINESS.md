@@ -9,13 +9,13 @@ build. Previous visual fixes and green unit tests do not establish that goal.
 | Area | Required evidence | Current state |
 | --- | --- | --- |
 | First session | Fresh profile → guided gathering, power, barracks, training, movement, attack and victory through normal controls; skip/replay work | Seven lessons and sandbox persistence pass; normal-input skip/return/graduation/fresh replay captured |
-| Campaign | All six missions complete without cheats; correct objectives, retry/next/finale; completion survives restart | All six recipes have win/continuation evidence at recorded checkpoints; latest missions3/5 pass; complete current sequence/restart/retry audit remains |
+| Campaign | All six missions complete without cheats; correct objectives, retry/next/finale; completion survives restart | Older six-mission fresh-process prefix passes; current paid-AI same-App chain passes missions1–4, then fails mission5 construction; real Restart resets/replays triggers correctly |
 | Save continuity | Mid-mission save/restart/load preserves triggers, orders, paid production, fog, mines, effects and support; missing/corrupt files recover | 14 save tests pass; real Ctrl+S/Ctrl+L restores paid queue/economy/fog and suppresses opening briefing; missing/corrupt loads preserve current match and show revised player-facing feedback; broader campaign runtime pending |
 | Interface | English default, coherent icons/tooltips, no clipping at supported desktop sizes; small browser viewport inspected | Compact cards, locked tooltip and queue captured at1280x720/900x720; browser, remaining screens/overlays pending |
 | Art/audio | Fresh menu, base, economy, combat, defeat/victory captures; readable silhouettes; commands/music/volume controls verified | Prior material pass only; further review required |
-| Skirmish/balance | All shipped maps/factions/difficulties playable; reproducible multi-seed difficulty and faction sweeps; no indefinite matches | Partial old evidence; full sweep required |
+| Skirmish/balance | All shipped maps/factions/difficulties playable; reproducible multi-seed difficulty and faction sweeps; no indefinite matches | Old canonical72 complete; old difficulty144 has5 timeouts. Current paid-AI targeted10 complete, including all5 former timeouts; current216 sweep active. Alternate starts/seeds remain open |
 | Delivery | Windows and Linux archives launch from arbitrary working directories without Rust/Nix; writable user saves/config | Corrected Linux development archive starts in no-Nix/read-only Ubuntu; matching separate harness passes save recovery; Windows GNU compiles and Wine menu/save recovery render correctly; native Windows/release profile/Steam Runtime/hardware pending |
-| Reliability | Full tests, packaged-build smoke, long matches and measured performance on supported hardware | 168 library tests pass; no-Nix/read-only development startup passes; standard release OOM retained; current release/performance gates outstanding |
+| Reliability | Full tests, packaged-build smoke, long matches and measured performance on supported hardware | Current library suite170 passed/0 failed/1 network-dependent ignored; earlier packaged startup passes; standard release OOM retained; current release/performance gates outstanding |
 | Distribution | Accurate feature/system-requirement copy, asset provenance/licenses and generated-content inventory; store-ready media | Restricted logo removed; upstream/font notices added; unresolved art/audio provenance in ASSET_PROVENANCE.md |
 
 ## Verification policy
@@ -337,9 +337,33 @@ The same-App campaign chain is supervised under
 `open-rts-campaign-chain-paid-ai-2.service`; its earlier foreground attempt
 endedSIGTERM and is preserved separately, not counted as full completion.
 
-Unit-order save proof remains failed: the real worker/resource click succeeds,
-but two intended Shift-queued moves are absent from the saved queue. Input/order
-diagnostics are prepared; no queue restoration success is claimed. Current AI
-behavioral tests are running with the exact build03 compiler environment after
-an identified native-library environment mismatch; compilation alone proves
-neither AI development nor remote-human control protection.
+## Current paid-AI and order-save acceptance
+
+The current library suite passes170 tests with0 failures and1 explicitly ignored
+network-bootstrap test (`target/ai-tech-full-tests.log`). A separate current saved
+trigger/order/production regression passes (`target/ai-tech-savedflags.log`).
+Paid-AI progression and Human-controller protection tests pass: AI pays normal
+costs and physically constructs its technology, then produces armed advanced
+units; configured Human teams retain their resources and orders. This headless
+protection check does not establish live online peer behavior.
+
+The ten exact configuration comparisons in
+`target/ai-tech-targeted-20261009` complete, including all five old600-second
+timeouts. The pinned current canonical216-case sweep is running under
+`rts-skirmish-current-canonical-all-20261009.service`; its terminal summary must
+be inspected before acceptance. These are configuration resolution checks,
+not statistical win rates, independent seed coverage or alternate-start proof.
+
+Real unit-order save creation and fresh-process restoration both exit0:
+`screenshots/steam-quality/save-orders-{create,resume}-06/observations.json`.
+Actual mouse inputs assign harvesting and two Shift-queued waypoints. The
+loaded mineral entity reference remaps correctly, both queued targets survive,
+the worker finishes its route, ore32→38 and mineral240→234. Original save bytes
+remain unchanged; Saved and resumed screenshots were inspected. Earlier failed
+inputs landed on the command HUD, so they did not constitute a serializer bug.
+Mines, temporary effects and support cooldowns still need separate runtime proof.
+
+The current same-App campaign reaches four victories, then fails mission5 with
+an unfinished foundation. Diagnostic traces are gathering assignment/cancellation
+history; a reachable path at the failure snapshot alone does not prove correct
+initial assignment. No current six-mission same-App completion is claimed.
