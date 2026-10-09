@@ -1,0 +1,18 @@
+{
+  "asset": "mission02-crossfire-v3.png",
+  "tool": "image_gen.imagegen (built-in)",
+  "recorded_at_utc": "2026-10-09 15:56:39 UTC",
+  "model_version": "not exposed by tool",
+  "seed": "not exposed by tool",
+  "prompt": "Edit this original campaign illustration with one precise consistency change: remove every red hanging banner, flag and painted geometric emblem/insignia from all buildings and towers, including the foreground-left tower, central headquarters and far-right tower. Replace their occupied surfaces naturally with plain matching gray concrete or steel panels. Keep the enemy identity through existing restrained red lights and turret accents only. Preserve the complete canyon composition, architecture, robot infantry, tracked tanks, crossing red firing lines, cinematic lighting, colors, perspective and quiet dark lower band. Do not add any text, symbols, flags, banners, logos, UI or watermark. Preserve landscape aspect ratio and all other visual details.",
+  "transparent_background": false,
+  "width": 1672,
+  "height": 941,
+  "sha256": "a430c113bcc3af6b4d6a08e9155847a32dee3da22e623b993f3db6f97f356351",
+  "bytes": 2243920,
+  "original_output_filename": "exec-fd327e3f-84ef-41db-b810-cf30df7b9b60.png",
+  "status": "visually inspected candidate; outside shipped assets; not gameplay evidence",
+  "intent": "edit original mission02 candidate to remove banners and emblems",
+  "reference_image": "mission02-crossfire-v2.png",
+  "reference_sha256": "a303d5fc2e8da601d6dc0d9c4d66aea9c228558dcdd3c7d7fe9414862710141e"
+}
