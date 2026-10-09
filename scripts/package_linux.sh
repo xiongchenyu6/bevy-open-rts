@@ -96,7 +96,19 @@ shutil.copy2(root / 'docs' / 'DESKTOP_DELIVERY.md', stage / 'BUILD_NOTES.md')
 (stage / 'docs').mkdir()
 for notice in ['ASSET_PROVENANCE.md', 'asset-source-hashes.json']:
     shutil.copy2(root / 'docs' / notice, stage / 'docs' / notice)
-shutil.copytree(root / 'docs' / 'third-party' / 'linux-runtime', stage / 'docs' / 'third-party' / 'linux-runtime')
+notices = root / 'docs' / 'third-party' / 'linux-runtime'
+notice_manifest = json.loads((notices / 'manifest.json').read_text())
+actual_providers = {str(pathlib.Path(path).parents[1]) for path in provenance.values()}
+recorded_providers = {row['packaged_store_path'] for row in notice_manifest['components']}
+if actual_providers != recorded_providers:
+    raise SystemExit('Bundled library providers changed; regenerate exact-source runtime notices')
+for row in notice_manifest['components']:
+    for notice_name, digest in row['notices'].items():
+        path = notices / row['component'] / notice_name
+        with path.open('rb') as stream:
+            if hashlib.file_digest(stream, 'sha256').hexdigest() != digest:
+                raise SystemExit(f'Runtime notice hash mismatch: {path}')
+shutil.copytree(notices, stage / 'docs' / 'third-party' / 'linux-runtime')
 shutil.copy2(root / 'ASSETS.md', stage / 'ASSETS.md')
 for license_file in root.glob('LICENSE*'):
     if license_file.is_file():
