@@ -14,7 +14,7 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Save continuity | Fresh-process restoration of campaign triggers, orders, paid jobs, economy, fog, mines, temporary effects and support; safe missing/corrupt loads | First-wave campaign, paid jobs/fog/economy, harvest references, queued moves and F1/F5 effects pass in bounded runtime proofs. Real older-save→current-core mine migration passes exact4HP triggering; fresh-current creation and broader status/damage effects remain open. |
 | Interface | English default; coherent icons/tooltips; no clipping at supported sizes; browser inspected | Native cards/tooltips/save menu inspected at1280x720 and900x720; compact unit markers and single finale-map action captured. Fresh browser menu/setup/start/select/move inspected at1280x720/900x720 using software compositor; remaining overlays/final artifacts require review. |
 | Art/audio | Readable menu/base/economy/combat/defeat/victory; sound, music, commands and volume controls verified | Recorded visual checkpoints only. Human audio validation and complete current presentation review remain open. Six original encoded illustrations are wired; mission5 native briefing inspected. Other images/layouts/audio remain open. |
-| Skirmish/balance | All maps/factions/difficulties/starts playable; reproducible repeated/independent-seed sweeps; no indefinite matches | Foundation-fix pin completes216/216 canonical cases with validated outcomes. Latest damage pin has55/216 completed in a live sweep; alternate starts, repeatability, independent seeds and broad balance remain open. |
+| Skirmish/balance | All maps/factions/difficulties/starts playable; reproducible repeated/independent-seed sweeps; no indefinite matches | Foundation-fix pin completes216/216 canonical cases with validated outcomes. Latest damage pin is running canonical216 and full ordered-start3,726 sweeps; repeatability, independent seeds and broad balance remain open. |
 | Delivery | Windows/Linux release archives launch without Rust/Nix from arbitrary directories; writable user data | Earlier optimized Linux package passes bounded hardware/input smoke. Windows GNU/Wine harness evidence exists. Current release packages, native Windows/MSVC and Steam Runtime remain open. |
 | Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Real EMP application regressions pass3/3; prior full suite178/0/1. Three new combat-damage regressions pass; updated full suite181/0/1 and shared native build pass; final-package/runtime acceptance remains incomplete. No representative combat performance or long-session acceptance yet. |
 | Distribution | Accurate store copy, provenance/licenses/generated inventory and store-ready media | Unpublished store draft and partial provenance audit exist. Art/audio rights gaps and final media remain open. |
@@ -87,10 +87,14 @@ configurations; independent raw config/status/outcome validation reports zero
 errors (`logs/skirmish-foundation-canonical-validation-20261010.json`). Older
 BigArena and FourCorners timeout artifacts remain preserved. Current damage
 pin `cbb2d6eb` runs a fresh216-case sweep in
-`target/skirmish-combat-canonical-all-20261010`; observed55 completions with no
-failures at the latest check. It is still running. This covers canonical starts
-only, not all3,726 ordered-start configurations, independent seeds, statistical
-win rates or representative hardware performance.
+`target/skirmish-combat-canonical-all-20261010`; its live summary records progress and failures. A separate immutable-pin full
+ordered-start sweep is now running under
+`rts-skirmish-combat-all-starts-20261010.service`, output
+`target/skirmish-combat-all-starts-20261010`, log
+`logs/skirmish-combat-all-starts-20261010.log`. Its manifest verifies3,726 exact
+configurations and the same executable hash. Neither sweep is complete yet.
+Repeated/independent-seed outcomes, statistical win rates and representative
+hardware performance remain unverified.
 
 ## Browser and online
 
