@@ -171,3 +171,19 @@ mission5 gameplay still loses HQ before AA preparation completes; this is not
 a campaign pass. The new foundation-fix canonical216 audit is running on pin
 8c0c4438 under `rts-skirmish-foundation-canonical-all-20261010.service`; the
 previous788 sweep finishes215/216 with the preserved FourCorners timeout.
+
+## Actual EMP application acceptance
+
+A further source audit found that `queue_apply_emp_disabled` itself removed all
+active tasks and queues when applying or extending EMP. Earlier regressions
+attached the component directly and therefore missed this entry point. Commit
+cd8067d removes that cancellation; the three full-schedule regressions now use
+the actual queued helper and test status extension without task/queue loss.
+They pass3/3 in2.72s, and the full suite passes178/0/1 in186.78s
+(`logs/emp-application-{focused,full}.log`). All three native programs build in
+2m30s; their sealed manifest is under `target/emp-application-shared-20261010-lqbfy3ax`.
+The old-pin runtime trace did not observe an active constructor losing its task
+to EMP in that particular run; no cancellation timestamp is asserted. Current
+mission5 and mine runtime acceptance remain open. The original Wasm build was
+stopped for this semantic correction, preserving logs/dependency cache, and
+unit02 resumes with refreshed source provenance.
