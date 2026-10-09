@@ -157,3 +157,16 @@ matches both staged bytes and repository sources
 (`target/package-asset-hashes-wmgre5rq/verification.json`). PowerShell uses the
 same path/hash format but still requires execution on Windows. No final current
 release archive or launch acceptance is implied by these staging checks.
+
+After extracting a new desktop package, run:
+
+```sh
+python3 scripts/verify_runtime_assets.py /path/to/extracted-package
+```
+
+The command checks the exact file set and SHA256 of every recorded asset.
+It exits1 for missing, extra or changed files, malformed inventory or invalid
+paths. Actual360-file staging passes; deliberate corruption, removal, addition
+and invalid paths fail (`target/runtime-assets-verifier-vrsv15rz/checks.json`).
+This verifies correspondence to BUILD_INFO, not publisher authenticity, asset
+rights or game launch; those remain separate gates.
