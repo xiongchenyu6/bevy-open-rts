@@ -76,6 +76,10 @@ exit /b %errorlevel%
 (stage / 'launch.cmd').write_bytes(launcher.replace('\n', '\r\n').encode('ascii'))
 commit = subprocess.check_output(['git', '-c', f'safe.directory={root}', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
 (stage / 'BUILD_INFO.json').write_text(json.dumps({
+    'runtime_asset_sha256': {
+        path.relative_to(stage).as_posix(): hashlib.file_digest(path.open('rb'), 'sha256').hexdigest()
+        for path in sorted((stage / 'assets').rglob('*')) if path.is_file()
+    },
     'target': 'x86_64-pc-windows-gnu', 'profile': profile,
     'package_tag': package_tag,
     'rust_version': subprocess.check_output(['rustc', '--version'], text=True).strip(),

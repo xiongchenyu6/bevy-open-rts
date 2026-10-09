@@ -67,7 +67,13 @@ exit /b %errorlevel%
 [System.IO.File]::WriteAllText((Join-Path $Stage 'launch.cmd'), ($Launcher -replace "`r?`n", "`r`n"), [System.Text.Encoding]::ASCII)
 $Commit = (& git -C $Root rev-parse HEAD)
 if ($LASTEXITCODE -ne 0) { throw 'Could not record source revision' }
+$AssetHashes = [ordered]@{}
+Get-ChildItem -LiteralPath (Join-Path $Stage 'assets') -Recurse -File | Sort-Object FullName | ForEach-Object {
+    $RelativePath = $_.FullName.Substring($Stage.Length + 1).Replace('\', '/')
+    $AssetHashes[$RelativePath] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+}
 $Info = [ordered]@{
+    runtime_asset_sha256 = $AssetHashes
     source_commit = $Commit
     source_worktree_dirty = [bool](& git -C $Root status --porcelain)
     binary_sha256 = (Get-FileHash -LiteralPath $Binary -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -75,7 +81,7 @@ $Info = [ordered]@{
     rust_version = (& rustc --version)
     validation = 'Packaging alone does not establish runtime or clean Windows compatibility.'
 }
-$Info | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $Stage 'BUILD_INFO.json') -Encoding utf8
+$Info | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $Stage 'BUILD_INFO.json') -Encoding utf8
 Compress-Archive -LiteralPath $Stage -DestinationPath $Archive -CompressionLevel Optimal
 $Checksum = (Get-FileHash -LiteralPath $Archive -Algorithm SHA256).Hash.ToLowerInvariant()
 "$Checksum  $Name.zip" | Set-Content -LiteralPath "$Archive.sha256" -Encoding ascii

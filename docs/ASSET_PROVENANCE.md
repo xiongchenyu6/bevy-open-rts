@@ -144,3 +144,13 @@ not prove final package launch. Their historical generation gaps do
 not describe the current six original derivatives. Other icon, VFX and voice
 rights gaps remain open; these generation records do not establish blanket
 commercial clearance for unrelated assets.
+
+## Packaged asset verification
+
+Desktop packagers now record `runtime_asset_sha256` in BUILD_INFO.json for
+all copied runtime files, including notices. Linux and GNU Windows dictionary
+expressions were exercised against an actual staged360-file tree; every hash
+matches both staged bytes and repository sources
+(`target/package-asset-hashes-wmgre5rq/verification.json`). PowerShell uses the
+same path/hash format but still requires execution on Windows. No final current
+release archive or launch acceptance is implied by these staging checks.

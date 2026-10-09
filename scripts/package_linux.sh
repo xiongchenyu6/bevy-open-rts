@@ -101,6 +101,10 @@ for license_file in root.glob('LICENSE*'):
     if license_file.is_file():
         shutil.copy2(license_file, stage / license_file.name)
 (stage / 'BUILD_INFO.json').write_text(json.dumps({
+    'runtime_asset_sha256': {
+        path.relative_to(stage).as_posix(): hashlib.file_digest(path.open('rb'), 'sha256').hexdigest()
+        for path in sorted((stage / 'assets').rglob('*')) if path.is_file()
+    },
     'source_binary': str(binary), 'source_sha256': hashlib.file_digest(binary.open('rb'), 'sha256').hexdigest(),
     'binary_profile': 'development' if 'debug' in binary.parts else 'release',
     'build_variant': os.environ.get('BEVY_OPEN_RTS_BUILD_VARIANT', 'unrecorded'),
