@@ -323,3 +323,23 @@ hash checks, with full source fonts and unused crosshairs excluded
 Reviewable player-facing store copy is in `docs/STEAM_STORE_DRAFT.md`; internal
 claim evidence is separate, and no unmeasured system-requirement numbers or
 unverified platform/Steam integration badges are asserted. It is not published.
+
+## Current paid-AI restart evidence
+
+Shared capture build03 finished with exit0 in110m31s after dependency-cache
+recovery. The immutable capture SHA is
+`bbacd8e42b4cc1e244b95382b6bf5a9b12d722305e3482efac4a2fa5047484f2`.
+The real pause-menu Restart test exits0: clock45.066/3enemyHMG resets to0.033/
+zeroHMG/all fired flagsfalse; the authored wave then appears again at45.066
+with3HMG. Root inspected `current-campaign-restart-paid-ai/03_wave_replayed.png`
+and the result JSON. Saved-trigger load continuity still needs its current test.
+The same-App campaign chain is supervised under
+`open-rts-campaign-chain-paid-ai-2.service`; its earlier foreground attempt
+endedSIGTERM and is preserved separately, not counted as full completion.
+
+Unit-order save proof remains failed: the real worker/resource click succeeds,
+but two intended Shift-queued moves are absent from the saved queue. Input/order
+diagnostics are prepared; no queue restoration success is claimed. Current AI
+behavioral tests are running with the exact build03 compiler environment after
+an identified native-library environment mismatch; compilation alone proves
+neither AI development nor remote-human control protection.
