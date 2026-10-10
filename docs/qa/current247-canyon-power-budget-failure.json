@@ -1,0 +1,37 @@
+{
+  "scope": "Same-App candidate failed in mission3 from an unaffordable power request, not game defeat",
+  "actual_child_exit": 1,
+  "before_power_attempt": {
+    "clock": 100.53214263916016,
+    "resources": [
+      8,
+      0
+    ],
+    "low_power": true,
+    "phase": "Running"
+  },
+  "terminal": {
+    "clock": 103.76542663574219,
+    "resources": [
+      14,
+      0
+    ],
+    "headquarters": {
+      "hp": 20.0,
+      "max": 20.0,
+      "position": [
+        -22.0,
+        0.0,
+        -22.0
+      ]
+    },
+    "phase": "Running"
+  },
+  "actual_reactor_cost": {
+    "ore": 3,
+    "crystal": 1
+  },
+  "correction": "Check both resources and pay for Mission3 second reactor before the second turret",
+  "runtime_correction_verified": false,
+  "six_mission_complete": false
+}
