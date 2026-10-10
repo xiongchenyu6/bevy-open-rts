@@ -15,6 +15,8 @@ mod finale;
 mod twin;
 #[path = "campaign_bot/survivors.rs"]
 mod survivors;
+#[path = "campaign_bot/focus_target.rs"]
+mod focus_target;
 
 pub(super) fn run_finale(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Result<(), String> {
     finale::run(app, handle, dir)
@@ -107,6 +109,7 @@ impl SetupWatch {
 }
 
 struct VisibleEnemyContact {
+    key: u64,
     id: String,
     position: Vec3,
 }
@@ -123,6 +126,7 @@ fn visible_enemy_contacts(app: &mut App) -> Result<Vec<VisibleEnemyContact>, Str
             }
             let p = e["position"].as_array().ok_or("visible position missing")?;
             result.push(VisibleEnemyContact {
+                key: e["key"].as_u64().ok_or("visible enemy key missing")?,
                 id: e["id"].as_str().ok_or("visible id missing")?.into(),
                 position: Vec3::new(
                     p[0].as_f64().ok_or("x missing")? as f32,

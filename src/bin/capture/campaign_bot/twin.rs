@@ -167,7 +167,12 @@ pub(super) fn opening(app: &mut App, watch: &mut SetupWatch) -> Result<(), Strin
             // Engage the live local threat through the normal army shortcut and
             // attack-move command; no individual selection delay under fire.
             select_all_player_army(app);
-            ground_order(app, threat.position, true)?;
+            if let Some(contact) = contacts.iter().find(|contact| {
+                contact.id == threat.id
+                    && contact.position.distance_squared(threat.position) < 0.0001
+            }) {
+                focus_target::attack(app, &watch.dir, contact.key)?;
+            }
             println!(
                 "[capture] Twin live-ground-response t={:.1}: {}",
                 state.clock, threat.id

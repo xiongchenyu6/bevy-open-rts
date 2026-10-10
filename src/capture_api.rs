@@ -1729,6 +1729,11 @@ pub fn capture_player_completed_structure_position_near(
         .min_by(|left, right| xz_distance(*left, near).total_cmp(&xz_distance(*right, near)))
 }
 
+/// Read-only targeting/placement state for normal capture input cancellation.
+pub fn capture_has_pending_command_mode(app: &mut App) -> bool {
+    app.world().resource::<CommandMode>().has_pending_interaction()
+}
+
 /// Whether the player currently has a pending structure placement (build mode).
 pub fn capture_player_in_placement_mode(app: &mut App) -> bool {
     app.world()
