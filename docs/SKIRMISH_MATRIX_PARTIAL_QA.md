@@ -1,6 +1,6 @@
 # Current fixed-pin skirmish matrix review
 
-Latest checkpoint: [2,005 terminal cases](qa/current244-matrix-2005-review.json), with 2,004 completed and one simulation timeout. Big Arena Chaos Easy versus Chaos Beginner at starts 2/1 remained Running after 600 seconds. The scan continues; this failure is unresolved. The 692-case snapshot below is historical.
+Latest checkpoint: [2,005 terminal cases](qa/current244-matrix-2005-review.json), with 2,004 completed and one simulation timeout. Big Arena Chaos Easy versus Chaos Beginner at starts 2/1 remained Running after 600 seconds. The old244 scan continues and retains this failure. The exact configuration now resolves on current267 at 415.653 simulation seconds within unchanged limits ([bounded fix proof](qa/case1885-no-path-pursuit-review.json)); this does not revalidate the entire old sweep on new code. The 692-case snapshot below is historical.
 
 The independently verified snapshot covers 692 of 3726 planned cases: all 692 completed, with zero simulation timeouts, wall timeouts, process errors or integrity errors. Plain & Simple and Four Corners each have all 324 planned cases; Tech Divide has the next 44. The matrix remains active. This is partial evidence, not completion or a general balance verdict. Exact hashes, version differences and the live process observation are in [the portable record](qa/current244-skirmish-partial-review.json).
 
