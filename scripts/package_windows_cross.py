@@ -39,6 +39,9 @@ shutil.copy2(root / 'docs/PLAYER_GUIDE.md', stage / 'README.md')
 shutil.copy2(root / 'docs/WINDOWS_DELIVERY.md', stage / 'BUILD_NOTES.md')
 for notice in ('ASSET_PROVENANCE.md', 'asset-source-hashes.json'):
     shutil.copy2(root / 'docs' / notice, stage / notice)
+shutil.copy2(root / 'docs' / 'RUST_DEPENDENCY_MATERIALS.md', stage / 'RUST_DEPENDENCY_MATERIALS.md')
+# These are curated source-component notices, not complete license clearance.
+shutil.copytree(root / 'docs' / 'third-party' / 'rust', stage / 'docs' / 'third-party' / 'rust')
 shutil.copy2(root / 'ASSETS.md', stage / 'ASSETS.md')
 for license_file in root.glob('LICENSE*'):
     if license_file.is_file():
@@ -76,6 +79,10 @@ exit /b %errorlevel%
 (stage / 'launch.cmd').write_bytes(launcher.replace('\n', '\r\n').encode('ascii'))
 commit = subprocess.check_output(['git', '-c', f'safe.directory={root}', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
 (stage / 'BUILD_INFO.json').write_text(json.dumps({
+    'rust_notice_sha256': {
+        path.relative_to(stage).as_posix(): hashlib.file_digest(path.open('rb'), 'sha256').hexdigest()
+        for path in sorted((stage / 'docs' / 'third-party' / 'rust').rglob('*')) if path.is_file()
+    },
     'runtime_asset_sha256': {
         path.relative_to(stage).as_posix(): hashlib.file_digest(path.open('rb'), 'sha256').hexdigest()
         for path in sorted((stage / 'assets').rglob('*')) if path.is_file()

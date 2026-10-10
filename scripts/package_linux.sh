@@ -109,11 +109,18 @@ for row in notice_manifest['components']:
             if hashlib.file_digest(stream, 'sha256').hexdigest() != digest:
                 raise SystemExit(f'Runtime notice hash mismatch: {path}')
 shutil.copytree(notices, stage / 'docs' / 'third-party' / 'linux-runtime')
+shutil.copy2(root / 'docs' / 'RUST_DEPENDENCY_MATERIALS.md', stage / 'RUST_DEPENDENCY_MATERIALS.md')
+# These are curated source-component notices, not complete license clearance.
+shutil.copytree(root / 'docs' / 'third-party' / 'rust', stage / 'docs' / 'third-party' / 'rust')
 shutil.copy2(root / 'ASSETS.md', stage / 'ASSETS.md')
 for license_file in root.glob('LICENSE*'):
     if license_file.is_file():
         shutil.copy2(license_file, stage / license_file.name)
 (stage / 'BUILD_INFO.json').write_text(json.dumps({
+    'rust_notice_sha256': {
+        path.relative_to(stage).as_posix(): hashlib.file_digest(path.open('rb'), 'sha256').hexdigest()
+        for path in sorted((stage / 'docs' / 'third-party' / 'rust').rglob('*')) if path.is_file()
+    },
     'runtime_asset_sha256': {
         path.relative_to(stage).as_posix(): hashlib.file_digest(path.open('rb'), 'sha256').hexdigest()
         for path in sorted((stage / 'assets').rglob('*')) if path.is_file()
