@@ -137,6 +137,7 @@ archive = output / f'{name}.tar.gz'
 if archive.exists():
     raise SystemExit(f'Refusing to replace archive: {archive}')
 subprocess.run(['tar', '-czf', str(archive), '-C', str(output), name], check=True)
+subprocess.run([sys.executable, str(root / 'scripts' / 'verify_package.py'), str(archive)], check=True)
 with archive.open('rb') as stream:
     checksum = hashlib.file_digest(stream, 'sha256').hexdigest()
 (archive.parent / (archive.name + '.sha256')).write_text(f'{checksum}  {archive.name}\n')

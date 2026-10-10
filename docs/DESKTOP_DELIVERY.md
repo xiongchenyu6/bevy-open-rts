@@ -16,7 +16,7 @@ Vulkan/OpenGL drivers and a Wayland desktop are host prerequisites. Graphics dri
 
 ## Validation and release gates
 
-`BUILD_INFO.json` records source binary hash, build profile, and bundled-library provenance. The accompanying `.sha256` file verifies archive integrity. Debug archives are validation artifacts, not release candidates.
+`BUILD_INFO.json` records source and packaged executable hashes, build profile, asset/notice inventories, and bundled-library provenance. Packaging runs `scripts/verify_package.py` against the completed archive before reporting success. The checker rejects missing inventories, changed bytes, duplicate members and unsafe paths. The accompanying `.sha256` file verifies archive integrity. These checks do not prove runtime compatibility. Debug archives are validation artifacts, not release candidates.
 
 Test extraction and launch from `/tmp` in a Steam Runtime container with **no `/nix` mount**, using a Wayland compositor and software Vulkan. Check asset loading, main menu, campaign/tutorial entry, gameplay, quit, persistence, and restart. Repeat on physical AMD, Intel, and NVIDIA GPUs with audio and read-only installation. Preserve logs/screenshots and identify the exact archive hash. A startup-only test does not prove gameplay or commercial readiness.
 

@@ -102,6 +102,7 @@ with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as bundle:
     for path in sorted(stage.rglob('*')):
         if path.is_file():
             bundle.write(path, path.relative_to(stage.parent))
+subprocess.run([sys.executable, str(root / 'scripts' / 'verify_package.py'), str(archive)], check=True)
 checksum = hashlib.file_digest(archive.open('rb'), 'sha256').hexdigest()
 archive.with_name(archive.name + '.sha256').write_text(f'{checksum}  {archive.name}\n')
 print(f'Archive: {archive}\nSHA256: {checksum}')

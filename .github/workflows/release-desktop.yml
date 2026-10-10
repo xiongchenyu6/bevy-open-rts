@@ -33,6 +33,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Package executable and assets
         run: ./scripts/package_windows.ps1
+      - name: Verify archive inventories and executable identity
+        run: |
+          python scripts/verify_package.py dist/bevy-open-rts-windows-x86_64.zip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Retain package for download and runtime verification
         uses: actions/upload-artifact@v4
         with:

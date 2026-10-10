@@ -9,6 +9,7 @@ Build on 64-bit Windows with Rust 1.98.0 and Visual Studio 2022 Build Tools
 rustup target add x86_64-pc-windows-msvc
 cargo build --locked --release --target x86_64-pc-windows-msvc --bin bevy-open-rts
 ./scripts/package_windows.ps1
+python scripts/verify_package.py dist/bevy-open-rts-windows-x86_64.zip
 ```
 
 The manual **Build Windows desktop package** GitHub workflow performs these
@@ -16,6 +17,8 @@ steps on a Windows runner and retains a downloadable artifact. It does not
 publish a release or upload to Steam. Audio is included. The lockfile fixes
 dependencies and the workflow pins Rust; byte-identical builds are not promised.
 This native MSVC workflow has not yet been executed.
+
+Archive verification requires Python 3.11+ and checks executable, asset and curated Rust notice hashes without extracting files. The workflow runs it before retaining artifacts. It rejects incomplete older manifests; it does not establish Windows runtime compatibility or license clearance.
 
 The package contains the AMD64 executable, runtime `assets/`, `launch.cmd`,
 licenses, build metadata, and the asset inventory/provenance files
