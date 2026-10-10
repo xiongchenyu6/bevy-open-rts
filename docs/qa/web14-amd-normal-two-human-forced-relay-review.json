@@ -1,0 +1,310 @@
+{
+  "scope": "Final267 core exactWeb14 normal two-human forcedTURN paidPower functional proof; remainingeight/reconnect/independentworld gates open",
+  "wasm_sha256": "65f27ec9f326d8a1d4ad7a8eae5a4eefd4ddc36b9dc6fed07a48b3a508fe628a",
+  "assets": 332,
+  "actual_exit": 0,
+  "node_exit": 0,
+  "verifier_exit": 0,
+  "deadline_seconds": 240,
+  "wall_seconds_from_prelaunch_artifact_to_final_result": 114.87816739082336,
+  "browser_close": "awaitbrowser.close completed normally; no timeoutorforcedcleanup",
+  "normal_inputs": [
+    "physicalOnline",
+    "Host",
+    "Join displayedpubliccode",
+    "Ready",
+    "Start",
+    "firstappliedownWorker/readiness",
+    "briefingX",
+    "realWorkerselect",
+    "Powercard",
+    "greenvisibleplacement"
+  ],
+  "initial_bank": [
+    32,
+    16
+  ],
+  "paid_cost": [
+    3,
+    1
+  ],
+  "final_bank": [
+    29,
+    15
+  ],
+  "final_power_capacity": 26,
+  "actual_common_DTO_ticks": [
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    136,
+    137,
+    138,
+    139,
+    140
+  ],
+  "mismatched_ticks": [],
+  "guest_applied_tick": 140,
+  "completed_power": [
+    {
+      "cargo": null,
+      "construction": null,
+      "health": [
+        12.0,
+        12.0
+      ],
+      "id": 9,
+      "kind": {
+        "Structure": {
+          "id": "PowerReactor"
+        }
+      },
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "team": {
+        "Player": 1
+      },
+      "translation": [
+        10.831581115722656,
+        0.0,
+        -17.498512268066406
+      ],
+      "veterancy": null,
+      "visual_faction": "Demon"
+    }
+  ],
+  "host_routes": [
+    {
+      "connectionState": "connected",
+      "iceConnectionState": "connected",
+      "signalingState": "stable",
+      "iceGatheringState": "complete",
+      "localDescriptionType": "offer",
+      "remoteDescriptionType": "answer",
+      "candidateCount": 10,
+      "candidateErrors": [
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        }
+      ],
+      "descriptionStages": [
+        {
+          "stage": "createOffer-called",
+          "time": 15869.09999999404,
+          "descriptionType": null
+        },
+        {
+          "stage": "createOffer-resolved",
+          "time": 15875.199999988079,
+          "descriptionType": null
+        },
+        {
+          "stage": "setLocalDescription-called",
+          "time": 15875.699999988079,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "setLocalDescription-resolved",
+          "time": 15876.59999999404,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "setRemoteDescription-called",
+          "time": 95798,
+          "descriptionType": "answer"
+        },
+        {
+          "stage": "setRemoteDescription-resolved",
+          "time": 95806,
+          "descriptionType": "answer"
+        }
+      ],
+      "routes": [
+        {
+          "nominated": true,
+          "bytesSent": 39588,
+          "bytesReceived": 6167,
+          "localType": "relay",
+          "remoteType": "relay"
+        }
+      ]
+    }
+  ],
+  "guest_routes": [
+    {
+      "connectionState": "connected",
+      "iceConnectionState": "connected",
+      "signalingState": "stable",
+      "iceGatheringState": "complete",
+      "localDescriptionType": "answer",
+      "remoteDescriptionType": "offer",
+      "candidateCount": 10,
+      "candidateErrors": [
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        }
+      ],
+      "descriptionStages": [
+        {
+          "stage": "setRemoteDescription-called",
+          "time": 50881.59999999404,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "setRemoteDescription-resolved",
+          "time": 50885.40000000596,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "createAnswer-called",
+          "time": 50885.69999998808,
+          "descriptionType": null
+        },
+        {
+          "stage": "createAnswer-resolved",
+          "time": 50886.09999999404,
+          "descriptionType": null
+        },
+        {
+          "stage": "setLocalDescription-called",
+          "time": 50886.19999998808,
+          "descriptionType": "answer"
+        },
+        {
+          "stage": "setLocalDescription-resolved",
+          "time": 50887.29999998212,
+          "descriptionType": "answer"
+        }
+      ],
+      "routes": [
+        {
+          "nominated": true,
+          "bytesSent": 6167,
+          "bytesReceived": 39588,
+          "localType": "relay",
+          "remoteType": "relay"
+        }
+      ]
+    }
+  ],
+  "hardware": {
+    "browser_GL_renderer": "ANGLE (AMD, Vulkan 1.4.354 (AMD Radeon Graphics (RADV RENOIR) (0x00001638)), radv-26.2.4)",
+    "host_adapter": {
+      "vendor": "amd",
+      "architecture": "gcn-5",
+      "isFallbackAdapter": false
+    },
+    "guest_adapter": {
+      "vendor": "amd",
+      "architecture": "gcn-5",
+      "isFallbackAdapter": false
+    }
+  },
+  "capture_timings": [
+    {
+      "role": "p1",
+      "label": "08-candidate-Power-preview",
+      "started_wall_ms": 1791674507276,
+      "remaining_wall_ms": 132996,
+      "budget_ms": 25000,
+      "read_only_protocol": "Page.captureScreenshot",
+      "actual_png_bytes": 879020,
+      "completed": true,
+      "elapsed_wall_ms": 635
+    },
+    {
+      "role": "p1",
+      "label": "09-paid-state",
+      "started_wall_ms": 1791674513772,
+      "remaining_wall_ms": 126500,
+      "budget_ms": 8000,
+      "read_only_protocol": "Page.captureScreenshot",
+      "actual_png_bytes": 875497,
+      "completed": true,
+      "elapsed_wall_ms": 596
+    }
+  ],
+  "personal_image_review": {
+    "green_preview": true,
+    "completed_Power_visible": true,
+    "rendered_29_15_and_26_capacity": true,
+    "compact_Worker_arcs": true
+  },
+  "limitations": [
+    "GuestvalidatedDTO+appliedtick+renderedsceneisnotindependentfullguestworldequivalence",
+    "OnlytwoactualHumancontexts; eightpeerandreconnectopen",
+    "No gameperformance/FPS claim fromcapturetimingcomparison",
+    "No credentialsorSDPvaluesretained",
+    "Priorsoftware124andharnessfailuresremainpreserved; hardwareflagsnotgameplayfix"
+  ],
+  "evidence_sha256": {
+    "target/web14-normal-two-human-relay07-20261011/final-supervisor-result.json": "1e8aa01872b4a387fc5c563506820170037c2109e75304fba7ed1249b4f546f2",
+    "target/web14-normal-two-human-relay07-20261011/bounded-relay-paid-proof.json": "24d4ec5ef4999ca334df816ba156342ffd8daa099f77d8af74917845d47ba5e8",
+    "target/web14-normal-two-human-relay07-20261011/host-09-authoritative-state-observation.json": "adb8f6b06f8a026f637d099cc68be7526744504dfd2f6750f34d195999002a2c",
+    "target/web14-normal-two-human-relay07-20261011/p1-09-paid-state-observation.json": "4385b80e9fa71d7b87e532b463a5b05e05ab600390c4f9dd57e48618400d3253",
+    "target/web14-normal-two-human-relay07-20261011/p1-08-candidate-Power-preview.png": "0cf60ffc6acf73e04e073217cda09c1be5e1ff7e47a34a3a4db0ab4e106a4157",
+    "target/web14-normal-two-human-relay07-20261011/p1-09-paid-state.png": "f7b18cc3eed906dd5df2ba50ccd9c4f28dca64de71668be71d48f591630754a7",
+    "target/web14-normal-two-human-relay07-20261011/actual-browser-gpu.json": "3da165dbbba0e850de7560d9f3b6d74bbe6c61849cad4b975fcf2aca05d7a7d1",
+    "target/web14-normal-two-human-relay07-20261011/capture-stage-timings.json": "2d65744e991d81dc33a7ef45b6ac82081cf8ea6e09cf3db182fd808dcaa24824",
+    "target/web14-normal-two-human-relay07-20261011/host-actual-WebGPU-adapter.json": "457956b281189bd10f55f83b1098e6bde8bc0faf6da0fda50175cd7b574c5405",
+    "target/web14-normal-two-human-relay07-20261011/p1-actual-WebGPU-adapter.json": "457956b281189bd10f55f83b1098e6bde8bc0faf6da0fda50175cd7b574c5405"
+  }
+}
