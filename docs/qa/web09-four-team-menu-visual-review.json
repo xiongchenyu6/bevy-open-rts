@@ -33,5 +33,17 @@
     "four-ai-ffa.png": "d457691e04b886ce11ad430670bed88cad092430943a09de34fa388903dd41ef",
     "allied-two-teams.png": "e43b995f4ebf8b5c8ffed0e1ceb025da843b312205589fbc843c64bc3fdb1766"
   },
-  "compact_layout_verified": false
+  "compact_layout_verified": true,
+  "compact_layout": {
+    "viewport": [
+      900,
+      720
+    ],
+    "four_controller_rows_readable": true,
+    "allied_and_enemy_description_visible": true,
+    "correct_team_battle_summary": true,
+    "start_and_back_buttons_fully_visible": true,
+    "screenshot": "target/web09-four-team-compact-review-20261010/allied-900x720.png",
+    "sha256": "6ee849fbd0b6cbed7e60b83ec581581a8defec45617d64f1732c44d20ef99bf7"
+  }
 }

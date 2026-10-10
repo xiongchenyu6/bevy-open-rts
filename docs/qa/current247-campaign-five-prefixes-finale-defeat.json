@@ -105,5 +105,16 @@
       "domain": "Terrain"
     }
   ],
-  "six_mission_complete": false
+  "six_mission_complete": false,
+  "finale_headquarters_ownership_loss": {
+    "entity": 377957120361,
+    "owner": "Player(1)",
+    "health": 18.0,
+    "position": [
+      -32.0,
+      0.0,
+      -26.0
+    ],
+    "scope": "Original human HQ appears under enemy ownership; not inferred from absence alone"
+  }
 }
