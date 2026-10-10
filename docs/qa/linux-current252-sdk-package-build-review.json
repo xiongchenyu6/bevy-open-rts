@@ -1,0 +1,44 @@
+{
+  "scope": "SDK252 frozen source, build, archive and extracted asset identity only; normal-player acceptance pending",
+  "build": {
+    "scope": "Clean official Steam Runtime4 SDK build with official Rust; no runtime/gameplay acceptance",
+    "actual_exit": 0,
+    "wall_seconds": 473.54821951998747,
+    "frozen_inputs_unchanged": true,
+    "image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+    "no_nix_mount": true,
+    "fresh_target_directory": false,
+    "reused_dependency_cache": true,
+    "project_artifacts_cleaned": true,
+    "binary_sha256": "06e7513654a07028eaae359fc1abfe2f202daf5bea136d021e0112a779bab207",
+    "binary_bytes": 102905912
+  },
+  "package": {
+    "scope": "SDK-built Linux archive packaging only; clean player-flow/runtime acceptance pending",
+    "actual_exit": 0,
+    "wall_seconds": 7.291610710992245,
+    "sdk_build": "06e7513654a07028eaae359fc1abfe2f202daf5bea136d021e0112a779bab207",
+    "packaging_image": "sha256:b78a537676c4aacd878a7239072bc4a45dc758922355a1103e923a44e302ba0c",
+    "independent_integrity_exit": 0,
+    "archive_sha256": "4e0c03f3319a0f48e287ea8d188571a35189ca90904699a95f2a9f6b1ddf9c75"
+  },
+  "packed_binary_sha256": "19ac14c3d31a66f5165496a18504a36b1ad8054fd4e8aea92497de4a39fe2d44",
+  "frozen_input_count": 611,
+  "integrity": {
+    "scope": "Archive integrity only; no runtime or license clearance",
+    "files": 380,
+    "runtime_asset_sha256": 332,
+    "rust_notice_sha256": 9
+  },
+  "extracted_assets": {
+    "passed": true,
+    "recorded_assets": 332,
+    "actual_assets": 332,
+    "missing": [],
+    "extra": [],
+    "changed": []
+  },
+  "save_position_correction_commit": "a6373f8",
+  "source_boundaries": "Frozen snapshot also includes uncommitted capture QA changes; does not imply six-mission acceptance",
+  "full_release_ready": false
+}
