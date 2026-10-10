@@ -1,0 +1,21 @@
+{
+  "scope": "Actual four repaired assemblies, eight asset-only renders; not paid gameplay acceptance",
+  "binary_sha256": "cc4cf99e01c334b2f1d7614fc617eed8e176242117dfdab23407d1b6fd325444",
+  "evidence_directory": "target/model-portraits-four-mounts-20261010",
+  "technical_verification_passed": true,
+  "inspected_entities": [
+    "CryoSprayer",
+    "RocketGunship",
+    "SiegeAirship",
+    "TechRepairDepot"
+  ],
+  "attachment_visual_review_passed": true,
+  "findings": [
+    "Cryo canister now contacts the body.",
+    "Aircraft duplicate accessories mount symmetrically inside their hulls.",
+    "Depot apparatus sit on the floor.",
+    "Procedural faction indicators remain in these images; model-only portrait presentation is under review."
+  ],
+  "runtime_replaced": false,
+  "live_gameplay_reference_verified": false
+}
