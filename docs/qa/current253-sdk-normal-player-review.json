@@ -1,0 +1,73 @@
+{
+  "scope": "Exact SDK253 normal-input repeated own-unit Y, paid construction/harvest restoration and normal Campaign initial entry only; no productionqueue/all Save/whole campaign or release claim",
+  "archive_sha256": "2e29876d38ee4db63a8a86de10514b97b5ce47b00808ff979520c781b592c072",
+  "packed_binary_sha256": "a4d386a953a0c1fa69d14cafc21a49415dffc5ba67649e4b88714d73ed8927de",
+  "actual_service_exit": 0,
+  "total_wall_seconds": 228.87139228201704,
+  "cases": [
+    {
+      "case": "save-height",
+      "actual_runner_exit": 0,
+      "wall_seconds": 86.40467023602105,
+      "normal_game_exits": [
+        {
+          "index": 1,
+          "pid": 3234893,
+          "actual_exit": 0,
+          "normal_window_close": true
+        },
+        {
+          "index": 2,
+          "pid": 3237248,
+          "actual_exit": 0,
+          "normal_window_close": true
+        }
+      ],
+      "installation_unchanged": true,
+      "archive_unchanged": true,
+      "result_sha256": "7d40caa4610b723dc814da0dc1a9a434364a22e166eb5cd741b22b2dad16233a",
+      "direct_frame_review": true
+    },
+    {
+      "case": "save-work",
+      "actual_runner_exit": 0,
+      "wall_seconds": 98.85341019599582,
+      "normal_game_exits": [
+        {
+          "index": 1,
+          "pid": 3239028,
+          "actual_exit": 0,
+          "normal_window_close": true
+        },
+        {
+          "index": 2,
+          "pid": 3241260,
+          "actual_exit": 0,
+          "normal_window_close": true
+        }
+      ],
+      "installation_unchanged": true,
+      "archive_unchanged": true,
+      "result_sha256": "a0b6d2d5bcef83882ffdfa2627389c6e71f44fed2f83cddfd7935708a94211f2",
+      "direct_frame_review": true
+    },
+    {
+      "case": "campaign-entry",
+      "actual_runner_exit": 0,
+      "wall_seconds": 42.26512090800679,
+      "normal_game_exits": [
+        {
+          "index": 1,
+          "pid": 3243696,
+          "actual_exit": 0,
+          "normal_window_close": true
+        }
+      ],
+      "installation_unchanged": true,
+      "archive_unchanged": true,
+      "result_sha256": "cd59b4ad5ec4302868da9e3fe7c354554ef1437502964a27d203867b84399c0c",
+      "direct_frame_review": true
+    }
+  ],
+  "full_release_ready": false
+}
