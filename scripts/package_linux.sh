@@ -102,6 +102,17 @@ actual_providers = {str(pathlib.Path(path).parents[1]) for path in provenance.va
 recorded_providers = {row['packaged_store_path'] for row in notice_manifest['components']}
 if actual_providers != recorded_providers:
     raise SystemExit('Bundled library providers changed; regenerate exact-source runtime notices')
+library_identities = notice_manifest.get('library_source_sha256', {})
+if library_identities:
+    if set(library_identities) != set(provenance):
+        raise SystemExit('Bundled library identity inventory differs from executable closure')
+    for soname, identity in library_identities.items():
+        provider = pathlib.Path(provenance[soname])
+        if str(provider) != identity['provider_file']:
+            raise SystemExit(f'Library provider differs from notice provenance: {soname}')
+        with provider.open('rb') as stream:
+            if hashlib.file_digest(stream, 'sha256').hexdigest() != identity['sha256']:
+                raise SystemExit(f'Library bytes differ from notice provenance: {soname}')
 for row in notice_manifest['components']:
     for notice_name, digest in row['notices'].items():
         path = notices / row['component'] / notice_name

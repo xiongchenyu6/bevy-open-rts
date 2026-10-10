@@ -1,0 +1,17 @@
+{
+  "scope": "SDK library provenance packaging guard only; no gameplay or legal clearance",
+  "positive_sdk_library_count": 10,
+  "positive_raw_library_hashes_match": true,
+  "negative_fixture": {
+    "scope": "Intentionally invalid library provenance metadata fixture only; not a game build or playable artifact",
+    "tampered_soname": "ld-linux-x86-64.so.2"
+  },
+  "negative_result": {
+    "scope": "Negative provenance fixture only",
+    "actual_packager_exit": 1,
+    "wrong_hash_rejected": true,
+    "archive_not_created": true
+  },
+  "negative_log_sha256": "9b504de6dc59365d98ef3eaf3d1caa1ad2ae54a457009fe22206cb5f6aad09b1",
+  "behavior": "When a SDK manifest supplies source library hashes, require exact closure membership, provider path and bytes before creating an archive"
+}
