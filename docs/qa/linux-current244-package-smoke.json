@@ -1,0 +1,57 @@
+{
+  "scope": "Exact current244 optimized archive integrity and basic clean input/save/load; not full gameplay/performance/license acceptance",
+  "archive_sha256": "bcf047febca59a22cc787aca7a3033ce9c189be2a684c1c19cc012faa20fab9d",
+  "packed_executable_sha256": "576efe946990721088b4fdc32c9c724799e15b3be0e93477e21f1002f949851c",
+  "build": {
+    "actual_exit": 0,
+    "frozen_inputs_unchanged": true,
+    "wall_seconds": 791.150314005994,
+    "scope": "Frozen current244 optimizedLinux QA candidate; performance/runtime/finalrelease gates pending",
+    "command": [
+      "/nix/store/gmgfpzc0w2pgby0lmq9r88m39albiyfw-cargo-1.98.1/bin/cargo",
+      "rustc",
+      "--locked",
+      "--offline",
+      "--release",
+      "--jobs",
+      "1",
+      "--bin",
+      "bevy-open-rts",
+      "--",
+      "-Clto=thin",
+      "-Ccodegen-units=8",
+      "-Cllvm-args=-threads=1"
+    ],
+    "binary_sha256": "12bdd93a71d1cadb4435316aedb13546788183bd4a20085f8c24b77f97067dd5",
+    "binary_bytes": 103425008
+  },
+  "archive_integrity": {
+    "files": 379,
+    "assets": 332,
+    "rust_notices": 9,
+    "independent_verifier_exit": 0
+  },
+  "clean_container": {
+    "actual_exit": 0,
+    "os": "Ubuntu 24.04.5 LTS",
+    "user": "65534:65534",
+    "installation_readonly": true,
+    "nix_mount": false,
+    "gpu_device": "/dev/dri/renderD128"
+  },
+  "keyboard_save_sha256": "8219dc1e27683207b2d94fb0819cd909822b929cf77453061d26aa5d7a07ca01",
+  "mouse_save_sha256": "2cd0393598bce3a79d38d4334ae7bc9fd3fa9fac05ba562b5b0dd774293fb437",
+  "mouse_load_bytes_unchanged": true,
+  "reviewed_frames": [
+    {
+      "file": "target/linux-current244-clean-input-20261010/10-before-mouse-load-menu.png",
+      "sha256": "2e469f0396dacb4873df8a96b9826c4c02be918a03de37a51824a03cc6450562"
+    },
+    {
+      "file": "target/linux-current244-clean-input-20261010/11-mouse-loaded.png",
+      "sha256": "ec40e6cbe860b1699af85828e6caaa55c8e7c67fde014f9a9b66afddb63b8ee2"
+    }
+  ],
+  "later_result_hud_change_included": false,
+  "final_release_ready": false
+}
