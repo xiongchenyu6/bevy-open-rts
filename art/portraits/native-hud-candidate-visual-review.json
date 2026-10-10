@@ -1,0 +1,54 @@
+{
+  "scope": "Bounded normal-input HUD review with private71 candidate assets; not complete roster or final package acceptance",
+  "capture_sha256": "5b421784b27d897eb7350244dab2a02a56e77d6749c2730808c950e681fba8ee",
+  "resolutions": [
+    [
+      1920,
+      1080
+    ],
+    [
+      900,
+      720
+    ]
+  ],
+  "child_exits": [
+    0,
+    0
+  ],
+  "screenshots": [
+    {
+      "path": "target/private-portrait-hud-20261010/1920/00_worker.png",
+      "sha256": "33ebd4bb41a6b62fd542dd63b7510cb36254c46c6c466f71b3a51d4a16975c90"
+    },
+    {
+      "path": "target/private-portrait-hud-20261010/1920/01_disabled_tooltip.png",
+      "sha256": "2b9cb1a66e21ea62aa7f1b4af8ee1af86730348ddb54b906dbee34649cb95c95"
+    },
+    {
+      "path": "target/private-portrait-hud-20261010/1920/02_production_queue.png",
+      "sha256": "6672d32423a606a083aaa5806446235f01123c9ba96e5d7c60a50512838e378e"
+    },
+    {
+      "path": "target/private-portrait-hud-20261010/900/00_worker.png",
+      "sha256": "96dd708b7d44a744dc9efaaf82c44f7ef7c6c1e38003caecc19f06b781a49e29"
+    },
+    {
+      "path": "target/private-portrait-hud-20261010/900/01_disabled_tooltip.png",
+      "sha256": "a2bad11a2679c8ebcd34ea2be7d527614c68c7604137cf9f6472a1583b588a60"
+    },
+    {
+      "path": "target/private-portrait-hud-20261010/900/02_production_queue.png",
+      "sha256": "3d0f0c1c22cc5451995c7ef2135515c052db128aa1e38aa48b8eef3487896d55"
+    }
+  ],
+  "findings": [
+    "Worker selected through normal input; candidate portrait visually corresponds to its actual model.",
+    "PowerReactor and Barracks completed through normal paid construction input; infantry queued through normal training input.",
+    "Worker build cards, Barracks train cards and disabled tooltip remain readable within both viewports.",
+    "No observed portrait cropping or UI text clipping in these six samples.",
+    "Camera framing at the map edge exposes black space above the terrain in production samples; final presentation review remains open."
+  ],
+  "runtime_assets_replaced": false,
+  "all70_ui_verified": false,
+  "mission_completed": false
+}
