@@ -3,6 +3,19 @@ name: Build Windows desktop package
 # Produces reviewable artifacts only; does not publish a release or deploy.
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/release-desktop.yml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - '.cargo/**'
+      - 'src/**'
+      - 'assets/**'
+      - 'scripts/package_windows.ps1'
+      - 'scripts/verify_package.py'
+      - 'docs/third-party/**'
+      - 'docs/RUST_DEPENDENCY_MATERIALS.md'
+      - 'ASSETS.md'
 
 permissions:
   contents: read

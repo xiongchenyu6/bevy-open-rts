@@ -12,8 +12,9 @@ cargo build --locked --release --target x86_64-pc-windows-msvc --bin bevy-open-r
 python scripts/verify_package.py dist/bevy-open-rts-windows-x86_64.zip
 ```
 
-The manual **Build Windows desktop package** GitHub workflow performs these
-steps on a Windows runner and retains a downloadable artifact. It does not
+The **Build Windows desktop package** GitHub workflow performs these
+steps on a Windows runner and retains a downloadable artifact. It supports
+manual runs and pull requests changing game/build/package inputs. It does not
 publish a release or upload to Steam. Audio is included. The lockfile fixes
 dependencies and the workflow pins Rust; byte-identical builds are not promised.
 This native MSVC workflow has not yet been executed.
