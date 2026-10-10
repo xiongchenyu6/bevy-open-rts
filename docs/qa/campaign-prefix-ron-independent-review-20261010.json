@@ -1,0 +1,24 @@
+{
+  "scope": "Independent parsing of actual saved RON files; only first two missions",
+  "rows": [
+    {
+      "index": 0,
+      "file": "screenshots/steam-quality/current-campaign-chain-normal-support/0/campaign-after.ron",
+      "sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+      "completed": [
+        "hold_the_line"
+      ],
+      "exact_prefix": true
+    },
+    {
+      "index": 1,
+      "file": "screenshots/steam-quality/current-campaign-chain-normal-support/1/campaign-after.ron",
+      "sha256": "49a2d1643b35bdc53c65186dff35bb82e29e9c7d92f72d20472cda617e645fc2",
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost"
+      ],
+      "exact_prefix": true
+    }
+  ]
+}
