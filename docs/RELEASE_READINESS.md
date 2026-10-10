@@ -29,35 +29,46 @@ fixture passes. Costs, profile timers, six-pick budget and physical clearance
 remain unchanged. Exact packed-base snapshots motivate angular coverage and
 bounded expansion inside normal construction influence.
 
-The latest full simulation suite records237 passed, zero failed and one ignored
-at the harvest-contact/menu-cursor checkpoint. The harvest correction
-(`52385a4`) preserves legal cached contact routes and replans blocked gathering
-and dropoff approaches. Its real-cargo regression deposits six ore by tick225;
-this does not establish campaign completion. Later presentation/capture-only
-builds succeeded but do not create new four-binary or final-package parity.
-The earlier movement-clearance checkpoint completed eight failed-case rechecks
-within unchanged600-simulation/180-wall-second limits. Its fresh3,726-case sweep
-uses sealed `0295f5…`, predates the harvest correction and remains incomplete.
+The latest verified library checkpoint passes240 tests, zero failures and one
+ignored test. Contact refinement (`828b111`, `445a7ac`) completes both recorded
+constructor scenarios within the original900-tick budget while preserving body,
+terrain, HP and bank checks. Native four-binary builds pass. Boot Camp correction
+`eeb460a` passes the actual fresh-profile skip, seven lessons, graduation,
+campaign transition and replay; `docs/qa/current-boot-camp-review.json` includes
+reviewed screenshots. Final-package first-session revalidation remains open.
 
-All70 model-only portraits and the original roster preview are installed by
-`91d824b`. Normal-input HUD checks at1920x1080 and900x720 pass; full-roster
-paid/UI and final package verification remain open. Original menu background
-integration `07843b2` passed three post-integration native menu/setup images.
-Render-only outskirts `ef588b9` passed both supported tilt extremes with11
-frames each; all22 were visually reviewed. Original four-state cursor atlas
-`aa4193f` has native loaded-pixel/index/hotspot evidence, and its post-integration
-seven-phase native metadata run passed; final browser pointer appearance/alignment
-remain pending. Unused legacy
-VFX removal `1309f29` reduces runtime inventory to332 files and326 payload ledger
-entries; private startup/paid-HUD smoke does not prove final combat/package behavior.
+Current original armor and70 re-rendered portraits are installed, with all70
+paired renders and128/72px dark/light review. Representative native menu and
+paid HUD checks pass; all-roster paid creation remains open. Runtime inventory
+contains332 files with326 payload ledger entries. Native map outskirts pass
+both tilt extremes and22 reviewed frames. Browser08 starts under SwiftShader,
+and all four applied CSS cursor frames/hotspots match the original atlas;
+actual pointer appearance, world click alignment and final browser gameplay
+remain separate checks.
 
-The fresh normal-input M1 on the harvest-fixed core still ends in HumanDefeat
-at481.7s. Earlier283.286s defeat remains preserved. The next ordinary paid
-counter strategy is under test; no mission costs, waves or stats were weakened.
-All six missions in one App remain unproven. Normal paid HUD actions produce
-14.45 seconds of mixed native audio with zero clipped samples; ASR recovers the
-English selection acknowledgment only. Full event coverage, combat mix and
-human listening remain open. All nine release gates above still apply.
+The current optimized Linux candidate compiles with unchanged frozen inputs.
+Its archive passes independent379-file/332-asset/nine-Rust-notice integrity
+checks. Ubuntu24.04.5 runs the exact readonly archive as a nonroot user with
+AMD Vulkan and no Nix mount; keyboard Save/Load passes with unchanged save bytes.
+Legacy mouse-menu coordinates miss controls, so that path is not accepted.
+See `docs/qa/linux-current240-package-smoke.json`. Complete package playthrough,
+dense combat performance, Steam Runtime and native Windows remain open.
+
+Current separate-process schema3 orders, mines and F1/F5 effects pass bounded
+normal-input restoration. Independent evidence verifies distinct PIDs,
+unchanged saves, target remapping, exact4 mine damage, shield scale.25 and normal
+expiry. Active construction, paid production and natural midfade weather are
+under test; broader effects and final-package continuity remain unproven.
+
+Campaign M1 still fails: the centered-contact counter run loses at621.1s;
+spaced construction with2Ore/2Crystal loses at241.3s despite normal resources.
+Both failures are preserved. No six-mission same-App acceptance is claimed.
+The earlier movement-clearance3,726-case sweep predates current contact fixes;
+it remains incomplete and has one recorded600-second timeout (0939), currently
+being rechecked with the same limits on current240. Eight prior timeout cases
+passed bounded rechecks; these do not prove the full map matrix. Natural audio
+output/selection-ack ASR remain bounded; full events, mix and human listening
+are still open. All nine release gates remain in scope.
 
 ## Verification policy
 
@@ -79,7 +90,7 @@ and [content survey](https://partner.steamgames.com/doc/gettingstarted/contentsu
 Submission needs the owner's Steamworks account and explicit publication scope.
 No store submission is authorized by the quality goal alone.
 
-## Current campaign evidence
+## Earlier campaign checkpoints (not current acceptance)
 
 Older separate-process runs complete all six missions with exact persisted
 prefixes. They do not prove the required same-App chain. Current paid-AI runs
