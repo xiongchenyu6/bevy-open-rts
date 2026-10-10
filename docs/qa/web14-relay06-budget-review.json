@@ -1,0 +1,84 @@
+{
+  "scope": "Exactfinal267Web14 forcedrelay normalpaid flow; original240timeout, no completion pass",
+  "wasm_sha256": "65f27ec9f326d8a1d4ad7a8eae5a4eefd4ddc36b9dc6fed07a48b3a508fe628a",
+  "actual_exit": 124,
+  "deadline_seconds": 240,
+  "capture_method": "ReadonlyCDP actualcompositedPNG, no scene/UIwrites",
+  "capture_timings": [
+    {
+      "role": "p1",
+      "label": "08-candidate-Power-preview",
+      "started_wall_ms": 1791674070529,
+      "remaining_wall_ms": 65346,
+      "budget_ms": 25000,
+      "read_only_protocol": "Page.captureScreenshot",
+      "actual_png_bytes": 876696,
+      "completed": true,
+      "elapsed_wall_ms": 18153
+    }
+  ],
+  "preview_personally_reviewed_green": true,
+  "last_guest_applied_tick": 40,
+  "last_clock": 9.921899795532227,
+  "last_economy": {
+    "crystal": 15,
+    "ore": 29,
+    "power_capacity": 8,
+    "power_sabotage_remaining": 0.0,
+    "power_used": 0,
+    "production_veterancy_ranks": [
+      0,
+      0,
+      0
+    ]
+  },
+  "power": {
+    "cargo": null,
+    "construction": [
+      0.1750001162290573,
+      1.0
+    ],
+    "health": [
+      10.07499885559082,
+      12.0
+    ],
+    "id": 9,
+    "kind": {
+      "Structure": {
+        "id": "PowerReactor"
+      }
+    },
+    "rotation": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "scale": [
+      1.0,
+      0.9285823702812195,
+      1.0
+    ],
+    "team": {
+      "Player": 1
+    },
+    "translation": [
+      10.831581115722656,
+      0.0,
+      -17.498512268066406
+    ],
+    "veterancy": null,
+    "visual_faction": "Demon"
+  },
+  "completion_sample_count": 15,
+  "completed": false,
+  "no_CDP_speedup_claim": true,
+  "no_product_fix_inferred": true,
+  "eight_peer_reconnect_independentworld_pass": false,
+  "evidence_sha256": {
+    "target/web14-normal-two-human-relay06-20261011/final-supervisor-result.json": "ee0e88ab2e8149bb921c0c5e523366327f82433fdd8b69d45bc9bf6a6d3e418f",
+    "target/web14-normal-two-human-relay06-20261011/capture-stage-timings.json": "dbed093c716a96048d0325f45c70e121aafcf989b3ff9f17d50286e2ef15e522",
+    "target/web14-normal-two-human-relay06-20261011/p1-08-candidate-Power-preview.png": "a7f9b65b00d371eed218ac8afc4e37f747e2cd5ab2c66b43d17ccf72b338cc76",
+    "target/web14-normal-two-human-relay06-20261011/completion-14.json": "4629e3bf249f3652281ed01ce1397a7b87001bf43a415db9ec65c9b9edc437ee"
+  }
+}
