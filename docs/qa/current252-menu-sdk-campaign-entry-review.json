@@ -1,0 +1,56 @@
+{
+  "scope": "Exact parameterized future SDK archive inside official Runtime4; normalMainCampaign/lockedcard/back/firstmission briefing+Enter+F10/CtrlS configuration only; no fullcampaign or fight claim",
+  "archive_sha256": "e026531da02d7787e3576ddd1cd77c60358cb9d9b150b937131182823eb3eb21",
+  "binary_sha256": "4724664f7f6f3f36766ed8d8d009e3642fddc80a2101002f2a01bce97476e383",
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 3203091,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_game_cleanup": false,
+  "locked_card_no_match_save_created": true,
+  "mission_observations": {
+    "schema": 3,
+    "mission_id": "hold_the_line",
+    "map_path": "bevy://maps/CanyonPass",
+    "starting_ore": 48,
+    "starting_crystal": 24,
+    "actual_ore": 48,
+    "actual_crystal": 24,
+    "player_controllers_ron": "[\n            1,\n            2,\n        ]",
+    "player_factions_ron": "[\n            0,\n            1,\n        ]",
+    "clock_sec": 1.6780006,
+    "save_sha256": "2a31b601958283129af466b775fce43be2ebc63b0adf0abba433a555e44fe4a4",
+    "active_teams_ron": "[\n            true,\n            true,\n        ]"
+  },
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "wall_seconds": 42.14108478897833,
+  "passed": true,
+  "raw_evidence": "target/sdk252-menu-campaign-entry-20261011-02",
+  "original_wall_limit_seconds": 240,
+  "screenshots": {
+    "00-normal-main-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-normal-campaign-map": "e9d8a913cb2efed8e93cbb7068d1817f849da3d0fe9e2d2213bb96722f482346",
+    "02-locked-second-card": "fa2244ee0d0ec2db8ef28e95532897543e7ffa3e5d58a57a00aed9d5404e4781",
+    "03-normal-back-main-menu": "e592bc0a562bc6a3f1e28861ba2be1edc252374698a4f229eb4dbac5ea6a430c",
+    "04-real-mission-briefing": "b608222f578324b04fff28decaec8bb783ef145ae1ba62516043566563ad3ac7",
+    "05-enter-dismissed-briefing": "81344091dcf9b6052bf0cbb138370d943920997eb895167f9009a14c565043e3",
+    "06-tactical-pause": "0cfd6b601bf0809dd1a7de976d7500533b60f8d5f0b1089bbbe5b53f2debd4a4",
+    "07-actual-mission-save": "07c0c94abdbf23ad319e244e8fe85dd8b8e6f73bd3afde05970c532f475abbf3"
+  },
+  "result_sha256": "0beac7d0cd73d63a816e56716e6c805845e161abc3aac1951dec8899058f0dcb",
+  "preserved_failure": {
+    "path": "target/sdk252-menu-campaign-entry-20261011-01",
+    "actual_exit": 1,
+    "reason": "Runner incorrectly expected legacy Godot .tscn path; actual canonical bevy://maps/CanyonPass correct; strict canonical equality used for retry"
+  },
+  "visual_limits": [
+    "Mission fullscreen briefing subtitle clips at its right edge in retained04 image; not complete text-readability acceptance",
+    "Menu-corrected SDK252 artifact only, predates Flash cleanup and SDK253",
+    "Normal Campaign entry/configuration and locked-card rejection only, not mission victory or fullcampaign"
+  ]
+}
