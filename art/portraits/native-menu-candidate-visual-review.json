@@ -1,0 +1,30 @@
+{
+  "scope": "Root visual review of normal native main menus with private candidate assets; menu layout and roster only",
+  "capture_sha256": "5b421784b27d897eb7350244dab2a02a56e77d6749c2730808c950e681fba8ee",
+  "shots": [
+    {
+      "path": "target/model-roster-ui-review-20261010/menu-1920.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "dbb67f88d4c5e07832273e44a4fad18f51748b3492eefed257ed85fefcc69295",
+      "child_exit": 0
+    },
+    {
+      "path": "target/model-roster-ui-review-20261010/menu-900.png",
+      "width": 900,
+      "height": 720,
+      "sha256": "e48f2a95a7bebdb63ee100cbb175619cc3e0136e3d00efacaceb08da747af1e4",
+      "child_exit": 0
+    }
+  ],
+  "visual_verdict": "pass",
+  "findings": [
+    "English headings and command buttons readable at both resolutions.",
+    "Roster group visible inside its card; no observed clipping or overlap.",
+    "Infantry and drone remain smaller than vehicles at actual model scale."
+  ],
+  "repository_runtime_assets_replaced": false,
+  "all70_portraits_displayed": false,
+  "paid_gameplay_acceptance": false,
+  "final_package_acceptance": false
+}
