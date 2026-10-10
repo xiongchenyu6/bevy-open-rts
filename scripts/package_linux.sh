@@ -73,8 +73,8 @@ launcher.write_text('''#!/bin/sh
 set -eu
 INSTALL_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 export BEVY_ASSET_ROOT="$INSTALL_DIR"
-# Bundled Nix libc has no distro defaults: include the host driver locations.
-HOST_LIB_DIRS=/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu:/usr/lib64:/lib64:/usr/lib:/lib
+# Include host and Steam container drivers in the bundled loader search.
+HOST_LIB_DIRS=/usr/lib/pressure-vessel/overrides/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu:/usr/lib64:/lib64:/usr/lib:/lib
 export XKB_CONFIG_ROOT="${XKB_CONFIG_ROOT:-/usr/share/X11/xkb}"
 export XLOCALEDIR="${XLOCALEDIR:-/usr/share/X11/locale}"
 export ALSA_CONFIG_PATH="${ALSA_CONFIG_PATH:-/usr/share/alsa/alsa.conf}"
