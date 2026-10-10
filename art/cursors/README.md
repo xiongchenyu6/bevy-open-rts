@@ -27,3 +27,13 @@ raw observations remain in `target/original-cursors-browser-01/`. This covers
 only default image application, not the other three transitions, native cursor
 behavior, pointer-to-order alignment or the final game build. Runtime assets
 remain unchanged.
+
+
+Two later ordinary-input recipes failed and remain recorded in
+`candidates-v1/browser-transition-review.json`: a game-canvas screenshot times
+out, and a subsequent patrol attempt still shows the default cursor. The
+selected entity/command mode was not independently confirmed, so the latter
+cannot be attributed to the atlas. Move/Attack/Build transitions remain open;
+use an inspected selection/action recipe on the sealed final core before
+runtime integration. These failures do not invalidate the bounded default
+image application evidence or establish browser gameplay performance.

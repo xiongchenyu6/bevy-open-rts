@@ -1,0 +1,28 @@
+{
+  "scope": "Failed ordinary-input recipes, not accepted cursor transitions or performance",
+  "browser02": {
+    "child_exit": 1,
+    "failure": "game-canvas screenshot exceeded30s; no remaining states accepted"
+  },
+  "browser03": {
+    "child_exit": 1,
+    "failure": "attempted patrol input still displayed default cursor; selected entity/mode not independently confirmed",
+    "observed_hotspot": [
+      2,
+      1
+    ],
+    "observed_default_visible_pixels": 319,
+    "page_errors": []
+  },
+  "default_application_accepted": true,
+  "move_attack_build_transitions_accepted": false,
+  "native_accepted": false,
+  "input_alignment_accepted": false,
+  "runtime_replaced": false,
+  "raw_evidence": [
+    "target/original-cursors-browser-02/",
+    "target/original-cursors-browser-03/",
+    "logs/original-cursors-browser-02.log",
+    "logs/original-cursors-browser-03.log"
+  ]
+}
