@@ -1,0 +1,168 @@
+{
+  "scope": "Exact corrected SDK267 package02 normal visible Ore rally, paid Worker job and same/fresh-process restoration",
+  "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+  "packed_binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+  "evidence_directory": "target/sdk267-save-actual-visible-ore-20261011-01",
+  "result_sha256": "0178b4f044550149c82fb02e9972b15d6724c10406242304da5165c5f7d607fa",
+  "wall_seconds": 119.56675950600766,
+  "wall_limit_seconds": 240,
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 3937157,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "index": 2,
+      "pid": 3940711,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "normal_controls": "Skirmish start; F10; ordinary HQ selection, zoom and arrow pan; current screenshot-reviewed visible Ore right click; paid Worker hotkey; CtrlS/CtrlL; normal close and new process load. Readonly geometry supplied visible body identity only.",
+  "reviewed_body": {
+    "reviewed_image": "02-actual-visible-resource-preview-0.png",
+    "reviewed_image_sha256": "5967584c7507da70da164c0901b7b76079ea0a0f92a87ab05cb26ce1e6694d1e",
+    "resource_entity": 8589933961,
+    "kind": "Ore",
+    "resource_point": [
+      581,
+      338
+    ],
+    "selection_precondition": true,
+    "actual_world_bounds": {
+      "center_screen": [
+        578.7931518554688,
+        309.51947021484375
+      ],
+      "ground_screen": [
+        579.36376953125,
+        314.78289794921875
+      ],
+      "height_above_global_anchor": 0.3275500237941742,
+      "max": [
+        -15.697178840637207,
+        0.3275500237941742,
+        -7.610597133636475
+      ],
+      "min": [
+        -16.155797958374023,
+        0.029999999329447746,
+        -8.116202354431152
+      ],
+      "size": [
+        0.4586191177368164,
+        0.2975500226020813,
+        0.5056052207946777
+      ],
+      "top_screen": [
+        578.2113037109375,
+        304.1525573730469
+      ]
+    },
+    "source": "Read-only currently visible loaded GLB body projection, not hidden save coordinates"
+  },
+  "cost": [
+    2,
+    0
+  ],
+  "bank_before": [
+    32,
+    16
+  ],
+  "bank_final": [
+    30,
+    16
+  ],
+  "comparisons": [
+    {
+      "elapsed": 0.2675032615661621,
+      "target_keys": [
+        8589933961,
+        12884900998
+      ],
+      "producer_keys": [
+        8589933868,
+        12884900919
+      ],
+      "passed": true
+    },
+    {
+      "elapsed": 0.26012134552001953,
+      "target_keys": [
+        12884900998,
+        12884900628
+      ],
+      "producer_keys": [
+        12884900919,
+        12884900988
+      ],
+      "passed": true
+    }
+  ],
+  "load_byte_checks": [
+    {
+      "session": 1,
+      "before": "aca9cd8e0cc066b69c3b86bf8ab04f1dadde98bb39f91b77c5ff9d782f7a70d9",
+      "after": "aca9cd8e0cc066b69c3b86bf8ab04f1dadde98bb39f91b77c5ff9d782f7a70d9",
+      "unchanged": true
+    },
+    {
+      "session": 2,
+      "before": "602a31d7f2f33ff24e414eb871052c62da9ee1c782aa48d644511f91fa8a1dfa",
+      "after": "602a31d7f2f33ff24e414eb871052c62da9ee1c782aa48d644511f91fa8a1dfa",
+      "unchanged": true
+    }
+  ],
+  "produced_worker": {
+    "key": 64424507955,
+    "id": "Worker",
+    "position": [
+      -13.928827285766602,
+      0.05000000074505806,
+      -10.98940372467041
+    ],
+    "active": [
+      {
+        "kind": "Move",
+        "destination": [
+          -14.442625045776367,
+          0.0,
+          -8.0828218460083
+        ]
+      },
+      {
+        "kind": "Harvest",
+        "target": 12884900628,
+        "state": 0
+      }
+    ],
+    "queued": [],
+    "cargo_ron": "Some((0, 0))"
+  },
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-baseline-paused": "042474daed7160a740f7b59d755a588d879ac3ae2f0a3287347da8b9e0e2e2f1",
+    "02-actual-visible-resource-preview-0": "5967584c7507da70da164c0901b7b76079ea0a0f92a87ab05cb26ce1e6694d1e",
+    "03-actual-visible-ore-rally": "c2aac1a8ee83a876cd034ceac5308ca64997f6f2f9067fb8e39b6fabdf85cd34",
+    "04-worker-train-tooltip": "9f5f10eff38f7006b125361f619790fd138b384b25cce407cf71567b4975d992",
+    "07-partial-paid-queue": "79d852a1b110d2928fa866a0c9bfd591218b5a09c86feb6a67bf63da60bd2a42",
+    "08-same-process-loaded": "62b948d1861d5b01dd65b17d21a16bbd7c7abcb20485f81218deda45403f972a",
+    "09-same-process-resaved": "8065b200310fe27c89d1ac09fe602be4bf42631a3fcaa0187022935af4544146",
+    "10-fresh-menu": "8888eb9704d130d25356a0bd920b7341406817217c396081667e9b0ef284e76c",
+    "11-fresh-process-loaded": "0477d88c7a75b23955c8052d4ee549adeaccce5cc4eb18a92ce49f8a4569458f",
+    "12-fresh-process-resaved": "c38ec922bc20736083957818509cda1de36f6c2cf4453df5a8f9a2517295f694",
+    "13-paid-worker-actual-ore-harvest": "24f16081b8aac4ea5b86d4e50e838487df700b509aac8321840a61ea852d78ad"
+  },
+  "agent_preview_and_final_images_reviewed": true,
+  "passed": true,
+  "exclusions": [
+    "Harvest order received; cargo remains zero and resource collection/deposit income was not observed.",
+    "This case does not prove all save states, all first-session flows, audio or whole release readiness.",
+    "Native earlier route failures remain preserved separately; this record uses exact optimized SDK267 identity."
+  ]
+}
