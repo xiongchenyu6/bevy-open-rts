@@ -44,22 +44,41 @@ pub(crate) fn contact_position_is_clear(
     })
 }
 
+/// A retained contact route must still fit both static and current mobile bodies.
+/// A unit can occupy an old waypoint after the route was originally planned.
 pub(crate) fn contact_route_is_open(
     grid: &NavGrid,
     position: Vec3,
     goal: Vec3,
     path: Option<&PlannedPath>,
+    source_radius: f32,
+    obstacles: &[(Vec3, f32)],
+    buildings: &[(Vec3, f32)],
+    occupied: &[(Vec3, f32)],
 ) -> bool {
+    let segment_clear = |from, to| {
+        grid.line_clear(from, to)
+            && grid.terrain_line_clear(from, to)
+            && contact_escape_segment_is_clear(
+                from,
+                to,
+                source_radius,
+                obstacles,
+                buildings,
+                occupied,
+                false,
+            )
+    };
     let mut anchor = position;
     if let Some(path) = path {
         for waypoint in path.waypoints.iter().skip(path.next) {
-            if !grid.line_clear(anchor, *waypoint) {
+            if !segment_clear(anchor, *waypoint) {
                 return false;
             }
             anchor = *waypoint;
         }
     }
-    grid.line_clear(anchor, goal)
+    segment_clear(anchor, goal)
 }
 
 /// Choose the nearest reachable side of a structure. A worker-sized temporary

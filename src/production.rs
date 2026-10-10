@@ -1181,6 +1181,10 @@ pub(crate) fn update_construct_orders(
                         constructor_transform.translation,
                         order.target,
                         planned_path,
+                        constructor_selectable.radius,
+                        &static_obstacles,
+                        &building_footprints,
+                        &occupied,
                     )
                 })
             } else {

@@ -332,12 +332,58 @@ Crossfire terrain is flat. This does not identify the live movement cause.
 
 The measured endpoint fixture (`movement_endpoint_tests`) rebuilds112 archived
 actor footprints in the real headless schedule with registry-default runtime
-components. Its focused03 result is1 passed/0 failed in0.95 seconds; both Tanks
+components. Its historical focused03 result used default-map bounds and was1 passed/0 failed
+in0.95 seconds; both Tanks
 advance approximately2.75m in30 ticks. Focused01 typecheck failure and focused02
-HUD fixture panic are retained. The passing fixture rejects the proposed static
-geometry explanation under those defaults; it does not reproduce or fix the
+HUD fixture panic are retained. The map bounds were subsequently corrected to actual Crossfire64×64, and both
+current endpoint fixtures passed in the230-test suite. The historical fixture
+rejects the proposed static geometry explanation only under its old defaults; it does not reproduce or fix the
 live stall, or accept paid gameplay.
 
 Additional read-only speed/domain/Chrono and simulation-gating telemetry is
 prepared for the next shared capture. Those runtime fields still await an actual
 run; **M1 and the six-mission same-App campaign remain unaccepted**.
+
+## Assault screenshot framing preparation
+
+The harness now returns the camera from the distant order/scouting point to the
+largest nearby cluster of living own ASSAULT combat units before the existing
+`02_assault.png` capture. A genuinely visible contact within8m can occupy one
+quarter of the focus offset. `assault-framing.json` records the own entity keys,
+positions, focus and any visible contact used. This changes camera focus and
+neutralizes edge scrolling only; it adds no application updates, orders, units,
+resources, fog reveals or quota changes. Original screenshots are untouched.
+The framing change is prepared source and still requires the next sealed native
+run and visual review; no polished-image acceptance is claimed.
+
+## Constructor route revalidation proof
+
+The next fresh M1 on capture `4e35e921c31fcb88ee5defae873ede17f621aee79140532b36fe7bdef9677521`
+ended child1 at108.765 seconds with a paid second Power Reactor still atremaining1
+and own HQ20HP. It did not reach the assault screenshot. The builder remained
+alive, speed2.5/Terrain, with no EMP/Chrono; global movement gates were active.
+Its recorded next path segment intersects an own Tank: step minimum1.46858m is
+less than their combined radius1.5m. Retained contact routes previously checked
+the shared static grid, allowing an old waypoint to remain occupied by a later
+mobile body.
+
+The corrected Crossfire64×64 pair fixture retains measured Worker/Tank positions
+and all static footprints, with a physically clear fixture continuation after
+the measured next point; the original later waypoints were not archived. It
+is a mechanism fixture, not a complete saved-population reproduction. Baseline
+RED04 failed with no Worker progress. GREEN04 replans via the existing bounded
+contact solver and completes the site at286ticks (~9.53 seconds), within the
+unchanged900-tick construction deadline. Every step preserves static, terrain
+and mobile-body checks. The Tank receives no movement order or scripted position
+change; normal separation displacement is0.013536m, below the existing0.05m gap.
+Wrong-bounds and earlier fixture/strict-equality failures are retained as such.
+
+The implementation revalidates retained contact-route segments against current
+occupied bodies using the existing contact clearance helper; it adds no routing
+layer and changes no army quotas, costs, stats, collision margins or macro budget.
+Full library verification passed230/0/1 in37.06 seconds; four native builds
+exited0 in3m03. Sealed capture is
+`f0fe2960f581cd9cdf3c5b8ca11b186323cc65f7c751e745015089665d07ba0d`,
+with matching source manifest and unchanged338 runtime asset hashes. Fresh
+original-population M1 on that pin is still pending; the earlier Tank stall
+cause and whole campaign acceptance remain open.

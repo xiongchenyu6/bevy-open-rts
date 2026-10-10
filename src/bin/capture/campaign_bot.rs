@@ -941,6 +941,49 @@ fn attack(app: &mut App, cursor: &mut usize, headquarters_only: bool) -> Result<
     ground_order(app, target, true)
 }
 
+/// Frame the actual assault body after an order has moved the input camera away.
+/// Uses only own living actors and visible contacts; no updates or orders here.
+fn frame_assault_screenshot(app: &mut App, dir: &Path) -> Result<(), String> {
+    let army: Vec<_> = capture_campaign_units(app)
+        .into_iter()
+        .filter(|unit| unit.health > 0.0 && unit.combat && unit.groups.contains(&ASSAULT))
+        .collect();
+    let Some(subject) = army.iter().max_by_key(|candidate| {
+        army.iter()
+            .filter(|peer| peer.position.distance(candidate.position) <= 6.0)
+            .count()
+    }) else {
+        return Ok(());
+    };
+    let cluster: Vec<_> = army
+        .iter()
+        .filter(|unit| unit.position.distance(subject.position) <= 6.0)
+        .collect();
+    let centre = cluster.iter().map(|unit| unit.position).sum::<Vec3>() / cluster.len() as f32;
+    let contacts = visible_enemy_contacts(app)?;
+    let contact = contacts
+        .iter()
+        .filter(|contact| contact.position.distance(centre) <= 8.0)
+        .min_by(|a, b| {
+            a.position
+                .distance_squared(centre)
+                .total_cmp(&b.position.distance_squared(centre))
+        });
+    let focus = contact.map_or(centre, |contact| centre.lerp(contact.position, 0.25));
+    capture_set_cursor(app, Vec2::new(WIDTH as f32 * 0.5, HEIGHT as f32 * 0.5));
+    capture_focus_camera_on(app, focus);
+    std::fs::write(dir.join("assault-framing.json"), serde_json::to_vec_pretty(&serde_json::json!({
+        "scope": "ordinary camera framing only; unchanged orders and update budget",
+        "clock": capture_campaign_state(app).clock,
+        "focus": focus.to_array(), "own_cluster_centre": centre.to_array(),
+        "own_cluster": cluster.iter().map(|unit| serde_json::json!({"entity":unit.entity.to_bits(),
+            "id":unit.id,"position":unit.position.to_array(),"hp":unit.health})).collect::<Vec<_>>(),
+        "nearby_visible_contact": contact.map(|contact| serde_json::json!({"id":contact.id,
+            "position":contact.position.to_array(),"visible":true})),
+    })).map_err(|error| error.to_string())?).map_err(|error| error.to_string())?;
+    Ok(())
+}
+
 pub(super) fn log_state(
     app: &mut App,
     trace: &mut std::fs::File,
@@ -1203,6 +1246,7 @@ pub(super) fn run(
             {
                 attack(app, &mut scout_cursor, index == 1)?;
                 if !launched {
+                    frame_assault_screenshot(app, dir)?;
                     shoot(app, handle, dir.join("02_assault.png"));
                 }
                 launched = true;
