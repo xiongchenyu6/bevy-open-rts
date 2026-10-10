@@ -457,3 +457,26 @@ physical quarter-cell route, while the source-centered6m window does not reach
 that route's valid contact end. This is a diagnostic observation, not an
 executed movement fix. A second recorded-endpoint regression and a same-budget
 window-centering candidate are prepared outside Rust source pending verification.
+
+
+### Fixed-budget contact window verification (2026-10-10)
+
+The second recorded endpoint RED fails with the same106physical actors and
+900-tick deadline: the Worker keeps ConstructOrder at(-13.837750,-21.006952),
+with no movement route or construction progress. Raw failure is
+`logs/campaign-robotics-window-red-01.log` (actual exit101).
+
+The refinement window now centers between the actual source and target while
+retaining49×49maximum nodes, quarter-cell spacing,32original candidate goals,
+and the same static/terrain/mobile segment guards. Both source and target must
+be inside the bounded window; seed legs still begin at the actual source.
+No global navigation, movement threshold, actor state, cost or time budget changes.
+The first endpoint completes at187ticks and the second at233ticks (~7.77s),
+with all step/body/no-teleport/HP/bank assertions intact. Focused GREEN passes2/0;
+existing contact regressions pass21/0 and full library tests239/0/1 in43.53s.
+Four native builds exit0 in3m48. Immutable capture is
+`target/robotics-window-shared-20261010/capture`, SHA256
+`758caf88f13307ba1b4a624b6b6d976274fa481afc67e64fd70d24c352d6e93d`;
+its pin verifies all Rust/Cargo inputs and332current assets, including the
+refreshed original-material portraits. The same paid-counter real M1 run is
+pending; these fixture passes do not establish complete campaign acceptance.

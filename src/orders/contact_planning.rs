@@ -484,6 +484,7 @@ pub(crate) fn reachable_unit_contact_approach(
     }
     local_contact::refined_contact_approach(
         source_position,
+        target_position,
         source_radius,
         &candidates,
         grid,

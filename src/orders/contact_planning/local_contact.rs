@@ -4,6 +4,7 @@ use std::collections::{HashMap, VecDeque};
 
 pub(super) fn refined_contact_approach(
     source: Vec3,
+    target_position: Vec3,
     radius: f32,
     goals: &[Vec3],
     grid: &NavGrid,
@@ -15,9 +16,18 @@ pub(super) fn refined_contact_approach(
         return None;
     }
     let step = NAV_GRID_CELL_M * 0.5;
+    let center = source.lerp(target_position, 0.5);
     let origin = (
+        ((center.x - grid.origin_x) / step).floor() as i32,
+        ((center.z - grid.origin_z) / step).floor() as i32,
+    );
+    let source_cell = (
         ((source.x - grid.origin_x) / step).floor() as i32,
         ((source.z - grid.origin_z) / step).floor() as i32,
+    );
+    let target_cell = (
+        ((target_position.x - grid.origin_x) / step).floor() as i32,
+        ((target_position.z - grid.origin_z) / step).floor() as i32,
     );
     let point = |cell: (i32, i32)| {
         Vec3::new(
@@ -34,6 +44,9 @@ pub(super) fn refined_contact_approach(
             && (cell.0 - origin.0).abs() <= 24
             && (cell.1 - origin.1).abs() <= 24
     };
+    if !inside(source_cell) || !inside(target_cell) {
+        return None;
+    }
     let clear = |from, to| {
         grid.line_clear(from, to)
             && grid.terrain_line_clear(from, to)
@@ -50,7 +63,7 @@ pub(super) fn refined_contact_approach(
     let mut queue = VecDeque::new();
     for dz in -4..=4 {
         for dx in -4..=4 {
-            let cell = (origin.0 + dx, origin.1 + dz);
+            let cell = (source_cell.0 + dx, source_cell.1 + dz);
             if inside(cell) && clear(source, point(cell)) {
                 parents.insert(cell, None);
                 queue.push_back(cell);
@@ -58,6 +71,10 @@ pub(super) fn refined_contact_approach(
         }
     }
     while let Some(cell) = queue.pop_front() {
+        debug_assert!(
+            parents.len() <= 49 * 49,
+            "refinement must retain its fixed node budget"
+        );
         let current = point(cell);
         if let Some(target) = goals
             .iter()
