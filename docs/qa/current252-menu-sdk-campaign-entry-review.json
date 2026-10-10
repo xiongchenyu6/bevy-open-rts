@@ -49,7 +49,7 @@
     "reason": "Runner incorrectly expected legacy Godot .tscn path; actual canonical bevy://maps/CanyonPass correct; strict canonical equality used for retry"
   },
   "visual_limits": [
-    "Mission fullscreen briefing subtitle clips at its right edge in retained04 image; not complete text-readability acceptance",
+    "Retained04 briefing subtitle shows partial text ending \u201c4 minut\u201d; full typewriter reveal and final subtitle readability were not observed, so clipping is not established",
     "Menu-corrected SDK252 artifact only, predates Flash cleanup and SDK253",
     "Normal Campaign entry/configuration and locked-card rejection only, not mission victory or fullcampaign"
   ]
