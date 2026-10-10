@@ -1,0 +1,20 @@
+{
+  "records": [
+    {
+      "name": "wordmark",
+      "width": 630,
+      "height": 110,
+      "sha256": "0d4308380de3fb23338061961c9c723658ffa68190babf9a65a540cb1b8a6f26",
+      "byte_reproduced": true
+    },
+    {
+      "name": "library-logo",
+      "width": 1280,
+      "height": 230,
+      "sha256": "64ec9b8033aa9f60d3f4665e57de5858309e343013e54893dd89d86162d70123",
+      "byte_reproduced": true
+    }
+  ],
+  "review": "Full-size,126/189px light/dark wordmarks and transparent1280x230 logo inspected",
+  "scope": "Original brand candidates; capsules, Steam client placement and store upload not accepted"
+}
