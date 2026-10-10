@@ -1,0 +1,39 @@
+{
+  "scope": "Current245 exact-package four Normal AI hardware probe; periodic100ms samples, not per-frame tail or final dense-combat acceptance",
+  "raw_csv": "target/linux-current245-four-ai-perf-retry02-20261010/mango/ld-linux-x86-64.so.2_2026-10-10_11-43-29.csv",
+  "raw_csv_sha256": "7190fe2b3777ecb00102f7e2c9b670202803c29960d89cd257e678d1ef89c859",
+  "actual_container_exit": 0,
+  "stats": {
+    "sample_count": 597,
+    "elapsed_span_seconds": 59.681925699,
+    "mean_sampled_fps": 59.62879916247906,
+    "median_sampled_fps": 60.3646,
+    "p95_sampled_frametime_ms": 19.90058,
+    "mean_gpu_load": 66.0033500837521
+  },
+  "saved_controllers": [
+    4,
+    4,
+    4,
+    4
+  ],
+  "starting_resources": {
+    "ore": 32,
+    "crystal": 16
+  },
+  "save_clock": 82.26795,
+  "saved_living_unit_count": 33,
+  "reviewed_combat_frame": "target/linux-current245-four-ai-perf-retry02-20261010/08-match.png",
+  "benchmark_host": [
+    "Ubuntu 24.04.5 LTS",
+    "AMD Ryzen 7 5800H with Radeon Graphics",
+    "",
+    "28582596",
+    "7.2.9",
+    "",
+    "performance"
+  ],
+  "background_headless_sweeps_present": true,
+  "stable60_verified": false,
+  "final_performance_gate_complete": false
+}
