@@ -1,0 +1,22 @@
+{
+  "planned": 3726,
+  "terminal_snapshot": 1654,
+  "counts": {
+    "completed": 1654
+  },
+  "complete_matrix": false,
+  "integrity_verified": true,
+  "errors": [],
+  "failures": [],
+  "source_pin": "target/objective-foundation-shared-20261010/pin.json",
+  "audit_sha256": "c4f395dd8853a41da1768c8752e7116159b7ccef3c1be44afe1def300f8616f1",
+  "manifest_sha256": "22a48ce6df07265635d1ba8c7fcbcf4050f73ca362f072fb63192361ce9e5dac",
+  "private_asset_count": 332,
+  "private_asset_hashes_match": true,
+  "interpretation": "Completion means current Annihilation policy: only Command Centers and Workers retain a team. Other surviving units/structures do not invalidate this policy. No independent seeds/repeats/random maps claimed.",
+  "scope": "Independent partial verification of sealed current244 matrix; not current253 equivalence or full coverage",
+  "raw_evidence": "target/current244-matrix-independent-20261011-latest.json",
+  "raw_sha256": "d2847f32c158982b3620646e39618b29acd2d93dcad072419c9e0944eec17cb1",
+  "service": "rts-current244-all-starts-20261010.service",
+  "observed_active_pid": 1841197
+}
