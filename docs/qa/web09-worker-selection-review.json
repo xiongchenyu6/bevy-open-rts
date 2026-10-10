@@ -1,0 +1,35 @@
+{
+  "scope": "Current247 Wasm normal-input idle-worker selection visual proof; software WebGPU only, no deployment/hardware-FPS claim",
+  "build": {
+    "actual_exit": 0,
+    "source_and_assets_unchanged": true,
+    "wall_seconds": 610.1171976480109,
+    "scope": "Frozen current browserQA build; runtime/finalrelease acceptance pending",
+    "wasm_sha256": "e3f2d6cecfb92d9a0d6987fc67912863675ac25ad2d84819f8de83f9542f70e3",
+    "wasm_bytes": 26961261,
+    "site_path": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build09-snapshot-20261010/source/web"
+  },
+  "actual_browser_process_exit": 0,
+  "page_errors": [],
+  "input_sequence": [
+    "Play mouse click",
+    "Enter start match",
+    "Alt+I idle worker selection and camera focus",
+    "Mouse wheel zoom"
+  ],
+  "visual_review": {
+    "selected_worker_visible": true,
+    "compact_four_arc_foot_marker": true,
+    "oversized_full_selection_circle_absent": true,
+    "keyboard_idle_worker_camera_focus_observed": true,
+    "wheel_input_sent": true,
+    "zoom_change_verified": false
+  },
+  "screenshots": {
+    "setup.png": "14e39087877d9eb5ec20484daf0b9bf220fa092af0045147a8fec31366fbf6b4",
+    "worker-default-zoom.png": "197166687468a9171648703784fb3fe3430c0c65d6023e2c237c1744979ae981",
+    "worker-close-zoom.png": "d2d8b13735df5d8cb1aca64b3152e15204222ec105e3119aad2b667f6443c09e"
+  },
+  "user_web_index_untouched": true,
+  "final_release_ready": false
+}
