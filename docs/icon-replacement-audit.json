@@ -1,11 +1,9 @@
 {
   "audit_date": "2026-10-10",
-  "scope": "Historical107-icon audit;24 unused paths removed,20 original semantic replacements;63 remaining legacy images",
-  "unresolved_count": 63,
+  "scope": "Historical pre-native-replacement audit; retired image records only. Current70 entity portraits and RosterPreview are original native outputs recorded in art/portraits/runtime-integration.json.",
   "icons": [
     {
       "path": "assets/ui/icons/AdvancedReactorPlant.png",
-      "current_sha256": "541bae548a80f80e25267c257639830e09e445036d5cc3ef9fd281e888628f6b",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -21,11 +19,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "541bae548a80f80e25267c257639830e09e445036d5cc3ef9fd281e888628f6b"
     },
     {
       "path": "assets/ui/icons/AntiAirWalker.png",
-      "current_sha256": "a6cf6f6f2a4b800f88df4be77c0372dbfd15a55d6427656e1ebcd4882b2bbeae",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -40,11 +38,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "a6cf6f6f2a4b800f88df4be77c0372dbfd15a55d6427656e1ebcd4882b2bbeae"
     },
     {
       "path": "assets/ui/icons/ArcCoilDefenseTower.png",
-      "current_sha256": "7573c42eaf2ea49d320f70baf58a500b0bfdcb330a19e43ce186c301dba5bdaf",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -60,11 +58,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "7573c42eaf2ea49d320f70baf58a500b0bfdcb330a19e43ce186c301dba5bdaf"
     },
     {
       "path": "assets/ui/icons/AttackMove.png",
-      "current_sha256": "7b686b71a4e1e3f0a1985b6ee75cfa6c92157db0cf513f5941f78fb3e86dbc41",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": false,
@@ -79,11 +77,11 @@
         "sha256": "7b686b71a4e1e3f0a1985b6ee75cfa6c92157db0cf513f5941f78fb3e86dbc41",
         "svg": "art/semantic-icons/candidates-v3/AttackMove.svg",
         "svg_sha256": "c2d02c0de415289cca32b997d8b3fb73cc977caa7336af79e98e7d71a139d1a6"
-      }
+      },
+      "legacy_sha256": "7b686b71a4e1e3f0a1985b6ee75cfa6c92157db0cf513f5941f78fb3e86dbc41"
     },
     {
       "path": "assets/ui/icons/Barracks.png",
-      "current_sha256": "889489afcf31351b93044d93609037586f7b9d0e36443a55122f8d10749290f1",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -99,11 +97,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "889489afcf31351b93044d93609037586f7b9d0e36443a55122f8d10749290f1"
     },
     {
       "path": "assets/ui/icons/BomberVTOL.png",
-      "current_sha256": "aacdc88fd2babd3e8273270a1421b61ae3bbfde13dc9a36775245c3ed49184a9",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -116,11 +114,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "aacdc88fd2babd3e8273270a1421b61ae3bbfde13dc9a36775245c3ed49184a9"
     },
     {
       "path": "assets/ui/icons/ChronoRelay.png",
-      "current_sha256": "8aac3d459c02c383d3fe6a6d1dfb4ee9ad5f4bbe4370561f291a60dc83592732",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": true,
@@ -135,11 +133,11 @@
         "sha256": "8aac3d459c02c383d3fe6a6d1dfb4ee9ad5f4bbe4370561f291a60dc83592732",
         "svg": "art/semantic-icons/candidates-v3/ChronoRelay.svg",
         "svg_sha256": "944fc01c869721004771185b502fb5e5acb8ee4aa4b1f73c63203c9d0cb0b4d5"
-      }
+      },
+      "legacy_sha256": "8aac3d459c02c383d3fe6a6d1dfb4ee9ad5f4bbe4370561f291a60dc83592732"
     },
     {
       "path": "assets/ui/icons/CryoSprayer.png",
-      "current_sha256": "8972e90bab13183a7f1b3157d8382189d032c9fc32a0df96172d02bde5006e4e",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -155,11 +153,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "8972e90bab13183a7f1b3157d8382189d032c9fc32a0df96172d02bde5006e4e"
     },
     {
       "path": "assets/ui/icons/DeployMode.png",
-      "current_sha256": "4613109ea0afa5d2fe93aed9ce1c491ac6d68766270e37ec7fb9e4d513ee5436",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": true,
@@ -174,11 +172,11 @@
         "sha256": "4613109ea0afa5d2fe93aed9ce1c491ac6d68766270e37ec7fb9e4d513ee5436",
         "svg": "art/semantic-icons/candidates-v3/DeployMode.svg",
         "svg_sha256": "120eecda4cadcb6d5f473a0e66e1d7fe98f74e48bf068f884b7376d585cdc4e9"
-      }
+      },
+      "legacy_sha256": "4613109ea0afa5d2fe93aed9ce1c491ac6d68766270e37ec7fb9e4d513ee5436"
     },
     {
       "path": "assets/ui/icons/DroneMineLayer.png",
-      "current_sha256": "96f1a7266305e7fc03bb4be6bd4bd818796e17936003a943272449e0935b2f6e",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -189,11 +187,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "96f1a7266305e7fc03bb4be6bd4bd818796e17936003a943272449e0935b2f6e"
     },
     {
       "path": "assets/ui/icons/EmpPulse.png",
-      "current_sha256": "5f16904c25aa47beb27ce1b09ff4c568504d2dd731735297f68881459a21e736",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": true,
@@ -208,11 +206,11 @@
         "sha256": "5f16904c25aa47beb27ce1b09ff4c568504d2dd731735297f68881459a21e736",
         "svg": "art/semantic-icons/candidates-v3/EmpPulse.svg",
         "svg_sha256": "689412ab47fc79fdda45ad1d2af21570e0be4119bdb1c98fe6a6542baee79395"
-      }
+      },
+      "legacy_sha256": "5f16904c25aa47beb27ce1b09ff4c568504d2dd731735297f68881459a21e736"
     },
     {
       "path": "assets/ui/icons/EngineerDrone.png",
-      "current_sha256": "98f0435211312fd7fa190feebaa79029454e782f37a1f15a854b4c7fadb9f426",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -226,11 +224,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "98f0435211312fd7fa190feebaa79029454e782f37a1f15a854b4c7fadb9f426"
     },
     {
       "path": "assets/ui/icons/FieldMedic.png",
-      "current_sha256": "e376b9a92d7c49282582fb8356d59e22fa9ba1145fd1f675a96f45b469d5368f",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -244,11 +242,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "e376b9a92d7c49282582fb8356d59e22fa9ba1145fd1f675a96f45b469d5368f"
     },
     {
       "path": "assets/ui/icons/FlakHoverTank.png",
-      "current_sha256": "c490e05ef73207ae15ffd89ce961da27bd9b5796990a95e92ac525d10788a3cf",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -259,11 +257,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "c490e05ef73207ae15ffd89ce961da27bd9b5796990a95e92ac525d10788a3cf"
     },
     {
       "path": "assets/ui/icons/FlakRocketTeam.png",
-      "current_sha256": "100d4e8ef76252cdfb68b7f86a5ab57f25aaae27ca23276a0df37395c3104994",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -277,11 +275,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "100d4e8ef76252cdfb68b7f86a5ab57f25aaae27ca23276a0df37395c3104994"
     },
     {
       "path": "assets/ui/icons/FlakRocketTeamMk2.png",
-      "current_sha256": "988214ffc1c2f0e28805e41d6cf74c390a70e29d29f9adf8ab8ef5dbc98a4aa9",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -295,11 +293,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "988214ffc1c2f0e28805e41d6cf74c390a70e29d29f9adf8ab8ef5dbc98a4aa9"
     },
     {
       "path": "assets/ui/icons/FlameAssaultBuggy.png",
-      "current_sha256": "71194dd8ca490e9131a406d6befbaa8af0456cabb5682b3adf1887d0f7bbd6f7",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -310,11 +308,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "71194dd8ca490e9131a406d6befbaa8af0456cabb5682b3adf1887d0f7bbd6f7"
     },
     {
       "path": "assets/ui/icons/GrenadierTrooper.png",
-      "current_sha256": "3d916f82b4117c63bf5a2c4069a4b4633284a793ddb5cc21fe9b8fbe9b553df8",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -329,11 +327,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "3d916f82b4117c63bf5a2c4069a4b4633284a793ddb5cc21fe9b8fbe9b553df8"
     },
     {
       "path": "assets/ui/icons/GuardArea.png",
-      "current_sha256": "55c3037e2635364bbb416a05a8c61be3fd75f830d772f3f7cfebfdf70b2b6360",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": true,
@@ -348,11 +346,11 @@
         "sha256": "55c3037e2635364bbb416a05a8c61be3fd75f830d772f3f7cfebfdf70b2b6360",
         "svg": "art/semantic-icons/candidates-v3/GuardArea.svg",
         "svg_sha256": "aea8472027a5e12a63c0a6fed45ea5f829af4cbe01a92b6eafdd40093fc3d59e"
-      }
+      },
+      "legacy_sha256": "55c3037e2635364bbb416a05a8c61be3fd75f830d772f3f7cfebfdf70b2b6360"
     },
     {
       "path": "assets/ui/icons/HammerSiegeTank.png",
-      "current_sha256": "2d592623d2bb3a597f1c63e0426c40066eb5045a3ccdbc0d8aba4cabc98011fc",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -363,11 +361,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "2d592623d2bb3a597f1c63e0426c40066eb5045a3ccdbc0d8aba4cabc98011fc"
     },
     {
       "path": "assets/ui/icons/HeavyBombardmentAirship.png",
-      "current_sha256": "60b6bab70cdda5f03fdb242a650f11f6a6f9cde3253bee276ee6dd50ad85ed13",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -380,11 +378,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "60b6bab70cdda5f03fdb242a650f11f6a6f9cde3253bee276ee6dd50ad85ed13"
     },
     {
       "path": "assets/ui/icons/HeavyMachinegunTrooper.png",
-      "current_sha256": "6a5dbe6f06e7624211db8db93129f1170611555fc5abd5593347ccc95a07a86f",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -398,11 +396,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "6a5dbe6f06e7624211db8db93129f1170611555fc5abd5593347ccc95a07a86f"
     },
     {
       "path": "assets/ui/icons/HeavySiegeWalker.png",
-      "current_sha256": "951777fca3fb49957d75e0305969f3be5110953b9753cfe918b1ecb902c1da37",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -419,11 +417,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "951777fca3fb49957d75e0305969f3be5110953b9753cfe918b1ecb902c1da37"
     },
     {
       "path": "assets/ui/icons/HoldPosition.png",
-      "current_sha256": "c7c282ec0ff587627ca5b8f2207462ed46ab367ea6c789b7842fba228dd58fd2",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": false,
@@ -438,11 +436,11 @@
         "sha256": "c7c282ec0ff587627ca5b8f2207462ed46ab367ea6c789b7842fba228dd58fd2",
         "svg": "art/semantic-icons/candidates-v3/HoldPosition.svg",
         "svg_sha256": "0473818a61bc27d6c63e1a3eafc1f78203e48a818b2df92946524351070e2350"
-      }
+      },
+      "legacy_sha256": "c7c282ec0ff587627ca5b8f2207462ed46ab367ea6c789b7842fba228dd58fd2"
     },
     {
       "path": "assets/ui/icons/InterceptorVTOL.png",
-      "current_sha256": "f25893fa319f684576d54a53a163be9b6122a55af5e7268dd33fa40d96f90074",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -455,11 +453,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "f25893fa319f684576d54a53a163be9b6122a55af5e7268dd33fa40d96f90074"
     },
     {
       "path": "assets/ui/icons/JammerVehicle.png",
-      "current_sha256": "f1f30c04133fa7bd875df70d74e0292e85e8b57b3a1450775fac915db13ffba3",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -470,11 +468,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "f1f30c04133fa7bd875df70d74e0292e85e8b57b3a1450775fac915db13ffba3"
     },
     {
       "path": "assets/ui/icons/LanceBeamDefenseTower.png",
-      "current_sha256": "f7eb0628b51f6261cc2ba3ca4be9187356271e93090b147700048cd5c6941c67",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -490,11 +488,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "f7eb0628b51f6261cc2ba3ca4be9187356271e93090b147700048cd5c6941c67"
     },
     {
       "path": "assets/ui/icons/LanceBeamTank.png",
-      "current_sha256": "8f5f3ddc2b635da25039a9013f48526fa497eb1147f8d4d4bc331dc84632e968",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -505,11 +503,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "8f5f3ddc2b635da25039a9013f48526fa497eb1147f8d4d4bc331dc84632e968"
     },
     {
       "path": "assets/ui/icons/LightRifleInfantry.png",
-      "current_sha256": "a085ada1d8911bdc357a20fb8b1da79eb7772affebe36f092cff27a8a2b00d61",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -523,11 +521,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "a085ada1d8911bdc357a20fb8b1da79eb7772affebe36f092cff27a8a2b00d61"
     },
     {
       "path": "assets/ui/icons/LongbowMissileCrawler.png",
-      "current_sha256": "873a77098ab88d213fb985c59381800a7392f823b54b66faa3cc6db133960f3a",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -538,11 +536,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "873a77098ab88d213fb985c59381800a7392f823b54b66faa3cc6db133960f3a"
     },
     {
       "path": "assets/ui/icons/MirageScoutTank.png",
-      "current_sha256": "96ca01d9004b29af110a2280c665c9ef116cfd8f5617c48bc2bcb9955469f3df",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -553,11 +551,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "96ca01d9004b29af110a2280c665c9ef116cfd8f5617c48bc2bcb9955469f3df"
     },
     {
       "path": "assets/ui/icons/MobileRepairCrawler.png",
-      "current_sha256": "e4a71eca3e2edf6ba3a2f820888f45bd0f8d01c931442a1223ee676964a676f3",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -568,11 +566,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "e4a71eca3e2edf6ba3a2f820888f45bd0f8d01c931442a1223ee676964a676f3"
     },
     {
       "path": "assets/ui/icons/MobileShieldProjector.png",
-      "current_sha256": "f6cd23627974c0e0cc7587449b2ca88b893dee97c5764fa37046f468156ba74b",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -583,11 +581,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "f6cd23627974c0e0cc7587449b2ca88b893dee97c5764fa37046f468156ba74b"
     },
     {
       "path": "assets/ui/icons/ModularMissileCarrier.png",
-      "current_sha256": "fc6ac86309e67dba0e1787e826b36a7b16ea3eb120004ff52b50245d6b1bef8b",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -598,11 +596,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "fc6ac86309e67dba0e1787e826b36a7b16ea3eb120004ff52b50245d6b1bef8b"
     },
     {
       "path": "assets/ui/icons/MortarTeam.png",
-      "current_sha256": "f73a7bdb0705877633eb79d9cdc74ed86bf0f278470ec31d042af7e4e8766a2a",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -617,11 +615,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "f73a7bdb0705877633eb79d9cdc74ed86bf0f278470ec31d042af7e4e8766a2a"
     },
     {
       "path": "assets/ui/icons/NaniteRepairSwarm.png",
-      "current_sha256": "b8bea792f2011fcd25b5234038d233dfd7934a21537627aba56331a99b539fda",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": true,
@@ -636,11 +634,11 @@
         "sha256": "b8bea792f2011fcd25b5234038d233dfd7934a21537627aba56331a99b539fda",
         "svg": "art/semantic-icons/candidates-v3/NaniteRepairSwarm.svg",
         "svg_sha256": "46da86c5f71528ccec4bf11d76d0d00d49541c702aacc69d3eaf7cc7703cfbaa"
-      }
+      },
+      "legacy_sha256": "b8bea792f2011fcd25b5234038d233dfd7934a21537627aba56331a99b539fda"
     },
     {
       "path": "assets/ui/icons/OrbitalStrike.png",
-      "current_sha256": "fa039c4a7ee7b1e2093740f2d7e8ce49acd4c3bde220872bcd9df9c51ce64610",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": false,
@@ -655,11 +653,11 @@
         "sha256": "fa039c4a7ee7b1e2093740f2d7e8ce49acd4c3bde220872bcd9df9c51ce64610",
         "svg": "art/semantic-icons/candidates-v3/OrbitalStrike.svg",
         "svg_sha256": "d66af5569a65c239c21915cdbfb937e796e82a70595bbd5202a3fdf689c23b70"
-      }
+      },
+      "legacy_sha256": "fa039c4a7ee7b1e2093740f2d7e8ce49acd4c3bde220872bcd9df9c51ce64610"
     },
     {
       "path": "assets/ui/icons/OrePurifier.png",
-      "current_sha256": "c0330105940352498a4d9a79635d8fa72f66ab3102518572406cb757fdec92b0",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -675,11 +673,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "c0330105940352498a4d9a79635d8fa72f66ab3102518572406cb757fdec92b0"
     },
     {
       "path": "assets/ui/icons/Paradrop.png",
-      "current_sha256": "b4d6018dfeb7cbd953759cc1c3fa3fb4d7f09ac64caa3b0de1c3fd1c397cdd0a",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": false,
@@ -694,11 +692,11 @@
         "sha256": "b4d6018dfeb7cbd953759cc1c3fa3fb4d7f09ac64caa3b0de1c3fd1c397cdd0a",
         "svg": "art/semantic-icons/candidates-v3/Paradrop.svg",
         "svg_sha256": "4869f439847ca62e12b9ac2e5a688b151fbf27eac2f57a880b8d40beb01a6d7f"
-      }
+      },
+      "legacy_sha256": "b4d6018dfeb7cbd953759cc1c3fa3fb4d7f09ac64caa3b0de1c3fd1c397cdd0a"
     },
     {
       "path": "assets/ui/icons/Patrol.png",
-      "current_sha256": "ff5acdf2a364315131d32cfc2c418b36a6bd88dec61aee09afe6ee4f286b8b1b",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": true,
@@ -713,11 +711,11 @@
         "sha256": "ff5acdf2a364315131d32cfc2c418b36a6bd88dec61aee09afe6ee4f286b8b1b",
         "svg": "art/semantic-icons/candidates-v3/Patrol.svg",
         "svg_sha256": "b59292c5dc8d7fcfe8910c3b9de4d7b5b5fba8286b59f9291183d6de2b782b71"
-      }
+      },
+      "legacy_sha256": "ff5acdf2a364315131d32cfc2c418b36a6bd88dec61aee09afe6ee4f286b8b1b"
     },
     {
       "path": "assets/ui/icons/PhaseSaboteur.png",
-      "current_sha256": "c1ce3d0f579a4d1034865d2164490f0c2d38d8bc3b4d8bdabd0dc54168c5d43c",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -732,11 +730,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "c1ce3d0f579a4d1034865d2164490f0c2d38d8bc3b4d8bdabd0dc54168c5d43c"
     },
     {
       "path": "assets/ui/icons/PowerReactor.png",
-      "current_sha256": "9465cadd13fe245ef4c7c0a0942b540e5d0a494cf76516c39e608ab754412aeb",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -754,11 +752,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "9465cadd13fe245ef4c7c0a0942b540e5d0a494cf76516c39e608ab754412aeb"
     },
     {
       "path": "assets/ui/icons/PrismDefenseObelisk.png",
-      "current_sha256": "87e10b89265234e86a82300c6eb4d4c78e70878973cc173188245ce7e1ec8782",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -774,11 +772,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "87e10b89265234e86a82300c6eb4d4c78e70878973cc173188245ce7e1ec8782"
     },
     {
       "path": "assets/ui/icons/PulseRifleCommando.png",
-      "current_sha256": "7aeb1503e138e20ac75fef13f295755896bab8a631e705328523b00257c096e3",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -793,11 +791,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "7aeb1503e138e20ac75fef13f295755896bab8a631e705328523b00257c096e3"
     },
     {
       "path": "assets/ui/icons/RadarSweep.png",
-      "current_sha256": "293af0c96ccc7dce6e00ffdc8a038b8c15a7fa0961e6c42158d8219f601701b4",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": false,
@@ -812,11 +810,11 @@
         "sha256": "293af0c96ccc7dce6e00ffdc8a038b8c15a7fa0961e6c42158d8219f601701b4",
         "svg": "art/semantic-icons/candidates-v3/RadarSweep.svg",
         "svg_sha256": "71adbd3ac33f9e3532d5bdf34903fac07d48b8e21619eb8b58a1581331de0ac1"
-      }
+      },
+      "legacy_sha256": "293af0c96ccc7dce6e00ffdc8a038b8c15a7fa0961e6c42158d8219f601701b4"
     },
     {
       "path": "assets/ui/icons/RadarUplink.png",
-      "current_sha256": "3ae44c20358d76d283bb48fe8c972da25e943ad5d1fa41e8530ddf8a4ba105cb",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -832,11 +830,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "3ae44c20358d76d283bb48fe8c972da25e943ad5d1fa41e8530ddf8a4ba105cb"
     },
     {
       "path": "assets/ui/icons/RailArtilleryWalker.png",
-      "current_sha256": "eafb6424dd2021d21069ad7483003ea649f38b950479b53337425ea27913560f",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -853,11 +851,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "eafb6424dd2021d21069ad7483003ea649f38b950479b53337425ea27913560f"
     },
     {
       "path": "assets/ui/icons/RailCannonBunker.png",
-      "current_sha256": "03d2c68db3363283e7cc536d44167e0ba8ee1d1128b328bb5b76a516002bd176",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -873,11 +871,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "03d2c68db3363283e7cc536d44167e0ba8ee1d1128b328bb5b76a516002bd176"
     },
     {
       "path": "assets/ui/icons/RailSniperTeam.png",
-      "current_sha256": "d26612428419258aacd93f42862b08c630c979af4cecdae64546ae5edfcd9ab1",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -891,11 +889,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "d26612428419258aacd93f42862b08c630c979af4cecdae64546ae5edfcd9ab1"
     },
     {
       "path": "assets/ui/icons/RailgunTank.png",
-      "current_sha256": "02b3ea530ef82837d75536a3eb542afcfdce6980f6340b3b2f49dd77cadea82a",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -906,11 +904,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "02b3ea530ef82837d75536a3eb542afcfdce6980f6340b3b2f49dd77cadea82a"
     },
     {
       "path": "assets/ui/icons/RallyPoint.png",
-      "current_sha256": "12ecbc54149d049d9534ec940cf25ab66ceddd913e80e32b2fa8dcc28f046717",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": false,
@@ -925,11 +923,11 @@
         "sha256": "12ecbc54149d049d9534ec940cf25ab66ceddd913e80e32b2fa8dcc28f046717",
         "svg": "art/semantic-icons/candidates-v3/RallyPoint.svg",
         "svg_sha256": "002b68e5606819989bda187a56870d34169d3a7b66befe000179e6d13b385b29"
-      }
+      },
+      "legacy_sha256": "12ecbc54149d049d9534ec940cf25ab66ceddd913e80e32b2fa8dcc28f046717"
     },
     {
       "path": "assets/ui/icons/Refinery.png",
-      "current_sha256": "a4538550b38ad3abe6b515771fdcd36b8c05667b7f313a2f58a0038d207694b0",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -946,11 +944,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "a4538550b38ad3abe6b515771fdcd36b8c05667b7f313a2f58a0038d207694b0"
     },
     {
       "path": "assets/ui/icons/Repair.png",
-      "current_sha256": "406df2d61f13bc7c6bde642d9cb1e03ee0ce21c83c277f5e3fc3ada1e37eb3c5",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": false,
@@ -965,11 +963,11 @@
         "sha256": "406df2d61f13bc7c6bde642d9cb1e03ee0ce21c83c277f5e3fc3ada1e37eb3c5",
         "svg": "art/semantic-icons/candidates-v3/Repair.svg",
         "svg_sha256": "b35557d76b351fa21afb2b384dbe6129a8b381dec197d16f1d9505ce080f0c04"
-      }
+      },
+      "legacy_sha256": "406df2d61f13bc7c6bde642d9cb1e03ee0ce21c83c277f5e3fc3ada1e37eb3c5"
     },
     {
       "path": "assets/ui/icons/RepairPad.png",
-      "current_sha256": "66ee205d00c1f38056d59199cc65343c386b791ae29f33da646e43597f79259c",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -984,11 +982,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "66ee205d00c1f38056d59199cc65343c386b791ae29f33da646e43597f79259c"
     },
     {
       "path": "assets/ui/icons/RoboticsBay.png",
-      "current_sha256": "c66718393bb73f651e2562d7f4e107d6bcff0e70a7780b7a7530610bedd11e8f",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1003,11 +1001,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "c66718393bb73f651e2562d7f4e107d6bcff0e70a7780b7a7530610bedd11e8f"
     },
     {
       "path": "assets/ui/icons/RocketGunship.png",
-      "current_sha256": "d58bad87e255fec79c994998b5d7ee70bdd6f82c31a53769589e19646c47b2ee",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -1021,11 +1019,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "d58bad87e255fec79c994998b5d7ee70bdd6f82c31a53769589e19646c47b2ee"
     },
     {
       "path": "assets/ui/icons/RocketInfantry.png",
-      "current_sha256": "a0129fcd330a463155e5d0219b2a07a2a0b8b7f070a3b4d18fa19de74073de29",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -1040,11 +1038,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "a0129fcd330a463155e5d0219b2a07a2a0b8b7f070a3b4d18fa19de74073de29"
     },
     {
       "path": "assets/ui/icons/RocketTrooperRobot.png",
-      "current_sha256": "eae8f867e2d985dc93df1d8cca08a982b878e6e7012ef13836781052a52709d2",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1059,11 +1057,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "eae8f867e2d985dc93df1d8cca08a982b878e6e7012ef13836781052a52709d2"
     },
     {
       "path": "assets/ui/icons/RosterPreview.png",
-      "current_sha256": "5f0c8928f2e4242c7107a5fc9077e9849d7f0cbb049e3504a0b58f705a1d117b",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -1071,11 +1069,11 @@
         "src/lib.rs:2604",
         "src/menu.rs:363"
       ],
-      "render_source": "roster_composite"
+      "render_source": "roster_composite",
+      "legacy_sha256": "5f0c8928f2e4242c7107a5fc9077e9849d7f0cbb049e3504a0b58f705a1d117b"
     },
     {
       "path": "assets/ui/icons/SaboteurInfiltrator.png",
-      "current_sha256": "218542879f06bbeec67d32c71c711a5c6c283f4fd8b57a728f397732f8f2b30e",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1090,11 +1088,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "218542879f06bbeec67d32c71c711a5c6c283f4fd8b57a728f397732f8f2b30e"
     },
     {
       "path": "assets/ui/icons/Scatter.png",
-      "current_sha256": "60f3adcd84c6a4f4ce2a4f0a46067802eacc3cbbe8a0839a21be819d7008b243",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": true,
@@ -1109,11 +1107,11 @@
         "sha256": "60f3adcd84c6a4f4ce2a4f0a46067802eacc3cbbe8a0839a21be819d7008b243",
         "svg": "art/semantic-icons/candidates-v3/Scatter.svg",
         "svg_sha256": "96b8d0d9b2f8a12681bb1fd16492d8c2175e9b4f67856e216e69559cecc61f83"
-      }
+      },
+      "legacy_sha256": "60f3adcd84c6a4f4ce2a4f0a46067802eacc3cbbe8a0839a21be819d7008b243"
     },
     {
       "path": "assets/ui/icons/ScoutRover.png",
-      "current_sha256": "acd7fd778fc118a26baf31c9954e44ed430b8867acfb52c4673ff7914cdeee11",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1124,11 +1122,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "acd7fd778fc118a26baf31c9954e44ed430b8867acfb52c4673ff7914cdeee11"
     },
     {
       "path": "assets/ui/icons/SellStructure.png",
-      "current_sha256": "939cf480605179283f9b333c5f04cb78d3d619e5254845c874d09db4eb22c071",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": false,
@@ -1143,11 +1141,11 @@
         "sha256": "939cf480605179283f9b333c5f04cb78d3d619e5254845c874d09db4eb22c071",
         "svg": "art/semantic-icons/candidates-v3/SellStructure.svg",
         "svg_sha256": "9eef651ee11f8e4d64cbf7ca5146081e44d34529023ab3bf72c2e9ff95a8378b"
-      }
+      },
+      "legacy_sha256": "939cf480605179283f9b333c5f04cb78d3d619e5254845c874d09db4eb22c071"
     },
     {
       "path": "assets/ui/icons/ShieldOverdrive.png",
-      "current_sha256": "52d121064773eb44f4169e8e0a213c9c6e8f3a2ac2b823f2e3d4770c4973e073",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": true,
@@ -1162,11 +1160,11 @@
         "sha256": "52d121064773eb44f4169e8e0a213c9c6e8f3a2ac2b823f2e3d4770c4973e073",
         "svg": "art/semantic-icons/candidates-v3/ShieldOverdrive.svg",
         "svg_sha256": "7ac7b02029f347196c5cde4c64a3f806d502e7b8343edddaa3dc8e7c4be48a2f"
-      }
+      },
+      "legacy_sha256": "52d121064773eb44f4169e8e0a213c9c6e8f3a2ac2b823f2e3d4770c4973e073"
     },
     {
       "path": "assets/ui/icons/ShieldTrooper.png",
-      "current_sha256": "f611b8dcf1630c47b8aa0242408ec942e5e11ca9495cbcb993585773aa490135",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1180,11 +1178,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "f611b8dcf1630c47b8aa0242408ec942e5e11ca9495cbcb993585773aa490135"
     },
     {
       "path": "assets/ui/icons/ShockTrooper.png",
-      "current_sha256": "26d948c49074ef1cffd25161d534cdafe1b30553688738fe9ec3fd11ed719922",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": true,
@@ -1199,11 +1197,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "26d948c49074ef1cffd25161d534cdafe1b30553688738fe9ec3fd11ed719922"
     },
     {
       "path": "assets/ui/icons/SiegeAirship.png",
-      "current_sha256": "eebcf9ebc5038e0546e5ad883cd7062490a8a4d9ac1df6d1768616e14d1ab5c3",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1217,11 +1215,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "eebcf9ebc5038e0546e5ad883cd7062490a8a4d9ac1df6d1768616e14d1ab5c3"
     },
     {
       "path": "assets/ui/icons/SiegeArtilleryVehicle.png",
-      "current_sha256": "a93a09f4acb25bbaf4a94cc77c8f5043132ab0fbec465c5c3fc9d3b34b1f8bfb",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1232,11 +1230,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "a93a09f4acb25bbaf4a94cc77c8f5043132ab0fbec465c5c3fc9d3b34b1f8bfb"
     },
     {
       "path": "assets/ui/icons/SiegeDrillTank.png",
-      "current_sha256": "1dcfc93e2300151305dce671098e312bcf5d255371bfa81f02006582da4968e6",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1247,11 +1245,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "1dcfc93e2300151305dce671098e312bcf5d255371bfa81f02006582da4968e6"
     },
     {
       "path": "assets/ui/icons/SniperScout.png",
-      "current_sha256": "fe10020e44cde1353f8e1ac7d86925fe32fae0250734a9defe4fd4115a1f66cb",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1265,11 +1263,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "fe10020e44cde1353f8e1ac7d86925fe32fae0250734a9defe4fd4115a1f66cb"
     },
     {
       "path": "assets/ui/icons/StopCommand.png",
-      "current_sha256": "acf5bfb654d58c0613eaf12bdf4b0e60791f1f75acf48c6e0f868728c7a256bb",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": false,
@@ -1284,11 +1282,11 @@
         "sha256": "acf5bfb654d58c0613eaf12bdf4b0e60791f1f75acf48c6e0f868728c7a256bb",
         "svg": "art/semantic-icons/candidates-v3/StopCommand.svg",
         "svg_sha256": "f16e96002251bae9e2e3f6accb4aaa4a7c00af31a797c4f1b771857a3ccc4322"
-      }
+      },
+      "legacy_sha256": "acf5bfb654d58c0613eaf12bdf4b0e60791f1f75acf48c6e0f868728c7a256bb"
     },
     {
       "path": "assets/ui/icons/StrategicMissile.png",
-      "current_sha256": "138d64036cab88f1ea416322c1ca1a74aa3235a642fc9e981122d92e10da2750",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": true,
@@ -1303,11 +1301,11 @@
         "sha256": "138d64036cab88f1ea416322c1ca1a74aa3235a642fc9e981122d92e10da2750",
         "svg": "art/semantic-icons/candidates-v3/StrategicMissile.svg",
         "svg_sha256": "38e5f3515fbc7144e6399c0b6885e6d01f67e092e804af554e765fab13aafea2"
-      }
+      },
+      "legacy_sha256": "138d64036cab88f1ea416322c1ca1a74aa3235a642fc9e981122d92e10da2750"
     },
     {
       "path": "assets/ui/icons/TacticalOfficer.png",
-      "current_sha256": "dd2a75f0dafcb2f6a0f6a98745ea2678ab9fcc422069e2f61559b4014b02d068",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1322,11 +1320,11 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "dd2a75f0dafcb2f6a0f6a98745ea2678ab9fcc422069e2f61559b4014b02d068"
     },
     {
       "path": "assets/ui/icons/TechHospital.png",
-      "current_sha256": "37fd66855e0b723e3e8df69a13e921356398017ac24761fd4c352b795270cb2e",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1342,11 +1340,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "37fd66855e0b723e3e8df69a13e921356398017ac24761fd4c352b795270cb2e"
     },
     {
       "path": "assets/ui/icons/TechLab.png",
-      "current_sha256": "68ec9b7fe48d39954f8e08c9f4ac75d55e3d4d68c39d51362ba5928deeb99212",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1361,11 +1359,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "68ec9b7fe48d39954f8e08c9f4ac75d55e3d4d68c39d51362ba5928deeb99212"
     },
     {
       "path": "assets/ui/icons/TechLocked.png",
-      "current_sha256": "bd851446f5967990f4fef48e01798ba2225560483496b339794725b9f0686fe6",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": false,
@@ -1381,11 +1379,11 @@
         "sha256": "bd851446f5967990f4fef48e01798ba2225560483496b339794725b9f0686fe6",
         "svg": "art/semantic-icons/candidates-v3/TechLocked.svg",
         "svg_sha256": "9eef3e2058fa453c2f5007a5df6f5e9c166822f68c2ea20e510280bc2b380ed9"
-      }
+      },
+      "legacy_sha256": "bd851446f5967990f4fef48e01798ba2225560483496b339794725b9f0686fe6"
     },
     {
       "path": "assets/ui/icons/TechOilDerrick.png",
-      "current_sha256": "ad80d1d2be637e0a4a810964bedcece0c1cc4234300c4a55294fcb09c4f62902",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1402,11 +1400,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "ad80d1d2be637e0a4a810964bedcece0c1cc4234300c4a55294fcb09c4f62902"
     },
     {
       "path": "assets/ui/icons/TechRepairDepot.png",
-      "current_sha256": "a9926348700f38fbd503482a0a839f995e35c0c6267cd025c95a02e6d1eef0dd",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1424,11 +1422,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "a9926348700f38fbd503482a0a839f995e35c0c6267cd025c95a02e6d1eef0dd"
     },
     {
       "path": "assets/ui/icons/TeslaCrawlerMk2.png",
-      "current_sha256": "f98c1fac2099240ec6a16a47775017727311a275abbb535670e462e8237ac717",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1439,11 +1437,11 @@
       "render_models": [],
       "role": "Unit",
       "render_source": "authored_procedural_tank",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "f98c1fac2099240ec6a16a47775017727311a275abbb535670e462e8237ac717"
     },
     {
       "path": "assets/ui/icons/TeslaFenceSegment.png",
-      "current_sha256": "e840bef87fcf9d4dc717c534e8b8a5d24a6d9585040bd782f9458051105a1546",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1454,11 +1452,11 @@
       "render_models": [],
       "role": "Structure",
       "render_source": "authored_procedural_entity",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "e840bef87fcf9d4dc717c534e8b8a5d24a6d9585040bd782f9458051105a1546"
     },
     {
       "path": "assets/ui/icons/WeatherControlSpire.png",
-      "current_sha256": "02bee742b244951dd87321000eff577e8f1e2619c794e7b1b24985fdb04c7345",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1475,11 +1473,11 @@
       ],
       "role": "Structure",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "02bee742b244951dd87321000eff577e8f1e2619c794e7b1b24985fdb04c7345"
     },
     {
       "path": "assets/ui/icons/WeatherStorm.png",
-      "current_sha256": "6c531c2faecc63cae321261569cfb1831fd953b369d349cfb9d86896701707b2",
       "source_comparison": "absent_from_upstream",
       "matches_audited_bytes": false,
       "generated_sheet_record": true,
@@ -1494,11 +1492,11 @@
         "sha256": "6c531c2faecc63cae321261569cfb1831fd953b369d349cfb9d86896701707b2",
         "svg": "art/semantic-icons/candidates-v3/WeatherStorm.svg",
         "svg_sha256": "ced868316abdc03ddbd21ae30b7a6c2e194b696b036c9461e6f03f51192b0676"
-      }
+      },
+      "legacy_sha256": "6c531c2faecc63cae321261569cfb1831fd953b369d349cfb9d86896701707b2"
     },
     {
       "path": "assets/ui/icons/Worker.png",
-      "current_sha256": "6aa1ff316914e9615206f670e19168553325b87bcff48bb9442423b6154932c9",
       "source_comparison": "different",
       "matches_audited_bytes": true,
       "generated_sheet_record": false,
@@ -1512,7 +1510,8 @@
       ],
       "role": "Unit",
       "render_source": "kenney_parts",
-      "model_rights_verified": true
+      "model_rights_verified": true,
+      "legacy_sha256": "6aa1ff316914e9615206f670e19168553325b87bcff48bb9442423b6154932c9"
     }
   ],
   "source_sha256": {
@@ -1749,5 +1748,6 @@
     }
   ],
   "current_icon_count": 83,
-  "historical_audited_count": 107
+  "historical_audited_count": 107,
+  "historical_unresolved_count": 63
 }

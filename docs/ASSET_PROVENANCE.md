@@ -1,13 +1,14 @@
 # Asset Provenance
 
-Audit date: 2026-10-08. This records evidence and unresolved release work; it does
-not grant permission for unidentified assets.
+Current inventory update: 2026-10-10. The runtime tree contains 338 tracked files.
+Historical import audits are distinguished below from current original assets;
+unidentified remaining families are not licensed by their presence in the tree.
 
 ## Inventory and evidence
 
 The audit initially found **556 tracked files**. The restricted Lampe logo has
 since been removed from the asset tree and migration inventory. The remaining
-325-file migration manifest names an unavailable local Godot source directory, but no
+343-entry historical migration manifest names an unavailable local Godot source directory, but no
 source revision, hashes or per-file licenses. It is an import inventory, not a
 rights manifest. Runtime references are in `src/audio.rs`, the generated registry,
 `assets/data/godot_model_map.model_map.ron`, and `src/menu.rs`.
@@ -18,7 +19,7 @@ rights manifest. Runtime references are in `src/audio.rs`, the generated registr
 | Godot logo | [Local notice](../assets/logos/LOGO_LICENSES.md) identifies Andrea Calabró, 2017, CC-BY-4.0. | Include required attribution/license and modification information if distributed. |
 | Lampe Games logo | The same local notice explicitly prohibits use in projects derived from Open RTS. | Removed from the asset tree and migration inventory; retain the restriction notice. Verify final packages contain no copy. |
 | WenQuanYi subset font | Regenerated directly from SHA-verified official 0.2.0-beta TTC face 0 with fontTools 4.61.1. Two runs reproduce identical bytes; 1,219 codepoints cover Rust text, full ASCII, English/Chinese CSV catalogs and all prior glyphs with unchanged advance widths. [Font notices/source hashes](../assets/fonts/WQY-LICENSE-PROVENANCE.md) are retained. | Verify fresh gameplay/menu rendering and include notices in packages. The ignored local full TTF is untouched and no longer an input. |
-| Other art | Ten icons and `icosphere.obj` match official upstream. Another 105 icons, three emblems, two cursor files and six VFX images are absent; background and two icons differ. Explicit generated-sheet copy records were recovered for 27 current icons. | Recover missing generation/service records and transformed-image correspondence. VFX creation evidence remains missing. The official MIT notice does not establish rights in absent families. |
+| Current entity portraits and roster | All 70 entity portraits and RosterPreview now come from original native rendering of actual licensed Kenney/authored game geometry. Complete model-only references, independent render reproduction, alpha/framing, 128/72px readability and bounded normal menu/HUD/paid-model samples are recorded in `art/portraits/runtime-integration.json`. | Full-roster paid-gameplay/UI coverage and final package validation remain open. VFX, cursors and background are separate families. |
 | SFX and music | Recovered oscillator/noise-only FFmpeg creation recipes for all 19 WAVs and the battle loop. Fourteen legacy SFX match resynthesis PCM; the other five SFX and music were regenerated with the checked-in deterministic script. Three independent FFmpeg 9.0.1 runs match their file bytes and decoded PCM exactly. | Preserve reproduction script, seed, tool/output hashes and validation records. Human listening on release hardware remains unverified. |
 
 ## Pinned source comparison
@@ -28,7 +29,9 @@ upstream SHA-256 values, differences and source notice hashes. The official sour
 archive is pinned to [revision a628ad3bb6a9a903587a181a7ee3300dbf735e81](https://github.com/lampe-games/godot-open-rts/tree/a628ad3bb6a9a903587a181a7ee3300dbf735e81)
 (2025-01-07); archive SHA-256:
 `97a43db32a3f1d15da5da4714dbb1d671770f538d287f7cc19659b15448e9494`.
-This proves 379 byte matches, including 14 English voices and 210 UI files.
+The historical comparison recorded 379 byte matches, including 14 former English
+voices and 210 import-era UI files. Current original voices and model portraits
+have separate source/render provenance; these old matches do not describe them.
 Source membership does not prove provider rights. The notice scan found project
 MIT terms and explicit logo exceptions, with no audio-specific permission records.
 The import-era customized checkout named by the migration manifest remains unavailable.
@@ -81,7 +84,7 @@ metadata are recorded under `official_kenney_archives` and
   AudioLoader and AudioSource decoder, without clipping or sample-count changes
   (`logs/authored-audio-assets-load.log`). A native match startup capture also
   passed (`logs/authored-audio-game-load.log`). Human listening remains unverified.
-  Voice and generated-art provider gaps are unaffected.
+  Remaining VFX/cursor/background provenance and human listening are unaffected.
 - Generated-sheet source paths are evidence of production steps, not proof of
   applicable model/service terms. VFX creation records remain missing.
 
@@ -188,9 +191,10 @@ Source, recipe and original/current hashes are in
 Actual native b843 review covers RallyPoint, AttackMove, SellStructure,
 RadarSweep, EmpPulse and ShieldOverdrive. Paid F1/F5 save/load/expiry and real
 old-format rejection pass with unchanged save bytes. Root inspected the actual
-images; the command-center T button is AttackMove, not Repair. Other14 icons,
-all tooltips, smaller windows and browser rendering remain pending. This does
-not close entity portraits, VFX, cursor, faction-emblem or voice rights gaps.
+images; the command-center T button is AttackMove, not Repair. The remaining ten command/power glyphs were inspected at 1280/900 in the clearly
+labeled shared-component visual fixture; other normal HUD views cover the
+remaining glyphs. This is bounded UI evidence, not all-power gameplay proof.
+VFX, cursor and background provenance remain separate open work.
 
 ## Original faction and speech candidates
 
@@ -249,3 +253,23 @@ loading, event playback, volume controls, listening and mixing still require
 verification; no runtime paths or assets have been replaced.
 
 The current voice pack contains 32 original Kokoro-generated OGG files (16 per language), mapped to all 17 voice events with SupportPowerFired reusing Ack2. Source/model revisions, licenses, prompts, source and encoded hashes, and deterministic decoded-PCM checks are recorded in `art/voice/manifest.json` and `art/voice/provenance.json`. English Hello uses “Ready for orders.” Both official local ASR models recovered that line; ASR is not human listening or tone approval. Actual native audio-only QA loaded all 32 clips and naturally completed all 34 event/language mappings with real sinks at Linear(0.92); private-output recording contained no clipped samples and preserved the default sink. Evidence and scope are in `art/voice/README.md`. Natural gameplay triggering, overlapping mix, physical-output listening and human tone approval remain pending. The former provider pack and its generation script have been removed.
+
+## Current original native model images
+
+Exactly 71 existing runtime PNG paths now contain the approved original native
+outputs: 70 entity portraits plus the six-model mixed-faction RosterPreview.
+`art/portraits/runtime-integration.json` records every selected PNG/decoded-RGBA
+hash, renderer/source/model/layout references, CC0 Space Kit and authored-code
+source terms, contextual-marker exclusion and bounded review records. It does
+not claim whole-scene parity or all-70 paid gameplay. Normal gameplay retains
+its contextual faction indicators; only model portraits omit them.
+
+The old 71 image bytes and source records remain historical outside the runtime
+tree at `target/portrait-legacy-before-integration-20261010`. The exact 338-file
+set is retained; the other 267 runtime hashes are unchanged. The active 332-entry
+source ledger has zero hash mismatches; six font/logo notice documents remain
+outside that payload-comparison ledger and are retained in the runtime/package
+inventory. Three stale derived registry/import metadata hashes were refreshed,
+with their prior records explicitly historical and no upstream-equality claim.
+Post-integration native UI and the final packaged exact-set/hash checks remain
+separate verification steps.

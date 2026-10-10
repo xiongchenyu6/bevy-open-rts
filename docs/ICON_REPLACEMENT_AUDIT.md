@@ -1,3 +1,5 @@
+Current runtime update: all 70 entity portraits and RosterPreview now use original native model outputs; see [runtime integration](../art/portraits/runtime-integration.json). The audit below records retired import-era images, not remaining current portrait gaps.
+
 # Unresolved icon replacement audit
 
 Initial read-only audit, 2026-10-10:107 legacy icon files (105 absent upstream,

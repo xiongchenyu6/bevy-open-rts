@@ -2,8 +2,8 @@
 
 `entities.json` maps all 70 unique existing registry portrait paths to entity IDs,
 roles, faction memberships, ModelMap entries and actual assembly sources. Its
-provenance statuses describe the legacy images: 62 unresolved and eight already
-recorded. RosterPreview is a separate 71st asset-only group composition.
+current image hashes/provenance point to the 70 integrated original native
+outputs; pre-integration image records are retained only as historical evidence. RosterPreview is a separate 71st asset-only group composition.
 Neutral TechHospital, TechOilDerrick and TechRepairDepot use the Alliance visual
 default without claiming faction ownership. No legacy PNG is a render input.
 
@@ -35,9 +35,9 @@ success. Root reviewed all 70 at 128px and 72px on dark/light backgrounds and
 accepted the candidate visuals. Evidence: `target/model-only-full70-20261010`.
 Earlier detached-part renders remain explicitly failed historical evidence.
 
-Paid normal-game model/UI comparison and runtime PNG integration remain pending.
-These are staged asset candidates, not proof that units were trained or structures
-built through gameplay. No runtime portrait has been replaced by this work.
+All 70 entity portraits are now integrated at their existing runtime paths.
+Complete paid normal-game coverage remains unverified; the bounded representative
+model/UI reviews are separate from all-70 asset-only parity/readability.
 
 ## Original roster composition candidate
 
@@ -59,7 +59,8 @@ without clipping or overlap. `native-menu-candidate-visual-review.json` records
 that bounded menu verdict. `native-hud-candidate-visual-review.json` covers
 representative Worker/build/queue/tooltip views at both sizes; it does not
 prove all 70 portraits were displayed or created through paid gameplay.
-Repository runtime images remain unchanged.
+The approved roster now occupies its existing runtime path; this remains an
+asset-only formation, not proof of an actual mixed-faction battle.
 
 The readable roster checker requires run IDs exactly `{0, 1}`, validates every
 member's ID/faction/f32 layout against the source configuration, and checks any
@@ -69,23 +70,17 @@ faction, position and PNG hash all reject; original evidence is unchanged.
 Checks: `target/roster-checker-negative-20261010/result.json` and the original
 stage's new `independent-review-02.json`; prior reports are not overwritten.
 
-## Runtime integration after the shared seal
+## Verified runtime integration
 
-1. Recheck the approved model-only 70-image manifest and roster pair against
-   their sealed binaries, source inventories and image hashes. Preserve old PNG
-   bytes outside the runtime tree as historical proof, with no fallback routes.
-2. Replace only the 70 validated registry icon paths and RosterPreview at their
-   existing paths. The exact 71-path replacement should leave the other 267
-   payload hashes unchanged and the payload count at 338; verify rather than
-   assume the final inventory is unchanged.
-3. Record selected PNG SHA256 and decoded RGBA hashes, actual model/CC0 or authored
-   source references, renderer/model-map/layout/source hashes, marker exclusion
-   and the bounded visual reviews. Update active asset-source/provenance/package
-   inventories; retire unresolved legacy-image claims from the current inventory.
-4. Repeat normal menu/HUD loading and representative paid model views against
-   the integrated tree, then verify the final packaged exact set and hashes.
-   Preserve the distinction between all-70 asset-only model parity/readability
-   and the smaller normal-game/UI sample. Full-roster paid gameplay and final
-   package acceptance remain separate gates.
+`runtime-integration.json` pins the selected 70 run-0 portrait images and roster
+run-0 image, decoded RGBA, source/model/layout hashes and bounded review records.
+Exactly 71 existing paths changed; all other 267 tracked runtime hashes remain
+unchanged and the exact file count is 338. Prior bytes and provenance remain
+outside assets at `target/portrait-legacy-before-integration-20261010`.
+The active source ledger has zero hash mismatches; derived-source hash refreshes
+retain their prior records explicitly as history. Regenerating `entities.json`
+checks installed image hashes and retains current original-output provenance.
 
-Runtime replacement waits for the coordinated shared source/assets seal.
+Post-integration native UI and final-package checks are distinct from the private
+candidate menu/HUD reviews. All-70 paid gameplay/UI coverage and final package
+acceptance are not implied by this integration.

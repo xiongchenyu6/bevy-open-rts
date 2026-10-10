@@ -35,7 +35,7 @@
       "generated_original": 6
     },
     "data": {
-      "absent_from_upstream": 1
+      "authored_derived_registry_metadata": 1
     },
     "fonts": {
       "absent_from_upstream": 1
@@ -44,7 +44,8 @@
       "identical": 1
     },
     "migration": {
-      "absent_from_upstream": 3
+      "authored_derived_registry_metadata": 2,
+      "absent_from_upstream": 1
     },
     "models": {
       "identical": 154
@@ -63,16 +64,17 @@
       "absent_from_upstream": 6
     },
     "ui": {
-      "different": 2,
-      "absent_from_upstream": 87,
-      "identical": 10
+      "different": 1,
+      "absent_from_upstream": 25,
+      "generated_original_model_portrait": 70,
+      "identical": 2,
+      "generated_original_roster": 1
     },
     "vfx": {
       "absent_from_upstream": 6
     },
     "voice": {
-      "absent_from_upstream": 16,
-      "identical": 14
+      "original_generated_voice": 32
     }
   },
   "assets": [
@@ -114,8 +116,10 @@
     },
     {
       "path": "assets/data/godot_model_map.model_map.ron",
-      "sha256": "e1674c86f38d6c358ab768581b6280df02ab14344f5c9ec834ac539a93dc0e3c",
-      "comparison": "absent_from_upstream"
+      "sha256": "2f0745a56bd0566e98209ba3040943ada3015570c53b86dfe4bf7ce3ad0a4c77",
+      "comparison": "authored_derived_registry_metadata",
+      "provenance": "art/portraits/attachment_transforms.json",
+      "scope": "Current derived source metadata; no upstream byte-equality claim"
     },
     {
       "path": "assets/fonts/wqy-microhei-ui.ttf",
@@ -173,13 +177,17 @@
     },
     {
       "path": "assets/migration/asset_manifest.json",
-      "sha256": "ce0936081e3dbcb96e9a3891f627151695505b2666538d84b98543de35aedc02",
-      "comparison": "absent_from_upstream"
+      "sha256": "8cecd676ebea359b91d80e24616ba5607ea815cde2dcaf09b5526751feae2484",
+      "comparison": "authored_derived_registry_metadata",
+      "provenance": "art/portraits/attachment_transforms.json",
+      "scope": "Current derived source metadata; no upstream byte-equality claim"
     },
     {
       "path": "assets/migration/gameplay_registry.json",
-      "sha256": "13cb914a6ea7485ca34dfb179c337aac1723499696ab69c2abca9ecf49a07b82",
-      "comparison": "absent_from_upstream"
+      "sha256": "410c88dc604a5160e09855f7c5cbcf1c0aa283a8b7808c68a631e04bd95bad85",
+      "comparison": "authored_derived_registry_metadata",
+      "provenance": "art/portraits/attachment_transforms.json",
+      "scope": "Current derived source metadata; no upstream byte-equality claim"
     },
     {
       "path": "assets/migration/migration_report.md",
@@ -3090,36 +3098,63 @@
     },
     {
       "path": "assets/ui/icons/AdvancedReactorPlant.png",
-      "sha256": "541bae548a80f80e25267c257639830e09e445036d5cc3ef9fd281e888628f6b",
-      "comparison": "absent_from_upstream"
+      "sha256": "605dfc712694034c34b5efdc6aa951da7ec4b701ce6674dfdd3debf15d14b458",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "790d271bd45b38ac1ef6469cff6ac5e32e90d1f1c592b4bdf9fa56392d404539",
+      "entity_id": "AdvancedReactorPlant",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/AircraftFactory.png",
-      "sha256": "34c5802e0841ef9211d8eb7b04f9c135ffa73cf1d91b44358848749b69788751",
-      "comparison": "identical",
-      "upstream_sha256": "34c5802e0841ef9211d8eb7b04f9c135ffa73cf1d91b44358848749b69788751"
+      "sha256": "0d77ee93699a2637033ae8723b581d7f8ccd07e6a849a9c4bd30be7cbe125102",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "fa48fa42e6fef6883efc053a68d9ee037e2c713c5f18ae437cbf2d7e99efc365",
+      "entity_id": "AircraftFactory",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/AntiAirTurret.png",
-      "sha256": "57342d57363913d44ba41ea4e0670c7cb50bcbc55a2574d13f31a8db3628f8f3",
-      "comparison": "identical",
-      "upstream_sha256": "57342d57363913d44ba41ea4e0670c7cb50bcbc55a2574d13f31a8db3628f8f3"
+      "sha256": "b364e15591ec54cab9827a5f61d717d06af8912d9a681174eabc2917946ceb0a",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "fbb8c62ce1b100abb060bb1428cb5f41a033222e5caf7d786068795edc5f17dd",
+      "entity_id": "AntiAirTurret",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/AntiAirWalker.png",
-      "sha256": "a6cf6f6f2a4b800f88df4be77c0372dbfd15a55d6427656e1ebcd4882b2bbeae",
-      "comparison": "absent_from_upstream"
+      "sha256": "1bd4ae4c1f51589fe917affd3a25c32709f85364fe54cda401b7dbf99b2ae502",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "74939ca7e918e8c5d175f5d8f55c06fb232bed21fcebedf75dd7ffa2c1217c8c",
+      "entity_id": "AntiAirWalker",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/AntiGroundTurret.png",
-      "sha256": "beb2ab5074621b977820148bac18094d7679bfa0c555ef0401df1dbd2ccc6fa6",
-      "comparison": "identical",
-      "upstream_sha256": "beb2ab5074621b977820148bac18094d7679bfa0c555ef0401df1dbd2ccc6fa6"
+      "sha256": "8ed4129c90f32bad829ddc77c565fe25d6324d55be5723e8aa391d63c581ecb1",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "6b368660970a3cef54c7f9352d417033ec4695584b7771d40b570090a863b7cc",
+      "entity_id": "AntiGroundTurret",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/ArcCoilDefenseTower.png",
-      "sha256": "7573c42eaf2ea49d320f70baf58a500b0bfdcb330a19e43ce186c301dba5bdaf",
-      "comparison": "absent_from_upstream"
+      "sha256": "cff7651f88a80bfe32ac90a232760a3c2bd5997928b2628ffaffb1b238f84c07",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "3308ec4ce6d9285c8b7a0a7997a7fb0182781ef70dd991d05afb0b96f8a998e8",
+      "entity_id": "ArcCoilDefenseTower",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/AttackMove.png",
@@ -3138,19 +3173,23 @@
     },
     {
       "path": "assets/ui/icons/Barracks.png",
-      "sha256": "889489afcf31351b93044d93609037586f7b9d0e36443a55122f8d10749290f1",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/generated/imagegen-rts-expansion-20260615/72/Barracks.png",
-        "timestamp": "2026-06-14T19:05:36.337Z",
-        "record_line": 5113,
-        "command_sha256": "7342c230ffd01ceb91bd85b29324a81a458122908a017ec6fbffd58bd3be611a"
-      }
+      "sha256": "c8af091dec42fe6a51136e99b6b5ca5678833da7b25831d6401157b64f40d705",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "a1ac5e84909cd78b5f89611ea0624a775e9d379389287030d6a0a672c852dc93",
+      "entity_id": "Barracks",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/BomberVTOL.png",
-      "sha256": "aacdc88fd2babd3e8273270a1421b61ae3bbfde13dc9a36775245c3ed49184a9",
-      "comparison": "absent_from_upstream"
+      "sha256": "ff2d131a520e285ed7e6cecb72c40e8aa21c2fd68b8037d8f81d24b86eb64af2",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "016ce2503fb29ceae6c491ed61fb90627dd395c2e1cbdd806afe85609f1e37ba",
+      "entity_id": "BomberVTOL",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/ChronoRelay.png",
@@ -3175,20 +3214,23 @@
     },
     {
       "path": "assets/ui/icons/CommandCenter.png",
-      "sha256": "0051e77b4604defc49b78c3cc78099984cb796f2f2696985848bead5ecb777b4",
-      "comparison": "identical",
-      "upstream_sha256": "0051e77b4604defc49b78c3cc78099984cb796f2f2696985848bead5ecb777b4"
+      "sha256": "187519d2064f31f22e4300079367557ecf098a8c47e61d213086cc5b6c219e0c",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "42f300bee4070c38449646523550dc36ac2f44460403f0385955cb6b233c305f",
+      "entity_id": "CommandCenter",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/CryoSprayer.png",
-      "sha256": "8972e90bab13183a7f1b3157d8382189d032c9fc32a0df96172d02bde5006e4e",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/ui/icons/generated/rts-techwave-20260615/72/CryoSprayer.png",
-        "timestamp": "2026-06-14T20:18:53.867Z",
-        "record_line": 6786,
-        "command_sha256": "ab7e86a3c52968de43cec3cdc800c5b8cecaf808f87eb6b9ad8d8726027fe0d9"
-      }
+      "sha256": "47a4adac91df6004757d1d75ecf1dea91486af4552fe1507128c85f96609afab",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "cee16b3d78d68baeb76b78e8b0d17aea0775942f5e05d7dbbc84be3ce5860014",
+      "entity_id": "CryoSprayer",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/DeployMode.png",
@@ -3213,14 +3255,23 @@
     },
     {
       "path": "assets/ui/icons/Drone.png",
-      "sha256": "866fa4b513e7ea5ccea943ac5de66042442be3cf6359e6a5647126411f62af23",
-      "comparison": "identical",
-      "upstream_sha256": "866fa4b513e7ea5ccea943ac5de66042442be3cf6359e6a5647126411f62af23"
+      "sha256": "5d14073d8a80bccc6731290cc0b96498535258e42cc0cb32a6fa53c5a01dcbf2",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "ede15e2da6f9c71242fafc21ab5860fc91f46755d31ab1ec2373cd3a1d1d4507",
+      "entity_id": "Drone",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/DroneMineLayer.png",
-      "sha256": "96f1a7266305e7fc03bb4be6bd4bd818796e17936003a943272449e0935b2f6e",
-      "comparison": "absent_from_upstream"
+      "sha256": "8fe2e7c0d446e9b46049d73a8727cf51a3515c3f4e38d35880ca1b7f57ef96bb",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "c334a94c235e9798adedacb39f4ab4b36393c7d56af77f0591055e06f8cbe3bd",
+      "entity_id": "DroneMineLayer",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/EmpPulse.png",
@@ -3245,44 +3296,73 @@
     },
     {
       "path": "assets/ui/icons/EngineerDrone.png",
-      "sha256": "98f0435211312fd7fa190feebaa79029454e782f37a1f15a854b4c7fadb9f426",
-      "comparison": "absent_from_upstream"
+      "sha256": "4c916b703c0326d4a754ecacad1eb0727823f55f322e329fe53b5a2a176b34d2",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "550c4179ac44e9322b4bc9332af5765871c173c6d1afab90e53614552829e75a",
+      "entity_id": "EngineerDrone",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/FieldMedic.png",
-      "sha256": "e376b9a92d7c49282582fb8356d59e22fa9ba1145fd1f675a96f45b469d5368f",
-      "comparison": "absent_from_upstream"
+      "sha256": "735d366cd05917fd5796f803ab25da827400513de91fb99f4334cb2b2cf76885",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "fe0efbce9aba4873fefab090b1e69ec139a74ed0f6ab93887408586d159c5a65",
+      "entity_id": "FieldMedic",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/FlakHoverTank.png",
-      "sha256": "c490e05ef73207ae15ffd89ce961da27bd9b5796990a95e92ac525d10788a3cf",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/FlakHoverTank.png",
-        "timestamp": "2026-06-14T21:41:53.661Z",
-        "record_line": 8599,
-        "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
-      }
+      "sha256": "110a348d69396c9f0322f39d1cfdad7af95210ce72c0e4c5455ecf1632444853",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "03672d2b159f1c0d979bad1fa44dd75b530238fb4241da95dc5d5245afba7d2e",
+      "entity_id": "FlakHoverTank",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/FlakRocketTeam.png",
-      "sha256": "100d4e8ef76252cdfb68b7f86a5ab57f25aaae27ca23276a0df37395c3104994",
-      "comparison": "absent_from_upstream"
+      "sha256": "f4b03c4060e2846b5d313e5bebb6d36e9b43fea4953bbc8df52e1d8435b1c553",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "52fa8fc513cc75d577818ca526359835749ee8b86a8f97f3682c1342f5e1dcc2",
+      "entity_id": "FlakRocketTeam",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/FlakRocketTeamMk2.png",
-      "sha256": "988214ffc1c2f0e28805e41d6cf74c390a70e29d29f9adf8ab8ef5dbc98a4aa9",
-      "comparison": "absent_from_upstream"
+      "sha256": "e4ffa37418140bd4b9817900e2748987415b2bca6881c957ad17333c6b40f7c8",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "7df6a9e955e56a60b2e0fa4c364540a25ff778c1f24ac6ff7889b719097a48db",
+      "entity_id": "FlakRocketTeamMk2",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/FlameAssaultBuggy.png",
-      "sha256": "71194dd8ca490e9131a406d6befbaa8af0456cabb5682b3adf1887d0f7bbd6f7",
-      "comparison": "absent_from_upstream"
+      "sha256": "31a8edad65508708966c1b5965c0f84ee561f0f9d162b6c8b6d7b0d2e0057bd3",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "e6496f9682247205f33f1581ee0a2ae0a8fb6ae7cef6bf689d2586783c49baa9",
+      "entity_id": "FlameAssaultBuggy",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/GrenadierTrooper.png",
-      "sha256": "3d916f82b4117c63bf5a2c4069a4b4633284a793ddb5cc21fe9b8fbe9b553df8",
-      "comparison": "absent_from_upstream"
+      "sha256": "68c99cd8cb9cbe3d5dea7e5933610a210470e686f4b3677028bdef6e69b90353",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "b6686ae8689e69c4edc26ed08c3c1c56c54169db3ff8a5f9a0b073090002b554",
+      "entity_id": "GrenadierTrooper",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/GuardArea.png",
@@ -3307,35 +3387,53 @@
     },
     {
       "path": "assets/ui/icons/HammerSiegeTank.png",
-      "sha256": "2d592623d2bb3a597f1c63e0426c40066eb5045a3ccdbc0d8aba4cabc98011fc",
-      "comparison": "absent_from_upstream"
+      "sha256": "5635659dc5a33945787d6bd34e6667c629541088a64e899b8db9124039d11f31",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "57fc735974894834c1145366327d7d237f9b1b17bd85b36be767265eec684519",
+      "entity_id": "HammerSiegeTank",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/HeavyBombardmentAirship.png",
-      "sha256": "60b6bab70cdda5f03fdb242a650f11f6a6f9cde3253bee276ee6dd50ad85ed13",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/generated/imagegen-rts-techwave-20260615/72/HeavyBombardmentAirship.png",
-        "timestamp": "2026-06-14T21:08:40.643Z",
-        "record_line": 7927,
-        "command_sha256": "a2fef89b7fc119edc1b71883b6608618986674d92b43899d2592a6411206ea8a"
-      }
+      "sha256": "f88e611b476bd42f65ef4b38fde56707fef2c11172d8dd65c209bf584b9f885b",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "894b01ab2703ec4e57eb9c57b93e5d724b9ee30b5bc503c4271906eb13b39c3a",
+      "entity_id": "HeavyBombardmentAirship",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/HeavyMachinegunTrooper.png",
-      "sha256": "6a5dbe6f06e7624211db8db93129f1170611555fc5abd5593347ccc95a07a86f",
-      "comparison": "absent_from_upstream"
+      "sha256": "fa411f6d6ac3a1a5937bbceedb3f601b8e8b9e87ff3dc09c66bc42d8f3b7697c",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "ef24b254233654d55411144166f4faf123f2aabe0ea2e01f430c0a76242f39ba",
+      "entity_id": "HeavyMachinegunTrooper",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/HeavySiegeWalker.png",
-      "sha256": "951777fca3fb49957d75e0305969f3be5110953b9753cfe918b1ecb902c1da37",
-      "comparison": "absent_from_upstream"
+      "sha256": "9fb6de2f1e3ecea05c1bd063f2605704738a03d71e8b496a118752d53cacae5b",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "52613af5e84f74b9e30406f8123b5fc55ceba0669d28f745e9718aaf1441b1dd",
+      "entity_id": "HeavySiegeWalker",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/Helicopter.png",
-      "sha256": "f13558b8c5f107dd6c691d7ef79b2030d7ec1575b04eebc08f3b89588eb7f915",
-      "comparison": "identical",
-      "upstream_sha256": "f13558b8c5f107dd6c691d7ef79b2030d7ec1575b04eebc08f3b89588eb7f915"
+      "sha256": "7be2dafeb398e92d00c95e63282fd7444683512de46d51df61d9d807b4732279",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "7dbd4fb5e707bafbe3ec30fbf4cdbed3c5bfe892f2fca65a620f06d52e3383ac",
+      "entity_id": "Helicopter",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/HoldPosition.png",
@@ -3354,88 +3452,113 @@
     },
     {
       "path": "assets/ui/icons/InterceptorVTOL.png",
-      "sha256": "f25893fa319f684576d54a53a163be9b6122a55af5e7268dd33fa40d96f90074",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/generated/imagegen-rts-techwave-20260615/72/InterceptorVTOL.png",
-        "timestamp": "2026-06-14T21:08:40.511Z",
-        "record_line": 7926,
-        "command_sha256": "6f8d6eccb5194692cb7fd02ba9fce7031910f9fadb98ddd39145a196b442f4bf"
-      }
+      "sha256": "2cf52617e1173bc80a2a8c2c76ccf5ea2684316259011b2a584cc1cf2f88be30",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "8f6b97a80d4579487696d3df589a294b647eb182238326b3b8b663b3fb26c16b",
+      "entity_id": "InterceptorVTOL",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/JammerVehicle.png",
-      "sha256": "f1f30c04133fa7bd875df70d74e0292e85e8b57b3a1450775fac915db13ffba3",
-      "comparison": "absent_from_upstream"
+      "sha256": "61efcd1fc3587f9905b210383a40880f9e5d9dd9ffe13fb409ed50db0e767d45",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "43fa93e556bb4ebf4f321e54baf7471be36b778dd300e3bd9496ae1f89c22d47",
+      "entity_id": "JammerVehicle",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/LanceBeamDefenseTower.png",
-      "sha256": "f7eb0628b51f6261cc2ba3ca4be9187356271e93090b147700048cd5c6941c67",
-      "comparison": "absent_from_upstream"
+      "sha256": "29ce3b7b04c46067f85a238a68c7acb4a80173a1d2be70ab0e91051d62c6fc10",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "6d3467dd5761a83dd798a06fe82aab85cafec0f76d10a9711d1025c0bb71d04c",
+      "entity_id": "LanceBeamDefenseTower",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/LanceBeamTank.png",
-      "sha256": "8f5f3ddc2b635da25039a9013f48526fa497eb1147f8d4d4bc331dc84632e968",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/ui/icons/generated/rts-techwave-20260615/72/LanceBeamTank.png",
-        "timestamp": "2026-06-14T20:18:53.867Z",
-        "record_line": 6786,
-        "command_sha256": "ab7e86a3c52968de43cec3cdc800c5b8cecaf808f87eb6b9ad8d8726027fe0d9"
-      }
+      "sha256": "bcba78db6393954df55e98cb24cb6a7465649445c5e1caf2592e71cf31206e79",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "488580b0d764c554803c4b1ed449e85d11efb258fbd8bb6dcd404c6bd819cdb3",
+      "entity_id": "LanceBeamTank",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/LightRifleInfantry.png",
-      "sha256": "a085ada1d8911bdc357a20fb8b1da79eb7772affebe36f092cff27a8a2b00d61",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/generated/imagegen-rts-expansion-20260615/72/LightRifleInfantry.png",
-        "timestamp": "2026-06-14T19:05:36.337Z",
-        "record_line": 5113,
-        "command_sha256": "7342c230ffd01ceb91bd85b29324a81a458122908a017ec6fbffd58bd3be611a"
-      }
+      "sha256": "53f526a883505e49b1fa3239f043228a1bd23e37e186d4ee5385bc251b02e74b",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "9e152c31ca8bec79e8fbcfe259d25b0740a7c0e25b5e11963845aceb832d4e07",
+      "entity_id": "LightRifleInfantry",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/LongbowMissileCrawler.png",
-      "sha256": "873a77098ab88d213fb985c59381800a7392f823b54b66faa3cc6db133960f3a",
-      "comparison": "absent_from_upstream"
+      "sha256": "ae8fa5f983804a1b2d5cc50b0d05df6130e12947cec8566e2846ea69a1d8b360",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "b46596bc97b7358fd33050caa42515b8aca1503c350b9e0d485ebc553c6670a2",
+      "entity_id": "LongbowMissileCrawler",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/MirageScoutTank.png",
-      "sha256": "96ca01d9004b29af110a2280c665c9ef116cfd8f5617c48bc2bcb9955469f3df",
-      "comparison": "absent_from_upstream"
+      "sha256": "7c0d88a14172d70d09f6b9cae95d3beb25ddef2533a75dceff922925849a25ab",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "55f13bc8e33d8a0c1580170fde0003ee6be037db26a0da115463b0bbbae6d5f2",
+      "entity_id": "MirageScoutTank",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/MobileRepairCrawler.png",
-      "sha256": "e4a71eca3e2edf6ba3a2f820888f45bd0f8d01c931442a1223ee676964a676f3",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/MobileRepairCrawler.png",
-        "timestamp": "2026-06-14T21:41:53.661Z",
-        "record_line": 8599,
-        "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
-      }
+      "sha256": "9cdec018d65dabce461e1bf9944c61568e8877562bc1dcb09754b29e32d5359b",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "5cf28a0a37c5a4802ecf4164fa9260596a03de484f69d86cc69536634ca3e3d8",
+      "entity_id": "MobileRepairCrawler",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/MobileShieldProjector.png",
-      "sha256": "f6cd23627974c0e0cc7587449b2ca88b893dee97c5764fa37046f468156ba74b",
-      "comparison": "absent_from_upstream"
+      "sha256": "f651a804ba1575d46f73924c9545cc1df95b429e15562f92629c99b4bdba1ac3",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "1ebf6bf825e795d43159a92d9495eaea7601248d8c8e057bfdf91b77a50374d3",
+      "entity_id": "MobileShieldProjector",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/ModularMissileCarrier.png",
-      "sha256": "fc6ac86309e67dba0e1787e826b36a7b16ea3eb120004ff52b50245d6b1bef8b",
-      "comparison": "absent_from_upstream"
+      "sha256": "17a7d989e1357321b6f563ac247a1e85ee4154555f5c1d83d1051609e79547dc",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "76d8826a56aee3a06afdc11cce056f0363c0b961503c7a6e2d547a3922f51ff6",
+      "entity_id": "ModularMissileCarrier",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/MortarTeam.png",
-      "sha256": "f73a7bdb0705877633eb79d9cdc74ed86bf0f278470ec31d042af7e4e8766a2a",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/MortarTeam.png",
-        "timestamp": "2026-06-14T21:41:53.661Z",
-        "record_line": 8599,
-        "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
-      }
+      "sha256": "91f9a8cbb10a19d7107de2dcc58dd7b25998ee4342e0545a8ee098ef6a426835",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "ab946cd5b6fe6e3ecaab01de5595e9acdb104db03c30fd06e2663eb167df4e4d",
+      "entity_id": "MortarTeam",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/NaniteRepairSwarm.png",
@@ -3475,8 +3598,13 @@
     },
     {
       "path": "assets/ui/icons/OrePurifier.png",
-      "sha256": "c0330105940352498a4d9a79635d8fa72f66ab3102518572406cb757fdec92b0",
-      "comparison": "absent_from_upstream"
+      "sha256": "27cfff38d201b90f404f7e8091937999c923736907975e347658eda25eef8b37",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "525d6a2c97e194d71aa66a54ddaeef28974fcb4fc1aced4555bf48c53e2bd90d",
+      "entity_id": "OrePurifier",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/Paradrop.png",
@@ -3516,35 +3644,43 @@
     },
     {
       "path": "assets/ui/icons/PhaseSaboteur.png",
-      "sha256": "c1ce3d0f579a4d1034865d2164490f0c2d38d8bc3b4d8bdabd0dc54168c5d43c",
-      "comparison": "absent_from_upstream"
+      "sha256": "23dc30b91fbf4badb2289dd94f99d79ac66286ab025d5a26545f5132956d676e",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "c30be76f6fb9a07c9b7bda5d7de9bbf7216ca68d4a2aa8d58fe220017f4ef1ae",
+      "entity_id": "PhaseSaboteur",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/PowerReactor.png",
-      "sha256": "9465cadd13fe245ef4c7c0a0942b540e5d0a494cf76516c39e608ab754412aeb",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/ui/icons/generated/ai-rts/72/PowerReactorConcept.png",
-        "timestamp": "2026-06-14T17:30:11.921Z",
-        "record_line": 2813,
-        "command_sha256": "2a778602cc2f907c0e50f1d3742e67ba809671bc5d665a790d3da50b2576bfdb"
-      }
+      "sha256": "c3ef679e9422709d73a531a6b02b5fada06f03ad47bcee90197fdeabf7852656",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "3d98cb34fcae575235d3a72f5562e626d797bd0086978f4f26f33ff68fc3e205",
+      "entity_id": "PowerReactor",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/PrismDefenseObelisk.png",
-      "sha256": "87e10b89265234e86a82300c6eb4d4c78e70878973cc173188245ce7e1ec8782",
-      "comparison": "absent_from_upstream"
+      "sha256": "ce03606a0c9897b8a45305e313434f0994b6f6a8a02851f0b351ed3c22a24580",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "85afdff21c82926b63487500e35e7ea8bbf405fb0ca96d479dceb3a5941ac0ac",
+      "entity_id": "PrismDefenseObelisk",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/PulseRifleCommando.png",
-      "sha256": "7aeb1503e138e20ac75fef13f295755896bab8a631e705328523b00257c096e3",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/PulseRifleCommando.png",
-        "timestamp": "2026-06-14T21:41:53.661Z",
-        "record_line": 8599,
-        "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
-      }
+      "sha256": "6ca5202e8d62176f55ce736d39cd9a16be5f405a597061487a9b830bac76ee78",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "2f64dbd4c924e3e30a9d864e271974422335f6acf710b0d9d44496c14ef5a627",
+      "entity_id": "PulseRifleCommando",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/RadarSweep.png",
@@ -3563,34 +3699,53 @@
     },
     {
       "path": "assets/ui/icons/RadarUplink.png",
-      "sha256": "3ae44c20358d76d283bb48fe8c972da25e943ad5d1fa41e8530ddf8a4ba105cb",
-      "comparison": "absent_from_upstream"
+      "sha256": "b0b6cb4197172b62d0bdb7e5d39b94594d978fca56849d025dc9c8b93ac1ae04",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "1fb8ea71b57d8cd92b96584c94114715034bb85082829b0225f934b502d9ed1c",
+      "entity_id": "RadarUplink",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/RailArtilleryWalker.png",
-      "sha256": "eafb6424dd2021d21069ad7483003ea649f38b950479b53337425ea27913560f",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/ui/icons/generated/rts-future-pack-20260615/72/RailArtilleryWalker.png",
-        "timestamp": "2026-06-15T03:50:39.246Z",
-        "record_line": 18204,
-        "command_sha256": "b03c0b8d9cae592ba9c633fd47b615856e9e47c9983f5e4ffa34f0f9ce414b81"
-      }
+      "sha256": "455ab143d00394a3e95f68a7a4df62d1fb4b74e3259305b2dd7cd22819cd930a",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "959fa57ea20be83cb5bee8c67fe9c24e31271a8a5ba574062e15a72efb9f9005",
+      "entity_id": "RailArtilleryWalker",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/RailCannonBunker.png",
-      "sha256": "03d2c68db3363283e7cc536d44167e0ba8ee1d1128b328bb5b76a516002bd176",
-      "comparison": "absent_from_upstream"
+      "sha256": "0348e27e3e008762edb5ee959c9540380d8f7014e5177ac6a7f1549ccb013967",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "69177c97d5101998c16fcf6d72c5471cd281e9af2b5c6679c434f1042303dd64",
+      "entity_id": "RailCannonBunker",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/RailSniperTeam.png",
-      "sha256": "d26612428419258aacd93f42862b08c630c979af4cecdae64546ae5edfcd9ab1",
-      "comparison": "absent_from_upstream"
+      "sha256": "47bdde309632d3334bcf6d97caf99694cc038dcb96b660d66fc50d9716fa2d08",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "12c5595e5f11f9b40ce63b921371cf941c75d63dc068a9a5e03de6c80f0db8d8",
+      "entity_id": "RailSniperTeam",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/RailgunTank.png",
-      "sha256": "02b3ea530ef82837d75536a3eb542afcfdce6980f6340b3b2f49dd77cadea82a",
-      "comparison": "absent_from_upstream"
+      "sha256": "a74881d632291fc5dfd7205b82c9aedfad756b6250b1a4d9912e71456e749530",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "ffaa84e7f667b17773bd4c2bfad492899489ee3a1f51e3cf758c010011c69e31",
+      "entity_id": "RailgunTank",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/RallyPoint.png",
@@ -3609,14 +3764,13 @@
     },
     {
       "path": "assets/ui/icons/Refinery.png",
-      "sha256": "a4538550b38ad3abe6b515771fdcd36b8c05667b7f313a2f58a0038d207694b0",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/generated/imagegen-rts-expansion-20260615/72/Refinery.png",
-        "timestamp": "2026-06-14T18:50:12.723Z",
-        "record_line": 4769,
-        "command_sha256": "e20294a86e612383b11188cf4c2b3a478b03684713e8dab0975b7c5eb061258d"
-      }
+      "sha256": "2e860b1bdd2ee70f12b6b50600666339e46b131426c412bad813112fd8fcb05c",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "7a62335871304056bd0ff3d74a4d1683b63158b134087558fa12e0011d13dd70",
+      "entity_id": "Refinery",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/Repair.png",
@@ -3635,8 +3789,13 @@
     },
     {
       "path": "assets/ui/icons/RepairPad.png",
-      "sha256": "66ee205d00c1f38056d59199cc65343c386b791ae29f33da646e43597f79259c",
-      "comparison": "absent_from_upstream"
+      "sha256": "79e120e984ade3f8f8d7461100ed6aff3c2703e54c1ce484d4d57ffed9fc0b03",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "2a3b6d84e0fb8b51a457b354a73575b8fc07765b28a6dfe8cd8b63ccc63e819d",
+      "entity_id": "RepairPad",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/ResourceA.png",
@@ -3652,51 +3811,63 @@
     },
     {
       "path": "assets/ui/icons/RoboticsBay.png",
-      "sha256": "c66718393bb73f651e2562d7f4e107d6bcff0e70a7780b7a7530610bedd11e8f",
-      "comparison": "absent_from_upstream"
+      "sha256": "e914a9612e77a90fdcf15f5ac624a95d02e91c30dc2a625a832c4a36f4c7ee99",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "3fb9ea30b8d77a2317eb574e20773c838798d797286f2e9290e0b88efcfa9663",
+      "entity_id": "RoboticsBay",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/RocketGunship.png",
-      "sha256": "d58bad87e255fec79c994998b5d7ee70bdd6f82c31a53769589e19646c47b2ee",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/RocketGunship.png",
-        "timestamp": "2026-06-14T21:41:53.661Z",
-        "record_line": 8599,
-        "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
-      }
+      "sha256": "bbe2e6fe95487d71fa6fb47640170db1fbd62254b340c4ddd298966d8325fa2f",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "7a4f4f29a6a0862a77af338ef7c9e20ab9ba397c1fcf84e814a8b508317d0b13",
+      "entity_id": "RocketGunship",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/RocketInfantry.png",
-      "sha256": "a0129fcd330a463155e5d0219b2a07a2a0b8b7f070a3b4d18fa19de74073de29",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/generated/imagegen-rts-expansion-20260615/72/RocketInfantry.png",
-        "timestamp": "2026-06-14T19:18:16.899Z",
-        "record_line": 5372,
-        "command_sha256": "9e720b5a082f560b420c523e662e8debc302b389f7b22cd369a13a36d1301baa"
-      }
+      "sha256": "35dc7b19264c2f7b45972f157d0070abca17e0b6cf43a54c4b748e4ede83f985",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "cd89da9a21645e37b69e223a3dd79f26cd0c942bb29b26b815c3e0382adea5bc",
+      "entity_id": "RocketInfantry",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/RocketTrooperRobot.png",
-      "sha256": "eae8f867e2d985dc93df1d8cca08a982b878e6e7012ef13836781052a52709d2",
-      "comparison": "absent_from_upstream"
+      "sha256": "9644657a6c06c08732a08e6ab568f54e7e79b54bb9cd242bb48a11b4d97d2a09",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "9d63eb0fdd2cbdcfb2ce950d69c6689f0800801834249e699c0cabf5f70cee97",
+      "entity_id": "RocketTrooperRobot",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/RosterPreview.png",
-      "sha256": "5f0c8928f2e4242c7107a5fc9077e9849d7f0cbb049e3504a0b58f705a1d117b",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/ui/icons/generated/imagegen-rts-ra2-inspired-roster-20260616-01/preview-72-on-dark.png",
-        "timestamp": "2026-06-16T19:23:53.172Z",
-        "record_line": 78139,
-        "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
-      }
+      "sha256": "3bf0d5cb6328e27b942e435bf7466eae8eb3555ca8907adb054b4808766683e4",
+      "comparison": "generated_original_roster",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "6b46a6d5d17087ceb03d3054fc418f93fa36a4263411f467ac0dc3053c483b35",
+      "entity_id": null,
+      "source_scope": "Original mixed-faction asset-only composition; per-member model-only parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/SaboteurInfiltrator.png",
-      "sha256": "218542879f06bbeec67d32c71c711a5c6c283f4fd8b57a728f397732f8f2b30e",
-      "comparison": "absent_from_upstream"
+      "sha256": "bf04964e3f5b4f1041ae82e4e12c89aa8166555c4ccdd50262da1b54b2b6123a",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "36fff456528c4fbed812a63a9e03a992e47b1ab6af48f5b2fc6855d8516817da",
+      "entity_id": "SaboteurInfiltrator",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/Scatter.png",
@@ -3721,8 +3892,13 @@
     },
     {
       "path": "assets/ui/icons/ScoutRover.png",
-      "sha256": "acd7fd778fc118a26baf31c9954e44ed430b8867acfb52c4673ff7914cdeee11",
-      "comparison": "absent_from_upstream"
+      "sha256": "f7dbb7b6ad8deed14f14cbd33b2ac9001557b9ba3eeccd24ea3509e630d0ef4e",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "6d7bdde149f7cf9acc21865026edbc7fc8065b61908e1d82d9b091d5293e56a9",
+      "entity_id": "ScoutRover",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/SellStructure.png",
@@ -3762,39 +3938,63 @@
     },
     {
       "path": "assets/ui/icons/ShieldTrooper.png",
-      "sha256": "f611b8dcf1630c47b8aa0242408ec942e5e11ca9495cbcb993585773aa490135",
-      "comparison": "absent_from_upstream"
+      "sha256": "9609ea2e9134b9b2bfc9c392ade4647e2ff89e646902b04d2a454c9630bf89c5",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "c7098c711e2f6fc6cfe5c54182f6025c1a80d0f8536b5526c81062d919201a15",
+      "entity_id": "ShieldTrooper",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/ShockTrooper.png",
-      "sha256": "26d948c49074ef1cffd25161d534cdafe1b30553688738fe9ec3fd11ed719922",
-      "comparison": "absent_from_upstream",
-      "generated_sheet_copy": {
-        "source_artifact": "assets/ui/icons/generated/rts-techwave-20260615/72/ShockTrooper.png",
-        "timestamp": "2026-06-14T20:18:53.867Z",
-        "record_line": 6786,
-        "command_sha256": "ab7e86a3c52968de43cec3cdc800c5b8cecaf808f87eb6b9ad8d8726027fe0d9"
-      }
+      "sha256": "bc64718bc532348a8d4363bef2dcb34654c1b830c7c00cad7af96d6ad36bcedf",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "9b206fe53ff9d588ed3e4c84c2018d3e56271fbca0836d1578bd685d6abba7a9",
+      "entity_id": "ShockTrooper",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/SiegeAirship.png",
-      "sha256": "eebcf9ebc5038e0546e5ad883cd7062490a8a4d9ac1df6d1768616e14d1ab5c3",
-      "comparison": "absent_from_upstream"
+      "sha256": "cd551dbff9704df6e4a49f195487d8f861799f4d56990d55038ac99ac280d8c1",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "a6adadffe26e2e80c1ed045657cd62e490c6c036e4161d66bdb9e9c8263c5abd",
+      "entity_id": "SiegeAirship",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/SiegeArtilleryVehicle.png",
-      "sha256": "a93a09f4acb25bbaf4a94cc77c8f5043132ab0fbec465c5c3fc9d3b34b1f8bfb",
-      "comparison": "absent_from_upstream"
+      "sha256": "3bc81b0c8473e08f263a40963a81485d9308e305ad14754277d6a46c01d05394",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "fa78af06022275cd232052f185df5a51e5e8ec7970558cca8749a7c3d50ce2d1",
+      "entity_id": "SiegeArtilleryVehicle",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/SiegeDrillTank.png",
-      "sha256": "1dcfc93e2300151305dce671098e312bcf5d255371bfa81f02006582da4968e6",
-      "comparison": "absent_from_upstream"
+      "sha256": "4159b12d03a3da0c546c6e0189b7d8dd15beb0370ac5e65f973abedbd1ccc397",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "b4e6db232689ba42a9ba3e549bc7c0de427329b2d3d547e4db521f38796899c3",
+      "entity_id": "SiegeDrillTank",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/SniperScout.png",
-      "sha256": "fe10020e44cde1353f8e1ac7d86925fe32fae0250734a9defe4fd4115a1f66cb",
-      "comparison": "absent_from_upstream"
+      "sha256": "bc7aa7db9ec9a13ec07e8ea00154a0b74768ff1e2a1147df9cc368706595f4b4",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "93803661a1bee3cfd7ce1bc47094c336e0d42bb7fda7eb5f789d3180b1dbb30a",
+      "entity_id": "SniperScout",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/StopCommand.png",
@@ -3834,24 +4034,43 @@
     },
     {
       "path": "assets/ui/icons/TacticalOfficer.png",
-      "sha256": "dd2a75f0dafcb2f6a0f6a98745ea2678ab9fcc422069e2f61559b4014b02d068",
-      "comparison": "absent_from_upstream"
+      "sha256": "7fdfae5c77b99decc8dc8abbfb57291e1d4bbcd04448e55c301ba6e4595e9dd0",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "21cad35243f72e1f042a8dfefe927931a408a806887f1adff991447907124b6b",
+      "entity_id": "TacticalOfficer",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/Tank.png",
-      "sha256": "f2f67cc5488fa146eb2e13c9626f18c1a5accee7fea56fa9e52e135b6f20c266",
-      "comparison": "identical",
-      "upstream_sha256": "f2f67cc5488fa146eb2e13c9626f18c1a5accee7fea56fa9e52e135b6f20c266"
+      "sha256": "92a93b11f3629dbb1af68f368bf72bb99647ec4af4f68e41d6fa7f71fa9515c2",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "e2c4e100d31b9adbb80273255e3e11947eba6b6f6b6f9991709bbbc79d38c1a6",
+      "entity_id": "Tank",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/TechHospital.png",
-      "sha256": "37fd66855e0b723e3e8df69a13e921356398017ac24761fd4c352b795270cb2e",
-      "comparison": "absent_from_upstream"
+      "sha256": "af3cd51eb5e127322674582d0073bdffd966ef47d0332a7add129b7a6f541335",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "9904229e65b3ebc1d6e9cf72785415c2ebd54201044f35c1acc3c63f189aeb2f",
+      "entity_id": "TechHospital",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/TechLab.png",
-      "sha256": "68ec9b7fe48d39954f8e08c9f4ac75d55e3d4d68c39d51362ba5928deeb99212",
-      "comparison": "absent_from_upstream"
+      "sha256": "e874d83b3c6059318f4c70908b3eb5470f63a51ece62e762dacf889edc37bb65",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "bf5f52b792a398dd7e3d358b1ffc7e410968466c7e9dde07937b472b136b32cb",
+      "entity_id": "TechLab",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/TechLocked.png",
@@ -3870,34 +4089,63 @@
     },
     {
       "path": "assets/ui/icons/TechOilDerrick.png",
-      "sha256": "ad80d1d2be637e0a4a810964bedcece0c1cc4234300c4a55294fcb09c4f62902",
-      "comparison": "absent_from_upstream"
+      "sha256": "ee1a25303b0555e4287942a1924fca417065a6565459e34108ea908e402fc714",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "6546511c81e7000e134939f251836cc2c06d9b1b1818fe420b33f93713535ca2",
+      "entity_id": "TechOilDerrick",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/TechRepairDepot.png",
-      "sha256": "a9926348700f38fbd503482a0a839f995e35c0c6267cd025c95a02e6d1eef0dd",
-      "comparison": "absent_from_upstream"
+      "sha256": "ae9c34005f167c94364dd730148e317fcdded944e406d7463ec139a9dae6f21f",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "4a8ba23c2b3bada13e9dabf84d594cd17301975c502ca9bef888666c6f38930a",
+      "entity_id": "TechRepairDepot",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/TeslaCrawlerMk2.png",
-      "sha256": "f98c1fac2099240ec6a16a47775017727311a275abbb535670e462e8237ac717",
-      "comparison": "absent_from_upstream"
+      "sha256": "d039c8b98cde3b335f34c8428954de8f7ea1def1822f972b25d0fa1d51c51333",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "d3c1d3da42235b50386c723bd39e4b9c7bb81c6c79748e81e8ec3ca80a107e63",
+      "entity_id": "TeslaCrawlerMk2",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/TeslaFenceSegment.png",
-      "sha256": "e840bef87fcf9d4dc717c534e8b8a5d24a6d9585040bd782f9458051105a1546",
-      "comparison": "absent_from_upstream"
+      "sha256": "46894c75da1a9c55234ad93d30a3311e33e45a5f6af633c81bc480056d307263",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "b6e2022f8ebc102fea42d124888e06656c037e2a3ded04bba79f4e22b92ce2f6",
+      "entity_id": "TeslaFenceSegment",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/VehicleFactory.png",
-      "sha256": "364fb8dffc97d49a9f260a87208dc9a5594f2f5d7424ab137fcd470200260f2d",
-      "comparison": "identical",
-      "upstream_sha256": "364fb8dffc97d49a9f260a87208dc9a5594f2f5d7424ab137fcd470200260f2d"
+      "sha256": "2195476625fd54f96c5e176f37a7fea53f70cf57a2ace4b2e03f375042ff84e6",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "ce6f02100984b2e2076e45c3f14720f96c04e4919e356c89301d3cd47bf18e20",
+      "entity_id": "VehicleFactory",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/WeatherControlSpire.png",
-      "sha256": "02bee742b244951dd87321000eff577e8f1e2619c794e7b1b24985fdb04c7345",
-      "comparison": "absent_from_upstream"
+      "sha256": "b31cbb65ed0039d509daea58664de7e47b3c4dce73b7e992c8253ac7ada7f723",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "68322ad68d7af6a058e4f5c9fea39d5275773bc01856712375f7047504c07536",
+      "entity_id": "WeatherControlSpire",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/ui/icons/WeatherStorm.png",
@@ -3922,9 +4170,13 @@
     },
     {
       "path": "assets/ui/icons/Worker.png",
-      "sha256": "6aa1ff316914e9615206f670e19168553325b87bcff48bb9442423b6154932c9",
-      "comparison": "different",
-      "upstream_sha256": "9e8fe94c5e323cba74cdc8305713101924f2d590e1d4bff22d3e5baf691719b7"
+      "sha256": "3e62ad89c098f7b93de3ef64f64a6692706018d3da69cd4a48e2ac3ba78dcb36",
+      "comparison": "generated_original_model_portrait",
+      "provenance": "art/portraits/runtime-integration.json",
+      "decoded_rgba_sha256": "109d6b80e7b3de25eae2eae90ba67d59a500b52f36bb1778b96aa1dbb2f2a52b",
+      "entity_id": "Worker",
+      "source_scope": "model-only parity; not whole-scene parity",
+      "all_roster_paid_gameplay_verified": false
     },
     {
       "path": "assets/vfx/exhaust_puff.png",
@@ -4387,5 +4639,496 @@
       }
     ],
     "scope": "obsolete runtime paths; original6current derivatives preserved"
+  },
+  "retired_native_portrait_images": {
+    "scope": "Historical replaced image provenance; not current runtime sources",
+    "records": [
+      {
+        "path": "assets/ui/icons/AdvancedReactorPlant.png",
+        "sha256": "541bae548a80f80e25267c257639830e09e445036d5cc3ef9fd281e888628f6b",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/AircraftFactory.png",
+        "sha256": "34c5802e0841ef9211d8eb7b04f9c135ffa73cf1d91b44358848749b69788751",
+        "comparison": "identical",
+        "upstream_sha256": "34c5802e0841ef9211d8eb7b04f9c135ffa73cf1d91b44358848749b69788751"
+      },
+      {
+        "path": "assets/ui/icons/AntiAirTurret.png",
+        "sha256": "57342d57363913d44ba41ea4e0670c7cb50bcbc55a2574d13f31a8db3628f8f3",
+        "comparison": "identical",
+        "upstream_sha256": "57342d57363913d44ba41ea4e0670c7cb50bcbc55a2574d13f31a8db3628f8f3"
+      },
+      {
+        "path": "assets/ui/icons/AntiAirWalker.png",
+        "sha256": "a6cf6f6f2a4b800f88df4be77c0372dbfd15a55d6427656e1ebcd4882b2bbeae",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/AntiGroundTurret.png",
+        "sha256": "beb2ab5074621b977820148bac18094d7679bfa0c555ef0401df1dbd2ccc6fa6",
+        "comparison": "identical",
+        "upstream_sha256": "beb2ab5074621b977820148bac18094d7679bfa0c555ef0401df1dbd2ccc6fa6"
+      },
+      {
+        "path": "assets/ui/icons/ArcCoilDefenseTower.png",
+        "sha256": "7573c42eaf2ea49d320f70baf58a500b0bfdcb330a19e43ce186c301dba5bdaf",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/Barracks.png",
+        "sha256": "889489afcf31351b93044d93609037586f7b9d0e36443a55122f8d10749290f1",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/generated/imagegen-rts-expansion-20260615/72/Barracks.png",
+          "timestamp": "2026-06-14T19:05:36.337Z",
+          "record_line": 5113,
+          "command_sha256": "7342c230ffd01ceb91bd85b29324a81a458122908a017ec6fbffd58bd3be611a"
+        }
+      },
+      {
+        "path": "assets/ui/icons/BomberVTOL.png",
+        "sha256": "aacdc88fd2babd3e8273270a1421b61ae3bbfde13dc9a36775245c3ed49184a9",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/CommandCenter.png",
+        "sha256": "0051e77b4604defc49b78c3cc78099984cb796f2f2696985848bead5ecb777b4",
+        "comparison": "identical",
+        "upstream_sha256": "0051e77b4604defc49b78c3cc78099984cb796f2f2696985848bead5ecb777b4"
+      },
+      {
+        "path": "assets/ui/icons/CryoSprayer.png",
+        "sha256": "8972e90bab13183a7f1b3157d8382189d032c9fc32a0df96172d02bde5006e4e",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/ui/icons/generated/rts-techwave-20260615/72/CryoSprayer.png",
+          "timestamp": "2026-06-14T20:18:53.867Z",
+          "record_line": 6786,
+          "command_sha256": "ab7e86a3c52968de43cec3cdc800c5b8cecaf808f87eb6b9ad8d8726027fe0d9"
+        }
+      },
+      {
+        "path": "assets/ui/icons/Drone.png",
+        "sha256": "866fa4b513e7ea5ccea943ac5de66042442be3cf6359e6a5647126411f62af23",
+        "comparison": "identical",
+        "upstream_sha256": "866fa4b513e7ea5ccea943ac5de66042442be3cf6359e6a5647126411f62af23"
+      },
+      {
+        "path": "assets/ui/icons/DroneMineLayer.png",
+        "sha256": "96f1a7266305e7fc03bb4be6bd4bd818796e17936003a943272449e0935b2f6e",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/EngineerDrone.png",
+        "sha256": "98f0435211312fd7fa190feebaa79029454e782f37a1f15a854b4c7fadb9f426",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/FieldMedic.png",
+        "sha256": "e376b9a92d7c49282582fb8356d59e22fa9ba1145fd1f675a96f45b469d5368f",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/FlakHoverTank.png",
+        "sha256": "c490e05ef73207ae15ffd89ce961da27bd9b5796990a95e92ac525d10788a3cf",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/FlakHoverTank.png",
+          "timestamp": "2026-06-14T21:41:53.661Z",
+          "record_line": 8599,
+          "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
+        }
+      },
+      {
+        "path": "assets/ui/icons/FlakRocketTeam.png",
+        "sha256": "100d4e8ef76252cdfb68b7f86a5ab57f25aaae27ca23276a0df37395c3104994",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/FlakRocketTeamMk2.png",
+        "sha256": "988214ffc1c2f0e28805e41d6cf74c390a70e29d29f9adf8ab8ef5dbc98a4aa9",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/FlameAssaultBuggy.png",
+        "sha256": "71194dd8ca490e9131a406d6befbaa8af0456cabb5682b3adf1887d0f7bbd6f7",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/GrenadierTrooper.png",
+        "sha256": "3d916f82b4117c63bf5a2c4069a4b4633284a793ddb5cc21fe9b8fbe9b553df8",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/HammerSiegeTank.png",
+        "sha256": "2d592623d2bb3a597f1c63e0426c40066eb5045a3ccdbc0d8aba4cabc98011fc",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/HeavyBombardmentAirship.png",
+        "sha256": "60b6bab70cdda5f03fdb242a650f11f6a6f9cde3253bee276ee6dd50ad85ed13",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/generated/imagegen-rts-techwave-20260615/72/HeavyBombardmentAirship.png",
+          "timestamp": "2026-06-14T21:08:40.643Z",
+          "record_line": 7927,
+          "command_sha256": "a2fef89b7fc119edc1b71883b6608618986674d92b43899d2592a6411206ea8a"
+        }
+      },
+      {
+        "path": "assets/ui/icons/HeavyMachinegunTrooper.png",
+        "sha256": "6a5dbe6f06e7624211db8db93129f1170611555fc5abd5593347ccc95a07a86f",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/HeavySiegeWalker.png",
+        "sha256": "951777fca3fb49957d75e0305969f3be5110953b9753cfe918b1ecb902c1da37",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/Helicopter.png",
+        "sha256": "f13558b8c5f107dd6c691d7ef79b2030d7ec1575b04eebc08f3b89588eb7f915",
+        "comparison": "identical",
+        "upstream_sha256": "f13558b8c5f107dd6c691d7ef79b2030d7ec1575b04eebc08f3b89588eb7f915"
+      },
+      {
+        "path": "assets/ui/icons/InterceptorVTOL.png",
+        "sha256": "f25893fa319f684576d54a53a163be9b6122a55af5e7268dd33fa40d96f90074",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/generated/imagegen-rts-techwave-20260615/72/InterceptorVTOL.png",
+          "timestamp": "2026-06-14T21:08:40.511Z",
+          "record_line": 7926,
+          "command_sha256": "6f8d6eccb5194692cb7fd02ba9fce7031910f9fadb98ddd39145a196b442f4bf"
+        }
+      },
+      {
+        "path": "assets/ui/icons/JammerVehicle.png",
+        "sha256": "f1f30c04133fa7bd875df70d74e0292e85e8b57b3a1450775fac915db13ffba3",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/LanceBeamDefenseTower.png",
+        "sha256": "f7eb0628b51f6261cc2ba3ca4be9187356271e93090b147700048cd5c6941c67",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/LanceBeamTank.png",
+        "sha256": "8f5f3ddc2b635da25039a9013f48526fa497eb1147f8d4d4bc331dc84632e968",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/ui/icons/generated/rts-techwave-20260615/72/LanceBeamTank.png",
+          "timestamp": "2026-06-14T20:18:53.867Z",
+          "record_line": 6786,
+          "command_sha256": "ab7e86a3c52968de43cec3cdc800c5b8cecaf808f87eb6b9ad8d8726027fe0d9"
+        }
+      },
+      {
+        "path": "assets/ui/icons/LightRifleInfantry.png",
+        "sha256": "a085ada1d8911bdc357a20fb8b1da79eb7772affebe36f092cff27a8a2b00d61",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/generated/imagegen-rts-expansion-20260615/72/LightRifleInfantry.png",
+          "timestamp": "2026-06-14T19:05:36.337Z",
+          "record_line": 5113,
+          "command_sha256": "7342c230ffd01ceb91bd85b29324a81a458122908a017ec6fbffd58bd3be611a"
+        }
+      },
+      {
+        "path": "assets/ui/icons/LongbowMissileCrawler.png",
+        "sha256": "873a77098ab88d213fb985c59381800a7392f823b54b66faa3cc6db133960f3a",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/MirageScoutTank.png",
+        "sha256": "96ca01d9004b29af110a2280c665c9ef116cfd8f5617c48bc2bcb9955469f3df",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/MobileRepairCrawler.png",
+        "sha256": "e4a71eca3e2edf6ba3a2f820888f45bd0f8d01c931442a1223ee676964a676f3",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/MobileRepairCrawler.png",
+          "timestamp": "2026-06-14T21:41:53.661Z",
+          "record_line": 8599,
+          "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
+        }
+      },
+      {
+        "path": "assets/ui/icons/MobileShieldProjector.png",
+        "sha256": "f6cd23627974c0e0cc7587449b2ca88b893dee97c5764fa37046f468156ba74b",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/ModularMissileCarrier.png",
+        "sha256": "fc6ac86309e67dba0e1787e826b36a7b16ea3eb120004ff52b50245d6b1bef8b",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/MortarTeam.png",
+        "sha256": "f73a7bdb0705877633eb79d9cdc74ed86bf0f278470ec31d042af7e4e8766a2a",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/MortarTeam.png",
+          "timestamp": "2026-06-14T21:41:53.661Z",
+          "record_line": 8599,
+          "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
+        }
+      },
+      {
+        "path": "assets/ui/icons/OrePurifier.png",
+        "sha256": "c0330105940352498a4d9a79635d8fa72f66ab3102518572406cb757fdec92b0",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/PhaseSaboteur.png",
+        "sha256": "c1ce3d0f579a4d1034865d2164490f0c2d38d8bc3b4d8bdabd0dc54168c5d43c",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/PowerReactor.png",
+        "sha256": "9465cadd13fe245ef4c7c0a0942b540e5d0a494cf76516c39e608ab754412aeb",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/ui/icons/generated/ai-rts/72/PowerReactorConcept.png",
+          "timestamp": "2026-06-14T17:30:11.921Z",
+          "record_line": 2813,
+          "command_sha256": "2a778602cc2f907c0e50f1d3742e67ba809671bc5d665a790d3da50b2576bfdb"
+        }
+      },
+      {
+        "path": "assets/ui/icons/PrismDefenseObelisk.png",
+        "sha256": "87e10b89265234e86a82300c6eb4d4c78e70878973cc173188245ce7e1ec8782",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/PulseRifleCommando.png",
+        "sha256": "7aeb1503e138e20ac75fef13f295755896bab8a631e705328523b00257c096e3",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/PulseRifleCommando.png",
+          "timestamp": "2026-06-14T21:41:53.661Z",
+          "record_line": 8599,
+          "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
+        }
+      },
+      {
+        "path": "assets/ui/icons/RadarUplink.png",
+        "sha256": "3ae44c20358d76d283bb48fe8c972da25e943ad5d1fa41e8530ddf8a4ba105cb",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/RailArtilleryWalker.png",
+        "sha256": "eafb6424dd2021d21069ad7483003ea649f38b950479b53337425ea27913560f",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/ui/icons/generated/rts-future-pack-20260615/72/RailArtilleryWalker.png",
+          "timestamp": "2026-06-15T03:50:39.246Z",
+          "record_line": 18204,
+          "command_sha256": "b03c0b8d9cae592ba9c633fd47b615856e9e47c9983f5e4ffa34f0f9ce414b81"
+        }
+      },
+      {
+        "path": "assets/ui/icons/RailCannonBunker.png",
+        "sha256": "03d2c68db3363283e7cc536d44167e0ba8ee1d1128b328bb5b76a516002bd176",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/RailSniperTeam.png",
+        "sha256": "d26612428419258aacd93f42862b08c630c979af4cecdae64546ae5edfcd9ab1",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/RailgunTank.png",
+        "sha256": "02b3ea530ef82837d75536a3eb542afcfdce6980f6340b3b2f49dd77cadea82a",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/Refinery.png",
+        "sha256": "a4538550b38ad3abe6b515771fdcd36b8c05667b7f313a2f58a0038d207694b0",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/generated/imagegen-rts-expansion-20260615/72/Refinery.png",
+          "timestamp": "2026-06-14T18:50:12.723Z",
+          "record_line": 4769,
+          "command_sha256": "e20294a86e612383b11188cf4c2b3a478b03684713e8dab0975b7c5eb061258d"
+        }
+      },
+      {
+        "path": "assets/ui/icons/RepairPad.png",
+        "sha256": "66ee205d00c1f38056d59199cc65343c386b791ae29f33da646e43597f79259c",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/RoboticsBay.png",
+        "sha256": "c66718393bb73f651e2562d7f4e107d6bcff0e70a7780b7a7530610bedd11e8f",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/RocketGunship.png",
+        "sha256": "d58bad87e255fec79c994998b5d7ee70bdd6f82c31a53769589e19646c47b2ee",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/ui/icons/generated/rts-expansion-20260615/72/RocketGunship.png",
+          "timestamp": "2026-06-14T21:41:53.661Z",
+          "record_line": 8599,
+          "command_sha256": "265f20f54d6a2d6f37c59c9530183330bf4056897dffed8749b7a9741aba27a6"
+        }
+      },
+      {
+        "path": "assets/ui/icons/RocketInfantry.png",
+        "sha256": "a0129fcd330a463155e5d0219b2a07a2a0b8b7f070a3b4d18fa19de74073de29",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/generated/imagegen-rts-expansion-20260615/72/RocketInfantry.png",
+          "timestamp": "2026-06-14T19:18:16.899Z",
+          "record_line": 5372,
+          "command_sha256": "9e720b5a082f560b420c523e662e8debc302b389f7b22cd369a13a36d1301baa"
+        }
+      },
+      {
+        "path": "assets/ui/icons/RocketTrooperRobot.png",
+        "sha256": "eae8f867e2d985dc93df1d8cca08a982b878e6e7012ef13836781052a52709d2",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/SaboteurInfiltrator.png",
+        "sha256": "218542879f06bbeec67d32c71c711a5c6c283f4fd8b57a728f397732f8f2b30e",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/ScoutRover.png",
+        "sha256": "acd7fd778fc118a26baf31c9954e44ed430b8867acfb52c4673ff7914cdeee11",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/ShieldTrooper.png",
+        "sha256": "f611b8dcf1630c47b8aa0242408ec942e5e11ca9495cbcb993585773aa490135",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/ShockTrooper.png",
+        "sha256": "26d948c49074ef1cffd25161d534cdafe1b30553688738fe9ec3fd11ed719922",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/ui/icons/generated/rts-techwave-20260615/72/ShockTrooper.png",
+          "timestamp": "2026-06-14T20:18:53.867Z",
+          "record_line": 6786,
+          "command_sha256": "ab7e86a3c52968de43cec3cdc800c5b8cecaf808f87eb6b9ad8d8726027fe0d9"
+        }
+      },
+      {
+        "path": "assets/ui/icons/SiegeAirship.png",
+        "sha256": "eebcf9ebc5038e0546e5ad883cd7062490a8a4d9ac1df6d1768616e14d1ab5c3",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/SiegeArtilleryVehicle.png",
+        "sha256": "a93a09f4acb25bbaf4a94cc77c8f5043132ab0fbec465c5c3fc9d3b34b1f8bfb",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/SiegeDrillTank.png",
+        "sha256": "1dcfc93e2300151305dce671098e312bcf5d255371bfa81f02006582da4968e6",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/SniperScout.png",
+        "sha256": "fe10020e44cde1353f8e1ac7d86925fe32fae0250734a9defe4fd4115a1f66cb",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/TacticalOfficer.png",
+        "sha256": "dd2a75f0dafcb2f6a0f6a98745ea2678ab9fcc422069e2f61559b4014b02d068",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/Tank.png",
+        "sha256": "f2f67cc5488fa146eb2e13c9626f18c1a5accee7fea56fa9e52e135b6f20c266",
+        "comparison": "identical",
+        "upstream_sha256": "f2f67cc5488fa146eb2e13c9626f18c1a5accee7fea56fa9e52e135b6f20c266"
+      },
+      {
+        "path": "assets/ui/icons/TechHospital.png",
+        "sha256": "37fd66855e0b723e3e8df69a13e921356398017ac24761fd4c352b795270cb2e",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/TechLab.png",
+        "sha256": "68ec9b7fe48d39954f8e08c9f4ac75d55e3d4d68c39d51362ba5928deeb99212",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/TechOilDerrick.png",
+        "sha256": "ad80d1d2be637e0a4a810964bedcece0c1cc4234300c4a55294fcb09c4f62902",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/TechRepairDepot.png",
+        "sha256": "a9926348700f38fbd503482a0a839f995e35c0c6267cd025c95a02e6d1eef0dd",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/TeslaCrawlerMk2.png",
+        "sha256": "f98c1fac2099240ec6a16a47775017727311a275abbb535670e462e8237ac717",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/TeslaFenceSegment.png",
+        "sha256": "e840bef87fcf9d4dc717c534e8b8a5d24a6d9585040bd782f9458051105a1546",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/VehicleFactory.png",
+        "sha256": "364fb8dffc97d49a9f260a87208dc9a5594f2f5d7424ab137fcd470200260f2d",
+        "comparison": "identical",
+        "upstream_sha256": "364fb8dffc97d49a9f260a87208dc9a5594f2f5d7424ab137fcd470200260f2d"
+      },
+      {
+        "path": "assets/ui/icons/WeatherControlSpire.png",
+        "sha256": "02bee742b244951dd87321000eff577e8f1e2619c794e7b1b24985fdb04c7345",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/ui/icons/Worker.png",
+        "sha256": "6aa1ff316914e9615206f670e19168553325b87bcff48bb9442423b6154932c9",
+        "comparison": "different",
+        "upstream_sha256": "9e8fe94c5e323cba74cdc8305713101924f2d590e1d4bff22d3e5baf691719b7"
+      },
+      {
+        "path": "assets/ui/icons/RosterPreview.png",
+        "sha256": "5f0c8928f2e4242c7107a5fc9077e9849d7f0cbb049e3504a0b58f705a1d117b",
+        "comparison": "absent_from_upstream",
+        "generated_sheet_copy": {
+          "source_artifact": "assets/ui/icons/generated/imagegen-rts-ra2-inspired-roster-20260616-01/preview-72-on-dark.png",
+          "timestamp": "2026-06-16T19:23:53.172Z",
+          "record_line": 78139,
+          "command_sha256": "fab25e1d8279bd1cb54ad1c6f248f2e325dbd78df523ca96ee901f01cb831cda"
+        }
+      }
+    ]
+  },
+  "derived_source_refresh_history": {
+    "scope": "Historical metadata hashes before reconciliation",
+    "records": [
+      {
+        "path": "assets/data/godot_model_map.model_map.ron",
+        "sha256": "e1674c86f38d6c358ab768581b6280df02ab14344f5c9ec834ac539a93dc0e3c",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/migration/asset_manifest.json",
+        "sha256": "ce0936081e3dbcb96e9a3891f627151695505b2666538d84b98543de35aedc02",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/migration/gameplay_registry.json",
+        "sha256": "13cb914a6ea7485ca34dfb179c337aac1723499696ab69c2abca9ecf49a07b82",
+        "comparison": "absent_from_upstream"
+      }
+    ]
   }
 }
