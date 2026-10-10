@@ -1,0 +1,32 @@
+{
+  "scope": "Current diagnostic chain; no disk persistence acceptance",
+  "capture_sha256": "dbcfc45d993f72e22dabfea5fe4c8f0cd5ebdca2bfa8438ab568d809321ff132",
+  "second_mission": {
+    "completed_prefix": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ],
+    "visual_result": "Victory: enemy Command Centers destroyed",
+    "visual_time": "06:07",
+    "screenshot": "screenshots/steam-quality/current-campaign-chain-foundation-20261010/1/02_victory.png",
+    "screenshot_sha256": "6c7836bc2a98c9e04884bd50e1398b656275947633d12abe52837da76d8ba0fd"
+  },
+  "third_mission_recovery": {
+    "structure": "AntiAirTurret",
+    "position": [
+      -16,
+      -22
+    ],
+    "target": 463856465780,
+    "new_builder": 3917010173119,
+    "ordinary_right_click_assignment_observed": true,
+    "subsequent_completion_logged": true,
+    "underlying_path_failure_fixed": false,
+    "original_power_failure_reproduced": false
+  },
+  "six_mission_complete": false
+}
