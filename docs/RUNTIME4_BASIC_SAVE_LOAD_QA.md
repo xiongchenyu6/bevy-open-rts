@@ -1,0 +1,9 @@
+# Current 250 Runtime 4 basic Save/Load review
+
+The exact SDK archive ran inside official Steam Linux Runtime 4 with the pinned Ubuntu graphics provider. Normal virtual Wayland keyboard/pointer input entered Skirmish, started the default 32/16 scene, paused with F10, saved with Ctrl+S and loaded with Ctrl+L. A normal window close exited 0. A distinct fresh process entered an ordinary match and loaded the same file with Ctrl+L; its normal close also exited 0. Loading from MainMenu is not claimed: the hotkey is registered only in a live match.
+
+The run took 199.65 seconds within its original 240-second overall deadline. Both actual process exits, nine reviewed screenshots, save-byte equality across two loads, and readonly installation/archive before/after hashes pass. No actors, resources, orders, options or save contents were injected. The source, binary/archive hashes and commands are pinned in [the portable review](qa/current250-runtime4-basic-save-load-review.json). Raw inputs/logs/profile/screenshots remain in `target/current250-steamrt4-save-load-normal-20261010-01`; no source edits or Cargo were used.
+
+This accepts only the basic UI/persistence flow. Actor continuity remains open: the Drone appears near/clipped by the top viewport edge after loading. Readonly source inspection shows saved world translation is passed to `spawn_unit`, which adds authored unit height again, while the restore patch sets yaw without restoring exact translation. The same unchanged file was loaded twice here; accumulation through re-saving was not exercised. A dedicated position regression and product correction are required before full scene continuity acceptance.
+
+Both game logs report unavailable ALSA/Pulse output. This is not audio or mixing acceptance. Performance, broad saves/orders, campaign state and general Runtime 4 release readiness are separate gates.

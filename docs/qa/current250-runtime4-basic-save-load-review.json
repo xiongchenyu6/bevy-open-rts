@@ -1,0 +1,86 @@
+{
+  "scope": "Exact current250 SDK archive in official Runtime4, normal basic UI Save/Load/fresh-process flow; actor continuity NOT accepted",
+  "archive_sha256": "ff2e5fb7b0498b5133ea0ea07acc65fecc107da156c1792bfe9a400d0d331665",
+  "binary_sha256": "5bc8251328780aa0365d9df641137b4e56978eab86cdcad1cd069dc77977c3f7",
+  "overall_budget_seconds": 240,
+  "actual_wall_seconds": 199.6506944639841,
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 2859051,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "index": 2,
+      "pid": 2865394,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "official_runtime_commands": [
+    [
+      "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/steamrt4-runtime-depot-20261010/SteamLinuxRuntime_4/run",
+      "--graphics-provider=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/steam-runtime-ubuntu-graphics-provider-20261010/root",
+      "--filesystem=/tmp/rts-sv250-qcnxycsz",
+      "--filesystem=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current250-steamrt4-save-load-normal-20261010-01",
+      "--filesystem=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-current250-steamrt4-extracted-20261010/bevy-open-rts-linux-x86_64:ro",
+      "--",
+      "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-current250-steamrt4-extracted-20261010/bevy-open-rts-linux-x86_64/launch.sh"
+    ],
+    [
+      "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/steamrt4-runtime-depot-20261010/SteamLinuxRuntime_4/run",
+      "--graphics-provider=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/steam-runtime-ubuntu-graphics-provider-20261010/root",
+      "--filesystem=/tmp/rts-sv250-qcnxycsz",
+      "--filesystem=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current250-steamrt4-save-load-normal-20261010-01",
+      "--filesystem=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-current250-steamrt4-extracted-20261010/bevy-open-rts-linux-x86_64:ro",
+      "--",
+      "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-current250-steamrt4-extracted-20261010/bevy-open-rts-linux-x86_64/launch.sh"
+    ]
+  ],
+  "installation_readonly": true,
+  "installation_file_count": 380,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "fresh_private_profile": true,
+  "save_sha256": "c7be55764e982a21a7b4bfc977b49f9257e59b9efee4a752050a0c5ef5ed58dc",
+  "loads_in_distinct_sessions": [
+    1,
+    2
+  ],
+  "screenshots": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-skirmish-setup": "bca00d708ef4044a8613aca661b98852989a77cb44fb812e7bbdd0357f9e1e72",
+    "02-basic-scene": "b2184d7e09b53f7b79fa47c877388656e858c629850329fa21eb9b2e8fd09b2e",
+    "03-paused": "0b4a9aba007025e2362d92551031a618ec915b724bfafa84085c077a6b7256c8",
+    "04-saved": "cbe4bed5c5e802755bf67c40e6b638b6be77a05b0ce024d94cdf6214902f3c04",
+    "05-loaded": "3b71e74413d5aed5e64fee86e6f1a24aa9ec328fa0a8731632a04e3a1e04ae10",
+    "06-fresh-process-menu": "0655cc14377a8179f1535fc191f31592ba62e8b9166d415db9d4daec7d4b8eaa",
+    "07-fresh-before-load": "07dc26bef03910cf5c79832e1c3815cdbfcb4a6a6454e5515670cfd2c521c21a",
+    "08-fresh-loaded": "df0b817d765e0e73a978ddf2ccbc857b8eba7951a0a81bec5acfb0525772662d"
+  },
+  "all_nine_frames_reviewed": true,
+  "reviewed_visuals": [
+    "English command menu and normal Skirmish setup",
+    "Normal32/16 basic HQ/Workers scene",
+    "F10 tactical pause",
+    "Game saved notification",
+    "Game loaded notification in original and fresh processes"
+  ],
+  "normal_window_close_without_forced_cleanup": true,
+  "audio_limitation": "Both game logs report unavailable ALSA/Pulse output; no audio gate acceptance",
+  "scene_continuity_limitation": {
+    "observed": "Drone moves toward/clips the top viewport edge after both loads; HQ and Workers remain visible. Same saved-file bytes were loaded twice, not resaved.",
+    "source_evidence": [
+      "src/save.rs:172 stores Transform.translation",
+      "src/save.rs:640 passes saved.position to normal spawn_unit",
+      "src/spawn.rs:125 adds authored def.height",
+      "src/save.rs:748 restores yaw but not original translation"
+    ],
+    "mechanism": "Saved world Y is supplied to a spawn path that adds authored height again; exact actor Y continuity requires its own regression/fix. No hidden actor/save contents were inspected in this smoke."
+  },
+  "basic_flow_accepted": true,
+  "actor_continuity_accepted": false,
+  "full_runtime_release_accepted": false,
+  "raw_result_sha256": "9831d54ba6e44006b7e7c9146772a3c5f7c5b58a2e7fd5d2db4897bd83cdf44f"
+}
