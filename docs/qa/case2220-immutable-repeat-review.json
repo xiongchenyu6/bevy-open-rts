@@ -1,0 +1,121 @@
+{
+  "scope": "Exact case2220 immutable old244/current267 audit repeats, original600sim/180wall, Nice10; not whole matrix clearance",
+  "original_scan": "target/current244-all-starts-20261010/2220/status.json",
+  "original_classification": "wall_timeout180.016814 without result",
+  "repeats": [
+    {
+      "scope": "Exact case2220 repeat; wall timeout alone is not gameplay failure evidence",
+      "config": {
+        "map": "big_arena",
+        "factions": [
+          "chaos",
+          "alliance"
+        ],
+        "difficulties": [
+          "normal",
+          "normal"
+        ],
+        "spawn_slots": [
+          4,
+          0
+        ],
+        "max_seconds": 600
+      },
+      "command": [
+        "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/objective-foundation-shared-20261010/skirmish_audit",
+        "big_arena",
+        "chaos",
+        "normal",
+        "4",
+        "alliance",
+        "normal",
+        "0",
+        "600",
+        "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/repeat244-case2220-20261011-01/result.json"
+      ],
+      "binary_sha256": "c4f395dd8853a41da1768c8752e7116159b7ccef3c1be44afe1def300f8616f1",
+      "asset_count": 332,
+      "asset_pin_sha256": "38c639a7a904b5777fa253b2ccd9b8a61a06c8d631bca557ca062f1e8e94d89d",
+      "simulation_limit": 600,
+      "wall_limit": 180,
+      "nice": 10,
+      "trace_enabled": false,
+      "child_pid": 4126878,
+      "actual_exit": 124,
+      "classification": "wall_timeout",
+      "wall_seconds": 180.0167073199991,
+      "result_present": false,
+      "binary_unchanged": true,
+      "assets_unchanged": true,
+      "evidence_directory": "target/repeat244-case2220-20261011-01",
+      "process_result_sha256": "c45112928c11f7dca36981cd60664b54f882a756fb5e8da448842b91f6dd4170"
+    },
+    {
+      "scope": "Exact case2220 repeat; wall timeout alone is not gameplay failure evidence",
+      "config": {
+        "map": "big_arena",
+        "factions": [
+          "chaos",
+          "alliance"
+        ],
+        "difficulties": [
+          "normal",
+          "normal"
+        ],
+        "spawn_slots": [
+          4,
+          0
+        ],
+        "max_seconds": 600
+      },
+      "command": [
+        "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/case1885-movement-shared-20261011/skirmish_audit",
+        "big_arena",
+        "chaos",
+        "normal",
+        "4",
+        "alliance",
+        "normal",
+        "0",
+        "600",
+        "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/repeat267-case2220-20261011-01/result.json"
+      ],
+      "binary_sha256": "3f7994f460e16c4d4d8483e976cc6e71b03688e342030de5f0175717ecb1605f",
+      "asset_count": 332,
+      "asset_pin_sha256": "6fbe1b04909806021007d9122b4a1d82debcc703a5bdf238667e8e5bd3bc6aa2",
+      "simulation_limit": 600,
+      "wall_limit": 180,
+      "nice": 10,
+      "trace_enabled": false,
+      "child_pid": 4139064,
+      "actual_exit": 0,
+      "classification": "terminal",
+      "wall_seconds": 46.77894212899264,
+      "result_present": true,
+      "binary_unchanged": true,
+      "assets_unchanged": true,
+      "evidence_directory": "target/repeat267-case2220-20261011-01",
+      "process_result_sha256": "fab6fdc95437a67690c0b0fc734addc3f3cc2691a22ebc5c62d84bb88ff35956",
+      "simulation_result": {
+        "completed": true,
+        "timeout": false,
+        "clock_seconds": 232.1873016357422,
+        "updates": 6966,
+        "winning_teams": [
+          0
+        ],
+        "starting_resources": {
+          "crystal": 16,
+          "ore": 32
+        }
+      },
+      "result_sha256": "81674691eaad600bc653ef5b2b6a8b6be05a63cb0c1e9dc08bf50410543249b4"
+    }
+  ],
+  "interpretation": "Old244 again reached wall timeout without a simulation outcome. Current267 completed at232.187sim/46.779wall withChaos winner0. Wall timeout is not proof of infinite gameplay, and this comparison does not isolate a causal source change.",
+  "contention": "Root kept GPU idle through the first repeat; root reserved relay06 GPU during current267 repeat. No newcompiler or trace instrumentation in this lane. Existing oldscan1841197 was not stopped.",
+  "limits": [
+    "One exactcase only; old244 sweep retains its original1885 simulation timeout and2220 wall timeout.",
+    "Native debug audit identities differ from optimized SDK player acceptance."
+  ]
+}
