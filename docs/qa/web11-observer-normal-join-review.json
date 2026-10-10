@@ -458,5 +458,8 @@
     "Selected route was host-host, not relay.",
     "Current source predates subsequent saveSchema4 work."
   ],
-  "evidence": "target/web11-physical-observer-online-20261011"
+  "evidence": "target/web11-physical-observer-online-20261011",
+  "supervisor_actual_exit": 124,
+  "supervisor_terminal_source": "journal rts-web11-physical-observer-online-20261011 at03:11:15; absent-unit ExecMainStatus0 is not evidence",
+  "launcher_interpretation": "Existing wrapper did propagate timeout124; no launcher masking defect established."
 }
