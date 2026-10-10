@@ -1,0 +1,13 @@
+{
+  "scope": "Root visually inspected browser CSS repeat preview at250px tiles; no game material acceptance",
+  "preview_source": "art/armor-surface/candidates-v1/tile-review.html",
+  "screenshot_path": "target/armor-tile-review-local-20261010.png",
+  "screenshot_sha256": "c3da373c3d9517b529ad0ef696972e9b9f60f52d6fc0e67e85a2ae2cfb0d8309",
+  "observations": [
+    "Subtle neutral grain remains low contrast at preview size",
+    "No obvious hard horizontal or vertical tile seams in inspected desktop preview"
+  ],
+  "actual_vehicle_material_verified": false,
+  "runtime_integrated": false,
+  "failed_attempt": "Initial localhost8765 URL returned404; retained target/armor-tile-review-20261010.png, valid inspection used local file URL"
+}
