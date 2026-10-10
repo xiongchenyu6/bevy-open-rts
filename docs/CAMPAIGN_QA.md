@@ -310,3 +310,34 @@ build and fresh unchanged-quota M1 observation run are still pending at this
 checkpoint. Neither1920 gameplay PNG dimensions nor the new telemetry fields
 have yet been accepted from an actual run. This change supplies observations;
 it does not accept M1 or the six-mission campaign.
+
+## Native 1080p observation result
+
+The sealed construction/Nav capture `47b3c7188216b90928fcef1d3114d16dfc688e423ba27ebc67ade9ea0267d363`
+ran fresh-profile M1 with the same paid AA quotas in
+`current-campaign-m1-nav-1080/`. All archived PNG headers are1920×1080 and the
+periodic joined order/path/EMP fields are present, with identical campaign/live/
+contact clocks. Root inspected the assault screenshot: it is mainly fog/empty
+space with long order lines, so it is **not accepted as a polished store image**.
+The original images are preserved.
+
+The process exhausted its existing240-round macro budget and exited1 with phase
+**Running**, not HumanDefeat; the failure contact clock is1390.215 seconds and
+own HQ remains20HP. Two Tank entity keys244813132745/2005749724971 have precisely
+unchanged position, Move/Attack orders, goal and next waypoint in224 samples
+from213.517 to1389.682 seconds (1176.166 seconds). The endpoint identifies their
+attack targets as enemy Barracks/VehicleFactory. A read-only endpoint geometry
+replay found no static rejection for their next desired step; the authored
+Crossfire terrain is flat. This does not identify the live movement cause.
+
+The measured endpoint fixture (`movement_endpoint_tests`) rebuilds112 archived
+actor footprints in the real headless schedule with registry-default runtime
+components. Its focused03 result is1 passed/0 failed in0.95 seconds; both Tanks
+advance approximately2.75m in30 ticks. Focused01 typecheck failure and focused02
+HUD fixture panic are retained. The passing fixture rejects the proposed static
+geometry explanation under those defaults; it does not reproduce or fix the
+live stall, or accept paid gameplay.
+
+Additional read-only speed/domain/Chrono and simulation-gating telemetry is
+prepared for the next shared capture. Those runtime fields still await an actual
+run; **M1 and the six-mission same-App campaign remain unaccepted**.

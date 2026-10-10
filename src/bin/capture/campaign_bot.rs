@@ -985,6 +985,10 @@ pub(super) fn log_state(
                 "path_next_index": debug.map(|actor| &actor["path_next"]),
                 "path_next_position": debug.map(|actor| &actor["path_next_position"]),
                 "emp_remaining": debug.map(|actor| &actor["emp_remaining"]),
+                "unit_speed": debug.map(|actor| &actor["unit_speed"]),
+                "movement_domain": debug.map(|actor| &actor["movement_domain"]),
+                "chrono_remaining": debug.map(|actor| &actor["chrono_remaining"]),
+                "chrono_speed_multiplier": debug.map(|actor| &actor["chrono_speed_multiplier"]),
             })
         }).collect();
     let visible_enemy_headquarters: Vec<_> = live["structures"]
@@ -1014,6 +1018,7 @@ pub(super) fn log_state(
         "unit_orders": unit_orders,
         "observation_clocks": {"campaign": state.clock, "live": live["clock"], "contact": contact["clock"]},
         "visible_enemy_headquarters": visible_enemy_headquarters,
+        "movement_gating": contact["movement_gating"],
     });
     writeln!(trace, "{value}").map_err(|error| error.to_string())?;
     trace.flush().map_err(|error| error.to_string())?;

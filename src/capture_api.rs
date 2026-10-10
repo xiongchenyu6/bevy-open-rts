@@ -1384,6 +1384,10 @@ pub fn capture_construction_contact_debug(app: &mut App) -> serde_json::Value {
             "path_next": world.get::<PlannedPath>(entity).map(|path| path.next),
             "path_next_position": world.get::<PlannedPath>(entity).and_then(|path| path.waypoints.get(path.next)).map(|point| point.to_array()),
             "emp_remaining": world.get::<EmpDisabled>(entity).map(|emp| emp.remaining),
+            "unit_speed": unit.map(|unit| unit.speed),
+            "movement_domain": world.get::<MovementDomain>(entity).map(|domain| format!("{domain:?}")),
+            "chrono_remaining": world.get::<ChronoRelay>(entity).map(|chrono| chrono.remaining),
+            "chrono_speed_multiplier": world.get::<ChronoRelay>(entity).map(|chrono| chrono.speed_multiplier),
             "construction_remaining": world.get::<UnderConstruction>(entity).map(|site| site.remaining),
             "queued_count": world.get::<OrderQueue>(entity).map(|queue| queue.orders.len()).unwrap_or(0),
             "queued_construct_targets": world.get::<OrderQueue>(entity).map(|queue| queue.orders.iter().filter_map(|order| {
@@ -1460,6 +1464,11 @@ pub fn capture_construction_contact_debug(app: &mut App) -> serde_json::Value {
     }
     serde_json::json!({ "entities":entities, "contacts":contacts,
         "clock":world.resource::<MatchState>().start_time_sec,
+        "movement_gating": {"delta_secs": world.resource::<Time>().delta_secs(),
+            "app_screen": format!("{:?}", world.resource::<State<AppScreen>>().get()),
+            "menu_visible": world.resource::<MatchMenuState>().visible,
+            "match_running": world.resource::<MatchState>().is_running(),
+            "flow_active": world.resource::<MatchFlow>().is_active()},
         "pending_placement":format!("{:?}", world.resource::<CommandMode>().pending_structure_placement), "grid": {
         "version": grid.version, "origin_x": grid.origin_x, "origin_z": grid.origin_z,
         "width": grid.width, "height": grid.height,

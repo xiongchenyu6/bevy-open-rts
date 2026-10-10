@@ -7372,3 +7372,6 @@ mod emp_task_tests;
 
 #[cfg(test)]
 mod hold_guard_tests;
+
+#[cfg(test)]
+mod movement_endpoint_tests;
