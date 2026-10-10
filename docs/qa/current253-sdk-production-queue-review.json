@@ -1,0 +1,290 @@
+{
+  "scope": "Exact parameterized SDK archive; normal paid three-Infantry Barracks queue across same/freshprocess load; production scope only",
+  "archive_sha256": "2e29876d38ee4db63a8a86de10514b97b5ce47b00808ff979520c781b592c072",
+  "binary_sha256": "a4d386a953a0c1fa69d14cafc21a49415dffc5ba67649e4b88714d73ed8927de",
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 3378215,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "index": 2,
+      "pid": 3381644,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_game_cleanup": false,
+  "wall_seconds": 121.41451845900156,
+  "comparisons": [
+    {
+      "elapsed": 0.2628288269042969,
+      "producer_keys": [
+        73014442417,
+        141733919209
+      ],
+      "queue_entries": 3,
+      "passed": true
+    },
+    {
+      "elapsed": 0.2600898742675781,
+      "producer_keys": [
+        141733919209,
+        12884900398
+      ],
+      "queue_entries": 3,
+      "passed": true
+    }
+  ],
+  "load_byte_checks": [
+    {
+      "session": 1,
+      "before": "d6fcacc3e825121230ec783e8881fd36049f09969dcafb4809b07f08af7805a1",
+      "after": "d6fcacc3e825121230ec783e8881fd36049f09969dcafb4809b07f08af7805a1",
+      "unchanged": true
+    },
+    {
+      "session": 2,
+      "before": "8980ed9484d8982dc5936eec9761409f8caed84ac5f4aa479947e368682b74e0",
+      "after": "8980ed9484d8982dc5936eec9761409f8caed84ac5f4aa479947e368682b74e0",
+      "unchanged": true
+    }
+  ],
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "passed": true,
+  "raw_evidence": "target/sdk253-save-production-queue-20261011-01",
+  "original_wall_limit_seconds": 240,
+  "actual_service": "rts-sdk253-save-production-queue-20261011-01",
+  "result_sha256": "c93cbfa78fba1055c240d3db11b7c15d166eb7546b574efeaa99ffd7c444053f",
+  "snapshots": [
+    {
+      "path": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk253-save-production-queue-20261011-01/01-baseline-paused.ron",
+      "sha256": "72091ae563ba90b8bf33b4a35d43bb8a04eaf160baf48a6e5dccc144667999ba",
+      "ore": 32,
+      "crystal": 16,
+      "jobs": [],
+      "infantry_count": 0
+    },
+    {
+      "path": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk253-save-production-queue-20261011-01/05-buildings-paid.ron",
+      "sha256": "a3e954e478b65a9ee5a56bf033f5077a5a43c2b8e379a79ab486edafe3ee832f",
+      "ore": 26,
+      "crystal": 14,
+      "jobs": [],
+      "infantry_count": 0
+    },
+    {
+      "path": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk253-save-production-queue-20261011-01/07-partial-paid-queue.ron",
+      "sha256": "d6fcacc3e825121230ec783e8881fd36049f09969dcafb4809b07f08af7805a1",
+      "ore": 23,
+      "crystal": 14,
+      "jobs": [
+        {
+          "producer": 73014442417,
+          "producer_id": "Barracks",
+          "id": "LightRifleInfantry",
+          "train": true,
+          "timer": 1.7695283889770508,
+          "origin": [
+            -12.822525978088379,
+            0.0,
+            -20.75538444519043
+          ],
+          "cost": [
+            1,
+            0
+          ]
+        },
+        {
+          "producer": 73014442417,
+          "producer_id": "Barracks",
+          "id": "LightRifleInfantry",
+          "train": true,
+          "timer": 3.0,
+          "origin": [
+            -12.822525978088379,
+            0.0,
+            -20.75538444519043
+          ],
+          "cost": [
+            1,
+            0
+          ]
+        },
+        {
+          "producer": 73014442417,
+          "producer_id": "Barracks",
+          "id": "LightRifleInfantry",
+          "train": true,
+          "timer": 3.0,
+          "origin": [
+            -12.822525978088379,
+            0.0,
+            -20.75538444519043
+          ],
+          "cost": [
+            1,
+            0
+          ]
+        }
+      ],
+      "infantry_count": 0
+    },
+    {
+      "path": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk253-save-production-queue-20261011-01/09-same-process-resaved.ron",
+      "sha256": "8980ed9484d8982dc5936eec9761409f8caed84ac5f4aa479947e368682b74e0",
+      "ore": 23,
+      "crystal": 14,
+      "jobs": [
+        {
+          "producer": 141733919209,
+          "producer_id": "Barracks",
+          "id": "LightRifleInfantry",
+          "train": true,
+          "timer": 1.506698489189148,
+          "origin": [
+            -12.822525978088379,
+            0.0,
+            -20.75538444519043
+          ],
+          "cost": [
+            1,
+            0
+          ]
+        },
+        {
+          "producer": 141733919209,
+          "producer_id": "Barracks",
+          "id": "LightRifleInfantry",
+          "train": true,
+          "timer": 3.0,
+          "origin": [
+            -12.822525978088379,
+            0.0,
+            -20.75538444519043
+          ],
+          "cost": [
+            1,
+            0
+          ]
+        },
+        {
+          "producer": 141733919209,
+          "producer_id": "Barracks",
+          "id": "LightRifleInfantry",
+          "train": true,
+          "timer": 3.0,
+          "origin": [
+            -12.822525978088379,
+            0.0,
+            -20.75538444519043
+          ],
+          "cost": [
+            1,
+            0
+          ]
+        }
+      ],
+      "infantry_count": 0
+    },
+    {
+      "path": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk253-save-production-queue-20261011-01/12-fresh-process-resaved.ron",
+      "sha256": "18bd855e7b7142a982b142233f96ecd7d886f53d74314298c2adf2bc2efa62e7",
+      "ore": 23,
+      "crystal": 14,
+      "jobs": [
+        {
+          "producer": 12884900398,
+          "producer_id": "Barracks",
+          "id": "LightRifleInfantry",
+          "train": true,
+          "timer": 1.2466086149215698,
+          "origin": [
+            -12.822525978088379,
+            0.0,
+            -20.75538444519043
+          ],
+          "cost": [
+            1,
+            0
+          ]
+        },
+        {
+          "producer": 12884900398,
+          "producer_id": "Barracks",
+          "id": "LightRifleInfantry",
+          "train": true,
+          "timer": 3.0,
+          "origin": [
+            -12.822525978088379,
+            0.0,
+            -20.75538444519043
+          ],
+          "cost": [
+            1,
+            0
+          ]
+        },
+        {
+          "producer": 12884900398,
+          "producer_id": "Barracks",
+          "id": "LightRifleInfantry",
+          "train": true,
+          "timer": 3.0,
+          "origin": [
+            -12.822525978088379,
+            0.0,
+            -20.75538444519043
+          ],
+          "cost": [
+            1,
+            0
+          ]
+        }
+      ],
+      "infantry_count": 0
+    },
+    {
+      "path": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk253-save-production-queue-20261011-01/13-three-paid-infantry-completed.ron",
+      "sha256": "b6ddfe9705ebd6a798f7815db8625b577b7d5794a93039c9be6690d342c4ffe4",
+      "ore": 23,
+      "crystal": 14,
+      "jobs": [],
+      "infantry_count": 3
+    }
+  ],
+  "screenshots": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-baseline-paused": "2a6b7300c17f7efb82b817e73a579c29fb091a0e4e41af9ec31231500dd194fe",
+    "02-power-preview": "6795057d9f8a09460d158b93c61e4be9f7586d3be381fc6bb663c98da8a3b54c",
+    "03-power-completed": "17a31959f55540392865c245fb0e827aa45971ab05699c8d3d453385eb658be2",
+    "04-barracks-preview": "c2e048f3ddfb1a33bf4f5ed65c545a7c54468ccd9d40df9e9c2f95d7a85e241d",
+    "05-buildings-paid": "cb96f3f34494abc21167cc65c768292d5ab3f1abddb5f1c13f065811fd920828",
+    "06-infantry-card-tooltip": "e54287e2c8b4cce54e17d455ca086e9a22b84b9aea83d91f0fbf7ffedff0dd02",
+    "07-partial-paid-queue": "acac9d156fb4728bc0cc7055c3e501fd0e8583942af66b1d115d76f941777c03",
+    "08-same-process-loaded": "89c5cd802ae3fc40ec0fc317ac2495d3c6659434fb1552bb24a88c63334842e2",
+    "09-same-process-resaved": "446977415d8d9579832e3e1920505650d56d1f5339bbcfdca673acab843cddbe",
+    "10-fresh-menu": "15860bb9448d5b178b611aa9e69455ac17b87b0a6417061cabfeba4b7acf20ef",
+    "11-fresh-process-loaded": "ab59b0f57dc04583103b8b4680f5ad20ca0a35986a5d52c734f803c7732d29b9",
+    "12-fresh-process-resaved": "a508e602b7049ddabca3b392a48710340ef5d42a979ab0f3cac4c19501dc5180",
+    "13-three-paid-infantry-completed": "e7254e3a15e7edbec10ba8fcec6ee402544285dd82c805f86acd15952a2f8613"
+  },
+  "independent_root_review": {
+    "service_exit": 0,
+    "all14_image_hashes_match": true,
+    "directly_reviewed": [
+      "08-same-process-loaded.png",
+      "13-three-paid-infantry-completed.png"
+    ],
+    "budget_and_queue_counts_checked": true,
+    "source": "Parent independent review, 2026-10-11"
+  },
+  "limits": [
+    "Three Light Rifle Infantry jobs at one real paid Barracks only",
+    "No rally endpoint, other producers/types, audio, full save-state or whole release acceptance",
+    "Synthetic reader fixtures are not gameplay evidence"
+  ]
+}
