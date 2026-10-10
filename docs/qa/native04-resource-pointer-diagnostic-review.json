@@ -1,0 +1,1411 @@
+{
+  "scope": "Sealed native04 DEBUG main, Nix runtime, normal offline UI pointer diagnostic only; not optimized SDK or resource continuity acceptance",
+  "binary_sha256": "5bc4d7e3549e2b12fd0ea1417c3a859cd9843af6e69f3ea9f99ce4b1dc5e42cb",
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 3654479,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_game_cleanup": false,
+  "wall_seconds": 48.11112840397982,
+  "installation_unchanged": true,
+  "artifact_pin_unchanged": true,
+  "pinned_332_assets_unchanged": true,
+  "raw_evidence": "target/native04-resource-pointer-diagnostic-20261011-01",
+  "original_wall_limit_seconds": 240,
+  "diagnostic_recipe_completed": true,
+  "resource_rally_continuity_pass": false,
+  "actual_ui_right_events": [
+    {
+      "cards": [
+        {
+          "action": "SelectIdleWorker",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            953.0,
+            358.0
+          ],
+          "physical_max": [
+            994.0,
+            390.0
+          ],
+          "physical_min": [
+            912.0,
+            326.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 0
+        },
+        {
+          "action": "Patrol",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1043.0,
+            358.0
+          ],
+          "physical_max": [
+            1084.0,
+            390.0
+          ],
+          "physical_min": [
+            1002.0,
+            326.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 1
+        },
+        {
+          "action": "ScatterSelected",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1133.0,
+            358.0
+          ],
+          "physical_max": [
+            1174.0,
+            390.0
+          ],
+          "physical_min": [
+            1092.0,
+            326.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 2
+        },
+        {
+          "action": "StopSelected",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1223.0,
+            358.0
+          ],
+          "physical_max": [
+            1264.0,
+            390.0
+          ],
+          "physical_min": [
+            1182.0,
+            326.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 3
+        },
+        {
+          "action": "SelectBuildTab(Production)",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            953.0,
+            430.0
+          ],
+          "physical_max": [
+            994.0,
+            462.0
+          ],
+          "physical_min": [
+            912.0,
+            398.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 4
+        },
+        {
+          "action": "SelectBuildTab(Defense)",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1043.0,
+            430.0
+          ],
+          "physical_max": [
+            1084.0,
+            462.0
+          ],
+          "physical_min": [
+            1002.0,
+            398.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 5
+        },
+        {
+          "action": "Build(\"PowerReactor\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1133.0,
+            430.0
+          ],
+          "physical_max": [
+            1174.0,
+            462.0
+          ],
+          "physical_min": [
+            1092.0,
+            398.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 6
+        },
+        {
+          "action": "Build(\"Refinery\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1223.0,
+            430.0
+          ],
+          "physical_max": [
+            1264.0,
+            462.0
+          ],
+          "physical_min": [
+            1182.0,
+            398.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 7
+        },
+        {
+          "action": "Build(\"Barracks\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            953.0,
+            502.0
+          ],
+          "physical_max": [
+            994.0,
+            534.0
+          ],
+          "physical_min": [
+            912.0,
+            470.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 8
+        },
+        {
+          "action": "Build(\"RepairPad\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1043.0,
+            502.0
+          ],
+          "physical_max": [
+            1084.0,
+            534.0
+          ],
+          "physical_min": [
+            1002.0,
+            470.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 9
+        },
+        {
+          "action": "Build(\"RadarUplink\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1133.0,
+            502.0
+          ],
+          "physical_max": [
+            1174.0,
+            534.0
+          ],
+          "physical_min": [
+            1092.0,
+            470.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 10
+        },
+        {
+          "action": "Build(\"VehicleFactory\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1223.0,
+            502.0
+          ],
+          "physical_max": [
+            1264.0,
+            534.0
+          ],
+          "physical_min": [
+            1182.0,
+            470.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 11
+        },
+        {
+          "action": "Build(\"OrePurifier\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            953.0,
+            574.0
+          ],
+          "physical_max": [
+            994.0,
+            606.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 12
+        },
+        {
+          "action": "Build(\"AdvancedReactorPlant\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1043.0,
+            574.0
+          ],
+          "physical_max": [
+            1084.0,
+            606.0
+          ],
+          "physical_min": [
+            1002.0,
+            542.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 13
+        },
+        {
+          "action": "Build(\"TechLab\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1133.0,
+            574.0
+          ],
+          "physical_max": [
+            1174.0,
+            606.0
+          ],
+          "physical_min": [
+            1092.0,
+            542.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 14
+        },
+        {
+          "action": "Build(\"AircraftFactory\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1223.0,
+            574.0
+          ],
+          "physical_max": [
+            1264.0,
+            606.0
+          ],
+          "physical_min": [
+            1182.0,
+            542.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 15
+        },
+        {
+          "action": "Build(\"RoboticsBay\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1043.0,
+            646.0
+          ],
+          "physical_max": [
+            1084.0,
+            678.0
+          ],
+          "physical_min": [
+            1002.0,
+            614.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 16
+        },
+        {
+          "action": "Build(\"WeatherControlSpire\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1133.0,
+            646.0
+          ],
+          "physical_max": [
+            1174.0,
+            678.0
+          ],
+          "physical_min": [
+            1092.0,
+            614.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 17
+        },
+        {
+          "action": "Build(\"CommandCenter\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1223.0,
+            646.0
+          ],
+          "physical_max": [
+            1264.0,
+            678.0
+          ],
+          "physical_min": [
+            1182.0,
+            614.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 18
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            326.0
+          ],
+          "physical_max": [
+            912.0,
+            326.0
+          ],
+          "physical_min": [
+            912.0,
+            326.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 19
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            326.0
+          ],
+          "physical_max": [
+            912.0,
+            326.0
+          ],
+          "physical_min": [
+            912.0,
+            326.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 20
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            326.0
+          ],
+          "physical_max": [
+            912.0,
+            326.0
+          ],
+          "physical_min": [
+            912.0,
+            326.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 21
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            326.0
+          ],
+          "physical_max": [
+            912.0,
+            326.0
+          ],
+          "physical_min": [
+            912.0,
+            326.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 22
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            326.0
+          ],
+          "physical_max": [
+            912.0,
+            326.0
+          ],
+          "physical_min": [
+            912.0,
+            326.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 23
+        }
+      ],
+      "cursor_ground": [
+        -16.169567108154297,
+        0.0,
+        -16.042552947998047
+      ],
+      "elapsed": 31.736698150634766,
+      "hud_blocks_cursor": false,
+      "hud_rects": [
+        [
+          [
+            0.0,
+            518.0
+          ],
+          [
+            172.0,
+            690.0
+          ]
+        ],
+        [
+          [
+            910.0,
+            324.0
+          ],
+          [
+            1266.0,
+            680.0
+          ]
+        ],
+        [
+          [
+            196.0,
+            602.0
+          ],
+          [
+            652.0,
+            690.0
+          ]
+        ]
+      ],
+      "left_pressed": false,
+      "left_released": false,
+      "right_pressed": true,
+      "right_released": false,
+      "state": {
+        "pending_placement": null,
+        "selected_owned": [
+          {
+            "local_entity": 8589933888,
+            "network_id": 3,
+            "type": "Worker"
+          }
+        ]
+      },
+      "window": {
+        "browser_dpr": null,
+        "cursor_logical": [
+          556.0,
+          462.0
+        ],
+        "cursor_physical": [
+          556.0,
+          462.0
+        ],
+        "logical_size": [
+          1276.0,
+          690.0
+        ],
+        "physical_size": [
+          1276,
+          690
+        ],
+        "scale_factor": 1.0
+      }
+    },
+    {
+      "cards": [
+        {
+          "action": "SelectIdleWorker",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            953.0,
+            574.0
+          ],
+          "physical_max": [
+            994.0,
+            606.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 0
+        },
+        {
+          "action": "Train(\"Worker\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1043.0,
+            574.0
+          ],
+          "physical_max": [
+            1084.0,
+            606.0
+          ],
+          "physical_min": [
+            1002.0,
+            542.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 1
+        },
+        {
+          "action": "Train(\"EngineerDrone\")",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1133.0,
+            574.0
+          ],
+          "physical_max": [
+            1174.0,
+            606.0
+          ],
+          "physical_min": [
+            1092.0,
+            542.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 2
+        },
+        {
+          "action": "SetRallyPoint",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1223.0,
+            574.0
+          ],
+          "physical_max": [
+            1264.0,
+            606.0
+          ],
+          "physical_min": [
+            1182.0,
+            542.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 3
+        },
+        {
+          "action": "AttackMove",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1133.0,
+            646.0
+          ],
+          "physical_max": [
+            1174.0,
+            678.0
+          ],
+          "physical_min": [
+            1092.0,
+            614.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 4
+        },
+        {
+          "action": "SellStructure",
+          "contains_physical_cursor": false,
+          "display": "Flex",
+          "enabled": true,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            1223.0,
+            646.0
+          ],
+          "physical_max": [
+            1264.0,
+            678.0
+          ],
+          "physical_min": [
+            1182.0,
+            614.0
+          ],
+          "physical_size": [
+            82.0,
+            64.0
+          ],
+          "slot": 5
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 6
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 7
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 8
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 9
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 10
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 11
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 12
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 13
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 14
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 15
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 16
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 17
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 18
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 19
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 20
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 21
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 22
+        },
+        {
+          "action": "None",
+          "contains_physical_cursor": false,
+          "display": "None",
+          "enabled": false,
+          "inherited_visible": true,
+          "interaction": "None",
+          "physical_center": [
+            912.0,
+            542.0
+          ],
+          "physical_max": [
+            912.0,
+            542.0
+          ],
+          "physical_min": [
+            912.0,
+            542.0
+          ],
+          "physical_size": [
+            0.0,
+            0.0
+          ],
+          "slot": 23
+        }
+      ],
+      "cursor_ground": [
+        -16.169567108154297,
+        0.0,
+        -16.042552947998047
+      ],
+      "elapsed": 32.477237701416016,
+      "hud_blocks_cursor": false,
+      "hud_rects": [
+        [
+          [
+            0.0,
+            518.0
+          ],
+          [
+            172.0,
+            690.0
+          ]
+        ],
+        [
+          [
+            910.0,
+            540.0
+          ],
+          [
+            1266.0,
+            680.0
+          ]
+        ],
+        [
+          [
+            196.0,
+            602.0
+          ],
+          [
+            652.0,
+            690.0
+          ]
+        ]
+      ],
+      "left_pressed": false,
+      "left_released": false,
+      "right_pressed": true,
+      "right_released": false,
+      "state": {
+        "pending_placement": null,
+        "selected_owned": [
+          {
+            "local_entity": 8589933868,
+            "network_id": 1,
+            "type": "CommandCenter"
+          }
+        ]
+      },
+      "window": {
+        "browser_dpr": null,
+        "cursor_logical": [
+          556.0,
+          462.0
+        ],
+        "cursor_physical": [
+          556.0,
+          462.0
+        ],
+        "logical_size": [
+          1276.0,
+          690.0
+        ],
+        "physical_size": [
+          1276,
+          690
+        ],
+        "scale_factor": 1.0
+      }
+    }
+  ],
+  "actual_own_harvest_node": {
+    "key": 8589933916,
+    "kind": 0,
+    "position": [
+      -17.470190048217773,
+      0.0,
+      -9.429200172424316
+    ],
+    "amount": 240
+  },
+  "distance_ground_to_hq_xz": 2.2802381853366858,
+  "distance_ground_to_own_harvest_node_xz": 6.740033751132715,
+  "same_cursor_and_ground_in_this_fixture": true,
+  "evidence_hashes": {
+    "target/native04-resource-pointer-diagnostic-20261011-01/result.json": "3dd0148e067eb22c2e49afd96f9c84781a2249c1a5129de1f18e620035a6198e",
+    "target/native04-resource-pointer-diagnostic-20261011-01/online-observer.json": "acd83ee01fabd78e7e4168e7f8c017cda4e95c16666ae7da53d76c7bb15eba13",
+    "target/native04-resource-pointer-diagnostic-20261011-01/pointer-readonly-analysis.json": "5af0df79c44e3203fa1ddae674e26c9ccab992e95cdd936cfddc9d5019413afc"
+  },
+  "screenshots": {
+    "00-native-main-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-paused-baseline": "076884b351bd1e73641c8aed4338380d157b9739a266d364593e55f612286504",
+    "02-worker-selected-normal-zoom": "e7ac9f9d018580747225b959b6006618de10a2de2cc49419531b43795c72e3db",
+    "03-worker-rightclick": "d45fb9ab9a81248f6e0da2a21e67a6c57f92726cdf7a34919142001ee1f8146d",
+    "04-hq-selected-before-same-point": "1d731271c80fbcef1c4b6a3a0094201e985bbd843a90c1c55cd00cb98fe51c30",
+    "05-hq-rightclick-same-point": "e3d1e3f30bf9cde7129c2514a39c9029de8282665ebbaa770ea3be2ed7e9449f"
+  },
+  "limits": [
+    "No runtime resource mesh bounds or projected ground/body anchors were captured by this observer",
+    "Resource visibility state at pick was not captured; actual visual identity and capsule calibration remain open",
+    "SDK03 stale-pointer hypothesis not directly measured by this different debug artifact",
+    "Normal native DEBUG/Nix fixture only; SDK258 and final package behavior remain separate",
+    "No resource visibility/mesh/projected-anchor observation, so model calibration and actual body identity are unverified",
+    "No rally/height/radius product changes claimed"
+  ]
+}
