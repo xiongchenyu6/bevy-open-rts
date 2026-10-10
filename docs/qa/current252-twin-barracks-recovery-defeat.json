@@ -1,0 +1,42 @@
+{
+  "scope": "Failed standalone normal paid Barracks recovery diagnostic; not same-App six-mission acceptance",
+  "process": {
+    "actual_exit": 1,
+    "wall_seconds": 127.9320546980016,
+    "binary_sha256": "73d8b198503297f4c22f664202af84d9451c8d71005e33baa76c917f86e790cb",
+    "scope": "Mission5 first lost Barracks normal paid rear recovery diagnostic from legitimate scenario setup; not six-mission chain proof",
+    "profile": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current252-twin-barracks-recovery-profile-20261011"
+  },
+  "paid_recovery_placement_clock": 102.03211975097656,
+  "final_clock": 104.49874877929688,
+  "final_phase": "HumanDefeat",
+  "final_types": {
+    "Drone": 1,
+    "HeavyMachinegunTrooper": 2,
+    "RocketInfantry": 3,
+    "Tank": 4
+  },
+  "unfinished_barracks_at_defeat": [
+    {
+      "completed": false,
+      "hp": 6.519994735717773,
+      "id": "Barracks",
+      "max": 13.0,
+      "position": [
+        -28.999998092651367,
+        0.0,
+        -33.0
+      ]
+    }
+  ],
+  "foundation_placed_but_completion_not_verified": true,
+  "passed": false,
+  "root_failure_frame_directly_reviewed": true,
+  "evidence_directory": "screenshots/steam-quality/current252-twin-barracks-recovery-20261011",
+  "evidence_sha256": {
+    "runtime.log": "cd87ce5eefb2486026cf29af0ecbd720f4c2e4b52acb2697e41140f1273f4a90",
+    "telemetry.jsonl": "ac527cf5d062dfa50c625adb9cd35fa45c041730171e36befb35a38dce615996",
+    "failure.png": "cf5e97771988735a4476743808aba93e5ae7b22868bbf22be59bb75884c199cc",
+    "process-result.json": "37a5909f8adcb444d9c58749563e2e6d2ce37e772a7534fc64be0cab97f7435a"
+  }
+}
