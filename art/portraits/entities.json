@@ -2,9 +2,9 @@
   "schema": 1,
   "scope": "Source-only export inventory; no images generated or replaced",
   "source_sha256": {
-    "src/generated_registry.rs": "3ed3f3401b9b629020037ab65d09c0ea6b6ff62ee6e3c9261784ab7fe58a125e",
-    "assets/data/godot_model_map.model_map.ron": "e1674c86f38d6c358ab768581b6280df02ab14344f5c9ec834ac539a93dc0e3c",
-    "src/capture_api/portrait_export.rs": "89e4dd7c2448e16bd4838e32f470c21e28f1c96171ff70979bf325e4426717d6"
+    "src/generated_registry.rs": "e1344b1450c7dc32e3deac3b21a14d4304e63405cae51856ad4c6521b3d8452c",
+    "assets/data/godot_model_map.model_map.ron": "2f0745a56bd0566e98209ba3040943ada3015570c53b86dfe4bf7ce3ad0a4c77",
+    "src/capture_api/portrait_export.rs": "19c16a6aeff9c78e2e906d94f1786152bf6593371b6475bd0ddfdac7e05b4989"
   },
   "registry_icon_count": 70,
   "unresolved_count": 62,

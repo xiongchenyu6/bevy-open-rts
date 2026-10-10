@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "runtime_path": "ui/icons/RosterPreview.png",
+  "scope": "Original asset-only battle-group composition from actual current game models; no gameplay acceptance",
+  "size": [512, 512],
+  "members": [
+    {"entity_id": "Tank", "faction": "alliance", "ground_position": [0.0, 1.0]},
+    {"entity_id": "FlameAssaultBuggy", "faction": "demon", "ground_position": [-2.3, -1.2]},
+    {"entity_id": "TeslaCrawlerMk2", "faction": "chaos", "ground_position": [2.3, -1.2]},
+    {"entity_id": "LightRifleInfantry", "faction": "alliance", "ground_position": [-0.8, 3.1]},
+    {"entity_id": "ShieldTrooper", "faction": "chaos", "ground_position": [0.8, 3.1]},
+    {"entity_id": "Drone", "faction": "chaos", "ground_position": [0.0, -3.4]}
+  ],
+  "constraints": {
+    "legacy_png_input": false,
+    "preserve_game_model_scales": true,
+    "contextual_markers_excluded": true,
+    "independent_runs": 2,
+    "transparent_rgba": true,
+    "paid_gameplay_verified": false,
+    "runtime_replaced": false
+  }
+}

@@ -13,7 +13,7 @@ use crate::*;
 #[cfg(not(target_arch = "wasm32"))]
 mod portrait_export;
 #[cfg(not(target_arch = "wasm32"))]
-pub use portrait_export::export_portrait_stage;
+pub use portrait_export::{export_portrait_stage, export_roster_stage};
 
 #[cfg(not(target_arch = "wasm32"))]
 mod semantic_ui;

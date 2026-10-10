@@ -5,6 +5,9 @@ use bevy::render::view::screenshot::{Screenshot, ScreenshotCaptured};
 use bevy::world_serialization::{WorldInstance, WorldInstanceSpawner};
 use std::{path::Path, time::Duration};
 
+mod roster_export;
+pub use roster_export::export_roster_stage;
+
 #[derive(Resource, Default)]
 struct PortraitReadback {
     path: std::path::PathBuf,
