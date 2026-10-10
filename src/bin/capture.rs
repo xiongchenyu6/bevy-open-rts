@@ -286,7 +286,19 @@ fn main() {
                 .next()
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("screenshots/menu/menu.png"));
-            render_menu_at(&path, WIDTH, HEIGHT)
+            let width = args
+                .next()
+                .and_then(|value| value.parse().ok())
+                .unwrap_or(WIDTH);
+            let height = args
+                .next()
+                .and_then(|value| value.parse().ok())
+                .unwrap_or(HEIGHT);
+            if width == 0 || height == 0 {
+                Err("menu dimensions must be positive".into())
+            } else {
+                render_menu_at(&path, width, height)
+            }
         }
         Some("menu-wide") => {
             let path = args
