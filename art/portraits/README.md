@@ -35,3 +35,14 @@ correspondence, not permission to replace the actual assembled rendering path.
 This inventory neither reads legacy PNGs as render inputs nor generates or
 replaces any image. Initial complete exports and visual review are recorded. Corrected-model
 exports, paid in-game comparisons and runtime integration remain pending.
+
+## Model-only reference scope
+
+Contextual faction ground indicators are tagged separately from registered GLB
+and authored procedural geometry. The exporter hides only those tagged
+indicators; the independent full-game asset reference compares the same model
+meshes and materials. Runtime indicators remain visible in ordinary gameplay.
+Manifests explicitly record model-only parity and the excluded indicator count.
+The checker rejects older marker-inclusive scope; a new complete70-entity
+render and visual review are required before runtime integration. The marker
+regression and new render remain pending native validation.
