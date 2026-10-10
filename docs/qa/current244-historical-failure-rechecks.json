@@ -1,0 +1,100 @@
+{
+  "passed": true,
+  "binary_sha256": "c4f395dd8853a41da1768c8752e7116159b7ccef3c1be44afe1def300f8616f1",
+  "normal_resources": {
+    "ore": 32,
+    "crystal": 16
+  },
+  "simulation_limit": 600,
+  "wall_limit": 180,
+  "isolated_asset_count": 332,
+  "results": [
+    {
+      "case": "0101",
+      "outcome": [
+        0
+      ],
+      "simulation_seconds": 99.69882202148438,
+      "wall_seconds": 14.598549862974323,
+      "actual_exit": 0
+    },
+    {
+      "case": "0199",
+      "outcome": [
+        0
+      ],
+      "simulation_seconds": 176.1753387451172,
+      "wall_seconds": 18.159209735982586,
+      "actual_exit": 0
+    },
+    {
+      "case": "0238",
+      "outcome": [
+        0
+      ],
+      "simulation_seconds": 220.2514190673828,
+      "wall_seconds": 21.515592687006574,
+      "actual_exit": 0
+    },
+    {
+      "case": "0366",
+      "outcome": [
+        1
+      ],
+      "simulation_seconds": 198.41342163085938,
+      "wall_seconds": 22.867267825000454,
+      "actual_exit": 0
+    },
+    {
+      "case": "0387",
+      "outcome": [
+        1
+      ],
+      "simulation_seconds": 153.33712768554688,
+      "wall_seconds": 16.90115169598721,
+      "actual_exit": 0
+    },
+    {
+      "case": "0400",
+      "outcome": [
+        0
+      ],
+      "simulation_seconds": 223.21871948242188,
+      "wall_seconds": 22.164904448000016,
+      "actual_exit": 0
+    },
+    {
+      "case": "0012",
+      "outcome": [
+        0
+      ],
+      "simulation_seconds": 74.19921112060547,
+      "wall_seconds": 8.233797125983983,
+      "actual_exit": 0
+    },
+    {
+      "case": "0684",
+      "outcome": [
+        1
+      ],
+      "simulation_seconds": 187.34439086914062,
+      "wall_seconds": 22.370217354997294,
+      "actual_exit": 0
+    },
+    {
+      "case": "0939",
+      "outcome": [
+        1
+      ],
+      "simulation_seconds": 238.9220733642578,
+      "wall_seconds": 73.58691316697514,
+      "actual_exit": 0
+    }
+  ],
+  "validation_errors": [],
+  "asset_errors": [],
+  "scope": "Nine preserved historical failures on current244 native binary; does not prove full matrix, independent seeds, performance or final packages",
+  "evidence_directory": "target/current244-failed-rechecks-20261010",
+  "full_matrix_service": "rts-current244-all-starts-20261010.service",
+  "full_matrix_complete": false
+}

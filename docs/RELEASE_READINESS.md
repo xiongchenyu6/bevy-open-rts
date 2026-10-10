@@ -72,6 +72,16 @@ passed bounded rechecks; these do not prove the full map matrix. Natural audio
 output/selection-ack ASR remain bounded; full events, mix and human listening
 are still open. All nine release gates remain in scope.
 
+Current244 native regression tests pass244/0 with1 ignored, and all four native
+programs build with unchanged source/assets. Nine preserved historical timeout
+cases pass fresh current-binary rechecks at normal32/16 and600s simulation/180s
+wall limits (`docs/qa/current244-historical-failure-rechecks.json`). Case0939
+finishes at238.922s. A new isolated3,726-case current-binary sweep is running;
+no whole-matrix result is claimed. The current campaign diagnostic has cleared
+Mission1 and is running Mission2; its launch omitted the profile opt-in, so it
+cannot prove disk persistence. Native frames verify the corrected Mission2
+headquarters objective and hidden objective text on Mission1 results.
+
 ## Verification policy
 
 Use the shared game scene and real input for player-flow acceptance. Inspect
