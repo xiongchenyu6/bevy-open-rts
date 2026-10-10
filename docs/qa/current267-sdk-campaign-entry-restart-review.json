@@ -1,0 +1,73 @@
+{
+  "scope": "Exact parameterized future SDK archive inside official Runtime4; normalMainCampaign/lockedcard/back/firstmission briefing+Enter+F10/CtrlS configuration only; no fullcampaign or fight claim",
+  "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+  "binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 1573,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "wall_seconds": 82.81993241398595,
+  "mission_observations": {
+    "schema": 4,
+    "mission_id": "hold_the_line",
+    "map_path": "bevy://maps/CanyonPass",
+    "starting_ore": 48,
+    "starting_crystal": 24,
+    "actual_ore": 48,
+    "actual_crystal": 24,
+    "player_controllers_ron": "[\n            1,\n            2,\n        ]",
+    "player_factions_ron": "[\n            0,\n            1,\n        ]",
+    "clock_sec": 1.667399,
+    "save_sha256": "72ef0f86e5ddb7ead79cf8083d545fb2c5cf00f483b73cf830ff8016e848b66c",
+    "active_teams_ron": "[\n            true,\n            true,\n        ]"
+  },
+  "restart": {
+    "save_sha256": "3558b56106f165fdcfddbbbe0981262619afcb42e278be582981eacca1bbec4b",
+    "clock": 0.40680763,
+    "bank": [
+      48,
+      24
+    ],
+    "mission_triggers_ron": "[\n        false,\n        false,\n        false,\n        false,\n        false,\n    ]",
+    "normal_input": true,
+    "review": {
+      "reviewed_image_sha256": "3391ae5e39dd8ae07bd0dd838743ca5de66ca56ec72c8ff7fabf4bdbb3d7154d",
+      "restart_point": [
+        640,
+        552
+      ],
+      "reviewer": "Root direct view actual native frame: Restart Match visible at640,552; original48/24 and Mission1 Hold the Line visible"
+    }
+  },
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "00-normal-main-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-normal-campaign-map": "e9d8a913cb2efed8e93cbb7068d1817f849da3d0fe9e2d2213bb96722f482346",
+    "02-locked-second-card": "fa2244ee0d0ec2db8ef28e95532897543e7ffa3e5d58a57a00aed9d5404e4781",
+    "03-normal-back-main-menu": "e592bc0a562bc6a3f1e28861ba2be1edc252374698a4f229eb4dbac5ea6a430c",
+    "04-real-mission-briefing": "550a6aa365a1cb020a3728ceb5e752c4fab50605f284f03f86e3512376931efc",
+    "05-enter-dismissed-briefing": "bd718665a8a636c0004a2b96c765dd72624b18f83a114131f7bddc5b9b3de520",
+    "06-tactical-pause": "fed2b6fb14f1864f921d3feed02dd05d296d5a68e827199df8982b9108729b53",
+    "07-actual-mission-save": "f6efccfe3b27e1a893c03ec2882d7b7a2383ac88b6225d2d8ede19c6a5fd6a3d",
+    "08-normal-pause-restart-menu": "3391ae5e39dd8ae07bd0dd838743ca5de66ca56ec72c8ff7fabf4bdbb3d7154d",
+    "09-normal-restarted-briefing": "28f4864552d8c08bcda67274cbedbc481d4eec2acd721e68c57e8ddeeaf30f07",
+    "10-real-restarted-mission": "856464df2b616e57eeeecda622c930245f4a68c460c68225f9f81858572cd9d1"
+  },
+  "evidence_directory": "target/sdk267-campaign-entry-restart-20261011-01",
+  "result_sha256": "82d19f1e586615011a5e4d057e63112e98ed32b96359c807ddb26fdb44a5aee5",
+  "original_wall_limit_seconds": 240,
+  "locked_second_card_no_match_or_save": true,
+  "agent_actual_restart_menu_and_reset_frames_reviewed": true,
+  "root_current_restart_button_review": true,
+  "passed": true,
+  "limitations": [
+    "Inherited05-enter-dismissed-briefing filename does not prove dismissal: fullyrevealed briefing remains visible behind08pause. Entry and Restart are verified; dismissal notclaimed.",
+    "NormalRestart validates initial mission identity/setup/clock/bank/roster/triggers, not naturaldefeat Retry or sixmission progression.",
+    "No directmission setter, campaignsave editing, actor/resource/fog/time grants."
+  ]
+}
