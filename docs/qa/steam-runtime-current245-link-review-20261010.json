@@ -1,0 +1,56 @@
+{
+  "scope": "Exact245 packaged executable dynamic link resolution inside installed historical Sniper; no rendering/gameplay acceptance",
+  "actual_exit": 0,
+  "installed_runtime": "Sniper 0.20240916.101795",
+  "archive_sha256": "481640cc032ea07e996e64fbfd7f9fc6e56565d243705117998972e4ba2fffc0",
+  "log_sha256": "4fda69f974090ca09b26a23c6ed2365e38a58587ba09bd1a7ef7ccbe0a9c9063",
+  "resolved_packaged_libraries": [
+    {
+      "soname": "libwayland-client.so.0",
+      "packaged_file": "libwayland-client.so.0",
+      "sha256": "e9e4101aa9807041494e8621ee6e4fa034efc4d6a5fe8c9c9461b56e6eb7bd73"
+    },
+    {
+      "soname": "libm.so.6",
+      "packaged_file": "libm.so.6",
+      "sha256": "ef275e83bcd0940743c2cbd35b1a1d52218e052bfaccdd1ee9e7903ee98c7817"
+    },
+    {
+      "soname": "libasound.so.2",
+      "packaged_file": "libasound.so.2",
+      "sha256": "bdf0f9e487cce8f8dcee83b4f4567cf3c86b0f56629f32108c88e2fc37076269"
+    },
+    {
+      "soname": "libgcc_s.so.1",
+      "packaged_file": "libgcc_s.so.1",
+      "sha256": "dbb5d88cd5a3096a2bee9d3bba755c2176f0fda202174b649fa0ccdffb7d6f0c"
+    },
+    {
+      "soname": "libc.so.6",
+      "packaged_file": "libc.so.6",
+      "sha256": "c33840084962357ce6e5181019824d6b81588fbab2fa083494f0ef498c9fed68"
+    },
+    {
+      "soname": "/lib64/ld-linux-x86-64.so.2",
+      "packaged_file": "ld-linux-x86-64.so.2",
+      "sha256": "e2e9975273f65f7cb730f4fcc8a9a5aae62763b6263de877a8b896311819d7b6"
+    },
+    {
+      "soname": "libffi.so.8",
+      "packaged_file": "libffi.so.8",
+      "sha256": "7625384b98dea59012fd03eb7d1b82be690bdacee546a70dabd8b2238a88df09"
+    },
+    {
+      "soname": "libpthread.so.0",
+      "packaged_file": "libpthread.so.0",
+      "sha256": "43efe71fe0424f58c14d34aca6adb6b0518300e28f280c9beb1019924eeffefb"
+    },
+    {
+      "soname": "librt.so.1",
+      "packaged_file": "librt.so.1",
+      "sha256": "fa1f92682c68f368c044bcf1c48e0de7435c703f49d3ea761eeba485e4ad6734"
+    }
+  ],
+  "graphics_import_disabled": true,
+  "full_runtime_gate_complete": false
+}
