@@ -1166,7 +1166,7 @@ pub(super) fn run(
             train_to_count(app, &mut watch, "Barracks", "RocketInfantry", 3)?;
             refresh_groups(app)?;
             watch.checkpoint(app, "early-air-defense-ready")?;
-            if index == 1 || capture_campaign_state(app).low_power {
+            if matches!(index, 1 | 2) || capture_campaign_state(app).low_power {
                 build(app, &mut watch, "PowerReactor")?;
             }
             build(app, &mut watch, "AntiGroundTurret")?;
@@ -1269,7 +1269,8 @@ pub(super) fn run(
                 if launched { "assault" } else { "regroup" },
             )?;
             last_hq_health = hq.health;
-            if state.low_power && round % 12 == 0 {
+            let power_budget = capture_player_resources(app);
+            if state.low_power && round % 12 == 0 && power_budget.0 >= 3 && power_budget.1 >= 1 {
                 build(app, &mut watch, "PowerReactor")?;
             }
             watch.advance(app, 150);

@@ -1,0 +1,73 @@
+{
+  "scope": "Same-App normal-input campaign candidate: four verified disk prefixes, Mission5 actual defeat; not six-mission completion",
+  "capture_sha256": "6e896d4faf7ba6f3247431be9a9d85ac9d50a997cc377231f690ec93468c670e",
+  "process": {
+    "exit_code": 1,
+    "same_application": true,
+    "all_six_disk_prefixes_verified": false,
+    "accepted": false,
+    "errors": []
+  },
+  "prefixes": [
+    {
+      "index": 0,
+      "completed": [
+        "hold_the_line"
+      ],
+      "profile_sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+      "profile_prefix_verified": true
+    },
+    {
+      "index": 1,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost"
+      ],
+      "profile_sha256": "49a2d1643b35bdc53c65186dff35bb82e29e9c7d92f72d20472cda617e645fc2",
+      "profile_prefix_verified": true
+    },
+    {
+      "index": 2,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost",
+        "canyon_siege"
+      ],
+      "profile_sha256": "1426d6501034241653895738b720208fb07fc93c3f1bcfdcc552ae7bfd1e365f",
+      "profile_prefix_verified": true
+    },
+    {
+      "index": 3,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost",
+        "canyon_siege",
+        "highland_bastion_stand"
+      ],
+      "profile_sha256": "d723d3da24dc005cc7ac9f18e36ae7f8de7a1d73a59065e9c0b450185a8bc559",
+      "profile_prefix_verified": true
+    }
+  ],
+  "mission3_budget_correction_runtime_verified": true,
+  "mission5_terminal": {
+    "clock": 104.46541595458984,
+    "phase": "HumanDefeat",
+    "remaining_types": {
+      "Tank": 1
+    }
+  },
+  "headquarters_capture_observation": [
+    {
+      "entity": 1056561953049,
+      "hp": 16.0,
+      "position": [
+        -26.0,
+        0.0,
+        -26.0
+      ],
+      "visible": true
+    }
+  ],
+  "six_mission_complete": false,
+  "evidence_directory": "screenshots/steam-quality/current247-campaign-power-budget-20261010"
+}

@@ -164,7 +164,8 @@ pub(super) fn run(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Result<(
                     "finale-defend"
                 },
             )?;
-            if round % 12 == 0 && state.low_power && capture_player_resources(app).0 >= 3 {
+            let power_budget = capture_player_resources(app);
+            if round % 12 == 0 && state.low_power && power_budget.0 >= 3 && power_budget.1 >= 1 {
                 build(app, &mut watch, "PowerReactor")?;
             }
             watch.advance(app, 90);
