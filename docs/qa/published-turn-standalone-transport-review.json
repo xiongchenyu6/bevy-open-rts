@@ -1,0 +1,39 @@
+{
+  "scope": "Standalone two-RTC-endpoint forced relay transport; no game UI/signaling/actor workload acceptance",
+  "actual_exit": 0,
+  "wall_seconds": 82.74011419501039,
+  "wall_limit": 240,
+  "policy": "iceTransportPolicy=relay on both actualRTCPeerConnections",
+  "published_provider_origin": "http://localhost:8080",
+  "routes": [
+    {
+      "nominated": true,
+      "local_type": "relay",
+      "remote_type": "relay",
+      "sent": 3820,
+      "received": 3596
+    },
+    {
+      "nominated": true,
+      "local_type": "relay",
+      "remote_type": "relay",
+      "sent": 3596,
+      "received": 3820
+    }
+  ],
+  "messages_received": 16,
+  "acks_received": 16,
+  "candidate_error_codes_retained": [
+    701
+  ],
+  "credential_and_sdp_values_retained": false,
+  "game_turn_gate_closed": false,
+  "eight_peer_gate_closed": false,
+  "reconnect_gate_closed": false,
+  "evidence_sha256": {
+    "target/forced-relay-transport-20261011/supervisor-result.json": "6af95c7dcc461a0cc1f7774990e3505d3deb10d1113dff254e345795e2b40824",
+    "target/forced-relay-transport-20261011/browser/result.json": "6aa150e3d2b86702c3d0a421b5dedbdab1b1a1983e318d545380fdf25fac1473",
+    "target/online-eight-human-prepared-20261011/forced_relay_transport.mjs": "8a5791a4627dc3ec61afbd0d5dbefacdc73e7b972bc9acc22a6a9417bc89dc59",
+    "target/online-eight-human-prepared-20261011/relay-config-explicit-origin-curl.json": "cfa8727afa71170c1dfce8c442a07cf534a1268d539ae97f7e3eb822467f6ea2"
+  }
+}
