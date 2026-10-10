@@ -18,8 +18,14 @@ precise Git commit recorded in the published crate, including ancestor-directory
 licenses where applicable. URLs, commits and hashes remain in
 `target/linux-resolved-dependency-metadata-20261010/`.
 
-Four packages have no matching upstream notice file found: constgebra0.1.4,
-crc-catalog2.5.0, hexf-parse0.2.1 and simd_helpers0.1.0. Their published source
+A subsequent archive-level review finds crc-catalog2.5.0 original licenses
+in its published `LICENSES/` subdirectory, which the top-level filename scan
+missed. Exact MIT/Apache texts and archive/member hashes are preserved in
+`third-party/rust/crc-catalog-2.5.0/`; its archive checksum matches Cargo.lock.
+The older companion and audit counts above are unchanged historical artifacts.
+
+Three packages still have no matching notice file found: constgebra0.1.4,
+hexf-parse0.2.1 and simd_helpers0.1.0. Their published source
 archives and license declarations are retained. Do not invent copyright notices
 or describe generic license terms as retrieved package originals. Complete
 license applicability, attribution and distribution review remains open.

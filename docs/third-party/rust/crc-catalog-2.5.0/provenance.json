@@ -1,0 +1,21 @@
+{
+  "package": "crc-catalog",
+  "version": "2.5.0",
+  "source": "Exact published crate archive; checksum matches Cargo.lock",
+  "crate_sha256": "217698eaf96b4a3f0bc4f3662aaa55bdf913cd54d7204591faa790070c6d0853",
+  "files": [
+    {
+      "archive_member": "crc-catalog-2.5.0/LICENSES/Apache-2.0.txt",
+      "file": "Apache-2.0.txt",
+      "sha256": "d3cdb764b98283ee7c3a3cea8d374e2a2957322374378d1f3263f4d512741fc3",
+      "bytes": 11346
+    },
+    {
+      "archive_member": "crc-catalog-2.5.0/LICENSES/MIT.txt",
+      "file": "MIT.txt",
+      "sha256": "5ef8fcfb6cccec8fcae043c834099a60c8b7406408db576e026d2b7e67dc5cf5",
+      "bytes": 1073
+    }
+  ],
+  "scope": "Original nested license files, not complete distribution clearance"
+}
