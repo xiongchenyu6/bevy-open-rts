@@ -1,0 +1,39 @@
+{
+  "scope": "Preserved failed diagnostic; not mission acceptance",
+  "process": {
+    "actual_exit": 1,
+    "wall_seconds": 77.96838266402483,
+    "binary_sha256": "083f621da6473857446873143be4313e06e37b84ed4f288aa66d13de76d6c19b",
+    "scope": "Mission3 normal gameplay diagnostic from legitimate scenario setup; not six-mission chain proof",
+    "profile": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current244-survivors-m3-profile-20261010"
+  },
+  "terminal_observation": {
+    "phase": "Running",
+    "clock": 103.5654296875,
+    "movement_gating": {
+      "app_screen": "InMatch",
+      "delta_secs": 0.03333333507180214,
+      "flow_active": true,
+      "match_running": true,
+      "menu_visible": false
+    },
+    "types": {
+      "Drone": 1,
+      "HeavyMachinegunTrooper": 3,
+      "RocketInfantry": 3,
+      "Tank": 9,
+      "Worker": 2
+    },
+    "resources": [
+      44,
+      3
+    ]
+  },
+  "error": "could not place PowerReactor at a valid build location",
+  "next_trial": {
+    "service": "rts-current244-survivors-m3-03-20261010.service",
+    "capture_sha256": "509ca021fd2e6b34959bb023561a0078167dbbac4dd7cf966c03e554edad2e4b",
+    "change": "Continue existing army after placement failure only if headquarters absent, match Running and mission allows annihilation; original error snapshot retained"
+  },
+  "next_trial_complete": false
+}
