@@ -82,6 +82,6 @@
   "fresh_campaign_menu_frame_directly_reviewed": true,
   "fresh_menu_frame_sha256": "ee88ec59b5428fc213e0fa41ff9145bc161e85dce3701b0fd1225b9f01cba9a1",
   "evidence_directory": "screenshots/steam-quality/current252-campaign-engineer-defense-20261011",
-  "remaining": "Normal initial menu/card start, retry/restart and final artifact validation; postmatchFlashfix predates this capture and is unverified here",
+  "remaining": "Normal initial menu/card start, retry/restart and final artifact validation; postmatch Flash cleanup is newer than this sealed capture and is unverified here",
   "full_campaign_gate_pass": false
 }
