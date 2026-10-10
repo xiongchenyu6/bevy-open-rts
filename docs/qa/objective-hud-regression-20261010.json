@@ -19,5 +19,13 @@
     "src/hud.rs": "d5b44e87c2d9cd82aff0ded73fc6552e3bff7640521c3edb51034724ae2d6753",
     "src/lib.rs": "772ae5c02eaf6f98d6921ea7786f47e31ee82cb109cd547d248426bf45af2052",
     "src/objective_hud_tests.rs": "e22dc1c7bcf8250d45f0162ba79c4e9e7903417573bf4f574b3d868db8706969"
+  },
+  "native_visual_review": {
+    "binary_sha256": "dbcfc45d993f72e22dabfea5fe4c8f0cd5ebdca2bfa8438ab568d809321ff132",
+    "screenshot": "screenshots/steam-quality/current-campaign-chain-foundation-20261010/1/setup-21-after-build-normal-support-TechLab.png",
+    "screenshot_sha256": "30224c6df1c29ca132752e1c8762b87efc132b570f6a58fcd7490d3dbc3fd063",
+    "visible_objective": "Destroy enemy Command Centers 0 / 1",
+    "worker_requirement_absent": true,
+    "scope": "Native diagnostic mission 2 frame; final package pending"
   }
 }
