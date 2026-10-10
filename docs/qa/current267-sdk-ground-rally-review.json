@@ -1,0 +1,114 @@
+{
+  "scope": "Exact parameterized SDK archive; normal ground rally plus one paid Infantry Barracks job across same/freshprocess load; production scope only",
+  "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+  "binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 4183712,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "index": 2,
+      "pid": 4187365,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "wall_seconds": 123.31898832099978,
+  "comparisons": [
+    {
+      "elapsed": 0.26016998291015625,
+      "producer_keys": [
+        30064769381,
+        12884900661
+      ],
+      "queue_entries": 1,
+      "passed": true
+    },
+    {
+      "elapsed": 0.2599601745605469,
+      "producer_keys": [
+        12884900661,
+        12884900985
+      ],
+      "queue_entries": 1,
+      "passed": true
+    }
+  ],
+  "load_byte_checks": [
+    {
+      "session": 1,
+      "before": "927a3326762ae787dfe447b84894db59aa855a88d5e798807f8375396bd7aac3",
+      "after": "927a3326762ae787dfe447b84894db59aa855a88d5e798807f8375396bd7aac3",
+      "unchanged": true
+    },
+    {
+      "session": 2,
+      "before": "e9e24b400988e2231a5853566a0b77c8c6382bcc491bee08b3ad7e84dad40946",
+      "after": "e9e24b400988e2231a5853566a0b77c8c6382bcc491bee08b3ad7e84dad40946",
+      "unchanged": true
+    }
+  ],
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-baseline-paused": "e67bab8735fca1c3fe77f58ed98a9181933d3353674559a0b2c81786d7609dbd",
+    "02-power-card-tooltip": "ce8d5399feea19b8ead650dfa8bdb670665e5a9d523dbf7c808bdfd974b13353",
+    "02-power-preview": "3fcc90325d06a1686eb2749bf7f59c101f89245154735bfb2299f42aa3cd77bf",
+    "03-power-completed": "4a7fe63e5a6b9b41ec819080c1b3c71073ce61c34325cb9571ed27d7a3959ce9",
+    "04-barracks-preview": "03fcc68343a18363b945f39bfdc3f5813a9391cd1af098f264ff2383c43d3683",
+    "05-buildings-paid": "93f9a99fcd153d12bd12905f8c430ea22cbdcaddddd3b83a57c122b72835a938",
+    "06-infantry-card-tooltip": "ace04e8c60d7ccc1fe6a26e00edbb0fe4be5a0f9092a728972529268d1b694f6",
+    "06-ground-rally": "dd35dd27845e7086d8cf1303e7e26be4877048d7b772a317c9bbce3b60d93d1b",
+    "07-partial-paid-queue": "cd639986fa5878e100a2aa333389f5bab25ee1a6c50b153de2ad7104e78e2482",
+    "08-same-process-loaded": "1060b4f0a9887ba20b457fe9f068cdd38ce60d7676e0472ede3f31ec614312de",
+    "09-same-process-resaved": "1a35bbc8b0bfe744c1367251b168df47df4aea58cfd984f44d3b0242e3750fab",
+    "10-fresh-menu": "881272f1152d46509996ddc4babf6a3172dd074d540f8202567bf9b01f2a98a7",
+    "11-fresh-process-loaded": "29f950c7f4f7fa3b4b1ba658caf9a86497d241014710dadde144d49883d2f0f5",
+    "12-fresh-process-resaved": "0224b756af725ca25881287b9613062ddd1bbced55912ad0260aed50e802b6f6",
+    "13-one-paid-infantry-completed": "4e5d522a2a03b5cce5d05c8fb293e59565a9dc62a135a7c20fb20301838ef0b8"
+  },
+  "rally_endpoint": {
+    "unit": {
+      "key": 55834573217,
+      "id": "LightRifleInfantry",
+      "position": [
+        -12.588043212890625,
+        0.05000000074505806,
+        -16.477582931518555
+      ],
+      "active": [],
+      "queued": [],
+      "cargo_ron": "None"
+    },
+    "rally": {
+      "target": [
+        -12.797674179077148,
+        0.0,
+        -16.437721252441406
+      ],
+      "mode": 0,
+      "target_entity": null
+    },
+    "distance_xz": 0.2133871960618652
+  },
+  "evidence_directory": "target/sdk267-save-rally-20261011-01",
+  "result_sha256": "f5d0e6c7c9241eb64e1e15416874895f6a504aa415890d8ad381ab59bd63cfd8",
+  "original_wall_limit_seconds": 240,
+  "bank_final": [
+    25,
+    14
+  ],
+  "paid_infantry": 1,
+  "final_jobs": 0,
+  "agent_final_image_reviewed": true,
+  "root_independent_review": true,
+  "passed": true,
+  "limits": [
+    "Ground rally only; entityrally covered by separate267cases.",
+    "OneInfantry1/0 afterpaidPower/Barracks, endpoint.213387m\u2264.5 andnoMoveOrder; not allorders."
+  ]
+}
