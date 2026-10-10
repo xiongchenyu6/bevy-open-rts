@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local first-three portrait staging and reproducible review metadata."""
+"""Stage the audited portrait roster and preserve reproducible QA evidence."""
 import argparse
 import hashlib
 import json
@@ -8,64 +8,75 @@ from pathlib import Path
 import subprocess
 import time
 
+from verify_portrait_stage import verify
+
 
 def sha(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    with path.open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
 def main():
-    from PIL import Image
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--binary', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--inventory', type=Path)
+    parser.add_argument('--timeout', type=float, default=1200)
     args = parser.parse_args()
+    if args.timeout <= 0:
+        parser.error('--timeout must be positive')
     repo = Path(__file__).resolve().parents[1]
-    binary = args.binary.resolve()
+    binary = args.binary.resolve(strict=True)
+    inventory = (args.inventory or repo / 'art/portraits/entities.json').resolve(strict=True)
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    sources = {str(p.relative_to(repo)): sha(p) for p in sorted((repo / 'src').rglob('*.rs'))}
-    sources['Cargo.lock'] = sha(repo / 'Cargo.lock')
-    assets = {str(p.relative_to(repo)): sha(p) for p in sorted((repo / 'assets').rglob('*')) if p.is_file() and not p.name.endswith('.full.ttf')}
-    metadata = {'binary': str(binary), 'binary_sha256': sha(binary), 'source_sha256': sources, 'asset_sha256': assets,
-                'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=repo, text=True).strip(),
-                'command': [str(binary), str(output / 'renders')], 'asset_only': True, 'runtime_replaced': False,
-                'live_gameplay_reference_verified': False, 'reviewer_visual_acceptance': False}
-    for name in ['docs/asset-source-hashes.json', 'ASSETS.md', 'docs/ASSET_PROVENANCE.md']:
-        path = repo / name
-        if path.exists(): metadata.setdefault('provenance_files', {})[name] = {'sha256': sha(path), 'contents': path.read_text()}
-    (output / 'provenance-start.json').write_text(json.dumps(metadata, indent=2))
-    env = dict(os.environ, BEVY_ASSET_ROOT=str(repo))
-    started = time.time()
-    with (output / 'export.log').open('w') as log:
-        result = subprocess.run(metadata['command'], cwd=repo, env=env, stdout=log, stderr=subprocess.STDOUT)
-    metadata.update(exit_code=result.returncode, elapsed_seconds=time.time()-started)
-    (output / 'exit.json').write_text(json.dumps({'exit_code': result.returncode, 'elapsed_seconds': metadata['elapsed_seconds']}, indent=2))
-    if result.returncode:
-        (output / 'provenance.json').write_text(json.dumps(metadata, indent=2))
-        return result.returncode
-    rows = json.loads((output / 'renders/manifest.json').read_text())
-    checks = []
-    for entity in ['AdvancedReactorPlant', 'CommandCenter', 'Tank']:
-        first, second = [output / 'renders' / f'{entity}-{run}.png' for run in range(2)]
-        a, b = Image.open(first).convert('RGBA'), Image.open(second).convert('RGBA')
-        if a.size != (512, 512) or a.tobytes() != b.tobytes(): raise RuntimeError(f'{entity}: decoded determinism failed')
-        alpha = a.getchannel('A')
-        if alpha.getextrema() != (0, 255): raise RuntimeError(f'{entity}: transparent/opaque alpha missing')
-        bounds = alpha.getbbox()
-        if not bounds or min(bounds[:2]) <= 0 or max(bounds[2:]) >= 512: raise RuntimeError(f'{entity}: clipped/empty silhouette')
-        for size in [512, 72]:
-            icon = a.resize((size, size), Image.Resampling.LANCZOS)
-            for theme, color in [('light', '#e9edf2'), ('dark', '#151d2b')]:
-                card = Image.new('RGBA', (size, size), color)
-                card.alpha_composite(icon)
-                card.convert('RGB').save(output / f'{entity}-{size}-{theme}.png')
-        checks.append({'entity': entity, 'sha256': [sha(first), sha(second)], 'byte_identical': first.read_bytes() == second.read_bytes(),
-                       'decoded_identical': True, 'alpha_bounds': bounds, 'mesh_count': next(row['geometry']['mesh_count'] for row in rows if row['id'] == entity)})
-    changed = [name for name, digest in assets.items() if not (repo/name).exists() or sha(repo/name) != digest]
-    metadata.update(checks=checks, assets_changed_during_export=changed, image_library_version=Image.__version__)
-    (output / 'provenance.json').write_text(json.dumps(metadata, indent=2))
-    if changed: raise RuntimeError('assets changed during export')
-    return 0
+    assets = {str(p.relative_to(repo)): sha(p) for p in sorted((repo / 'assets').rglob('*'))
+              if p.is_file() and not p.name.endswith('.full.ttf')}
+    metadata = {
+        'binary': str(binary), 'binary_sha256': sha(binary),
+        'inventory': str(inventory), 'inventory_sha256': sha(inventory),
+        'asset_sha256': assets,
+        'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=repo, text=True).strip(),
+        'command': [str(binary), str(inventory), str(output / 'renders')],
+        'scope': 'Asset-only model export; paid gameplay and visual acceptance remain separate',
+        'runtime_replaced': False, 'reviewer_visual_acceptance': False,
+    }
+    (output / 'provenance-start.json').write_text(json.dumps(metadata, indent=2) + '\n')
+    started = time.monotonic()
+    code = 1
+    try:
+        with (output / 'export.log').open('x') as log:
+            child = subprocess.run(metadata['command'], cwd=repo,
+                                   env=dict(os.environ, BEVY_ASSET_ROOT=str(repo)),
+                                   stdout=log, stderr=subprocess.STDOUT, timeout=args.timeout)
+        code = child.returncode
+        metadata['child_exit'] = code
+        if code == 0:
+            report = verify(inventory, output / 'renders')
+            (output / 'independent-verification.json').write_text(json.dumps(report, indent=2) + '\n')
+            metadata['verification_passed'] = True
+            changed = [name for name, digest in assets.items()
+                       if not (repo / name).is_file() or sha(repo / name) != digest]
+            current_paths = {str(p.relative_to(repo)) for p in (repo / 'assets').rglob('*')
+                             if p.is_file() and not p.name.endswith('.full.ttf')}
+            added = sorted(current_paths - assets.keys())
+            metadata['assets_changed_during_export'] = changed
+            metadata['assets_added_during_export'] = added
+            if changed or added:
+                raise RuntimeError('Runtime assets changed during export')
+            if sha(binary) != metadata['binary_sha256'] or sha(inventory) != metadata['inventory_sha256']:
+                raise RuntimeError('Binary or inventory changed during export')
+    except subprocess.TimeoutExpired as error:
+        code = 124
+        metadata['error'] = str(error)
+    except Exception as error:
+        code = 1
+        metadata['error'] = repr(error)
+    finally:
+        metadata.update(exit_code=code, elapsed_seconds=time.monotonic() - started)
+        (output / 'provenance.json').write_text(json.dumps(metadata, indent=2) + '\n')
+        (output / 'exit.json').write_text(json.dumps({'exit_code': code}, indent=2) + '\n')
+    return code
 
 
 if __name__ == '__main__':
