@@ -1,0 +1,170 @@
+{
+  "scope": "Exact CURRENT250 Steam Runtime4 SDK-built optimized Linuxarchive, nonroot cleanUbuntu/noNix normal Waylandinput in freshprivateprofile; one mainservice without optionalmenu review",
+  "archive_sha256": "ff2e5fb7b0498b5133ea0ea07acc65fecc107da156c1792bfe9a400d0d331665",
+  "binary_sha256": "5bc8251328780aa0365d9df641137b4e56978eab86cdcad1cd069dc77977c3f7",
+  "installation_file_count": 380,
+  "runtime_asset_count": 332,
+  "sdk_libraries": 10,
+  "actual_container_exit": 0,
+  "actual_game_container_namespace_pids": [
+    58,
+    348
+  ],
+  "actual_game_exits": [
+    [
+      58,
+      0
+    ],
+    [
+      348,
+      0
+    ]
+  ],
+  "forced_cleanup": false,
+  "raw_evidence": "target/linux-current250-steamrt4-boot-camp-normal-20261010-01",
+  "container_command": [
+    "docker",
+    "run",
+    "--rm",
+    "--name",
+    "rts-linux-current250-steamrt4-boot-camp-normal01",
+    "--user",
+    "65534:65534",
+    "--device",
+    "/dev/dri/renderD128",
+    "--mount",
+    "type=bind,src=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-current250-steamrt4-extracted-20261010/bevy-open-rts-linux-x86_64,dst=/installation,readonly",
+    "--mount",
+    "type=bind,src=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-current250-steamrt4-boot-camp-normal-20261010-01,dst=/evidence",
+    "--entrypoint",
+    "sh",
+    "rts-local-thin-input-runtime:20261008",
+    "/evidence/run.sh"
+  ],
+  "container_result_sha256": "999a4bd3dfa177a554186ececfc3c39c2f95d98397ccc64a59bc85b34949819e",
+  "checks": {
+    "fresh_boot_camp_menu": true,
+    "normal_skip_to_campaign_map": true,
+    "normal_back_restart_lesson_one": true,
+    "seven_lessons": true,
+    "natural_victory": true,
+    "four_normally_paid_infantry": true,
+    "normal_graduate_campaign_map": true,
+    "same_process_replay_menu": true,
+    "fresh_process_replay_menu": true,
+    "replay_lesson_one_reset_64ore32crystal": true,
+    "normal_whole_army_select_only_starting_drone_no_trained_infantry": true,
+    "state_resource_unit_or_timer_grants": false,
+    "hidden_enemy_positions_used": false,
+    "optional_menu_review_in_mainservice": false
+  },
+  "natural_result": {
+    "shown_match_time": "09:09",
+    "enemy_unit_kills": 2,
+    "enemy_structure_kills": 1,
+    "own_unit_losses": 0,
+    "own_structure_losses": 0
+  },
+  "phase_bounds": [
+    {
+      "stage": "gather",
+      "started_epoch_seconds": 1791647077.0914023,
+      "started_monotonic_seconds": 188106.177227556,
+      "completion_screenshot_mtime_epoch": 1791647090.073725,
+      "completion_observed_seconds": 12.982322692871094,
+      "original_budget_seconds": 60.0,
+      "image": "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/05-gather-progress.png",
+      "sha256": "0b158c247cc272ad3e5849867fbf28c7798d812ece675e6baf2958b729f2084f"
+    },
+    {
+      "stage": "power-construction",
+      "started_epoch_seconds": 1791647184.758588,
+      "started_monotonic_seconds": 188213.844412585,
+      "completion_screenshot_mtime_epoch": 1791647192.7362404,
+      "completion_observed_seconds": 7.977652311325073,
+      "original_budget_seconds": 30.0,
+      "image": "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/07-power-completed.png",
+      "sha256": "84f9700396f4b32944feb5b005d136d903cae5dcea5bd24f352d7a8a7302d55b"
+    },
+    {
+      "stage": "barracks",
+      "started_epoch_seconds": 1791647243.5361605,
+      "started_monotonic_seconds": 188272.621985941,
+      "completion_screenshot_mtime_epoch": 1791647254.522948,
+      "completion_observed_seconds": 10.986787557601929,
+      "original_budget_seconds": 30.0,
+      "image": "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/09-barracks-completed.png",
+      "sha256": "dc0e2d532181c1c8a74b4c9f63f567e8ea400aac3993985e94ed1e1a940f0276"
+    },
+    {
+      "stage": "train",
+      "started_epoch_seconds": 1791647306.6364753,
+      "started_monotonic_seconds": 188335.722301229,
+      "completion_screenshot_mtime_epoch": 1791647323.6966202,
+      "completion_observed_seconds": 17.060144901275635,
+      "original_budget_seconds": 120.0,
+      "image": "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/12-trained-infantry.png",
+      "sha256": "c8fbf07b3560b64880a8bc178fac4c2a2cfb65f974acbea9bc2fa32c2183c8b9"
+    },
+    {
+      "stage": "move",
+      "started_epoch_seconds": 1791647370.0579221,
+      "started_monotonic_seconds": 188399.143745964,
+      "completion_screenshot_mtime_epoch": 1791647376.7723684,
+      "completion_observed_seconds": 6.714446306228638,
+      "original_budget_seconds": 20.0,
+      "image": "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/13-moved-infantry.png",
+      "sha256": "19e9a4789f241ef263ef8f7d7f70209bde1ae31894db2fc39c4f77831d7924c5"
+    },
+    {
+      "stage": "attack",
+      "started_epoch_seconds": 1791647424.1046927,
+      "started_monotonic_seconds": 188453.190515229,
+      "completion_screenshot_mtime_epoch": 1791647587.5803661,
+      "completion_observed_seconds": 163.47567343711853,
+      "original_budget_seconds": 300.0,
+      "image": "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/19-natural-graduation.png",
+      "sha256": "255f50633e648a10a156a533efdf92e02f46c37b6d0b3aec910a3c70ecca012f"
+    }
+  ],
+  "profile": {
+    "path": "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/user-data/bevy-open-rts/campaign.ron",
+    "ron": "(version:1,training_complete:true,completed:[])",
+    "sha256_before_restart": "2264aab2d7e7dae2d74a86b515a3d4d8dd630f89048565b8f47148db0d085e93",
+    "sha256_after_restart": "2264aab2d7e7dae2d74a86b515a3d4d8dd630f89048565b8f47148db0d085e93",
+    "bytes_unchanged": true
+  },
+  "all380_install_files_and_archive_bytes_unchanged": true,
+  "all_images": {
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/00-fresh-menu.png": "6840b44cc2c2bfa30a580f52c1be28168bb13b7f9ec504eb9949048a2acf34bf",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/01-training-start.png": "813d532d9b67afd87c659b52e93642cb5545e34a9c03f785939f772f2c91f6a3",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/02-skipped.png": "cb1ee455477df7657e152850355bc73f4b5ae695ba2387f23c4b261b4d9166ad",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/03-restarted-training.png": "4f7d3ad65ee838b1b1747ae5bad64386dc7c6f1b57196f1f856251d15f1abbaa",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/04-select-worker.png": "0c2042cae1cf07a0ecd118040bd7b6d460871b071ea61b951df80e1265a9383e",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/05-gather-progress.png": "0b158c247cc272ad3e5849867fbf28c7798d812ece675e6baf2958b729f2084f",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/06-power-green-ghost.png": "6204952297289c30e159a573f26b42ac4cf94b2c5a299033af6bfbfe7e5b3710",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/07-power-completed.png": "84f9700396f4b32944feb5b005d136d903cae5dcea5bd24f352d7a8a7302d55b",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/08-barracks-green-ghost.png": "9770ce0b31b2c08e32a4921cf7f328b87295cffa47a8ab3acdf72aabd7acad29",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/09-barracks-completed.png": "dc0e2d532181c1c8a74b4c9f63f567e8ea400aac3993985e94ed1e1a940f0276",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/10-barracks-selected.png": "3a5e500c6b86f3e44089ed896216a1549b7bedce2423eed2bf844ed6e65c3cf5",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/11-paid-training-queue.png": "f5bd6d598d03bcc30fc75f6f97ca85a15541368cdf461ed7bd5ed3068204a1c7",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/12-trained-infantry.png": "c8fbf07b3560b64880a8bc178fac4c2a2cfb65f974acbea9bc2fa32c2183c8b9",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/13-moved-infantry.png": "19e9a4789f241ef263ef8f7d7f70209bde1ae31894db2fc39c4f77831d7924c5",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/14-whole-army.png": "5d45ad10e6b2a9df728c59d6df4776b1e7f3439bfdd6c6ccb97528bd2424199b",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/15-first-public-scout.png": "fe0062436114c1e6d9e5333a32635fba12d50fc37fa894084c0b03ae58d5c4c2",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/16-second-public-scout.png": "813deab3ce26783854b644870a30519d22f49fcf9346c620518c663d357ebd15",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/17-third-public-scout.png": "a83ebd813f3c59a2b22fc588f610f2c1cf2c3d63eb40446e97cd13ca62dd3323",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/18-fourth-public-scout.png": "55882603a3dde6d716e8235f32718a8455573c5d63ebbccfbe4c2b1da275e579",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/19-natural-graduation.png": "255f50633e648a10a156a533efdf92e02f46c37b6d0b3aec910a3c70ecca012f",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/20-graduate-campaign-map.png": "be631a15e72b0dabc436cdbcf4877e090658782950f6e9ed09e5e02b8ffcb1d6",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/21-replay-menu-same-process.png": "3b3eaf822ba6d4f3a999b55c0f2f8431ed91e8e52bf782bba88456ea08001836",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/22-replay-menu-fresh-process.png": "3b3eaf822ba6d4f3a999b55c0f2f8431ed91e8e52bf782bba88456ea08001836",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/23-fresh-process-replay-lesson-one.png": "7ac91cb3e6c2e3109156458767ba14d6deafc2d0010d437095d07af9d1c1d607",
+    "target/linux-current250-steamrt4-boot-camp-normal-20261010-01/24-replay-starting-army.png": "c9f211e8fc990ab1bfa9354840a94896bd34e45c41aec87856723e59f67e6bf8"
+  },
+  "limits": [
+    "Packaged BootCamp and profile continuity only; not wholeSteamreadiness",
+    "Alliedaudio mix/hearing, menus, performance, campaign and broadersave states require their owncurrentartifact proofs",
+    "Historical247 outertimeout remainsfailed andunchanged"
+  ]
+}
