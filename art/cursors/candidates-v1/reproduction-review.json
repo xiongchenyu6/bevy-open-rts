@@ -1,0 +1,51 @@
+{
+  "checks": [
+    {
+      "name": "default",
+      "width": 32,
+      "height": 32,
+      "sha256": "b8e9a07191a57fb4d48c42870d9338944822f8f74c552d36c3533ab1be1a44a3",
+      "byte_reproduced": true,
+      "alpha_min": 0,
+      "alpha_max": 255
+    },
+    {
+      "name": "move",
+      "width": 32,
+      "height": 32,
+      "sha256": "86783697e63104efbb564c9d7d4b8043731971cfab2bcdb0565a7e0656cc3f42",
+      "byte_reproduced": true,
+      "alpha_min": 0,
+      "alpha_max": 255
+    },
+    {
+      "name": "attack",
+      "width": 32,
+      "height": 32,
+      "sha256": "6521e30190bc067a2a08424d4684c2a4191d96db25b6f8647a6878bc2e51d2e8",
+      "byte_reproduced": true,
+      "alpha_min": 0,
+      "alpha_max": 255
+    },
+    {
+      "name": "build",
+      "width": 32,
+      "height": 32,
+      "sha256": "56948a8f5b55fb8788a7fa6332c53e8ee7661726a0c0552792575938b823cbe8",
+      "byte_reproduced": true,
+      "alpha_min": 0,
+      "alpha_max": 255
+    },
+    {
+      "name": "rts_cursor_atlas",
+      "width": 128,
+      "height": 32,
+      "sha256": "6df4fb3f03b92fb601718577027b8e72990ae7736a8afdf4bbcbb611766c6155",
+      "byte_reproduced": true,
+      "alpha_min": 0,
+      "alpha_max": 255
+    }
+  ],
+  "runtime_replaced": false,
+  "visual_review": "Original 32px and 3x light/dark sheet inspected; runtime hotspot/input not verified"
+}

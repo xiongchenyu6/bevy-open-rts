@@ -1,0 +1,60 @@
+{
+  "scope": "Original geometry candidates; runtime loading and input alignment not yet accepted",
+  "inputs": "repository-authored SVG geometry; no images, fonts or external artwork",
+  "source_license": "repository MIT OR Apache-2.0",
+  "generator_sha256": "129a826db2db65bfe3eb0e82bc6a21ea11d6fb443b87bd9909438ce742ebf1d9",
+  "rasterizer": "0.48.1",
+  "layout": {
+    "tile_size": [
+      32,
+      32
+    ],
+    "columns": 4,
+    "rows": 1
+  },
+  "frames": [
+    {
+      "index": 0,
+      "state": "default",
+      "hotspot": [
+        2,
+        1
+      ],
+      "svg_sha256": "5c82c0bb9350050d3ad4865f1535b38941b0461b63a0c4a34c20043fee764d8c",
+      "png_sha256": "b8e9a07191a57fb4d48c42870d9338944822f8f74c552d36c3533ab1be1a44a3"
+    },
+    {
+      "index": 1,
+      "state": "move",
+      "hotspot": [
+        16,
+        16
+      ],
+      "svg_sha256": "a31181881db88947ea882e130f7efa99d300c421f12ff1314a4458c0a68fbb5e",
+      "png_sha256": "86783697e63104efbb564c9d7d4b8043731971cfab2bcdb0565a7e0656cc3f42"
+    },
+    {
+      "index": 2,
+      "state": "attack",
+      "hotspot": [
+        16,
+        16
+      ],
+      "svg_sha256": "c1e14fac3f85f7b0ac4dca0184e586794bd18d1497ec81fda88934c2cb52f258",
+      "png_sha256": "6521e30190bc067a2a08424d4684c2a4191d96db25b6f8647a6878bc2e51d2e8"
+    },
+    {
+      "index": 3,
+      "state": "build",
+      "hotspot": [
+        16,
+        16
+      ],
+      "svg_sha256": "2ba99cf485a5bf3dd4f1b886ed5fb1b8da43a3e01d6f7bfd6d43f941a4a38c62",
+      "png_sha256": "56948a8f5b55fb8788a7fa6332c53e8ee7661726a0c0552792575938b823cbe8"
+    }
+  ],
+  "atlas_svg_sha256": "cc65fef943c39017e52343439aaa211d87c96ecf7d833cd4c27ea3cd16dbab64",
+  "atlas_png_sha256": "6df4fb3f03b92fb601718577027b8e72990ae7736a8afdf4bbcbb611766c6155",
+  "runtime_replaced": false
+}
