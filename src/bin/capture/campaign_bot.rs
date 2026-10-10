@@ -808,7 +808,19 @@ fn rally_to_safe_staging(
         .as_ref()
         .ok_or("headquarters lost")?
         .position;
-    let offsets = if mission_index == 4 {
+    let offsets = if mission_index == 4 && producer == "Barracks" {
+        // Separate the infantry reserve from the armour rally: one radius-4.8
+        // EMP must not immobilise the whole paid opening army.
+        [
+            (-3.0, 6.0),
+            (-6.0, 6.0),
+            (-3.0, 9.0),
+            (-6.0, 9.0),
+            (-3.0, 12.0),
+            (-6.0, 12.0),
+            (0.0, 12.0),
+        ]
+    } else if mission_index == 4 {
         [
             (6.0, 5.0),
             (5.0, 6.0),

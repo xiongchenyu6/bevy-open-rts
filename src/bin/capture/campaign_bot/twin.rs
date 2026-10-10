@@ -124,8 +124,8 @@ pub(super) fn opening(app: &mut App, watch: &mut SetupWatch) -> Result<(), Strin
         .ok_or("headquarters lost")?
         .position;
     println!("[capture] Twin crystal-field guard staging HQ+6.5,6 and visible ground response16m");
-    select_all_player_army(app);
-    ground_order(app, base + Vec3::new(6.5, 0.0, 6.0), false)?;
+    // Keep the distinct producer rallies. Consolidating every unit at one
+    // point put all fifteen ground actors inside a single enemy EMP.
     watch.advance(app, 90);
     hold_army(app)?;
     watch.checkpoint(app, "opening-whole-army-held")?;
@@ -181,7 +181,7 @@ pub(super) fn opening(app: &mut App, watch: &mut SetupWatch) -> Result<(), Strin
             let units = capture_campaign_units(app);
             if units
                 .iter()
-                .any(|unit| unit.combat && unit.position.distance(base) > 9.0)
+                .any(|unit| unit.combat && unit.position.distance(base) > 18.0)
             {
                 select_all_player_army(app);
                 ground_order(app, base + Vec3::new(6.5, 0.0, 6.0), false)?;

@@ -1,0 +1,25 @@
+{
+  "scope": "Mission5 standalone separated normal producer rallies and survivor victory; not six-mission chain proof",
+  "process": {
+    "actual_exit": 0,
+    "wall_seconds": 215.37462656499702,
+    "binary_sha256": "945c7b8bf3192a4f2f0016958ecda33ebd8bb63e727aecbdc470f16215e78853",
+    "scope": "Mission5 normal visible-target focus diagnostic from legitimate scenario setup; not six-mission chain proof",
+    "profile": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current247-twin-separated-rallies-profile-20261010"
+  },
+  "victory_clock": 259.1916198730469,
+  "phase": "HumanVictory",
+  "remaining_units": {
+    "HeavyMachinegunTrooper": 1,
+    "RocketInfantry": 3,
+    "Tank": 7,
+    "Worker": 1
+  },
+  "headquarters_lost": true,
+  "profile_ron": "(version:1,training_complete:false,completed:[\"twin_front\"])",
+  "profile_sha256": "f1ab3a738ce92e5dc89c034fab427a8879b844f4f57bd0447682c47e39832371",
+  "reviewed_victory_screenshot": "screenshots/steam-quality/current247-twin-separated-rallies-20261010/02_victory.png",
+  "screenshot_sha256": "144fc31a5c4f1a9c4df1d5c980186f2992caa2e76f54950a3832d806dc11c818",
+  "game_rules_changed": false,
+  "six_mission_complete": false
+}
