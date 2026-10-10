@@ -1,5 +1,5 @@
 {
-  "scope": "Current250 official SDK-built Linux archive, provenance/library and asset integrity only; fresh player-flow and Runtime4 gameplay acceptance pending",
+  "scope": "Current250 SDK archive integrity is verified; known save-position defect prevents final release acceptance",
   "build": {
     "scope": "Clean official Steam Runtime4 SDK build with official Rust; no runtime/gameplay acceptance",
     "actual_exit": 0,
@@ -39,5 +39,6 @@
     "changed": []
   },
   "sdk_library_count": 10,
-  "full_release_ready": false
+  "full_release_ready": false,
+  "known_gameplay_defect": "Save restore adds authored unit height to saved world Y; position restoration correction pending"
 }
