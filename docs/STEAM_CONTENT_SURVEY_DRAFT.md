@@ -18,9 +18,15 @@ Proposed description:
 The installed inventory includes six original campaign illustrations and 32
 fixed English/Chinese voice files. Native entity portraits are renders of the
 actual Kenney/authored game geometry, with separate model-source records.
-The original menu background is currently a candidate; include it in the final
-description only if its reviewed version is installed. Source records are in
-`art/campaign/`, `art/voice/`, `art/portraits/` and `art/menu-background/`.
+The original generated desert menu background is now installed and passed
+three native menu/setup screenshot checks at 900×720 and 1920×1080. Original
+cursor graphics are authored SVG geometry rasterized into a fixed four-frame
+atlas; native loaded pixels and state metadata were checked, while final
+browser appearance and click alignment remain unverified. Source records are
+in `art/campaign/`, `art/voice/`, `art/portraits/`, `art/menu-background/` and
+`art/cursors/`. Six unused legacy VFX textures were retired from runtime assets.
+These development checks do not establish final-package acceptance or complete
+provider-term and distribution-rights review.
 
 ## Live-generated AI content
 
