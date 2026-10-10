@@ -1,0 +1,31 @@
+{
+  "scope": "Mission3 standalone normal-input victory; not full campaign or final package acceptance",
+  "process": {
+    "actual_exit": 0,
+    "wall_seconds": 171.636187015014,
+    "binary_sha256": "509ca021fd2e6b34959bb023561a0078167dbbac4dd7cf966c03e554edad2e4b",
+    "scope": "Mission3 normal gameplay diagnostic from legitimate scenario setup; not six-mission chain proof",
+    "profile": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current244-survivors-m3-profile-03-20261010"
+  },
+  "victory_clock": 254.45872497558594,
+  "phase": "HumanVictory",
+  "headquarters_capture": {
+    "entity": 4294966784,
+    "team": "Player(1)",
+    "health": 20.0,
+    "original_position": [
+      -22.0,
+      0.0,
+      -22.0
+    ]
+  },
+  "survivor_observations": 27,
+  "saved_completed": [
+    "canyon_siege"
+  ],
+  "profile_sha256": "5eced7913b50bfa72b62f5aaed6f698b6d3f3c98511a635df74e6df73e991296",
+  "screenshot": "screenshots/steam-quality/current244-campaign-survivors-m3-03-20261010/02_victory.png",
+  "screenshot_sha256": "8a85690de659062d5ba2efabb9fcfda1dc64aa54fe1796ec6c75ac6b8335dd84",
+  "construction_failure_retained": "could not place PowerReactor at a valid build location",
+  "six_mission_chain_complete": false
+}
