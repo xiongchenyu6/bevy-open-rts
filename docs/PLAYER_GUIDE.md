@@ -30,7 +30,8 @@ Center; cover their flight paths with anti-air before they reach it.
 - Right-click ground to move, enemies to attack, or deposits to gather.
 - Hover command icons for costs, requirements and shortcut keys.
 - Use the **Attack-Move** icon or its displayed key for an armed advance.
-- Move the pointer to the screen edge to pan; use the wheel to zoom.
+- Use the arrow keys or move the pointer to the screen edge to pan.
+- Use the wheel to zoom and **[ / ]** to rotate the view.
 - **Ctrl+1–9** assigns a control group; **1–9** recalls it.
 - **Esc** opens the match menu. In desktop offline matches, click **Save/Load**
   or use **Ctrl+S/Ctrl+L**. Saving replaces the previous quicksave.
