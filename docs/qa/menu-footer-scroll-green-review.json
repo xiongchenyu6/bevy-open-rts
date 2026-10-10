@@ -1,0 +1,578 @@
+{
+  "scope": "Native menu layout, normal footer Back and reverse scrolling at 1280/900-width client696 and normal fullscreen720 only; not final SDK/browser/Windows or complete HUD acceptance",
+  "binary_sha256": "9105069480bef76268dc6fab589b541b1a647fa8e18f15eee788f5553d733c69",
+  "check_and_build": {
+    "results": {
+      "check": 0,
+      "build": 0
+    },
+    "wall_seconds": 130.61060190200806,
+    "menu_unchanged": true
+  },
+  "actual_driver_exit": 0,
+  "actual_game_exit": 0,
+  "normal_close": true,
+  "wall_seconds": 136.81768821098376,
+  "binary_unchanged": true,
+  "cases": [
+    {
+      "case": "1280",
+      "down_sha256": "e293f760eee317f64c0e913caa0de292c15603dfcd384caf2a039bc3fdfaff95",
+      "single_reverse_sha256": "b2cdcca5204828efec194c4c92f9fe56a103dee2754c00c0d5423cf04c4e0ea4",
+      "reverse_frames_differ": true,
+      "single_reverse_frame_directly_reviewed": true,
+      "footer_buttons_visible": true
+    },
+    {
+      "case": "900",
+      "down_sha256": "5f870ec8f9853d7f60b7626ca58e34a56de2d067e37cef7905943e39b9cddeec",
+      "single_reverse_sha256": "7a80d5b4f52aa0d54db94985a2817c535a46c64df9ca4e59cf6dbd3e5f7bfe5c",
+      "reverse_frames_differ": true,
+      "single_reverse_frame_directly_reviewed": true,
+      "footer_buttons_visible": true
+    },
+    {
+      "case": "fullscreen",
+      "down_sha256": "5cfe3e5dbd6e3f77ded513d61e01292133c4288584f41c25ccaee4b982fe1fd8",
+      "single_reverse_sha256": "7b688a76848088617b34156e46597e86c283dc935fdc89bdb3fac63a551c5aa8",
+      "reverse_frames_differ": true,
+      "single_reverse_frame_directly_reviewed": true,
+      "footer_buttons_visible": true
+    }
+  ],
+  "geometry": [
+    {
+      "label": "00-menu-1280",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 26,
+            "width": 1280,
+            "height": 694
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 694
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 26
+          },
+          "fullscreen_mode": 0
+        }
+      ]
+    },
+    {
+      "label": "geometry-0",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 24,
+            "width": 1280,
+            "height": 696
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 696
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 24
+          },
+          "fullscreen_mode": 0
+        }
+      ]
+    },
+    {
+      "label": "1280-setup-before",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 24,
+            "width": 1280,
+            "height": 696
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 696
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 24
+          },
+          "fullscreen_mode": 0
+        }
+      ]
+    },
+    {
+      "label": "1280-setup-down-end",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 24,
+            "width": 1280,
+            "height": 696
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 696
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 24
+          },
+          "fullscreen_mode": 0
+        }
+      ]
+    },
+    {
+      "label": "1280-setup-one-up",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 24,
+            "width": 1280,
+            "height": 696
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 696
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 24
+          },
+          "fullscreen_mode": 0
+        }
+      ]
+    },
+    {
+      "label": "1280-back-main",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 24,
+            "width": 1280,
+            "height": 696
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 696
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 24
+          },
+          "fullscreen_mode": 0
+        }
+      ]
+    },
+    {
+      "label": "04-menu-900",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 24,
+            "width": 900,
+            "height": 696
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 900,
+            "height": 696
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 900,
+            "height": 24
+          },
+          "fullscreen_mode": 0
+        }
+      ]
+    },
+    {
+      "label": "900-setup-before",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 24,
+            "width": 900,
+            "height": 696
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 900,
+            "height": 696
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 900,
+            "height": 24
+          },
+          "fullscreen_mode": 0
+        }
+      ]
+    },
+    {
+      "label": "900-setup-down-end",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 24,
+            "width": 900,
+            "height": 696
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 900,
+            "height": 696
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 900,
+            "height": 24
+          },
+          "fullscreen_mode": 0
+        }
+      ]
+    },
+    {
+      "label": "900-setup-one-up",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 24,
+            "width": 900,
+            "height": 696
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 900,
+            "height": 696
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 900,
+            "height": 24
+          },
+          "fullscreen_mode": 0
+        }
+      ]
+    },
+    {
+      "label": "900-back-main",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 24,
+            "width": 900,
+            "height": 696
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 900,
+            "height": 696
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 900,
+            "height": 24
+          },
+          "fullscreen_mode": 0
+        }
+      ]
+    },
+    {
+      "label": "fullscreen-menu",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 720
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 720
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0
+          },
+          "fullscreen_mode": 1
+        }
+      ]
+    },
+    {
+      "label": "fullscreen-setup-before",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 720
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 720
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0
+          },
+          "fullscreen_mode": 1
+        }
+      ]
+    },
+    {
+      "label": "fullscreen-setup-down-end",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 720
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 720
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0
+          },
+          "fullscreen_mode": 1
+        }
+      ]
+    },
+    {
+      "label": "fullscreen-setup-one-up",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 720
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 720
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0
+          },
+          "fullscreen_mode": 1
+        }
+      ]
+    },
+    {
+      "label": "fullscreen-back-main",
+      "views": [
+        {
+          "id": 5,
+          "type": "con",
+          "pid": 3059384,
+          "shell": "xdg_shell",
+          "app_id": null,
+          "name": "Open RTS",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 720
+          },
+          "window_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 720
+          },
+          "deco_rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0
+          },
+          "fullscreen_mode": 1
+        }
+      ]
+    }
+  ],
+  "screenshots": {
+    "00-menu-1280": "acfa6898f05aaaf34de199cd886b4fb80a403e44fc7d462f5bff7dd67725c5cf",
+    "geometry-0": "6bc800f6fe34157eb70745500b9e090f580a8fec61ea8ecd03d8d110f2a43634",
+    "1280-setup-before": "b2cdcca5204828efec194c4c92f9fe56a103dee2754c00c0d5423cf04c4e0ea4",
+    "1280-setup-down-end": "e293f760eee317f64c0e913caa0de292c15603dfcd384caf2a039bc3fdfaff95",
+    "1280-setup-one-up": "b2cdcca5204828efec194c4c92f9fe56a103dee2754c00c0d5423cf04c4e0ea4",
+    "1280-back-main": "78129aa7afbe98405f50edf62460ea9fce90b8794a0e47569b1179919eab8a47",
+    "04-menu-900": "45805e3b592fa6992fada2a1780683071ec100540556afc7df3489f487e22ba8",
+    "900-setup-before": "7a80d5b4f52aa0d54db94985a2817c535a46c64df9ca4e59cf6dbd3e5f7bfe5c",
+    "900-setup-down-end": "5f870ec8f9853d7f60b7626ca58e34a56de2d067e37cef7905943e39b9cddeec",
+    "900-setup-one-up": "7a80d5b4f52aa0d54db94985a2817c535a46c64df9ca4e59cf6dbd3e5f7bfe5c",
+    "900-back-main": "c787648d4c9d788aaf09a8ae568d846081871e0fc170c7df567ff58e10aed6fa",
+    "fullscreen-menu": "402df3ce5b0031f4a1f8c2e2d634de02149a641494885ee254c752e3e44ebc3c",
+    "fullscreen-setup-before": "7b688a76848088617b34156e46597e86c283dc935fdc89bdb3fac63a551c5aa8",
+    "fullscreen-setup-down-end": "5cfe3e5dbd6e3f77ded513d61e01292133c4288584f41c25ccaee4b982fe1fd8",
+    "fullscreen-setup-one-up": "7b688a76848088617b34156e46597e86c283dc935fdc89bdb3fac63a551c5aa8",
+    "fullscreen-back-main": "293e72e9d52e8daf5be97eb9520b561a76f60ac325e3ece385cf278647be82f1"
+  },
+  "red_evidence": "menu-footer-overscroll-red-review.json",
+  "remaining": "Final package and browser layout revalidation, wider HUD/tooltips remain open",
+  "full_ui_gate_pass": false
+}

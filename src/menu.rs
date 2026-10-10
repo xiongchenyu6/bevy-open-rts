@@ -1228,10 +1228,9 @@ pub(crate) fn setup_main_menu(
                 height: Val::Percent(100.0),
                 flex_direction: FlexDirection::Column,
                 align_items: AlignItems::Center,
-                // Anchor to the top (not centered) so a tall dialog never clips
-                // the player rows off the top edge; scroll if it exceeds height.
+                // Keep the dialog within the client area; only its setup content scrolls.
                 justify_content: JustifyContent::FlexStart,
-                overflow: Overflow::scroll_y(),
+                overflow: Overflow::clip(),
                 row_gap: px(8),
                 padding: UiRect::new(px(12), px(12), px(8), px(8)),
                 ..default()
@@ -1244,6 +1243,8 @@ pub(crate) fn setup_main_menu(
                 Node {
                     width: Val::Percent(90.0),
                     max_width: px(1040),
+                    max_height: Val::Percent(100.0),
+                    min_height: px(0),
                     min_width: px(680),
                     flex_direction: FlexDirection::Column,
                     align_items: AlignItems::Stretch,
@@ -1257,12 +1258,18 @@ pub(crate) fn setup_main_menu(
             ))
             .with_children(|modal| {
                 modal
-                    .spawn(Node {
-                        flex_direction: FlexDirection::Row,
-                        align_items: AlignItems::FlexStart,
-                        column_gap: px(14),
-                        ..default()
-                    })
+                    .spawn((
+                        MainMenuScrollArea,
+                        ScrollPosition::default(),
+                        Node {
+                            min_height: px(0),
+                            overflow: Overflow::scroll_y(),
+                            flex_direction: FlexDirection::Row,
+                            align_items: AlignItems::FlexStart,
+                            column_gap: px(14),
+                            ..default()
+                        },
+                    ))
                     .with_children(|cols| {
                         // LEFT column — 地图 (map preview + details + resources + summary).
                         cols.spawn(Node {
@@ -1374,6 +1381,7 @@ pub(crate) fn setup_main_menu(
                 // Bottom — 开始 / 返回, full width, stacked (godot Play.tscn).
                 modal
                     .spawn(Node {
+                        flex_shrink: 0.0,
                         flex_direction: FlexDirection::Column,
                         align_items: AlignItems::Stretch,
                         row_gap: px(6),
@@ -2025,7 +2033,7 @@ pub(crate) fn menu_button_label(
 
 pub(crate) fn main_menu_scroll(
     mut wheel_events: MessageReader<MouseWheel>,
-    mut scroll_q: Query<&mut ScrollPosition, With<MainMenuScrollArea>>,
+    mut scroll_q: Query<(&mut ScrollPosition, &ComputedNode), With<MainMenuScrollArea>>,
 ) {
     let mut delta = 0.0;
     for event in wheel_events.read() {
@@ -2038,8 +2046,10 @@ pub(crate) fn main_menu_scroll(
     if delta == 0.0 {
         return;
     }
-    for mut scroll in &mut scroll_q {
-        scroll.y = (scroll.y + delta).max(0.0);
+    for (mut scroll, node) in &mut scroll_q {
+        let max_y = (node.content_size.y - node.size.y + node.scrollbar_size.y).max(0.0)
+            * node.inverse_scale_factor();
+        scroll.y = (scroll.y + delta).clamp(0.0, max_y);
     }
 }
 
