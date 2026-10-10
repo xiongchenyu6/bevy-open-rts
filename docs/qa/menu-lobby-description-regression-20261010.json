@@ -1,5 +1,5 @@
 {
-  "scope": "Lobby labels tested against actual runtime setup; rendered four-team layout remains pending",
+  "scope": "Lobby labels tested against actual runtime setup; current247 browser layouts independently reviewed",
   "red": {
     "actual_exit": 101,
     "failed": 2,
@@ -15,5 +15,6 @@
   },
   "behavior": "Mode and all enemy/ally labels derive from active teams and actual relations; match rules unchanged",
   "source_before_formatter": "target/menu-lobby-before-format-20261010",
-  "final_package_verified": false
+  "final_package_verified": false,
+  "rendered_layout_evidence": "docs/qa/web09-four-team-menu-visual-review.json"
 }
