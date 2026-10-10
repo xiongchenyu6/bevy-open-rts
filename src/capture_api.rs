@@ -22,6 +22,11 @@ pub use semantic_ui::{
     capture_semantic_ui_targets, capture_semantic_ui_tooltip, capture_setup_semantic_ui,
 };
 
+#[cfg(not(target_arch = "wasm32"))]
+mod voice_audio;
+#[cfg(not(target_arch = "wasm32"))]
+pub use voice_audio::capture_voice_audio;
+
 mod audit_progress;
 mod repair_trace;
 mod skirmish_audit;

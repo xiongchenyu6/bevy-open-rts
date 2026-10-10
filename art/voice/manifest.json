@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "Portable original voice candidate inputs/encode mapping; runtime integration/listening acceptance pending",
+  "scope": "Original integrated voice pack with bounded native audio-fixture evidence; human listening and natural gameplay acceptance pending",
   "tool_version": "ffmpeg version 9.0.1 Copyright (c) 2000-2026 the FFmpeg developers",
   "encoder": [
     "-hide_banner",
@@ -1277,5 +1277,20 @@
   "enum_per_language": 17,
   "human_listening_accepted": false,
   "tone_accepted": false,
-  "runtime_integrated": false
+  "runtime_integrated": true,
+  "audio_fixture": {
+    "binary_sha256": "cc05c6043f5cb1ae639b04f67c8de02bafcdea42678348dd4f0d9549b6a712c6",
+    "loader_pass": true,
+    "playback_pass": true,
+    "events": 34,
+    "unique_sources": 32,
+    "natural_completions": 34,
+    "forced_cleanup": 0,
+    "timeouts": 0,
+    "recorded_frames": 3350400,
+    "recorded_sample_rate": 48000,
+    "clipped_samples": 0,
+    "evidence": "target/voice-runtime-audio-qa-20261010",
+    "scope": "isolated audio fixture; no natural game-event or physical listening acceptance"
+  }
 }

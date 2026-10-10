@@ -149,6 +149,12 @@ fn main() {
             let height = args.next().and_then(|v| v.parse().ok()).unwrap_or(720);
             dir.and_then(|dir| semantic_ui::render(&dir, width, height))
         }
+        #[cfg(not(target_arch = "wasm32"))]
+        Some("voice-audio") => args
+            .next()
+            .map(PathBuf::from)
+            .ok_or_else(|| "voice-audio needs new output directory".to_string())
+            .and_then(|p| bevy_open_rts::capture_voice_audio(&p)),
         Some("hud-card") => {
             let dir = args
                 .next()

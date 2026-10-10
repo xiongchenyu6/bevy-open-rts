@@ -81,13 +81,17 @@ pub(crate) fn play_pending_audio_feedback(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     locale: Option<Res<Locale>>,
+    options: Option<Res<MenuOptionsState>>,
     mut feedback: ResMut<AudioFeedback>,
 ) {
+    let master = options.as_ref().map_or(1.0, |o| o.master_volume);
+    let sfx = options.as_ref().map_or(1.0, |o| o.sfx_volume);
+    let voice_gain = options.as_ref().map_or(1.0, |o| o.voice_volume);
     let language = locale.map(|locale| locale.0).unwrap_or(Language::Zh);
     if let Some(sound) = feedback.pending_sound.take() {
         commands.spawn((
             AudioPlayer::new(asset_server.load(sound.audio_path())),
-            PlaybackSettings::DESPAWN.with_volume(Volume::Linear(sound.volume())),
+            PlaybackSettings::DESPAWN.with_volume(Volume::Linear(sound.volume() * master * sfx)),
             MatchScopedEntity,
         ));
         feedback.last_sound = Some(sound);
@@ -95,7 +99,7 @@ pub(crate) fn play_pending_audio_feedback(
     if let Some(voice) = feedback.pending_voice.take() {
         commands.spawn((
             AudioPlayer::new(asset_server.load(voice.audio_path(language))),
-            PlaybackSettings::DESPAWN.with_volume(Volume::Linear(0.92)),
+            PlaybackSettings::DESPAWN.with_volume(Volume::Linear(0.92 * master * voice_gain)),
             MatchScopedEntity,
         ));
         feedback.last_voice = Some(voice);
@@ -173,66 +177,50 @@ impl UnitVoiceEvent {
         }
     }
 
-    /// Chinese pack: edge-tts 云希 (unit acks) + 晓晓 (announcer); see
-    /// scripts/gen_zh_voice.sh.
     pub(crate) fn audio_path_zh(self) -> &'static str {
         match self {
-            Self::Hello => "voice/chinese/edge-yunxi/sir.ogg",
-            Self::Ack1 => "voice/chinese/edge-yunxi/yes_sir.ogg",
-            Self::Ack2 => "voice/chinese/edge-yunxi/acknowledged.ogg",
-            Self::Training => "voice/chinese/edge-xiaoxiao/training.ogg",
-            Self::UnitReady => "voice/chinese/edge-xiaoxiao/unit_ready.ogg",
-            Self::ConstructionComplete => "voice/chinese/edge-xiaoxiao/construction_complete.ogg",
-            Self::NotEnoughResources => "voice/chinese/edge-xiaoxiao/not_enough_resources.ogg",
-            Self::SupportPowerReady => "voice/chinese/edge-xiaoxiao/support_power_ready.ogg",
-            Self::SupportPowerFired => "voice/chinese/edge-yunxi/acknowledged.ogg",
-            Self::EnemySupportPowerFired => "voice/chinese/edge-xiaoxiao/enemy_support_power.ogg",
-            Self::EnemySuperweaponReady => {
-                "voice/chinese/edge-xiaoxiao/enemy_superweapon_ready.ogg"
-            }
+            Self::Hello => "voice/chinese/unit/hello.ogg",
+            Self::Ack1 => "voice/chinese/unit/ack1.ogg",
+            Self::Ack2 => "voice/chinese/unit/ack2.ogg",
+            Self::Training => "voice/chinese/announcer/training.ogg",
+            Self::UnitReady => "voice/chinese/announcer/unit_ready.ogg",
+            Self::ConstructionComplete => "voice/chinese/announcer/construction_complete.ogg",
+            Self::NotEnoughResources => "voice/chinese/announcer/not_enough_resources.ogg",
+            Self::SupportPowerReady => "voice/chinese/announcer/support_power_ready.ogg",
+            Self::SupportPowerFired => "voice/chinese/unit/ack2.ogg",
+            Self::EnemySupportPowerFired => "voice/chinese/announcer/enemy_support_power_fired.ogg",
+            Self::EnemySuperweaponReady => "voice/chinese/announcer/enemy_superweapon_ready.ogg",
             Self::EnemySuperweaponLaunched => {
-                "voice/chinese/edge-xiaoxiao/enemy_superweapon_launched.ogg"
+                "voice/chinese/announcer/enemy_superweapon_launched.ogg"
             }
-            Self::Victory => "voice/chinese/edge-xiaoxiao/victory.ogg",
-            Self::Defeat => "voice/chinese/edge-xiaoxiao/defeat.ogg",
-            Self::BaseUnderAttack => "voice/chinese/edge-xiaoxiao/base_under_attack.ogg",
-            Self::UnitUnderAttack => "voice/chinese/edge-xiaoxiao/unit_under_attack.ogg",
-            Self::UnitLost => "voice/chinese/edge-xiaoxiao/unit_lost.ogg",
+            Self::Victory => "voice/chinese/announcer/victory.ogg",
+            Self::Defeat => "voice/chinese/announcer/defeat.ogg",
+            Self::BaseUnderAttack => "voice/chinese/announcer/base_under_attack.ogg",
+            Self::UnitUnderAttack => "voice/chinese/announcer/unit_under_attack.ogg",
+            Self::UnitLost => "voice/chinese/announcer/unit_lost.ogg",
         }
     }
-
     pub(crate) fn audio_path_en(self) -> &'static str {
         match self {
-            Self::Hello => "voice/english/ttsmaker-com-2704-jackson-us/sir.ogg",
-            Self::Ack1 => "voice/english/ttsmaker-com-2704-jackson-us/yes_sir.ogg",
-            Self::Ack2 => "voice/english/ttsmaker-com-2704-jackson-us/acknowledged.ogg",
-            Self::Training => "voice/english/ttsmaker-com-148-alayna-us/training.ogg",
-            Self::UnitReady => "voice/english/ttsmaker-com-148-alayna-us/unit_ready.ogg",
-            Self::ConstructionComplete => {
-                "voice/english/ttsmaker-com-148-alayna-us/construction_complete.ogg"
+            Self::Hello => "voice/english/unit/hello.ogg",
+            Self::Ack1 => "voice/english/unit/ack1.ogg",
+            Self::Ack2 => "voice/english/unit/ack2.ogg",
+            Self::Training => "voice/english/announcer/training.ogg",
+            Self::UnitReady => "voice/english/announcer/unit_ready.ogg",
+            Self::ConstructionComplete => "voice/english/announcer/construction_complete.ogg",
+            Self::NotEnoughResources => "voice/english/announcer/not_enough_resources.ogg",
+            Self::SupportPowerReady => "voice/english/announcer/support_power_ready.ogg",
+            Self::SupportPowerFired => "voice/english/unit/ack2.ogg",
+            Self::EnemySupportPowerFired => "voice/english/announcer/enemy_support_power_fired.ogg",
+            Self::EnemySuperweaponReady => "voice/english/announcer/enemy_superweapon_ready.ogg",
+            Self::EnemySuperweaponLaunched => {
+                "voice/english/announcer/enemy_superweapon_launched.ogg"
             }
-            Self::NotEnoughResources => {
-                "voice/english/ttsmaker-com-148-alayna-us/not_enough_resources.ogg"
-            }
-            Self::SupportPowerReady => "voice/english/ttsmaker-com-148-alayna-us/unit_ready.ogg",
-            Self::SupportPowerFired => {
-                "voice/english/ttsmaker-com-2704-jackson-us/acknowledged.ogg"
-            }
-            Self::EnemySupportPowerFired => {
-                "voice/english/ttsmaker-com-148-alayna-us/unit_under_attack.ogg"
-            }
-            Self::EnemySuperweaponReady | Self::EnemySuperweaponLaunched => {
-                "voice/english/ttsmaker-com-148-alayna-us/your_base_is_under_attack.ogg"
-            }
-            Self::Victory => "voice/english/ttsmaker-com-148-alayna-us/you_are_victorious.ogg",
-            Self::Defeat => "voice/english/ttsmaker-com-148-alayna-us/you_have_lost.ogg",
-            Self::BaseUnderAttack => {
-                "voice/english/ttsmaker-com-148-alayna-us/your_base_is_under_attack.ogg"
-            }
-            Self::UnitUnderAttack => {
-                "voice/english/ttsmaker-com-148-alayna-us/unit_under_attack.ogg"
-            }
-            Self::UnitLost => "voice/english/ttsmaker-com-148-alayna-us/unit_lost.ogg",
+            Self::Victory => "voice/english/announcer/victory.ogg",
+            Self::Defeat => "voice/english/announcer/defeat.ogg",
+            Self::BaseUnderAttack => "voice/english/announcer/base_under_attack.ogg",
+            Self::UnitUnderAttack => "voice/english/announcer/unit_under_attack.ogg",
+            Self::UnitLost => "voice/english/announcer/unit_lost.ogg",
         }
     }
 }
@@ -427,6 +415,53 @@ mod voice_tests {
                     "missing voice file: {path}"
                 );
             }
+        }
+    }
+}
+
+#[cfg(all(test, feature = "audio"))]
+mod volume_tests {
+    use super::*;
+    use bevy::ecs::system::RunSystemOnce;
+    #[test]
+    fn actual_feedback_spawns_apply_master_and_independent_channel_volumes() {
+        for (master, voice, sfx) in [
+            (1.0, 1.0, 1.0),
+            (0.0, 1.0, 1.0),
+            (1.0, 0.0, 1.0),
+            (1.0, 1.0, 0.0),
+            (0.5, 0.4, 0.3),
+        ] {
+            let mut app = App::new();
+            app.add_plugins((MinimalPlugins, bevy::asset::AssetPlugin::default()));
+            app.init_asset::<AudioSource>();
+            app.insert_resource(MenuOptionsState {
+                master_volume: master,
+                voice_volume: voice,
+                sfx_volume: sfx,
+                ..default()
+            });
+            app.insert_resource(AudioFeedback {
+                pending_voice: Some(UnitVoiceEvent::Hello),
+                pending_sound: Some(SoundEffectKind::Select),
+                ..default()
+            });
+            app.world_mut()
+                .run_system_once(play_pending_audio_feedback)
+                .unwrap();
+            let gains: Vec<_> = app
+                .world_mut()
+                .query::<&PlaybackSettings>()
+                .iter(app.world())
+                .map(|p| p.volume)
+                .collect();
+            assert_eq!(
+                gains,
+                vec![
+                    Volume::Linear(0.72 * master * sfx),
+                    Volume::Linear(0.92 * master * voice)
+                ]
+            );
         }
     }
 }

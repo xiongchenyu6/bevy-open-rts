@@ -77,6 +77,42 @@
   },
   "assets": [
     {
+      "path": "assets/campaign/mission_01-v2.jpg",
+      "sha256": "6cd02c15357fef191b1c3368a676a1d60be1c22f8703b44be8a1f0c6370b9222",
+      "comparison": "generated_original",
+      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+    },
+    {
+      "path": "assets/campaign/mission_02-v2.jpg",
+      "sha256": "96c214bdd16c7c0bbaa9aa3ab77d4ef37a064bf7ca59a06a4497ff3b41bc825c",
+      "comparison": "generated_original",
+      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+    },
+    {
+      "path": "assets/campaign/mission_03-v2.jpg",
+      "sha256": "ec75ee9ee9e5f2e5c2134efbb34dcaf6f3b51aecc24a78d8700262f15b41f110",
+      "comparison": "generated_original",
+      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+    },
+    {
+      "path": "assets/campaign/mission_04-v2.jpg",
+      "sha256": "eadb68ea555c33410d97147cf106aa76d65f3ccfba75258e16a5ddaa3866cfdd",
+      "comparison": "generated_original",
+      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+    },
+    {
+      "path": "assets/campaign/mission_05-v2.jpg",
+      "sha256": "e8e49b0c7c5dd7a78bc90af38975793552b1abb024aecae73ad3414be1c26b7c",
+      "comparison": "generated_original",
+      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+    },
+    {
+      "path": "assets/campaign/mission_06-v2.jpg",
+      "sha256": "45032cf3846cd12f1709d68ea045599dcc157353980e57e63ae385abc3c31c06",
+      "comparison": "generated_original",
+      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+    },
+    {
       "path": "assets/data/godot_model_map.model_map.ron",
       "sha256": "e1674c86f38d6c358ab768581b6280df02ab14344f5c9ec834ac539a93dc0e3c",
       "comparison": "absent_from_upstream"
@@ -3921,204 +3957,228 @@
       "comparison": "absent_from_upstream"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/base_under_attack.ogg",
-      "sha256": "0af2018d1323844fc69bc8dfd8698cbee27075136973da4941ceedda7a91eb4f",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/base_under_attack.ogg",
+      "sha256": "f73ae0fe757a040296e2975bff1ef5d9380393eb087029a402db9f0171c1dd1e",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "2c969b65c7a11e2548985f189e3a8e2a7180e1e5dca58c701b39a1fa65f0ef73"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/construction_complete.ogg",
-      "sha256": "98e7ecb1ea9103f53e53103c745462984d74f1c34b8e4f4f2c69b63afa18be3f",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/construction_complete.ogg",
+      "sha256": "bff568e942a796bd77f25b158f806c683e0b312b83a2b743f9deb7d3fdac2e96",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "4b26c0e6e15a7b8ca7bad1006015ec9f2f1804835f347d9f41c67f499d5bdeab"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/defeat.ogg",
-      "sha256": "aec3708de2f2ea44671dfe8521c2e66a05feab804a12595750a647f13c2829a9",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/defeat.ogg",
+      "sha256": "fd87d8ddba6c36ff990b85eb6d856516ca89b710d7719e85084547b87a9a78dd",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "c0caf90d4281b8bd8ee5f13ca5de9780d5ee0bcfc52822fc47a2194867472287"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/enemy_superweapon_launched.ogg",
-      "sha256": "034597e99f1c61c909c21bdaf43e9bcb9164c04d89d25b3f99e2890b78449409",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/enemy_superweapon_launched.ogg",
+      "sha256": "36dfe0f5f5046f18880fe4fb6b0459b15e99fe52d7b4f3e38c762176efcb9f72",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "55899184a7e6f9abfdb97e5ef5df520cd1da3b84b4332a21a06af52828e310c1"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/enemy_superweapon_ready.ogg",
-      "sha256": "adbc67ae93e680ff8c1ebab6874d2b98f77840e7eac26bab2a797cb49b580b78",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/enemy_superweapon_ready.ogg",
+      "sha256": "809f9ac6a1beb24d7e2a05aefe7616d59cf562dd0fcc54dfcf0d47c226d0da91",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "a5ab0cec9c375bf28a7136083aa48f85c65c65150f1d7371239894d5a89cfbca"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/enemy_support_power.ogg",
-      "sha256": "680f2312dd8dd4d718a1b2fa1af697602e517b1e04e3a6d138701169995d0d6f",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/enemy_support_power_fired.ogg",
+      "sha256": "793d95b5fb4277b444987d7e7b8c28af8aab6d70a51560b1c0f00406ee8a7d56",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "72a7bdab1bbf689dd0e3d26e678b944d48c7da050aa29c3055d4994d4d1037bb"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/not_enough_resources.ogg",
-      "sha256": "315d9676134800eecd1202a402ba08780d82c3169089053e8f7eaccb60ca8645",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/not_enough_resources.ogg",
+      "sha256": "e0495e0856eabc131e260cf1c6ce812c930b11b687d622cef733e79b381a7b23",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "2ad71fce381b54e00a227dd45cd1b990b493de1bd1ead8248b63534278a949f8"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/support_power_ready.ogg",
-      "sha256": "0fcf79b7cccdea7597ca9e09cfa9eed0fd00de547d3c6b9c3c01b188a4efbdab",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/support_power_ready.ogg",
+      "sha256": "cddab3aabb9e3a5d0655714ac9c5e34dbb4c77cf1038a991357ca4a35990f844",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "d35afe65084b3620e7609896e2ca60836cc67ea1d59470b4c24879474a3d1bbb"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/training.ogg",
-      "sha256": "e4ef22d31a6efc9b086e6448c2cefcd840baee41e8c174f5d4667dafe2a90b2e",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/training.ogg",
+      "sha256": "80e4edc9197a3c0aaf4828c71f60e9f9886ddfb7c9843680596e7b77bb1ab964",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "87af6f47565a6f8fc7941a0b24636a1cdf949a4418ba082a27cdd76c8deecfd2"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/unit_lost.ogg",
-      "sha256": "a22ce9ad915b9cbfe8f7e42260a57875652b3773b4640b6de973a20cc242cf04",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/unit_lost.ogg",
+      "sha256": "47d0385e765b8cf79b9061a2d0365e756473efa2eb45f79be9d39f5fc195c7fa",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "623ad55b64c7bd1bab85e10594f0a5e1ab79b4e75eeb143cfb5afe040127d308"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/unit_ready.ogg",
-      "sha256": "3fc3c8f10eb5b2c89f877fc50e4fb10e0513dc22f455b00b8ed2a2d6e2ab6ae7",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/unit_ready.ogg",
+      "sha256": "198608871e4435d18c98806dbb84cd61f7f60198d98dce0417ce527859292f94",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "c04c03418dd4c2d546b55936377cff122fe753a5ad1b0e5bb929d26efdb6045d"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/unit_under_attack.ogg",
-      "sha256": "4cd6e90e1ab72e1d93e2b62cae6fb38c690194199a47f2a49b39983f6ba25146",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/unit_under_attack.ogg",
+      "sha256": "564c18dc8dc4790d427ebd9e754263fc00feb121835e0e52cecad39c70476b09",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "c164069aadbb92f6a82461328400d34936be2d104cc77ef0f840b10a56422640"
     },
     {
-      "path": "assets/voice/chinese/edge-xiaoxiao/victory.ogg",
-      "sha256": "c509b9d14027919d8d1a840b9e7a25537a576e0be8c02a0b4441a4e483c441ee",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/announcer/victory.ogg",
+      "sha256": "c1fc682af7f76a920ac4e4ba0634e82a9c61f0598b33946434c73bedebe178af",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "e977d97fd321bde509398307922686f5ee417fb4901a56a726170902a2bac2e1"
     },
     {
-      "path": "assets/voice/chinese/edge-yunxi/acknowledged.ogg",
-      "sha256": "a5667e38fc32abce160e293b566ae028b825a3987b728e704056a4974b68885c",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/unit/ack1.ogg",
+      "sha256": "294660b658718e1158e17cea6998eeaa2dab6f3e39713413ebdba7bd0e7d47e1",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "bfb4c912e9c8360561f32545294860c096aed54afaca8476f75b011e939f4df5"
     },
     {
-      "path": "assets/voice/chinese/edge-yunxi/sir.ogg",
-      "sha256": "973e92e284048062ecb19d43f2cb044d88a502f1e9d801e3f9999df819982407",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/unit/ack2.ogg",
+      "sha256": "1cb20ea9e6ad8090d2ed960088e01d29c46322193b174d576c13447b9b127159",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "e1e93c87c4d1f0e4d08aafce9fc3958c6227837f036157c07b6dd067e786a5f0"
     },
     {
-      "path": "assets/voice/chinese/edge-yunxi/yes_sir.ogg",
-      "sha256": "f3f9796d0623febdfbd783b7a378fdc14873cc0cfe64195810bcdceb1ece7c17",
-      "comparison": "absent_from_upstream"
+      "path": "assets/voice/chinese/unit/hello.ogg",
+      "sha256": "7b07ce6b990f9c0e1739d746e0758c64873a75624ef4e40855255a98a6912c40",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "88d545530a3d24d968d1e9f4e9df1c84879d1c025a1a17b54820f890f17fbe6a"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/battle_control_offline.ogg",
-      "sha256": "5adf4d2e6d98324f21b6e553e6f4ba39dbc1ccd7a95b41d600d2cea0159daa6a",
-      "comparison": "identical",
-      "upstream_sha256": "5adf4d2e6d98324f21b6e553e6f4ba39dbc1ccd7a95b41d600d2cea0159daa6a"
+      "path": "assets/voice/english/announcer/base_under_attack.ogg",
+      "sha256": "9ac1327983d387158b90a8c3cb036354864937c1524c6a3b4e66dfe9d186778f",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "ca4ad2d5c7629c01e9ffbb122923f9019c3eacfa07a8d1750d80e1fb80fe9f40"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/battle_control_online.ogg",
-      "sha256": "a04a732a576597e7e26c0887b760c796d6f96d96b2d6402d9e811d52a71f1bb6",
-      "comparison": "identical",
-      "upstream_sha256": "a04a732a576597e7e26c0887b760c796d6f96d96b2d6402d9e811d52a71f1bb6"
+      "path": "assets/voice/english/announcer/construction_complete.ogg",
+      "sha256": "b46bb60b5d9d4660dab9433937b2c8aded77d7456440faa71b6047bfb242ac53",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "13de9c14df585e977bdc603f6761ca9309d5418d8b0dd6d401b43c4406333aa7"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/construction_complete.ogg",
-      "sha256": "53a1f915b3ad21fed70ad630e3d206daa37e103cfcbaa3e44655b709f2dc0acb",
-      "comparison": "identical",
-      "upstream_sha256": "53a1f915b3ad21fed70ad630e3d206daa37e103cfcbaa3e44655b709f2dc0acb"
+      "path": "assets/voice/english/announcer/defeat.ogg",
+      "sha256": "975ac6056e3f5339023d71e44348a3d91af6857f9ea83e476f60b5436c0b23fe",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "dffe6e67d31b72b407dfb5a0f68b062f64dc4df238b23bac6c017edaef33a6a2"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/not_enough_resources.ogg",
-      "sha256": "b5255f69ec44e21f58b9f194756319555f498cc9d78a24a792b9bbe457d38238",
-      "comparison": "identical",
-      "upstream_sha256": "b5255f69ec44e21f58b9f194756319555f498cc9d78a24a792b9bbe457d38238"
+      "path": "assets/voice/english/announcer/enemy_superweapon_launched.ogg",
+      "sha256": "0ec6b24d3fd60eebbf3e73b5311141b7eceacb2343e52211d13b70d30c5248a7",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "90682941a983fa2403430e35435c90fe263ac1d0155ee337ebb0f09d2c26fc87"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/training.ogg",
-      "sha256": "b4caf625632b77319ec7312b8ee18e3e0306c2ebc02f61f68f0c46009b6bc337",
-      "comparison": "identical",
-      "upstream_sha256": "b4caf625632b77319ec7312b8ee18e3e0306c2ebc02f61f68f0c46009b6bc337"
+      "path": "assets/voice/english/announcer/enemy_superweapon_ready.ogg",
+      "sha256": "f9d45b87fc124b8af93bc69e9af4bb1b0f9c5d925ce59ecf87d3c1f654fa26f7",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "4cb7a250b312bf739d22351ff03b0278ee2230a1d7e2e57f45a7660533023a56"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/unit_lost.ogg",
-      "sha256": "f1c66e4e266a2f22f0f9e62d9e2f986b0fd05f84966904e479f9ab45cfeae234",
-      "comparison": "identical",
-      "upstream_sha256": "f1c66e4e266a2f22f0f9e62d9e2f986b0fd05f84966904e479f9ab45cfeae234"
+      "path": "assets/voice/english/announcer/enemy_support_power_fired.ogg",
+      "sha256": "0933a1b4683929db35a4345414205962f656bd09b304262d1f22653f98cdca62",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "12aad2add0840f584cd287629b5ac10dc425d1d2415eb3251b6417c859bd1232"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/unit_ready.ogg",
-      "sha256": "325ae3cebdb3e2b5ee21e54f591effcb527b6fda24ec45cf8d370cef9c671f81",
-      "comparison": "identical",
-      "upstream_sha256": "325ae3cebdb3e2b5ee21e54f591effcb527b6fda24ec45cf8d370cef9c671f81"
+      "path": "assets/voice/english/announcer/not_enough_resources.ogg",
+      "sha256": "672f1f0b1b613c3771c8f60a8f2fb9a6f230b40e0c10437ee637d6ba079ded72",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "b381cea3b86cd4bb1e62169a8ade332980dc044ca2c29edee90694e0000883f5"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/unit_under_attack.ogg",
-      "sha256": "ff2ae52bb323b5ca83b239c54838cde8b53ed9bb8516d81dd7fff79cba5c754f",
-      "comparison": "identical",
-      "upstream_sha256": "ff2ae52bb323b5ca83b239c54838cde8b53ed9bb8516d81dd7fff79cba5c754f"
+      "path": "assets/voice/english/announcer/support_power_ready.ogg",
+      "sha256": "4c062f0fbbc92c2ce2bce5b26ec7740d772a865c1c8e39fe2f03be9a67b84d56",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "e87b222adaff829152dce5bb8385c724f931c5545765c7fa86117997b1ba41f4"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/you_are_victorious.ogg",
-      "sha256": "88b3714abd74f911ad163eb59e30e10c211d7de2fd3e7d0d1c8e0028a4eedbbf",
-      "comparison": "identical",
-      "upstream_sha256": "88b3714abd74f911ad163eb59e30e10c211d7de2fd3e7d0d1c8e0028a4eedbbf"
+      "path": "assets/voice/english/announcer/training.ogg",
+      "sha256": "1590dfc39e19c3de412340cc869b5c610f50c19c3867cbdc682f5ce5169dd881",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "eed454b3ee1c82d6df0843623e2f5f0f742c9430ac06caf575c0078b15ebbbd9"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/you_have_lost.ogg",
-      "sha256": "64f9163d4d92d0f221ae46ebb9f4b60d1a220634cfb6fab5a8fbdd7c4e6ebd87",
-      "comparison": "identical",
-      "upstream_sha256": "64f9163d4d92d0f221ae46ebb9f4b60d1a220634cfb6fab5a8fbdd7c4e6ebd87"
+      "path": "assets/voice/english/announcer/unit_lost.ogg",
+      "sha256": "ed9483539db797ee148a3f135ec1b6c8e96449c42a88c466024b80e8498b4c18",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "0902f1e4c729f7cc326e8b51d43728ab506aff26c8250c4f65087077def4c99f"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/your_base_is_under_attack.ogg",
-      "sha256": "9877325b20d99991bede5c08e8dcb13969e79870dea7248e1fe0fd5a32518e72",
-      "comparison": "identical",
-      "upstream_sha256": "9877325b20d99991bede5c08e8dcb13969e79870dea7248e1fe0fd5a32518e72"
+      "path": "assets/voice/english/announcer/unit_ready.ogg",
+      "sha256": "44de57e2233928c4dfd590e33c2b2f11b3a2bdc34d11c4f7a2a536f0c570af07",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "2fd95944d8dd1545b8f609efdd32e8fe3afde29898b311766f252804bd243163"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-2704-jackson-us/acknowledged.ogg",
-      "sha256": "36051c4d4c724042a96030abb0c1563c7c74be6e06f10ffe8ca7bcae546a0bd9",
-      "comparison": "identical",
-      "upstream_sha256": "36051c4d4c724042a96030abb0c1563c7c74be6e06f10ffe8ca7bcae546a0bd9"
+      "path": "assets/voice/english/announcer/unit_under_attack.ogg",
+      "sha256": "2bd6722ab634d5d9bd5aad3ee677b0f0cf8dc8476eb3454e13f5d21d1864e304",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "90dcc5951602b5ae2736e6ba8c1a6ec79c46c50f422ee11ffa6607e960c5daca"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-2704-jackson-us/sir.ogg",
-      "sha256": "85b8ee23c90274255d7e4077076b04e8051026880ace9e8c8bf63feb2d6d7413",
-      "comparison": "identical",
-      "upstream_sha256": "85b8ee23c90274255d7e4077076b04e8051026880ace9e8c8bf63feb2d6d7413"
+      "path": "assets/voice/english/announcer/victory.ogg",
+      "sha256": "6b4a0aadac66ace9a658e9dad27f04ce77b0778544bca7e5fbe0cc8e4f4d5db5",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "339b653929a5693d17f885b08bf3034fc81583097a0ee7fd360d8ad350d6e1c7"
     },
     {
-      "path": "assets/voice/english/ttsmaker-com-2704-jackson-us/yes_sir.ogg",
-      "sha256": "1c6b5f9485822e5ff1df9ef7ecdbe2fa73a471a9d8124d752bc2b19c716d44a6",
-      "comparison": "identical",
-      "upstream_sha256": "1c6b5f9485822e5ff1df9ef7ecdbe2fa73a471a9d8124d752bc2b19c716d44a6"
+      "path": "assets/voice/english/unit/ack1.ogg",
+      "sha256": "3e9db0c29c7fc417d24e4823bab16bc0234bfcc8f30d390e0896e1ecf1db243a",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "2d61a236de7d48c6e4c5d72d65a4f09f8aaa4b5da09bdb15508ddfc6f275da1c"
     },
     {
-      "path": "assets/campaign/mission_01-v2.jpg",
-      "sha256": "6cd02c15357fef191b1c3368a676a1d60be1c22f8703b44be8a1f0c6370b9222",
-      "comparison": "generated_original",
-      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+      "path": "assets/voice/english/unit/ack2.ogg",
+      "sha256": "4c380c0df4b6cb52b2566611b2452d18c14aa3df97ee0628228ee6ce4f5682a4",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "9c3a90571a2a893b832c062d013b633ab378183c02a6b6ec493ed585d66ad8ef"
     },
     {
-      "path": "assets/campaign/mission_02-v2.jpg",
-      "sha256": "96c214bdd16c7c0bbaa9aa3ab77d4ef37a064bf7ca59a06a4497ff3b41bc825c",
-      "comparison": "generated_original",
-      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
-    },
-    {
-      "path": "assets/campaign/mission_03-v2.jpg",
-      "sha256": "ec75ee9ee9e5f2e5c2134efbb34dcaf6f3b51aecc24a78d8700262f15b41f110",
-      "comparison": "generated_original",
-      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
-    },
-    {
-      "path": "assets/campaign/mission_04-v2.jpg",
-      "sha256": "eadb68ea555c33410d97147cf106aa76d65f3ccfba75258e16a5ddaa3866cfdd",
-      "comparison": "generated_original",
-      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
-    },
-    {
-      "path": "assets/campaign/mission_05-v2.jpg",
-      "sha256": "e8e49b0c7c5dd7a78bc90af38975793552b1abb024aecae73ad3414be1c26b7c",
-      "comparison": "generated_original",
-      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
-    },
-    {
-      "path": "assets/campaign/mission_06-v2.jpg",
-      "sha256": "45032cf3846cd12f1709d68ea045599dcc157353980e57e63ae385abc3c31c06",
-      "comparison": "generated_original",
-      "generation_record": "art/campaign/runtime-derivatives-20261010.json"
+      "path": "assets/voice/english/unit/hello.ogg",
+      "sha256": "1c9acb77e1e1034832f7685655cbd9c00c4404b3fa569c4309d1d932fd02afaa",
+      "comparison": "original_generated_voice",
+      "provenance": "art/voice/provenance.json",
+      "source_sha256": "a8da92e15192baa257417f995cd727516ae880c5f620850fc77db30bc5718ea4"
     }
   ],
   "historical_generation_evidence": {

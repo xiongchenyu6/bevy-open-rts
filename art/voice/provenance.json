@@ -1,5 +1,5 @@
 {
-  "scope": "Original Kokoro-generated source recordings; metadata does not substitute for human listening/tone review",
+  "scope": "Original integrated voice pack with bounded native audio-fixture evidence; human listening and natural gameplay acceptance pending",
   "official_source_provenance": {
     "repo": "hexgrad/Kokoro-82M",
     "revision": "f3ff3571791e39611d31c381e3a41a3af07b4987",
@@ -457,5 +457,21 @@
     "container_bytes_equal": 0
   },
   "human_listening_accepted": false,
-  "tone_accepted": false
+  "tone_accepted": false,
+  "runtime_integrated": true,
+  "audio_fixture": {
+    "binary_sha256": "cc05c6043f5cb1ae639b04f67c8de02bafcdea42678348dd4f0d9549b6a712c6",
+    "loader_pass": true,
+    "playback_pass": true,
+    "events": 34,
+    "unique_sources": 32,
+    "natural_completions": 34,
+    "forced_cleanup": 0,
+    "timeouts": 0,
+    "recorded_frames": 3350400,
+    "recorded_sample_rate": 48000,
+    "clipped_samples": 0,
+    "evidence": "target/voice-runtime-audio-qa-20261010",
+    "scope": "isolated audio fixture; no natural game-event or physical listening acceptance"
+  }
 }
