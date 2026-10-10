@@ -15,11 +15,17 @@ membership and explicitly use the Alliance visual default, without claiming
 ownership. Multi-faction entities retain all memberships. Regenerate the source
 inventory with `python3 art/portraits/audit_entities.py`.
 
-The existing native exporter currently hardcodes AdvancedReactorPlant,
-CommandCenter and Tank. Extend its validated iteration with this list and faction
-selection, retaining full actual spawn/model assembly, attachments, rest-pose
-geometry parity, assembled AABB framing, transparent RGBA and independent render
-reproducibility. Registry models may be empty for authored procedural tanks and
+The native exporter now accepts this audited inventory and faction selection:
+
+```sh
+cargo run --locked --bin portrait_export -- art/portraits/entities.json /new/staging-directory
+```
+
+It validates registry IDs, matching icon paths, uniqueness and faction names
+before creating the staging directory. It retains actual spawn/model assembly,
+attachments, independent MainMenu asset-reference geometry parity, assembled
+AABB framing, transparent RGBA and two separate rendering runs. Compilation and
+full70 runtime export/readability acceptance are still pending. Registry models may be empty for authored procedural tanks and
 TeslaFenceSegment; that is not missing geometry. ModelMap references are source
 correspondence, not permission to replace the actual assembled rendering path.
 
