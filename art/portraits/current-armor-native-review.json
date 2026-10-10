@@ -1,0 +1,46 @@
+{
+  "scope": "All70 paired asset-only currentarmor portraits and original roster; not paid-gameplay/fullUI/finalpackage acceptance",
+  "capture_exporter_sha256": "73275653cdf16676e60c43263e1d71c361ab85cbef9b44abc2c8746d957e9920",
+  "actual_exits": [
+    0,
+    0,
+    0
+  ],
+  "paired_entity_count": 70,
+  "root_reviewed_all70": true,
+  "sizes": [
+    128,
+    72
+  ],
+  "backgrounds": [
+    "dark",
+    "light"
+  ],
+  "sheets": [
+    {
+      "path": "target/current-armor-portrait-refresh-20261010/portraits/review/sheet-1-full.png",
+      "sha256": "f277e55056df58ee82eb770db6b18c1e4f0818180c076b36c00b30fd170c9d17"
+    },
+    {
+      "path": "target/current-armor-portrait-refresh-20261010/portraits/review/sheet-2-full.png",
+      "sha256": "29758d4a39371b960a5b2ac0397a1527f27ab6af6c3bdef1120a363ef08018c0"
+    },
+    {
+      "path": "target/current-armor-portrait-refresh-20261010/portraits/review/sheet-3-full.png",
+      "sha256": "c301e035e461eb0630b7e0a413e3270d58c945771311fa1f3266d738fe10879e"
+    },
+    {
+      "path": "target/current-armor-portrait-refresh-20261010/portraits/review/sheet-4-full.png",
+      "sha256": "eee4e91cf2a93d559f6b984d5b75b4765829bbb176ad3999d12783e7b0b5c952"
+    },
+    {
+      "path": "target/current-armor-portrait-refresh-20261010/portraits/review/sheet-5-full.png",
+      "sha256": "4d8ad029e157c81fadca80ac7a39cfd0225ecade3e6a55cb59c7eb169079eba9"
+    }
+  ],
+  "root_visual_review": "Silhouettes, attached equipment and current restrained armor remain readable across all70 on dark/light128/72px; no observed clipped silhouettes or detached parts. Similar base-role families share geometry intentionally.",
+  "roster_image_sha256": "9d7a50a0e124c64a0aa06de9e98023d785135f1c48c819d515916af17a088675",
+  "roster_visual_review": "Six member silhouettes and equipment are distinct with transparent background; current armor coherent.",
+  "runtime_integrated": false,
+  "final_package_verified": false
+}
