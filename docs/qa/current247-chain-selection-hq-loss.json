@@ -1,0 +1,61 @@
+{
+  "scope": "Same-App chain passed four disk prefixes, then harness stopped during still-running Mission5; not game defeat or six-mission completion",
+  "process": {
+    "exit_code": 1,
+    "same_application": true,
+    "all_six_disk_prefixes_verified": false,
+    "accepted": false,
+    "errors": []
+  },
+  "prefixes": [
+    {
+      "index": 0,
+      "completed": [
+        "hold_the_line"
+      ],
+      "profile_sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+      "profile_prefix_verified": true
+    },
+    {
+      "index": 1,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost"
+      ],
+      "profile_sha256": "49a2d1643b35bdc53c65186dff35bb82e29e9c7d92f72d20472cda617e645fc2",
+      "profile_prefix_verified": true
+    },
+    {
+      "index": 2,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost",
+        "canyon_siege"
+      ],
+      "profile_sha256": "1426d6501034241653895738b720208fb07fc93c3f1bcfdcc552ae7bfd1e365f",
+      "profile_prefix_verified": true
+    },
+    {
+      "index": 3,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost",
+        "canyon_siege",
+        "highland_bastion_stand"
+      ],
+      "profile_sha256": "d723d3da24dc005cc7ac9f18e36ae7f8de7a1d73a59065e9c0b450185a8bc559",
+      "profile_prefix_verified": true
+    }
+  ],
+  "mission5_clock": 210.14926147460938,
+  "actual_phase": "Running",
+  "surviving_types": {
+    "HeavyMachinegunTrooper": 2,
+    "RocketInfantry": 2,
+    "Tank": 9,
+    "Worker": 3
+  },
+  "error": "headquarters lost while clearing selection",
+  "correction": "Permit existing HQ-loss survivor continuation for this exact selection error under the unchanged Running/no-owned-HQ/annihilation-mission guards",
+  "runtime_correction_verified": false
+}
