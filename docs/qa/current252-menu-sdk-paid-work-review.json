@@ -1,0 +1,730 @@
+{
+  "scope": "Exact menu-correctedSDK252 archive in officialRuntime4, normal paidPower partialconstruction and distinctWorkerHarvest same/freshprocess continuity; notproductionqueues/fullSavegate",
+  "archive_sha256": "e026531da02d7787e3576ddd1cd77c60358cb9d9b150b937131182823eb3eb21",
+  "binary_sha256": "4724664f7f6f3f36766ed8d8d009e3642fddc80a2101002f2a01bce97476e383",
+  "actual_service_exit": 0,
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 3175186,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "index": 2,
+      "pid": 3177486,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "wall_seconds": 98.93065726698842,
+  "original_wall_limit_seconds": 240,
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "raw_evidence": "target/sdk252-menu-save-work-20261011-02",
+  "raw_result_sha256": "615513f7fad34bbb607f6b542287d61eae384c8c3f0de2efc19c64ea6ab2a453",
+  "snapshots": [
+    {
+      "path": "target/sdk252-menu-save-work-20261011-02/01-baseline-paused.ron",
+      "sha256": "54edc2b7536443cd548b0a4a286d788e064ab77fa3f17b03e39c8b624715770f",
+      "session": 1,
+      "state": {
+        "clock": 4.64587926864624,
+        "ore": 32,
+        "crystal": 16,
+        "units": [
+          {
+            "key": 8589933888,
+            "id": "Worker",
+            "position": [
+              -18.0,
+              0.05000000074505806,
+              -15.0
+            ],
+            "active": [],
+            "queued": [],
+            "cargo_ron": "Some((0, 0))"
+          },
+          {
+            "key": 8589933892,
+            "id": "Worker",
+            "position": [
+              -12.0,
+              0.05000000074505806,
+              -15.0
+            ],
+            "active": [],
+            "queued": [],
+            "cargo_ron": "Some((0, 0))"
+          },
+          {
+            "key": 8589933885,
+            "id": "Drone",
+            "position": [
+              -17.0,
+              1.5,
+              -20.0
+            ],
+            "active": [],
+            "queued": [],
+            "cargo_ron": "None"
+          }
+        ],
+        "structures": [
+          {
+            "key": 8589933873,
+            "id": "CommandCenter",
+            "position": [
+              -15.0,
+              0.0,
+              -18.0
+            ],
+            "construction": null,
+            "cost": null
+          }
+        ],
+        "own_harvest_resources": []
+      }
+    },
+    {
+      "path": "target/sdk252-menu-save-work-20261011-02/03-paid-initial.ron",
+      "sha256": "e223ad2efa6034a96aeb6b231e9bc1e8b1902a60669aac6ac7e3fe1f75b2cf0b",
+      "session": 1,
+      "state": {
+        "clock": 10.51948356628418,
+        "ore": 29,
+        "crystal": 15,
+        "units": [
+          {
+            "key": 8589933885,
+            "id": "Drone",
+            "position": [
+              -17.0,
+              1.5,
+              -20.0
+            ],
+            "active": [],
+            "queued": [],
+            "cargo_ron": "None"
+          },
+          {
+            "key": 8589933892,
+            "id": "Worker",
+            "position": [
+              -12.009195327758789,
+              0.05000000074505806,
+              -15.763955116271973
+            ],
+            "active": [
+              {
+                "kind": "Move",
+                "destination": [
+                  -12.042593955993652,
+                  0.0,
+                  -18.538583755493164
+                ]
+              },
+              {
+                "kind": "Construct",
+                "target": 12884900227
+              }
+            ],
+            "queued": [],
+            "cargo_ron": "Some((0, 0))"
+          },
+          {
+            "key": 8589933888,
+            "id": "Worker",
+            "position": [
+              -17.573665618896484,
+              0.05000000074505806,
+              -11.140297889709473
+            ],
+            "active": [
+              {
+                "kind": "Harvest",
+                "target": 8589933921,
+                "state": 1
+              }
+            ],
+            "queued": [],
+            "cargo_ron": "Some((2, 0))"
+          }
+        ],
+        "structures": [
+          {
+            "key": 12884900227,
+            "id": "PowerReactor",
+            "position": [
+              -12.822525978088379,
+              0.0,
+              -20.75538444519043
+            ],
+            "construction": [
+              1.0,
+              1.0
+            ],
+            "cost": [
+              3,
+              1
+            ]
+          },
+          {
+            "key": 8589933873,
+            "id": "CommandCenter",
+            "position": [
+              -15.0,
+              0.0,
+              -18.0
+            ],
+            "construction": null,
+            "cost": null
+          }
+        ],
+        "own_harvest_resources": [
+          {
+            "key": 8589933921,
+            "kind": 0,
+            "position": [
+              -17.470190048217773,
+              0.0,
+              -9.429200172424316
+            ],
+            "amount": 238
+          }
+        ]
+      }
+    },
+    {
+      "path": "target/sdk252-menu-save-work-20261011-02/04-midphase.ron",
+      "sha256": "6f4e1f42a26bfab8fc295e8a1051bb8f2d77a3788e427507c1de8a017d0ed4bb",
+      "session": 1,
+      "state": {
+        "clock": 12.924559593200684,
+        "ore": 29,
+        "crystal": 15,
+        "units": [
+          {
+            "key": 8589933885,
+            "id": "Drone",
+            "position": [
+              -17.0,
+              1.5,
+              -20.0
+            ],
+            "active": [],
+            "queued": [],
+            "cargo_ron": "None"
+          },
+          {
+            "key": 8589933888,
+            "id": "Worker",
+            "position": [
+              -17.573665618896484,
+              0.05000000074505806,
+              -11.140297889709473
+            ],
+            "active": [
+              {
+                "kind": "Harvest",
+                "target": 8589933921,
+                "state": 1
+              }
+            ],
+            "queued": [],
+            "cargo_ron": "Some((5, 0))"
+          },
+          {
+            "key": 8589933892,
+            "id": "Worker",
+            "position": [
+              -12.040096282958984,
+              0.05000000074505806,
+              -18.331167221069336
+            ],
+            "active": [
+              {
+                "kind": "Construct",
+                "target": 12884900227
+              }
+            ],
+            "queued": [],
+            "cargo_ron": "Some((0, 0))"
+          }
+        ],
+        "structures": [
+          {
+            "key": 12884900227,
+            "id": "PowerReactor",
+            "position": [
+              -12.822525978088379,
+              0.0,
+              -20.75538444519043
+            ],
+            "construction": [
+              0.5812549591064453,
+              1.0
+            ],
+            "cost": [
+              3,
+              1
+            ]
+          },
+          {
+            "key": 8589933873,
+            "id": "CommandCenter",
+            "position": [
+              -15.0,
+              0.0,
+              -18.0
+            ],
+            "construction": null,
+            "cost": null
+          }
+        ],
+        "own_harvest_resources": [
+          {
+            "key": 8589933921,
+            "kind": 0,
+            "position": [
+              -17.470190048217773,
+              0.0,
+              -9.429200172424316
+            ],
+            "amount": 235
+          }
+        ]
+      }
+    },
+    {
+      "path": "target/sdk252-menu-save-work-20261011-02/06-same-process-resaved.ron",
+      "sha256": "1f93b15a7a1b8fb01e81d4e902a8bf603266725127d4bd7a6779638baaf1591f",
+      "session": 1,
+      "state": {
+        "clock": 13.184706687927246,
+        "ore": 29,
+        "crystal": 15,
+        "units": [
+          {
+            "key": 12884900824,
+            "id": "Worker",
+            "position": [
+              -12.040096282958984,
+              0.05000000074505806,
+              -18.331167221069336
+            ],
+            "active": [
+              {
+                "kind": "Construct",
+                "target": 12884900794
+              }
+            ],
+            "queued": [],
+            "cargo_ron": "Some((0, 0))"
+          },
+          {
+            "key": 12884900739,
+            "id": "Drone",
+            "position": [
+              -17.0,
+              1.5,
+              -20.0
+            ],
+            "active": [],
+            "queued": [],
+            "cargo_ron": "None"
+          },
+          {
+            "key": 12884900658,
+            "id": "Worker",
+            "position": [
+              -17.573665618896484,
+              0.05000000074505806,
+              -11.140297889709473
+            ],
+            "active": [
+              {
+                "kind": "Harvest",
+                "target": 12884900618,
+                "state": 1
+              }
+            ],
+            "queued": [],
+            "cargo_ron": "Some((5, 0))"
+          }
+        ],
+        "structures": [
+          {
+            "key": 12884900794,
+            "id": "PowerReactor",
+            "position": [
+              -12.822525978088379,
+              0.0,
+              -20.75538444519043
+            ],
+            "construction": [
+              0.5032109618186951,
+              1.0
+            ],
+            "cost": [
+              3,
+              1
+            ]
+          },
+          {
+            "key": 17179868475,
+            "id": "CommandCenter",
+            "position": [
+              -15.0,
+              0.0,
+              -18.0
+            ],
+            "construction": null,
+            "cost": null
+          }
+        ],
+        "own_harvest_resources": [
+          {
+            "key": 12884900618,
+            "kind": 0,
+            "position": [
+              -17.470190048217773,
+              0.0,
+              -9.429200172424316
+            ],
+            "amount": 235
+          }
+        ]
+      }
+    },
+    {
+      "path": "target/sdk252-menu-save-work-20261011-02/09-fresh-process-resaved.ron",
+      "sha256": "4e66bda17439dec3e52244439b1a52fb58b47dafa1d0139267306f7b5d8221fe",
+      "session": 2,
+      "state": {
+        "clock": 13.445693016052246,
+        "ore": 29,
+        "crystal": 15,
+        "units": [
+          {
+            "key": 12884900556,
+            "id": "Drone",
+            "position": [
+              -17.0,
+              1.5,
+              -20.0
+            ],
+            "active": [],
+            "queued": [],
+            "cargo_ron": "None"
+          },
+          {
+            "key": 12884900492,
+            "id": "Worker",
+            "position": [
+              -17.573665618896484,
+              0.05000000074505806,
+              -11.140297889709473
+            ],
+            "active": [
+              {
+                "kind": "Harvest",
+                "target": 8589933210,
+                "state": 1
+              }
+            ],
+            "queued": [],
+            "cargo_ron": "Some((5, 0))"
+          },
+          {
+            "key": 12884900425,
+            "id": "Worker",
+            "position": [
+              -12.040096282958984,
+              0.05000000074505806,
+              -18.331167221069336
+            ],
+            "active": [
+              {
+                "kind": "Construct",
+                "target": 12884900423
+              }
+            ],
+            "queued": [],
+            "cargo_ron": "Some((0, 0))"
+          }
+        ],
+        "structures": [
+          {
+            "key": 12884900698,
+            "id": "CommandCenter",
+            "position": [
+              -15.0,
+              0.0,
+              -18.0
+            ],
+            "construction": null,
+            "cost": null
+          },
+          {
+            "key": 12884900423,
+            "id": "PowerReactor",
+            "position": [
+              -12.822525978088379,
+              0.0,
+              -20.75538444519043
+            ],
+            "construction": [
+              0.4249151349067688,
+              1.0
+            ],
+            "cost": [
+              3,
+              1
+            ]
+          }
+        ],
+        "own_harvest_resources": [
+          {
+            "key": 8589933210,
+            "kind": 0,
+            "position": [
+              -17.470190048217773,
+              0.0,
+              -9.429200172424316
+            ],
+            "amount": 235
+          }
+        ]
+      }
+    },
+    {
+      "path": "target/sdk252-menu-save-work-20261011-02/10-resumed-completed.ron",
+      "sha256": "ee00ce26fa07e8d0b4ca7f7c733a32b411bbe38b55abbff0bb47a4cee6b6bc28",
+      "session": 2,
+      "state": {
+        "clock": 25.851930618286133,
+        "ore": 41,
+        "crystal": 15,
+        "units": [
+          {
+            "key": 12884900492,
+            "id": "Worker",
+            "position": [
+              -15.49720287322998,
+              0.05000000074505806,
+              -11.29744815826416
+            ],
+            "active": [
+              {
+                "kind": "Harvest",
+                "target": 8589933213,
+                "state": 1
+              }
+            ],
+            "queued": [],
+            "cargo_ron": "Some((1, 0))"
+          },
+          {
+            "key": 12884900556,
+            "id": "Drone",
+            "position": [
+              -17.0,
+              1.5,
+              -20.0
+            ],
+            "active": [],
+            "queued": [],
+            "cargo_ron": "None"
+          },
+          {
+            "key": 12884900425,
+            "id": "Worker",
+            "position": [
+              -12.040096282958984,
+              0.05000000074505806,
+              -18.331167221069336
+            ],
+            "active": [],
+            "queued": [],
+            "cargo_ron": "Some((0, 0))"
+          }
+        ],
+        "structures": [
+          {
+            "key": 12884900698,
+            "id": "CommandCenter",
+            "position": [
+              -15.0,
+              0.0,
+              -18.0
+            ],
+            "construction": null,
+            "cost": null
+          },
+          {
+            "key": 12884900423,
+            "id": "PowerReactor",
+            "position": [
+              -12.822525978088379,
+              0.0,
+              -20.75538444519043
+            ],
+            "construction": null,
+            "cost": null
+          }
+        ],
+        "own_harvest_resources": [
+          {
+            "key": 8589933210,
+            "kind": 0,
+            "position": [
+              -17.470190048217773,
+              0.0,
+              -9.429200172424316
+            ],
+            "amount": 234
+          },
+          {
+            "key": 8589933213,
+            "kind": 0,
+            "position": [
+              -15.503700256347656,
+              0.0,
+              -9.616700172424316
+            ],
+            "amount": 233
+          }
+        ]
+      }
+    }
+  ],
+  "restore_comparisons": [
+    {
+      "elapsed": 0.2601470947265625,
+      "checks": {
+        "elapsed_nonnegative": true,
+        "same_constructor": true,
+        "same_gatherer": true,
+        "foundation_position": true,
+        "paid_cost": true,
+        "total": true,
+        "progress": true,
+        "economy": true,
+        "equivalent_harvest_node": true
+      },
+      "constructor_keys": [
+        8589933892,
+        12884900824
+      ],
+      "gatherer_keys": [
+        8589933888,
+        12884900658
+      ],
+      "foundation_keys": [
+        12884900227,
+        12884900794
+      ],
+      "harvest_target_keys": [
+        8589933921,
+        12884900618
+      ]
+    },
+    {
+      "elapsed": 0.260986328125,
+      "checks": {
+        "elapsed_nonnegative": true,
+        "same_constructor": true,
+        "same_gatherer": true,
+        "foundation_position": true,
+        "paid_cost": true,
+        "total": true,
+        "progress": true,
+        "economy": true,
+        "equivalent_harvest_node": true
+      },
+      "constructor_keys": [
+        12884900824,
+        12884900425
+      ],
+      "gatherer_keys": [
+        12884900658,
+        12884900492
+      ],
+      "foundation_keys": [
+        12884900794,
+        12884900423
+      ],
+      "harvest_target_keys": [
+        12884900618,
+        8589933210
+      ]
+    }
+  ],
+  "load_byte_checks": [
+    {
+      "session": 1,
+      "before": "6f4e1f42a26bfab8fc295e8a1051bb8f2d77a3788e427507c1de8a017d0ed4bb",
+      "after": "6f4e1f42a26bfab8fc295e8a1051bb8f2d77a3788e427507c1de8a017d0ed4bb",
+      "unchanged": true
+    },
+    {
+      "session": 2,
+      "before": "1f93b15a7a1b8fb01e81d4e902a8bf603266725127d4bd7a6779638baaf1591f",
+      "after": "1f93b15a7a1b8fb01e81d4e902a8bf603266725127d4bd7a6779638baaf1591f",
+      "unchanged": true
+    }
+  ],
+  "original_known_node_consumption": {
+    "before": {
+      "key": 8589933210,
+      "kind": 0,
+      "position": [
+        -17.470190048217773,
+        0.0,
+        -9.429200172424316
+      ],
+      "amount": 235
+    },
+    "after": {
+      "key": 8589933210,
+      "kind": 0,
+      "position": [
+        -17.470190048217773,
+        0.0,
+        -9.429200172424316
+      ],
+      "amount": 234
+    }
+  },
+  "all13_original_frames_reviewed": true,
+  "actual_power_tooltip": "A BuildPowerReactor cost3ore1crystal; dynamicidle-dependentactionlayout",
+  "visual_behavior": "Greenplacement, charged29/15, realpartialghost andConstructorpulse; same/freshloadedpartialsite; finalcompletedPower/41ore15crystal",
+  "all_image_sha256": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-baseline-paused": "656f58c684d5a4634fe1c29606f99f77c3f205700173b7f081882f18e2878fde",
+    "02-worker-selected-before-build": "b8da85f9ff5a583c801ded3c5c9784377424d6e80d8fa46cf118e1790fb39f05",
+    "02-power-card-tooltip": "621e607e743eee4ccb244bd8083877e31f4ab394c45c232ddff484f58e20041c",
+    "02-power-preview": "ee7fdc04eb26a09b3cc211a69733f5e9f5f5f6d4117ddf2cc3b97e3382fcd589",
+    "03-paid-initial": "e872482d380639e4bd0e605c16bdefdc63ae3b610f38b602dc23c7154cd9980e",
+    "04-midphase": "85e32d3ba928e2039ee37e933620868bd91543bbfb05490677f0b7a02277decd",
+    "05-same-process-loaded": "362584083f2ce967360588c0c1b6e65495a92f6ba740c56397b1d64edacce9ba",
+    "06-same-process-resaved": "5c1c87912a70b139db7b3f66066bc9bf1d3b1fdd68ec4c2b9c93e9b9e1e45d7e",
+    "07-fresh-menu": "697c1fb9a0d6ed69a724350c30f836a1e4db9947fecd00653c09dbf3950202dd",
+    "08-fresh-process-loaded": "56ada7e2e3113a0cbd5eea42818821f685d990dc0eba2c0b050bc8d01c701edc",
+    "09-fresh-process-resaved": "135ef14a881d823322ec9f4ea95fd0f3b6dee46c3eacfa669cd3add06fff5aa1",
+    "10-resumed-completed": "9bfc7bd8d01b5f77ef0a7bca47a2efd6af74e35ff9d2c483d3fe6f6fe5740118"
+  },
+  "preserved_first_failure": {
+    "evidence": "target/sdk252-menu-save-work-20261011-01",
+    "actual_service_exit": 1,
+    "second_game_forced_cleanup": true,
+    "reason": "Reader exportedonlycurrentlyreferencedHarvest node afternormalfullcargo/dropoffretarget; priorknownnodewasmissingfromobservation. Originalexactdepletionconditionretained; correctedreaderincludesonlypreviousactualownHarvesttargets."
+  },
+  "limits": [
+    "PaidPower andHarvest/normalapproach only; noBarracksproductionjob claim",
+    "Thisfooter-correctedpackage lacks laterFlashcleanup",
+    "NooverallSave/UI/Steamreadiness claim"
+  ]
+}
