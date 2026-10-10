@@ -1,0 +1,100 @@
+{
+  "scope": "Exact parameterized SDK archive; normal entity rally and one paid Worker job across same/freshprocess load; production scope only",
+  "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+  "binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+  "wall_seconds": 86.6999331000261,
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 3945338,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "index": 2,
+      "pid": 3947387,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "comparisons": [
+    {
+      "elapsed": 0.2613716125488281,
+      "target_keys": [
+        8589933888,
+        12884900832
+      ],
+      "producer_keys": [
+        8589933868,
+        12884900843
+      ],
+      "passed": true
+    },
+    {
+      "elapsed": 0.2607421875,
+      "target_keys": [
+        12884900832,
+        12884900738
+      ],
+      "producer_keys": [
+        12884900843,
+        12884900982
+      ],
+      "passed": true
+    }
+  ],
+  "load_byte_checks": [
+    {
+      "session": 1,
+      "before": "77379ae2d0beede5391362a22ec6e653568ca200f152747f51805a7e1864d43b",
+      "after": "77379ae2d0beede5391362a22ec6e653568ca200f152747f51805a7e1864d43b",
+      "unchanged": true
+    },
+    {
+      "session": 2,
+      "before": "1eb1da84ec615fe5ed52f52b31d66ba9ba7f1ff088546d8388705be7b9678a55",
+      "after": "1eb1da84ec615fe5ed52f52b31d66ba9ba7f1ff088546d8388705be7b9678a55",
+      "unchanged": true
+    }
+  ],
+  "produced_worker": {
+    "key": 55834573780,
+    "id": "Worker",
+    "position": [
+      -17.122440338134766,
+      0.05000000074505806,
+      -15.951160430908203
+    ],
+    "active": [
+      {
+        "kind": "Follow",
+        "target": 12884900738,
+        "allow_enemy": false
+      }
+    ],
+    "queued": [],
+    "cargo_ron": "Some((0, 0))"
+  },
+  "screenshots": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-baseline-paused": "54f471fb90d6a810cd77a381a25d92296b5a73f439fd8683e536383e6129fb2b",
+    "02-command-center-selected": "759388e1b2238bf39e20bf16a6f87887de1961de6d01063ca57265912c58b606",
+    "03-entity-rally-paused": "d0c42430378dc667b31ae15cf95e5217b24011bdaa4f51929f79b862a156f8f5",
+    "04-worker-train-tooltip": "93966b1d5a0b45921aa1d4ad952d0dfb29dddad54a008cb84b2e135e25069474",
+    "07-partial-paid-queue": "a522a493d389b1bdb7ad783ded62e82b99ab09e0ebc3c10754807d89b8674a73",
+    "08-same-process-loaded": "8189948804aa69a348d802eab347ce84c49b4e9307b835ad72811b0e476b1810",
+    "09-same-process-resaved": "00b7da4c5eb0448a177fa5a70ab84b1af45b0b1d6a1210806e205774c3fe630c",
+    "10-fresh-menu": "8888eb9704d130d25356a0bd920b7341406817217c396081667e9b0ef284e76c",
+    "11-fresh-process-loaded": "ee2a7b556718a62a6e2a968e096d2af22805077bb90892da6309ceaf63976e80",
+    "12-fresh-process-resaved": "b70856fcd100da1d749b9803424f7566498df34d5d31d8ccef546f3b87a31169",
+    "13-paid-worker-target-order": "3b518dd401e2f7b18d9a2ebd37ebd2b844e4bf02d26139093196ceb122bfbb4a"
+  },
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "evidence_directory": "target/sdk267-save-own-worker-20261011-01",
+  "result_sha256": "51f1e41144bb0d2150edac07de80f5839487362d1999af58e9c864b5daf7cb53",
+  "wall_limit_seconds": 240,
+  "passed": true,
+  "agent_final_frame_reviewed": true,
+  "limits": "One paid Worker2/0, bank30/16, received Follow to same actual own Worker after same/fresh remap; not all save states or first-session acceptance."
+}

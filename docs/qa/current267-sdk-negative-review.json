@@ -1,0 +1,64 @@
+{
+  "scope": "Exact format4 SDK normal CtrlL negative-input rejection; genuine paused paid-job/movement scene continuity; UI error review required",
+  "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+  "binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+  "wall_seconds": 46.97926801000722,
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 3955292,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "negative_cases": [
+    {
+      "case": "missing",
+      "fixture_sha256": null,
+      "load_input_unchanged": true,
+      "normal_resaved_sha256": "1078c1a0903f03db77216445170b45729e840350f8a587d46092e121c8bcdb2d",
+      "paused_scene_serialized_bytes_equal": true
+    },
+    {
+      "case": "truncated",
+      "fixture_sha256": "c626398570835c7ef0f0acca1a036d104678da34f47fb44710fbc73ed0b590de",
+      "load_input_unchanged": true,
+      "normal_resaved_sha256": "1078c1a0903f03db77216445170b45729e840350f8a587d46092e121c8bcdb2d",
+      "paused_scene_serialized_bytes_equal": true
+    },
+    {
+      "case": "invalid-rally-reference",
+      "fixture_sha256": "bc74bc21480f2c0b3d9ad95459815c2ec316d5abd60562efce7f5fadae4e898b",
+      "load_input_unchanged": true,
+      "normal_resaved_sha256": "1078c1a0903f03db77216445170b45729e840350f8a587d46092e121c8bcdb2d",
+      "paused_scene_serialized_bytes_equal": true
+    },
+    {
+      "case": "unsupported-real-format3",
+      "fixture_sha256": "eb6388c704a98e99224c8aacb790965b5b3a05ecb22162fd35a8e7d22bd63dcc",
+      "load_input_unchanged": true,
+      "normal_resaved_sha256": "1078c1a0903f03db77216445170b45729e840350f8a587d46092e121c8bcdb2d",
+      "paused_scene_serialized_bytes_equal": true
+    }
+  ],
+  "screenshots": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-real-paused-baseline": "bbbf3bb36275be82353e9044033ce7e0773a9138c50c0270933d4b41c375d924",
+    "02-missing-error": "b2c5beae6b43dad643864057b90b3e09e8ce724f7766b71f92e051ac9789bf9f",
+    "02-missing-normal-resaved": "b2cdb4ea0493e61afb3fc4dcb987969c1b42cf175ff112b200841a2612cdbd9c",
+    "03-truncated-error": "5aaae1cbe4aa7a220a90d76b6eb10697d40f5bae2ba4a995529117296c1f2ad8",
+    "03-truncated-normal-resaved": "94d156f6e82258a13bb2e7f898800d53db532450dd18c61c26f439f44647798c",
+    "04-invalid-rally-reference-error": "4a96b0a23fc09704a67d1dae0fc2368f7d89a500b8f69da2ba7a17da5104d5fd",
+    "04-invalid-rally-reference-normal-resaved": "1af2ac9bbae5d2a45ed121ac4b5861e4bd75c1e14f5094936955846517b6524d",
+    "05-unsupported-real-format3-error": "96f21ef2641126870bd1bfa763e37a6e6f667a64e72bb9b72fca2e5283bd9a74",
+    "05-unsupported-real-format3-normal-resaved": "12eb0eda8fc0a3f7c9f99b81c2738cce1ca00d6ace21622745701e79ffb2b132"
+  },
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "evidence_directory": "target/sdk267-save-negative-20261011-02",
+  "result_sha256": "65485dd2051205ccfb1d08ae0c9a4394ad543c4efb346fc190de659d69d3fec6",
+  "wall_limit_seconds": 240,
+  "passed": true,
+  "agent_final_frame_reviewed": true,
+  "limits": "Four failed normal loads preserve entire paused real Move+paid partial Worker scene bytes. Original launcher01 failed before game due relative script path; journal retained target/sdk267-negative-launch01-failure.log. Genuine old SDK253 save remains unchanged. Not a successful-save continuity case."
+}
