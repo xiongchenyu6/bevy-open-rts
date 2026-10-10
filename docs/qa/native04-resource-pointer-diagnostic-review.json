@@ -198,7 +198,8 @@
     "SDK03 stale-pointer hypothesis not directly measured by this different debug artifact",
     "Normal native DEBUG/Nix fixture only; SDK258 and final package behavior remain separate",
     "No resource visibility/mesh/projected-anchor observation, so model calibration and actual body identity are unverified",
-    "No rally/height/radius product changes claimed"
+    "No rally/height/radius product changes claimed",
+    "The delayed own-Harvest node does not prove the initial cursor hit that node: a headquarters dropoff order can naturally retarget to nearby ore. Initial paused order verification is pending; do not infer picker disagreement from the delayed save alone."
   ],
   "full_card_rects_retained_in_hashed_raw_observer": true
 }
