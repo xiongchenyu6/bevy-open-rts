@@ -62,7 +62,20 @@ no Move/Path, live ConstructOrder, and later completion assertions. Logs and per
 exits are `logs/constructor-full-27-*`; the pipeline result is
 `target/constructor-full-27-result.json`.
 
-The current native artifact seal and exact case0684 600s/180s paired audit recheck
-are pending. These focused results do not establish all-map balance, all-start
+The four native binaries were sealed in `target/construction-nav-shared-20261010`.
+The audit SHA256 is `fad4846516f6ae6f5a879ab5309d90b01f24ac561d074d297c774aac0a2f353f`;
+`pin.json` records Rust/Cargo versions, every Rust/Cargo input and all 338 runtime
+asset hashes. The native build exited0 in3m33s.
+
+The exact previously failing case0684 then passed both trace and no-trace runs with
+unchanged **600s simulation /180s wall limits**. Both processes exited0 and their raw
+result JSONs are exactly equal: team1 won at180.542938 simulation seconds after5417
+updates, with normal32/16 resources and the original spawn0/2 configuration. Actual
+child wall times were19.91s and26.90s, including startup/shutdown. Trace final state
+explicitly shows no pending foundations. Raw results, process metadata, JSONL and
+independent comparison are in `target/tech-divide-construction-fixed-pair-05`.
+
+These results establish this construction safety/contact regression and this exact
+bounded match's termination. They do not establish all-map balance, all-start
 completion, or general performance. The other broad-start failures remain separate
 verification work.
