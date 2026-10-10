@@ -1,0 +1,137 @@
+{
+  "scope": "Exact source-component materials for six SDK library providers; no legal clearance, source offer publication or Rust missing-notice resolution",
+  "verified_components": 6,
+  "verified_files": 19,
+  "verified_bytes": 120445832,
+  "components": {
+    "alsa-lib": {
+      "version": "1.2.14-1",
+      "files": [
+        {
+          "file": "alsa-lib_1.2.14-1.dsc",
+          "bytes": 2919,
+          "sha256": "6ea64563ba6b010e92465d23868f60e70513478d84bea8a2a97f6691f940976f"
+        },
+        {
+          "file": "alsa-lib_1.2.14.orig.tar.bz2",
+          "bytes": 1115517,
+          "sha256": "be9c88a0b3604367dd74167a2b754a35e142f670292ae47a2fdef27a2ee97a32"
+        },
+        {
+          "file": "alsa-lib_1.2.14.orig.tar.bz2.asc",
+          "bytes": 833,
+          "sha256": "d4d73561754d9e0956a77aa5edf9c7120f80129bda6832257d98c2010915b3e8"
+        },
+        {
+          "file": "alsa-lib_1.2.14-1.debian.tar.xz",
+          "bytes": 33724,
+          "sha256": "904a04da389db325ae9011f328be4fa3b1cb820554bb41aff0b94721bae8b616"
+        }
+      ]
+    },
+    "gcc-14": {
+      "version": "14.2.0-19",
+      "files": [
+        {
+          "file": "gcc-14_14.2.0-19.dsc",
+          "bytes": 47347,
+          "sha256": "7db1e202cce66617e9134a662c877a3a773de5b612fd52179815877e0ecfb847"
+        },
+        {
+          "file": "gcc-14_14.2.0.orig.tar.gz",
+          "bytes": 94299633,
+          "sha256": "e162a5ef3f0077ecae598c6556908d2ab80841532df3398072a96a6df6e6aa29"
+        },
+        {
+          "file": "gcc-14_14.2.0-19.debian.tar.xz",
+          "bytes": 2577016,
+          "sha256": "31cbab4bafa48aa1c540497bd8098cbcf98e673778f927651ed944709f687781"
+        }
+      ]
+    },
+    "glibc": {
+      "version": "2.41-12+deb13u3",
+      "files": [
+        {
+          "file": "glibc_2.41-12+deb13u3.dsc",
+          "bytes": 7576,
+          "sha256": "aa1ab10010fcf169454a5c6a123094a3997392922593d86a3a5adc180a07ca40"
+        },
+        {
+          "file": "glibc_2.41.orig.tar.xz",
+          "bytes": 20323540,
+          "sha256": "f24aa441021121a79266f0d75242706cab8843a47901fefe74527491807f1998"
+        },
+        {
+          "file": "glibc_2.41-12+deb13u3.debian.tar.xz",
+          "bytes": 494644,
+          "sha256": "de7d715bf7e559b78baebac4115122641842f65faf0a5080a55954877a55cebe"
+        }
+      ]
+    },
+    "libffi": {
+      "version": "3.4.8-2",
+      "files": [
+        {
+          "file": "libffi_3.4.8-2.dsc",
+          "bytes": 1948,
+          "sha256": "4424defe3f37c0084f062e03330b2ba3d3f927367c33be455cfacf7f85a78161"
+        },
+        {
+          "file": "libffi_3.4.8.orig.tar.gz",
+          "bytes": 595051,
+          "sha256": "cbb7f0b3b095dc506387ec1e35b891bfb4891d05b90a495bc69a10f2293f80ff"
+        },
+        {
+          "file": "libffi_3.4.8-2.debian.tar.xz",
+          "bytes": 11220,
+          "sha256": "f23ac79a19895ebb6bbb539263d0d945ebc2d3e91217a597f5819777f08b401c"
+        }
+      ]
+    },
+    "libxkbcommon": {
+      "version": "1.7.0-2",
+      "files": [
+        {
+          "file": "libxkbcommon_1.7.0-2.dsc",
+          "bytes": 2802,
+          "sha256": "f513da93558121b17d0f980d4b24419e5463c6d880c03b31275221c6e83223e8"
+        },
+        {
+          "file": "libxkbcommon_1.7.0.orig.tar.xz",
+          "bytes": 534312,
+          "sha256": "65782f0a10a4b455af9c6baab7040e2f537520caa2ec2092805cdfd36863b247"
+        },
+        {
+          "file": "libxkbcommon_1.7.0-2.debian.tar.xz",
+          "bytes": 8464,
+          "sha256": "fcf3db4a281477b93a3bd2ae00bbbd8ea2e589e12301112547779a17ec7c6b80"
+        }
+      ]
+    },
+    "wayland": {
+      "version": "1.23.1-3",
+      "files": [
+        {
+          "file": "wayland_1.23.1-3.dsc",
+          "bytes": 2650,
+          "sha256": "03b4da461e507338731b86183e989e0e9c3fa28f34d8739f0b30d8dd9b88bce8"
+        },
+        {
+          "file": "wayland_1.23.1.orig.tar.gz",
+          "bytes": 370199,
+          "sha256": "158ec49af498f2558c7fbf7e8b070d010d4e270cc6076003a18a6c813f87e244"
+        },
+        {
+          "file": "wayland_1.23.1-3.diff.gz",
+          "bytes": 16437,
+          "sha256": "f48a224e6d744d33ab00378b7a7f2b3ab6461706e30b722e320d047d880e70c8"
+        }
+      ]
+    }
+  },
+  "official_base_url": "https://repo.steampowered.com/steamrt4/images/4.0.20260805.254769/sources/",
+  "raw_result_sha256": "da57ef9bd50045bb364f978306de91a77d4f8e5b738c5248f6a6815ca79dd949",
+  "published": false,
+  "legal_clearance": false
+}
