@@ -1,0 +1,8 @@
+{
+  "scope": "Frozen firstcontact Wasm/current332art Chrome SwiftShader startup only; not hardware/performance/finalpackage acceptance",
+  "errors": [],
+  "ready": true,
+  "root_visual_review": "Actual1280x720 English menu readable, originalbackground/currentroster visible, no observed clipping; startup only.",
+  "image_sha256": "204d1409fc868ed32d5c1dd23d988dbd269053e45293d735dc15762051fefaa5",
+  "wasm_sha256": "01dc2246d4474ccc9931441a11b11963436e8e18654d70c8c5c17a4f3f35f1ac"
+}
