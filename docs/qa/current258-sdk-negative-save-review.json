@@ -1,0 +1,86 @@
+{
+  "archive_sha256": "97ec2f7d2dee8912409297777e51f712b986dbb976b89d82126d462015b2057d",
+  "binary_sha256": "23dc7cb2965d8448351abf0b0d1327d1e1cc97c6afbf40547cbbd139b6e8b053",
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 3553736,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_game_cleanup": false,
+  "wall_seconds": 47.30910753199714,
+  "negative_cases": [
+    {
+      "case": "missing",
+      "fixture_sha256": null,
+      "load_input_unchanged": true,
+      "normal_resaved_sha256": "293d6a3705e984f664a2f2efb4f846a76e0bd7120012a7d71cb901f304818389",
+      "paused_scene_serialized_bytes_equal": true
+    },
+    {
+      "case": "truncated",
+      "fixture_sha256": "fc61f94d4778944011f79c48efa7896947e80ada416ff6793e343c3fbcc4e062",
+      "load_input_unchanged": true,
+      "normal_resaved_sha256": "293d6a3705e984f664a2f2efb4f846a76e0bd7120012a7d71cb901f304818389",
+      "paused_scene_serialized_bytes_equal": true
+    },
+    {
+      "case": "invalid-rally-reference",
+      "fixture_sha256": "11c81450fc8db5a6a58d7a389fbd0d7ccfec092e3b93a91a9e9e59e3ebb6923f",
+      "load_input_unchanged": true,
+      "normal_resaved_sha256": "293d6a3705e984f664a2f2efb4f846a76e0bd7120012a7d71cb901f304818389",
+      "paused_scene_serialized_bytes_equal": true
+    },
+    {
+      "case": "unsupported-real-format3",
+      "fixture_sha256": "eb6388c704a98e99224c8aacb790965b5b3a05ecb22162fd35a8e7d22bd63dcc",
+      "load_input_unchanged": true,
+      "normal_resaved_sha256": "293d6a3705e984f664a2f2efb4f846a76e0bd7120012a7d71cb901f304818389",
+      "paused_scene_serialized_bytes_equal": true
+    }
+  ],
+  "baseline_sha256": "293d6a3705e984f664a2f2efb4f846a76e0bd7120012a7d71cb901f304818389",
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "old_format3_original_unchanged": true,
+  "passed": true,
+  "scope": "Exact corrected SDK258 package02 schema4 normal CtrlL rejection on a genuine paused paid-production and movement scene",
+  "raw_evidence": "target/sdk258-save-negative-20261011-02",
+  "original_wall_limit_seconds": 240,
+  "result_sha256": "19a4ae6644bc2d09ad6bbe7aa006d9dc451c90c553c344e432cd37d3fb9ae8b2",
+  "screenshots": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-real-paused-baseline": "9ee6f78c9960936d89941e7f29eaba351f20bd9853079960a4a40d3a8c41ea06",
+    "02-missing-error": "84e7f54949fdf0f0b5971b5114b751706f97f8dc2450dc125516a8090dd5f641",
+    "02-missing-normal-resaved": "0c5d3e19410eb1da1d6027b195c7656293e7f988899054e3267ce9bbe2cc57ee",
+    "03-truncated-error": "0b785bc29be1ce9d3cb242d7eb8150f4d6c462c2a0dd2b546bc27addfdc7eb30",
+    "03-truncated-normal-resaved": "b7ee5a3120ab440207dc85c0efede7c54848052fa708b63827a3d6294b69ed22",
+    "04-invalid-rally-reference-error": "bc1678b3f288cf49e24287ecc754459baa31aa07036bd252193cfab0de3172b2",
+    "04-invalid-rally-reference-normal-resaved": "4ae0cba51c5eb0fc8c26ee2a89e232a0f57ca4dcd2c058f3b1546d31c5f38ae9",
+    "05-unsupported-real-format3-error": "2cf9bf32a265812286526a30a35eaacda33c626a870bb59f3bf9f1c8d33901b4",
+    "05-unsupported-real-format3-normal-resaved": "66a2c995204ea9035d8b12d76a22e81f3583c4c66e47ee18559e5c25b811cf07"
+  },
+  "direct_error_review": {
+    "missing": "No saved game found. Save a match first.",
+    "truncated": "The saved game is damaged and cannot be loaded. Your current match is unchanged.",
+    "invalid_rally_reference": "The saved game is damaged and cannot be loaded. Your current match is unchanged.",
+    "real_old_format3": "This save is incompatible with this game version. Start a new match."
+  },
+  "root_independent_review": {
+    "all10_png_hashes_match": true,
+    "normal_exit_and_install_archive_old_source_unchanged": true,
+    "direct_error_text_and_partial_job_frame_review": true
+  },
+  "preserved_first_failure": {
+    "path": "target/sdk258-save-negative-20261011-01",
+    "actual_exit": 1,
+    "reason": "Ordinary short Move had already completed; strict active-order baseline precondition failed before any negative load"
+  },
+  "limits": [
+    "Four listed invalid/missing/version inputs only, not exhaustive corruption or all saved states",
+    "Current normal resource rally remains a separate pending case",
+    "QA writes only deliberately invalid inputs or copies unchanged genuine old-format bytes into isolated profile; valid baseline/resaves are produced by actual CtrlS"
+  ]
+}
