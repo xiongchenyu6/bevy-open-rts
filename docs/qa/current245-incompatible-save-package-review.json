@@ -1,0 +1,39 @@
+{
+  "scope": "Exact245 optimized package incompatible-version negative IO fixture; normal Ctrl+L/Ctrl+S, not successful-load continuity",
+  "container": {
+    "exit": 0,
+    "command": [
+      "docker",
+      "run",
+      "--rm",
+      "--name",
+      "rts-linux-current245-incompatible-save",
+      "--user",
+      "65534:65534",
+      "--device",
+      "/dev/dri/renderD128",
+      "--mount",
+      "type=bind,src=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-current245-extracted-20261010/bevy-open-rts-linux-x86_64,dst=/installation,readonly",
+      "--mount",
+      "type=bind,src=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-current245-incompatible-save-20261010,dst=/evidence",
+      "--entrypoint",
+      "sh",
+      "rts-local-thin-input-runtime:20261008",
+      "/evidence/run.sh"
+    ],
+    "archive_sha256": "481640cc032ea07e996e64fbfd7f9fc6e56565d243705117998972e4ba2fffc0",
+    "binary_sha256": "491f29eaafbf6e6398d669ccb99cd6eb248e6b47200ba99d1c21facc272f0fa9",
+    "scope": "Actual exact extracted readonly archive; no Nix mount"
+  },
+  "actual_runtime": {
+    "scope": "Full RON incompatible version fixture only; visual review pending",
+    "actual_game_alive": true,
+    "incompatible_load_scene_save_bytes_unchanged": true
+  },
+  "scene_bytes_unchanged": true,
+  "scene_save_sha256": "1f2e1cc8840efcb303bee11f26ef26f663795de3e9259848d6ec98ed8c9b1272",
+  "fixture_only_changes_version_3_to_999": true,
+  "reviewed_message": "Load failed: This save is incompatible with this game version. Start a new match.",
+  "reviewed_screenshot_sha256": "2e3a19df218f3071972fb4cafa743ceb130c95be42af0def4398bfb8653be8c9",
+  "final247_verified": false
+}
