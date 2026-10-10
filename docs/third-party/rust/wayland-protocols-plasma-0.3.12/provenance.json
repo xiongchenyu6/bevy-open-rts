@@ -1,0 +1,53 @@
+{
+  "scope": "Original nested protocol-component license texts; not an assertion of final linked-code applicability or distribution clearance",
+  "package": "wayland-protocols-plasma",
+  "version": "0.3.12",
+  "archive_sha256": "2b6d8cf1eb2c1c31ed1f5643c88a6e53538129d4af80030c8cabd1f9fa884d91",
+  "files": [
+    {
+      "package": "wayland-protocols-plasma",
+      "version": "0.3.12",
+      "archive_sha256": "2b6d8cf1eb2c1c31ed1f5643c88a6e53538129d4af80030c8cabd1f9fa884d91",
+      "member": "wayland-protocols-plasma-0.3.12/plasma-wayland-protocols/LICENSES/BSD-3-Clause.txt",
+      "sha256": "e11af671c491efac2f94c1d752bea92f4308ca2450c7d11e582e4b48c40e4de1",
+      "bytes": 1480,
+      "scope": "Nested legal-directory candidate; applicability requires package-specific review"
+    },
+    {
+      "package": "wayland-protocols-plasma",
+      "version": "0.3.12",
+      "archive_sha256": "2b6d8cf1eb2c1c31ed1f5643c88a6e53538129d4af80030c8cabd1f9fa884d91",
+      "member": "wayland-protocols-plasma-0.3.12/plasma-wayland-protocols/LICENSES/CC0-1.0.txt",
+      "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
+      "bytes": 7048,
+      "scope": "Nested legal-directory candidate; applicability requires package-specific review"
+    },
+    {
+      "package": "wayland-protocols-plasma",
+      "version": "0.3.12",
+      "archive_sha256": "2b6d8cf1eb2c1c31ed1f5643c88a6e53538129d4af80030c8cabd1f9fa884d91",
+      "member": "wayland-protocols-plasma-0.3.12/plasma-wayland-protocols/LICENSES/LGPL-2.1-or-later.txt",
+      "sha256": "1ccf09bf2f598308df4bed9cd8e9657dc5cd0973d2800318f2e241486e2edf3f",
+      "bytes": 25906,
+      "scope": "Nested legal-directory candidate; applicability requires package-specific review"
+    },
+    {
+      "package": "wayland-protocols-plasma",
+      "version": "0.3.12",
+      "archive_sha256": "2b6d8cf1eb2c1c31ed1f5643c88a6e53538129d4af80030c8cabd1f9fa884d91",
+      "member": "wayland-protocols-plasma-0.3.12/plasma-wayland-protocols/LICENSES/MIT-CMU.txt",
+      "sha256": "577bcdce29392adc2d1eb2233d999589e2950bd0ea5aa5e6525568794571fead",
+      "bytes": 1143,
+      "scope": "Nested legal-directory candidate; applicability requires package-specific review"
+    },
+    {
+      "package": "wayland-protocols-plasma",
+      "version": "0.3.12",
+      "archive_sha256": "2b6d8cf1eb2c1c31ed1f5643c88a6e53538129d4af80030c8cabd1f9fa884d91",
+      "member": "wayland-protocols-plasma-0.3.12/plasma-wayland-protocols/LICENSES/MIT.txt",
+      "sha256": "8f25018489d6fe0dec34a352314c38dc146247b7de65735790f4398a92afa84b",
+      "bytes": 1108,
+      "scope": "Nested legal-directory candidate; applicability requires package-specific review"
+    }
+  ]
+}

@@ -33,3 +33,15 @@ license applicability, attribution and distribution review remains open.
 Keep these Rust materials separate from the six bundled dynamic-library source
 providers documented in `LINUX_RUNTIME_SOURCE_MATERIALS.md`. Neither inventory
 establishes rights for game art, models, fonts, effects or voices.
+
+## Nested published-source review
+
+A checksum-verified scan of all635 archives identifies seven legal-directory
+files: the two crc-catalog licenses above and five texts in
+`wayland-protocols-plasma0.3.12/plasma-wayland-protocols/LICENSES/`. The latter
+are preserved under `third-party/rust/wayland-protocols-plasma-0.3.12/` with
+exact archive-member hashes. They belong to embedded protocol sources; the
+crate-level MIT declaration alone does not describe this source inventory.
+Final component use and distribution applicability remain to be reviewed.
+The original source companion already contains those complete crate archives;
+these extracted texts supplement its historical top-level notice collection.
