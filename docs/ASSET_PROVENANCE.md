@@ -234,4 +234,7 @@ A separate “Ready for orders.” Hello candidate is retained in
 PCM check verifies mono24kHz16-bit audio, 1.575seconds, no clipping and SHA-256
 `a8da92e15192baa257417f995cd727516ae880c5f620850fc77db30bc5718ea4`.
 The original32 candidates and ASR outputs remain unchanged. Independent
-transcription of this revision is pending; no runtime substitution is accepted.
+audio-only base/small transcription in `target/voice-hello-asr-review-20261010/`
+exits0: both recover “Ready for orders”, differing only in punctuation, with no
+reference text supplied. Listening/tone and in-game mixing remain unverified;
+no runtime substitution is accepted.
