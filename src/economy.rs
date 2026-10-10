@@ -7,6 +7,9 @@ use bevy::prelude::*;
 
 use crate::*;
 
+mod harvest_contact;
+use harvest_contact::update_harvest_contact_route;
+
 pub(crate) const RESOURCE_ORDER_SCREEN_PICK_MIN_RADIUS_PX: f32 = 48.0;
 
 pub(crate) const RESOURCE_ORDER_SCREEN_PICK_MAX_RADIUS_PX: f32 = 95.0;
@@ -828,6 +831,7 @@ pub(crate) fn update_harvest_orders(
     mut commands: Commands,
     time: Res<Time>,
     mut economies: ResMut<Economies>,
+    grid: Res<NavGrid>,
     mut collectors: Query<
         (
             Entity,
@@ -839,6 +843,7 @@ pub(crate) fn update_harvest_orders(
             &mut ResourceCargo,
             &mut HarvestOrder,
             Option<&MoveOrder>,
+            Option<&PlannedPath>,
             Option<&EmpDisabled>,
         ),
         (With<Unit>, Without<Structure>, Without<ResourceNode>),
@@ -859,7 +864,34 @@ pub(crate) fn update_harvest_orders(
         ),
         (With<Structure>, Without<Unit>),
     >,
+    obstacles: Query<
+        (&Transform, &Selectable, Option<&Structure>, Option<&Health>),
+        (
+            Or<(With<Structure>, With<ResourceNode>, With<TerrainWall>)>,
+            Without<Unit>,
+        ),
+    >,
+    bodies: Query<(Entity, &Transform, &Selectable, &MovementDomain, &Health), With<Unit>>,
 ) {
+    let static_obstacles: Vec<_> = obstacles
+        .iter()
+        .filter(|(_, _, _, health)| !health.is_some_and(|health| health.current <= 0.0))
+        .map(|(transform, body, _, _)| (transform.translation, body.radius))
+        .collect();
+    let buildings: Vec<_> = obstacles
+        .iter()
+        .filter(|(_, _, building, health)| {
+            building.is_some() && !health.is_some_and(|health| health.current <= 0.0)
+        })
+        .map(|(transform, body, _, _)| (transform.translation, body.radius))
+        .collect();
+    let occupied: Vec<_> = bodies
+        .iter()
+        .filter(|(_, _, _, domain, health)| {
+            **domain == MovementDomain::Terrain && health.current > 0.0
+        })
+        .map(|(entity, transform, body, _, _)| (entity, transform.translation, body.radius))
+        .collect();
     for (
         unit_entity,
         team,
@@ -870,6 +902,7 @@ pub(crate) fn update_harvest_orders(
         mut cargo,
         mut order,
         move_order,
+        planned_path,
         emp,
     ) in &mut collectors
     {
@@ -947,21 +980,22 @@ pub(crate) fn update_harvest_orders(
                     if let Ok((_, resource_transform, resource_selectable, _)) =
                         resources.get(target)
                     {
-                        if !move_order_targets_contact(
-                            move_order,
-                            resource_transform.translation,
-                            selectable.radius,
-                            resource_selectable.radius,
-                        ) {
-                            commands.entity(unit_entity).try_insert(MoveOrder {
-                                target: unit_contact_move_target_position(
-                                    transform.translation,
-                                    selectable.radius,
-                                    resource_transform.translation,
-                                    resource_selectable.radius,
-                                ),
-                            });
-                        }
+                        let peers: Vec<_> = occupied
+                            .iter()
+                            .filter(|(entity, _, _)| *entity != unit_entity)
+                            .map(|(_, position, radius)| (*position, *radius))
+                            .collect();
+                        update_harvest_contact_route(
+                            &mut commands,
+                            unit_entity,
+                            (transform.translation, selectable.radius),
+                            (resource_transform.translation, resource_selectable.radius),
+                            (move_order, planned_path),
+                            &grid,
+                            &static_obstacles,
+                            &buildings,
+                            &peers,
+                        );
                     }
                     continue;
                 }
@@ -1083,21 +1117,22 @@ pub(crate) fn update_harvest_orders(
                             .try_remove::<MoveOrder>();
                         continue;
                     }
-                    if !move_order_targets_contact(
-                        move_order,
-                        dropoff_position,
-                        selectable.radius,
-                        dropoff_radius,
-                    ) {
-                        commands.entity(unit_entity).try_insert(MoveOrder {
-                            target: unit_contact_move_target_position(
-                                transform.translation,
-                                selectable.radius,
-                                dropoff_position,
-                                dropoff_radius,
-                            ),
-                        });
-                    }
+                    let peers: Vec<_> = occupied
+                        .iter()
+                        .filter(|(entity, _, _)| *entity != unit_entity)
+                        .map(|(_, position, radius)| (*position, *radius))
+                        .collect();
+                    update_harvest_contact_route(
+                        &mut commands,
+                        unit_entity,
+                        (transform.translation, selectable.radius),
+                        (dropoff_position, dropoff_radius),
+                        (move_order, planned_path),
+                        &grid,
+                        &static_obstacles,
+                        &buildings,
+                        &peers,
+                    );
                     continue;
                 }
 

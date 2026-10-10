@@ -163,6 +163,38 @@ fn normal_paid_factory_constructor_escapes_and_finishes_in_full_schedule() {
             let bank = app.world().resource::<Economies>().get(Team::Player(1));
             (bank.ore, bank.crystal)
         };
+        let cargo_before = {
+            let world = app.world_mut();
+            let mut query = world.query::<(
+                Entity,
+                &Team,
+                &crate::economy::ResourceCargo,
+                &crate::economy::HarvestOrder,
+            )>();
+            query
+                .iter(world)
+                .filter(|(_, team, _, _)| **team == Team::Player(1))
+                .map(|(entity, _, cargo, order)| (entity, cargo.ore, cargo.crystal, order.state))
+                .collect::<Vec<_>>()
+        };
+        let passive_income = {
+            let world = app.world_mut();
+            let delta = world.resource::<Time>().delta_secs();
+            let mut query = world.query::<(
+                &Team,
+                &crate::economy::IncomeSource,
+                Option<&UnderConstruction>,
+            )>();
+            query
+                .iter(world)
+                .filter(|(team, _, _)| **team == Team::Player(1))
+                .fold((0, 0), |total, (_, income, site)| {
+                    let mut copy = *income;
+                    let paid =
+                        crate::economy::advance_income_source(&mut copy, delta, site.is_none());
+                    (total.0 + paid.0, total.1 + paid.1)
+                })
+        };
         app.update();
         let world = app.world_mut();
         let after = {
@@ -179,7 +211,62 @@ fn normal_paid_factory_constructor_escapes_and_finishes_in_full_schedule() {
                 assert_eq!((site.cost.ore, site.cost.crystal), (cost.ore, cost.crystal));
                 assert!(site.free_worker_origin.is_none());
                 assert!(before.0 >= cost.ore && before.1 >= cost.crystal);
-                paid = after.0 < before.0 || after.1 < before.1;
+                // A genuine six-ore return can mask the factory debit in the
+                // same schedule frame. Verify exact conservation, not net loss.
+                let mut deposits = (0, 0);
+                for (worker, ore, crystal, state) in &cargo_before {
+                    if *state == crate::economy::HarvestState::MovingToDropoff
+                        && world
+                            .get::<crate::economy::ResourceCargo>(*worker)
+                            .is_some_and(|cargo| cargo.ore == 0 && cargo.crystal == 0)
+                        && world
+                            .get::<crate::economy::HarvestOrder>(*worker)
+                            .is_some_and(|order| {
+                                order.state == crate::economy::HarvestState::MovingToResource
+                            })
+                    {
+                        deposits.0 += ore;
+                        deposits.1 += crystal;
+                    }
+                }
+                let mut purifiers =
+                    world.query::<(&Team, &Structure, Option<&UnderConstruction>)>();
+                assert!(
+                    !purifiers
+                        .iter(world)
+                        .any(|(team, structure, site)| *team == Team::Player(1)
+                            && structure.id == "OrePurifier"
+                            && site.is_none()),
+                    "fixture must account for any purifier bonus"
+                );
+                let spend = (
+                    before.0 + passive_income.0 + deposits.0 - after.0,
+                    before.1 + passive_income.1 + deposits.1 - after.1,
+                );
+                assert_eq!(
+                    spend,
+                    (cost.ore, cost.crystal),
+                    "exact factory payment after accounting for observed harvest returns and passive income"
+                );
+                paid = true;
+                println!(
+                    "factory payment receipt deposits={deposits:?} passive={passive_income:?} spend={spend:?}"
+                );
+                println!(
+                    "factory payment boundary before={before:?} after={after:?} cost=({}, {})",
+                    cost.ore, cost.crystal
+                );
+                for (worker, ore, crystal, state) in &cargo_before {
+                    let cargo_after = world
+                        .get::<crate::economy::ResourceCargo>(*worker)
+                        .map(|cargo| (cargo.ore, cargo.crystal));
+                    let state_after = world
+                        .get::<crate::economy::HarvestOrder>(*worker)
+                        .map(|order| order.state);
+                    println!(
+                        "factory boundary worker={worker:?} cargo_before=({ore},{crystal}) state_before={state:?} cargo_after={cargo_after:?} state_after={state_after:?}"
+                    );
+                }
             }
         }
         let Some(factory) = factory else { continue };

@@ -352,3 +352,78 @@ fn measured_constructor_detours_around_stationary_tank_without_body_overlap() {
         "site must actually complete within the unchanged 900-tick construction budget"
     );
 }
+
+#[test]
+fn measured_harvester_routes_around_adjacent_aa_and_delivers_real_cargo() {
+    // Measured Worker/resource/AA geometry; isolated mechanism fixture, not paid gameplay.
+    let fixture = r#"[
+        [1,"Worker","Player(0)",[-15.196226,0.05,-21.040670],0.6,6,null],
+        [2,"resource",null,[-14.4,0,-22.6],0.6,null,229],
+        [3,"AntiAirTurret","Player(0)",[-16,0,-22],0.6,8,null],
+        [4,"CommandCenter","Player(0)",[-22,0,-22],2,20,null],
+        [5,"CommandCenter","Player(1)",[22,0,-22],2,20,null]
+    ]"#;
+    let (mut app, keys) = measured_app(fixture);
+    let worker = keys[&1];
+    let node = keys[&2];
+    let turret = keys[&3];
+    let def = registry::entity("Worker").unwrap();
+    let start = app.world().get::<Transform>(worker).unwrap().translation;
+    let turret_position = app.world().get::<Transform>(turret).unwrap().translation;
+    let goal = Vec3::new(-15.304574, 0.0, -21.403446);
+    let combined_radius = def.radius + app.world().get::<Selectable>(turret).unwrap().radius;
+    assert!(xz_distance(goal, turret_position) < combined_radius);
+    assert!(
+        (xz_distance(
+            goal,
+            app.world().get::<Transform>(node).unwrap().translation
+        ) - 1.5)
+            .abs()
+            < 0.0001
+    );
+    app.world_mut().entity_mut(worker).insert((
+        ResourceCargo {
+            capacity: def.resource_capacity,
+            ore: 0,
+            crystal: 0,
+        },
+        HarvestOrder {
+            resource: Some(node),
+            state: HarvestState::MovingToResource,
+            collect_remaining: 0.0,
+            last_kind: Some(ResourceKind::Ore),
+        },
+        MoveOrder { target: goal },
+    ));
+    let ore_before = app.world().resource::<Economies>().get(Team::Player(0)).ore;
+    let amount_before = app.world().get::<ResourceNode>(node).unwrap().amount;
+    for tick in 0..900 {
+        let before = app.world().get::<Transform>(worker).unwrap().translation;
+        app.update();
+        let after = app.world().get::<Transform>(worker).unwrap().translation;
+        assert!(
+            distance_point_to_xz_segment(turret_position, before, after) + 1e-4 >= combined_radius,
+            "harvester step entered AA body"
+        );
+        if app.world().resource::<Economies>().get(Team::Player(0)).ore > ore_before {
+            println!("measured harvest delivered at tick{tick}, start {start:?}, end {after:?}");
+            break;
+        }
+    }
+    let removed = amount_before - app.world().get::<ResourceNode>(node).unwrap().amount;
+    let gained = app.world().resource::<Economies>().get(Team::Player(0)).ore - ore_before;
+    println!(
+        "measured harvest removed{removed} gained{gained} position {:?}",
+        app.world().get::<Transform>(worker).unwrap().translation
+    );
+    assert!(
+        gained > 0,
+        "measured blocked contact never collected and delivered real ore"
+    );
+    assert_eq!(
+        gained, removed,
+        "delivered ore must come from the actual node"
+    );
+    assert_eq!(app.world().get::<Health>(worker).unwrap().current, 6.0);
+    assert_eq!(app.world().get::<Health>(turret).unwrap().current, 8.0);
+}

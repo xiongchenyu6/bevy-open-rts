@@ -387,3 +387,35 @@ exited0 in3m03. Sealed capture is
 with matching source manifest and unchanged338 runtime asset hashes. Fresh
 original-population M1 on that pin is still pending; the earlier Tank stall
 cause and whole campaign acceptance remain open.
+
+### Measured harvest contact and payment regression (2026-10-10)
+
+The original-strategy M1 baseline on capture `4cdc1c3f…` ended in actual
+HumanDefeat at283.2857s. Strict click tracing recorded103 ordinary clicks and
+no wrong living requested IDs. It did not reproduce the previous long Tank
+freeze. It did record Worker4294966766 at(-15.196226,-21.040670) with an unchanged
+harvest movement target for112.8885s. That radial resource-contact goal was only
+0.91624m from the adjacent own AA structure, inside their combined1.2m bodies.
+Raw evidence is retained in
+`screenshots/steam-quality/current-campaign-m1-clearance-baseline` and
+`target/campaign-m1-clearance-baseline-observations.json`.
+
+The actual-schedule Crossfire fixture preserves that measured resource/AA
+geometry and normal cargo capacity. RED delivered no ore during900ticks.
+Reusing the existing bounded contact planner delivers6Ore at tick225; resource
+removal equals actual bank gain, with unchanged HP and no AA body entry. Valid
+existing harvest routes remain cached; only invalid goals or blocked routes
+replan. No costs, collision margins, resource amounts or campaign quotas change.
+Focused raw results are `logs/campaign-harvest-red-01.log` and
+`logs/campaign-harvest-green-02.log`.
+
+The subsequent full suite exposed a payment-test oracle error, not a missing
+factory: its foundation birth had bank85/13→85/13 while a real Worker returned
+6Ore. The factory's authored6Ore debit was exactly masked by that income.
+`logs/campaign-factory-payment-diagnostic-01.log` preserves the original failed
+net-bank-drop assertion. The corrected test verifies exact observed cargo
+returns plus passive income against the authored payment; receipt is
+returns6/0, passive0/0, spend6/0. The factory completes at45.233s with the original
+movement/contact/body and deadline assertions retained. Focused GREEN passes,
+and `logs/campaign-harvest-full-02.log` records237passed/0failed/1ignored43.68s.
+Fresh original-population M1 acceptance remains pending on the newly built core.
