@@ -53,7 +53,9 @@
     "Tank": 7
   },
   "hq_loss_survivor_continuation_observed": true,
-  "selection_recovery_runtime_verified": true,
+  "selection_recovery_runtime_verified": false,
   "next_recipe_change": "Normal retreat of one healthy existing Worker toward nearest public map corner; rules/banks/HP unchanged",
-  "worker_retreat_runtime_verified": false
+  "worker_retreat_runtime_verified": false,
+  "original_macro_error": "campaign headquarters eliminated",
+  "scope_limit": "HQ-loss survivor continuation occurred through the existing headquarters-eliminated branch; exact clearing-selection error branch was not exercised"
 }
