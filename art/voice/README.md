@@ -38,3 +38,12 @@ This is audio-only fixture evidence. Natural game-event triggering, overlapping
 music/effects mix, rapid acknowledgments, physical speaker/headphone listening,
 tone approval and final-core/package revalidation remain open. ASR recovered the
 revised Hello with two audio-only models; that does not approve human listening.
+
+A subsequent normal-input HUD run selected a Worker, completed paid PowerReactor
+and Barracks construction, and queued infantry through the real command cards.
+Its private virtual-output monitor recorded 14.45 seconds of mixed native audio
+at stereo 48 kHz, with peak PCM16 21,017 and zero clipped samples. Both native and
+recorder processes exited0, assets and the default output were unchanged, and
+the temporary output was removed. `natural-hud-output-review.json` pins this
+bounded sample. It does not establish individual event coverage, combat mixing,
+human listening, independent slider behavior in the final package, or release readiness.

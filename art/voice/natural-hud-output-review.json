@@ -1,0 +1,22 @@
+{
+  "scope": "Normal-input Worker selection, paidPower/Barracks construction and infantry queue; mixed native audio output sample, no individual event/human/finalpackage acceptance",
+  "capture_sha256": "f435c1b9d01dcb9fe4880422bb4bcadf8d37731f8aaa8182c052111ff5c1c3a4",
+  "child_exit": 0,
+  "recorder_exit": 0,
+  "channels": 2,
+  "sample_rate": 48000,
+  "frames": 693600,
+  "recording_sha256": "fd32f24f31b572246a7fd8c9abeecec682583729baa8d381aed36704d6bf86a6",
+  "peak_pcm16": 21017,
+  "clipped_samples": 0,
+  "nonzero_samples": 955956,
+  "assets_unchanged": true,
+  "mixed_output_sample_pass": true,
+  "unload_exit": 0,
+  "default_sink_unchanged": true,
+  "wall_seconds": 16.15768388399738,
+  "human_listening_accepted": false,
+  "evidence_directory": "target/natural-hud-audio-20261010",
+  "native_log_sha256": "8c36f1a98f68144fc48ce6cf2899a79ea9465c9b63d0cdd8b168bfb55f274b6f",
+  "recording_seconds": 14.45
+}
