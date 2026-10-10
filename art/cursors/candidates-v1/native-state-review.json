@@ -1,0 +1,199 @@
+{
+  "scope": "Bounded actual normal-input native cursor asset/state metadata; source/readability and finalbrowser pointer/alignment are distinct",
+  "binary_sha256": "1a93062fbd235bb2e8f6ed6c715a5dd80d7d086cc0982af35bbd8a3083716714",
+  "candidate_atlas_sha256": "6df4fb3f03b92fb601718577027b8e72990ae7736a8afdf4bbcbb611766c6155",
+  "actual_loaded_rgba_sha256": "4f8ea4fc13fb2a48bb729a954b64dd65d52cc8ac7a40f315294fa3ee555f97d3",
+  "child_exit": 0,
+  "schema_pass": true,
+  "repository_assets_unchanged": true,
+  "phases": [
+    {
+      "phase": "00_default_hud",
+      "applied_index": 0,
+      "hotspot": [
+        2,
+        1
+      ],
+      "command_mode": {
+        "attack_move": false,
+        "patrol": false,
+        "placement": null,
+        "rally": false,
+        "support": false
+      }
+    },
+    {
+      "phase": "01_move_patrol",
+      "applied_index": 1,
+      "hotspot": [
+        16,
+        16
+      ],
+      "command_mode": {
+        "attack_move": false,
+        "patrol": true,
+        "placement": null,
+        "rally": false,
+        "support": false
+      }
+    },
+    {
+      "phase": "02_move_over_hud_default",
+      "applied_index": 0,
+      "hotspot": [
+        2,
+        1
+      ],
+      "command_mode": {
+        "attack_move": false,
+        "patrol": true,
+        "placement": null,
+        "rally": false,
+        "support": false
+      }
+    },
+    {
+      "phase": "03_attack_move",
+      "applied_index": 2,
+      "hotspot": [
+        16,
+        16
+      ],
+      "command_mode": {
+        "attack_move": true,
+        "patrol": false,
+        "placement": null,
+        "rally": false,
+        "support": false
+      }
+    },
+    {
+      "phase": "04_build_ghost",
+      "applied_index": 3,
+      "hotspot": [
+        16,
+        16
+      ],
+      "command_mode": {
+        "attack_move": false,
+        "patrol": false,
+        "placement": "PowerReactor",
+        "rally": false,
+        "support": false
+      }
+    },
+    {
+      "phase": "05_build_over_hud_default",
+      "applied_index": 0,
+      "hotspot": [
+        2,
+        1
+      ],
+      "command_mode": {
+        "attack_move": false,
+        "patrol": false,
+        "placement": "PowerReactor",
+        "rally": false,
+        "support": false
+      }
+    },
+    {
+      "phase": "06_cancel_default",
+      "applied_index": 0,
+      "hotspot": [
+        2,
+        1
+      ],
+      "command_mode": {
+        "attack_move": false,
+        "patrol": false,
+        "placement": null,
+        "rally": false,
+        "support": false
+      }
+    }
+  ],
+  "normal_budget_before": [
+    32,
+    16
+  ],
+  "normal_budget_after": [
+    25,
+    14
+  ],
+  "actual_paid_completed": [
+    "PowerReactor",
+    "Barracks",
+    "LightRifleInfantry"
+  ],
+  "build_ghost_placement_committed": false,
+  "native_os_pointer_visual_verified": false,
+  "final_current_wasm_four_state_visual_and_alignment_verified": false,
+  "runtime_atlas_replaced": false,
+  "images": [
+    {
+      "path": "target/cursor-native-candidate-20261010-02/observed/00_default_hud-offscreen-no-pointer.png",
+      "sha256": "d752389464043d085b7d4aca023ed54d77c904bc10a5a9afa201f6496c0c6d9a",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "native_os_pointer_rendered": false
+    },
+    {
+      "path": "target/cursor-native-candidate-20261010-02/observed/01_move_patrol-offscreen-no-pointer.png",
+      "sha256": "26049c5a21ab2a39db728edd9c023f2322d8dac9badafe69fbbe07aa77613d61",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "native_os_pointer_rendered": false
+    },
+    {
+      "path": "target/cursor-native-candidate-20261010-02/observed/02_move_over_hud_default-offscreen-no-pointer.png",
+      "sha256": "437f7182584e295c713dde1082e7955cb0cc03b36e231958da8e0be61d42a451",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "native_os_pointer_rendered": false
+    },
+    {
+      "path": "target/cursor-native-candidate-20261010-02/observed/03_attack_move-offscreen-no-pointer.png",
+      "sha256": "46da1a5f9f05e7e583d3ca0d33c665e80050e98dcd00ea2261d0df651e574d59",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "native_os_pointer_rendered": false
+    },
+    {
+      "path": "target/cursor-native-candidate-20261010-02/observed/04_build_ghost-offscreen-no-pointer.png",
+      "sha256": "4a66f8b29debe144756110ba8a2084ea3dfd9af3d669b1c2db7cd1f18f0ea6f3",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "native_os_pointer_rendered": false
+    },
+    {
+      "path": "target/cursor-native-candidate-20261010-02/observed/05_build_over_hud_default-offscreen-no-pointer.png",
+      "sha256": "4984883038e95ab68d00162c843f5ae236e4e2680755920e4ebceb53cd07784e",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "native_os_pointer_rendered": false
+    },
+    {
+      "path": "target/cursor-native-candidate-20261010-02/observed/06_cancel_default-offscreen-no-pointer.png",
+      "sha256": "86b456267f983c88e569034c04cfa04d5e3cd6c7d9ba28fdb943d2c244a1d4df",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "native_os_pointer_rendered": false
+    }
+  ],
+  "first_failed_attempt_preserved": "target/cursor-native-candidate-20261010-01"
+}

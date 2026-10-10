@@ -39,6 +39,10 @@ mod semantic_ui;
 mod camera_edges;
 
 
+#[cfg(not(target_arch = "wasm32"))]
+#[path = "capture/cursor_qa.rs"]
+mod cursor_qa;
+
 #[path = "capture/save_flow.rs"]
 mod save_flow;
 
@@ -176,6 +180,12 @@ fn main() {
             };
             camera_edges::run(&dir, width, height, requested_tilt)
         })(),
+        #[cfg(not(target_arch = "wasm32"))]
+        Some("cursor-qa") => args
+            .next()
+            .map(PathBuf::from)
+            .ok_or_else(|| "cursor-qa needs new output directory".to_string())
+            .and_then(|output| cursor_qa::run(&output)),
         Some("hud-card") => {
             let dir = args
                 .next()

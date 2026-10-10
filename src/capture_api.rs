@@ -25,6 +25,11 @@ mod portrait_export;
 pub use portrait_export::{export_portrait_stage, export_roster_stage};
 
 #[cfg(not(target_arch = "wasm32"))]
+mod cursor_qa;
+#[cfg(not(target_arch = "wasm32"))]
+pub use cursor_qa::{capture_cursor_command_button, capture_cursor_state};
+
+#[cfg(not(target_arch = "wasm32"))]
 mod semantic_ui;
 #[cfg(not(target_arch = "wasm32"))]
 pub use semantic_ui::{
