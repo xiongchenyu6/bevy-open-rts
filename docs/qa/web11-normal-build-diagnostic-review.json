@@ -1,0 +1,150 @@
+{
+  "scope": "Normal two-Human frontend diagnostic on pre-schema4Wasm11; not paid/8peer acceptance",
+  "wasm_sha256": "eeecc6960588376b828f5bf2723a584efd3534af346f577cde895a69f5052cd4",
+  "wrapper": {
+    "node_actual_exit": 0,
+    "driver_actual_exit": 0,
+    "actual_exit": 0,
+    "deadline_seconds": 240
+  },
+  "driver": {
+    "actual_driver_exit": 0,
+    "error": null,
+    "real_contexts": 2,
+    "roles": [
+      "host",
+      "p1"
+    ],
+    "events": 3,
+    "diagnostics": [],
+    "workflow_only": true,
+    "acceptance_pass": false,
+    "reason": "Physical workflow alone is not acceptance; review actual DTO/applied ticks and route/paid/reconnect/eight-peer evidence independently."
+  },
+  "facts": [
+    "Physical Host/Join/Ready/Start completed; genuinePlayer2Worker selection shown.",
+    "ActualAtooltip in run04 identified BuildPowerReactor3Ore1Crystal8s.",
+    "Run06directAcardclick: selectedWorker/card visible07; noselection/card/ghost in08.",
+    "NoPower entity or3/1debit proven. This does not establish a remote build/debit defect."
+  ],
+  "source_readonly_findings": {
+    "selection": "Uses geometricHudHitZones atpress, notUIInteractionhover; refresh_hud_hit_zones.before(select_entities).",
+    "geometry": "Stable20-slot1280x720 card expects approximatelyx914..1270/y354..710 containingA1136,450.",
+    "mode": "begin_structure_placement_mode_for_faction changes targeting/pendingplacement, notSelected.",
+    "replication": "No explicitSelected removal found; actualentityreplacement remains separate causal hypothesis."
+  },
+  "earlier_failures": {
+    "2": {
+      "wrapper": {
+        "node_actual_exit": 124,
+        "driver_actual_exit": 1,
+        "actual_exit": 124,
+        "deadline_seconds": 240
+      },
+      "driver": {
+        "actual_driver_exit": 1,
+        "error": "page.waitForTimeout: Target page, context or browser has been closed",
+        "real_contexts": 2,
+        "roles": [
+          "host",
+          "p1"
+        ],
+        "events": 0,
+        "diagnostics": [],
+        "workflow_only": true,
+        "acceptance_pass": false,
+        "reason": "Physical workflow alone is not acceptance; review actual DTO/applied ticks and route/paid/reconnect/eight-peer evidence independently."
+      }
+    },
+    "3": {
+      "wrapper": {
+        "node_actual_exit": 124,
+        "driver_actual_exit": 1,
+        "actual_exit": 124,
+        "deadline_seconds": 240
+      },
+      "driver": {
+        "actual_driver_exit": 1,
+        "error": "page.screenshot: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\u001b[2m  - fonts loaded\u001b[22m\n",
+        "real_contexts": 2,
+        "roles": [
+          "host",
+          "p1"
+        ],
+        "events": 3,
+        "diagnostics": [],
+        "workflow_only": true,
+        "acceptance_pass": false,
+        "reason": "Physical workflow alone is not acceptance; review actual DTO/applied ticks and route/paid/reconnect/eight-peer evidence independently."
+      }
+    },
+    "4": {
+      "wrapper": {
+        "node_actual_exit": 124,
+        "driver_actual_exit": 1,
+        "actual_exit": 124,
+        "deadline_seconds": 240
+      },
+      "driver": {
+        "actual_driver_exit": 1,
+        "error": "page.screenshot: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\u001b[2m  - fonts loaded\u001b[22m\n",
+        "real_contexts": 2,
+        "roles": [
+          "host",
+          "p1"
+        ],
+        "events": 3,
+        "diagnostics": [],
+        "workflow_only": true,
+        "acceptance_pass": false,
+        "reason": "Physical workflow alone is not acceptance; review actual DTO/applied ticks and route/paid/reconnect/eight-peer evidence independently."
+      }
+    },
+    "5": {
+      "wrapper": {
+        "node_actual_exit": 124,
+        "driver_actual_exit": 1,
+        "actual_exit": 124,
+        "deadline_seconds": 240
+      },
+      "driver": {
+        "actual_driver_exit": 1,
+        "error": "page.evaluate: Target page, context or browser has been closed",
+        "real_contexts": 2,
+        "roles": [
+          "host",
+          "p1"
+        ],
+        "events": 2,
+        "diagnostics": [],
+        "workflow_only": true,
+        "acceptance_pass": false,
+        "reason": "Physical workflow alone is not acceptance; review actual DTO/applied ticks and route/paid/reconnect/eight-peer evidence independently."
+      }
+    }
+  },
+  "screenshots": {
+    "target/web11-physical-diagnostic06-20261011/host-00-menu.png": "204d1409fc868ed32d5c1dd23d988dbd269053e45293d735dc15762051fefaa5",
+    "target/web11-physical-diagnostic06-20261011/p1-09-placement-attempt.png": "f2a897aa43b634e49608d4229eafe8e5844d586617ae454fa682fa25465a579d",
+    "target/web11-physical-diagnostic06-20261011/host-02-normal-created.png": "b70355051e4a288461cc673f0f8099b719e0c124ef0fbeb374af50729e4bf50d",
+    "target/web11-physical-diagnostic06-20261011/p1-06-briefing-closure.png": "f2a897aa43b634e49608d4229eafe8e5844d586617ae454fa682fa25465a579d",
+    "target/web11-physical-diagnostic06-20261011/host-05-normal-match.png": "870a5a7a437962c2ca1e3322aaac6ec29d77bf38affb222659028e6562e9a19f",
+    "target/web11-physical-diagnostic06-20261011/p1-08-Power-preview.png": "f2a897aa43b634e49608d4229eafe8e5844d586617ae454fa682fa25465a579d",
+    "target/web11-physical-diagnostic06-20261011/p1-07-worker-selected.png": "bac2ed8a6e5b64c60ab1281e20d05a84922231e6b38d35a87651fcd38bb9ddd5",
+    "target/web11-physical-diagnostic06-20261011/p1-03-normal-joined.png": "af14e7fcfb1338a8ef1421a5cff27190971d73c5464ebe854406e827387ef569",
+    "target/web11-physical-diagnostic06-20261011/p1-02-code-entered.png": "f655c8cccc6b024b32ac6d25687fad7c8ec6e1b20eb9b6a69254dc3309f64f3f",
+    "target/web11-physical-diagnostic06-20261011/host-01-online-home.png": "2e71fea51bc1980dd296bb5d810df694c0240adcb13730aacf931337d5c2e16a",
+    "target/web11-physical-diagnostic06-20261011/p1-04-normal-ready.png": "62c6969f4a433fe4467a1dd2171e0f3cc2275324acaba8135906968350917c40",
+    "target/web11-physical-diagnostic06-20261011/host-04-normal-ready.png": "111fddaa147418d41efb18fc4a763376ba1788b434f9f681dd5cd08bc922877b",
+    "target/web11-physical-diagnostic06-20261011/p1-05-normal-match.png": "301717fd0d072910a85cffcd8a6b6ee721a0e19665889a15a6b2a91426443f96",
+    "target/web11-physical-diagnostic06-20261011/p1-01-online-home.png": "2e71fea51bc1980dd296bb5d810df694c0240adcb13730aacf931337d5c2e16a",
+    "target/web11-physical-diagnostic06-20261011/host-09-authoritative-receipt.png": "833e0365805fac332baaccf53da597cc514e5fc68f3efedca2f83458f6ce1744",
+    "target/web11-physical-diagnostic06-20261011/p1-00-menu.png": "204d1409fc868ed32d5c1dd23d988dbd269053e45293d735dc15762051fefaa5"
+  },
+  "next": "NormalmousemoveontoA, twoactualbrowserframes+settlebeforepress; previewbeforeplacement. No product/sourcefix without measuredfailure.",
+  "limitations": [
+    "Current258/schema4Wasm12 is a separate later artifact.",
+    "Workflow0 means diagnostics completed, not successful paid build.",
+    "Worldequivalence, paidcompletion, queuedcontrol,8realpeers,forcedTURN andsame-sessionreconnect remain open."
+  ]
+}
