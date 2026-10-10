@@ -1,0 +1,34 @@
+{
+  "scope": "Standalone Mission5 natural normal-input victory only; not same-App six-mission or initial menu proof",
+  "process": {
+    "actual_exit": 0,
+    "wall_seconds": 301.8136818659841,
+    "binary_sha256": "a5acd5d9b99481a9b2c675a9f5be1823861875012128c863527cc225cb9d7b1d",
+    "scope": "Mission5 visible air Engineer interception by existing Rockets through normal input, with existing paid producer recovery; legitimate scenario setup, not six-mission chain proof",
+    "profile": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current252-twin-engineer-defense-profile-20261011"
+  },
+  "final_clock": 256.8588562011719,
+  "phase": "HumanVictory",
+  "HQ": {
+    "hp": 20.0,
+    "max": 20.0,
+    "position": [
+      -26.0,
+      0.0,
+      -26.0
+    ]
+  },
+  "own_unit_types": {
+    "Drone": 1,
+    "HeavyMachinegunTrooper": 3,
+    "RocketInfantry": 5,
+    "Tank": 9,
+    "Worker": 4
+  },
+  "normal_visible_Engineer_focus_events": 0,
+  "specific_Engineer_defense_branch_runtime_verified": false,
+  "victory_frame_directly_reviewed": true,
+  "evidence_directory": "screenshots/steam-quality/current252-twin-engineer-defense-20261011",
+  "frame_sha256": "86c1af3c6870b726cd2a8a65d04f0d2061c136f3f8e618dd186a2241435a5b59",
+  "next": "Same-App six-mission chain now running on same sealed capture; no success assumed"
+}
