@@ -1,0 +1,124 @@
+{
+  "scope": "Normal Human0/Beginner1 controls: active paid PowerReactor construction, paid LightRifleInfantry job, natural midfade weather; separate-process mouse Load",
+  "schema": 3,
+  "runtime_asset_count": 332,
+  "results": {
+    "create": {
+      "pid": 1655527,
+      "save_sha256": "07cb113dbbe3ff1b5883bfac01486b32d3d99892fced753cc2eab1039584124b",
+      "binary_sha256": "8a52110e392ae6b6084be3c166bec0f2f9c26777d36b56378391c98ba626a443",
+      "raw_result": "logs/save-lifecycle-current240-create-05-result.json",
+      "raw_result_sha256": "b361fe1da994ac2a81123707a3d68a2d7c7870394498c3714fec6dd663725dd9",
+      "observations": "screenshots/steam-quality/save-lifecycle-current240-create-05/observations.json",
+      "observations_sha256": "8e6fb309e276e35ab84b2ad8956d029514da6fb5781fd7a500afc7abe3b2367d"
+    },
+    "resume": {
+      "pid": 1657926,
+      "save_sha256": "07cb113dbbe3ff1b5883bfac01486b32d3d99892fced753cc2eab1039584124b",
+      "binary_sha256": "8a52110e392ae6b6084be3c166bec0f2f9c26777d36b56378391c98ba626a443",
+      "raw_result": "logs/save-lifecycle-current240-resume-05-result.json",
+      "raw_result_sha256": "1a14fe605e1180fd0bc7cb0e709e702cc1336ee251b6046ffcb2180d97dc3e29",
+      "observations": "screenshots/steam-quality/save-lifecycle-current240-resume-05/observations.json",
+      "observations_sha256": "fa76b287ae1ec9a7f2d2db602181ca3ded0895f9278eb2857959a2a2fda78e5c"
+    }
+  },
+  "weather": {
+    "expected": {
+      "blend": 0.2888888418674469,
+      "current": "Sandstorm",
+      "phase_remaining": 130.7753448486328,
+      "previous": "Clear",
+      "step": 1
+    },
+    "restored": {
+      "blend": 0.3185185492038727,
+      "current": "Sandstorm",
+      "phase_remaining": 130.5086212158203,
+      "previous": "Clear",
+      "step": 1
+    },
+    "after": {
+      "blend": 1.0,
+      "current": "Sandstorm",
+      "phase_remaining": 124.37480926513672,
+      "previous": "Clear",
+      "step": 1
+    }
+  },
+  "saved_jobs": [
+    {
+      "cost": [
+        1,
+        0
+      ],
+      "id": "LightRifleInfantry",
+      "origin": [
+        -10.5,
+        0.0,
+        -21.5
+      ],
+      "producer": 25769802177,
+      "producer_id": "Barracks",
+      "team": 0,
+      "timer": 2.933333396911621,
+      "train": true
+    }
+  ],
+  "saved_player_foundations": [
+    {
+      "construction": [
+        0.880000114440918,
+        1.0
+      ],
+      "construction_cost": [
+        3,
+        1
+      ],
+      "effects": {
+        "chrono": null,
+        "emp": null,
+        "income_remaining": null,
+        "projector_remaining": null,
+        "shield": null
+      },
+      "free_worker_origin": null,
+      "garrison_count": 0,
+      "health": 2.3199987411499023,
+      "id": "PowerReactor",
+      "key": 17179867263,
+      "known": true,
+      "position": [
+        -8.0,
+        0.0,
+        -18.0
+      ],
+      "rally": null,
+      "repair_remaining": null,
+      "team": 0,
+      "weapon_remaining": 0.0,
+      "yaw": 0.0
+    }
+  ],
+  "save_bytes_unchanged": true,
+  "library_tests": {
+    "passed": 240,
+    "failed": 0,
+    "ignored": 1
+  },
+  "actual_screenshots": [
+    "screenshots/steam-quality/save-lifecycle-current240-create-05/01_saved.png",
+    "screenshots/steam-quality/save-lifecycle-current240-resume-05/01_restored.png",
+    "screenshots/steam-quality/save-lifecycle-current240-resume-05/02_completed.png"
+  ],
+  "earlier_failures_preserved": [
+    "logs/save-lifecycle-current240-create-01-result.json",
+    "logs/save-lifecycle-current240-create-02-result.json",
+    "logs/save-lifecycle-current240-create-03-result.json",
+    "logs/save-lifecycle-current240-resume-04-result.json"
+  ],
+  "limits": [
+    "Other weather kinds/cycle rollover are not individually covered",
+    "Other production types and temporary statuses/support powers remain separate",
+    "Final packaged executable continuity remains separate"
+  ]
+}

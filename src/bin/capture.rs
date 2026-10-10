@@ -53,6 +53,10 @@ mod save_flow;
 mod save_orders;
 
 #[cfg(not(target_arch = "wasm32"))]
+#[path = "capture/save_lifecycle.rs"]
+mod save_lifecycle;
+
+#[cfg(not(target_arch = "wasm32"))]
 #[path = "capture/save_effects.rs"]
 mod save_effects;
 
@@ -202,6 +206,24 @@ fn main() {
                 .and_then(|value| value.parse().ok())
                 .unwrap_or(HEIGHT);
             render_hud_card(&dir, width, height)
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        Some("save-lifecycle") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .ok_or("save-lifecycle needs output directory".to_string());
+            dir.and_then(|dir| save_lifecycle::create(&dir))
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        Some("save-lifecycle-resume") => {
+            match (
+                args.next().map(PathBuf::from),
+                args.next().map(PathBuf::from),
+            ) {
+                (Some(evidence), Some(dir)) => save_lifecycle::resume(&evidence, &dir),
+                _ => Err("save-lifecycle-resume needs evidence and output directories".into()),
+            }
         }
         #[cfg(not(target_arch = "wasm32"))]
         Some("save-orders") => {

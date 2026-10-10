@@ -47,6 +47,13 @@ mod skirmish_audit;
 pub use skirmish_audit::{SkirmishAuditConfig, run_skirmish_audit};
 
 #[cfg(not(target_arch = "wasm32"))]
+mod save_lifecycle;
+#[cfg(not(target_arch = "wasm32"))]
+pub use save_lifecycle::{
+    capture_disk_lifecycle_state, capture_lifecycle_setup_button, capture_live_lifecycle_state,
+};
+
+#[cfg(not(target_arch = "wasm32"))]
 mod save_orders;
 #[cfg(not(target_arch = "wasm32"))]
 pub use save_orders::{capture_disk_order_state, capture_live_order_state, capture_world_click_safety};
