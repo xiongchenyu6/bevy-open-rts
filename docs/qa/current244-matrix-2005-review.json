@@ -1,0 +1,42 @@
+{
+  "scope": "Partial frozen244 fixed-configuration sweep; not current263 equivalence or independent seeds",
+  "planned": 3726,
+  "terminal_snapshot": 2005,
+  "counts": {
+    "completed": 2004,
+    "simulation_timeout": 1
+  },
+  "integrity_verified": true,
+  "source_audit_sha256": "c4f395dd8853a41da1768c8752e7116159b7ccef3c1be44afe1def300f8616f1",
+  "private_asset_count": 332,
+  "verifier_actual_exit": 2,
+  "verifier_report": "target/current244-matrix-independent-20261011-check02.json",
+  "verifier_report_sha256": "c03c5472b00b7c5f3bd02ffad3e9057a0cb97af897feffc67dd2d77c87e9e65a",
+  "failures": [
+    {
+      "index": 1885,
+      "config": {
+        "map": "big_arena",
+        "factions": [
+          "chaos",
+          "chaos"
+        ],
+        "difficulties": [
+          "easy",
+          "beginner"
+        ],
+        "spawn_slots": [
+          2,
+          1
+        ],
+        "max_seconds": 600
+      },
+      "classification": "simulation_timeout",
+      "exit_code": 2,
+      "evidence": "target/current244-all-starts-20261010/1885"
+    }
+  ],
+  "status": "Incomplete; timeout1885 needs causal analysis. Original live scan continues unchanged.",
+  "result.json_sha256": "62aa4e9f0923e4fd6f8cc2ad12a86abcafddc8bf5f12b1f84fd6b32f6956e22f",
+  "status.json_sha256": "82322f9c244e54cb4dfb6adcd867c3c7116f98c7a83039584935f5aedc0f9469"
+}
