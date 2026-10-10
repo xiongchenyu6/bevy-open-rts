@@ -1,0 +1,28 @@
+{
+  "scope": "Rootvisualreview of privateoriginalbackground mainmenu/setup; not runtime/finalpackage acceptance",
+  "shots": [
+    {
+      "path": "target/menu-original-ui-20261010/menu-1920.png",
+      "sha256": "b2fb9d9980adf36493c20aed17a49e376c96df049ec09bd698e39e1a3115865b",
+      "child_exit": 0
+    },
+    {
+      "path": "target/menu-original-ui-20261010/menu-900.png",
+      "sha256": "5d026bfb7e7cc42e63664be4a217386f6726f4f90aa4f79ed1213efdd4f9d286",
+      "child_exit": 0
+    },
+    {
+      "path": "target/menu-original-ui-20261010/menu-setup-1920.png",
+      "sha256": "1921061aa1cb6f2db0c0aaa86f15a73589f826ff07e5cadce77a6c8a94dda979",
+      "child_exit": 0
+    }
+  ],
+  "source_image_sha256": "c74a20e551d368392f8a6ca9d600e8ce5cf374d659776b10511bb572014e053c",
+  "findings": [
+    "Mainmenu1920 andsetup1920 showcoherentdesertdepth withreadableEnglishcontrols.",
+    "Mainmenu900 maintainsreadablecardsandbuttons, butexistingimagefit leavesblacktop/bottombands; responsivecovercropping remainstobeimplemented.",
+    "No observed textoverlap orforegroundsubjectblocking inthese3samples."
+  ],
+  "runtime_replaced": false,
+  "responsive_background_complete": false
+}

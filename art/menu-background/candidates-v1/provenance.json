@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "scope": "Original menu/setup background candidate; not a gameplay screenshot or runtime integration acceptance",
+  "backend": "built-in image_gen",
+  "input_images": [],
+  "prompt_path": "art/menu-background/candidates-v1/prompt.txt",
+  "prompt_sha256": "0ce7dbedd7406a998d755832a5fc1e1e7e5a43043a37af886fa456929f8de96f",
+  "source_path": "art/menu-background/candidates-v1/background-original.png",
+  "source_sha256": "c74a20e551d368392f8a6ca9d600e8ce5cf374d659776b10511bb572014e053c",
+  "source_size": [
+    1672,
+    941
+  ],
+  "root_visual_review": "Landscape composition is coherent with the desert setting; center/right negative space remains usable. No observed text, logos or depicted actors. Actual menu readability remains pending.",
+  "runtime_replaced": false,
+  "final_package_verified": false,
+  "terms_and_distribution_review_complete": false
+}
