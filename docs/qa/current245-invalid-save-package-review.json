@@ -1,0 +1,18 @@
+{
+  "scope": "Exact optimized245 archive negative IO fixtures using normal Ctrl+L/Ctrl+S; missing/truncated files are intentionally invalid test inputs",
+  "actual_container_exit": 0,
+  "archive_sha256": "481640cc032ea07e996e64fbfd7f9fc6e56565d243705117998972e4ba2fffc0",
+  "packed_binary_sha256": "491f29eaafbf6e6398d669ccb99cd6eb248e6b47200ba99d1c21facc272f0fa9",
+  "game_alive": true,
+  "paused_scene_save_sha256": "7a02145d2e7b9ba35f052fabb5c293194675d04200d61e337efe3f1a8b5096e4",
+  "after_missing_and_corrupt_scene_bytes_identical": true,
+  "reviewed_errors": [
+    "No saved game found. Save a match first.",
+    "The saved game is damaged and cannot be loaded. Your current match is unchanged."
+  ],
+  "screenshots": {
+    "03-missing-load.png": "b6219a635395283d5c11208d32127632efe7c87e189ac86404cfff2c80d2fc6a",
+    "04-corrupt-load.png": "5801805a79e0d5973f1981949aee606277e94c23d27b802633dddcf7d2946590"
+  },
+  "scope_limits": "No successful-load continuity or incompatible-version result claimed by this test"
+}
