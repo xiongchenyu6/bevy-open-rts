@@ -1,0 +1,77 @@
+{
+  "scope": "Exact-version upstream tree filename audit; not rights clearance or substitute license text",
+  "components": [
+    {
+      "name": "constgebra",
+      "version": "0.1.4",
+      "declared_license": "MIT OR Apache-2.0",
+      "crate_checksum": "e1aaf9b65849a68662ac6c0810c8893a765c960b907dd7cfab9c4a50bf764fbc",
+      "published_vcs_commit": "eae8e094e5779f42f1db2a7adf9036aa33744bc8",
+      "upstream_tree_url": "https://api.github.com/repos/knickish/constgebra/git/trees/eae8e094e5779f42f1db2a7adf9036aa33744bc8?recursive=1",
+      "tree_response_sha256": "0e414d87eba95caa514d02f70589f5b3929cfacb86a70dbe96a21e2f06e241ca",
+      "tree_truncated": false,
+      "dedicated_notice_filename_found": false,
+      "paths": [
+        ".github",
+        ".github/workflows",
+        ".github/workflows/rust.yml",
+        ".gitignore",
+        "Cargo.toml",
+        "README.md",
+        "src",
+        "src/comptime.rs",
+        "src/lib.rs",
+        "src/runtime.rs"
+      ]
+    },
+    {
+      "name": "hexf-parse",
+      "version": "0.2.1",
+      "declared_license": "CC0-1.0",
+      "crate_checksum": "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df",
+      "published_vcs_commit": "4225763d744183d720f575ae96d04161b4d08ea0",
+      "upstream_tree_url": "https://api.github.com/repos/lifthrasiir/hexf/git/trees/4225763d744183d720f575ae96d04161b4d08ea0?recursive=1",
+      "tree_response_sha256": "715e85656900b66a048cf2dd4f9063d1f383c3002c6bc1a6d362c6e987f84980",
+      "tree_truncated": false,
+      "dedicated_notice_filename_found": false,
+      "paths": [
+        ".github",
+        ".github/workflows",
+        ".github/workflows/rust.yml",
+        ".gitignore",
+        ".travis.yml",
+        "Cargo.toml",
+        "README.md",
+        "parse",
+        "parse/Cargo.toml",
+        "parse/src",
+        "parse/src/lib.rs",
+        "src",
+        "src/lib.rs",
+        "tests",
+        "tests/example.rs"
+      ]
+    },
+    {
+      "name": "simd_helpers",
+      "version": "0.1.0",
+      "declared_license": "MIT",
+      "crate_checksum": "95890f873bec569a0362c235787f3aca6e1e887302ba4840839bcc6459c42da6",
+      "published_vcs_commit": "ca1a2f84aa386d758e98f8a609d990263932fb85",
+      "upstream_tree_url": "https://api.github.com/repos/lu-zero/simd_helpers/git/trees/ca1a2f84aa386d758e98f8a609d990263932fb85?recursive=1",
+      "tree_response_sha256": "fe5b840ac06a764a770fe88eacebeaaa7584e6db2a27a893df70bed55d03d26a",
+      "tree_truncated": false,
+      "dedicated_notice_filename_found": false,
+      "paths": [
+        ".gitignore",
+        "Cargo.toml",
+        "README.md",
+        "src",
+        "src/lib.rs",
+        "tests",
+        "tests/cold_for.rs"
+      ]
+    }
+  ],
+  "remaining_requirement": "Obtain or establish applicable original notice materials before final distribution review; do not synthesize copyright notices."
+}

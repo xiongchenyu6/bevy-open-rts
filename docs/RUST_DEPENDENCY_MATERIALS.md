@@ -30,6 +30,12 @@ archives and license declarations are retained. Do not invent copyright notices
 or describe generic license terms as retrieved package originals. Complete
 license applicability, attribution and distribution review remains open.
 
+A repeat audit of each published crate's exact upstream Git commit finds no
+dedicated notice filename in any of the three complete, untruncated trees.
+Commit IDs, Cargo.lock checksums, tree URLs, response hashes and filenames are
+recorded in `rust-missing-notice-audit.json`. This confirms the remaining source
+material gap; it does not replace the missing notices or establish clearance.
+
 Keep these Rust materials separate from the six bundled dynamic-library source
 providers documented in `LINUX_RUNTIME_SOURCE_MATERIALS.md`. Neither inventory
 establishes rights for game art, models, fonts, effects or voices.
