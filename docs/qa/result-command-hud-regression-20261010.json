@@ -14,5 +14,15 @@
     "full_ignored": 1
   },
   "behavior": "Existing result cleanup clears pending targeting modes and StatsText command feedback on both victory and defeat",
-  "final_package_verified": false
+  "final_package_verified": false,
+  "native_build": {
+    "actual_exit": 0,
+    "binaries": {
+      "capture": "055b38fd9fd9145c38f2fd9fdb0512573a30347e27829972ea8ec96df377362f",
+      "bevy-open-rts": "10fdd56c642a2feece3296da144469761c766fc652b852dd7ec8c6f3a014dba5"
+    },
+    "assets": 332,
+    "inputs_unchanged": true,
+    "evidence": "target/result-hud-highland-shared-20261010/pin.json"
+  }
 }
