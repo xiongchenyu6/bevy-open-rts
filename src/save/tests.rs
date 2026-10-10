@@ -221,7 +221,11 @@ fn sample_save() -> SaveGame {
             construction_cost: None,
             free_worker_origin: None,
             repair_remaining: None,
-            rally: Some(([5.0, 0.0, 5.0], 1)),
+            rally: Some(SavedRally {
+                target: [5.0, 0.0, 5.0],
+                mode: 1,
+                target_entity: None,
+            }),
             garrison_count: 0,
         }],
         resources: vec![(3, 0, [8.0, 0.0, 8.0], 40)],

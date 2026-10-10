@@ -12,11 +12,13 @@ use crate::*;
 mod continuity;
 #[cfg(test)]
 mod position_tests;
+#[cfg(test)]
+mod rally_tests;
 pub(crate) use continuity::*;
 
 // Web builds keep saves in memory only — the disk path is native-only.
 #[cfg_attr(target_arch = "wasm32", allow(dead_code))]
-pub(crate) const SAVE_VERSION: u32 = 3;
+pub(crate) const SAVE_VERSION: u32 = 4;
 
 /// Save loaded from disk, consumed by `apply_loaded_save` right after the match
 /// world is (re)built by the normal InMatch setup chain.
@@ -217,9 +219,11 @@ pub(crate) fn collect_save_game(world: &mut World) -> Option<SaveGame> {
             construction: construction
                 .map(|construction| (construction.remaining, construction.total)),
             rally: rally.and_then(|rally| {
-                rally
-                    .target
-                    .map(|target| (target.to_array(), rally.mode as u8))
+                rally.target.map(|target| SavedRally {
+                    target: target.to_array(),
+                    mode: rally.mode as u8,
+                    target_entity: rally.target_unit.map(Entity::to_bits),
+                })
             }),
             construction_cost: construction.map(|c| (c.cost.ore, c.cost.crystal)),
             free_worker_origin: construction
@@ -774,11 +778,12 @@ pub(crate) fn apply_loaded_save(world: &mut World) {
             }
             construction.free_worker_origin = saved.free_worker_origin.map(Vec3::from_array);
         }
-        if let Some((target, mode)) = saved.rally
+        if let Some(saved_rally) = saved.rally
             && let Some(mut rally) = world.get_mut::<RallyPoint>(entity)
         {
-            rally.target = Some(Vec3::from_array(target));
-            rally.mode = if mode == RallyMode::AttackMove as u8 {
+            rally.target = Some(Vec3::from_array(saved_rally.target));
+            rally.target_unit = saved_rally.target_entity.map(|key| remap[&key]);
+            rally.mode = if saved_rally.mode == RallyMode::AttackMove as u8 {
                 RallyMode::AttackMove
             } else {
                 RallyMode::Move

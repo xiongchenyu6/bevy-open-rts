@@ -54,9 +54,17 @@ pub(crate) struct SavedStructure {
     pub(crate) construction_cost: Option<(i32, i32)>,
     pub(crate) free_worker_origin: Option<[f32; 3]>,
     pub(crate) repair_remaining: Option<f32>,
-    /// Rally target plus RallyMode ordinal (0 move, 1 attack-move).
-    pub(crate) rally: Option<([f32; 3], u8)>,
+    pub(crate) rally: Option<SavedRally>,
     pub(crate) garrison_count: usize,
+}
+
+/// Ground fallback and optional entity target are both part of rally behavior.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub(crate) struct SavedRally {
+    pub(crate) target: [f32; 3],
+    /// RallyMode ordinal (0 move, 1 attack-move).
+    pub(crate) mode: u8,
+    pub(crate) target_entity: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -1035,7 +1043,8 @@ pub(crate) fn validate_save(save: &SaveGame) -> Result<(), String> {
             })
             || structure
                 .rally
-                .is_some_and(|(p, mode)| mode > 1 || p.iter().any(|v| !v.is_finite()))
+                .as_ref()
+                .is_some_and(|rally| rally.mode > 1 || rally.target.iter().any(|v| !v.is_finite()))
         {
             return Err("Invalid saved structure state".to_string());
         }
@@ -1051,6 +1060,22 @@ pub(crate) fn validate_save(save: &SaveGame) -> Result<(), String> {
             .any(|v| !v.is_finite() || *v < 0.0)
     {
         return Err("Invalid saved economy or support state".to_string());
+    }
+    for structure in &save.structures {
+        if let Some(target) = structure.rally.as_ref().and_then(|r| r.target_entity) {
+            let owned_actor = save
+                .units
+                .iter()
+                .any(|u| u.key == target && u.team == structure.team)
+                || save
+                    .structures
+                    .iter()
+                    .any(|s| s.key == target && s.team == structure.team);
+            let resource = save.resources.iter().any(|r| r.0 == target && r.3 > 0);
+            if !owned_actor && !resource {
+                return Err("Invalid saved rally target".to_string());
+            }
+        }
     }
     for job in &save.build_jobs {
         if job.team >= n

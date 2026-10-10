@@ -1,0 +1,58 @@
+{
+  "scope": "Native schema4 rally entity continuity regression and complete library verification; normal packaged player acceptance pending",
+  "save_version": 4,
+  "behavior": "Preserve ground fallback, Move/AttackMove mode and optional saved entity key; remap target to actual restored entity; reject dangling or nonowned/nonresource reference",
+  "unsupported_older_schemas": true,
+  "migration_or_compatibility_layer": false,
+  "meaningful_old_source_red": {
+    "raw": "target/save-rally-entity-red-snapshot-20261011/red01-result.json",
+    "actual_exit": 101,
+    "tests_failed": 2,
+    "reason": "Real collected ownWorker and visibleResource rally lost target_unit on apply"
+  },
+  "preserved_cache_failure": {
+    "raw": "target/save-rally-entity-shared-20261011/result.json",
+    "actual_focused_exit": 101,
+    "reason": "Shared target reused old isolated RED test binary; no product failure inferred"
+  },
+  "current_verification": {
+    "raw": "target/save-rally-entity-shared02-20261011",
+    "package_only_dev_clean_actual_exit": 0,
+    "actual_root_compile_and_dependency_paths_confirmed": true,
+    "focused": {
+      "passed": 3,
+      "failed": 0,
+      "wall_seconds": 5.99
+    },
+    "full": {
+      "passed": 258,
+      "failed": 0,
+      "ignored": 1,
+      "wall_seconds": 264.49
+    },
+    "native_build_actual_exit": 0,
+    "sources_and_332_assets_unchanged": true,
+    "bins": {
+      "bevy-open-rts": "bceac35cd6cf8976e833cb6c9fb19854406fc2185ee478551936ffa2bd3bcd00",
+      "capture": "a84b66bbfe03f8767146f9386890071fe8bc033a5bb58b0f4a3b46f27ad8513b"
+    }
+  },
+  "regression_checks": [
+    "Own Worker and visible ResourceNode through three real RON collect/apply fresh-App remapping cycles",
+    "Normal enqueue charges one actual Worker from starting bank; actual production gives Follow/Harvest targeting restored entity",
+    "Dangling target rejection instead of ground fallback"
+  ],
+  "evidence_hashes": {
+    "target/save-rally-entity-shared02-20261011/focused.log": "b090471ae82c084a2eee1401e4349129516200f218e12e14a122d0f481277ac5",
+    "target/save-rally-entity-shared02-20261011/full.log": "40de753017021fd21b7360f43de80f8384f4939262ee791e8bb1db21ea717f80",
+    "target/save-rally-entity-shared02-20261011/build.log": "de4d47eec042410f5407e382a3306b514c686b38fe2616c2a26b01360b767934",
+    "target/save-rally-entity-shared02-20261011/focused.d": "05bd89de98a60b48446b0dbf003b4bbf49fb04aabee0df713a38cb604daa6e87",
+    "target/save-rally-entity-shared02-20261011/focused-dependency-proof.json": "e1269fda94b4c372bb6316e7d27915d174fa630f6c9f2f2ec06a8f899c5d5bee",
+    "target/save-rally-entity-shared02-20261011/pin.json": "c3ab68a59e31f0bd9488e0a0a09f81c70cd8f487da6fe0a0090d6b14bdfaf3d6"
+  },
+  "limits": [
+    "Headless integration fixtures are not normal packaged UI/player acceptance",
+    "Historical SDK253/schema3 proofs remain valid only for their frozen artifacts",
+    "New schema4 optimized SDK and normal ownWorker/resource rally player QA still pending"
+  ]
+}
