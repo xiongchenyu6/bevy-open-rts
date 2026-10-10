@@ -19,6 +19,25 @@ The project is **not ready for Steam submission**. All nine gates remain in scop
 | Reliability | Full suite, packaged smoke, long sessions and representative hardware combat performance | Real EMP application regressions pass3/3; prior full suite178/0/1. Three new combat-damage regressions pass; fresh/load transition regressions2/2 and updated Hold suite200/0/1 and shared native build pass at that checkpoint. The first pending constructor/navigation full suite fails204/4/1. Subsequent physical, arrival and curved-egress corrections pass measured safety cases and the unchanged45s Human/AI test; two600s AI cases still fail, exposing separation and bonus-worker spawn defects. The final constructor/navigation checkpoint passes219 tests, with0 failures and1 ignored; contact safety14/14 and the real-wall fixture pass. All four native binaries build with actual exit0 (`target/constructor-full-27-result.json`). This proves that checkpoint, not final packaged reliability. Matched pre-Hold native/Wasm07 human+AI control passes queue2, completed route and158 exact same-tick DTO comparisons with normal cleanup. The short hardware probe samples52.63FPS/GPU98.6% during early combat; stable representative combat and long-session acceptance remain open. |
 | Distribution | Accurate store copy, provenance/licenses/generated inventory and store-ready media | Unpublished store draft, an original reproducible wordmark and verified Steam media export brief exist; final media needs at least five actual1920×1080 gameplay captures. Partial provenance audit exists. Art/audio rights gaps and final media remain open. |
 
+## Current development checkpoint
+
+The paid AI spawn/site correction passes the unchanged marker, eight spatial
+and cost regressions, and seven AI development/completion fixtures. Normal
+Chaos completes paid Power/Radar/RoboticsBay/TechLab and trains armed advanced
+units on the original far-start fixture; the original45s remote-Human control
+fixture passes. Costs, profile timers, six-pick budget and physical clearance
+remain unchanged. Exact packed-base snapshots motivate angular coverage and
+bounded expansion inside normal construction influence.
+
+The current full suite passes229/0/1 in176.20s with actual exit0
+(`logs/ai-placement-shared-14-full.log/.exit`). Four native binaries are still
+building; no final artifact or whole-map acceptance follows from this suite.
+The70 model-only portrait candidates pass140 paired exports, transparent RGBA,
+explicit contextual-marker exclusion and complete128px/72px dark/light review
+(`art/portraits/model-only-full70-visual-review.json`). Runtime replacement,
+normal paid-model comparison and final native/browser presentation remain open.
+All nine release gates above still apply.
+
 ## Verification policy
 
 Use the shared game scene and real input for player-flow acceptance. Inspect
