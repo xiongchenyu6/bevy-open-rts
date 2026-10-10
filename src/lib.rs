@@ -2596,7 +2596,7 @@ pub(crate) fn queue_startup_loading_assets(
     retain_loading_asset(
         &mut loading,
         &mut retained,
-        asset_server.load::<Image>("ui/background.png"),
+        asset_server.load::<Image>(menu::MENU_BACKGROUND_PATH),
     );
     retain_loading_asset(
         &mut loading,

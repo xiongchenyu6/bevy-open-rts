@@ -1,0 +1,35 @@
+{
+  "source_path": "art/menu-background/candidates-v1/background-original.png",
+  "runtime_path": "assets/ui/background-original-v1.png",
+  "sha256": "c74a20e551d368392f8a6ca9d600e8ce5cf374d659776b10511bb572014e053c",
+  "private_native_visual_evidence": "art/menu-background/candidates-v1/native-cover-review.json",
+  "runtime_source_references_updated": 3,
+  "post_integration_native_verified": true,
+  "final_package_verified": false,
+  "terms_and_distribution_review_complete": false,
+  "capture_sha256": "71d6526ea507cd16173362788398590ff103abc3464732d5aba82dff1efa396b",
+  "runtime_result": {
+    "exits": [
+      0,
+      0,
+      0
+    ],
+    "wall_seconds": 4.9465178470127285,
+    "assets_unchanged": true
+  },
+  "reviewed_images": [
+    {
+      "path": "target/menu-integrated-ui-20261010/menu-1920.png",
+      "sha256": "f5d945db2a8665c451eb09ae0ee85ecdfadb8d8d25fed2c04ee87386c5aecbdf"
+    },
+    {
+      "path": "target/menu-integrated-ui-20261010/menu-900.png",
+      "sha256": "26406d7d825f8c4781e5e77bf68b4d3023db18dd9bad3781b842960ced8e18ea"
+    },
+    {
+      "path": "target/menu-integrated-ui-20261010/menu-setup-1920.png",
+      "sha256": "3a9de7813eb65b1a0814b4e8f7dc0562f65e45f95d46a98cd065952be5b573cd"
+    }
+  ],
+  "root_visual_review": "All three actual postintegration images inspected: readable controls, proportional background, no letterboxing at900x720; menu/setup1920x1080 intact."
+}

@@ -280,3 +280,16 @@ inventory. Three stale derived registry/import metadata hashes were refreshed,
 with their prior records explicitly historical and no upstream-equality claim.
 Post-integration native UI and the final packaged exact-set/hash checks remain
 separate verification steps.
+
+## Original menu backdrop integration (2026-10-10)
+
+`assets/ui/background-original-v1.png` now supplies the main menu and skirmish
+setup backdrop. It is an original built-in image generation output; the prompt,
+source hash and no-reference generation record are in
+`art/menu-background/candidates-v1/`. The previous background with unresolved
+source history was retired outside the packaged asset tree. Native private
+staging verified readable menus at 900×720 and 1920×1080 with proportional
+cover cropping; `art/menu-background/runtime-integration.json` separately tracks
+the passed three-image post-integration run and still-pending final package
+and distribution review.
+The runtime inventory remains 338 files and the active payload ledger 332 entries.

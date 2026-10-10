@@ -44,7 +44,8 @@
       "identical": 1
     },
     "migration": {
-      "authored_derived_registry_metadata": 2,
+      "authored_runtime_inventory": 1,
+      "authored_derived_registry_metadata": 1,
       "absent_from_upstream": 1
     },
     "models": {
@@ -64,7 +65,7 @@
       "absent_from_upstream": 6
     },
     "ui": {
-      "different": 1,
+      "generated_original": 1,
       "absent_from_upstream": 25,
       "generated_original_model_portrait": 70,
       "identical": 2,
@@ -177,7 +178,7 @@
     },
     {
       "path": "assets/migration/asset_manifest.json",
-      "sha256": "32075d8090a2ed8e2186fb995c44fbd692f1eef1d89e1f749c0782b26413e9d2",
+      "sha256": "0c0bc46478a5e6ae945281ca1e01461d2f6263c53dc10b1597332fb965756f58",
       "comparison": "authored_runtime_inventory",
       "provenance": "scripts/generate_registry.py --asset-manifest-only",
       "scope": "Current runtime file inventory, not imported Godot source membership"
@@ -3036,10 +3037,10 @@
       "comparison": "absent_from_upstream"
     },
     {
-      "path": "assets/ui/background.png",
-      "sha256": "c82eeb871a91e7a259cfb175255430b4498cbfe203859d29cad882eea6f0fd1b",
-      "comparison": "different",
-      "upstream_sha256": "900cfb789d8c85cb0958cc66b1061af5308f4679615d1936cdd45867f49afcdb"
+      "path": "assets/ui/background-original-v1.png",
+      "sha256": "c74a20e551d368392f8a6ca9d600e8ce5cf374d659776b10511bb572014e053c",
+      "comparison": "generated_original",
+      "generation_record": "art/menu-background/candidates-v1/provenance.json"
     },
     {
       "path": "assets/ui/cursors/rts_cursor.cur.ron",
@@ -5143,6 +5144,21 @@
       "after_sha256": "32075d8090a2ed8e2186fb995c44fbd692f1eef1d89e1f749c0782b26413e9d2",
       "reason": "Replace stale import-source listing with actual338-file runtime inventory",
       "historical_manifest": "target/asset-manifest-before-runtime-cleanup-20261010.json"
+    },
+    {
+      "reason": "Versioned original menu backdrop integration; runtime asset count remains338",
+      "previous_sha256": "32075d8090a2ed8e2186fb995c44fbd692f1eef1d89e1f749c0782b26413e9d2",
+      "current_sha256": "0c0bc46478a5e6ae945281ca1e01461d2f6263c53dc10b1597332fb965756f58"
+    }
+  ],
+  "retired_menu_backgrounds": [
+    {
+      "path": "assets/ui/background.png",
+      "sha256": "c82eeb871a91e7a259cfb175255430b4498cbfe203859d29cad882eea6f0fd1b",
+      "comparison": "different",
+      "upstream_sha256": "900cfb789d8c85cb0958cc66b1061af5308f4679615d1936cdd45867f49afcdb",
+      "reason": "Replaced by original generated desert background with prompt/provenance",
+      "archive": "target/menu-background-retired-20261010/background.png"
     }
   ]
 }

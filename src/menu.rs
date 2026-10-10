@@ -10,6 +10,8 @@ use crate::*;
 mod backdrop;
 pub(crate) use backdrop::update_menu_backdrop_crop;
 
+pub(crate) const MENU_BACKGROUND_PATH: &str = "ui/background-original-v1.png";
+
 pub(crate) fn random_map_index() -> usize {
     SKIRMISH_MAPS.len()
 }
@@ -236,7 +238,7 @@ pub(crate) fn setup_menu_backdrop(
         .spawn((
             Name::new("Godot Main Menu Background"),
             DespawnOnExit(screen),
-            ImageNode::new(asset_server.load("ui/background.png"))
+            ImageNode::new(asset_server.load(MENU_BACKGROUND_PATH))
                 .with_mode(bevy::ui::widget::NodeImageMode::Stretch),
             Node {
                 position_type: PositionType::Absolute,
@@ -1188,14 +1190,14 @@ pub(crate) fn setup_main_menu(
         DespawnOnExit(AppScreen::SkirmishSetup),
     ));
 
-    // Scenic backdrop (godot's assets/ui/background.png) behind everything, with a
+    // Original desert backdrop behind everything, with a
     // dark tactical tint so the panels stay readable on top. Spawned first so it
     // renders behind the menu root.
     commands
         .spawn((
             Name::new("Menu Background"),
             DespawnOnExit(AppScreen::SkirmishSetup),
-            ImageNode::new(asset_server.load("ui/background.png"))
+            ImageNode::new(asset_server.load(MENU_BACKGROUND_PATH))
                 .with_mode(bevy::ui::widget::NodeImageMode::Stretch),
             Node {
                 position_type: PositionType::Absolute,

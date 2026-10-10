@@ -202,7 +202,7 @@
     "translations/match.en.translation",
     "translations/match.pl.translation",
     "translations/match.zh_CN.translation",
-    "ui/background.png",
+    "ui/background-original-v1.png",
     "ui/cursors/rts_cursor.cur.ron",
     "ui/cursors/rts_cursor_atlas.png",
     "ui/factions/alliance_emblem.png",
