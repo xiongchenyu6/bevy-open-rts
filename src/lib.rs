@@ -7379,6 +7379,8 @@ pub(crate) fn free_position_in_bounds(
 
 #[cfg(test)]
 mod match_tests;
+#[cfg(test)]
+mod objective_hud_tests;
 
 #[cfg(test)]
 mod emp_task_tests;

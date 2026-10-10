@@ -2974,7 +2974,12 @@ pub(crate) fn update_objective_tracker_hud(
             objective_completion_percent(remaining as u32, total, total > 0 && remaining == 0)
                 as f32,
         )
-    } else if setup_settings.victory_condition == VictoryCondition::Headquarters {
+    } else if active_mission
+        .0
+        .and_then(mission_by_index)
+        .is_some_and(|mission| mission.victory == MissionVictory::Headquarters)
+        || setup_settings.victory_condition == VictoryCondition::Headquarters
+    {
         let remaining = structures
             .iter()
             .filter(|(structure, team, health)| {

@@ -1,0 +1,23 @@
+{
+  "scope": "Actual headless match schedule; rendered final-package verification remains pending",
+  "red": {
+    "log": "target/objective-hud-red-02.log",
+    "actual_exit": 101,
+    "passed": 1,
+    "failed": 1,
+    "failure": "Headquarters mission inherited skirmish worker requirement"
+  },
+  "green": {
+    "log": "target/objective-hud-green-01.log",
+    "actual_exit": 0,
+    "passed": 244,
+    "failed": 0,
+    "ignored": 1
+  },
+  "behavior": "Mission Headquarters objective takes priority over skirmish setting; existing match-end HUD cleanup remains unchanged",
+  "source_sha256": {
+    "src/hud.rs": "d5b44e87c2d9cd82aff0ded73fc6552e3bff7640521c3edb51034724ae2d6753",
+    "src/lib.rs": "772ae5c02eaf6f98d6921ea7786f47e31ee82cb109cd547d248426bf45af2052",
+    "src/objective_hud_tests.rs": "e22dc1c7bcf8250d45f0162ba79c4e9e7903417573bf4f574b3d868db8706969"
+  }
+}
