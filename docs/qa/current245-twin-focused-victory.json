@@ -1,0 +1,32 @@
+{
+  "scope": "Mission5 standalone normal-input focused attacks and victory; not six-mission chain proof",
+  "process": {
+    "actual_exit": 0,
+    "wall_seconds": 190.33348730998114,
+    "binary_sha256": "6236f5370dabd5e5475d3409da6ea2dbc87d215dc0c6a4802ab0bf98889e9344",
+    "scope": "Mission5 normal visible-target focus diagnostic from legitimate scenario setup; not six-mission chain proof",
+    "profile": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current245-twin-focused-profile-20261010"
+  },
+  "victory_clock": 192.5121612548828,
+  "phase": "HumanVictory",
+  "focused_attack_rows": 2,
+  "focused_targets": [
+    {
+      "id": "ShieldTrooper",
+      "key": 4294966746,
+      "assigned_actors": 14
+    },
+    {
+      "id": "JammerVehicle",
+      "key": 107374179556,
+      "assigned_actors": 9
+    }
+  ],
+  "saved_completed": [
+    "twin_front"
+  ],
+  "profile_sha256": "f1ab3a738ce92e5dc89c034fab427a8879b844f4f57bd0447682c47e39832371",
+  "screenshot": "screenshots/steam-quality/current245-twin-focused-20261010/02_victory.png",
+  "screenshot_sha256": "c578495a6619cf6b3f07aae4559200e830dc7b15eb5822dc39b93aebfa8dee8f",
+  "six_mission_complete": false
+}
