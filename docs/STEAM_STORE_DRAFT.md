@@ -1,6 +1,6 @@
 # Steam Store Copy Draft
 
-Working title: **Bevy Open RTS** (in-game heading: Open RTS). This is reviewable copy, not a published listing.
+Working title: **Open RTS**, matching the in-game heading and original wordmark. This is reviewable copy, not a published listing.
 Current release acceptance remains in [RELEASE_READINESS.md](RELEASE_READINESS.md).
 
 ## Short description
@@ -48,3 +48,5 @@ The copy uses plain product language and omits promotional links, dated claims,
 and simulated Steam interface graphics, following the
 [Steamworks description guidance](https://partner.steamgames.com/doc/store/page/description?l=english).
 Keep review notes and this reference outside the player-facing description.
+
+Original branding candidates and current export sizes are recorded in [Steam media preparation](STEAM_MEDIA.md). Final gameplay captures, capsule compositions and client placement remain pending.
