@@ -1,0 +1,380 @@
+{
+  "scope": "Native minimum900x720/maximum1280x720 supported tilt, normal controls and paid Radar; root inspected five actual images",
+  "capture_sha256": "ec18900c8decc72b7853a3a4c1afd75e731e4261565eab847e83e165ae01e3db",
+  "actual_runs": [
+    {
+      "mode": "min-tilt",
+      "exit": 0,
+      "screenshots": 11
+    },
+    {
+      "mode": "max-tilt",
+      "exit": 0,
+      "screenshots": 11
+    }
+  ],
+  "assets_unchanged": true,
+  "reviewed_images": [
+    {
+      "image": "target/apron-camera-edges-05-20261010/900-min-tilt/04_northwest.png",
+      "sha256": "519fa1b62974d417533f79b04b1a6c28b18c60c52a0f01c0c5ba48a73a3a292f",
+      "settings": {
+        "edge_pan": true,
+        "pan_speed": 18.0,
+        "tilt": 0.15000000596046448
+      },
+      "distance": 7.0,
+      "focus": [
+        -23.799999237060547,
+        0.0,
+        -23.799999237060547
+      ],
+      "fog": {
+        "cells": 36864,
+        "explored": 5999,
+        "opaque_cells": 30865
+      },
+      "ground_corners": [
+        {
+          "flat_ground": [
+            -28.348743438720703,
+            0.0,
+            -27.48031997680664
+          ],
+          "inside_map": false,
+          "screen": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -19.25125503540039,
+            0.0,
+            -27.48031997680664
+          ],
+          "inside_map": false,
+          "screen": [
+            900.0,
+            0.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -19.7872257232666,
+            0.0,
+            -20.55332374572754
+          ],
+          "inside_map": true,
+          "screen": [
+            900.0,
+            720.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -27.812772750854492,
+            0.0,
+            -20.55332374572754
+          ],
+          "inside_map": false,
+          "screen": [
+            0.0,
+            720.0
+          ]
+        }
+      ]
+    },
+    {
+      "image": "target/apron-camera-edges-05-20261010/900-min-tilt/08_zoom_out.png",
+      "sha256": "21cdc651bdf95068b87f9cdb833afd5b83aaef11fcac4212637b03ff99a5b033",
+      "settings": {
+        "edge_pan": true,
+        "pan_speed": 18.0,
+        "tilt": 0.15000000596046448
+      },
+      "distance": 9.0,
+      "focus": [
+        -23.799999237060547,
+        0.0,
+        23.799999237060547
+      ],
+      "fog": {
+        "cells": 36864,
+        "explored": 5999,
+        "opaque_cells": 30865
+      },
+      "ground_corners": [
+        {
+          "flat_ground": [
+            -29.94478988647461,
+            0.0,
+            18.828340530395508
+          ],
+          "inside_map": false,
+          "screen": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -17.655208587646484,
+            0.0,
+            18.828340530395508
+          ],
+          "inside_map": true,
+          "screen": [
+            900.0,
+            0.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -18.37923812866211,
+            0.0,
+            28.18585777282715
+          ],
+          "inside_map": false,
+          "screen": [
+            900.0,
+            720.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -29.220760345458984,
+            0.0,
+            28.18585777282715
+          ],
+          "inside_map": false,
+          "screen": [
+            0.0,
+            720.0
+          ]
+        }
+      ]
+    },
+    {
+      "image": "target/apron-camera-edges-05-20261010/1280-max-tilt/04_northwest.png",
+      "sha256": "1e4f8cc72fff10c8e9d213a1277f763c8d2f32ec24d4f792106a1fee11cd5167",
+      "settings": {
+        "edge_pan": true,
+        "pan_speed": 18.0,
+        "tilt": 1.0499999523162842
+      },
+      "distance": 7.0,
+      "focus": [
+        -23.799999237060547,
+        0.0,
+        -23.799999237060547
+      ],
+      "fog": {
+        "cells": 36864,
+        "explored": 5999,
+        "opaque_cells": 30865
+      },
+      "ground_corners": [
+        {
+          "flat_ground": [
+            -67.16529846191406,
+            0.0,
+            -72.82410430908203
+          ],
+          "inside_map": false,
+          "screen": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "flat_ground": [
+            19.565303802490234,
+            0.0,
+            -72.82410430908203
+          ],
+          "inside_map": false,
+          "screen": [
+            1280.0,
+            0.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -16.80215835571289,
+            0.0,
+            -15.888999938964844
+          ],
+          "inside_map": true,
+          "screen": [
+            1280.0,
+            720.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -30.797840118408203,
+            0.0,
+            -15.888999938964844
+          ],
+          "inside_map": false,
+          "screen": [
+            0.0,
+            720.0
+          ]
+        }
+      ]
+    },
+    {
+      "image": "target/apron-camera-edges-05-20261010/1280-max-tilt/08_zoom_out.png",
+      "sha256": "3332ed33a5a530d6b41a9951d57d24e5fb307b171eb775263d78ba26dcfb5971",
+      "settings": {
+        "edge_pan": true,
+        "pan_speed": 18.0,
+        "tilt": 1.0499999523162842
+      },
+      "distance": 9.0,
+      "focus": [
+        -23.799999237060547,
+        0.0,
+        23.799999237060547
+      ],
+      "fog": {
+        "cells": 36864,
+        "explored": 5999,
+        "opaque_cells": 30865
+      },
+      "ground_corners": [
+        {
+          "flat_ground": [
+            -82.38116455078125,
+            0.0,
+            -42.425506591796875
+          ],
+          "inside_map": false,
+          "screen": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "flat_ground": [
+            34.781166076660156,
+            0.0,
+            -42.425506591796875
+          ],
+          "inside_map": false,
+          "screen": [
+            1280.0,
+            0.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -14.346782684326172,
+            0.0,
+            34.486785888671875
+          ],
+          "inside_map": false,
+          "screen": [
+            1280.0,
+            720.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -33.25321578979492,
+            0.0,
+            34.486785888671875
+          ],
+          "inside_map": false,
+          "screen": [
+            0.0,
+            720.0
+          ]
+        }
+      ]
+    },
+    {
+      "image": "target/apron-camera-edges-05-20261010/1280-max-tilt/10_rotated_edge.png",
+      "sha256": "fb5c8a436360d732a2f26e2e070af41ce6cbdfa3a801a9048300fe65141fc44c",
+      "settings": {
+        "edge_pan": true,
+        "pan_speed": 18.0,
+        "tilt": 1.0499999523162842
+      },
+      "distance": 5.5,
+      "focus": [
+        -23.799999237060547,
+        0.0,
+        23.799999237060547
+      ],
+      "fog": {
+        "cells": 36864,
+        "explored": 5999,
+        "opaque_cells": 30865
+      },
+      "ground_corners": [
+        {
+          "flat_ground": [
+            -68.66938781738281,
+            0.0,
+            6.118671417236328
+          ],
+          "inside_map": false,
+          "screen": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -11.726746559143066,
+            0.0,
+            -22.891841888427734
+          ],
+          "inside_map": true,
+          "screen": [
+            1280.0,
+            0.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -16.559444427490234,
+            0.0,
+            26.653230667114258
+          ],
+          "inside_map": false,
+          "screen": [
+            1280.0,
+            720.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -25.748252868652344,
+            0.0,
+            31.334644317626953
+          ],
+          "inside_map": false,
+          "screen": [
+            0.0,
+            720.0
+          ]
+        }
+      ]
+    }
+  ],
+  "observations": [
+    "No outside-map empty background visible in these inspected edge/zoom/rotation frames",
+    "No visible hard repeat seams in inspected outside terrain",
+    "Black interior regions correspond to unexplored in-map fog",
+    "Map rim remains visible; HUD text and cards remain readable"
+  ],
+  "limitations": [
+    "Five of22 images visually inspected",
+    "Native only; final packaged/browser acceptance remains open",
+    "Supported extreme tilt produces a shallow battlefield view; this check proves coverage, not overall camera usability"
+  ]
+}
