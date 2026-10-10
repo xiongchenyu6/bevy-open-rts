@@ -1,0 +1,16 @@
+{
+  "scope": "Current native gameplay diagnostic; first mission only",
+  "capture_sha256": "dbcfc45d993f72e22dabfea5fe4c8f0cd5ebdca2bfa8438ab568d809321ff132",
+  "screenshot": "screenshots/steam-quality/current-campaign-chain-foundation-20261010/0/02_victory.png",
+  "screenshot_sha256": "fb0750efdf509be7539fa5d96e08759a049eb7824ba5fb8657f5c0807b8907ab",
+  "visual_review": {
+    "match_result": "Held the line",
+    "time": "04:00",
+    "objective_text_hidden": true,
+    "next_mission_button_visible": true
+  },
+  "same_process_next_mission_observed": true,
+  "disk_persistence_verified": false,
+  "launch_limitation": "OPEN_RTS_CAPTURE_PLAYER_PROFILE was absent in this run; corrected future launcher only",
+  "six_mission_complete": false
+}
