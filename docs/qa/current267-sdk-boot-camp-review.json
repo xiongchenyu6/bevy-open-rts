@@ -1,0 +1,84 @@
+{
+  "scope": "Exact corrected SDK267 package02 normal fresh-profile Boot Camp seven lessons, Skip, natural graduation and fresh-process Replay; not whole release clearance",
+  "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+  "packed_binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+  "evidence_directory": "target/linux-current267-steamrt4-boot-camp-normal-20261011-01",
+  "container_result_sha256": "039b9fa865666b793ab8fe9849eae043a895b4950bc0d18b1a8dd620d0e03f81",
+  "container_exit": 0,
+  "game_pid_exits": [
+    [
+      58,
+      0
+    ],
+    [
+      400,
+      0
+    ]
+  ],
+  "total_wall_limit_seconds": 1200,
+  "attack_limit_seconds": 300,
+  "first_completion_frame_elapsed_from_attack_start_seconds": 160.39478087425232,
+  "completion": {
+    "visible_time": "05:54",
+    "enemy_unit_kills": 0,
+    "enemy_building_kills": 1,
+    "own_unit_losses": 0,
+    "own_building_losses": 0
+  },
+  "observed_lessons": [
+    "Worker selected",
+    "Normal gathering raised Ore64 to70 then82 before spending",
+    "Paid Power green ghost and natural completion",
+    "Paid Barracks green ghost and natural completion",
+    "Four paid Light Rifle Infantry trained",
+    "Normal selected Infantry movement",
+    "Public scouting revealed actual red HQ; reviewed current image before normal attack; natural Boot Camp Complete"
+  ],
+  "persistence": {
+    "campaign_ron_sha256": "2264aab2d7e7dae2d74a86b515a3d4d8dd630f89048565b8f47148db0d085e93",
+    "training_complete": true,
+    "fresh_replay": "Actual1/7,64/32,pop0/8; CtrlAltA selected only startingDrone; twoWorkers and no prior constructed/trained army"
+  },
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "00-fresh-menu.png": "6840b44cc2c2bfa30a580f52c1be28168bb13b7f9ec504eb9949048a2acf34bf",
+    "01-training-start.png": "a5d0b5567962855eca812cb77376aa129187d0035e93f3bfb8d8a1e0bcb50b30",
+    "02-skipped.png": "cb1ee455477df7657e152850355bc73f4b5ae695ba2387f23c4b261b4d9166ad",
+    "03-restarted-training.png": "d027f3f4c70a18936e419be0efa388e4da095038105a963f004d39f184e4a238",
+    "04-select-worker.png": "f150ad69b6087278f771721ba63a40749adecea5a1aad322ea703ee05d1fef36",
+    "05-gather-progress.png": "7780063bb2412652ed80b2fd8328185c43a2b07a83ab388c80734b7d2565ea28",
+    "06-power-green-ghost.png": "24bec34053ec8644a0b9e1358683b7fb85997a22eed3cf3be31e1aed9ebc7449",
+    "07-power-completed.png": "c701a5c35c348c4bd30a314e26ab2da12bb072904f1fec16a55c8be2cf92ba99",
+    "08-barracks-green-ghost.png": "0f6ae9be2d6a35a53bd3b161c6768128eea91965be5e80712491c486559be557",
+    "09-barracks-completed.png": "edf5b9963cbd86cdf9dca99d70ccb53289adfeb158425cfee67e5a7eedccc436",
+    "10-barracks-selected.png": "b7e4f2029a3d73c3d0e42fc15eefd943261589f796b165b370cde1024d47d990",
+    "11-paid-training-queue.png": "c197094fe094cc50891502ec1eae5c947f8b34d3faee5a3634e3dadc21d8d6c9",
+    "12-trained-infantry.png": "338bfe438b6ea02d12772928cf674ce218027f476614b4837a188e7579df36dc",
+    "13-moved-infantry.png": "511ccb366fce685b4b337d5b5ced6d635704dae6092eca8f4eeeb1eb3defe016",
+    "14-whole-army.png": "7939c1406bb2fcdef3ca7883cc03f9ad3fd7ecfa41933e841e8efb4776b38615",
+    "15-first-public-scout.png": "bc0a3d087cc3ba9c58cdfcc2e8b30fef52985f2a6b19e443d96343fa45d6f319",
+    "16-second-public-scout.png": "1f7f679741196b5085d99d10bb46b64b963bba06ebbef207e90218a3b76b7cfa",
+    "17-third-public-scout.png": "5a555cec64a1ecf31d8085cec831f2f13ef37a72dc00ca76fc80b6111ab01fd1",
+    "18-fourth-public-scout.png": "db77c7dee9d372ebd7ba6b04ef3c140e30594493fc7289e210fc73ec69c7930a",
+    "19-attack-progress-2.png": "58baedac8337aa0d28c85259f25e9127c4f94f97fa658556b9a19fe6dddffedc",
+    "19-attack-progress.png": "58baedac8337aa0d28c85259f25e9127c4f94f97fa658556b9a19fe6dddffedc",
+    "19-natural-graduation.png": "45c00eb95a0cb54c03b350c8bb7fdc9b8941f8c9c28d15c70184a2e2ab329bd0",
+    "20-graduate-campaign-map.png": "be631a15e72b0dabc436cdbcf4877e090658782950f6e9ed09e5e02b8ffcb1d6",
+    "21-replay-menu-same-process.png": "3b3eaf822ba6d4f3a999b55c0f2f8431ed91e8e52bf782bba88456ea08001836",
+    "22-replay-menu-fresh-process.png": "3b3eaf822ba6d4f3a999b55c0f2f8431ed91e8e52bf782bba88456ea08001836",
+    "23-fresh-process-replay-lesson-one.png": "533e5922b184bafb9eaf53cb83096c6ea36a799453a5c6acd08929ae1a855daf",
+    "24-replay-starting-army.png": "524be18508300be5a755e7b8c9a8951cf9914fbcd935af9a7a081ab50d1b8afa"
+  },
+  "visual_review": {
+    "agent_current_ghosts_lessons_reveal_graduation_replay_reviewed": true,
+    "root_current_enemy_hq_frame_reviewed": true
+  },
+  "limits": [
+    "Natural visible resource income observed during lesson2; resource-node depletion was not separately measured.",
+    "No actor/resource/fog/timer setters, hidden enemy coordinates or valid-save edits.",
+    "Initial executable lookup failed before service/game and was corrected to actual Python; no game timeout or restart concealed.",
+    "Normal controls and bounded first-session scope only; save-state breadth, audio and performance remain separate."
+  ],
+  "passed": true
+}
