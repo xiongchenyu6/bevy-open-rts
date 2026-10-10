@@ -7,6 +7,9 @@ use bevy::prelude::*;
 
 use crate::*;
 
+mod backdrop;
+pub(crate) use backdrop::update_menu_backdrop_crop;
+
 pub(crate) fn random_map_index() -> usize {
     SKIRMISH_MAPS.len()
 }
@@ -233,7 +236,8 @@ pub(crate) fn setup_menu_backdrop(
         .spawn((
             Name::new("Godot Main Menu Background"),
             DespawnOnExit(screen),
-            ImageNode::new(asset_server.load("ui/background.png")),
+            ImageNode::new(asset_server.load("ui/background.png"))
+                .with_mode(bevy::ui::widget::NodeImageMode::Stretch),
             Node {
                 position_type: PositionType::Absolute,
                 width: Val::Percent(100.0),
@@ -1191,7 +1195,8 @@ pub(crate) fn setup_main_menu(
         .spawn((
             Name::new("Menu Background"),
             DespawnOnExit(AppScreen::SkirmishSetup),
-            ImageNode::new(asset_server.load("ui/background.png")),
+            ImageNode::new(asset_server.load("ui/background.png"))
+                .with_mode(bevy::ui::widget::NodeImageMode::Stretch),
             Node {
                 position_type: PositionType::Absolute,
                 width: Val::Percent(100.0),

@@ -2536,6 +2536,11 @@ pub fn add_game_scenes(app: &mut App) -> &mut App {
     );
     app.add_plugins(SharedMatchScenePlugin);
     add_main_menu_scene(app);
+    // Offscreen/native render apps own Image assets; pure headless simulation
+    // does not register this presentation-only query or its resource types.
+    if app.world().contains_resource::<Assets<Image>>() {
+        app.add_systems(Update, update_menu_backdrop_crop);
+    }
     app.init_resource::<StartupLoadingAssets>();
     app.init_resource::<Locale>();
     app.add_systems(Startup, (load_godot_model_map, load_rts_cursor));
