@@ -1,0 +1,67 @@
+{
+  "planned": 3726,
+  "terminal_snapshot": 2284,
+  "counts": {
+    "completed": 2282,
+    "simulation_timeout": 1,
+    "wall_timeout": 1
+  },
+  "complete_matrix": false,
+  "integrity_verified": true,
+  "audit_sha256": "c4f395dd8853a41da1768c8752e7116159b7ccef3c1be44afe1def300f8616f1",
+  "private_asset_count": 332,
+  "private_asset_hashes_match": true,
+  "failures": [
+    {
+      "index": 1885,
+      "config": {
+        "map": "big_arena",
+        "factions": [
+          "chaos",
+          "chaos"
+        ],
+        "difficulties": [
+          "easy",
+          "beginner"
+        ],
+        "spawn_slots": [
+          2,
+          1
+        ],
+        "max_seconds": 600
+      },
+      "classification": "simulation_timeout",
+      "exit_code": 2,
+      "evidence": "target/current244-all-starts-20261010/1885"
+    },
+    {
+      "index": 2220,
+      "config": {
+        "map": "big_arena",
+        "factions": [
+          "chaos",
+          "alliance"
+        ],
+        "difficulties": [
+          "normal",
+          "normal"
+        ],
+        "spawn_slots": [
+          4,
+          0
+        ],
+        "max_seconds": 600
+      },
+      "classification": "wall_timeout",
+      "exit_code": null,
+      "evidence": "target/current244-all-starts-20261010/2220"
+    }
+  ],
+  "scope": "Frozen244 partial sweep; no current267 full-matrix or independent-seed claim",
+  "verifier_report": "target/current244-matrix-independent-20261011-check03.json",
+  "verifier_report_sha256": "1859319e2d3e71a5376e058ae3ad9f3c90915f7697b53e0e945b9a4eecea83ad",
+  "root_rehashed_observation_records": 2283,
+  "wall_timeout_status_sha256": "6cde94f15c3016e357e752f225f904621732c033c77c6e7088f9eb99553a076e",
+  "wall_timeout_result_absent": true,
+  "status": "Case1885 resolves on current267; frozen244 failures retained. Case2220 wall timeout requires exact repeat and causal analysis; no infinite-match conclusion."
+}
