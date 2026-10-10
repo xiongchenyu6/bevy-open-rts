@@ -1,0 +1,31 @@
+{
+  "scope": "Currentnative debug freshprofile normalinput skip/sevenlessons/graduation/replay; final package and freshprocess persistence still separate",
+  "binary_sha256": "e22c47db003846c58e8d100701232cf7d3c96afecf691e58b16ea6f718b3d1fc",
+  "actual_exit": 0,
+  "wall_seconds": 31.548921683977824,
+  "private_asset_count": 332,
+  "assets_unchanged": true,
+  "screenshots": {
+    "captures/02_gathered.png": "24c8a7618255f5f098934c88d2b248f8533b1442504c8b18d73d134f4869220f",
+    "captures/01_skipped.png": "f62c91d16e610f7cc9a2f72d037676bf9c37543882863e5a72a09d9080983eb8",
+    "captures/06_graduated.png": "4ccd1a440c20b979fbed073c6390fbba27bbc82af8b407f626cbf763403fcb1a",
+    "captures/04_barracks.png": "94fb48d1b0c6b9ea120175ea9f77caf0e3277a1109e9b426740e473e2268c7df",
+    "captures/01_select_worker.png": "8bfbf0dc75a5e13f26c830de2b444aaecac4e0541f34032f2fb1dc3142d2b62c",
+    "captures/07_replay_menu.png": "c1843d47dc7363f147c1eaba341e2081c741522d0946173cde10ace6f0177888",
+    "captures/00_menu.png": "a4741875f3dc95d7d07f8d754f47787fd4d3ebaf97282bd9689716808c42fcde",
+    "captures/05_moved.png": "a1a75a0e63f0b6dd03d61e984226621fb073c2eecf1d500702ae54aac24582d3",
+    "captures/03_power.png": "ad571976987a58047c424b6d3bbe5e28a033890c450e4cf184a7bdaf0ae1a585",
+    "captures/08_replayed.png": "cea50f230fab786eaa850960014649ec80b1bff482c176793a7d4acfc831dbf5"
+  },
+  "root_reviewed": [
+    "captures/06_graduated.png",
+    "captures/07_replay_menu.png",
+    "captures/08_replayed.png"
+  ],
+  "root_visual_review": "Boot Camp Complete title and result actions clear; stale lesson/Skip panel hidden. Replay menu label shown; fresh replay returns to1/7 with zero trained army.",
+  "prior_failed_runs": [
+    "target/current-boot-camp-20261010",
+    "target/current-boot-camp-fixed02-20261010"
+  ],
+  "final_package_verified": false
+}
