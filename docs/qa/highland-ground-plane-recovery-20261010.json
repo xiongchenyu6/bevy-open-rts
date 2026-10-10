@@ -1,0 +1,18 @@
+{
+  "scope": "Normal construction recovery on elevated terrain; mission result still pending",
+  "capture_sha256": "055b38fd9fd9145c38f2fd9fdb0512573a30347e27829972ea8ec96df377362f",
+  "site_entity": 38654705179,
+  "site_position": [
+    -12.0,
+    1.399999976158142,
+    2.999897003173828
+  ],
+  "construction_remaining_before": 1.0,
+  "builders_assigned_after_normal_right_click": [
+    4294966767,
+    4294966764
+  ],
+  "completion_logged": true,
+  "same_900_tick_limit": true,
+  "six_mission_complete": false
+}

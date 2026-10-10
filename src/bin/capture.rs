@@ -1618,7 +1618,7 @@ fn recover_abandoned_campaign_foundation(
             && entity["position"].as_array().is_some_and(|position| {
                 let x = position[0].as_f64().unwrap_or(f64::MAX) as f32;
                 let z = position[2].as_f64().unwrap_or(f64::MAX) as f32;
-                Vec3::new(x, 0.0, z).distance(placed_at) < 0.25
+                Vec3::new(x, 0.0, z).distance(placed_at.with_y(0.0)) < 0.25
             })
     }) else {
         return Ok(false);
