@@ -1,0 +1,31 @@
+{
+  "scope": "Optimized visible-resource filtering Linux package build and integrity only; normal player acceptance pending",
+  "source_files": 615,
+  "asset_count": 332,
+  "frozen_input_hashes_verified": true,
+  "extracted_asset_hashes_verified": true,
+  "native_verification": "native-resource-visibility-review.json",
+  "build": {
+    "actual_exit": 0,
+    "wall_seconds": 545.7690024199837,
+    "sdk_image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+    "raw_binary_sha256": "d0e9f9655effe279d17f9d3ab4055e921b2e2380a13bda9da8ebf0871f409513",
+    "source_unchanged": true,
+    "actual_workspace_compile": true
+  },
+  "package": {
+    "actual_exit": 0,
+    "integrity_exit": 0,
+    "files": 381,
+    "archive_sha256": "f729ea4c1aa90b2c6c55dc7b8b5164e411601f30410b47e134a014d389c67756",
+    "binary_sha256": "5ed642f42859df730bf4f4e7e2aa3eb39609de58ac033d8b1174d61077974a4f",
+    "raw_evidence": "target/linux-current263-steamrt4-package-20261011",
+    "extract_evidence": "target/linux-current263-steamrt4-extracted-20261011/ready.json"
+  },
+  "notice_overlay": "17 exact SDK manifest notice files and truthful SDK README; no inherited Nix notice subtree",
+  "limits": [
+    "No runtime/player/audio/performance/Windows acceptance",
+    "Resource rally/model-body picking and multiplayer paid control remain open",
+    "Source offers, Rust notice gaps and full distribution rights remain open"
+  ]
+}
