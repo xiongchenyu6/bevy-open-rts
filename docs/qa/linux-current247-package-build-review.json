@@ -1,0 +1,51 @@
+{
+  "scope": "Current247 lobby/result-HUD optimized Linux archive, independent provenance/integrity only; player-flow acceptance pending",
+  "build": {
+    "actual_exit": 0,
+    "frozen_inputs_unchanged": true,
+    "wall_seconds": 783.680594770005,
+    "scope": "Frozen current247 optimizedLinux QA candidate; performance/runtime/finalrelease gates pending",
+    "command": [
+      "/nix/store/gmgfpzc0w2pgby0lmq9r88m39albiyfw-cargo-1.98.1/bin/cargo",
+      "rustc",
+      "--locked",
+      "--offline",
+      "--release",
+      "--jobs",
+      "1",
+      "--bin",
+      "bevy-open-rts",
+      "--",
+      "-Clto=thin",
+      "-Ccodegen-units=8",
+      "-Cllvm-args=-threads=1"
+    ],
+    "binary_sha256": "e4bf471e37eca76df60aebce46d5005046f9517346baf25fb99a228b608efe94",
+    "binary_bytes": 103426632
+  },
+  "provenance": {
+    "scope": "Frozen build provenance only; no gameplay or release acceptance",
+    "passed": true,
+    "frozen_files": 608,
+    "binary_sha256": "e4bf471e37eca76df60aebce46d5005046f9517346baf25fb99a228b608efe94"
+  },
+  "archive_sha256": "85309d050a3754780f496fe37e9b5682e1d0bbe2296083f307e9f239403a2e6f",
+  "packed_binary_sha256": "217eeba6de667b6a069d14f67f6792a5747a99ca1e89663dd6149e44728014ed",
+  "integrity": {
+    "scope": "Archive integrity only; no runtime or license clearance",
+    "files": 379,
+    "runtime_asset_sha256": 332,
+    "rust_notice_sha256": 9
+  },
+  "extracted_asset_check": {
+    "passed": true,
+    "recorded_assets": 332,
+    "actual_assets": 332,
+    "missing": [],
+    "extra": [],
+    "changed": []
+  },
+  "normal_input_runtime_verified": false,
+  "steamrt4_build_verified": false,
+  "full_release_ready": false
+}
