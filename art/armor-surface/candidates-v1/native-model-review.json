@@ -1,0 +1,28 @@
+{
+  "runtime_result": {
+    "scope": "Privateoriginalarmor texture actualmodel/normalpaidHUD sample; no finalpackage acceptance",
+    "runs": [
+      {
+        "width": 900,
+        "height": 720,
+        "child_exit": 0,
+        "command": [
+          "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/campaign-m1-counter-pin-20261010/capture",
+          "hud-card",
+          "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/armor-candidate-private-hud-20261010/900",
+          "900",
+          "720"
+        ]
+      }
+    ],
+    "assets_unchanged": true,
+    "wall_seconds": 11.732289006991778
+  },
+  "reviewed_images": [
+    "target/armor-candidate-private-hud-20261010/900/00_worker.png",
+    "target/armor-candidate-private-hud-20261010/900/02_production_queue.png"
+  ],
+  "accepted_for_runtime": false,
+  "reason": "Actual headquarters and Barracks show excessive grain resembling concrete; model readability needs smoother low-contrast steel",
+  "runtime_assets_unchanged": true
+}

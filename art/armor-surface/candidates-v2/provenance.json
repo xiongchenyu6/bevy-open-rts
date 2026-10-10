@@ -1,0 +1,10 @@
+{
+  "backend": "built-in image_gen edit",
+  "input_image": "art/armor-surface/candidates-v1/armor-matte-original-v1.png",
+  "source_path": "art/armor-surface/candidates-v2/armor-matte-original-v2.png",
+  "sha256": "c0ec0a674a2eeb038c417131eec5470e9ad35c0729d1884be5f6c26a8a2d420c",
+  "prompt_path": "art/armor-surface/candidates-v2/prompt.txt",
+  "runtime_integrated": false,
+  "actual_model_verified": false,
+  "distribution_review_complete": false
+}
