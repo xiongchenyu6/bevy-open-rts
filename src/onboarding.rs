@@ -297,6 +297,11 @@ pub(crate) fn update_tutorial(
     }
     if tutorial.stage == TutorialStage::Complete {
         tutorial.active = false;
+        // Completion changes active during this update; hide the old lesson now,
+        // before the Objectives button and result screen become visible.
+        for mut visible in &mut panels {
+            *visible = Visibility::Hidden;
+        }
         finalize_match(
             &mut state,
             &mut flow,
@@ -342,5 +347,54 @@ pub(crate) fn tutorial_skip(
     {
         *tutorial = TutorialState::default();
         next.set(AppScreen::CampaignMenu);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn completed_training_hides_lesson_in_the_same_update_and_after_reset() {
+        let mut app = App::new();
+        app.init_resource::<Economies>()
+            .init_resource::<MatchFlow>()
+            .insert_resource(MatchState {
+                phase: MatchPhase::HumanVictory,
+                enemy_structures_destroyed: 1,
+                ..default()
+            })
+            .insert_resource(TutorialState {
+                active: true,
+                stage: TutorialStage::Attack,
+                ..default()
+            })
+            .add_systems(Update, update_tutorial);
+        let panel = app
+            .world_mut()
+            .spawn((TutorialPanel, Visibility::Inherited))
+            .id();
+        app.update();
+        assert_eq!(
+            app.world().resource::<TutorialState>().stage,
+            TutorialStage::Complete
+        );
+        assert!(!app.world().resource::<TutorialState>().active);
+        assert_eq!(
+            app.world().get::<Visibility>(panel),
+            Some(&Visibility::Hidden)
+        );
+        *app.world_mut().resource_mut::<TutorialState>() = TutorialState::default();
+        *app.world_mut().resource_mut::<MatchState>() = MatchState::default();
+        app.update();
+        assert_eq!(
+            app.world().get::<Visibility>(panel),
+            Some(&Visibility::Hidden)
+        );
+        assert_eq!(
+            app.world().resource::<TutorialState>().stage,
+            TutorialStage::SelectWorker
+        );
+        assert!(app.world().resource::<MatchState>().is_running());
     }
 }

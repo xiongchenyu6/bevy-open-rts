@@ -38,10 +38,12 @@ mod semantic_ui;
 #[path = "capture/camera_edges.rs"]
 mod camera_edges;
 
-
 #[cfg(not(target_arch = "wasm32"))]
 #[path = "capture/cursor_qa.rs"]
 mod cursor_qa;
+
+#[path = "capture/boot_camp.rs"]
+mod boot_camp;
 
 #[path = "capture/save_flow.rs"]
 mod save_flow;
@@ -2892,8 +2894,7 @@ fn render_boot_camp(dir: &Path) -> Result<(), String> {
         return Err("move lesson did not observe selected infantry moving".into());
     }
     shoot(&mut app, &handle, dir.join("05_moved.png"));
-    issue_player_attack_move_to_nearest_anchor(&mut app)?;
-    if !wait_until(&mut app, 30 * 300, |app| capture_tutorial_stage(app) == 7) {
+    if !boot_camp::finish_attack_lesson(&mut app, dir)? {
         shoot(&mut app, &handle, dir.join("06_attack_failed.png"));
         return Err(format!(
             "boot camp did not finish: {}",

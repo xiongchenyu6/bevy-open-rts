@@ -1,0 +1,9 @@
+# Boot Camp normal-input review
+
+The current native debug fresh-profile workflow passed Skip Training, all seven lessons, graduation, Campaign Map, and Replay Boot Camp. The actual run exited 0 in 31.55 seconds, produced ten screenshots, and preserved all 332 private asset hashes. Graduation shows no stale lesson or overlapping Objectives heading; replay begins at lesson 1/7 with no trained army. Exact binary/image hashes and review details are in [the portable record](qa/current-boot-camp-review.json).
+
+The helper now explores public map quadrants through normal Attack-Move clicks and re-evaluates only visible living enemy Command Centers. It requires the four normally paid infantry and starting Drone in the actual army selection, logs each decision and observed orders, and keeps the original total 300 simulation-second attack budget. It neither reads hidden enemy positions nor injects units, resources, health, or tutorial state.
+
+The original one-shot helper mirrored both own-base axes, scouting an empty diagonal start 36 m from the adjacent enemy HQ. Its failed evidence remains in `target/current-boot-camp-20261010`. A subsequent run won naturally but returned before tutorial completion settled; that evidence remains in `target/current-boot-camp-fixed02-20261010`. The helper now permits four ordinary UI updates after natural victory within the existing deadline. The tutorial hides its lesson panel immediately when completing, rather than leaving Skip Training visible for one frame.
+
+The completion/reset system regression passes. The shared checkpoint passed 240 library tests with one ignored and built four native binaries successfully; source/Cargo and asset hashes stayed unchanged. The passing actual run is `target/current-boot-camp-fixed03-20261010`. This review covers current debug native behavior; final packaged builds, fresh-process persistence, browser behavior and other release gates require separate evidence.
