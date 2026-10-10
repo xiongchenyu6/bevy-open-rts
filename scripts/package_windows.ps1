@@ -40,6 +40,10 @@ foreach ($Notice in @('ASSET_PROVENANCE.md', 'asset-source-hashes.json')) {
     Copy-Item -LiteralPath (Join-Path $Root "docs/$Notice") -Destination (Join-Path $Stage $Notice)
 }
 Copy-Item -LiteralPath (Join-Path $Root 'ASSETS.md') -Destination (Join-Path $Stage 'ASSETS.md')
+Copy-Item -LiteralPath (Join-Path $Root 'docs/RUST_DEPENDENCY_MATERIALS.md') -Destination $Stage
+$RustNotices = Join-Path $Stage 'docs/third-party'
+New-Item -ItemType Directory -Path $RustNotices -Force | Out-Null
+Copy-Item -LiteralPath (Join-Path $Root 'docs/third-party/rust') -Destination $RustNotices -Recurse
 Get-ChildItem -LiteralPath $Root -Filter 'LICENSE*' -File | Copy-Item -Destination $Stage
 # The install can be read-only. Save/config paths are also independently
 # resolved by the game from LOCALAPPDATA, rather than from this working directory.
@@ -67,11 +71,18 @@ Get-ChildItem -LiteralPath (Join-Path $Stage 'assets') -Recurse -File | Sort-Obj
     $RelativePath = $_.FullName.Substring($Stage.Length + 1).Replace('\', '/')
     $AssetHashes[$RelativePath] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
 }
+$NoticeHashes = [ordered]@{}
+Get-ChildItem -LiteralPath (Join-Path $Stage 'docs/third-party/rust') -Recurse -File | Sort-Object FullName | ForEach-Object {
+    $RelativePath = $_.FullName.Substring($Stage.Length + 1).Replace('\', '/')
+    $NoticeHashes[$RelativePath] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+}
 $Info = [ordered]@{
+    rust_notice_sha256 = $NoticeHashes
     runtime_asset_sha256 = $AssetHashes
     source_commit = $Commit
     source_worktree_dirty = [bool](& git -C $Root status --porcelain)
     binary_sha256 = (Get-FileHash -LiteralPath $Binary -Algorithm SHA256).Hash.ToLowerInvariant()
+    packaged_binary_sha256 = (Get-FileHash -LiteralPath (Join-Path $Stage 'bevy-open-rts.exe') -Algorithm SHA256).Hash.ToLowerInvariant()
     target = 'x86_64-pc-windows-msvc'
     rust_version = (& rustc --version)
     validation = 'Packaging alone does not establish runtime or clean Windows compatibility.'
