@@ -14,5 +14,12 @@
   ],
   "completion_logged": true,
   "same_900_tick_limit": true,
-  "six_mission_complete": false
+  "six_mission_complete": false,
+  "original_builders": [
+    4294966767
+  ],
+  "new_builders_after_normal_right_click": [
+    4294966764
+  ],
+  "new_builder_has_move_and_path": true
 }
