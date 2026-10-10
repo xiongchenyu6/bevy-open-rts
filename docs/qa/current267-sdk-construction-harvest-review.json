@@ -1,0 +1,161 @@
+{
+  "scope": "Exact parameterized future SDK archive inside official Runtime4; normal paid activePower construction and distinctWorker gathering across same/freshprocess load, then normalcompletion; no productionqueue/broadercontinuity claim",
+  "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+  "binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 4154381,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "index": 2,
+      "pid": 4156821,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "wall_seconds": 100.49189504599781,
+  "comparisons": [
+    {
+      "elapsed": 0.26151561737060547,
+      "checks": {
+        "elapsed_nonnegative": true,
+        "same_constructor": true,
+        "same_gatherer": true,
+        "foundation_position": true,
+        "paid_cost": true,
+        "total": true,
+        "progress": true,
+        "economy": true,
+        "equivalent_harvest_node": true
+      },
+      "constructor_keys": [
+        8589933892,
+        12884900621
+      ],
+      "gatherer_keys": [
+        8589933888,
+        12884900701
+      ],
+      "foundation_keys": [
+        81604377208,
+        12884900578
+      ],
+      "harvest_target_keys": [
+        8589933916,
+        12884901209
+      ]
+    },
+    {
+      "elapsed": 0.2617053985595703,
+      "checks": {
+        "elapsed_nonnegative": true,
+        "same_constructor": true,
+        "same_gatherer": true,
+        "foundation_position": true,
+        "paid_cost": true,
+        "total": true,
+        "progress": true,
+        "economy": true,
+        "equivalent_harvest_node": true
+      },
+      "constructor_keys": [
+        12884900621,
+        12884900883
+      ],
+      "gatherer_keys": [
+        12884900701,
+        17179868482
+      ],
+      "foundation_keys": [
+        12884900578,
+        12884900997
+      ],
+      "harvest_target_keys": [
+        12884901209,
+        8589933251
+      ]
+    }
+  ],
+  "load_byte_checks": [
+    {
+      "session": 1,
+      "before": "6e2d69681f28c3c5f907cc0c83d6c5e77b665f7194c99d8ece8e3b64e6664095",
+      "after": "6e2d69681f28c3c5f907cc0c83d6c5e77b665f7194c99d8ece8e3b64e6664095",
+      "unchanged": true
+    },
+    {
+      "session": 2,
+      "before": "6626f7f22cc015803575782a2054ee983f67e55a14a40ddf568d562490493bb6",
+      "after": "6626f7f22cc015803575782a2054ee983f67e55a14a40ddf568d562490493bb6",
+      "unchanged": true
+    }
+  ],
+  "original_node_consumption": {
+    "before": {
+      "key": 8589933251,
+      "kind": 0,
+      "position": [
+        -17.470190048217773,
+        0.0,
+        -9.429200172424316
+      ],
+      "amount": 235
+    },
+    "after": {
+      "key": 8589933251,
+      "kind": 0,
+      "position": [
+        -17.470190048217773,
+        0.0,
+        -9.429200172424316
+      ],
+      "amount": 234
+    }
+  },
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-baseline-paused": "70843fe2c51a837c9e6eadc9a51ed82d7e2fa0620c7d8ce0326ab16e6c07dbc6",
+    "02-worker-selected-before-build": "ebf4a9974e6cbe72f70258de6f5e24f21d0d679afa5fd3a18eca6765eaeb7aec",
+    "02-power-card-tooltip": "ba438fb25eb5749f7ed1889180969939f33c9c1762656d211d64c18a3c1258d9",
+    "02-power-preview": "4fe463dc038a7be8018fb6172a8670110f7f71fb9ca6d6e3ddd2fec93021a0ac",
+    "03-paid-initial": "4a66a9be01c06b6d0bba03e9317d74b2230ea1435f66ce57ca4cd561593df0f3",
+    "04-midphase": "276d77b7e151ce21a0f7dd1e666e7d149e9c6e39f39e9ac01a6b7c708f4c61c4",
+    "05-same-process-loaded": "81af162b2c16766976a6124f02c6df0f1167189f864f3995aa18313857a3484b",
+    "06-same-process-resaved": "afda8dd0b183b51651af91136a1e9e392795adb13cf6fa5127f491b199306000",
+    "07-fresh-menu": "697c1fb9a0d6ed69a724350c30f836a1e4db9947fecd00653c09dbf3950202dd",
+    "08-fresh-process-loaded": "39605fb8ea6f86a84dcc895dd87f99c8873148acd0ccf6cd361439efe9ce3bee",
+    "09-fresh-process-resaved": "a9dbf63003e221a22f9b528440e1003459b10e40c5606c423121ba1e7ea9d7ad",
+    "10-resumed-completed": "ed92c31d83e3bc677af62639796af351670027f2f8b5f0e0a3b8a7b08bc5c6eb"
+  },
+  "evidence_directory": "target/sdk267-save-work-20261011-01",
+  "result_sha256": "3baa7a8b68869a1bc7dfbc087e09685b67da897c48a2777929a0423f10896257",
+  "wall_limit_seconds": 240,
+  "construction_limit_seconds": 30,
+  "paid_cost": [
+    3,
+    1
+  ],
+  "bank_after_payment": [
+    29,
+    15
+  ],
+  "bank_after_normal_completion": [
+    41,
+    15
+  ],
+  "observed_ore_income": 12,
+  "normal_completed_power": true,
+  "agent_midphase_and_completion_images_reviewed": true,
+  "root_independent_snapshot_image_hash_review": true,
+  "passed": true,
+  "limitations": [
+    "One paid Power foundation and distinct own Worker harvesting; not Barracks production or all save states.",
+    "Original known harvested node declined235to234; only own-observed node identities were retained by readonly reader.",
+    "Stacked notification toasts clutter the center; this does not certify presentation polish."
+  ]
+}
