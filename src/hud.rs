@@ -4176,9 +4176,13 @@ pub(crate) fn clear_battle_hud_on_match_end(
     mut battle_log: ResMut<BattleLog>,
     log_roots: Query<(Entity, Option<&Children>), With<BattleLogRoot>>,
     mut objective_root: Query<&mut Visibility, With<ObjectiveTrackerRoot>>,
+    combat_flashes: Query<Entity, With<CombatFlash>>,
 ) {
     if match_state.is_running() {
         return;
+    }
+    for entity in &combat_flashes {
+        commands.entity(entity).try_despawn();
     }
     clear_targeting_modes(&mut command_mode);
     for mut text in &mut command_feedback {

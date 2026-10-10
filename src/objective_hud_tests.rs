@@ -1,6 +1,63 @@
 //! Actual match-schedule regressions for mission text and resolved HUD visibility.
 use super::*;
 
+#[test]
+fn resolved_match_removes_only_transient_combat_flashes() {
+    for phase in [
+        MatchPhase::HumanVictory,
+        MatchPhase::HumanDefeat,
+        MatchPhase::MatchFinished,
+    ] {
+        let (mut app, _, _) = objective_scene();
+        let actors: Vec<Entity> = app
+            .world_mut()
+            .query_filtered::<Entity, Or<(With<Unit>, With<Structure>)>>()
+            .iter(app.world())
+            .collect();
+        assert!(!actors.is_empty(), "normal match must have real actors");
+        let wreck = app
+            .world_mut()
+            .spawn(CombatWreckage { remaining: 30.0 })
+            .id();
+        let flash = app
+            .world_mut()
+            .spawn((
+                Transform::default(),
+                CombatFlash {
+                    remaining: 1.0,
+                    total: 1.0,
+                    start_scale: 1.0,
+                    end_scale: 2.0,
+                    material: Handle::default(),
+                    emissive: LinearRgba::WHITE,
+                },
+            ))
+            .id();
+        app.world_mut().resource_mut::<TacticalPause>().0 = true;
+        app.update();
+        assert!(
+            app.world().get::<CombatFlash>(flash).is_some(),
+            "running tactical pause must retain flash"
+        );
+        app.world_mut().resource_mut::<MatchState>().phase = phase;
+        app.update();
+        assert!(
+            app.world().get_entity(flash).is_err(),
+            "resolved {phase:?} retained a frozen combat flash"
+        );
+        assert!(
+            app.world().get::<CombatWreckage>(wreck).is_some(),
+            "result cleanup removed wreckage"
+        );
+        for actor in actors {
+            assert!(
+                app.world().get_entity(actor).is_ok(),
+                "result cleanup removed a real actor"
+            );
+        }
+    }
+}
+
 fn objective_scene() -> (App, Entity, Entity) {
     let mut app = build_game_app(GameAppMode::Headless);
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(

@@ -1,0 +1,29 @@
+{
+  "scope": "Terminal-phase CombatFlash cleanup regression; no natural rendered result acceptance",
+  "red": {
+    "actual_exit": 101,
+    "passed": 0,
+    "failed": 1,
+    "assertion": "resolved HumanVictory retained a frozen combat flash"
+  },
+  "green": {
+    "focused_passed": 1,
+    "full_passed": 253,
+    "full_failed": 0,
+    "full_ignored": 1,
+    "main_capture_build_exit": 0
+  },
+  "retained": "Paused Running flash, naturally spawned units/structures and CombatWreckage",
+  "bins": {
+    "bevy-open-rts": "439b5097210b75ed05d73407511fb02a439ac500bac20d79f87037470abe1295",
+    "capture": "12c7543d2294572bead4a029285d682d14f43d0eb74fb9d6261c49dc266bcb12"
+  },
+  "asset_count": 332,
+  "inputs_unchanged": true,
+  "evidence": "target/match-end-flash-shared02-20261011",
+  "limitations": [
+    "Verification01 snapshot omitted workspace services; not assertion RED.",
+    "Verification02 post-build wrapper incorrectly demanded absolute source paths; corrected independent provenance check accepts Cargo relative src paths with actual current-root compilation.",
+    "Current menu SDK snapshot predates this cleanup. Natural result screenshot and final artifact revalidation remain separate."
+  ]
+}
