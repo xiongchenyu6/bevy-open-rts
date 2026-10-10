@@ -1,0 +1,155 @@
+{
+  "scope": "Final267-core Web14 normal two-human Host/Join/Ready/Start and actual game relay route; paid workflow failed before first applied guest state",
+  "wasm_sha256": "65f27ec9f326d8a1d4ad7a8eae5a4eefd4ddc36b9dc6fed07a48b3a508fe628a",
+  "actual_exit": 1,
+  "deadline_seconds": 240,
+  "failure": "Bounded actual UI event not observed: briefing-X-fresh-down",
+  "guest_phase_at_match_sample": "InMatch",
+  "guest_last_applied_tick_at_match_sample": 0,
+  "host_connections": [
+    {
+      "connectionState": "connected",
+      "iceConnectionState": "connected",
+      "signalingState": "stable",
+      "iceGatheringState": "complete",
+      "localDescriptionType": "offer",
+      "remoteDescriptionType": "answer",
+      "candidateCount": 10,
+      "candidateErrors": [
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        }
+      ],
+      "descriptionStages": [
+        {
+          "stage": "createOffer-called",
+          "time": 37132.5,
+          "descriptionType": null
+        },
+        {
+          "stage": "createOffer-resolved",
+          "time": 37138.30000001192,
+          "descriptionType": null
+        },
+        {
+          "stage": "setLocalDescription-called",
+          "time": 37138.5,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "setLocalDescription-resolved",
+          "time": 37140.59999999404,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "setRemoteDescription-called",
+          "time": 117254.59999999404,
+          "descriptionType": "answer"
+        },
+        {
+          "stage": "setRemoteDescription-resolved",
+          "time": 117293.59999999404,
+          "descriptionType": "answer"
+        }
+      ],
+      "routes": [
+        {
+          "nominated": true,
+          "bytesSent": 3635,
+          "bytesReceived": 2633,
+          "localType": "relay",
+          "remoteType": "relay"
+        }
+      ]
+    }
+  ],
+  "guest_connections": [
+    {
+      "connectionState": "connected",
+      "iceConnectionState": "connected",
+      "signalingState": "stable",
+      "iceGatheringState": "complete",
+      "localDescriptionType": "answer",
+      "remoteDescriptionType": "offer",
+      "candidateCount": 10,
+      "candidateErrors": [
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        }
+      ],
+      "descriptionStages": [
+        {
+          "stage": "setRemoteDescription-called",
+          "time": 69336,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "setRemoteDescription-resolved",
+          "time": 69338.19999998808,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "createAnswer-called",
+          "time": 69338.39999997616,
+          "descriptionType": null
+        },
+        {
+          "stage": "createAnswer-resolved",
+          "time": 69339.39999997616,
+          "descriptionType": null
+        },
+        {
+          "stage": "setLocalDescription-called",
+          "time": 69339.5,
+          "descriptionType": "answer"
+        },
+        {
+          "stage": "setLocalDescription-resolved",
+          "time": 69340.39999997616,
+          "descriptionType": "answer"
+        }
+      ],
+      "routes": [
+        {
+          "nominated": true,
+          "bytesSent": 2633,
+          "bytesReceived": 3635,
+          "localType": "relay",
+          "remoteType": "relay"
+        }
+      ]
+    }
+  ],
+  "normal_roles": 2,
+  "paid_complete": false,
+  "sixteen_DTO_agreement_verified": false,
+  "eight_peer": false,
+  "reconnect": false,
+  "independent_guest_world_equivalence": false,
+  "credentials_SDP_values_retained": false,
+  "evidence_sha256": {
+    "target/web14-normal-two-human-relay-20261011/result.json": "db1d4eb2703dbc7b91530eacaf4044d08b1c1b5ab62feaa068237ed7ccde3fa3",
+    "target/web14-normal-two-human-relay-20261011/final-supervisor-result.json": "a3041db022c69e30ca1dcd75d50eb96f0654a3c1b52394f023289d9025ccdc3f",
+    "target/web14-normal-two-human-relay-20261011/host-05-normal-match-observation.json": "a7ec82509e73cc10884582cd11c0455da938c9032177a35d290b2f87d16bfca1",
+    "target/web14-normal-two-human-relay-20261011/p1-05-normal-match-observation.json": "0c2d7033f126126b7c1f323d676d721ae5594f65aa44e31314623506b47c3d35"
+  },
+  "next_diagnostic": "Read-only wait for first applied guest snapshot/actual own Worker scene, then normal briefing click; retain original240 wall limit."
+}
