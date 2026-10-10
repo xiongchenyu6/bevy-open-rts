@@ -2,11 +2,13 @@
 use super::*;
 
 pub(super) mod ui;
+pub(super) mod world;
 
 #[derive(Resource)]
 pub(super) struct OnlineObserver {
     pub(super) enabled: bool,
     snapshots: BTreeMap<u64, OnlineWorldSnapshot>,
+    applied_worlds: BTreeMap<u64, serde_json::Value>,
     last_report: String,
     last_context: serde_json::Value,
     dirty: bool,
@@ -19,6 +21,7 @@ impl Default for OnlineObserver {
         Self {
             enabled: requested(),
             snapshots: BTreeMap::new(),
+            applied_worlds: BTreeMap::new(),
             last_report: String::new(),
             last_context: serde_json::Value::Null,
             dirty: false,
@@ -55,6 +58,14 @@ impl OnlineObserver {
     }
 }
 
+pub(super) fn reset_for_match(mut observer: ResMut<OnlineObserver>) {
+    observer.snapshots.clear();
+    observer.applied_worlds.clear();
+    observer.last_report.clear();
+    observer.last_context = serde_json::Value::Null;
+    observer.dirty = true;
+}
+
 pub(super) fn publish(
     mut observer: ResMut<OnlineObserver>,
     session: Res<OnlineSession>,
@@ -85,6 +96,7 @@ pub(super) fn publish(
         "snapshot_semantics": if session.is_host { "successfully_sent" } else { "validated_received_not_world_equivalence" },
         "snapshots": observer.snapshots.values().collect::<Vec<_>>(),
         "ui_events": observer.ui_events,
+        "applied_worlds": observer.applied_worlds.values().collect::<Vec<_>>(),
     });
     let Ok(report) = serde_json::to_string(&report) else {
         return;

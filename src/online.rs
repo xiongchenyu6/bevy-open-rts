@@ -1770,8 +1770,13 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
             Last,
             observer::publish.after(broadcast_online_world_snapshot),
         )
+        // Last runs after Update's deferred snapshot entity changes have applied.
+        .add_systems(Last, observer::world::record.before(observer::publish))
         .add_systems(OnEnter(AppScreen::OnlineLobby), enter_online_lobby)
-        .add_systems(OnEnter(AppScreen::InMatch), reset_online_match_replication)
+        .add_systems(
+            OnEnter(AppScreen::InMatch),
+            (reset_online_match_replication, observer::reset_for_match),
+        )
         .add_systems(
             Update,
             (

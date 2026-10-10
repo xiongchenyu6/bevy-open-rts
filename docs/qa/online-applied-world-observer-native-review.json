@@ -1,0 +1,59 @@
+{
+  "scope": "Opt-in independent guest ECS observation feature verified natively; realbrowserworld-equivalence remains pending matchingWasm15",
+  "feature_red": {
+    "actual_exit": 101,
+    "assertion_failures": 3,
+    "scope": "Emptyrecorderstub lacksactualWorldrows; notreplicationdefectclaim"
+  },
+  "lifecycle_red": {
+    "actual_exit": 101,
+    "assertion": "Newmatchactual777HP4 applied butoldcachedtick1 still501"
+  },
+  "green": {
+    "actual_exit": 0,
+    "passed": 6,
+    "failed": 0,
+    "tests": [
+      "actualsnapshot deferredspawn/despawn",
+      "actualhealthdivergence fromunchangedDTO",
+      "actualrenderTransform versusinterpolationtarget",
+      "disablednowrites/fortyrowbound",
+      "registeredAppUpdate\u2192Lastqueryafterdeferred",
+      "registerednewmatchobserverhistoryreset"
+    ]
+  },
+  "stopped_first_check_build": "Intentionalsemanticstop beforeseal tofixconfirmedQA-cachelifecyclegap; no passclaimed",
+  "full_library": {
+    "passed": 273,
+    "failed": 0,
+    "ignored": 1
+  },
+  "check_actual_exit": 0,
+  "build_actual_exit": 0,
+  "bins": {
+    "bevy-open-rts": "3db9cc84c630ebc0f4d6d0addcb6018a7c20892367e342365faa90bf86c86e44",
+    "capture": "4632667dc1e53813f6bb76b7f536ee38cf417ca8dcdbfa53b761de8a0ffc242a",
+    "skirmish_audit": "ea7cd44091521fc5f42c110bd6b2f887e822819757a30ec52ce9b7e655921296"
+  },
+  "asset_count": 332,
+  "source_and_assets_unchanged": true,
+  "query_scope": "ActualNetworkEntityId/kind/team/Transform/Health/VisualFaction/Cargo/UnderConstruction/Veterancy, actualeconomies/jobs/producerIDs/support/matchstate; receivedsnapshot isnotusedtobuildworldrows",
+  "transform_semantics": "Actualrenderpose recorded separately fromactualNetworkInterpolationtarget; intendedrenderlag isnotassertedequal tosentpacket",
+  "timing_semantics": "RowsafterwholeUpdate/deferredcommands atnewappliedtick. Clock/timercountersmayadvanceintentionally; futurevalidator mustreportactualdifferences beforeclassifying",
+  "default_off": true,
+  "max_applied_world_records": 40,
+  "gameplay_protocol_or_actor_writes": false,
+  "normalbrowser_world_acceptance": false,
+  "evidence_sha256": {
+    "target/applied-world-observer-red-20261011/result.json": "00e3abd4cfe3ed9f0911445c56582697625a5cad10179c2c6f17d60321b815a1",
+    "target/applied-world-observer-red-20261011/red.log": "1c54182470cd48361e5a32519262ed4f92e6e0020d50ce18b942486e3da6d2ef",
+    "target/applied-world-observer-lifecycle-red-20261011/result.json": "bcd80209644d771082f3150ad4383de6d94222d76ac0e915b264de131a86be8b",
+    "target/applied-world-observer-lifecycle-red-20261011/red.log": "4c1260298c404c52c9bf3a25398b26e175549c3bbb7e92143901f49ee77e0bd1",
+    "target/applied-world-observer-green02-20261011/result.json": "ba8bcb6d7404ecc81e4d33f4c9c8d3cbd93c10b31165beb38c8dc634a1d85d94",
+    "target/applied-world-observer-green02-20261011/green.log": "f7c06faa19a865fe3703da27b67facbc2bd45e8d2f1acbd1630d80b2784116b4",
+    "target/applied-world-observer-shared-20261011/semantic-stop.json": "2c36d5002bb876b8048d1b9309787f08de9c2aa101d61a52ce63381c9f3baa1c",
+    "target/applied-world-observer-shared02-20261011/pin.json": "5f76682e07baa41ca40c22af91bc53dae67da60b72e7e8e2b803be352741710a",
+    "target/applied-world-observer-shared02-20261011/full.log": "8f59d5e2cd3fa441f418d366dbe95ef63e9d94a9ec120a60c45833a8f1c33b79",
+    "target/applied-world-observer-shared02-20261011/result.json": "b9f672893446468fa274bcf0dac3ccdfd2e8cc3bf5ad310d80fe95a5337bbcda"
+  }
+}
