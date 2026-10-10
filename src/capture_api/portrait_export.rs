@@ -359,19 +359,51 @@ fn game_rest_reference(
     Ok(signature)
 }
 
-/// Export only the first three staging candidates, never runtime replacements.
-pub fn export_portrait_stage(directory: &Path) -> Result<serde_json::Value, String> {
+/// Export the audited registry inventory, never runtime replacements.
+pub fn export_portrait_stage(
+    inventory: &Path,
+    directory: &Path,
+) -> Result<serde_json::Value, String> {
+    let inventory: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(inventory).map_err(|error| error.to_string())?)
+            .map_err(|error| error.to_string())?;
+    let entries = inventory["entities"]
+        .as_array()
+        .filter(|entries| !entries.is_empty())
+        .ok_or("portrait inventory needs a nonempty entities array")?;
+    let mut targets = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    for entry in entries {
+        let id = entry["entity_id"].as_str().ok_or("missing entity_id")?;
+        let definition =
+            registry::entity(id).ok_or_else(|| format!("unknown portrait entity: {id}"))?;
+        let runtime_path = entry["runtime_path"]
+            .as_str()
+            .ok_or("missing runtime_path")?;
+        if definition.icon != Some(runtime_path) || !seen.insert(definition.id) {
+            return Err(format!("duplicate entity or incorrect portrait path: {id}"));
+        }
+        let faction_name = entry["portrait_faction"]
+            .as_str()
+            .ok_or("missing portrait_faction")?;
+        let faction = match faction_name {
+            "alliance" => SkirmishFaction::Alliance,
+            "demon" => SkirmishFaction::Demon,
+            "chaos" => SkirmishFaction::Chaos,
+            _ => return Err(format!("unknown portrait faction: {faction_name}")),
+        };
+        targets.push((definition.id, faction, runtime_path, faction_name));
+    }
     std::fs::create_dir(directory).map_err(|error| error.to_string())?;
     let mut reports = Vec::new();
-    for id in ["AdvancedReactorPlant", "CommandCenter", "Tank"] {
-        let reference = game_rest_reference(id, SkirmishFaction::Alliance)?;
+    for (id, faction, runtime_path, faction_name) in targets {
+        let reference = game_rest_reference(id, faction)?;
         std::fs::write(
             directory.join(format!("{id}-game-rest-reference.json")),
             serde_json::to_vec_pretty(&reference).unwrap(),
         )
         .map_err(|error| error.to_string())?;
         for run in 0..2 {
-            let faction = SkirmishFaction::Alliance;
             let mut app = renderer_app();
             let root = spawn_actual_model(&mut app, id, faction);
             settle(&mut app, root, id)?;
@@ -408,7 +440,7 @@ pub fn export_portrait_stage(directory: &Path) -> Result<serde_json::Value, Stri
                 .result
                 .take()
                 .ok_or("portrait readback timed out")??;
-            reports.push(serde_json::json!({"id":id,"run":run,"faction":"alliance","palette_slot":0,"geometry":signature,"camera":camera,"alpha":alpha,"image":path,"stage_only":true,"asset_only_full_game_reference_verified":true,"live_gameplay_reference_verified":false,"backend":backend,"light":{"illuminance":16000,"position":[-6,14,7]}}));
+            reports.push(serde_json::json!({"id":id,"run":run,"runtime_path":runtime_path,"faction":faction_name,"palette_slot":0,"geometry":signature,"camera":camera,"alpha":alpha,"image":path,"stage_only":true,"asset_only_full_game_reference_verified":true,"live_gameplay_reference_verified":false,"backend":backend,"light":{"illuminance":16000,"position":[-6,14,7]}}));
             std::fs::write(
                 directory.join("manifest.json"),
                 serde_json::to_vec_pretty(&reports).unwrap(),
