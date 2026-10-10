@@ -1,0 +1,35 @@
+{
+  "scope": "Optimized schema4 Linux SDK build and corrected package integrity only; player acceptance pending",
+  "source_files": 613,
+  "asset_count": 332,
+  "frozen_input_hashes_verified": true,
+  "extracted_asset_hashes_verified": true,
+  "native_verification": "native-schema4-rally-entity-review.json",
+  "build": {
+    "actual_exit": 0,
+    "wall_seconds": 540.3376133300189,
+    "sdk_image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+    "raw_binary_sha256": "fdc1e52ee6e1c336fe34fc4aa93edf42a8413b5d74200b47c090ca3e44036858",
+    "source_unchanged": true,
+    "actual_workspace_compile": true
+  },
+  "package": {
+    "actual_exit": 0,
+    "integrity_exit": 0,
+    "files": 381,
+    "archive_sha256": "97ec2f7d2dee8912409297777e51f712b986dbb976b89d82126d462015b2057d",
+    "binary_sha256": "23dc7cb2965d8448351abf0b0d1327d1e1cc97c6afbf40547cbbd139b6e8b053",
+    "raw_evidence": "target/linux-current258-steamrt4-package02-20261011",
+    "extract_evidence": "target/linux-current258-steamrt4-extracted02-20261011/ready.json"
+  },
+  "preserved_first_package": {
+    "raw_evidence": "target/linux-current258-steamrt4-package-20261011",
+    "archive_sha256": "7ff8de3e3666390a187ec731602bd6f0868cfd7ca3167c81fc3cc20a2d05220e",
+    "integrity_exit": 0,
+    "not_accepted_as_distribution_candidate": "Inherited Nix README and unlisted notices mixed with SDK provenance; corrected in separate package02 without recompilation."
+  },
+  "limits": [
+    "No runtime/player/audio/performance/Windows acceptance",
+    "Source offers, Rust notice gaps and complete distribution rights remain open"
+  ]
+}
