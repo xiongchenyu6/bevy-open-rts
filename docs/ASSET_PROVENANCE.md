@@ -216,6 +216,22 @@ WAVs for16 complete event texts in each language. Generation uses the retained
 commit-pinned official Kokoro82M model and stock voice files; exact model/voice
 hashes and authored texts are in its manifest. Actual generation exits0, and
 independent PCM checks verify all32 mono24kHz16-bit files are nonempty and
-unclipped. Listening quality/pronunciation/content transcription remain unverified;
+unclipped. Listening quality and pronunciation remain unverified;
 no runtime audio is replaced. This candidate set supplies distinct English
 support/superweapon warning texts that existing runtime fallback audio lacks.
+
+
+Local audio-only transcription is retained in
+`target/voice-asr-evaluation-20261010/`: official pinned Whisper base decodes all32
+candidates, and small independently checks six priority lines, both exiting0.
+Neither decoder receives expected text or phonemes. Five Mandarin priority
+lines are recovered by the larger model, allowing script differences; both
+models decode the English “Sir?” as “Sorry.” These results identify a review
+concern, without establishing human listening quality or a pronunciation defect.
+
+A separate “Ready for orders.” Hello candidate is retained in
+`target/voice-hello-revision-20261010/`. Its generator exits0 and an independent
+PCM check verifies mono24kHz16-bit audio, 1.575seconds, no clipping and SHA-256
+`a8da92e15192baa257417f995cd727516ae880c5f620850fc77db30bc5718ea4`.
+The original32 candidates and ASR outputs remain unchanged. Independent
+transcription of this revision is pending; no runtime substitution is accepted.
