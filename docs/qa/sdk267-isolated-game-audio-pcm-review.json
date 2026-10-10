@@ -1,0 +1,374 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-11",
+  "scope": "Native SDK267 exact packaged archive; isolated actual-game output PCM and normal Options master mute/restoration acceptance",
+  "status": "passed_scoped_pcm_checks",
+  "package": {
+    "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+    "binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+    "installation_read_only": true,
+    "all_installation_file_hashes_unchanged": true,
+    "archive_bytes_unchanged": true
+  },
+  "environment": {
+    "image_id": "sha256:bd2014420e7c14c3f4cdef4267839e7637361018f434ed49190a9e46ba19bc8f",
+    "user": "65534:65534",
+    "network": "none",
+    "exposed_device": "/dev/dri/renderD128",
+    "audio": "Private PulseAudio server containing only null sink rts_qa_game_only and its monitor; ALSA default routed to this server.",
+    "host_sound_devices_or_audio_sockets_mounted": false,
+    "microphone_or_desktop_audio_recorded": false,
+    "global_default_audio_device_modified": false,
+    "sole_playback_client": {
+      "container_pid": 64,
+      "binary": "ld-linux-x86-64.so.2",
+      "command_target": "/installation/bin/bevy-open-rts",
+      "recording_client": "parec",
+      "inspection_client": "pactl"
+    }
+  },
+  "normal_inputs": [
+    "Open Skirmish and Start Match from Main Menu.",
+    "Select starting Worker and issue right-click movement.",
+    "Return through Match Menu to Options; 20 ordinary Master minus clicks show 0%, keeping Music/SFX/Voice 100%.",
+    "Start fresh Skirmish and repeat selection/movement.",
+    "Return to confirmed Options; 20 ordinary Master plus clicks show 100%; repeat fresh match and cues.",
+    "Click public Build Power Reactor icon and valid green placement; wait for natural construction completion.",
+    "Close window normally."
+  ],
+  "checks": {
+    "baseline_match_nonzero_pcm": true,
+    "muted_match_and_selection_move_all_zero_pcm": true,
+    "restored_match_and_selection_move_nonzero_pcm": true,
+    "no_signed16_clipped_samples_in_any_recorded_phase": true,
+    "normal_game_exit_code": 0,
+    "container_exit_code": 0,
+    "service_exit_code": 0,
+    "power_reactor_completion_after_valid_green_placement": true,
+    "root_independently_checked_pcm_and_options_construction_screenshots": true
+  },
+  "phases": [
+    {
+      "phase": "actual-restored-build",
+      "acceptance_excluded": false,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 1996800,
+      "duration": 41.6,
+      "samples": 3993600,
+      "nonzero": 3951764,
+      "peak": 15820,
+      "clipped_samples": 0,
+      "rms": 341.76562095530784,
+      "rms_dbfs": -39.63443122256683,
+      "sha256": "4bb8284538c4445a633972cfd176bc604f5af5348f756cb0238c084fc74ce5d4"
+    },
+    {
+      "phase": "actual-restored-cues",
+      "acceptance_excluded": false,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 233257,
+      "duration": 4.859520833333334,
+      "samples": 466514,
+      "nonzero": 464026,
+      "peak": 17226,
+      "clipped_samples": 0,
+      "rms": 2064.619929781636,
+      "rms_dbfs": -24.01219639378258,
+      "sha256": "690e6d82a0046fd44e7628ebb075e5b708c765b5d58f07bcdd28eb0778ae81d0"
+    },
+    {
+      "phase": "actual-restored-match",
+      "acceptance_excluded": false,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 650743,
+      "duration": 13.557145833333333,
+      "samples": 1301486,
+      "nonzero": 1219206,
+      "peak": 617,
+      "clipped_samples": 0,
+      "rms": 94.49272119587805,
+      "rms_dbfs": -50.80103158005965,
+      "sha256": "0f2bcb64373fe5c3bdf57145bd716a08567c56fb2d55c098c95c01decb478f5f"
+    },
+    {
+      "phase": "actual-restored-menu",
+      "acceptance_excluded": false,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 158971,
+      "duration": 3.3118958333333333,
+      "samples": 317942,
+      "nonzero": 0,
+      "peak": 0,
+      "clipped_samples": 0,
+      "rms": 0.0,
+      "rms_dbfs": null,
+      "sha256": "0d2dec8cbb8155e088a911a2f29aed87706aa38363456db34baea9164e32580e"
+    },
+    {
+      "phase": "baseline-cues",
+      "acceptance_excluded": false,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 3509257,
+      "duration": 73.10952083333333,
+      "samples": 7018514,
+      "nonzero": 3464954,
+      "peak": 17319,
+      "clipped_samples": 0,
+      "rms": 536.6951886185818,
+      "rms_dbfs": -35.71444466063332,
+      "sha256": "5f3ace07d11527ecebd958ef602f1592e43800e8dc922f5670957f18a21c6f82"
+    },
+    {
+      "phase": "baseline-match",
+      "acceptance_excluded": false,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 1129143,
+      "duration": 23.5238125,
+      "samples": 2258286,
+      "nonzero": 2136012,
+      "peak": 663,
+      "clipped_samples": 0,
+      "rms": 94.29538942144062,
+      "rms_dbfs": -50.81918953114523,
+      "sha256": "702b13690e4648a042e1aa3481904c4dcc4dfd76e7d068e614e00f863d646157"
+    },
+    {
+      "phase": "baseline-menu",
+      "acceptance_excluded": false,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 1302971,
+      "duration": 27.145229166666667,
+      "samples": 2605942,
+      "nonzero": 0,
+      "peak": 0,
+      "clipped_samples": 0,
+      "rms": 0.0,
+      "rms_dbfs": null,
+      "sha256": "d1180fe14bd48f8533018b951a2c1eb42707ce2cc59cb32fa9e9ff4d9be447da"
+    },
+    {
+      "phase": "game-output",
+      "acceptance_excluded": true,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 1589708,
+      "duration": 33.118916666666664,
+      "samples": 3179416,
+      "nonzero": 0,
+      "peak": 0,
+      "clipped_samples": 0,
+      "rms": 0.0,
+      "rms_dbfs": null,
+      "sha256": "ab1d326a991487e22c3836236134715a7c2a280b1a1523735442b1c0cd3574a1"
+    },
+    {
+      "phase": "muted-build",
+      "acceptance_excluded": false,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 2403886,
+      "duration": 50.080958333333335,
+      "samples": 4807772,
+      "nonzero": 0,
+      "peak": 0,
+      "clipped_samples": 0,
+      "rms": 0.0,
+      "rms_dbfs": null,
+      "sha256": "3d2d81e1e004119db91d0bcb7de1c1c9faae7f8a24157434cb84d9cecabe8261"
+    },
+    {
+      "phase": "muted-cues",
+      "acceptance_excluded": false,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 555657,
+      "duration": 11.5761875,
+      "samples": 1111314,
+      "nonzero": 0,
+      "peak": 0,
+      "clipped_samples": 0,
+      "rms": 0.0,
+      "rms_dbfs": null,
+      "sha256": "1e890cb3f8825c3a1ed032ec3204cd11ff626aa79cd3cdb26d25ae2c3d894004"
+    },
+    {
+      "phase": "muted-match",
+      "acceptance_excluded": false,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 652229,
+      "duration": 13.588104166666668,
+      "samples": 1304458,
+      "nonzero": 0,
+      "peak": 0,
+      "clipped_samples": 0,
+      "rms": 0.0,
+      "rms_dbfs": null,
+      "sha256": "ae7925e5db8c7dd3d79cd46c6f6d1c5972bc6eb78a0b68713b57e1179d4d5e09"
+    },
+    {
+      "phase": "muted-menu",
+      "acceptance_excluded": false,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 158972,
+      "duration": 3.311916666666667,
+      "samples": 317944,
+      "nonzero": 0,
+      "peak": 0,
+      "clipped_samples": 0,
+      "rms": 0.0,
+      "rms_dbfs": null,
+      "sha256": "de4a6da8ba7b65dcde5b1a4a2b840136aae6cbf41fdf2f0385e73bfa29ac8f44"
+    },
+    {
+      "phase": "post-build",
+      "acceptance_excluded": false,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 114073,
+      "duration": 2.376520833333333,
+      "samples": 228146,
+      "nonzero": 193834,
+      "peak": 232,
+      "clipped_samples": 0,
+      "rms": 88.45794000431832,
+      "rms_dbfs": -51.37426227190598,
+      "sha256": "1735a85508f15c1232ee89ec7ef201a1d875bc3757d3218477bb44cf78ef332d"
+    },
+    {
+      "phase": "restored-build",
+      "acceptance_excluded": true,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 2277600,
+      "duration": 47.45,
+      "samples": 4555200,
+      "nonzero": 0,
+      "peak": 0,
+      "clipped_samples": 0,
+      "rms": 0.0,
+      "rms_dbfs": null,
+      "sha256": "b6c9d481ea60638e6ea3fbffbf7f9f4a5d6b31f0ad7493a39ec28966ac0f90ca"
+    },
+    {
+      "phase": "restored-cues",
+      "acceptance_excluded": true,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 233257,
+      "duration": 4.859520833333334,
+      "samples": 466514,
+      "nonzero": 0,
+      "peak": 0,
+      "clipped_samples": 0,
+      "rms": 0.0,
+      "rms_dbfs": null,
+      "sha256": "84f5b2330caff2d9b22f09211f400eaa6134ce34c82c471628d73a65cca1aa1e"
+    },
+    {
+      "phase": "restored-match",
+      "acceptance_excluded": true,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 653715,
+      "duration": 13.6190625,
+      "samples": 1307430,
+      "nonzero": 0,
+      "peak": 0,
+      "clipped_samples": 0,
+      "rms": 0.0,
+      "rms_dbfs": null,
+      "sha256": "427564312341065e01be93a0d48fcd5a4b06eef63e3750569fe56e0b380dfff8"
+    },
+    {
+      "phase": "restored-menu",
+      "acceptance_excluded": true,
+      "rate": 48000,
+      "channels": 2,
+      "frames": 158971,
+      "duration": 3.3118958333333333,
+      "samples": 317942,
+      "nonzero": 0,
+      "peak": 0,
+      "clipped_samples": 0,
+      "rms": 0.0,
+      "rms_dbfs": null,
+      "sha256": "0d2dec8cbb8155e088a911a2f29aed87706aa38363456db34baea9164e32580e"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_path": "target/linux-current267-game-audio-20261011-01/08-options-before-mute.png",
+      "sha256": "27cce349f15a8926018b83302ba6b50819b6f9b9f96f1260c81f15510b37ec81"
+    },
+    {
+      "evidence_path": "target/linux-current267-game-audio-20261011-01/09-master-zero.png",
+      "sha256": "2504c930610d321a7f66bf4cb47f715bf93a230e729c13e230cbb5e5cf4e8f60"
+    },
+    {
+      "evidence_path": "target/linux-current267-game-audio-20261011-01/23-actual-options-before-restore.png",
+      "sha256": "026bc463af71e888cd72c19c07d1e02382658c7b591b5d5fcce207e3e57c4e45"
+    },
+    {
+      "evidence_path": "target/linux-current267-game-audio-20261011-01/24-actual-master-restored.png",
+      "sha256": "b5e0477bc1894cf9b54f4e11264deea8d82d098e55b6e431ef070d717524e5e2"
+    },
+    {
+      "evidence_path": "target/linux-current267-game-audio-20261011-01/28-actual-power-ghost.png",
+      "sha256": "b72621af6e1876c114c57f52a974679f79890b355d187528901b323c1ee4ff52"
+    },
+    {
+      "evidence_path": "target/linux-current267-game-audio-20261011-01/29-actual-power-completed.png",
+      "sha256": "6c2a4ee061e9166e725d5e59ca140662fb218ae59bf72cebfb3dec0aff0516af"
+    },
+    {
+      "evidence_path": "target/linux-current267-game-audio-20261011-01/audio/baseline-match-clients.txt",
+      "sha256": "dd5caef6601e857594b4a3d178c8483e23676de714b706b9d18fa5201ee50453"
+    },
+    {
+      "evidence_path": "target/linux-current267-game-audio-20261011-01/audio/actual-restored-match-all-clients.txt",
+      "sha256": "d58fff7c67475fe40056227abf7c058510f95fafadfd8cac026ef3a41784c197"
+    },
+    {
+      "evidence_path": "target/linux-current267-game-audio-20261011-01/audio/game-client-cmdline.txt",
+      "sha256": "37fda98acfb06c999538d875cae631a77b3e2940cacbab14f94b8b037800c6f0"
+    },
+    {
+      "evidence_path": "target/linux-current267-game-audio-20261011-01/container-result.json",
+      "sha256": "e1b9813be687dddcc03da63b005540db42f12b4724dbf0538aaec9299fbc4781"
+    },
+    {
+      "evidence_path": "target/linux-current267-game-audio-20261011-01/game-exits.txt",
+      "sha256": "9e6f6e365dfd6e3039d5ade1d07e4af2b458de43a1503c8f7f4b44e0bd99c231"
+    },
+    {
+      "evidence_path": "target/linux-current267-game-audio-20261011-01/control.log",
+      "sha256": "6f04760e74b62a3e1e94af3178da6591d20617b1bf1d6d2346ecf20c490bddca"
+    }
+  ],
+  "excluded_artifacts": {
+    "07-baseline-build-complete.png": "No build acceptance; incorrect context interaction removed Command Center.",
+    "15-muted-power-complete.png": "Rejected overlapping red placement; no completed build.",
+    "16-options-still-muted.png": "Misnavigation; not Options.",
+    "17-master-restored.png": "Misnavigation; not restored Options; screenshot23 later confirmed still Master0.",
+    "restored-*.wav": "Excluded restoration proof; still muted following misnavigation.",
+    "21-restored-power-ghost.png": "No placement proof; no actual ghost."
+  },
+  "limitations": [
+    "No human auditory review or claim of hearing.",
+    "Normal Main Menu was silent in all recorded menu phases; code starts music on match entry.",
+    "Music/voice/SFX semantic content and all 17 voice events not individually accepted.",
+    "Power completion only accepted in actual-restored phase; muted power placement rejected.",
+    "Private audio image provides ALSA Pulse plugin and sound server absent from prior thin QA runtime; consumer host audio diversity remains separate.",
+    "Individual Music/SFX/Voice channel controls have not yet been tested separately.",
+    "Evidence files remain in the local target tree; this JSON records their hashes and measurements for portable review."
+  ]
+}
