@@ -1832,6 +1832,7 @@ pub(crate) fn move_units(
     mut match_state: ResMut<MatchState>,
     mut latest_battle_event: ResMut<LatestBattleEvent>,
     terrain: Res<TerrainHeightField>,
+    map_bounds: Res<MapBounds>,
     mut unit_queries: ParamSet<(
         Query<(
             Entity,
@@ -2006,6 +2007,31 @@ pub(crate) fn move_units(
             } else {
                 steered_direction
             };
+            // The shared grid uses a small inflation suitable for point routing.
+            // Repair a physically blocked leg with the actual mover clearance.
+            // Preserve its order goal and move normally along every real waypoint.
+            if *domain == MovementDomain::Terrain
+                && move_direction == Vec3::ZERO
+                && planned_path.is_some()
+            {
+                if let Some(waypoints) = physical_movement_path(
+                    previous_position,
+                    order.target,
+                    selectable.radius,
+                    &static_obstacles,
+                    &terrain,
+                    *map_bounds,
+                ) {
+                    **planned_path.as_mut().unwrap() = PlannedPath {
+                        goal: order.target,
+                        waypoints,
+                        next: 0,
+                    };
+                } else {
+                    commands.entity(entity).try_remove::<PlannedPath>();
+                }
+                continue;
+            }
             let move_direction = if constructing.is_some() && !unit.can_crush {
                 let clear = |candidate: Vec3| {
                     ground_bodies.iter().all(|(other, position, radius)| {
@@ -2164,6 +2190,46 @@ pub(crate) fn static_movement_segment_clear(
             obstacle.is_structure && offset.dot(movement) >= 0.0 && minimum + 1e-4 >= before
         }
     })
+}
+
+pub(crate) fn physical_movement_path(
+    position: Vec3,
+    goal: Vec3,
+    radius: f32,
+    obstacles: &[MovementObstacleSnapshot],
+    terrain: &TerrainHeightField,
+    bounds: MapBounds,
+) -> Option<Vec<Vec3>> {
+    let expanded = obstacles
+        .iter()
+        .map(|obstacle| {
+            (
+                obstacle.position,
+                obstacle.radius + radius + MOVEMENT_OBSTACLE_CLEARANCE_M - NAV_OBSTACLE_INFLATE_M,
+            )
+        })
+        .collect::<Vec<_>>();
+    let mut grid = NavGrid::default();
+    grid.rebuild_with_terrain(bounds, &expanded, terrain);
+    let start = grid.nearest_open_cell(grid.cell_of(position))?;
+    let end = grid.nearest_open_cell(grid.cell_of(goal))?;
+    let (_, waypoints) = grid.find_contact_path(
+        position,
+        &[grid.cell_center(start.0, start.1)],
+        &[grid.cell_center(end.0, end.1)],
+    )?;
+    let mut previous = position;
+    for waypoint in &waypoints {
+        if xz_distance(*waypoint, bounds.clamp_ground_point(*waypoint, radius)) > 1e-4
+            || terrain.step_blocked(previous, *waypoint)
+            || !grid.terrain_line_clear(previous, *waypoint)
+            || !static_movement_segment_clear(previous, *waypoint, radius, obstacles)
+        {
+            return None;
+        }
+        previous = *waypoint;
+    }
+    (!waypoints.is_empty()).then_some(waypoints)
 }
 
 fn safe_static_movement_direction(

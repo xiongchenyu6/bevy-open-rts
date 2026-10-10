@@ -7375,3 +7375,6 @@ mod hold_guard_tests;
 
 #[cfg(test)]
 mod movement_endpoint_tests;
+
+#[cfg(test)]
+mod movement_steering_tests;
