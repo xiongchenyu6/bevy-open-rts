@@ -1,0 +1,27 @@
+{
+  "scope": "SameApp currentchain normalcontrols afterdirectinitialscenario setup; exactfirsttwo on-disk prefixes only, not allsix",
+  "actual_exit": 1,
+  "accepted_all_six": false,
+  "verified_prefixes": [
+    {
+      "index": 0,
+      "completed": [
+        "hold_the_line"
+      ],
+      "profile_sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+      "profile_prefix_verified": true
+    },
+    {
+      "index": 1,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost"
+      ],
+      "profile_sha256": "49a2d1643b35bdc53c65186dff35bb82e29e9c7d92f72d20472cda617e645fc2",
+      "profile_prefix_verified": true
+    }
+  ],
+  "raw_chain_result_sha256": "767e6f6944f5447a8565124a838850192efdb91bcf2a0bdceec57120ffc62e28",
+  "failure": "Missionindex2 PowerReactor construction remains incomplete at146.9s/HQ20; rawlog retained",
+  "initial_menu_first_mission_click_verified": false
+}
