@@ -29,6 +29,6 @@
     }
   ],
   "first_repeat_trace_limit": "First trace watched a different living reactor; its HP history does not describe the attacked reactor.",
-  "fix_status": "Original-source regression fails; initial noPath fallback also fails. Further diagnosis pending.",
+  "fix_status": "The three real frozen244 timeouts remain verified. Initial regression fixtures lacked an own living headquarters, so match defeat stopped their repeated updates; those fixture results cannot establish a 180-frame movement stall or validate a fix. Corrected fixture requires a living own anchor and Running phase each tick; original-source RED rerun is pending.",
   "source_audit_sha256": "c4f395dd8853a41da1768c8752e7116159b7ccef3c1be44afe1def300f8616f1"
 }
