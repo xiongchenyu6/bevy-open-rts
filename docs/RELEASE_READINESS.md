@@ -45,8 +45,9 @@ paid/UI and final package verification remain open. Original menu background
 integration `07843b2` passed three post-integration native menu/setup images.
 Render-only outskirts `ef588b9` passed both supported tilt extremes with11
 frames each; all22 were visually reviewed. Original four-state cursor atlas
-`aa4193f` has native loaded-pixel/index/hotspot evidence, while its post-integration
-run and final browser pointer appearance/alignment remain pending. Unused legacy
+`aa4193f` has native loaded-pixel/index/hotspot evidence, and its post-integration
+seven-phase native metadata run passed; final browser pointer appearance/alignment
+remain pending. Unused legacy
 VFX removal `1309f29` reduces runtime inventory to332 files and326 payload ledger
 entries; private startup/paid-HUD smoke does not prove final combat/package behavior.
 

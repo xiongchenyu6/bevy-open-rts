@@ -6,8 +6,73 @@
   "native_metadata_evidence": "art/cursors/candidates-v1/native-state-review.json",
   "root_visual_review": "Four32px glyphs inspected on dark/light review sheet: distinct arrow/move crosshair/attack target/build hammer; border contrast remains readable.",
   "native_loaded_rgba_and_four_states_verified": true,
-  "post_integration_run_verified": false,
+  "post_integration_run_verified": true,
   "native_os_pointer_visual_verified": false,
   "final_current_wasm_four_state_visual_and_alignment_verified": false,
-  "final_package_verified": false
+  "final_package_verified": false,
+  "post_integration_evidence": {
+    "result_path": "target/cursor-native-postintegration-20261010-03/result.json",
+    "capture_sha256": "301377984894c593670dcc4470b475aed3ae2e0a80bced3b9dccb07d07af14bc",
+    "wall_seconds": 15.219725347007625,
+    "private_asset_count": 332,
+    "repository_assets_unchanged": true,
+    "root_independent_state_checks": [
+      {
+        "phase": "00_default_hud",
+        "index": 0,
+        "hotspot": [
+          2,
+          1
+        ]
+      },
+      {
+        "phase": "01_move_patrol",
+        "index": 1,
+        "hotspot": [
+          16,
+          16
+        ]
+      },
+      {
+        "phase": "02_move_over_hud_default",
+        "index": 0,
+        "hotspot": [
+          2,
+          1
+        ]
+      },
+      {
+        "phase": "03_attack_move",
+        "index": 2,
+        "hotspot": [
+          16,
+          16
+        ]
+      },
+      {
+        "phase": "04_build_ghost",
+        "index": 3,
+        "hotspot": [
+          16,
+          16
+        ]
+      },
+      {
+        "phase": "05_build_over_hud_default",
+        "index": 0,
+        "hotspot": [
+          2,
+          1
+        ]
+      },
+      {
+        "phase": "06_cancel_default",
+        "index": 0,
+        "hotspot": [
+          2,
+          1
+        ]
+      }
+    ]
+  }
 }
