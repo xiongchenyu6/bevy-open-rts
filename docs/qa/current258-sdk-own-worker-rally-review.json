@@ -1,0 +1,122 @@
+{
+  "archive_sha256": "97ec2f7d2dee8912409297777e51f712b986dbb976b89d82126d462015b2057d",
+  "binary_sha256": "23dc7cb2965d8448351abf0b0d1327d1e1cc97c6afbf40547cbbd139b6e8b053",
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 3534825,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "index": 2,
+      "pid": 3537034,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_game_cleanup": false,
+  "wall_seconds": 87.28770091300248,
+  "comparisons": [
+    {
+      "elapsed": 0.2628803253173828,
+      "target_keys": [
+        8589933888,
+        77309409759
+      ],
+      "producer_keys": [
+        8589933868,
+        12884900958
+      ],
+      "passed": true
+    },
+    {
+      "elapsed": 0.26062488555908203,
+      "target_keys": [
+        77309409759,
+        12884900836
+      ],
+      "producer_keys": [
+        12884900958,
+        17179868471
+      ],
+      "passed": true
+    }
+  ],
+  "load_byte_checks": [
+    {
+      "session": 1,
+      "before": "23b762327905fe74e6b456158a9e57437ab673c599713d1ac5b3fe5a2a0a086f",
+      "after": "23b762327905fe74e6b456158a9e57437ab673c599713d1ac5b3fe5a2a0a086f",
+      "unchanged": true
+    },
+    {
+      "session": 2,
+      "before": "35f89cc253f2b840d2a6c18ed917b220aa6b11600a38f468a5016ec127f3ac11",
+      "after": "35f89cc253f2b840d2a6c18ed917b220aa6b11600a38f468a5016ec127f3ac11",
+      "unchanged": true
+    }
+  ],
+  "produced_worker": {
+    "key": 21474834851,
+    "id": "Worker",
+    "position": [
+      -17.122440338134766,
+      0.05000000074505806,
+      -15.951160430908203
+    ],
+    "active": [
+      {
+        "kind": "Follow",
+        "target": 12884900836,
+        "allow_enemy": false
+      }
+    ],
+    "queued": [],
+    "cargo_ron": "Some((0, 0))"
+  },
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "passed": true,
+  "scope": "Exact corrected SDK258 package02 schema4 normal own-Worker rally continuity only",
+  "raw_evidence": "target/sdk258-save-own-worker-20261011-01",
+  "wall_limit_seconds": 240,
+  "package_files": 381,
+  "screenshots": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-baseline-paused": "0aabd1b91f2135985ccd577a7cd3e9e51e119986d8610b828e290389080f21aa",
+    "02-command-center-selected": "e3fcff86ecf31339e6cb5a5808fc93fe5be9e9385a6fb56299ec2a7300125eed",
+    "03-entity-rally-paused": "d9da01a880ad67b60b9bab92ab4c8387537a530c1ba572710b28e0cda6a23e2a",
+    "04-worker-train-tooltip": "8dcb06a7ffd4ec670be159f90bdf3be7537e198e7aadd5f753fb0ed30c2e7d79",
+    "07-partial-paid-queue": "858df11ca6f2ba9a2b7b7ae93c0f6573d47b8410cb447b130fb779a04222e13c",
+    "08-same-process-loaded": "8c2981fd01bbef3a4c5059b38de031a609c842bdce95fe98c6bb2119735dd705",
+    "09-same-process-resaved": "a03750c4b63591e106d8bd6029fc8a4be57292e08be79c7e25803ffabe006fd2",
+    "10-fresh-menu": "8888eb9704d130d25356a0bd920b7341406817217c396081667e9b0ef284e76c",
+    "11-fresh-process-loaded": "2e7cdad6879e6270e12d61972736b9182f7ee07124433f672070469428cf2ead",
+    "12-fresh-process-resaved": "22de32372a5a37f6e1ebd4c3dcd4b54da45d4c8353a4f77c51bd3a95adc542ca",
+    "13-paid-worker-target-order": "4ba8e03e3b2d8bf6c5ea46df3be93306bc9053e0f05816e3410d58f0415d8551"
+  },
+  "result_sha256": "63cfd7ba2a488e8748f35dfed12e33ff9d6026360419fcacdf1fa4b11da12a65",
+  "root_independent_review": {
+    "all12_png_hashes_match": true,
+    "direct_final_frame_review_three_workers_bank30_16": true,
+    "normal_exits_and_two_remap_comparisons": true
+  },
+  "remaining_cases": {
+    "visible_ore01": {
+      "actual_exit": 1,
+      "raw": "target/sdk258-save-visible-ore-20261011-01",
+      "reason": "Ordinary old pixel target selected own CommandCenter; observer misclassified valid own-structure reference as dangling; resource continuity not exercised"
+    },
+    "negative01": {
+      "actual_exit": 1,
+      "raw": "target/sdk258-save-negative-20261011-01",
+      "reason": "Normal short Worker Move completed before baseline; strict active-order precondition failed, no negative load exercised"
+    }
+  },
+  "limits": [
+    "Only own Worker entity target and one paid Worker job tested on this optimized package",
+    "Resource rally and negative-file cases remain open; their failed first attempts retained",
+    "No rally modes beyond Move, other producers, audio, complete save or release acceptance"
+  ]
+}
