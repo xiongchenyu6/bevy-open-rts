@@ -95,3 +95,15 @@ source gap from those derived images. Regenerate all70 portraits twice and the
 roster from a newly built exporter, validate output/source hashes and framing,
 then review and integrate the new outputs before final asset acceptance.
 The live inventory now contains332 files following unused VFX retirement.
+
+## Current original armor render refresh
+
+All70 portraits were exported twice with the original matte armor texture.
+Independent paired-byte, RGBA/framing and model-only reference checks passed;
+all70 were visually reviewed at128/72px on dark/light backgrounds. The roster
+also passed independent paired checks and visual review. These71 reviewed
+outputs are now installed;70 image hashes changed and the roster remained
+byte-identical. `current-armor-runtime-integration.json` is the active evidence
+record, while `runtime-integration.json` preserves the preceding checkpoint.
+Current inventory is332 files. Post-integration UI, all-roster paid creation,
+provider/distribution review and final package validation remain open.

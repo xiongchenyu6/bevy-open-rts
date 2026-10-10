@@ -44,8 +44,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "605dfc712694034c34b5efdc6aa951da7ec4b701ce6674dfdd3debf15d14b458",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "2c229153813f6694e3c1c788492a43e2b61e07b35d91709db30b4f76b6184cab",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -72,8 +72,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "0d77ee93699a2637033ae8723b581d7f8ccd07e6a849a9c4bd30be7cbe125102",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "9f9b8cde1a0b231623b58a2830506ad0460af4871292a6392a0888135a7f8af1",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -97,8 +97,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "b364e15591ec54cab9827a5f61d717d06af8912d9a681174eabc2917946ceb0a",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "b21459fc3871eb1b5dc2f125005a1427f0f0ca4c999a048b20d903f961627a34",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -124,8 +124,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "1bd4ae4c1f51589fe917affd3a25c32709f85364fe54cda401b7dbf99b2ae502",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "96f820d2538edd0ff30ec4b18fdedc29686652d40d82c1f477775c257cce70a5",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -149,8 +149,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "8ed4129c90f32bad829ddc77c565fe25d6324d55be5723e8aa391d63c581ecb1",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "3abc4e8e26835416626d42690250a22d75ad823a23ea94a548c88ae916eafe09",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -178,8 +178,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "cff7651f88a80bfe32ac90a232760a3c2bd5997928b2628ffaffb1b238f84c07",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "5e40c1e7014423211f1c2aeb8e90df50467318a1ad8230516a4f8aefc7ca4fc6",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -207,8 +207,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "c8af091dec42fe6a51136e99b6b5ca5678833da7b25831d6401157b64f40d705",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "452ec11195544f87feab5d7cf52cb206b3085477121c4df448eb22644017b601",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -232,8 +232,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "ff2d131a520e285ed7e6cecb72c40e8aa21c2fd68b8037d8f81d24b86eb64af2",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "c294d4449b6d3dbbcb92ecdbcf9262f0631164abc13818639243b8dcba5e8a5b",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -268,8 +268,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "187519d2064f31f22e4300079367557ecf098a8c47e61d213086cc5b6c219e0c",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "081773337da2a4d77e26c386507565239c22aeaf0efe0de90b229501e915a566",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -296,8 +296,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "47a4adac91df6004757d1d75ecf1dea91486af4552fe1507128c85f96609afab",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "214ed7824272686de2a58e24fff80974fc9e5fb6e8863507ec1805afe0e5876c",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -321,8 +321,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "5d14073d8a80bccc6731290cc0b96498535258e42cc0cb32a6fa53c5a01dcbf2",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "6622a6a2556f0a7409aa5295fa5a6722cf94e100ec9231364140a534ee4ae010",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -344,8 +344,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "8fe2e7c0d446e9b46049d73a8727cf51a3515c3f4e38d35880ca1b7f57ef96bb",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "c062ce81ba9da2e090d26202e6d85889074490a0073bd9427172650bfc425f15",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -371,8 +371,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "4c916b703c0326d4a754ecacad1eb0727823f55f322e329fe53b5a2a176b34d2",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "890e82e7d8e3029aee7901d1628137d9ad9b87ff6c7e9e3042d41feec366afd6",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -397,8 +397,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "735d366cd05917fd5796f803ab25da827400513de91fb99f4334cb2b2cf76885",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "350feb90f747c4cf7ec02bf1080906f6269e974ce466a4f092981ca7d2578131",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -420,8 +420,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "110a348d69396c9f0322f39d1cfdad7af95210ce72c0e4c5455ecf1632444853",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "d8049ac33ba0b4b3741b19932373b1bab44dbbf4d1df212381628c1474bfba59",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -446,8 +446,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "f4b03c4060e2846b5d313e5bebb6d36e9b43fea4953bbc8df52e1d8435b1c553",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "62c5341fddafdde74a6ecb693bc0aa3513754b85d1a67464405dbebff7fcd7f8",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -472,8 +472,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "e4ffa37418140bd4b9817900e2748987415b2bca6881c957ad17333c6b40f7c8",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "877053315dacfe3c70b97719ada583930ce35287f1c85dcfbca646593c268f7d",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -495,8 +495,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "31a8edad65508708966c1b5965c0f84ee561f0f9d162b6c8b6d7b0d2e0057bd3",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "7c2fa9646459df68031ed9c507d123d31554867318c2417233c209c4fe66f8c0",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -522,8 +522,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "68c99cd8cb9cbe3d5dea7e5933610a210470e686f4b3677028bdef6e69b90353",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "be155289381f71e65bee64c83f4b3faf28bbf3b41e96b199f0249c0a4130dd61",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -545,8 +545,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "5635659dc5a33945787d6bd34e6667c629541088a64e899b8db9124039d11f31",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "fb0e9315ce097839ac863d99fe5fa4117fffa991e7ff11a063a604df124a1785",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -571,8 +571,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "f88e611b476bd42f65ef4b38fde56707fef2c11172d8dd65c209bf584b9f885b",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "02a1a45af3d75f0e7640f29233333c203c7d6bfdbabae0036d2375317bd43084",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -597,8 +597,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "fa411f6d6ac3a1a5937bbceedb3f601b8e8b9e87ff3dc09c66bc42d8f3b7697c",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "20b74efeb1509c1cc6deaa1d4169e521c05c518e421917d9b67fd0c7391b92cd",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -626,8 +626,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "9fb6de2f1e3ecea05c1bd063f2605704738a03d71e8b496a118752d53cacae5b",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "7a15e6c39ccd8fe6bf9a708e7e30b6474f19ca9d54def5522ada33fce04c0938",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -651,8 +651,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "7be2dafeb398e92d00c95e63282fd7444683512de46d51df61d9d807b4732279",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "4ab70fbca89ab73b441b885f8998c7de10ba73d175c8839f3f4c4a0eb3ee42f3",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -676,8 +676,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "2cf52617e1173bc80a2a8c2c76ccf5ea2684316259011b2a584cc1cf2f88be30",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "9b592e12c09dd17127a7956e0a85ea513deba472e6450f1ce28c24b57bc8bd9f",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -699,8 +699,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "61efcd1fc3587f9905b210383a40880f9e5d9dd9ffe13fb409ed50db0e767d45",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "057b5418a2f388a15b26074720c0aef4c5c3cfb2755b547d67b95176752a6258",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -727,8 +727,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "29ce3b7b04c46067f85a238a68c7acb4a80173a1d2be70ab0e91051d62c6fc10",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "b9e45650262750166d14fc7e38455ec15a0a73570a836bafab5662f752374dac",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -750,8 +750,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "bcba78db6393954df55e98cb24cb6a7465649445c5e1caf2592e71cf31206e79",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "f2b32957796fd10f3e5cd6069cd1019c8c5637931b5f3f45d8e7b9aca1fff8f7",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -776,8 +776,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "53f526a883505e49b1fa3239f043228a1bd23e37e186d4ee5385bc251b02e74b",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "ed4bc5057daa28a3daa4a7e8ab4a5fb23a6592c99bff397d75a8d188acfa081c",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -799,8 +799,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "ae8fa5f983804a1b2d5cc50b0d05df6130e12947cec8566e2846ea69a1d8b360",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "639f4a5837feceabea9c87d471026410757dd06ce15136b204817e2211fb580b",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -822,8 +822,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "7c0d88a14172d70d09f6b9cae95d3beb25ddef2533a75dceff922925849a25ab",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "72ef5edd29616d13bb0377a3891c391549417cda0b54f3f895d9812df8fad6e1",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -845,8 +845,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "9cdec018d65dabce461e1bf9944c61568e8877562bc1dcb09754b29e32d5359b",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "8be646df5e1ee3aad663c52f6ca6da9849cf1908dc850e918cfc9eb557937aeb",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -868,8 +868,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "f651a804ba1575d46f73924c9545cc1df95b429e15562f92629c99b4bdba1ac3",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "b17929d58f2f6c6be813eb2005e62f1ee53840619955819ee4dad678c18665ae",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -891,8 +891,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "17a7d989e1357321b6f563ac247a1e85ee4154555f5c1d83d1051609e79547dc",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "3c9cce2facc69871c685fd9e4fa543effe46de2f958bb8b9ec81727307f8aeb1",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -918,8 +918,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "91f9a8cbb10a19d7107de2dcc58dd7b25998ee4342e0545a8ee098ef6a426835",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "d0f2fbb79f6ab19a70ef9d1209a11e7dfd55f0f6e540564d0aafd3398f8d0aa8",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -947,8 +947,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "27cfff38d201b90f404f7e8091937999c923736907975e347658eda25eef8b37",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "cdca338429377a384c9b1d339ebcc6d4286e9839553cf6835512cb0e8d2c6d07",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -974,8 +974,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "23dc30b91fbf4badb2289dd94f99d79ac66286ab025d5a26545f5132956d676e",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "ac0b4c0fc60e32b296b5d371273929f6872d703da489acbbf9b5f2e6e36388ef",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1003,8 +1003,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "c3ef679e9422709d73a531a6b02b5fada06f03ad47bcee90197fdeabf7852656",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "42dd997c412df5bce745ed51635435a411931b6a727d557f711ed478989f3d8e",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1031,8 +1031,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "ce03606a0c9897b8a45305e313434f0994b6f6a8a02851f0b351ed3c22a24580",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "e0897833eeb0842d718d00f14430d0488c0593f82250c915446a61f1e6da2311",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1058,8 +1058,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "6ca5202e8d62176f55ce736d39cd9a16be5f405a597061487a9b830bac76ee78",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "3e690033f48008e29f5993c070824aae502089817df346b4ca4096c05e56ebaa",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1087,8 +1087,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "b0b6cb4197172b62d0bdb7e5d39b94594d978fca56849d025dc9c8b93ac1ae04",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "acd7ff8cc8b65dc9aa68079c6778d4b3fe55035a222a94eb502d26bf00702440",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1116,8 +1116,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "455ab143d00394a3e95f68a7a4df62d1fb4b74e3259305b2dd7cd22819cd930a",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "a00f3610b3595a1efed00887472a44b541a31abc06f2226199795ebf060ca46d",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1144,8 +1144,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "0348e27e3e008762edb5ee959c9540380d8f7014e5177ac6a7f1549ccb013967",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "bd1540fcf46210fed72ea599ba76b252839deec3167996fa692c0565edfa11e8",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1170,8 +1170,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "47bdde309632d3334bcf6d97caf99694cc038dcb96b660d66fc50d9716fa2d08",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "d6a67d7def7305ac86e63d5d6db870f40191b53d299d13cbc468630c173da301",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1193,8 +1193,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "a74881d632291fc5dfd7205b82c9aedfad756b6250b1a4d9912e71456e749530",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "23802eee2acb848af21ff8e65d0c6f4352a4353816a20549393666f69bbf0ba8",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1223,8 +1223,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "2e860b1bdd2ee70f12b6b50600666339e46b131426c412bad813112fd8fcb05c",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "5d0f91702b9bf260d580b3ee28a812e422f17b7592f095370e707de63a977cde",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1251,8 +1251,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "79e120e984ade3f8f8d7461100ed6aff3c2703e54c1ce484d4d57ffed9fc0b03",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "05cc05d81afdd88afdd5d41f3bde8b83b3961a2415428302e47c6745b81cec22",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1279,8 +1279,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "e914a9612e77a90fdcf15f5ac624a95d02e91c30dc2a625a832c4a36f4c7ee99",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "6ebee48855a6ffab39e0131d61d6c3f3924c734f51ad97370246012cd7163210",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1305,8 +1305,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "bbe2e6fe95487d71fa6fb47640170db1fbd62254b340c4ddd298966d8325fa2f",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "867511016a838585fd3cb9e00c210cc61b218a96c32309546ed90f2fae79a289",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1332,8 +1332,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "35dc7b19264c2f7b45972f157d0070abca17e0b6cf43a54c4b748e4ede83f985",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "7b4c8520d346d6ee3de29ecfc70c582f680d6982ad11a59096e6c2c771e45e6c",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1359,8 +1359,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "9644657a6c06c08732a08e6ab568f54e7e79b54bb9cd242bb48a11b4d97d2a09",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "99efdbd042b72579459ed9cef5b4f5d9e280e6c17fea35ac51467ee15b1b6b02",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1386,8 +1386,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "bf04964e3f5b4f1041ae82e4e12c89aa8166555c4ccdd50262da1b54b2b6123a",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "dd000cee5e5375840384285120689014296b9800f6c15345ab7a9da474b1fcbd",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1410,8 +1410,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "f7dbb7b6ad8deed14f14cbd33b2ac9001557b9ba3eeccd24ea3509e630d0ef4e",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "527f53cabbc8cd42f6bf6b7859cf1ab360e0419008e7ae7d96f1bd56cde2b39f",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1436,8 +1436,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "9609ea2e9134b9b2bfc9c392ade4647e2ff89e646902b04d2a454c9630bf89c5",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "935041a4b80f6ce7fd9004413bb528c442878c33b88d5fadec80636ee7e55bfb",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1463,8 +1463,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "bc64718bc532348a8d4363bef2dcb34654c1b830c7c00cad7af96d6ad36bcedf",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "f517a3c0c99485e6890a044b6e32b5fe9c39736ed8632b6bac2322b66fae37ca",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1490,8 +1490,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "cd551dbff9704df6e4a49f195487d8f861799f4d56990d55038ac99ac280d8c1",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "02d7fa5c32a109ffb7b5d5b691f77027585c2e82ff8fbcf806b79e1fdcd89d77",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1513,8 +1513,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "3bc81b0c8473e08f263a40963a81485d9308e305ad14754277d6a46c01d05394",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "b086c68071f78ebe3fcee2ac31d2386df268f6cd5a1542c3ce83160fd4b99e9f",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1536,8 +1536,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "4159b12d03a3da0c546c6e0189b7d8dd15beb0370ac5e65f973abedbd1ccc397",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "aed292a8ff288c3bdd88d789ff8320f0be7bc8dcf3e78a40c0c346166fc2c5c0",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1562,8 +1562,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "bc7aa7db9ec9a13ec07e8ea00154a0b74768ff1e2a1147df9cc368706595f4b4",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "9036335100e5db2e8c8579105324a4db295e6c9a23e94b563f2663b5f57c65c6",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1589,8 +1589,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "7fdfae5c77b99decc8dc8abbfb57291e1d4bbcd04448e55c301ba6e4595e9dd0",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "4f527e19be9aa088fb2b58de9b3115c2028e0d24a061b1f9d9b53be9c7c7434b",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1612,8 +1612,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "92a93b11f3629dbb1af68f368bf72bb99647ec4af4f68e41d6fa7f71fa9515c2",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "78aa6c9bbe4f3cae7d2dbabba2f3cb5a574a13dd962465ef065e1f1ae0de9ce7",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1637,8 +1637,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "af3cd51eb5e127322674582d0073bdffd966ef47d0332a7add129b7a6f541335",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "586d659d46fa8c6fd664ac29883cdadd20a87e21b9575df68a347e74d8ed6790",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "neutral"
     },
     {
@@ -1665,8 +1665,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "e874d83b3c6059318f4c70908b3eb5470f63a51ece62e762dacf889edc37bb65",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "aea05ee60d3e5002c5ab0dea50543b72c97c7355cb5e8eba5b6fd77ee76f9300",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1691,8 +1691,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "ee1a25303b0555e4287942a1924fca417065a6565459e34108ea908e402fc714",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "88581809ad27b247676427a3b143e08cdae6f50212c49d448162395c1b89a982",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "neutral"
     },
     {
@@ -1718,8 +1718,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "ae9c34005f167c94364dd730148e317fcdded944e406d7463ec139a9dae6f21f",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "eaf15d4a61c82cb9b2d6f43d3de32f7154a19141e11d79dbfb2346566de498c6",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "neutral"
     },
     {
@@ -1741,8 +1741,8 @@
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "d039c8b98cde3b335f34c8428954de8f7ea1def1822f972b25d0fa1d51c51333",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "6f2d1cedcf3c13d8e0eafcb1f1b60b2ccd18526e4329efc21597489755d5d440",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1765,7 +1765,7 @@
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
       "runtime_image_sha256": "46894c75da1a9c55234ad93d30a3311e33e45a5f6af633c81bc480056d307263",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1792,8 +1792,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "2195476625fd54f96c5e176f37a7fea53f70cf57a2ace4b2e03f375042ff84e6",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "a49756a3d551ed55fadc5c9cf5b2447dc870c4abbf29a9ed09febb5f71a071d0",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1822,8 +1822,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "b31cbb65ed0039d509daea58664de7e47b3c4dce73b7e992c8253ac7ada7f723",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "f6b43a42aae5b871c493d9f67d01384f6a1e3eee6cf50e33b4bae8ce4374bc67",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     },
     {
@@ -1849,8 +1849,8 @@
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
       "render_input": "full actual assembled game geometry; never legacy PNG",
       "provenance_status": "original_native_model_runtime",
-      "runtime_image_sha256": "3e62ad89c098f7b93de3ef64f64a6692706018d3da69cd4a48e2ac3ba78dcb36",
-      "runtime_image_provenance": "art/portraits/runtime-integration.json",
+      "runtime_image_sha256": "64bef3c6a110b7de1f33e666611b290d4b40e409076cab3fa3dc2aaefd1a5a75",
+      "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json",
       "ownership": "faction_roster"
     }
   ],
@@ -1862,8 +1862,8 @@
       "src/lib.rs:2603"
     ],
     "scope": "Original mixed-faction asset-only group; normal-menu review, not paid gameplay",
-    "runtime_image_sha256": "3bf0d5cb6328e27b942e435bf7466eae8eb3555ca8907adb054b4808766683e4",
-    "runtime_image_provenance": "art/portraits/runtime-integration.json"
+    "runtime_image_sha256": "9d7a50a0e124c64a0aa06de9e98023d785135f1c48c819d515916af17a088675",
+    "runtime_image_provenance": "art/portraits/current-armor-runtime-integration.json"
   },
   "exporter": {
     "source": "src/capture_api/portrait_export.rs",
