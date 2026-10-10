@@ -1,0 +1,20 @@
+{
+  "scope": "Historical Valve pressure-vessel imports explicitly selected Ubuntu Radeon Vulkan provider; no GPU enumeration/rendering/gameplay acceptance",
+  "actual_exit": 0,
+  "provider": {
+    "scope": "Private copied Ubuntu graphics provider for subsequent Valve pressure-vessel tests; not gameplay evidence",
+    "image": "sha256:8ca373166e34107fd9cf9510fb4b37a07fb427392d15a6678d494714e59a5e0f",
+    "wall_seconds": 9.656262422009604,
+    "prepared": true
+  },
+  "provider_file_sha256": {
+    "usr/share/vulkan/icd.d/radeon_icd.json": "bc0e4f88754ce48b429c05fc8c691438c5f04a4170d482c925bc5998159db299",
+    "usr/lib/x86_64-linux-gnu/libvulkan_radeon.so": "db177dceb616b9aa2572a75f834a15b9ceb3adcd57a1f2b90f0bddf1663c9f0b",
+    "etc/ld.so.cache": "63e3ecf5eccf114c06a5733c0949e315225cf6cf969eb3bf4e12f82d6ce2cab0"
+  },
+  "icd_api_version": "1.4.318",
+  "imported_icd": "/usr/lib/pressure-vessel/overrides/share/vulkan/icd.d/radeon_icd.json",
+  "imported_driver": "/usr/lib/pressure-vessel/overrides/lib/x86_64-linux-gnu/libvulkan_radeon.so",
+  "raw_log_sha256": "b304d64bde11777ae370c8fb65525ae02dbcf1b51cd98a98657f21ed66690618",
+  "full_runtime_gate_complete": false
+}
