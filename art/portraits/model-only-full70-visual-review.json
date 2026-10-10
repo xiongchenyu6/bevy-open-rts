@@ -1,0 +1,28 @@
+{
+  "scope": "All70 model-only asset candidates; not live paid-gameplay or final presentation acceptance",
+  "binary_sha256": "8bd848449911baf355df6d3989fffe3154821fecef9b7395e52e5726b1405e95",
+  "manifest_sha256": "0197c367ac49ddd4514ecb6d3ab89eb31b5746c97fa7aa5aba77adc241a940a3",
+  "inventory_sha256": "4292d0da0c27bd58eefdf6c69576d001fcc6f708d9332b968f056b934e924dca",
+  "evidence_directory": "target/model-only-full70-20261010",
+  "entity_count": 70,
+  "render_count": 140,
+  "paired_byte_reproduction_verified": true,
+  "rgba_alpha_framing_verified": true,
+  "model_only_scope_marker_counts_verified": true,
+  "candidate_model_visual_review_passed": true,
+  "reviewed_sizes": [
+    128,
+    72
+  ],
+  "reviewed_72_backgrounds": [
+    "dark",
+    "light"
+  ],
+  "duplicate_image_groups": [],
+  "runtime_replaced": false,
+  "live_gameplay_reference_verified": false,
+  "remaining": [
+    "Normal paid-production model comparison and current native UI asset integration smoke.",
+    "Current final-package/browser rendering acceptance."
+  ]
+}
