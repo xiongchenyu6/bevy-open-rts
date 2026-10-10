@@ -38,5 +38,143 @@
     "telemetry.jsonl": "ac527cf5d062dfa50c625adb9cd35fa45c041730171e36befb35a38dce615996",
     "failure.png": "cf5e97771988735a4476743808aba93e5ae7b22868bbf22be59bb75884c199cc",
     "process-result.json": "37a5909f8adcb444d9c58749563e2e6d2ce37e772a7534fc64be0cab97f7435a"
-  }
+  },
+  "independent_root_capture_observations": [
+    {
+      "clock": 99.96548461914062,
+      "engineer": {
+        "domain": "air",
+        "hp": 5.0,
+        "id": "EngineerDrone",
+        "position": [
+          -16.374771118164062,
+          1.5,
+          -16.41306495666504
+        ]
+      },
+      "engineer_xz_distance_from_HQ": 13.585078378605425,
+      "rocket_orders": [
+        {
+          "position": [
+            -25.613567352294922,
+            0.05000000074505806,
+            -21.503332138061523
+          ],
+          "active_orders": [
+            {
+              "Move": [
+                -21.306943893432617,
+                0.05000000074505806,
+                -16.188064575195312
+              ]
+            },
+            {
+              "Attack": 73014441112
+            }
+          ]
+        },
+        {
+          "position": [
+            -25.922956466674805,
+            0.05000000074505806,
+            -22.38212776184082
+          ],
+          "active_orders": [
+            {
+              "Move": [
+                -21.306943893432617,
+                0.05000000074505806,
+                -16.188064575195312
+              ]
+            },
+            {
+              "Attack": 73014441112
+            }
+          ]
+        },
+        {
+          "position": [
+            -25.976789474487305,
+            0.05000000074505806,
+            -21.33403205871582
+          ],
+          "active_orders": [
+            {
+              "Move": [
+                -21.306943893432617,
+                0.05000000074505806,
+                -16.188064575195312
+              ]
+            },
+            {
+              "Attack": 73014441112
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "clock": 102.03211975097656,
+      "engineer": {
+        "domain": "air",
+        "hp": 5.0,
+        "id": "EngineerDrone",
+        "position": [
+          -22.231853485107422,
+          1.5,
+          -22.246850967407227
+        ]
+      },
+      "engineer_xz_distance_from_HQ": 5.318369657944919,
+      "rocket_orders": [
+        {
+          "position": [
+            -25.469398498535156,
+            0.05000000074505806,
+            -20.571857452392578
+          ],
+          "active_orders": [
+            {
+              "Attack": 356482282382
+            }
+          ]
+        },
+        {
+          "position": [
+            -23.931154251098633,
+            0.05000000074505806,
+            -20.637041091918945
+          ],
+          "active_orders": [
+            {
+              "Attack": 356482282382
+            }
+          ]
+        },
+        {
+          "position": [
+            -23.979257583618164,
+            0.05000000074505806,
+            -21.547122955322266
+          ],
+          "active_orders": [
+            {
+              "Attack": 356482282382
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "original_HQ_alive_under_enemy_ownership_at_failure": {
+    "entity": 4294966784,
+    "team": "Player(1)",
+    "health": 12.0,
+    "position": [
+      -26.0,
+      0.0,
+      -26.0
+    ]
+  },
+  "next_experiment": "Normal visible EngineerDrone interception by existing RocketInfantry before producer recovery; unverified"
 }
