@@ -13,6 +13,8 @@ use std::io::Write;
 mod finale;
 #[path = "campaign_bot/twin.rs"]
 mod twin;
+#[path = "campaign_bot/survivors.rs"]
+mod survivors;
 
 pub(super) fn run_finale(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Result<(), String> {
     finale::run(app, handle, dir)
@@ -1098,6 +1100,7 @@ pub(super) fn run(
             .map(|headquarters| headquarters.health),
         error: None,
     };
+    let mut remaining_rounds = 240;
     let result = (|| {
         log_state(app, &mut watch.trace, "opening")?;
         if index == 4 {
@@ -1184,6 +1187,7 @@ pub(super) fn run(
             .unwrap_or(0.0);
         let mut last_threat_capture = -30.0;
         for round in 0..240 {
+            remaining_rounds = 240 - round;
             if capture_match_phase_label(app) != "Running" {
                 break;
             }
@@ -1275,6 +1279,26 @@ pub(super) fn run(
         }
         Ok(())
     })();
+    let result = if result.as_ref().err().is_some_and(|error| {
+        error == "headquarters lost"
+            || error == "campaign headquarters eliminated"
+            || error.starts_with("could not place ")
+    }) && matches!(index, 2 | 4)
+        && capture_match_phase_label(app) == "Running"
+        && capture_campaign_state(app).headquarters.is_none()
+    {
+        std::fs::write(
+            dir.join("pre-survivor-error.json"),
+            serde_json::to_vec_pretty(&serde_json::json!({
+                "original_error": result.as_ref().err(),
+                "snapshot": capture_construction_contact_debug(app),
+                "scope": "Original macro failure retained; only existing army may continue"
+            })).map_err(|error| error.to_string())?,
+        ).map_err(|error| error.to_string())?;
+        survivors::run(app, &mut watch, remaining_rounds)
+    } else {
+        result
+    };
     if result.is_err() {
         let snapshot = capture_construction_contact_debug(app);
         std::fs::write(
