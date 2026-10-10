@@ -87,6 +87,22 @@ pub(super) fn run(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Result<(
     };
     let result = (|| {
         build(app, &mut watch, "PowerReactor")?;
+        // An EngineerDrone can capture a full-health HQ; ground tanks cannot
+        // intercept it. Pay for northern AA before committing the tank queue.
+        watch.checkpoint(app, "before-build-north-air-cover")?;
+        build_campaign_structure_with_offsets(
+            app,
+            "AntiAirTurret",
+            [
+                Vec3::new(0.0, 0.0, 3.5),
+                Vec3::new(3.5, 0.0, 3.5),
+                Vec3::new(-3.5, 0.0, 3.5),
+                Vec3::new(0.0, 0.0, 5.0),
+                Vec3::new(3.5, 0.0, 5.0),
+            ],
+            &mut |app| watch.observe(app),
+        )?;
+        watch.checkpoint(app, "after-build-north-air-cover")?;
         build(app, &mut watch, "VehicleFactory")?;
         // Reserve the turret's actual cost instead of spending the entire stock
         // on the production queue. Tanks produce while its worker approaches.

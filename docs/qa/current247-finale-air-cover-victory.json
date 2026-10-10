@@ -1,0 +1,35 @@
+{
+  "scope": "Mission6 standalone normal paid northern air cover and victory; not six-mission chain proof",
+  "process": {
+    "actual_exit": 0,
+    "wall_seconds": 219.08146584697533,
+    "binary_sha256": "6e54be19f805b31a2421b46a43607c44980539a0b817f55650efc1ac6253826b",
+    "scope": "Mission6 normal paid northern air-cover diagnostic from legitimate scenario setup; not six-mission chain proof",
+    "profile": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current247-finale-air-cover-profile-20261010"
+  },
+  "visual_time": "06:09",
+  "air_cover_complete_clock": 14.666749000549316,
+  "air_cover_normal_cost": {
+    "ore": 2,
+    "crystal": 2
+  },
+  "hq_at_air_cover_completion": 20.0,
+  "last_observed_hq": {
+    "hp": 20.0,
+    "max": 20.0,
+    "position": [
+      -32.0,
+      0.0,
+      -26.0
+    ]
+  },
+  "last_observation_clock": 368.3316345214844,
+  "completed": [
+    "thunder_decapitation"
+  ],
+  "profile_sha256": "871e90ca3ea9fcbc952a80350c0ea7ebfcf971975e7bc7a363366f3a3b48c700",
+  "screenshot": "screenshots/steam-quality/current247-finale-air-cover-20261010/02_victory.png",
+  "screenshot_sha256": "a5eae24d580fbc36a2c0575ada89ef56e8a7c0175afdc7d56289df7f9d55c93b",
+  "campaign_map_continuation_verified": true,
+  "six_mission_complete": false
+}
