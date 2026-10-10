@@ -1,0 +1,30 @@
+{
+  "scope": "Root visually inspected all70 original-model exports at128px on dark UI background; this is asset-only review, not live paid production acceptance",
+  "process_result": "process-result.json",
+  "sheets": [
+    "review/sheet-1.png",
+    "review/sheet-2.png",
+    "review/sheet-3.png",
+    "review/sheet-4.png",
+    "review/sheet-5.png"
+  ],
+  "technical_export_pass": true,
+  "runtime_replacement_approved": false,
+  "release_visual_acceptance": false,
+  "findings": [
+    "Multiple infantry weapons and backpack accessories float above or beside bodies.",
+    "AntiAirWalker turret assembly is detached from chassis.",
+    "Refinery chimney and RepairPad dish float above their structure bases.",
+    "Some composite models need attachment classification before acceptance."
+  ],
+  "next_action": "Correct actual registered model transforms, rerender full-game reference and portraits, then review all affected entities.",
+  "binary_sha256": "65c894dfdcd5a93ba6b756820dec22ba038ca5665a542b35ea859a2e1027adcd",
+  "inventory_sha256": "4292d0da0c27bd58eefdf6c69576d001fcc6f708d9332b968f056b934e924dca",
+  "manifest_sha256": "111b4253372c6955719ad161c455889a53f552bfc482fc27f0122f5324500361",
+  "render_count": 140,
+  "paired_entities": 70,
+  "child_exit": 0,
+  "independent_verification_exit": 0,
+  "runtime_assets_unchanged": true,
+  "evidence_directory": "target/model-portraits-full70-20261010"
+}

@@ -24,11 +24,14 @@ cargo run --locked --bin portrait_export -- art/portraits/entities.json /new/sta
 It validates registry IDs, matching icon paths, uniqueness and faction names
 before creating the staging directory. It retains actual spawn/model assembly,
 attachments, independent MainMenu asset-reference geometry parity, assembled
-AABB framing, transparent RGBA and two separate rendering runs. Compilation and
-full70 runtime export/readability acceptance are still pending. Registry models may be empty for authored procedural tanks and
+AABB framing, transparent RGBA and two separate rendering runs. The sealed native exporter completed all140 renders (70 entities twice);
+independent byte, RGBA, alpha and framing checks pass. Root reviewed all70
+at128px: multiple real model accessories are detached, so visual acceptance
+fails. See `full70-visual-review.json`; correct the registered models and
+rerender before replacing runtime icons. Registry models may be empty for authored procedural tanks and
 TeslaFenceSegment; that is not missing geometry. ModelMap references are source
 correspondence, not permission to replace the actual assembled rendering path.
 
 This inventory neither reads legacy PNGs as render inputs nor generates or
-replaces any image. Actual complete exports, paid in-game model comparisons,
-readability review and runtime integration remain pending.
+replaces any image. Initial complete exports and visual review are recorded. Corrected-model
+exports, paid in-game comparisons and runtime integration remain pending.
