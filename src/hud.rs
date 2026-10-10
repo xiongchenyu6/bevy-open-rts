@@ -2102,6 +2102,7 @@ pub(crate) fn minimap_input(
                     controlled_team,
                     controlled_team,
                     power,
+                    &order_resources.relations,
                 );
             }
             order_resources.command_mode.support_power = None;

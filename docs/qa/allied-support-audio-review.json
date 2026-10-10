@@ -1,0 +1,50 @@
+{
+  "scope": "Allied support announcement classification; actual system fixtures, not natural speaker/mix acceptance",
+  "behavior": "Actual TeamRelations classifies ready/fire/charging notifications. Local player and genuine enemy events preserved; allied/neutral actors do not overwrite unrelated cues with enemy warnings.",
+  "isolated_red": {
+    "actual_exit": 101,
+    "passed": 0,
+    "assertion_failures": 3,
+    "source_snapshot": "target/allied-support-red-snapshot-20261010",
+    "failures": [
+      "allied readiness emitted EnemySuperweaponReady",
+      "allied charge emitted SuperweaponWarning",
+      "allied firing replaced Hello with EnemySupportPowerFired"
+    ]
+  },
+  "contaminated_attempts": {
+    "01": "GREEN reused isolated RED artifact from shared target; not green-source evidence",
+    "02": "Timestamp-only invalidation did not remove relocated cache hazard; not green-source evidence",
+    "remedy": "Root authorized package-only dev clean; subsequent log and dep-info prove actual current-root compilation. SDK/private binaries and dependencies were preserved."
+  },
+  "green": {
+    "focused_passed": 3,
+    "full_passed": 250,
+    "full_failed": 0,
+    "full_ignored": 1,
+    "full_seconds": 106.62,
+    "build_exit": 0,
+    "build_seconds": 214,
+    "bins": {
+      "bevy-open-rts": "836c6a8e41e2fb47f791200f02556691454324879ecb6875123eb077969eddbd",
+      "capture": "c7c47b4a8bc1c940189df9568bfd6bdcfb3feb886b8a913fe93309d5db4f014a"
+    },
+    "source_assets_unchanged": true,
+    "assets": 332,
+    "dep_provenance": {
+      "manifest_dir": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts",
+      "env_dep_line": "# env-dep:CARGO_MANIFEST_DIR=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts",
+      "dep_info_sha256": "bdf820988282301277956231fa22d7e631f54e4ff84673f9a382ba896c958b69",
+      "red_snapshot_paths_present": false,
+      "actual_compile_line": "Compiling bevy-open-rts v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts)"
+    }
+  },
+  "owned_source_hashes": {
+    "src/audio.rs": "a55b3388c72124e055fad9f7301a4ed92229980b2ba5ee201846be5c2c750dda",
+    "src/support_powers.rs": "939369507f7c6ce055abe9398dd24b5720635a6ec5e54c2373ae7d8798baa628",
+    "src/support_powers/audio_tests.rs": "e102bf38b974dc250ea8959e0faf29f3c29689a692f4ca8f1775605d57b8ce6d",
+    "src/hud.rs": "38591984fd7e961019880db19842fba656966f7c7306faa550ca214994599fc4",
+    "src/online.rs": "8531ebfeff1ea307b3c77c32ae875b19117de4a521f6794c93a77c14e22762e0"
+  },
+  "limits": "No queue/mixing/gain/asset/stat/cooldown/budget changes, no GPU runtime, no natural allied support recording. Existing247 SDK/package and older52-audio fixture evidence do not become current acceptance."
+}

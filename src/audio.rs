@@ -252,11 +252,12 @@ pub(crate) fn record_support_power_ready_audio_feedback(
     team: Team,
     player_team: Team,
     power: SupportPowerKind,
+    relations: &TeamRelations,
 ) {
     if team == player_team {
         record_sound_audio_feedback(feedback, SoundEffectKind::SupportPowerReady);
         record_voice_audio_feedback(feedback, UnitVoiceEvent::SupportPowerReady);
-    } else if power.is_superweapon() {
+    } else if relations.are_enemies(team, player_team) && power.is_superweapon() {
         record_sound_audio_feedback(feedback, SoundEffectKind::SuperweaponWarning);
         record_voice_audio_feedback(feedback, UnitVoiceEvent::EnemySuperweaponReady);
     }

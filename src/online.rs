@@ -4296,6 +4296,7 @@ fn apply_online_player_commands(params: OnlineCommandApplyParams) {
                         team,
                         host_visible_team,
                         power,
+                        &relations,
                     );
                 }
             }

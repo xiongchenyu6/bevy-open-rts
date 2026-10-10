@@ -5,6 +5,9 @@ use bevy::prelude::*;
 
 use crate::*;
 
+#[cfg(test)]
+mod audio_tests;
+
 pub(crate) const SUPPORT_POWER_BUTTON_SIZE_PX: f32 = 64.0;
 
 pub(crate) const SUPPORT_POWER_BUTTON_GAP_PX: f32 = 5.0;
@@ -375,6 +378,7 @@ pub(crate) fn update_support_cooldowns(
     economies: Res<Economies>,
     active_teams: Option<Res<ActiveTeams>>,
     visible_player: Option<Res<VisiblePlayer>>,
+    relations: Res<TeamRelations>,
     mut support_cooldowns: ResMut<SupportCooldowns>,
     mut audio_feedback: ResMut<AudioFeedback>,
     mut battle_log: ResMut<BattleLog>,
@@ -412,6 +416,7 @@ pub(crate) fn update_support_cooldowns(
                     player_team,
                     power,
                     def.initial_cooldown,
+                    &relations,
                 );
                 continue;
             }
@@ -426,8 +431,15 @@ pub(crate) fn update_support_cooldowns(
                     team,
                     player_team,
                     power,
+                    &relations,
                 );
-                record_support_power_ready_battle_log(&mut battle_log, team, player_team, power);
+                record_support_power_ready_battle_log(
+                    &mut battle_log,
+                    team,
+                    player_team,
+                    power,
+                    &relations,
+                );
             }
         }
     }
@@ -438,14 +450,15 @@ pub(crate) fn record_support_power_audio_feedback(
     team: Team,
     player_team: Team,
     power: SupportPowerKind,
+    relations: &TeamRelations,
 ) {
     if team == player_team {
         record_sound_audio_feedback(feedback, SoundEffectKind::SupportPowerFire);
         record_voice_audio_feedback(feedback, UnitVoiceEvent::SupportPowerFired);
-    } else if power.is_superweapon() {
+    } else if relations.are_enemies(team, player_team) && power.is_superweapon() {
         record_sound_audio_feedback(feedback, SoundEffectKind::SuperweaponWarning);
         record_voice_audio_feedback(feedback, UnitVoiceEvent::EnemySuperweaponLaunched);
-    } else {
+    } else if relations.are_enemies(team, player_team) {
         record_sound_audio_feedback(feedback, SoundEffectKind::SupportPowerFire);
         record_voice_audio_feedback(feedback, UnitVoiceEvent::EnemySupportPowerFired);
     }
@@ -458,6 +471,7 @@ pub(crate) fn record_support_power_charging_feedback(
     player_team: Team,
     power: SupportPowerKind,
     charge_seconds: f32,
+    relations: &TeamRelations,
 ) {
     if !power.is_superweapon() {
         return;
@@ -473,7 +487,7 @@ pub(crate) fn record_support_power_charging_feedback(
             ),
             None,
         );
-    } else {
+    } else if relations.are_enemies(team, player_team) {
         push_battle_log(
             battle_log,
             format!(
@@ -492,6 +506,7 @@ pub(crate) fn record_support_power_ready_battle_log(
     team: Team,
     player_team: Team,
     power: SupportPowerKind,
+    relations: &TeamRelations,
 ) {
     if team == player_team {
         push_battle_log(
@@ -499,7 +514,7 @@ pub(crate) fn record_support_power_ready_battle_log(
             format!("{}: {}", t("支援就绪", "Support ready"), power.label()),
             None,
         );
-    } else if power.is_superweapon() {
+    } else if relations.are_enemies(team, player_team) && power.is_superweapon() {
         push_battle_log(
             battle_log,
             format!(
@@ -1375,7 +1390,13 @@ pub(crate) fn try_activate_ai_support_power(
             structures,
             &support_targets,
         ) {
-            record_support_power_audio_feedback(audio_feedback, team, player_team, power);
+            record_support_power_audio_feedback(
+                audio_feedback,
+                team,
+                player_team,
+                power,
+                relations,
+            );
             return true;
         }
     }
@@ -1492,6 +1513,7 @@ pub(crate) fn fire_support_power_on_left_click(
                 visible_team,
                 visible_team,
                 power,
+                &order_resources.relations,
             );
         }
         fired
