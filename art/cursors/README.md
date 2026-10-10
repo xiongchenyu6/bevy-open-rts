@@ -17,3 +17,13 @@ These are candidates. Before replacing runtime assets, verify actual native and
 browser custom-cursor loading, each state transition and hotspot alignment with
 ordinary input. Retain the previous atlas outside runtime assets, update the
 source inventory and revalidate the final package.
+
+
+A private browser stage using immutable pre-Hold Wasm07 applies the default
+candidate successfully (actual child exit0): the CSS custom image is32×32,
+hotspot(2,1), and browser-decoded RGBA exactly matches the atlas's first tile.
+No page errors occur. See `candidates-v1/browser-default-review.json`;
+raw observations remain in `target/original-cursors-browser-01/`. This covers
+only default image application, not the other three transitions, native cursor
+behavior, pointer-to-order alignment or the final game build. Runtime assets
+remain unchanged.

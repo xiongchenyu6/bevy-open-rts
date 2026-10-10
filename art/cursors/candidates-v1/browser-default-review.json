@@ -1,0 +1,13 @@
+{
+  "child_exit": 0,
+  "scope": "immutable oldWasm07 isolated default-cursor application only; other states/native/input alignment/final core unverified",
+  "wasm_sha256": "12883d5ce621e69aaa9a5598c76d2441c705eb3120bc1af65ef0cec9a5c7cc0c",
+  "atlas_sha256": "6df4fb3f03b92fb601718577027b8e72990ae7736a8afdf4bbcbb611766c6155",
+  "browser_default_32px_rgba_matches_original_atlas": true,
+  "browser_hotspot": [
+    2,
+    1
+  ],
+  "errors": [],
+  "runtime_replaced": false
+}
