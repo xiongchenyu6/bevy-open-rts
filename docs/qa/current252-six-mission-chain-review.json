@@ -1,0 +1,87 @@
+{
+  "scope": "Six same-App normal player-order campaign victories, exact persisted prefixes and fresh-process rendered campaign menu; initial mission uses legitimate scenario entry, not normal menu click, and is not final SDK/Windows acceptance",
+  "capture_binary_sha256": "a5acd5d9b99481a9b2c675a9f5be1823861875012128c863527cc225cb9d7b1d",
+  "process": {
+    "exit_code": 0,
+    "same_application": true,
+    "all_six_disk_prefixes_verified": true,
+    "accepted": true,
+    "errors": []
+  },
+  "fresh_process_menu": {
+    "exit_code": 0,
+    "fresh_process": true,
+    "profile": "(version:1,training_complete:false,completed:[\"hold_the_line\",\"strike_the_outpost\",\"canyon_siege\",\"highland_bastion_stand\",\"twin_front\",\"thunder_decapitation\"])"
+  },
+  "all_six_profile_copies_independently_rehashed": true,
+  "disk_prefixes": [
+    {
+      "index": 0,
+      "completed": [
+        "hold_the_line"
+      ],
+      "profile_sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+      "profile_prefix_verified": true
+    },
+    {
+      "index": 1,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost"
+      ],
+      "profile_sha256": "49a2d1643b35bdc53c65186dff35bb82e29e9c7d92f72d20472cda617e645fc2",
+      "profile_prefix_verified": true
+    },
+    {
+      "index": 2,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost",
+        "canyon_siege"
+      ],
+      "profile_sha256": "1426d6501034241653895738b720208fb07fc93c3f1bcfdcc552ae7bfd1e365f",
+      "profile_prefix_verified": true
+    },
+    {
+      "index": 3,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost",
+        "canyon_siege",
+        "highland_bastion_stand"
+      ],
+      "profile_sha256": "d723d3da24dc005cc7ac9f18e36ae7f8de7a1d73a59065e9c0b450185a8bc559",
+      "profile_prefix_verified": true
+    },
+    {
+      "index": 4,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost",
+        "canyon_siege",
+        "highland_bastion_stand",
+        "twin_front"
+      ],
+      "profile_sha256": "98e8bb2e9615d44baf9e2ebbd533489aa696b34a30bbaf21ce5331642de65b46",
+      "profile_prefix_verified": true
+    },
+    {
+      "index": 5,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost",
+        "canyon_siege",
+        "highland_bastion_stand",
+        "twin_front",
+        "thunder_decapitation"
+      ],
+      "profile_sha256": "f3c8f6fec86cb34316bac19d4f476f23a81546fe751201524326744d0aa9bf52",
+      "profile_prefix_verified": true
+    }
+  ],
+  "fresh_campaign_menu_frame_directly_reviewed": true,
+  "fresh_menu_frame_sha256": "ee88ec59b5428fc213e0fa41ff9145bc161e85dce3701b0fd1225b9f01cba9a1",
+  "evidence_directory": "screenshots/steam-quality/current252-campaign-engineer-defense-20261011",
+  "remaining": "Normal initial menu/card start, retry/restart and final artifact validation; postmatchFlashfix predates this capture and is unverified here",
+  "full_campaign_gate_pass": false
+}
