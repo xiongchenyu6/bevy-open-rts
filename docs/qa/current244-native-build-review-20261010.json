@@ -1,0 +1,22 @@
+{
+  "scope": "Native build and current-source identity; campaign runtime still pending",
+  "native_build_exit": 0,
+  "full_tests": {
+    "log": "target/objective-hud-green-01.log",
+    "passed": 244,
+    "failed": 0,
+    "ignored": 1
+  },
+  "asset_count": 332,
+  "identity_errors": [],
+  "binary_sha256": {
+    "capture": "dbcfc45d993f72e22dabfea5fe4c8f0cd5ebdca2bfa8438ab568d809321ff132",
+    "bevy-open-rts": "be77764033d6fae5a66fb73a464b6282f2716d30949d146862770452980c8101",
+    "skirmish_audit": "c4f395dd8853a41da1768c8752e7116159b7ccef3c1be44afe1def300f8616f1",
+    "portrait_export": "4fada5e59a37cbc1f74c920c4e8539c6c7c73fb0fdced11b21d1abcafee0b1bd"
+  },
+  "build_wall_seconds": 178.75209379196167,
+  "campaign_service": "rts-campaign-chain-foundation-20261010.service",
+  "historical_case_service": "rts-current244-failed-rechecks-20261010.service",
+  "final_steam_package_verified": false
+}
