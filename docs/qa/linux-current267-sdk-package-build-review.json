@@ -1,0 +1,34 @@
+{
+  "scope": "Current267 official Runtime4 SDK optimized archive build and integrity only; player, audio, performance and Windows acceptance pending",
+  "source_commit": "edd789865dad6d5bcbbcc2bdb2aa3f88adf6fc75",
+  "frozen_input_count": 617,
+  "asset_count": 332,
+  "native_pin_sha256": "6fbe1b04909806021007d9122b4a1d82debcc703a5bdf238667e8e5bd3bc6aa2",
+  "sdk_image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+  "sdk_actual_exit": 0,
+  "sdk_wall_seconds": 428.46505047401297,
+  "frozen_inputs_unchanged": true,
+  "raw_binary_sha256": "76b4c883f4311857be3131629c88ab0ed8c6640248d3bb1826da4a0700153fb7",
+  "packed_binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+  "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+  "archive_files": 381,
+  "package_actual_exit": 0,
+  "independent_integrity_exit": 0,
+  "sdk_compiled_dependency_count": 61,
+  "compiled_dependencies_sha256": "fd251635627a5e7a6c91546a99c4b22378c65d4669e6a290018abdfbac3080c7",
+  "independent_review": "617 frozen inputs, actual readonly /workspace compilation and dependency mapping, raw/packed/archive hashes and all332 extracted assets verified",
+  "first_package_attempt": {
+    "actual_exit": 1,
+    "path": "target/linux-current267-steamrt4-package-20261011",
+    "reason": "Root source-document refresh replaced SDK-specific runtime notice manifest; provider guard rejected packaging before archive creation."
+  },
+  "correction": "Fresh package-source02 restores complete exact-source SDK runtime notice directory from verified263 overlay; no recompile or change to sealed game binary.",
+  "sdk_notice_files": 17,
+  "rights_clearance": false,
+  "paths": {
+    "snapshot": "target/linux-current267-snapshot-20261011",
+    "build": "target/linux-current267-steamrt4-sdk-20261011",
+    "package": "target/linux-current267-steamrt4-package02-20261011",
+    "extract": "target/linux-current267-steamrt4-extracted02-20261011"
+  }
+}
