@@ -1,0 +1,32 @@
+{
+  "scope": "Independent currentnative bounded orders/mines/F1/F5 raw-proof checks; construction/weather/otherstatuses/finalpackage remain open",
+  "flows": [
+    {
+      "kind": "orders",
+      "creator_pid": 1475584,
+      "resume_pid": 1475939,
+      "save_sha256": "de0be59a8e45c021350fe43296a5e1a950457f2e37ca34dbb4e8ece475e1b262",
+      "binary_sha256": "758caf88f13307ba1b4a624b6b6d976274fa481afc67e64fd70d24c352d6e93d"
+    },
+    {
+      "kind": "mines",
+      "creator_pid": 1530731,
+      "resume_pid": 1533051,
+      "save_sha256": "9ff3d9398ccda9666ccd3892cf4808c2b29c0682e9e2b617cea897a4f295159f",
+      "binary_sha256": "c998f5b33fee01d20bd8accb50a3dea52f5a51f19de5477d5eb194b3e4a55ba0"
+    },
+    {
+      "kind": "effects",
+      "creator_pid": 1537601,
+      "resume_pid": 1538493,
+      "save_sha256": "35265a8770b6feb33635b62d231e718568a54706361cbde9d0263342ef19f21b",
+      "binary_sha256": "ad28098f2ec984cfc60bf7ce9e460226918b6a9840d98245afb3d133587f32e3"
+    }
+  ],
+  "mine_actual_damage": 4,
+  "mine_same_victim_and_causal_player_shot": true,
+  "shield_scale_exact": 0.25,
+  "effects_naturally_expired": true,
+  "raw_proof_record": "art/save/current-native-continuity-review.json",
+  "final_package_verified": false
+}
