@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 from pathlib import Path
@@ -1285,20 +1286,18 @@ def write_rust(registry: dict[str, object]) -> None:
     OUT_RS.write_text("\n".join(lines) + "\n")
 
 
-def write_reports(registry: dict[str, object]) -> None:
-    OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
-    OUT_JSON.write_text(json.dumps(registry, indent=2, sort_keys=True) + "\n")
-    removed_asset_paths = {
-        f"ui/icons/{entity_id}.png" for entity_id in REMOVED_ENTITY_IDS
-    }
+def write_runtime_asset_manifest() -> None:
+    asset_root = REPO_ROOT / "assets"
     source_assets = sorted(
-        str(path.relative_to(GODOT_ROOT / "assets"))
-        for path in (GODOT_ROOT / "assets").rglob("*")
+        path.relative_to(asset_root).as_posix()
+        for path in asset_root.rglob("*")
         if path.is_file()
         and path.suffix != ".import"
-        and str(path.relative_to(GODOT_ROOT / "assets")) not in removed_asset_paths
-        and not str(path.relative_to(GODOT_ROOT / "assets")).startswith("ui/kenney-crosshairs/")
+        and not path.name.endswith(".full.ttf")
     )
+    # Include the manifest itself even when generating a fresh checkout inventory.
+    manifest_path = OUT_ASSET_MANIFEST.relative_to(asset_root).as_posix()
+    source_assets = sorted(set(source_assets) | {manifest_path})
     asset_categories: dict[str, int] = {}
     for asset in source_assets:
         category = asset.split("/", 1)[0]
@@ -1306,7 +1305,9 @@ def write_reports(registry: dict[str, object]) -> None:
     OUT_ASSET_MANIFEST.write_text(
         json.dumps(
             {
-                "source": str(GODOT_ROOT / "assets"),
+                "schema": 1,
+                "source": "assets/",
+                "scope": "Current repository runtime files, including notices and migration metadata; excludes local full-font inputs and Godot import sidecars.",
                 "asset_count": len(source_assets),
                 "categories": dict(sorted(asset_categories.items())),
                 "assets": source_assets,
@@ -1316,6 +1317,12 @@ def write_reports(registry: dict[str, object]) -> None:
         )
         + "\n"
     )
+
+
+def write_reports(registry: dict[str, object]) -> None:
+    OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
+    OUT_JSON.write_text(json.dumps(registry, indent=2, sort_keys=True) + "\n")
+    write_runtime_asset_manifest()
     entities: list[dict[str, object]] = registry["entities"]  # type: ignore[assignment]
     factions: list[dict[str, object]] = registry["factions"]  # type: ignore[assignment]
     procedural_only = [
@@ -1381,4 +1388,12 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--asset-manifest-only", action="store_true",
+                        help="Refresh the current runtime inventory without the Godot source checkout")
+    args = parser.parse_args()
+    if args.asset_manifest_only:
+        OUT_ASSET_MANIFEST.parent.mkdir(parents=True, exist_ok=True)
+        write_runtime_asset_manifest()
+    else:
+        main()

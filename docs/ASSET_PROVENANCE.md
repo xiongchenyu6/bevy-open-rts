@@ -4,6 +4,13 @@ Current inventory update: 2026-10-10. The runtime tree contains 338 tracked file
 Historical import audits are distinguished below from current original assets;
 unidentified remaining families are not licensed by their presence in the tree.
 
+`assets/migration/asset_manifest.json` lists the current 338 runtime files,
+including notice documents and migration metadata. Refresh it with
+`python3 scripts/generate_registry.py --asset-manifest-only`; this does not need
+the historical Godot checkout. Local full-font inputs and `.import` sidecars are
+excluded. The previous imported-source listing is retained as historical audit
+evidence, rather than used as the current runtime inventory.
+
 ## Inventory and evidence
 
 The audit initially found **556 tracked files**. The restricted Lampe logo has

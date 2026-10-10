@@ -177,10 +177,10 @@
     },
     {
       "path": "assets/migration/asset_manifest.json",
-      "sha256": "8cecd676ebea359b91d80e24616ba5607ea815cde2dcaf09b5526751feae2484",
-      "comparison": "authored_derived_registry_metadata",
-      "provenance": "art/portraits/attachment_transforms.json",
-      "scope": "Current derived source metadata; no upstream byte-equality claim"
+      "sha256": "32075d8090a2ed8e2186fb995c44fbd692f1eef1d89e1f749c0782b26413e9d2",
+      "comparison": "authored_runtime_inventory",
+      "provenance": "scripts/generate_registry.py --asset-manifest-only",
+      "scope": "Current runtime file inventory, not imported Godot source membership"
     },
     {
       "path": "assets/migration/gameplay_registry.json",
@@ -5130,5 +5130,19 @@
         "comparison": "absent_from_upstream"
       }
     ]
-  }
+  },
+  "runtime_inventory_refresh_history": [
+    {
+      "before": {
+        "path": "assets/migration/asset_manifest.json",
+        "sha256": "8cecd676ebea359b91d80e24616ba5607ea815cde2dcaf09b5526751feae2484",
+        "comparison": "authored_derived_registry_metadata",
+        "provenance": "art/portraits/attachment_transforms.json",
+        "scope": "Current derived source metadata; no upstream byte-equality claim"
+      },
+      "after_sha256": "32075d8090a2ed8e2186fb995c44fbd692f1eef1d89e1f749c0782b26413e9d2",
+      "reason": "Replace stale import-source listing with actual338-file runtime inventory",
+      "historical_manifest": "target/asset-manifest-before-runtime-cleanup-20261010.json"
+    }
+  ]
 }
