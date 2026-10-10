@@ -1,11 +1,13 @@
 # Entity portrait export inventory
 
-`entities.json` identifies the 62 remaining entity portraits from the current
+`entities.json` identifies the 70 registry entity portraits from the current
 unresolved ledger by exact runtime path, registry ID, source line, scene,
 ModelMap entry, assembled model source and faction production membership.
-All 62 files exist; paths are unique, with no shared-icon aliases. The registry
-contains 70 entity icon paths in total; eight outside this replacement scope are
-listed separately. RosterPreview is a separate composition, not an entity ID.
+All 70 files exist; paths are unique, with no shared-icon aliases. Each row
+explicitly records provenance status: 62 unresolved and eight with already
+recorded provenance. A consistent full-model visual style should cover all 70;
+three preliminary exporter images do not complete this set. RosterPreview is
+a separate 71st asset-only composition task, not an entity ID.
 
 Faction choice prefers Alliance, then Demon, then Chaos among actual memberships.
 Neutral TechHospital, TechOilDerrick and TechRepairDepot have no production-faction

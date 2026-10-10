@@ -7,193 +7,10 @@
     "src/capture_api/portrait_export.rs": "89e4dd7c2448e16bd4838e32f470c21e28f1c96171ff70979bf325e4426717d6"
   },
   "registry_icon_count": 70,
-  "outside_replacement_scope": [
-    {
-      "runtime_path": "ui/icons/AircraftFactory.png",
-      "entity_id": "AircraftFactory",
-      "label": "Aircraft Factory",
-      "role": "Structure",
-      "available_factions": [
-        "alliance",
-        "demon",
-        "chaos"
-      ],
-      "portrait_faction": "alliance",
-      "registry_source": "src/generated_registry.rs:1694",
-      "scene_path": "res://source/match/units/AircraftFactory.tscn",
-      "model_assets": [
-        "models/kenney-spacekit/hangar_roundA.glb",
-        "models/kenney-spacekit/platform_large.glb",
-        "models/kenney-spacekit/satelliteDish_detailed.glb"
-      ],
-      "render_parts_symbol": "PARTS_AIRCRAFTFACTORY",
-      "registry_render_part_count": 3,
-      "model_map_source": "assets/data/godot_model_map.model_map.ron:48",
-      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
-    },
-    {
-      "runtime_path": "ui/icons/AntiAirTurret.png",
-      "entity_id": "AntiAirTurret",
-      "label": "Anti Air Turret",
-      "role": "Structure",
-      "available_factions": [
-        "alliance",
-        "demon"
-      ],
-      "portrait_faction": "alliance",
-      "registry_source": "src/generated_registry.rs:1750",
-      "scene_path": "res://source/match/units/AntiAirTurret.tscn",
-      "model_assets": [
-        "models/kenney-spacekit/turret_double.glb"
-      ],
-      "render_parts_symbol": "PARTS_ANTIAIRTURRET",
-      "registry_render_part_count": 1,
-      "model_map_source": "assets/data/godot_model_map.model_map.ron:72",
-      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
-    },
-    {
-      "runtime_path": "ui/icons/AntiGroundTurret.png",
-      "entity_id": "AntiGroundTurret",
-      "label": "Anti Ground Turret",
-      "role": "Structure",
-      "available_factions": [
-        "alliance",
-        "demon"
-      ],
-      "portrait_faction": "alliance",
-      "registry_source": "src/generated_registry.rs:1880",
-      "scene_path": "res://source/match/units/AntiGroundTurret.tscn",
-      "model_assets": [
-        "models/kenney-spacekit/turret_single.glb"
-      ],
-      "render_parts_symbol": "PARTS_ANTIGROUNDTURRET",
-      "registry_render_part_count": 1,
-      "model_map_source": "assets/data/godot_model_map.model_map.ron:108",
-      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
-    },
-    {
-      "runtime_path": "ui/icons/CommandCenter.png",
-      "entity_id": "CommandCenter",
-      "label": "Command Center",
-      "role": "Structure",
-      "available_factions": [
-        "alliance",
-        "demon",
-        "chaos"
-      ],
-      "portrait_faction": "alliance",
-      "registry_source": "src/generated_registry.rs:2131",
-      "scene_path": "res://source/match/units/CommandCenter.tscn",
-      "model_assets": [
-        "models/kenney-spacekit/barrels.glb",
-        "models/kenney-spacekit/corridor.glb",
-        "models/kenney-spacekit/corridor_corner.glb",
-        "models/kenney-spacekit/corridor_cornerRoundWindow.glb",
-        "models/kenney-spacekit/corridor_cross.glb",
-        "models/kenney-spacekit/corridor_detailed.glb",
-        "models/kenney-spacekit/corridor_end.glb",
-        "models/kenney-spacekit/corridor_open.glb",
-        "models/kenney-spacekit/corridor_windowClosed.glb",
-        "models/kenney-spacekit/machine_generator.glb",
-        "models/kenney-spacekit/machine_wireless.glb"
-      ],
-      "render_parts_symbol": "PARTS_COMMANDCENTER",
-      "registry_render_part_count": 14,
-      "model_map_source": "assets/data/godot_model_map.model_map.ron:210",
-      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
-    },
-    {
-      "runtime_path": "ui/icons/Drone.png",
-      "entity_id": "Drone",
-      "label": "Drone",
-      "role": "Unit",
-      "available_factions": [
-        "alliance",
-        "chaos"
-      ],
-      "portrait_faction": "alliance",
-      "registry_source": "src/generated_registry.rs:2252",
-      "scene_path": "res://source/match/units/Drone.tscn",
-      "model_assets": [
-        "models/kenney-spacekit/craft_speederA.glb"
-      ],
-      "render_parts_symbol": "PARTS_DRONE",
-      "registry_render_part_count": 1,
-      "model_map_source": "assets/data/godot_model_map.model_map.ron:330",
-      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
-    },
-    {
-      "runtime_path": "ui/icons/Helicopter.png",
-      "entity_id": "Helicopter",
-      "label": "Helicopter",
-      "role": "Unit",
-      "available_factions": [
-        "alliance",
-        "demon"
-      ],
-      "portrait_faction": "alliance",
-      "registry_source": "src/generated_registry.rs:3061",
-      "scene_path": "res://source/match/units/Helicopter.tscn",
-      "model_assets": [
-        "models/kenney-spacekit/craft_racer.glb"
-      ],
-      "render_parts_symbol": "PARTS_HELICOPTER",
-      "registry_render_part_count": 1,
-      "model_map_source": "assets/data/godot_model_map.model_map.ron:666",
-      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
-    },
-    {
-      "runtime_path": "ui/icons/Tank.png",
-      "entity_id": "Tank",
-      "label": "Tank",
-      "role": "Unit",
-      "available_factions": [
-        "alliance",
-        "demon"
-      ],
-      "portrait_faction": "alliance",
-      "registry_source": "src/generated_registry.rs:5450",
-      "scene_path": "res://source/match/units/Tank.tscn",
-      "model_assets": [],
-      "render_parts_symbol": "",
-      "registry_render_part_count": 0,
-      "model_map_source": "assets/data/godot_model_map.model_map.ron:1692",
-      "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
-    },
-    {
-      "runtime_path": "ui/icons/VehicleFactory.png",
-      "entity_id": "VehicleFactory",
-      "label": "Vehicle Factory",
-      "role": "Structure",
-      "available_factions": [
-        "alliance",
-        "demon",
-        "chaos"
-      ],
-      "portrait_faction": "alliance",
-      "registry_source": "src/generated_registry.rs:5990",
-      "scene_path": "res://source/match/units/VehicleFactory.tscn",
-      "model_assets": [
-        "models/kenney-spacekit/gate_complex.glb",
-        "models/kenney-spacekit/hangar_largeA.glb",
-        "models/kenney-spacekit/platform_large.glb"
-      ],
-      "render_parts_symbol": "PARTS_VEHICLEFACTORY",
-      "registry_render_part_count": 3,
-      "model_map_source": "assets/data/godot_model_map.model_map.ron:1986",
-      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
-    }
-  ],
-  "entity_count": 62,
-  "unique_runtime_paths": 62,
+  "unresolved_count": 62,
+  "already_provenance_count": 8,
+  "entity_count": 70,
+  "unique_runtime_paths": 70,
   "shared_icon_paths": {},
   "missing_faction_membership": [
     "TechHospital",
@@ -225,7 +42,58 @@
       "registry_render_part_count": 5,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:6",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
+    },
+    {
+      "runtime_path": "ui/icons/AircraftFactory.png",
+      "entity_id": "AircraftFactory",
+      "label": "Aircraft Factory",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:1694",
+      "scene_path": "res://source/match/units/AircraftFactory.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/hangar_roundA.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/satelliteDish_detailed.glb"
+      ],
+      "render_parts_symbol": "PARTS_AIRCRAFTFACTORY",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:48",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "already_provenance_recorded",
+      "ownership": "faction_roster"
+    },
+    {
+      "runtime_path": "ui/icons/AntiAirTurret.png",
+      "entity_id": "AntiAirTurret",
+      "label": "Anti Air Turret",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:1750",
+      "scene_path": "res://source/match/units/AntiAirTurret.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/turret_double.glb"
+      ],
+      "render_parts_symbol": "PARTS_ANTIAIRTURRET",
+      "registry_render_part_count": 1,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:72",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "already_provenance_recorded",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/AntiAirWalker.png",
@@ -248,7 +116,32 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:84",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
+    },
+    {
+      "runtime_path": "ui/icons/AntiGroundTurret.png",
+      "entity_id": "AntiGroundTurret",
+      "label": "Anti Ground Turret",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:1880",
+      "scene_path": "res://source/match/units/AntiGroundTurret.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/turret_single.glb"
+      ],
+      "render_parts_symbol": "PARTS_ANTIGROUNDTURRET",
+      "registry_render_part_count": 1,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:108",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "already_provenance_recorded",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/ArcCoilDefenseTower.png",
@@ -273,7 +166,9 @@
       "registry_render_part_count": 4,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:120",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/Barracks.png",
@@ -298,7 +193,9 @@
       "registry_render_part_count": 4,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:162",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/BomberVTOL.png",
@@ -319,7 +216,43 @@
       "registry_render_part_count": 1,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:198",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
+    },
+    {
+      "runtime_path": "ui/icons/CommandCenter.png",
+      "entity_id": "CommandCenter",
+      "label": "Command Center",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2131",
+      "scene_path": "res://source/match/units/CommandCenter.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/barrels.glb",
+        "models/kenney-spacekit/corridor.glb",
+        "models/kenney-spacekit/corridor_corner.glb",
+        "models/kenney-spacekit/corridor_cornerRoundWindow.glb",
+        "models/kenney-spacekit/corridor_cross.glb",
+        "models/kenney-spacekit/corridor_detailed.glb",
+        "models/kenney-spacekit/corridor_end.glb",
+        "models/kenney-spacekit/corridor_open.glb",
+        "models/kenney-spacekit/corridor_windowClosed.glb",
+        "models/kenney-spacekit/machine_generator.glb",
+        "models/kenney-spacekit/machine_wireless.glb"
+      ],
+      "render_parts_symbol": "PARTS_COMMANDCENTER",
+      "registry_render_part_count": 14,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:210",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "already_provenance_recorded",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/CryoSprayer.png",
@@ -343,7 +276,32 @@
       "registry_render_part_count": 4,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:300",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
+    },
+    {
+      "runtime_path": "ui/icons/Drone.png",
+      "entity_id": "Drone",
+      "label": "Drone",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2252",
+      "scene_path": "res://source/match/units/Drone.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/craft_speederA.glb"
+      ],
+      "render_parts_symbol": "PARTS_DRONE",
+      "registry_render_part_count": 1,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:330",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "already_provenance_recorded",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/DroneMineLayer.png",
@@ -362,7 +320,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:342",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/EngineerDrone.png",
@@ -385,7 +345,9 @@
       "registry_render_part_count": 2,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:360",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/FieldMedic.png",
@@ -407,7 +369,9 @@
       "registry_render_part_count": 2,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:378",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/FlakHoverTank.png",
@@ -426,7 +390,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:396",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/FlakRocketTeam.png",
@@ -448,7 +414,9 @@
       "registry_render_part_count": 4,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:426",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/FlakRocketTeamMk2.png",
@@ -470,7 +438,9 @@
       "registry_render_part_count": 4,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:456",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/FlameAssaultBuggy.png",
@@ -489,7 +459,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:486",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/GrenadierTrooper.png",
@@ -512,7 +484,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:522",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/HammerSiegeTank.png",
@@ -531,7 +505,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:540",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/HeavyBombardmentAirship.png",
@@ -553,7 +529,9 @@
       "registry_render_part_count": 1,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:576",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/HeavyMachinegunTrooper.png",
@@ -575,7 +553,9 @@
       "registry_render_part_count": 2,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:588",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/HeavySiegeWalker.png",
@@ -600,7 +580,32 @@
       "registry_render_part_count": 9,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:606",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
+    },
+    {
+      "runtime_path": "ui/icons/Helicopter.png",
+      "entity_id": "Helicopter",
+      "label": "Helicopter",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3061",
+      "scene_path": "res://source/match/units/Helicopter.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/craft_racer.glb"
+      ],
+      "render_parts_symbol": "PARTS_HELICOPTER",
+      "registry_render_part_count": 1,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:666",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "already_provenance_recorded",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/InterceptorVTOL.png",
@@ -621,7 +626,9 @@
       "registry_render_part_count": 1,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:678",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/JammerVehicle.png",
@@ -640,7 +647,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:690",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/LanceBeamDefenseTower.png",
@@ -664,7 +673,9 @@
       "registry_render_part_count": 4,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:714",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/LanceBeamTank.png",
@@ -683,7 +694,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:750",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/LightRifleInfantry.png",
@@ -705,7 +718,9 @@
       "registry_render_part_count": 2,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:792",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/LongbowMissileCrawler.png",
@@ -724,7 +739,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:810",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/MirageScoutTank.png",
@@ -743,7 +760,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:864",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/MobileRepairCrawler.png",
@@ -762,7 +781,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:888",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/MobileShieldProjector.png",
@@ -781,7 +802,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:912",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/ModularMissileCarrier.png",
@@ -800,7 +823,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:942",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/MortarTeam.png",
@@ -823,7 +848,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:972",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/OrePurifier.png",
@@ -848,7 +875,9 @@
       "registry_render_part_count": 4,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:996",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/PhaseSaboteur.png",
@@ -871,7 +900,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1032",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/PowerReactor.png",
@@ -896,7 +927,9 @@
       "registry_render_part_count": 5,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1056",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/PrismDefenseObelisk.png",
@@ -920,7 +953,9 @@
       "registry_render_part_count": 4,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1092",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/PulseRifleCommando.png",
@@ -943,7 +978,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1128",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/RadarUplink.png",
@@ -968,7 +1005,9 @@
       "registry_render_part_count": 4,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1146",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/RailArtilleryWalker.png",
@@ -993,7 +1032,9 @@
       "registry_render_part_count": 8,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1176",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/RailCannonBunker.png",
@@ -1017,7 +1058,9 @@
       "registry_render_part_count": 4,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1230",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/RailSniperTeam.png",
@@ -1039,7 +1082,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1266",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/RailgunTank.png",
@@ -1058,7 +1103,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1290",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/Refinery.png",
@@ -1084,7 +1131,9 @@
       "registry_render_part_count": 5,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1326",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/RepairPad.png",
@@ -1108,7 +1157,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1368",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/RoboticsBay.png",
@@ -1132,7 +1183,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1410",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/RocketGunship.png",
@@ -1154,7 +1207,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1440",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/RocketInfantry.png",
@@ -1177,7 +1232,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1464",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/RocketTrooperRobot.png",
@@ -1200,7 +1257,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1482",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/SaboteurInfiltrator.png",
@@ -1223,7 +1282,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1500",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/ScoutRover.png",
@@ -1243,7 +1304,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1524",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/ShieldTrooper.png",
@@ -1265,7 +1328,9 @@
       "registry_render_part_count": 2,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1536",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/ShockTrooper.png",
@@ -1288,7 +1353,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1554",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/SiegeAirship.png",
@@ -1311,7 +1378,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1578",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/SiegeArtilleryVehicle.png",
@@ -1330,7 +1399,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1602",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/SiegeDrillTank.png",
@@ -1349,7 +1420,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1626",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/SniperScout.png",
@@ -1371,7 +1444,9 @@
       "registry_render_part_count": 2,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1650",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/TacticalOfficer.png",
@@ -1394,7 +1469,30 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1668",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
+    },
+    {
+      "runtime_path": "ui/icons/Tank.png",
+      "entity_id": "Tank",
+      "label": "Tank",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5450",
+      "scene_path": "res://source/match/units/Tank.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1692",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "already_provenance_recorded",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/TechHospital.png",
@@ -1415,7 +1513,9 @@
       "registry_render_part_count": 4,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1776",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "neutral"
     },
     {
       "runtime_path": "ui/icons/TechLab.png",
@@ -1439,7 +1539,9 @@
       "registry_render_part_count": 3,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1812",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/TechOilDerrick.png",
@@ -1461,7 +1563,9 @@
       "registry_render_part_count": 6,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1842",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "neutral"
     },
     {
       "runtime_path": "ui/icons/TechRepairDepot.png",
@@ -1484,7 +1588,9 @@
       "registry_render_part_count": 8,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1896",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "neutral"
     },
     {
       "runtime_path": "ui/icons/TeslaCrawlerMk2.png",
@@ -1503,7 +1609,9 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1950",
       "assembly_source": "src/tank_models.rs::spawn_tank_model",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/TeslaFenceSegment.png",
@@ -1522,7 +1630,35 @@
       "registry_render_part_count": 0,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1980",
       "assembly_source": "authored Tesla geometry through normal spawn/model processing",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
+    },
+    {
+      "runtime_path": "ui/icons/VehicleFactory.png",
+      "entity_id": "VehicleFactory",
+      "label": "Vehicle Factory",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5990",
+      "scene_path": "res://source/match/units/VehicleFactory.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/gate_complex.glb",
+        "models/kenney-spacekit/hangar_largeA.glb",
+        "models/kenney-spacekit/platform_large.glb"
+      ],
+      "render_parts_symbol": "PARTS_VEHICLEFACTORY",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1986",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "already_provenance_recorded",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/WeatherControlSpire.png",
@@ -1548,7 +1684,9 @@
       "registry_render_part_count": 5,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:1998",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     },
     {
       "runtime_path": "ui/icons/Worker.png",
@@ -1571,7 +1709,9 @@
       "registry_render_part_count": 2,
       "model_map_source": "assets/data/godot_model_map.model_map.ron:2040",
       "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
-      "render_input": "full actual assembled game geometry; never legacy PNG"
+      "render_input": "full actual assembled game geometry; never legacy PNG",
+      "provenance_status": "unresolved",
+      "ownership": "faction_roster"
     }
   ],
   "roster_preview": {
