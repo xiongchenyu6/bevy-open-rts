@@ -599,6 +599,10 @@ pub(crate) fn spawn_faction_identity_marker(
     });
 }
 
+/// Contextual ground indicator; never part of the registered model body.
+#[derive(Component)]
+pub(crate) struct ContextualFactionMarker;
+
 pub(crate) fn spawn_faction_identity_marker_model(
     world: &mut World,
     root: Entity,
@@ -636,7 +640,7 @@ pub(crate) fn spawn_faction_identity_marker_model(
             ) else {
                 return;
             };
-            spawn_procedural_mesh_child(
+            let marker_entity = spawn_procedural_mesh_child(
                 world,
                 root,
                 "Human Faction Command Plate",
@@ -644,7 +648,10 @@ pub(crate) fn spawn_faction_identity_marker_model(
                 blue_material,
                 Transform::from_translation(local_offset),
             );
-            spawn_procedural_mesh_child(
+            world
+                .entity_mut(marker_entity)
+                .insert(ContextualFactionMarker);
+            let marker_entity = spawn_procedural_mesh_child(
                 world,
                 root,
                 "Human Faction Signal Mast",
@@ -652,6 +659,9 @@ pub(crate) fn spawn_faction_identity_marker_model(
                 white_material,
                 Transform::from_translation(local_offset + Vec3::Y * size * 0.36),
             );
+            world
+                .entity_mut(marker_entity)
+                .insert(ContextualFactionMarker);
         }
         FactionIdentityMarker::Demon => {
             let Some(spike_mesh) = add_procedural_mesh(
@@ -680,7 +690,7 @@ pub(crate) fn spawn_faction_identity_marker_model(
                 ("Demon Faction Center Spike", 0.0),
                 ("Demon Faction Right Spike", 0.42),
             ] {
-                spawn_procedural_mesh_child(
+                let marker_entity = spawn_procedural_mesh_child(
                     world,
                     root,
                     name,
@@ -690,6 +700,9 @@ pub(crate) fn spawn_faction_identity_marker_model(
                         local_offset + Vec3::new(x * size, size * 0.44, 0.0),
                     ),
                 );
+                world
+                    .entity_mut(marker_entity)
+                    .insert(ContextualFactionMarker);
             }
         }
         FactionIdentityMarker::Chaos => {
@@ -728,7 +741,7 @@ pub(crate) fn spawn_faction_identity_marker_model(
             ) else {
                 return;
             };
-            spawn_procedural_mesh_child(
+            let marker_entity = spawn_procedural_mesh_child(
                 world,
                 root,
                 "Chaos Faction Energy Ring",
@@ -737,7 +750,10 @@ pub(crate) fn spawn_faction_identity_marker_model(
                 Transform::from_translation(local_offset + Vec3::Y * size * 0.18)
                     .with_rotation(Quat::from_rotation_x(std::f32::consts::FRAC_PI_2)),
             );
-            spawn_procedural_mesh_child(
+            world
+                .entity_mut(marker_entity)
+                .insert(ContextualFactionMarker);
+            let marker_entity = spawn_procedural_mesh_child(
                 world,
                 root,
                 "Chaos Faction Core",
@@ -745,6 +761,9 @@ pub(crate) fn spawn_faction_identity_marker_model(
                 core_material,
                 Transform::from_translation(local_offset + Vec3::Y * size * 0.18),
             );
+            world
+                .entity_mut(marker_entity)
+                .insert(ContextualFactionMarker);
         }
     }
 }
@@ -950,14 +969,16 @@ pub(crate) fn spawn_procedural_mesh_child(
     mesh: Handle<Mesh>,
     material: Handle<StandardMaterial>,
     transform: Transform,
-) {
-    world.spawn((
-        Name::new(name),
-        ChildOf(root),
-        Mesh3d(mesh),
-        MeshMaterial3d(material),
-        transform,
-    ));
+) -> Entity {
+    world
+        .spawn((
+            Name::new(name),
+            ChildOf(root),
+            Mesh3d(mesh),
+            MeshMaterial3d(material),
+            transform,
+        ))
+        .id()
 }
 
 pub(crate) fn unit_vision_radius(def: &registry::EntityDef) -> f32 {

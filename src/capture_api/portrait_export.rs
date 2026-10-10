@@ -126,6 +126,24 @@ fn descendants(world: &World, root: Entity) -> Vec<Entity> {
     all
 }
 
+fn model_entities(world: &World, root: Entity) -> Vec<Entity> {
+    descendants(world, root)
+        .into_iter()
+        .filter(|entity| world.get::<ContextualFactionMarker>(*entity).is_none())
+        .collect()
+}
+
+fn hide_contextual_markers(world: &mut World, root: Entity) -> usize {
+    let markers: Vec<_> = descendants(world, root)
+        .into_iter()
+        .filter(|entity| world.get::<ContextualFactionMarker>(*entity).is_some())
+        .collect();
+    for entity in &markers {
+        world.entity_mut(*entity).insert(Visibility::Hidden);
+    }
+    markers.len()
+}
+
 fn texture_ready(server: &AssetServer, image: Option<&Handle<Image>>) -> bool {
     image.is_none_or(|image| server.is_loaded_with_dependencies(image.id()))
 }
@@ -200,7 +218,7 @@ fn geometry(app: &App, root: Entity) -> Result<(serde_json::Value, Vec<Vec3>), S
     let server = world.resource::<AssetServer>();
     let mut rows = Vec::new();
     let mut corners = Vec::new();
-    for entity in descendants(world, root) {
+    for entity in model_entities(world, root) {
         let Some(handle) = world.get::<Mesh3d>(entity) else {
             continue;
         };
@@ -245,7 +263,7 @@ fn geometry(app: &App, root: Entity) -> Result<(serde_json::Value, Vec<Vec3>), S
     }
     rows.sort_by_key(|value| value.to_string());
     Ok((
-        serde_json::json!({"mesh_count":rows.len(),"meshes":rows}),
+        serde_json::json!({"mesh_count":rows.len(),"meshes":rows,"reference_scope":"model meshes/materials only; contextual faction markers excluded","excluded_contextual_marker_count":descendants(world,root).iter().filter(|entity|world.get::<ContextualFactionMarker>(**entity).is_some()).count()}),
         corners,
     ))
 }
@@ -407,6 +425,7 @@ pub fn export_portrait_stage(
             let mut app = renderer_app();
             let root = spawn_actual_model(&mut app, id, faction);
             settle(&mut app, root, id)?;
+            let excluded_markers = hide_contextual_markers(app.world_mut(), root);
             let (signature, corners) = geometry(&app, root)?;
             if signature != reference {
                 return Err(format!(
@@ -440,7 +459,7 @@ pub fn export_portrait_stage(
                 .result
                 .take()
                 .ok_or("portrait readback timed out")??;
-            reports.push(serde_json::json!({"id":id,"run":run,"runtime_path":runtime_path,"faction":faction_name,"palette_slot":0,"geometry":signature,"camera":camera,"alpha":alpha,"image":path,"stage_only":true,"asset_only_full_game_reference_verified":true,"live_gameplay_reference_verified":false,"backend":backend,"light":{"illuminance":16000,"position":[-6,14,7]}}));
+            reports.push(serde_json::json!({"id":id,"run":run,"runtime_path":runtime_path,"faction":faction_name,"palette_slot":0,"geometry":signature,"reference_scope":"model-only parity; not whole-scene parity","excluded_contextual_marker_count":excluded_markers,"camera":camera,"alpha":alpha,"image":path,"stage_only":true,"asset_only_full_game_reference_verified":true,"live_gameplay_reference_verified":false,"backend":backend,"light":{"illuminance":16000,"position":[-6,14,7]}}));
             std::fs::write(
                 directory.join("manifest.json"),
                 serde_json::to_vec_pretty(&reports).unwrap(),
@@ -451,4 +470,72 @@ pub fn export_portrait_stage(
     Ok(
         serde_json::json!({"portraits":reports,"runtime_replaced":false,"gameplay_progression_claimed":false}),
     )
+}
+
+#[cfg(test)]
+mod marker_tests {
+    use super::*;
+    #[test]
+    fn portraits_exclude_only_contextual_markers_and_preserve_actual_tank_and_glb_children() {
+        for (faction, count) in [
+            (FactionIdentityMarker::Human, 2),
+            (FactionIdentityMarker::Demon, 3),
+            (FactionIdentityMarker::Chaos, 2),
+        ] {
+            let mut world = World::new();
+            world.init_resource::<Assets<Mesh>>();
+            world.init_resource::<Assets<StandardMaterial>>();
+            let root = world
+                .spawn((Transform::default(), Visibility::default()))
+                .id();
+            assert!(spawn_tank_model(&mut world, root, "Tank"));
+            let part = world
+                .spawn((
+                    ChildOf(root),
+                    WorldAssetRoot(Handle::default()),
+                    Transform::default(),
+                ))
+                .id();
+            let mesh = world
+                .resource_mut::<Assets<Mesh>>()
+                .add(Cuboid::new(0.1, 0.1, 0.1));
+            let material = world
+                .resource_mut::<Assets<StandardMaterial>>()
+                .add(StandardMaterial::default());
+            let accessory = spawn_procedural_mesh_child(
+                &mut world,
+                part,
+                "registered GLB accessory",
+                mesh,
+                material,
+                Transform::default(),
+            );
+            let models_before = model_entities(&world, root);
+            spawn_faction_identity_marker_model(&mut world, root, faction, Vec3::ZERO, 0.2);
+            let markers: Vec<_> = descendants(&world, root)
+                .into_iter()
+                .filter(|e| world.get::<ContextualFactionMarker>(*e).is_some())
+                .collect();
+            assert_eq!(markers.len(), count);
+            assert!(markers.iter().all(|e| {
+                world
+                    .get::<Visibility>(*e)
+                    .is_none_or(|v| *v != Visibility::Hidden)
+            }));
+            assert_eq!(model_entities(&world, root), models_before);
+            assert!(models_before.contains(&accessory));
+            assert!(models_before.iter().any(|e| {
+                world
+                    .get::<Name>(*e)
+                    .is_some_and(|n| n.as_str() == "tank hull")
+            }));
+            assert_eq!(hide_contextual_markers(&mut world, root), count);
+            assert!(
+                markers
+                    .iter()
+                    .all(|e| world.get::<Visibility>(*e) == Some(&Visibility::Hidden))
+            );
+            assert_eq!(model_entities(&world, root), models_before);
+        }
+    }
 }

@@ -481,6 +481,12 @@ def parse_scene(scene_file: Path) -> dict[str, object]:
         and Path(path).suffix.lower() in {".glb", ".png", ".ogg", ".wav"}
     ]
     render_parts = extract_render_parts(scene_file)
+    authored = json.loads((REPO_ROOT / "art/portraits/attachment_transforms.json").read_text())["entities"]
+    for part_index, part in enumerate(render_parts):
+        corrections = authored.get(scene_file.stem, {})
+        translation = corrections.get(f'{part["model"]}#{part_index}', corrections.get(part["model"]))
+        if translation is not None:
+            part["translation"] = translation
     model_assets = sorted({part["model"] for part in render_parts})
     media_assets = sorted({asset for asset in asset_paths if not asset.endswith(".glb")})
     movement_block = node_block(text, "Movement")

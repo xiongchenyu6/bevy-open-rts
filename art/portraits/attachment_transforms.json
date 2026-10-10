@@ -1,0 +1,569 @@
+{
+  "scope": "Real assembled-model contact corrections based on raw GLB bounds; no gameplay stat/portrait-only changes",
+  "entities": {
+    "CryoSprayer": {
+      "models/kenney-spacekit/weapon_gun.glb": [
+        -0.32,
+        0.28,
+        -1.675
+      ],
+      "models/kenney-spacekit/barrel.glb": [
+        0.44,
+        0.27,
+        0.37
+      ],
+      "models/kenney-spacekit/machine_barrel.glb": [
+        0.63,
+        0.25,
+        0.46
+      ]
+    },
+    "FieldMedic": {
+      "models/kenney-spacekit/machine_wireless.glb": [
+        -0.48,
+        0.25,
+        -0.26
+      ]
+    },
+    "AntiAirWalker": {
+      "models/kenney-spacekit/turret_double.glb": [
+        -1.3,
+        0.62,
+        -1.005
+      ],
+      "models/kenney-spacekit/satelliteDish.glb": [
+        -0.71,
+        0.57,
+        -0.53
+      ]
+    },
+    "FlakRocketTeam": {
+      "models/kenney-spacekit/weapon_gun.glb#2": [
+        -0.010321,
+        0.19322,
+        -1.279152
+      ],
+      "models/kenney-spacekit/weapon_gun.glb#3": [
+        0.583494,
+        0.179894,
+        -0.653176
+      ]
+    },
+    "FlakRocketTeamMk2": {
+      "models/kenney-spacekit/weapon_rifle.glb#2": [
+        -0.427229,
+        0.199882,
+        -0.92964
+      ],
+      "models/kenney-spacekit/weapon_rifle.glb#3": [
+        0.328133,
+        0.189888,
+        -0.318908
+      ]
+    },
+    "GrenadierTrooper": {
+      "models/kenney-spacekit/barrel.glb#1": [
+        0.54,
+        0.199882,
+        0.462471
+      ],
+      "models/kenney-spacekit/weapon_gun.glb#2": [
+        0.272771,
+        0.199882,
+        -0.04464
+      ]
+    },
+    "HeavyMachinegunTrooper": {
+      "models/kenney-spacekit/weapon_gun.glb#1": [
+        -0.314859,
+        0.226533,
+        -0.416592
+      ]
+    },
+    "LightRifleInfantry": {
+      "models/kenney-spacekit/weapon_rifle.glb#1": [
+        -0.200321,
+        0.19322,
+        -0.304152
+      ]
+    },
+    "PhaseSaboteur": {
+      "models/kenney-spacekit/machine_wireless.glb#1": [
+        0.49,
+        0.179894,
+        0.44
+      ],
+      "models/kenney-spacekit/weapon_rifle.glb#2": [
+        -0.266506,
+        0.179894,
+        -0.523176
+      ]
+    },
+    "PulseRifleCommando": {
+      "models/kenney-spacekit/machine_generator.glb#1": [
+        0.579,
+        0.206545,
+        0.52305
+      ],
+      "models/kenney-spacekit/weapon_rifle.glb#2": [
+        -0.734136,
+        0.206545,
+        -0.715128
+      ]
+    },
+    "RocketInfantry": {
+      "models/kenney-spacekit/rocket_fuelA.glb#1": [
+        0.545864,
+        0.206545,
+        0.154872
+      ],
+      "models/kenney-spacekit/rocket_topA.glb#2": [
+        0.585864,
+        0.206545,
+        0.274872
+      ]
+    },
+    "RocketTrooperRobot": {
+      "models/kenney-spacekit/machine_generator.glb#1": [
+        0.528,
+        0.198317,
+        0.4756
+      ],
+      "models/kenney-spacekit/rocket_topB.glb#2": [
+        0.526587,
+        0.198317,
+        0.246336
+      ]
+    },
+    "SaboteurInfiltrator": {
+      "models/kenney-spacekit/machine_generator.glb#1": [
+        0.4775,
+        0.173231,
+        0.429875
+      ],
+      "models/kenney-spacekit/weapon_gun.glb#2": [
+        0.010402,
+        0.173231,
+        -0.582688
+      ]
+    },
+    "ShieldTrooper": {
+      "models/kenney-spacekit/machine_generator.glb#1": [
+        0.561,
+        0.219871,
+        0.52195
+      ]
+    },
+    "ShockTrooper": {
+      "models/kenney-spacekit/weapon_gun.glb#1": [
+        -0.014136,
+        0.206545,
+        -0.895128
+      ],
+      "models/kenney-spacekit/machine_generator.glb#2": [
+        0.579,
+        0.206545,
+        0.52305
+      ]
+    },
+    "SniperScout": {
+      "models/kenney-spacekit/weapon_rifle.glb#1": [
+        -0.633413,
+        0.186557,
+        -0.623664
+      ]
+    },
+    "TacticalOfficer": {
+      "models/kenney-spacekit/weapon_rifle.glb#1": [
+        0.079679,
+        0.19322,
+        -0.304152
+      ],
+      "models/kenney-spacekit/satelliteDish.glb#2": [
+        0.61,
+        0.19322,
+        0.534776
+      ]
+    },
+    "Worker": {
+      "models/kenney-spacekit/machine_wireless.glb#1": [
+        -0.4,
+        0.213208,
+        -0.132
+      ]
+    },
+    "RailSniperTeam": {
+      "models/kenney-spacekit/weapon_rifle.glb#2": [
+        -0.570321,
+        0.19322,
+        -1.369152
+      ]
+    },
+    "Refinery": {
+      "models/kenney-spacekit/structure_closed.glb#1": [
+        -0.4,
+        0.07,
+        -0.25
+      ],
+      "models/kenney-spacekit/chimney.glb#2": [
+        1.2,
+        1.22,
+        0.825
+      ],
+      "models/kenney-spacekit/machine_barrelLarge.glb#3": [
+        0.85,
+        0.07,
+        0.55
+      ],
+      "models/kenney-spacekit/barrels_rail.glb#4": [
+        0.9,
+        0.07,
+        -0.7
+      ]
+    },
+    "RepairPad": {
+      "models/kenney-spacekit/gate_complex.glb#1": [
+        0.95,
+        0.07,
+        4.7
+      ],
+      "models/kenney-spacekit/machine_wirelessCable.glb#2": [
+        1.0,
+        0.07,
+        0.85
+      ]
+    },
+    "PrismDefenseObelisk": {
+      "models/kenney-spacekit/structure_closed.glb#1": [
+        0.0,
+        0.07,
+        0.0
+      ],
+      "models/kenney-spacekit/rock_crystalsLargeA.glb#2": [
+        -0.618615,
+        1.07,
+        -0.458609
+      ],
+      "models/kenney-spacekit/satelliteDish.glb#3": [
+        0.68,
+        0.07,
+        -0.155076
+      ]
+    },
+    "MortarTeam": {
+      "models/kenney-spacekit/rocket_baseA.glb#1": [
+        0.26,
+        0.431936,
+        -0.549721
+      ],
+      "models/kenney-spacekit/barrels.glb#2": [
+        0.43,
+        0.0,
+        0.34425
+      ]
+    },
+    "PowerReactor": {
+      "models/kenney-spacekit/machine_generatorLarge.glb#1": [
+        -0.35,
+        0.07,
+        0.0
+      ],
+      "models/kenney-spacekit/rocket_fuelB.glb#2": [
+        0.9,
+        0.07,
+        -0.6
+      ],
+      "models/kenney-spacekit/rocket_fuelB.glb#3": [
+        0.9,
+        0.07,
+        0.6
+      ],
+      "models/kenney-spacekit/chimney_detailed.glb#4": [
+        0.79,
+        0.07,
+        1.135
+      ]
+    },
+    "AircraftFactory": {
+      "models/kenney-spacekit/hangar_roundA.glb#1": [
+        0.0,
+        0.07,
+        0.0
+      ]
+    },
+    "ArcCoilDefenseTower": {
+      "models/kenney-spacekit/structure_closed.glb#1": [
+        0.0,
+        0.07,
+        0.0
+      ],
+      "models/kenney-spacekit/machine_generatorLarge.glb#2": [
+        0.0,
+        1.36,
+        0.0
+      ]
+    },
+    "Barracks": {
+      "models/kenney-spacekit/hangar_smallB.glb#1": [
+        0.0,
+        0.07,
+        -0.15
+      ],
+      "models/kenney-spacekit/gate_simple.glb#2": [
+        0.0,
+        0.36,
+        1.86
+      ]
+    },
+    "HeavySiegeWalker": {
+      "models/kenney-spacekit/supports_low.glb#5": [
+        -0.999,
+        -0.0122,
+        -0.6068
+      ],
+      "models/kenney-spacekit/supports_low.glb#6": [
+        -0.074,
+        -0.0122,
+        -0.6068
+      ],
+      "models/kenney-spacekit/supports_low.glb#7": [
+        -0.999,
+        -0.0122,
+        0.333
+      ],
+      "models/kenney-spacekit/supports_low.glb#8": [
+        -0.074,
+        -0.0122,
+        0.333
+      ],
+      "models/kenney-spacekit/weapon_gun.glb#2": [
+        -0.74,
+        0.8288,
+        -1.844275
+      ],
+      "models/kenney-spacekit/weapon_gun.glb#3": [
+        -0.6649,
+        0.8288,
+        -1.591
+      ]
+    },
+    "LanceBeamDefenseTower": {
+      "models/kenney-spacekit/structure_closed.glb#1": [
+        0.0,
+        0.07,
+        0.0
+      ],
+      "models/kenney-spacekit/turret_single.glb#2": [
+        0.0,
+        1.21,
+        0.0
+      ]
+    },
+    "OrePurifier": {
+      "models/kenney-spacekit/structure_detailed.glb#1": [
+        -0.35,
+        0.07,
+        -0.25
+      ],
+      "models/kenney-spacekit/barrels_rail.glb#3": [
+        0.9,
+        0.36,
+        -0.712667
+      ]
+    },
+    "RadarUplink": {
+      "models/kenney-spacekit/structure_closed.glb#1": [
+        0.0,
+        0.07,
+        0.15
+      ],
+      "models/kenney-spacekit/satelliteDish_large.glb#2": [
+        0.0,
+        0.91,
+        0.15
+      ],
+      "models/kenney-spacekit/machine_wirelessCable.glb#3": [
+        0.95,
+        0.07,
+        -0.85
+      ]
+    },
+    "RailArtilleryWalker": {
+      "models/kenney-spacekit/supports_low.glb#4": [
+        -1.0184,
+        -0.0736,
+        -0.6232
+      ],
+      "models/kenney-spacekit/supports_low.glb#5": [
+        -0.0912,
+        -0.0736,
+        -0.6232
+      ],
+      "models/kenney-spacekit/supports_low.glb#6": [
+        -1.0184,
+        -0.0736,
+        0.3496
+      ],
+      "models/kenney-spacekit/supports_low.glb#7": [
+        -0.0912,
+        -0.0736,
+        0.3496
+      ],
+      "models/kenney-spacekit/weapon_gun.glb#2": [
+        -1.36926,
+        0.72264,
+        -2.04547
+      ]
+    },
+    "RailCannonBunker": {
+      "models/kenney-spacekit/structure_closed.glb#1": [
+        0.0,
+        0.07,
+        0.0
+      ],
+      "models/kenney-spacekit/turret_double.glb#2": [
+        0.0,
+        0.91,
+        0.0
+      ]
+    },
+    "RoboticsBay": {
+      "models/kenney-spacekit/hangar_largeB.glb#1": [
+        0.0,
+        0.07,
+        0.0
+      ]
+    },
+    "RocketGunship": {
+      "models/kenney-spacekit/rocket_finsA.glb#1": [
+        -0.77,
+        0.099,
+        -0.49
+      ],
+      "models/kenney-spacekit/rocket_finsA.glb#2": [
+        -0.27,
+        0.099,
+        -0.49
+      ]
+    },
+    "SiegeAirship": {
+      "models/kenney-spacekit/machine_barrelLarge.glb#1": [
+        -0.87,
+        -0.056,
+        -0.36
+      ],
+      "models/kenney-spacekit/machine_barrelLarge.glb#2": [
+        -0.41,
+        -0.056,
+        -0.36
+      ]
+    },
+    "TechHospital": {
+      "models/kenney-spacekit/hangar_roundGlass.glb#1": [
+        0.0,
+        0.07,
+        0.0
+      ]
+    },
+    "TechLab": {
+      "models/kenney-spacekit/hangar_roundGlass.glb#1": [
+        0.0,
+        0.07,
+        0.0
+      ]
+    },
+    "TechOilDerrick": {
+      "models/kenney-spacekit/pipe_ringHighEnd.glb#1": [
+        0.0,
+        0.07,
+        0.0
+      ],
+      "models/kenney-spacekit/machine_barrelLarge.glb#5": [
+        -0.836043,
+        0.36,
+        0.75
+      ],
+      "models/kenney-spacekit/rocket_fuelA.glb#3": [
+        1.05,
+        0.07,
+        -0.7
+      ],
+      "models/kenney-spacekit/chimney_detailed.glb#2": [
+        0.0,
+        0.07,
+        0.0
+      ]
+    },
+    "TechRepairDepot": {
+      "models/kenney-spacekit/pipe_ring.glb#1": [
+        -1.1656,
+        0.01696,
+        -0.9992
+      ],
+      "models/kenney-spacekit/rail_middle.glb#2": [
+        -0.9684,
+        0.004,
+        -1.03716
+      ],
+      "models/kenney-spacekit/rail_middle.glb#3": [
+        1.602,
+        0.004,
+        1.51236
+      ],
+      "models/kenney-spacekit/machine_generatorLarge.glb#4": [
+        -0.688,
+        0.004,
+        0.134
+      ],
+      "models/kenney-spacekit/machine_barrelLarge.glb#5": [
+        0.112424,
+        0.004,
+        0.016825
+      ],
+      "models/kenney-spacekit/machine_barrelLarge.glb#6": [
+        0.746014,
+        0.004,
+        1.092018
+      ],
+      "models/kenney-spacekit/machine_wireless.glb#7": [
+        -0.7728,
+        0.004,
+        -0.3796
+      ]
+    },
+    "VehicleFactory": {
+      "models/kenney-spacekit/hangar_largeA.glb#1": [
+        0.0,
+        0.07,
+        -0.1
+      ],
+      "models/kenney-spacekit/gate_complex.glb#2": [
+        0.0,
+        0.36,
+        1.335
+      ]
+    },
+    "WeatherControlSpire": {
+      "models/kenney-spacekit/pipe_ringHighEnd.glb#1": [
+        0.0,
+        0.07,
+        0.0
+      ],
+      "models/kenney-spacekit/satelliteDish_large.glb#3": [
+        1.2,
+        0.07,
+        -1.0
+      ],
+      "models/kenney-spacekit/chimney_detailed.glb#2": [
+        0.326462,
+        1.2,
+        0.27
+      ],
+      "models/kenney-spacekit/machine_generatorLarge.glb#4": [
+        -0.89,
+        0.07,
+        0.95
+      ]
+    }
+  }
+}

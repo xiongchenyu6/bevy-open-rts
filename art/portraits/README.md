@@ -1,48 +1,40 @@
-# Entity portrait export inventory
+# Native entity portrait candidates
 
-`entities.json` identifies the 70 registry entity portraits from the current
-unresolved ledger by exact runtime path, registry ID, source line, scene,
-ModelMap entry, assembled model source and faction production membership.
-All 70 files exist; paths are unique, with no shared-icon aliases. Each row
-explicitly records provenance status: 62 unresolved and eight with already
-recorded provenance. A consistent full-model visual style should cover all 70;
-three preliminary exporter images do not complete this set. RosterPreview is
-a separate 71st asset-only composition task, not an entity ID.
+`entities.json` maps all 70 unique existing registry portrait paths to entity IDs,
+roles, faction memberships, ModelMap entries and actual assembly sources. Its
+provenance statuses describe the legacy images: 62 unresolved and eight already
+recorded. RosterPreview is a separate 71st asset-only group composition.
+Neutral TechHospital, TechOilDerrick and TechRepairDepot use the Alliance visual
+default without claiming faction ownership. No legacy PNG is a render input.
 
-Faction choice prefers Alliance, then Demon, then Chaos among actual memberships.
-Neutral TechHospital, TechOilDerrick and TechRepairDepot have no production-faction
-membership and explicitly use the Alliance visual default, without claiming
-ownership. Multi-faction entities retain all memberships. Regenerate the source
-inventory with `python3 art/portraits/audit_entities.py`.
-
-The native exporter now accepts this audited inventory and faction selection:
+The exporter accepts this inventory and validates IDs, icon paths and factions:
 
 ```sh
 cargo run --locked --bin portrait_export -- art/portraits/entities.json /new/staging-directory
+python3 art/portraits/check_attachments.py --check
 ```
 
-It validates registry IDs, matching icon paths, uniqueness and faction names
-before creating the staging directory. It retains actual spawn/model assembly,
-attachments, independent MainMenu asset-reference geometry parity, assembled
-AABB framing, transparent RGBA and two separate rendering runs. The sealed native exporter completed all140 renders (70 entities twice);
-independent byte, RGBA, alpha and framing checks pass. Root reviewed all70
-at128px: multiple real model accessories are detached, so visual acceptance
-fails. See `full70-visual-review.json`; correct the registered models and
-rerender before replacing runtime icons. Registry models may be empty for authored procedural tanks and
-TeslaFenceSegment; that is not missing geometry. ModelMap references are source
-correspondence, not permission to replace the actual assembled rendering path.
+Actual registered GLB parts, authored procedural bodies and detail attachments
+are spawned through the game model path. Authored contact corrections cover 42
+assemblies; `attachment_transforms.json` preserves them during registry generation.
+The geometry regression reads raw GLB hierarchy/accessor bounds, rejects detached
+Cryo primitives and overlapping aircraft mounts, requires depot primitive floor
+support, and retains separate actors with individually attached equipment.
 
-This inventory neither reads legacy PNGs as render inputs nor generates or
-replaces any image. Initial complete exports and visual review are recorded. Corrected-model
-exports, paid in-game comparisons and runtime integration remain pending.
+Contextual faction indicators alone carry a dedicated tag. They remain visible
+in normal gameplay; the exporter hides them and excludes them from both model
+collectors. Manifests record the excluded count and **model-only geometry/material
+parity**, never whole-scene parity. The regression retains real Tank geometry,
+GLB children and accessories while checking all three faction marker sets.
 
-## Model-only reference scope
+Validation checkpoint: shared native build passed and the library suite reports
+229 passed, zero failed, one ignored; the marker regression passed. Sealed
+exporter SHA `8bd848449911baf355df6d3989fffe3154821fecef9b7395e52e5726b1405e95`
+produced all 140 model-only PNGs (70 entities twice), with independent checker
+success. Root reviewed all 70 at 128px and 72px on dark/light backgrounds and
+accepted the candidate visuals. Evidence: `target/model-only-full70-20261010`.
+Earlier detached-part renders remain explicitly failed historical evidence.
 
-Contextual faction ground indicators are tagged separately from registered GLB
-and authored procedural geometry. The exporter hides only those tagged
-indicators; the independent full-game asset reference compares the same model
-meshes and materials. Runtime indicators remain visible in ordinary gameplay.
-Manifests explicitly record model-only parity and the excluded indicator count.
-The checker rejects older marker-inclusive scope; a new complete70-entity
-render and visual review are required before runtime integration. The marker
-regression and new render remain pending native validation.
+Paid normal-game model/UI comparison and runtime PNG integration remain pending.
+These are staged asset candidates, not proof that units were trained or structures
+built through gameplay. No runtime portrait has been replaced by this work.
