@@ -910,7 +910,7 @@
     }
   ],
   "runtime_replaced": true,
-  "post_integration_ui_verified": false,
+  "post_integration_ui_verified": true,
   "full_roster_paid_gameplay_verified": false,
   "final_package_verified": false,
   "after_asset_sha256": {
@@ -1321,5 +1321,7 @@
   ],
   "actual_portrait_changed_count": 70,
   "runtime_asset_count": 332,
-  "ledger_hash_mismatches": []
+  "ledger_hash_mismatches": [],
+  "post_integration_ui_scope": "Integratedcurrent332 native menu900/1920 and representative paidHUD Worker/Barracks/queue; noall70paidUI/finalpackage acceptance",
+  "post_integration_ui_review": "art/portraits/current-armor-integrated-ui-review.json"
 }

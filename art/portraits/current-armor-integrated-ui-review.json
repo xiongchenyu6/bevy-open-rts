@@ -1,0 +1,41 @@
+{
+  "scope": "Integratedcurrent332 native menu900/1920 and representative paidHUD Worker/Barracks/queue; noall70paidUI/finalpackage acceptance",
+  "reviewed_images": [
+    {
+      "path": "target/current-portraits-private-hud-20261010/900/00_worker.png",
+      "sha256": "e4e3553cb6802644c0695e14682a9f5a5e5090acd28684b79c7289be554d3619"
+    },
+    {
+      "path": "target/current-portraits-private-hud-20261010/900/02_production_queue.png",
+      "sha256": "e8ae6886c6fa8ce366ce52ae68d271c5ec7bbb069b5319e5cc3f34c0e6f8f543"
+    },
+    {
+      "path": "target/current-portraits-private-hud-20261010/1920/02_production_queue.png",
+      "sha256": "7b080ad36dae73774c69e1e60b36fc6c741d474632c77bb4aa176490ec9e0d7e"
+    },
+    {
+      "path": "target/current-portraits-menu-20261010/menu-900.png",
+      "sha256": "14897ad954d1ef4c73c9a35234d99775c7aa5da94d9d822cc73b949874da448b"
+    },
+    {
+      "path": "target/current-portraits-menu-20261010/menu-1920.png",
+      "sha256": "a4741875f3dc95d7d07f8d754f47787fd4d3ebaf97282bd9689716808c42fcde"
+    }
+  ],
+  "hud_actual_exits": [
+    0,
+    0
+  ],
+  "menu_actual_exits": [
+    0,
+    0,
+    0
+  ],
+  "assets_unchanged": true,
+  "observations": [
+    "Current portraits and roster remain readable in inspected normal menus and HUD",
+    "Original matte surface keeps geometry/faction strips clear",
+    "No observed text clipping in inspected frames"
+  ],
+  "final_package_verified": false
+}
