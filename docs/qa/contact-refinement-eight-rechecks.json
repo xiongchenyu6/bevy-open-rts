@@ -1,0 +1,131 @@
+{
+  "passed": true,
+  "binary_sha256": "b53edd44d710b27f8ca3560f92e54f7c641e189e047079109f67cfff7075ed9c",
+  "normal_resources": {
+    "ore": 32,
+    "crystal": 16
+  },
+  "simulation_limit": 600,
+  "wall_limit": 180,
+  "isolated_asset_count": 332,
+  "results": [
+    {
+      "case": "0101",
+      "outcome": [
+        1
+      ],
+      "simulation_seconds": 94.53223419189453,
+      "wall_seconds": 27.075337551999837,
+      "actual_exit": 0
+    },
+    {
+      "case": "0199",
+      "outcome": [
+        0
+      ],
+      "simulation_seconds": 175.94195556640625,
+      "wall_seconds": 17.253808211011346,
+      "actual_exit": 0
+    },
+    {
+      "case": "0238",
+      "outcome": [
+        0
+      ],
+      "simulation_seconds": 235.85475158691406,
+      "wall_seconds": 24.27079282599152,
+      "actual_exit": 0
+    },
+    {
+      "case": "0366",
+      "outcome": [
+        1
+      ],
+      "simulation_seconds": 179.6427459716797,
+      "wall_seconds": 21.01466541798436,
+      "actual_exit": 0
+    },
+    {
+      "case": "0387",
+      "outcome": [
+        1
+      ],
+      "simulation_seconds": 165.80645751953125,
+      "wall_seconds": 21.163717146002455,
+      "actual_exit": 0
+    },
+    {
+      "case": "0400",
+      "outcome": [
+        0
+      ],
+      "simulation_seconds": 198.4801025390625,
+      "wall_seconds": 20.859049497026717,
+      "actual_exit": 0
+    },
+    {
+      "case": "0012",
+      "outcome": [
+        0
+      ],
+      "simulation_seconds": 74.19921112060547,
+      "wall_seconds": 9.285156792990165,
+      "actual_exit": 0
+    },
+    {
+      "case": "0684",
+      "outcome": [
+        1
+      ],
+      "simulation_seconds": 185.21060180664062,
+      "wall_seconds": 21.863630506006302,
+      "actual_exit": 0
+    }
+  ],
+  "validation_errors": [],
+  "asset_errors": [],
+  "scope": "Eight historical timeout regressions on first contact-refinement828b111/current332 pin; no full3726 or second moving-constructor-window acceptance",
+  "source_commit": "828b111",
+  "raw_results": [
+    {
+      "case": "0101",
+      "result_sha256": "32f7baa084aac296cbf600edaea417e53a7f4255cf8406a844e2ce6965fe1f46",
+      "process_sha256": "07e8031e134d3fcb415c6e51cf9913576b84c122554b172bda7f9e1864eae5b3"
+    },
+    {
+      "case": "0199",
+      "result_sha256": "a13c49d3acd12bf98b79c28a18ed2a487b07eaa6a8606cab7f788334d818b25d",
+      "process_sha256": "a14ea49ba9f56e2c0a35c35b7304f2e942a3292b49ab4933f872ec0bbf361e61"
+    },
+    {
+      "case": "0238",
+      "result_sha256": "cfd4f1dd15202f08e4adbc63b8793f71e961a991fe0a418577f89352450aa672",
+      "process_sha256": "847f84fffaf6d592e027140d6e822919ed1dbe863cec98d3239bef0d1ef38b95"
+    },
+    {
+      "case": "0366",
+      "result_sha256": "2179b963a2616cbe65773f9dba4051c52c90b65c85eff106212be66c742ffcd8",
+      "process_sha256": "fc8f063b11e37dcce936e354de060b5e14757b2156df8b7672afc94e9020c9da"
+    },
+    {
+      "case": "0387",
+      "result_sha256": "025079e9c6aa79ae34c04afb60a5a423b06f5561e0ebff5a6bdc83276cf2f2d0",
+      "process_sha256": "fb36301c442d9ced525c96a7141f8b76eee2c7de948a7ab04339bcbf707765de"
+    },
+    {
+      "case": "0400",
+      "result_sha256": "41322f32ed48c3f108807c48994e439109430a44f949ea5ec0eefa9b44a27566",
+      "process_sha256": "d02168a804953901d28f814557ba57d34068f7e590ec95f4b21261ccb20c53cf"
+    },
+    {
+      "case": "0012",
+      "result_sha256": "e3b67a2a69ce73a5fdd00d480535f1bd2903026d605ce2774391916268197a58",
+      "process_sha256": "0fa0af8914a16031fc785d2dfdcc67a986bc09b25e4e206df7b41d13101b401d"
+    },
+    {
+      "case": "0684",
+      "result_sha256": "bb456d9985c5286f5acb6f98ad9dca14426382a993ad1b56754ca6c8bd4bf9f7",
+      "process_sha256": "bfd6bbe0031481dde438a8b1019846ca9fba3f267cebedd31535eb7074003c48"
+    }
+  ]
+}
