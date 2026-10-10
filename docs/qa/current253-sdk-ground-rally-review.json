@@ -1,0 +1,111 @@
+{
+  "archive_sha256": "2e29876d38ee4db63a8a86de10514b97b5ce47b00808ff979520c781b592c072",
+  "binary_sha256": "a4d386a953a0c1fa69d14cafc21a49415dffc5ba67649e4b88714d73ed8927de",
+  "wall_seconds": 122.97307126497617,
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 3393815,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "index": 2,
+      "pid": 3397372,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_game_cleanup": false,
+  "load_byte_checks": [
+    {
+      "session": 1,
+      "before": "eb6388c704a98e99224c8aacb790965b5b3a05ecb22162fd35a8e7d22bd63dcc",
+      "after": "eb6388c704a98e99224c8aacb790965b5b3a05ecb22162fd35a8e7d22bd63dcc",
+      "unchanged": true
+    },
+    {
+      "session": 2,
+      "before": "e9630d1143fb2eca160f9a23926e767b144a7f26497839468d69dee27ea984de",
+      "after": "e9630d1143fb2eca160f9a23926e767b144a7f26497839468d69dee27ea984de",
+      "unchanged": true
+    }
+  ],
+  "comparisons": [
+    {
+      "elapsed": 0.2622413635253906,
+      "producer_keys": [
+        8589932916,
+        21474834775
+      ],
+      "queue_entries": 1,
+      "passed": true
+    },
+    {
+      "elapsed": 0.2609405517578125,
+      "producer_keys": [
+        21474834775,
+        12884900382
+      ],
+      "queue_entries": 1,
+      "passed": true
+    }
+  ],
+  "rally_endpoint": {
+    "unit": {
+      "key": 51539605810,
+      "id": "LightRifleInfantry",
+      "position": [
+        -12.589559555053711,
+        0.05000000074505806,
+        -16.479450225830078
+      ],
+      "active": [],
+      "queued": [],
+      "cargo_ron": "None"
+    },
+    "rally": {
+      "target": [
+        -12.797674179077148,
+        0.0,
+        -16.437721252441406
+      ],
+      "mode": 0
+    },
+    "distance_xz": 0.21225692910359661
+  },
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "passed": true,
+  "scope": "SDK253 normal ground-rally continuity only; one paid Light Rifle Infantry",
+  "raw_evidence": "target/sdk253-save-ground-rally-20261011-01",
+  "original_wall_bound_seconds": 240,
+  "result_sha256": "6bbec0da47b14e9bb93d9bd0306f0665246acb4b376c27e7d794959f99cabc13",
+  "screenshots": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-baseline-paused": "cc79e90dc4e704d81a500bd3d81406bed82ed44568cebee3bd206b931ab74dcd",
+    "02-power-preview": "8ed93a5a381e946a2c6080e1a2e2cc257451db96b1097e5aceded3c7fdef3b50",
+    "03-power-completed": "f4f630071e799d04b6ad8720187877996387d19f5998791c97d53388593bc8a2",
+    "04-barracks-preview": "87ea3a3c473c998e1019ed6ac49d759f2a0dc0c8eab5ee6d2c6ce3fe6b0cbdc9",
+    "05-buildings-paid": "62e81deb21157e79765d2754f66c50851f7fdf80760583ecc4b7f84b749997e5",
+    "06-infantry-card-tooltip": "72b97a42fd468451db05c8466d4be2e03d5595796e850958407453934b9b2471",
+    "06-ground-rally": "3d09d004833e4504305ab8f9277d18bea36ec6e03b13de75bf84306c1e89cb8d",
+    "07-partial-paid-queue": "d8d084d6cda285f66a7580d25f2867594d0fe5e370507403d40870746ca468a4",
+    "08-same-process-loaded": "a6ff0e0264fa8f703133c006ddca4b7eda14c13f46d820dfcf5540aa48e330be",
+    "09-same-process-resaved": "09a61a0a4efcc11a472e47ec5a1fdde83aeb5f64af799e653c055b3074210a41",
+    "10-fresh-menu": "881272f1152d46509996ddc4babf6a3172dd074d540f8202567bf9b01f2a98a7",
+    "11-fresh-process-loaded": "727d06eca12f9bf90d65803caf42e6ac060a5388258ef361e5a026e802448906",
+    "12-fresh-process-resaved": "db876295ee0983633227081d6c94c70a9c902f9c167113872cd680294b91b0fc",
+    "13-three-paid-infantry-completed": "af81f2a064fa87bba06a867b78ba318c9422f0adc6a5c23a06e79acefe7f4bd4"
+  },
+  "root_independent_review": {
+    "all15_png_hashes_match": true,
+    "final_one_infantry_directly_viewed": true,
+    "normal_exits_and_endpoint_checked": true
+  },
+  "limits": [
+    "Inherited final screenshot label says three-paid-infantry; actual assertion and raw RON require exactly ONE, bank25/14",
+    "Ground target/mode only; entity/resource rally reference is currently not serialized and remains a known open defect",
+    "No audio, other rally modes, other units or complete save/release acceptance"
+  ]
+}
