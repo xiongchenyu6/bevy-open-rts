@@ -126,6 +126,7 @@ for license_file in root.glob('LICENSE*'):
         for path in sorted((stage / 'assets').rglob('*')) if path.is_file()
     },
     'source_binary': str(binary), 'source_sha256': hashlib.file_digest(binary.open('rb'), 'sha256').hexdigest(),
+    'packaged_binary_sha256': hashlib.file_digest(exe.open('rb'), 'sha256').hexdigest(),
     'binary_profile': 'development' if 'debug' in binary.parts else 'release',
     'build_variant': os.environ.get('BEVY_OPEN_RTS_BUILD_VARIANT', 'unrecorded'),
     'build_context': json.loads(pathlib.Path(os.environ['BEVY_OPEN_RTS_BUILD_CONTEXT']).read_text()) if os.environ.get('BEVY_OPEN_RTS_BUILD_CONTEXT') else None,
