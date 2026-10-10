@@ -1,0 +1,461 @@
+{
+  "scope": "Original Kokoro-generated source recordings; metadata does not substitute for human listening/tone review",
+  "official_source_provenance": {
+    "repo": "hexgrad/Kokoro-82M",
+    "revision": "f3ff3571791e39611d31c381e3a41a3af07b4987",
+    "files": [
+      {
+        "path": "README.md",
+        "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/README.md",
+        "sha256": "91dcabced89db6f109b8786642f50402d3ee87450e8189589b6f85520e7f4d78",
+        "bytes": 6348
+      },
+      {
+        "path": "VOICES.md",
+        "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/VOICES.md",
+        "sha256": "ec7e4941ad7e194af61e3455928528a9ff5360c7c505e412efab27d6a69ea106",
+        "bytes": 7625
+      },
+      {
+        "path": "config.json",
+        "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/config.json",
+        "sha256": "5abb01e2403b072bf03d04fde160443e209d7a0dad49a423be15196b9b43c17f",
+        "bytes": 2351
+      },
+      {
+        "path": "kokoro-v1_0.pth",
+        "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/kokoro-v1_0.pth",
+        "sha256": "496dba118d1a58f5f3db2efc88dbdc216e0483fc89fe6e47ee1f2c53f18ad1e4",
+        "bytes": 327212226
+      },
+      {
+        "path": "voices/af_heart.pt",
+        "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/voices/af_heart.pt",
+        "sha256": "0ab5709b8ffab19bfd849cd11d98f75b60af7733253ad0d67b12382a102cb4ff",
+        "bytes": 523425
+      },
+      {
+        "path": "voices/af_bella.pt",
+        "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/voices/af_bella.pt",
+        "sha256": "8cb64e02fcc8de0327a8e13817e49c76c945ecf0052ceac97d3081480e8e48d6",
+        "bytes": 523425
+      },
+      {
+        "path": "voices/am_fenrir.pt",
+        "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/voices/am_fenrir.pt",
+        "sha256": "98e507eca1db08230ae3b6232d59c10aec9630022d19accac4f5d12fcec3c37a",
+        "bytes": 523430
+      },
+      {
+        "path": "voices/zf_xiaoxiao.pt",
+        "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/voices/zf_xiaoxiao.pt",
+        "sha256": "cfaf6f2ded1ee56f1ff94fcd2b0e6cdf32e5b794bdc05b44e7439d44aef5887c",
+        "bytes": 523440
+      },
+      {
+        "path": "voices/zm_yunxi.pt",
+        "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/voices/zm_yunxi.pt",
+        "sha256": "dbe6e1ce7c3dbaf2f5667432947b638b1c6831ccbe154c4610dbcc44f431e27b",
+        "bytes": 523425
+      }
+    ],
+    "model_license": "Apache-2.0",
+    "sdk": "kokoro0.9.4",
+    "device": "cpu",
+    "threads": 2
+  },
+  "generation_sdk": {
+    "torch": "2.6.0+cpu",
+    "transformers": "4.51.3",
+    "device": "cpu",
+    "threads": 2,
+    "sample_rate": 24000,
+    "subtype": "PCM_16",
+    "packages": {
+      "torch": "2.6.0+cpu",
+      "transformers": "4.51.3",
+      "kokoro": "0.9.4",
+      "misaki": "0.9.4",
+      "pypinyin": "0.55.0",
+      "cn2an": "0.5.24",
+      "numpy": "2.5.3",
+      "soundfile": "0.13.1",
+      "phonemizer-fork": "3.3.2",
+      "espeakng-loader": "0.2.4"
+    }
+  },
+  "generation_recipe_sha256": {
+    "full32": "b71fd9238b9e60682de760d98827e103581aed3fd720598f470064bfc3fbcab4",
+    "hello_revision": "5af575c075168c7f148fa20668b4d196b29baf763819c3c69c93087026e6cb94"
+  },
+  "generation_records": [
+    {
+      "source": "sources/english/unit/hello.wav",
+      "sha256": "a8da92e15192baa257417f995cd727516ae880c5f620850fc77db30bc5718ea4",
+      "text": "Ready for orders.",
+      "voice": "am_fenrir",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ɹˈɛdi fɔɹ ˈɔɹdəɹz."
+      ]
+    },
+    {
+      "source": "sources/english/unit/ack1.wav",
+      "sha256": "2d61a236de7d48c6e4c5d72d65a4f09f8aaa4b5da09bdb15508ddfc6f275da1c",
+      "text": "Yes, sir.",
+      "voice": "am_fenrir",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "jˈɛs, sˌɜɹ."
+      ]
+    },
+    {
+      "source": "sources/english/unit/ack2.wav",
+      "sha256": "9c3a90571a2a893b832c062d013b633ab378183c02a6b6ec493ed585d66ad8ef",
+      "text": "Acknowledged.",
+      "voice": "am_fenrir",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "əknˈɑləʤd."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/training.wav",
+      "sha256": "eed454b3ee1c82d6df0843623e2f5f0f742c9430ac06caf575c0078b15ebbbd9",
+      "text": "Training.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "tɹˈAnɪŋ."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/unit_ready.wav",
+      "sha256": "2fd95944d8dd1545b8f609efdd32e8fe3afde29898b311766f252804bd243163",
+      "text": "Unit ready.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "jˈunət ɹˈɛdi."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/construction_complete.wav",
+      "sha256": "13de9c14df585e977bdc603f6761ca9309d5418d8b0dd6d401b43c4406333aa7",
+      "text": "Construction complete.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "kənstɹˈʌkʃən kəmplˈit."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/not_enough_resources.wav",
+      "sha256": "b381cea3b86cd4bb1e62169a8ade332980dc044ca2c29edee90694e0000883f5",
+      "text": "Not enough resources.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "nˌɑt ɪnˈʌf ɹˈisˌɔɹsᵻz."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/support_power_ready.wav",
+      "sha256": "e87b222adaff829152dce5bb8385c724f931c5545765c7fa86117997b1ba41f4",
+      "text": "Support power ready.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "səpˈɔɹt pˈWəɹ ɹˈɛdi."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/enemy_support_power_fired.wav",
+      "sha256": "12aad2add0840f584cd287629b5ac10dc425d1d2415eb3251b6417c859bd1232",
+      "text": "Enemy support power activated.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ˈɛnəmi səpˈɔɹt pˈWəɹ ˈæktəvˌATᵻd."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/enemy_superweapon_ready.wav",
+      "sha256": "4cb7a250b312bf739d22351ff03b0278ee2230a1d7e2e57f45a7660533023a56",
+      "text": "Enemy superweapon ready.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ˈɛnəmi sˈupəɹwˌɛpən ɹˈɛdi."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/enemy_superweapon_launched.wav",
+      "sha256": "90682941a983fa2403430e35435c90fe263ac1d0155ee337ebb0f09d2c26fc87",
+      "text": "Enemy superweapon launched.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ˈɛnəmi sˈupəɹwˌɛpən lˈɔnʧt."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/victory.wav",
+      "sha256": "339b653929a5693d17f885b08bf3034fc81583097a0ee7fd360d8ad350d6e1c7",
+      "text": "You are victorious.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "jˌu ɑɹ vɪktˈɔɹiəs."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/defeat.wav",
+      "sha256": "dffe6e67d31b72b407dfb5a0f68b062f64dc4df238b23bac6c017edaef33a6a2",
+      "text": "You have lost.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "jˌu hæv lˈɔst."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/base_under_attack.wav",
+      "sha256": "ca4ad2d5c7629c01e9ffbb122923f9019c3eacfa07a8d1750d80e1fb80fe9f40",
+      "text": "Your base is under attack.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "jˌʊɹ bˈAs ɪz ˈʌndəɹ ətˈæk."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/unit_under_attack.wav",
+      "sha256": "90dcc5951602b5ae2736e6ba8c1a6ec79c46c50f422ee11ffa6607e960c5daca",
+      "text": "Unit under attack.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "jˈunət ˈʌndəɹ ətˈæk."
+      ]
+    },
+    {
+      "source": "sources/english/announcer/unit_lost.wav",
+      "sha256": "0902f1e4c729f7cc326e8b51d43728ab506aff26c8250c4f65087077def4c99f",
+      "text": "Unit lost.",
+      "voice": "af_heart",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "jˈunət lˈɔst."
+      ]
+    },
+    {
+      "source": "sources/chinese/unit/hello.wav",
+      "sha256": "88d545530a3d24d968d1e9f4e9df1c84879d1c025a1a17b54820f890f17fbe6a",
+      "text": "长官？",
+      "voice": "zm_yunxi",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ꭧa↓ŋkwa→n?"
+      ]
+    },
+    {
+      "source": "sources/chinese/unit/ack1.wav",
+      "sha256": "bfb4c912e9c8360561f32545294860c096aed54afaca8476f75b011e939f4df5",
+      "text": "遵命。",
+      "voice": "zm_yunxi",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ʦwə→nmi↘ŋ."
+      ]
+    },
+    {
+      "source": "sources/chinese/unit/ack2.wav",
+      "sha256": "e1e93c87c4d1f0e4d08aafce9fc3958c6227837f036157c07b6dd067e786a5f0",
+      "text": "收到。",
+      "voice": "zm_yunxi",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ʂou→tau↘."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/training.wav",
+      "sha256": "87af6f47565a6f8fc7941a0b24636a1cdf949a4418ba082a27cdd76c8deecfd2",
+      "text": "训练中。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ɕy↘nljɛ↘n ꭧʊ→ŋ."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/unit_ready.wav",
+      "sha256": "c04c03418dd4c2d546b55936377cff122fe753a5ad1b0e5bb929d26efdb6045d",
+      "text": "单位就绪。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ta→nwei↘ ʨjou↘ɕy↘."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/construction_complete.wav",
+      "sha256": "4b26c0e6e15a7b8ca7bad1006015ec9f2f1804835f347d9f41c67f499d5bdeab",
+      "text": "建造完成。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ʨjɛ↘nʦau↘ wa↗nꭧʰə↗ŋ."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/not_enough_resources.wav",
+      "sha256": "2ad71fce381b54e00a227dd45cd1b990b493de1bd1ead8248b63534278a949f8",
+      "text": "资源不足。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ʦɨ→ɥɛ↗n pu↘ʦu↗."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/support_power_ready.wav",
+      "sha256": "d35afe65084b3620e7609896e2ca60836cc67ea1d59470b4c24879474a3d1bbb",
+      "text": "支援技能就绪。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ꭧɨ→ɥɛ↗n ʨi↘nə↗ŋ ʨjou↘ɕy↘."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/enemy_support_power_fired.wav",
+      "sha256": "72a7bdab1bbf689dd0e3d26e678b944d48c7da050aa29c3055d4994d4d1037bb",
+      "text": "敌方发动支援技能。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ti↗fa→ŋ fa→tʊ↘ŋ ꭧɨ→ɥɛ↗n ʨi↘nə↗ŋ."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/enemy_superweapon_ready.wav",
+      "sha256": "a5ab0cec9c375bf28a7136083aa48f85c65c65150f1d7371239894d5a89cfbca",
+      "text": "警告，敌方超级武器就绪。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ʨi↓ŋkau↘, ti↗fa→ŋ ꭧʰau→ʨi↗ u↓ʨʰi↘ ʨjou↘ɕy↘."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/enemy_superweapon_launched.wav",
+      "sha256": "55899184a7e6f9abfdb97e5ef5df520cd1da3b84b4332a21a06af52828e310c1",
+      "text": "警告，敌方超级武器已发射。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ʨi↓ŋkau↘, ti↗fa→ŋ ꭧʰau→ʨi↗ u↓ʨʰi↘ i↓ fa→ʂɤ↘."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/victory.wav",
+      "sha256": "e977d97fd321bde509398307922686f5ee417fb4901a56a726170902a2bac2e1",
+      "text": "你已获得胜利。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ni↓ i↓ xwo↘tɤ↗ʂə↘ŋli↘."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/defeat.wav",
+      "sha256": "c0caf90d4281b8bd8ee5f13ca5de9780d5ee0bcfc52822fc47a2194867472287",
+      "text": "你已战败。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ni↓ i↓ ꭧa↘npai↘."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/base_under_attack.wav",
+      "sha256": "2c969b65c7a11e2548985f189e3a8e2a7180e1e5dca58c701b39a1fa65f0ef73",
+      "text": "基地遇袭。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ʨi→ti↘ y↘ɕi↗."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/unit_under_attack.wav",
+      "sha256": "c164069aadbb92f6a82461328400d34936be2d104cc77ef0f840b10a56422640",
+      "text": "部队遇袭。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "pu↘twei↘ y↘ɕi↗."
+      ]
+    },
+    {
+      "source": "sources/chinese/announcer/unit_lost.wav",
+      "sha256": "623ad55b64c7bd1bab85e10594f0a5e1ab79b4e75eeb143cfb5afe040127d308",
+      "text": "单位损失。",
+      "voice": "zf_xiaoxiao",
+      "speed": 1.0,
+      "seed": 42,
+      "phonemes": [
+        "ta→nwei↘ swə↓nʂɨ→."
+      ]
+    }
+  ],
+  "asr": {
+    "base_revision": "e37978b90ca9030d5170a5c07aadb050351a65bb",
+    "small_revision": "973afd24965f72e36ca33b3055d56a652f456b4d",
+    "expected_prompts": false,
+    "revised_english_hello": "Ready for orders. / Ready for orders! both normalized match",
+    "limits": "Base Mandarin script/homophone differences; larger model recovered five priority lines; old Sir concern superseded only in new candidate. ASR is not listening/tone approval."
+  },
+  "reproduction": {
+    "encodes": 64,
+    "files": 32,
+    "decoded_pcm_equal": 32,
+    "unclipped_files": 32,
+    "container_bytes_equal": 0
+  },
+  "human_listening_accepted": false,
+  "tone_accepted": false
+}

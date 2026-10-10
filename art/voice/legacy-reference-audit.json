@@ -1,0 +1,639 @@
+{
+  "scope": "Current provider-tree removal plan; not compatibility or retention layer",
+  "files": [
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/base_under_attack.ogg",
+      "sha256": "0af2018d1323844fc69bc8dfd8698cbee27075136973da4941ceedda7a91eb4f",
+      "bytes": 9428,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 198,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3924,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/construction_complete.ogg",
+      "sha256": "98e7ecb1ea9103f53e53103c745462984d74f1c34b8e4f4f2c69b63afa18be3f",
+      "bytes": 9245,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 185,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3929,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/defeat.ogg",
+      "sha256": "aec3708de2f2ea44671dfe8521c2e66a05feab804a12595750a647f13c2829a9",
+      "bytes": 8479,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 197,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3934,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/enemy_superweapon_launched.ogg",
+      "sha256": "034597e99f1c61c909c21bdaf43e9bcb9164c04d89d25b3f99e2890b78449409",
+      "bytes": 17767,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 194,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3939,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/enemy_superweapon_ready.ogg",
+      "sha256": "adbc67ae93e680ff8c1ebab6874d2b98f77840e7eac26bab2a797cb49b580b78",
+      "bytes": 17005,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 191,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3944,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/enemy_support_power.ogg",
+      "sha256": "680f2312dd8dd4d718a1b2fa1af697602e517b1e04e3a6d138701169995d0d6f",
+      "bytes": 13058,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 189,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3949,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/not_enough_resources.ogg",
+      "sha256": "315d9676134800eecd1202a402ba08780d82c3169089053e8f7eaccb60ca8645",
+      "bytes": 8953,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 186,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3954,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/support_power_ready.ogg",
+      "sha256": "0fcf79b7cccdea7597ca9e09cfa9eed0fd00de547d3c6b9c3c01b188a4efbdab",
+      "bytes": 11362,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 187,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3959,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/training.ogg",
+      "sha256": "e4ef22d31a6efc9b086e6448c2cefcd840baee41e8c174f5d4667dafe2a90b2e",
+      "bytes": 8565,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 183,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3964,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/unit_lost.ogg",
+      "sha256": "a22ce9ad915b9cbfe8f7e42260a57875652b3773b4640b6de973a20cc242cf04",
+      "bytes": 9223,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 200,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3969,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/unit_ready.ogg",
+      "sha256": "3fc3c8f10eb5b2c89f877fc50e4fb10e0513dc22f455b00b8ed2a2d6e2ab6ae7",
+      "bytes": 9187,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 184,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3974,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/unit_under_attack.ogg",
+      "sha256": "4cd6e90e1ab72e1d93e2b62cae6fb38c690194199a47f2a49b39983f6ba25146",
+      "bytes": 8868,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 199,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3979,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-xiaoxiao/victory.ogg",
+      "sha256": "c509b9d14027919d8d1a840b9e7a25537a576e0be8c02a0b4441a4e483c441ee",
+      "bytes": 10242,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 196,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3984,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-yunxi/acknowledged.ogg",
+      "sha256": "a5667e38fc32abce160e293b566ae028b825a3987b728e704056a4974b68885c",
+      "bytes": 7610,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 182,
+          "kind": "runtime"
+        },
+        {
+          "path": "src/audio.rs",
+          "line": 188,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3989,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-yunxi/sir.ogg",
+      "sha256": "973e92e284048062ecb19d43f2cb044d88a502f1e9d801e3f9999df819982407",
+      "bytes": 7569,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 180,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3994,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/chinese/edge-yunxi/yes_sir.ogg",
+      "sha256": "f3f9796d0623febdfbd783b7a378fdc14873cc0cfe64195810bcdceb1ece7c17",
+      "bytes": 7431,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 181,
+          "kind": "runtime"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 3999,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/battle_control_offline.ogg",
+      "sha256": "5adf4d2e6d98324f21b6e553e6f4ba39dbc1ccd7a95b41d600d2cea0159daa6a",
+      "bytes": 22644,
+      "references": [
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 315,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4004,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": false
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/battle_control_online.ogg",
+      "sha256": "a04a732a576597e7e26c0887b760c796d6f96d96b2d6402d9e811d52a71f1bb6",
+      "bytes": 20626,
+      "references": [
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 316,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4010,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": false
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/construction_complete.ogg",
+      "sha256": "53a1f915b3ad21fed70ad630e3d206daa37e103cfcbaa3e44655b709f2dc0acb",
+      "bytes": 20968,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 212,
+          "kind": "runtime"
+        },
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 317,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4016,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/not_enough_resources.ogg",
+      "sha256": "b5255f69ec44e21f58b9f194756319555f498cc9d78a24a792b9bbe457d38238",
+      "bytes": 22007,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 215,
+          "kind": "runtime"
+        },
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 318,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4022,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/training.ogg",
+      "sha256": "b4caf625632b77319ec7312b8ee18e3e0306c2ebc02f61f68f0c46009b6bc337",
+      "bytes": 12045,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 209,
+          "kind": "runtime"
+        },
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 319,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4028,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/unit_lost.ogg",
+      "sha256": "f1c66e4e266a2f22f0f9e62d9e2f986b0fd05f84966904e479f9ab45cfeae234",
+      "bytes": 16120,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 235,
+          "kind": "runtime"
+        },
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 320,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4034,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/unit_ready.ogg",
+      "sha256": "325ae3cebdb3e2b5ee21e54f591effcb527b6fda24ec45cf8d370cef9c671f81",
+      "bytes": 13886,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 210,
+          "kind": "runtime"
+        },
+        {
+          "path": "src/audio.rs",
+          "line": 217,
+          "kind": "runtime"
+        },
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 321,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4040,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/unit_under_attack.ogg",
+      "sha256": "ff2ae52bb323b5ca83b239c54838cde8b53ed9bb8516d81dd7fff79cba5c754f",
+      "bytes": 19206,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 222,
+          "kind": "runtime"
+        },
+        {
+          "path": "src/audio.rs",
+          "line": 233,
+          "kind": "runtime"
+        },
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 322,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4046,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/you_are_victorious.ogg",
+      "sha256": "88b3714abd74f911ad163eb59e30e10c211d7de2fd3e7d0d1c8e0028a4eedbbf",
+      "bytes": 18671,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 227,
+          "kind": "runtime"
+        },
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 323,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4052,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/you_have_lost.ogg",
+      "sha256": "64f9163d4d92d0f221ae46ebb9f4b60d1a220634cfb6fab5a8fbdd7c4e6ebd87",
+      "bytes": 16410,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 228,
+          "kind": "runtime"
+        },
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 324,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4058,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-148-alayna-us/your_base_is_under_attack.ogg",
+      "sha256": "9877325b20d99991bede5c08e8dcb13969e79870dea7248e1fe0fd5a32518e72",
+      "bytes": 23176,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 225,
+          "kind": "runtime"
+        },
+        {
+          "path": "src/audio.rs",
+          "line": 230,
+          "kind": "runtime"
+        },
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 325,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4064,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-2704-jackson-us/acknowledged.ogg",
+      "sha256": "36051c4d4c724042a96030abb0c1563c7c74be6e06f10ffe8ca7bcae546a0bd9",
+      "bytes": 14073,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 208,
+          "kind": "runtime"
+        },
+        {
+          "path": "src/audio.rs",
+          "line": 219,
+          "kind": "runtime"
+        },
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 326,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4070,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-2704-jackson-us/sir.ogg",
+      "sha256": "85b8ee23c90274255d7e4077076b04e8051026880ace9e8c8bf63feb2d6d7413",
+      "bytes": 9880,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 206,
+          "kind": "runtime"
+        },
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 327,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4076,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    },
+    {
+      "path": "assets/voice/english/ttsmaker-com-2704-jackson-us/yes_sir.ogg",
+      "sha256": "1c6b5f9485822e5ff1df9ef7ecdbe2fa73a471a9d8124d752bc2b19c716d44a6",
+      "bytes": 11905,
+      "references": [
+        {
+          "path": "src/audio.rs",
+          "line": 207,
+          "kind": "runtime"
+        },
+        {
+          "path": "assets/migration/asset_manifest.json",
+          "line": 328,
+          "kind": "historical_inventory"
+        },
+        {
+          "path": "docs/asset-source-hashes.json",
+          "line": 4082,
+          "kind": "historical_inventory"
+        }
+      ],
+      "runtime_literal_reference": true
+    }
+  ],
+  "provider_tree_files": 30,
+  "delete_script": "scripts/gen_zh_voice.sh",
+  "files_to_update": [
+    "src/audio.rs",
+    "assets/migration/asset_manifest.json",
+    "docs/asset-source-hashes.json",
+    "docs/ASSET_PROVENANCE.md"
+  ],
+  "historical_records": "Former hashes may stay in historical audit; current inventories must contain new clean runtime paths only"
+}

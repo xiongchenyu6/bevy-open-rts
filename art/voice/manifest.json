@@ -1,0 +1,1281 @@
+{
+  "schema": 1,
+  "scope": "Portable original voice candidate inputs/encode mapping; runtime integration/listening acceptance pending",
+  "tool_version": "ffmpeg version 9.0.1 Copyright (c) 2000-2026 the FFmpeg developers",
+  "encoder": [
+    "-hide_banner",
+    "-loglevel",
+    "error",
+    "-nostdin",
+    "-i",
+    "{source}",
+    "-map_metadata",
+    "-1",
+    "-ac",
+    "1",
+    "-ar",
+    "24000",
+    "-c:a",
+    "libvorbis",
+    "-q:a",
+    "5",
+    "-threads",
+    "1",
+    "{destination}"
+  ],
+  "decode": [
+    "-hide_banner",
+    "-loglevel",
+    "error",
+    "-threads",
+    "1",
+    "-i",
+    "{path}",
+    "-ac",
+    "1",
+    "-ar",
+    "24000",
+    "-f",
+    "f32le",
+    "pipe:1"
+  ],
+  "files": [
+    {
+      "language": "english",
+      "primary_event": "Hello",
+      "source": "sources/english/unit/hello.wav",
+      "source_sha256": "a8da92e15192baa257417f995cd727516ae880c5f620850fc77db30bc5718ea4",
+      "text": "Ready for orders.",
+      "voice": "am_fenrir",
+      "runtime_relative_path": "voice/english/unit/hello.ogg",
+      "source_pcm": {
+        "sha256": "fb9fd73d5ab66ad18283f74bb9b36b1720b4ba4d3139db7979e0d5aed92b2ff6",
+        "frames": 37800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.575,
+        "peak_float": 0.5711669921875,
+        "rms_float": 0.0723756739946597,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "f115af9edea5602978d502900f093de99e718c91ece730f0ccb0f4c0601faf56",
+        "frames": 37800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.575,
+        "peak_float": 0.5728510618209839,
+        "rms_float": 0.07273348867166417,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "1c9acb77e1e1034832f7685655cbd9c00c4404b3fa569c4309d1d932fd02afaa",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "Ack1",
+      "source": "sources/english/unit/ack1.wav",
+      "source_sha256": "2d61a236de7d48c6e4c5d72d65a4f09f8aaa4b5da09bdb15508ddfc6f275da1c",
+      "text": "Yes, sir.",
+      "voice": "am_fenrir",
+      "runtime_relative_path": "voice/english/unit/ack1.ogg",
+      "source_pcm": {
+        "sha256": "8ffe3ce8020c3d9a2b25de6cd61408779011306179e555d52cd032c91e66da2f",
+        "frames": 30600,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.275,
+        "peak_float": 0.527679443359375,
+        "rms_float": 0.07045489085274137,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "fd6e3d5fdeab7011e92c618a54b80627496ddb5eb236698b7b591510cb6eba17",
+        "frames": 30600,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.275,
+        "peak_float": 0.5402849912643433,
+        "rms_float": 0.07060815363476185,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "3e9db0c29c7fc417d24e4823bab16bc0234bfcc8f30d390e0896e1ecf1db243a",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "Ack2",
+      "source": "sources/english/unit/ack2.wav",
+      "source_sha256": "9c3a90571a2a893b832c062d013b633ab378183c02a6b6ec493ed585d66ad8ef",
+      "text": "Acknowledged.",
+      "voice": "am_fenrir",
+      "runtime_relative_path": "voice/english/unit/ack2.ogg",
+      "source_pcm": {
+        "sha256": "9f4de1f8389b90f5ff96cd028d9521ad61a6b0d4cd0694f5b8356fe97449c3a8",
+        "frames": 33600,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.4,
+        "peak_float": 0.6505126953125,
+        "rms_float": 0.07341311069739383,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "8397696f68119af47538b889f0c04a7ecb4cfaaf69224840ec8578b5399d3666",
+        "frames": 33600,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.4,
+        "peak_float": 0.6560688018798828,
+        "rms_float": 0.07354302026649498,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "4c380c0df4b6cb52b2566611b2452d18c14aa3df97ee0628228ee6ce4f5682a4",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "Training",
+      "source": "sources/english/announcer/training.wav",
+      "source_sha256": "eed454b3ee1c82d6df0843623e2f5f0f742c9430ac06caf575c0078b15ebbbd9",
+      "text": "Training.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/training.ogg",
+      "source_pcm": {
+        "sha256": "8a837f98479de15f5cced9e313e4eb7a496988891e162f18c602d78b475138cc",
+        "frames": 34200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.425,
+        "peak_float": 0.400543212890625,
+        "rms_float": 0.04602018022234981,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "7604c4ba663a55676590af3a49c5c6055815852712ac0c41cd18e62367bc8db0",
+        "frames": 34200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.425,
+        "peak_float": 0.3878611922264099,
+        "rms_float": 0.04615803829411241,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "1590dfc39e19c3de412340cc869b5c610f50c19c3867cbdc682f5ce5169dd881",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "UnitReady",
+      "source": "sources/english/announcer/unit_ready.wav",
+      "source_sha256": "2fd95944d8dd1545b8f609efdd32e8fe3afde29898b311766f252804bd243163",
+      "text": "Unit ready.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/unit_ready.ogg",
+      "source_pcm": {
+        "sha256": "1953f0c041c880a2459c4027961a11a92eece53c6d213b8b211bd90dfb6446f8",
+        "frames": 38400,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.6,
+        "peak_float": 0.331390380859375,
+        "rms_float": 0.048084281176650624,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "684c8793120482b7743ba1d88fca7c77678fa8dbc73a1612a94bfe39b94e42c0",
+        "frames": 38400,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.6,
+        "peak_float": 0.3299725353717804,
+        "rms_float": 0.048160178566630206,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "44de57e2233928c4dfd590e33c2b2f11b3a2bdc34d11c4f7a2a536f0c570af07",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "ConstructionComplete",
+      "source": "sources/english/announcer/construction_complete.wav",
+      "source_sha256": "13de9c14df585e977bdc603f6761ca9309d5418d8b0dd6d401b43c4406333aa7",
+      "text": "Construction complete.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/construction_complete.ogg",
+      "source_pcm": {
+        "sha256": "d7bdd6c939c6e14fb8605e4e22b4c08166849edeedd28129bb26876fbd10e41b",
+        "frames": 46200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.925,
+        "peak_float": 0.529815673828125,
+        "rms_float": 0.05094623683106152,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "b5b56db376bd50bbe7d343638bbe995f0edb4c7b755dee24f97fea05e139b544",
+        "frames": 46200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.925,
+        "peak_float": 0.5379694104194641,
+        "rms_float": 0.051147671917236494,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "b46bb60b5d9d4660dab9433937b2c8aded77d7456440faa71b6047bfb242ac53",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "NotEnoughResources",
+      "source": "sources/english/announcer/not_enough_resources.wav",
+      "source_sha256": "b381cea3b86cd4bb1e62169a8ade332980dc044ca2c29edee90694e0000883f5",
+      "text": "Not enough resources.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/not_enough_resources.ogg",
+      "source_pcm": {
+        "sha256": "33941c8eec10df807312c4530fbf835cf02817fc72375e9706cc3c0d481359f9",
+        "frames": 46800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.95,
+        "peak_float": 0.29644775390625,
+        "rms_float": 0.046594914311848035,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "767b0aec2a209cabdf8f2a94ff1f056056428ea8391ec2b260594454257bbbab",
+        "frames": 46800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.95,
+        "peak_float": 0.31007862091064453,
+        "rms_float": 0.046783825742083,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "672f1f0b1b613c3771c8f60a8f2fb9a6f230b40e0c10437ee637d6ba079ded72",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "SupportPowerReady",
+      "source": "sources/english/announcer/support_power_ready.wav",
+      "source_sha256": "e87b222adaff829152dce5bb8385c724f931c5545765c7fa86117997b1ba41f4",
+      "text": "Support power ready.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/support_power_ready.ogg",
+      "source_pcm": {
+        "sha256": "f406d79369844ebad1263d764e6b72458e6442978602bf721a8d2c67969907e5",
+        "frames": 44400,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.85,
+        "peak_float": 0.3536376953125,
+        "rms_float": 0.04470349593162939,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "7b65f72c9e210debceae930a0633cf890b813fe3d47d7988ef2e525ac930887a",
+        "frames": 44400,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.85,
+        "peak_float": 0.35405880212783813,
+        "rms_float": 0.04494220569745265,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "4c062f0fbbc92c2ce2bce5b26ec7740d772a865c1c8e39fe2f03be9a67b84d56",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "EnemySupportPowerFired",
+      "source": "sources/english/announcer/enemy_support_power_fired.wav",
+      "source_sha256": "12aad2add0840f584cd287629b5ac10dc425d1d2415eb3251b6417c859bd1232",
+      "text": "Enemy support power activated.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/enemy_support_power_fired.ogg",
+      "source_pcm": {
+        "sha256": "9b746a012c3986f32e11eaab7a821a6c46b986eba67374a8e336511d4425053a",
+        "frames": 61200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.55,
+        "peak_float": 0.469879150390625,
+        "rms_float": 0.048414101260629484,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "af2b8ae1b6c03582d627f8eb3ec9ea5b75b77bb4698a35dd528470cc071d6cce",
+        "frames": 61200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.55,
+        "peak_float": 0.4707004129886627,
+        "rms_float": 0.04864177059570899,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "0933a1b4683929db35a4345414205962f656bd09b304262d1f22653f98cdca62",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "EnemySuperweaponReady",
+      "source": "sources/english/announcer/enemy_superweapon_ready.wav",
+      "source_sha256": "4cb7a250b312bf739d22351ff03b0278ee2230a1d7e2e57f45a7660533023a56",
+      "text": "Enemy superweapon ready.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/enemy_superweapon_ready.ogg",
+      "source_pcm": {
+        "sha256": "42699d8f3f0f7bae56e58bfc18fefbeaf668a4e74d1e231883a6151b130142f3",
+        "frames": 52800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.2,
+        "peak_float": 0.34173583984375,
+        "rms_float": 0.04638123001798287,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "1b9ae028fb6a9c9e84c804b29588997fc3ce96e20f8a5af0b8465492b84f457c",
+        "frames": 52800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.2,
+        "peak_float": 0.34699195623397827,
+        "rms_float": 0.04666619269200855,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "f9d45b87fc124b8af93bc69e9af4bb1b0f9c5d925ce59ecf87d3c1f654fa26f7",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "EnemySuperweaponLaunched",
+      "source": "sources/english/announcer/enemy_superweapon_launched.wav",
+      "source_sha256": "90682941a983fa2403430e35435c90fe263ac1d0155ee337ebb0f09d2c26fc87",
+      "text": "Enemy superweapon launched.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/enemy_superweapon_launched.ogg",
+      "source_pcm": {
+        "sha256": "4b8463d663e7aeda1b92635165e4bf39ab4d99ba573216e2fa48bc0e48e5821b",
+        "frames": 51000,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.125,
+        "peak_float": 0.36383056640625,
+        "rms_float": 0.046429260587625164,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "d4115120707ba629a76d0a870f256d6ecbe89faaaa4fd9c75bbe13d1ec6b5014",
+        "frames": 51000,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.125,
+        "peak_float": 0.34802308678627014,
+        "rms_float": 0.046651100556135895,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "0ec6b24d3fd60eebbf3e73b5311141b7eceacb2343e52211d13b70d30c5248a7",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "Victory",
+      "source": "sources/english/announcer/victory.wav",
+      "source_sha256": "339b653929a5693d17f885b08bf3034fc81583097a0ee7fd360d8ad350d6e1c7",
+      "text": "You are victorious.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/victory.ogg",
+      "source_pcm": {
+        "sha256": "6eb7edb7874297ecaf7f0d06accb87367bb8e90bdcd1bd034fd7361e6bdf536e",
+        "frames": 43200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.8,
+        "peak_float": 0.413848876953125,
+        "rms_float": 0.04999233811890168,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "eb649e8b847dd0949f93c4375b4e2232faff43012c855ad6383db32180d4c3f9",
+        "frames": 43200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.8,
+        "peak_float": 0.40921884775161743,
+        "rms_float": 0.05015858254378919,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "6b4a0aadac66ace9a658e9dad27f04ce77b0778544bca7e5fbe0cc8e4f4d5db5",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "Defeat",
+      "source": "sources/english/announcer/defeat.wav",
+      "source_sha256": "dffe6e67d31b72b407dfb5a0f68b062f64dc4df238b23bac6c017edaef33a6a2",
+      "text": "You have lost.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/defeat.ogg",
+      "source_pcm": {
+        "sha256": "90d82e5efbe58d88eb5d26de85cbc9253a3252f055de73950152ccb94f46dd82",
+        "frames": 37800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.575,
+        "peak_float": 0.4068603515625,
+        "rms_float": 0.048386384001804277,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "c102f4ce0ef7cf6515ba84207c3565547477f941f2529a877cdbad03f27423e3",
+        "frames": 37800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.575,
+        "peak_float": 0.403109073638916,
+        "rms_float": 0.048545280127314315,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "975ac6056e3f5339023d71e44348a3d91af6857f9ea83e476f60b5436c0b23fe",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "BaseUnderAttack",
+      "source": "sources/english/announcer/base_under_attack.wav",
+      "source_sha256": "ca4ad2d5c7629c01e9ffbb122923f9019c3eacfa07a8d1750d80e1fb80fe9f40",
+      "text": "Your base is under attack.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/base_under_attack.ogg",
+      "source_pcm": {
+        "sha256": "0be9e243685dda7290369191bfd0080bc7b6b0eec664ee3e9d0ecdcf72a4b81e",
+        "frames": 48600,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.025,
+        "peak_float": 0.309295654296875,
+        "rms_float": 0.045287134407372455,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "c33fb0f791f8cc593c48f375bc7ad53a723c4b4ecfe0a6d63b7b94102fa46dfe",
+        "frames": 48600,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.025,
+        "peak_float": 0.31246399879455566,
+        "rms_float": 0.04550662035679061,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "9ac1327983d387158b90a8c3cb036354864937c1524c6a3b4e66dfe9d186778f",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "UnitUnderAttack",
+      "source": "sources/english/announcer/unit_under_attack.wav",
+      "source_sha256": "90dcc5951602b5ae2736e6ba8c1a6ec79c46c50f422ee11ffa6607e960c5daca",
+      "text": "Unit under attack.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/unit_under_attack.ogg",
+      "source_pcm": {
+        "sha256": "a86081f7a87e8e195d46ff2cb9b16fcecb86af957f4f05fe5606c0b9e28ddf64",
+        "frames": 45000,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.875,
+        "peak_float": 0.315399169921875,
+        "rms_float": 0.0484136855934237,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "498590651f271dcaa21d041d30855c81e2fad3cf9946e60d667fe417851be349",
+        "frames": 45000,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.875,
+        "peak_float": 0.3135802149772644,
+        "rms_float": 0.048545563839783715,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "2bd6722ab634d5d9bd5aad3ee677b0f0cf8dc8476eb3454e13f5d21d1864e304",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "english",
+      "primary_event": "UnitLost",
+      "source": "sources/english/announcer/unit_lost.wav",
+      "source_sha256": "0902f1e4c729f7cc326e8b51d43728ab506aff26c8250c4f65087077def4c99f",
+      "text": "Unit lost.",
+      "voice": "af_heart",
+      "runtime_relative_path": "voice/english/announcer/unit_lost.ogg",
+      "source_pcm": {
+        "sha256": "64374104e17537e445d0248ac41f17c2e904f09a3c6c634084a6dccd5ec42496",
+        "frames": 39600,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.65,
+        "peak_float": 0.365570068359375,
+        "rms_float": 0.04968217359998117,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "0606909e461d0ea87dd9fa2aad4dfa8f867ce0801aaf01cb730c28793bb78403",
+        "frames": 39600,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.65,
+        "peak_float": 0.3803289532661438,
+        "rms_float": 0.04984892243786887,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "ed9483539db797ee148a3f135ec1b6c8e96449c42a88c466024b80e8498b4c18",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "Hello",
+      "source": "sources/chinese/unit/hello.wav",
+      "source_sha256": "88d545530a3d24d968d1e9f4e9df1c84879d1c025a1a17b54820f890f17fbe6a",
+      "text": "长官？",
+      "voice": "zm_yunxi",
+      "runtime_relative_path": "voice/chinese/unit/hello.ogg",
+      "source_pcm": {
+        "sha256": "cdde979db074c49942d863b5a0a80b441325841e8ce065f3c2411717f6962d2b",
+        "frames": 44400,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.85,
+        "peak_float": 0.364410400390625,
+        "rms_float": 0.04267485574585205,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "2f7486b285630a6cb72e0c5a0d2c1f8f37fd09b1bef63a673422aa4ed12f65e1",
+        "frames": 44400,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.85,
+        "peak_float": 0.38312068581581116,
+        "rms_float": 0.0429407121421882,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "7b07ce6b990f9c0e1739d746e0758c64873a75624ef4e40855255a98a6912c40",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "Ack1",
+      "source": "sources/chinese/unit/ack1.wav",
+      "source_sha256": "bfb4c912e9c8360561f32545294860c096aed54afaca8476f75b011e939f4df5",
+      "text": "遵命。",
+      "voice": "zm_yunxi",
+      "runtime_relative_path": "voice/chinese/unit/ack1.ogg",
+      "source_pcm": {
+        "sha256": "a413a5f65754b45d04ade1481b0f5abc4386771d26a161a214bea111832e092a",
+        "frames": 43200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.8,
+        "peak_float": 0.474639892578125,
+        "rms_float": 0.04625092775502056,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "f603de0efcd5e82f6a41f6c62c3454f959c63bac7976f03ac6310735a2767d5d",
+        "frames": 43200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.8,
+        "peak_float": 0.4794025421142578,
+        "rms_float": 0.04633404254723381,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "294660b658718e1158e17cea6998eeaa2dab6f3e39713413ebdba7bd0e7d47e1",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "Ack2",
+      "source": "sources/chinese/unit/ack2.wav",
+      "source_sha256": "e1e93c87c4d1f0e4d08aafce9fc3958c6227837f036157c07b6dd067e786a5f0",
+      "text": "收到。",
+      "voice": "zm_yunxi",
+      "runtime_relative_path": "voice/chinese/unit/ack2.ogg",
+      "source_pcm": {
+        "sha256": "964178b581e1269ce18ab6a99f14a244cbc2395a666435bf7a9bf2cfa6d94db6",
+        "frames": 43800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.825,
+        "peak_float": 0.36822509765625,
+        "rms_float": 0.04658700440709057,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "b7a040b6f43ea61b10876543608b90abc3a24a507b8450eeab8c70486d019b28",
+        "frames": 43800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 1.825,
+        "peak_float": 0.3889889717102051,
+        "rms_float": 0.0466175197573304,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "1cb20ea9e6ad8090d2ed960088e01d29c46322193b174d576c13447b9b127159",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "Training",
+      "source": "sources/chinese/announcer/training.wav",
+      "source_sha256": "87af6f47565a6f8fc7941a0b24636a1cdf949a4418ba082a27cdd76c8deecfd2",
+      "text": "训练中。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/training.ogg",
+      "source_pcm": {
+        "sha256": "997b0a6ec94e20cbdd438f80b2fb1925cf1690a224fae2323f86c657ae968014",
+        "frames": 48000,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.0,
+        "peak_float": 0.54742431640625,
+        "rms_float": 0.0898395985431576,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "90a0dc332fd75ab91bcc426fdf9e1b53d5ccb999ff196786e67aa4c61ff70f5b",
+        "frames": 48000,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.0,
+        "peak_float": 0.5427435636520386,
+        "rms_float": 0.089935599627466,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "80e4edc9197a3c0aaf4828c71f60e9f9886ddfb7c9843680596e7b77bb1ab964",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "UnitReady",
+      "source": "sources/chinese/announcer/unit_ready.wav",
+      "source_sha256": "c04c03418dd4c2d546b55936377cff122fe753a5ad1b0e5bb929d26efdb6045d",
+      "text": "单位就绪。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/unit_ready.ogg",
+      "source_pcm": {
+        "sha256": "d38b8bd9708a82fd4792ce90a895a4cc0b2c4d6f2cdd4963367aad40943824c0",
+        "frames": 48600,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.025,
+        "peak_float": 0.536651611328125,
+        "rms_float": 0.08829471096799738,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "3294ff036a5e49c225d19794be66ad2ff27e8e93909c8993b3cda2400d2fe1bc",
+        "frames": 48600,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.025,
+        "peak_float": 0.5245699882507324,
+        "rms_float": 0.08829691616434825,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "198608871e4435d18c98806dbb84cd61f7f60198d98dce0417ce527859292f94",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "ConstructionComplete",
+      "source": "sources/chinese/announcer/construction_complete.wav",
+      "source_sha256": "4b26c0e6e15a7b8ca7bad1006015ec9f2f1804835f347d9f41c67f499d5bdeab",
+      "text": "建造完成。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/construction_complete.ogg",
+      "source_pcm": {
+        "sha256": "aace28d6ea8b4681bec445fcdd7c6aa71808736f9c8c4edb364d8abd7d1dfac9",
+        "frames": 50400,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.1,
+        "peak_float": 0.47601318359375,
+        "rms_float": 0.08937437865208134,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "0855c836f5e5dc667a8f118cde867a8ec094f5766962a00e1626a623899a5d11",
+        "frames": 50400,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.1,
+        "peak_float": 0.48746582865715027,
+        "rms_float": 0.08958237252018891,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "bff568e942a796bd77f25b158f806c683e0b312b83a2b743f9deb7d3fdac2e96",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "NotEnoughResources",
+      "source": "sources/chinese/announcer/not_enough_resources.wav",
+      "source_sha256": "2ad71fce381b54e00a227dd45cd1b990b493de1bd1ead8248b63534278a949f8",
+      "text": "资源不足。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/not_enough_resources.ogg",
+      "source_pcm": {
+        "sha256": "2e49f04d1e3555a560b5fabb1ac0b41c3fc5906798bf9cbb8f9854c042d7fe38",
+        "frames": 49200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.05,
+        "peak_float": 0.548309326171875,
+        "rms_float": 0.0903765089565779,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "6dc2dbf6f0806ab03df7733de95ff6a344ccfdb98b2d24d7bb768a5670a0a2de",
+        "frames": 49200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.05,
+        "peak_float": 0.5587474703788757,
+        "rms_float": 0.09056570873967569,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "e0495e0856eabc131e260cf1c6ce812c930b11b687d622cef733e79b381a7b23",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "SupportPowerReady",
+      "source": "sources/chinese/announcer/support_power_ready.wav",
+      "source_sha256": "d35afe65084b3620e7609896e2ca60836cc67ea1d59470b4c24879474a3d1bbb",
+      "text": "支援技能就绪。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/support_power_ready.ogg",
+      "source_pcm": {
+        "sha256": "0df63ae0d16906eccdd18a745d3b2a05afdfee6fb634f31b0f1a291ba8a534ff",
+        "frames": 58200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.425,
+        "peak_float": 0.594512939453125,
+        "rms_float": 0.09327498273653484,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "7c00e87dd6bd93310d10dff3ef93bf479c14e2b799650c0af53342d39a29f4bb",
+        "frames": 58200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.425,
+        "peak_float": 0.5851006507873535,
+        "rms_float": 0.0934807776148495,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "cddab3aabb9e3a5d0655714ac9c5e34dbb4c77cf1038a991357ca4a35990f844",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "EnemySupportPowerFired",
+      "source": "sources/chinese/announcer/enemy_support_power_fired.wav",
+      "source_sha256": "72a7bdab1bbf689dd0e3d26e678b944d48c7da050aa29c3055d4994d4d1037bb",
+      "text": "敌方发动支援技能。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/enemy_support_power_fired.ogg",
+      "source_pcm": {
+        "sha256": "14e636a7f0b8d68db712cc822dc3fb3af78c25f54c5f4941ccf77c69aeacda3c",
+        "frames": 66000,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.75,
+        "peak_float": 0.58221435546875,
+        "rms_float": 0.09316468492096693,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "675157e10ba6e12243d83df3f54831fac3ec5f94f6b1dd5d5f31240491039145",
+        "frames": 66000,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.75,
+        "peak_float": 0.5963647365570068,
+        "rms_float": 0.09340204687471337,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "793d95b5fb4277b444987d7e7b8c28af8aab6d70a51560b1c0f00406ee8a7d56",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "EnemySuperweaponReady",
+      "source": "sources/chinese/announcer/enemy_superweapon_ready.wav",
+      "source_sha256": "a5ab0cec9c375bf28a7136083aa48f85c65c65150f1d7371239894d5a89cfbca",
+      "text": "警告，敌方超级武器就绪。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/enemy_superweapon_ready.ogg",
+      "source_pcm": {
+        "sha256": "6f9ab3c04e36e3c0c7c6d32956e4c687e6e64fe4e585bc5ec74dd84e7b4c454d",
+        "frames": 78600,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 3.275,
+        "peak_float": 0.5672607421875,
+        "rms_float": 0.09624696086078183,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "7515e5a471e5b98562f472d7d28af85685850819523bc725709e2cfae8b73f6f",
+        "frames": 78600,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 3.275,
+        "peak_float": 0.5748113989830017,
+        "rms_float": 0.09640407173116103,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "809f9ac6a1beb24d7e2a05aefe7616d59cf562dd0fcc54dfcf0d47c226d0da91",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "EnemySuperweaponLaunched",
+      "source": "sources/chinese/announcer/enemy_superweapon_launched.wav",
+      "source_sha256": "55899184a7e6f9abfdb97e5ef5df520cd1da3b84b4332a21a06af52828e310c1",
+      "text": "警告，敌方超级武器已发射。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/enemy_superweapon_launched.ogg",
+      "source_pcm": {
+        "sha256": "5aaaae2aebf8c426f8c29932d876ff4498a8ffef9b018853c453d731b9f0525d",
+        "frames": 84000,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 3.5,
+        "peak_float": 0.523162841796875,
+        "rms_float": 0.09593733637036425,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "70ff58cb107c785db99dacdb623464a11db7b7362a958faddaf6288f10aabe7f",
+        "frames": 84000,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 3.5,
+        "peak_float": 0.5275635719299316,
+        "rms_float": 0.09615332470084567,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "36dfe0f5f5046f18880fe4fb6b0459b15e99fe52d7b4f3e38c762176efcb9f72",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "Victory",
+      "source": "sources/chinese/announcer/victory.wav",
+      "source_sha256": "e977d97fd321bde509398307922686f5ee417fb4901a56a726170902a2bac2e1",
+      "text": "你已获得胜利。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/victory.ogg",
+      "source_pcm": {
+        "sha256": "f76171f80242c0783dffaf561ca21baf511b515f64553ceb64a1686daac8595b",
+        "frames": 55800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.325,
+        "peak_float": 0.608154296875,
+        "rms_float": 0.09462252023057788,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "2ae94f6e0bccc5ec8928feb4222f4452c75b297d9bbdd0188e0850f267bd603f",
+        "frames": 55800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.325,
+        "peak_float": 0.6134851574897766,
+        "rms_float": 0.09490013431083864,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "c1fc682af7f76a920ac4e4ba0634e82a9c61f0598b33946434c73bedebe178af",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "Defeat",
+      "source": "sources/chinese/announcer/defeat.wav",
+      "source_sha256": "c0caf90d4281b8bd8ee5f13ca5de9780d5ee0bcfc52822fc47a2194867472287",
+      "text": "你已战败。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/defeat.ogg",
+      "source_pcm": {
+        "sha256": "4584c7747d8e21821eb0a2db4df388bc784d5b0a2dd1f5e040673b67e5d3497d",
+        "frames": 48000,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.0,
+        "peak_float": 0.452545166015625,
+        "rms_float": 0.09040917559206332,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "913e8437d0ae8da89d62bed923c81e2c80737aecbe24a49143a24528f809c417",
+        "frames": 48000,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.0,
+        "peak_float": 0.4573180675506592,
+        "rms_float": 0.09049628713986681,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "fd87d8ddba6c36ff990b85eb6d856516ca89b710d7719e85084547b87a9a78dd",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "BaseUnderAttack",
+      "source": "sources/chinese/announcer/base_under_attack.wav",
+      "source_sha256": "2c969b65c7a11e2548985f189e3a8e2a7180e1e5dca58c701b39a1fa65f0ef73",
+      "text": "基地遇袭。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/base_under_attack.ogg",
+      "source_pcm": {
+        "sha256": "a18b888763edb84e4a5d62e3776f6ffb8dc9837a186964e17c8accb77db98f3d",
+        "frames": 49200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.05,
+        "peak_float": 0.362579345703125,
+        "rms_float": 0.08264940901435079,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "0f56140ba9929a1a7f63d1c3c9a52e036a6ed89f13ab11b2e2900c27bc7edd6c",
+        "frames": 49200,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.05,
+        "peak_float": 0.37445738911628723,
+        "rms_float": 0.08287156342178549,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "f73ae0fe757a040296e2975bff1ef5d9380393eb087029a402db9f0171c1dd1e",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "UnitUnderAttack",
+      "source": "sources/chinese/announcer/unit_under_attack.wav",
+      "source_sha256": "c164069aadbb92f6a82461328400d34936be2d104cc77ef0f840b10a56422640",
+      "text": "部队遇袭。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/unit_under_attack.ogg",
+      "source_pcm": {
+        "sha256": "a0558c5c5cdfdcfce4fcaffc1d4a0e78793d55a35634d9311b4a6b85bc7a64b7",
+        "frames": 49800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.075,
+        "peak_float": 0.5550537109375,
+        "rms_float": 0.08601720159032808,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "1eeca789e45f75e165ceb1b5ee5038a76982d0db4461752c13859b55210fc40b",
+        "frames": 49800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.075,
+        "peak_float": 0.566008985042572,
+        "rms_float": 0.08622858751892527,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "564c18dc8dc4790d427ebd9e754263fc00feb121835e0e52cecad39c70476b09",
+      "candidate_container_sha_reproducible": false
+    },
+    {
+      "language": "chinese",
+      "primary_event": "UnitLost",
+      "source": "sources/chinese/announcer/unit_lost.wav",
+      "source_sha256": "623ad55b64c7bd1bab85e10594f0a5e1ab79b4e75eeb143cfb5afe040127d308",
+      "text": "单位损失。",
+      "voice": "zf_xiaoxiao",
+      "runtime_relative_path": "voice/chinese/announcer/unit_lost.ogg",
+      "source_pcm": {
+        "sha256": "69779a5f9b3d9851f64172da618446a74fceb76f80988405a4c2834cf5c025e1",
+        "frames": 49800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.075,
+        "peak_float": 0.5992431640625,
+        "rms_float": 0.08851519246369353,
+        "clipped_samples": 0
+      },
+      "expected_decoded_ogg_pcm": {
+        "sha256": "81b1cd65ea29024c5ad41a5cb5c258e583b526df3ab02c74180c5e3f6b84a343",
+        "frames": 49800,
+        "sample_rate": 24000,
+        "channels": 1,
+        "seconds": 2.075,
+        "peak_float": 0.6028662919998169,
+        "rms_float": 0.08890292078101468,
+        "clipped_samples": 0
+      },
+      "candidate_ogg_sha256": "47d0385e765b8cf79b9061a2d0365e756473efa2eb45f79be9d39f5fc195c7fa",
+      "candidate_container_sha_reproducible": false
+    }
+  ],
+  "events": [
+    {
+      "language": "english",
+      "enum": "Hello",
+      "path": "voice/english/unit/hello.ogg",
+      "source_event": "hello_ready",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "Ack1",
+      "path": "voice/english/unit/ack1.ogg",
+      "source_event": "yes_sir",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "Ack2",
+      "path": "voice/english/unit/ack2.ogg",
+      "source_event": "acknowledged",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "Training",
+      "path": "voice/english/announcer/training.ogg",
+      "source_event": "training",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "UnitReady",
+      "path": "voice/english/announcer/unit_ready.ogg",
+      "source_event": "unit_ready",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "ConstructionComplete",
+      "path": "voice/english/announcer/construction_complete.ogg",
+      "source_event": "construction_complete",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "NotEnoughResources",
+      "path": "voice/english/announcer/not_enough_resources.ogg",
+      "source_event": "not_enough_resources",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "SupportPowerReady",
+      "path": "voice/english/announcer/support_power_ready.ogg",
+      "source_event": "support_power_ready",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "SupportPowerFired",
+      "path": "voice/english/unit/ack2.ogg",
+      "source_event": "acknowledged",
+      "reuse": "Ack2"
+    },
+    {
+      "language": "english",
+      "enum": "EnemySupportPowerFired",
+      "path": "voice/english/announcer/enemy_support_power_fired.ogg",
+      "source_event": "enemy_support_power",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "EnemySuperweaponReady",
+      "path": "voice/english/announcer/enemy_superweapon_ready.ogg",
+      "source_event": "enemy_superweapon_ready",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "EnemySuperweaponLaunched",
+      "path": "voice/english/announcer/enemy_superweapon_launched.ogg",
+      "source_event": "enemy_superweapon_launched",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "Victory",
+      "path": "voice/english/announcer/victory.ogg",
+      "source_event": "victory",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "Defeat",
+      "path": "voice/english/announcer/defeat.ogg",
+      "source_event": "defeat",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "BaseUnderAttack",
+      "path": "voice/english/announcer/base_under_attack.ogg",
+      "source_event": "base_under_attack",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "UnitUnderAttack",
+      "path": "voice/english/announcer/unit_under_attack.ogg",
+      "source_event": "unit_under_attack",
+      "reuse": null
+    },
+    {
+      "language": "english",
+      "enum": "UnitLost",
+      "path": "voice/english/announcer/unit_lost.ogg",
+      "source_event": "unit_lost",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "Hello",
+      "path": "voice/chinese/unit/hello.ogg",
+      "source_event": "sir",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "Ack1",
+      "path": "voice/chinese/unit/ack1.ogg",
+      "source_event": "yes_sir",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "Ack2",
+      "path": "voice/chinese/unit/ack2.ogg",
+      "source_event": "acknowledged",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "Training",
+      "path": "voice/chinese/announcer/training.ogg",
+      "source_event": "training",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "UnitReady",
+      "path": "voice/chinese/announcer/unit_ready.ogg",
+      "source_event": "unit_ready",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "ConstructionComplete",
+      "path": "voice/chinese/announcer/construction_complete.ogg",
+      "source_event": "construction_complete",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "NotEnoughResources",
+      "path": "voice/chinese/announcer/not_enough_resources.ogg",
+      "source_event": "not_enough_resources",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "SupportPowerReady",
+      "path": "voice/chinese/announcer/support_power_ready.ogg",
+      "source_event": "support_power_ready",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "SupportPowerFired",
+      "path": "voice/chinese/unit/ack2.ogg",
+      "source_event": "acknowledged",
+      "reuse": "Ack2"
+    },
+    {
+      "language": "chinese",
+      "enum": "EnemySupportPowerFired",
+      "path": "voice/chinese/announcer/enemy_support_power_fired.ogg",
+      "source_event": "enemy_support_power",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "EnemySuperweaponReady",
+      "path": "voice/chinese/announcer/enemy_superweapon_ready.ogg",
+      "source_event": "enemy_superweapon_ready",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "EnemySuperweaponLaunched",
+      "path": "voice/chinese/announcer/enemy_superweapon_launched.ogg",
+      "source_event": "enemy_superweapon_launched",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "Victory",
+      "path": "voice/chinese/announcer/victory.ogg",
+      "source_event": "victory",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "Defeat",
+      "path": "voice/chinese/announcer/defeat.ogg",
+      "source_event": "defeat",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "BaseUnderAttack",
+      "path": "voice/chinese/announcer/base_under_attack.ogg",
+      "source_event": "base_under_attack",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "UnitUnderAttack",
+      "path": "voice/chinese/announcer/unit_under_attack.ogg",
+      "source_event": "unit_under_attack",
+      "reuse": null
+    },
+    {
+      "language": "chinese",
+      "enum": "UnitLost",
+      "path": "voice/chinese/announcer/unit_lost.ogg",
+      "source_event": "unit_lost",
+      "reuse": null
+    }
+  ],
+  "unique_per_language": 16,
+  "enum_per_language": 17,
+  "human_listening_accepted": false,
+  "tone_accepted": false,
+  "runtime_integrated": false
+}
