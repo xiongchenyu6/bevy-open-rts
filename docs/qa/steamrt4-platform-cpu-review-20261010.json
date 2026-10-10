@@ -1,0 +1,31 @@
+{
+  "scope": "Official Runtime4 platform CPU launcher and x86_64 imported Radeon ICD readability; no game/GPU rendering acceptance",
+  "depot": {
+    "scope": "Official pinned Runtime4 depot acquisition only; no game/runtime acceptance",
+    "base_url": "https://repo.steampowered.com/steamrt4/images/4.0.20260805.254769/",
+    "prepared": true,
+    "archive_sha256": "3226d8234e7c0542ee767837832bfb1dad5e5e2dc944ec97eb221b437f6b9349",
+    "archive_bytes": 164895128,
+    "wall_seconds": 12.413005439011613
+  },
+  "versions": "#Name\tVersion\t\tRuntime\tRuntime_Version\tComment\ndepot\t4.0.20260805.254769\t\t\t# Overall version number\npressure-vessel\t0.20260805.0\t\t\t\npressure-vessel-arm64\t0.20260805.0\t\t\t\nscripts\t0.20260805.0\t\t\t# from steam-runtime-tools\nsteamrt4\t4.0.20260805.254769\tsteamrt4\t4.0.20260805.254769\t# steamrt4_platform_4.0.20260805.254769/\n",
+  "actual_cpu_preflight": {
+    "scope": "Official Runtime4 CPU launcher/imported ICD readability only; not game rendering",
+    "actual_exit": 0,
+    "wall_seconds": 0.9690700330247637,
+    "system_path": "/nix/store/lnirw7a51gnlhnrakivzg11vh4h5kszy-coreutils-full-9.11/bin:/run/current-system/sw/bin:/usr/bin:/bin",
+    "command": [
+      "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/steamrt4-runtime-depot-20261010/SteamLinuxRuntime_4/run",
+      "--graphics-provider=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/steam-runtime-ubuntu-graphics-provider-20261010/root",
+      "--",
+      "/bin/sh",
+      "-c",
+      "cat /etc/os-release; printf \"VK_ICD_FILENAMES=%s\\n\" \"$VK_ICD_FILENAMES\"; test -r \"$VK_ICD_FILENAMES\""
+    ]
+  },
+  "raw_log_sha256": "0d88aa8c6fa3a479d4b09f3b0616fd56ebe80d99fc092cce9b242dface7ba70b",
+  "nixos_preflight_correction": "New bwrap test binds /nix/store but not /run; SYSTEM_PATH uses the resolved coreutils store directory so true is available inside the test namespace",
+  "i386_graphics_provider_present": false,
+  "x86_64_package_scope": true,
+  "full_runtime_gate_complete": false
+}
