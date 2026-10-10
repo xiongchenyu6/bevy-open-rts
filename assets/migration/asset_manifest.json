@@ -1,5 +1,5 @@
 {
-  "asset_count": 338,
+  "asset_count": 332,
   "assets": [
     "campaign/mission_01-v2.jpg",
     "campaign/mission_02-v2.jpg",
@@ -301,12 +301,6 @@
     "ui/icons/WeatherControlSpire.png",
     "ui/icons/WeatherStorm.png",
     "ui/icons/Worker.png",
-    "vfx/exhaust_puff.png",
-    "vfx/fireball.png",
-    "vfx/impact_smoke.png",
-    "vfx/impact_spark.png",
-    "vfx/muzzle_flash.png",
-    "vfx/shockwave_ring.png",
     "voice/chinese/announcer/base_under_attack.ogg",
     "voice/chinese/announcer/construction_complete.ogg",
     "voice/chinese/announcer/defeat.ogg",
@@ -352,7 +346,6 @@
     "textures": 1,
     "translations": 8,
     "ui": 99,
-    "vfx": 6,
     "voice": 32
   },
   "schema": 1,

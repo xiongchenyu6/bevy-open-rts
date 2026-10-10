@@ -71,9 +71,6 @@
       "identical": 2,
       "generated_original_roster": 1
     },
-    "vfx": {
-      "absent_from_upstream": 6
-    },
     "voice": {
       "original_generated_voice": 32
     }
@@ -178,7 +175,7 @@
     },
     {
       "path": "assets/migration/asset_manifest.json",
-      "sha256": "0c0bc46478a5e6ae945281ca1e01461d2f6263c53dc10b1597332fb965756f58",
+      "sha256": "0b078f25b7649e66bcef3cf83812431ce2420e6881fd58c5ce528c47a8937c0c",
       "comparison": "authored_runtime_inventory",
       "provenance": "scripts/generate_registry.py --asset-manifest-only",
       "scope": "Current runtime file inventory, not imported Godot source membership"
@@ -4180,36 +4177,6 @@
       "all_roster_paid_gameplay_verified": false
     },
     {
-      "path": "assets/vfx/exhaust_puff.png",
-      "sha256": "de4294a4e1fcc45525846199494649a29b7a42ccf1f907a7bff8f0d1fa699ac9",
-      "comparison": "absent_from_upstream"
-    },
-    {
-      "path": "assets/vfx/fireball.png",
-      "sha256": "1c8496f49163a2d5794e223854fffa1960087632f618d7a85d8695f27bc496f2",
-      "comparison": "absent_from_upstream"
-    },
-    {
-      "path": "assets/vfx/impact_smoke.png",
-      "sha256": "bc2c101d501eaea3a2498cc56152790a02ae1fe59929383064bcf9bcb6a393dc",
-      "comparison": "absent_from_upstream"
-    },
-    {
-      "path": "assets/vfx/impact_spark.png",
-      "sha256": "fbefca5d71de26ff1429ff798c7129610fecf7c7a90094e151a14fe609d28a35",
-      "comparison": "absent_from_upstream"
-    },
-    {
-      "path": "assets/vfx/muzzle_flash.png",
-      "sha256": "500877e577df21747c7250c2e7a3001b1ce92be726db08e7ed8b5a712bff9ab5",
-      "comparison": "absent_from_upstream"
-    },
-    {
-      "path": "assets/vfx/shockwave_ring.png",
-      "sha256": "167654cb1c380d5663657e7f354a548628830acb06aad62f118846756a20a7a2",
-      "comparison": "absent_from_upstream"
-    },
-    {
       "path": "assets/voice/chinese/announcer/base_under_attack.ogg",
       "sha256": "f73ae0fe757a040296e2975bff1ef5d9380393eb087029a402db9f0171c1dd1e",
       "comparison": "original_generated_voice",
@@ -5160,5 +5127,43 @@
       "reason": "Replaced by original generated desert background with prompt/provenance",
       "archive": "target/menu-background-retired-20261010/background.png"
     }
-  ]
+  ],
+  "retired_unused_vfx": {
+    "files": [
+      {
+        "path": "assets/vfx/exhaust_puff.png",
+        "sha256": "de4294a4e1fcc45525846199494649a29b7a42ccf1f907a7bff8f0d1fa699ac9",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/vfx/fireball.png",
+        "sha256": "1c8496f49163a2d5794e223854fffa1960087632f618d7a85d8695f27bc496f2",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/vfx/impact_smoke.png",
+        "sha256": "bc2c101d501eaea3a2498cc56152790a02ae1fe59929383064bcf9bcb6a393dc",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/vfx/impact_spark.png",
+        "sha256": "fbefca5d71de26ff1429ff798c7129610fecf7c7a90094e151a14fe609d28a35",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/vfx/muzzle_flash.png",
+        "sha256": "500877e577df21747c7250c2e7a3001b1ce92be726db08e7ed8b5a712bff9ab5",
+        "comparison": "absent_from_upstream"
+      },
+      {
+        "path": "assets/vfx/shockwave_ring.png",
+        "sha256": "167654cb1c380d5663657e7f354a548628830acb06aad62f118846756a20a7a2",
+        "comparison": "absent_from_upstream"
+      }
+    ],
+    "archive": "target/unused-vfx-retired-20261010",
+    "static_audit": "target/unused-vfx-media-candidate-audit-20261010.json",
+    "private_runtime_check": "target/unused-vfx-private-hud-20261010/independent-verification.json",
+    "scope": "Unused texture removal; procedural combat effects retained; final packaged combat verification pending"
+  }
 }

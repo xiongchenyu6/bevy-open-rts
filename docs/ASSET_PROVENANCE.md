@@ -1,10 +1,10 @@
 # Asset Provenance
 
-Current inventory update: 2026-10-10. The runtime tree contains 338 tracked files.
+Current inventory update: 2026-10-10. The runtime tree contains 332 files after unused VFX retirement.
 Historical import audits are distinguished below from current original assets;
 unidentified remaining families are not licensed by their presence in the tree.
 
-`assets/migration/asset_manifest.json` lists the current 338 runtime files,
+`assets/migration/asset_manifest.json` lists the current 332 runtime files,
 including notice documents and migration metadata. Refresh it with
 `python3 scripts/generate_registry.py --asset-manifest-only`; this does not need
 the historical Godot checkout. Local full-font inputs and `.import` sidecars are
@@ -293,3 +293,14 @@ cover cropping; `art/menu-background/runtime-integration.json` separately tracks
 the passed three-image post-integration run and still-pending final package
 and distribution review.
 The runtime inventory remains 338 files and the active payload ledger 332 entries.
+
+## Unused VFX texture retirement (2026-10-10)
+
+Six unreferenced legacy PNGs (`exhaust_puff`, `fireball`, `impact_smoke`,
+`impact_spark`, `muzzle_flash`, `shockwave_ring`) were removed from runtime assets.
+Their hashes and historical source status remain in `retired_unused_vfx` in the
+source ledger; archived bytes are outside the packaged tree. Runtime code and
+data contained no texture references. A private asset copy without these files
+passed startup and normal paid building/production HUD checks; this is not a
+full combat or final package test. Procedural effects in `src/combat_vfx.rs`
+remain active. Current inventory is 332 files, with 326 payload ledger entries.
