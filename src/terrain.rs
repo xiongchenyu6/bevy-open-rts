@@ -584,3 +584,6 @@ pub(crate) fn terrain_detail_texture(
     image.sampler = ImageSampler::linear();
     images.add(image)
 }
+
+mod outskirts;
+pub(crate) use outskirts::spawn_battlefield_outskirts;

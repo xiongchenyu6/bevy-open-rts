@@ -4668,6 +4668,14 @@ pub(crate) fn setup(
     // Fog shroud needs the image asset system (real render / capture). Pure
     // headless logic tests have no `Assets<Image>`, so skip it there.
     if let Some(mut images) = images {
+        spawn_battlefield_outskirts(
+            &mut commands,
+            &mut meshes,
+            &mut materials,
+            &mut images,
+            map_bounds,
+            terrain_detail.as_ref(),
+        );
         spawn_fog_overlay(
             &mut commands,
             &mut meshes,

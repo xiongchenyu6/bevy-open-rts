@@ -34,6 +34,11 @@ use bevy::render::view::screenshot::{Screenshot, save_to_disk};
 #[path = "capture/semantic_ui.rs"]
 mod semantic_ui;
 
+#[cfg(not(target_arch = "wasm32"))]
+#[path = "capture/camera_edges.rs"]
+mod camera_edges;
+
+
 #[path = "capture/save_flow.rs"]
 mod save_flow;
 
@@ -155,6 +160,22 @@ fn main() {
             .map(PathBuf::from)
             .ok_or_else(|| "voice-audio needs new output directory".to_string())
             .and_then(|p| bevy_open_rts::capture_voice_audio(&p)),
+        #[cfg(not(target_arch = "wasm32"))]
+        Some("camera-edges") => (|| -> Result<(), String> {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .ok_or("camera-edges needs a new output directory")?;
+            let width = args.next().and_then(|v| v.parse().ok()).unwrap_or(1280);
+            let height = args.next().and_then(|v| v.parse().ok()).unwrap_or(720);
+            let requested_tilt = match args.next().as_deref().unwrap_or("default") {
+                "default" => None,
+                "min-tilt" => Some(0.15),
+                "max-tilt" => Some(1.05),
+                _ => return Err("camera-edges mode must be default, min-tilt or max-tilt".into()),
+            };
+            camera_edges::run(&dir, width, height, requested_tilt)
+        })(),
         Some("hud-card") => {
             let dir = args
                 .next()

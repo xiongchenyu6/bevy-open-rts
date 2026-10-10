@@ -1,5 +1,5 @@
 {
-  "scope": "Native minimum900x720/maximum1280x720 supported tilt, normal controls and paid Radar; root inspected five actual images",
+  "scope": "Native minimum 900x720 and maximum 1280x720 supported tilt; all 22 actual frames visually reviewed, normal controls and paid Radar; renderer geometry tests and full 237-test checkpoint passed.",
   "capture_sha256": "ec18900c8decc72b7853a3a4c1afd75e731e4261565eab847e83e165ae01e3db",
   "actual_runs": [
     {
@@ -376,5 +376,12 @@
     "Five of22 images visually inspected",
     "Native only; final packaged/browser acceptance remains open",
     "Supported extreme tilt produces a shallow battlefield view; this check proves coverage, not overall camera usability"
-  ]
+  ],
+  "remaining_frames_review": {
+    "count": 17,
+    "outside_void": false,
+    "hard_repeat_seams": false,
+    "in_map_opaque_fog_preserved": true,
+    "method": "Actual frames reviewed in a labeled contact sheet; root independently reviewed the other five frames."
+  }
 }

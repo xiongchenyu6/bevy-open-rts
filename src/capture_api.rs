@@ -11,6 +11,15 @@ use bevy_rts_camera::RtsCamera as RtsCam;
 use crate::*;
 
 #[cfg(not(target_arch = "wasm32"))]
+mod camera_edges;
+#[cfg(not(target_arch = "wasm32"))]
+pub use camera_edges::{
+    capture_camera_edge_observation, capture_camera_menu_button, capture_camera_menu_observation,
+    capture_camera_minimap_point, capture_camera_mouse_wheel,
+};
+
+
+#[cfg(not(target_arch = "wasm32"))]
 mod portrait_export;
 #[cfg(not(target_arch = "wasm32"))]
 pub use portrait_export::{export_portrait_stage, export_roster_stage};
