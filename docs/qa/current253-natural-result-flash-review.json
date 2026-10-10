@@ -1,0 +1,25 @@
+{
+  "scope": "Natural terminal result visual review on sealed native253 capture; legitimate Mission5 scenario, not final SDK/Windows or six-mission proof",
+  "process": {
+    "actual_exit": 0,
+    "wall_seconds": 440.71506818098715,
+    "binary_sha256": "12c7543d2294572bead4a029285d682d14f43d0eb74fb9d6261c49dc266bcb12",
+    "scope": "Natural normal-input Mission5 terminal visual review on Flash-cleanup capture; legitimate authored scenario entry, no six-mission/final SDK claim",
+    "profile": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current253-match-end-flash-natural-profile-20261011"
+  },
+  "final_phase": "HumanVictory",
+  "final_clock": 414.4203796386719,
+  "own_unit_types": {
+    "GrenadierTrooper": 3,
+    "HeavyMachinegunTrooper": 3,
+    "RocketInfantry": 5,
+    "Tank": 10,
+    "Worker": 3
+  },
+  "result_frame_directly_reviewed": true,
+  "orange_combat_flash_occlusion_absent_in_reviewed_result_frame": true,
+  "actors_and_ground_scorch_visible": true,
+  "frame_sha256": "62f4aa6b562f887510f5b02515f5e2be092f8138402a5c436f23fa5089643881",
+  "evidence_directory": "screenshots/steam-quality/current253-match-end-flash-natural-20261011",
+  "remaining": "Exact253 SDK natural result visuals and complete final artifact coverage"
+}
