@@ -1,0 +1,43 @@
+{
+  "scope": "Exact247 optimizedarchive native normal controller/alliance inputs, supportedfullscreen1280x720 client; UIlabels only, no fourAIgameplay or performance claim",
+  "archive_sha256": "85309d050a3754780f496fe37e9b5682e1d0bbe2296083f307e9f239403a2e6f",
+  "binary_sha256": "217eeba6de667b6a069d14f67f6792a5747a99ca1e89663dd6149e44728014ed",
+  "actual_container_exit": 0,
+  "actual_game_exit": 0,
+  "four_normal_ai": {
+    "mode": "Free-for-All",
+    "focus": "Spectate Focus: Player 1",
+    "opponents": [
+      "Player 2",
+      "Player 3",
+      "Player 4"
+    ],
+    "four_rows_readable": true
+  },
+  "two_alliances": {
+    "teams": [
+      1,
+      1,
+      3,
+      3
+    ],
+    "mode": "Team battle",
+    "opponents": [
+      "Player 3",
+      "Player 4"
+    ],
+    "allies": [
+      "Player 2"
+    ],
+    "four_rows_readable": true
+  },
+  "start_back_fully_visible": true,
+  "normal_mainmenu_fullscreen_button_used": true,
+  "preserved_windowed_context": "Primaryshot25 used1280x720 including24pxSwaytitlebar (client1280x696); Backclippedbelow supported720clientheight, notincludedinfullscreenacceptance",
+  "screenshots": {
+    "target/linux-current247-boot-camp-persistence-followup-20261010-02/04-normal-fullscreen-menu.png": "47583fd8863c49583a7983a3480a107a54dc0274c3203fc5ef29ac8ec1541616",
+    "target/linux-current247-boot-camp-persistence-followup-20261010-02/06-native-four-normal-ai-ffa.png": "b87710128339e6cf0c344681c8a808d2872531d07c6a7d4335793f42224dbf2e",
+    "target/linux-current247-boot-camp-persistence-followup-20261010-02/07-native-two-alliances.png": "dd15f8849762fee76ffe4cb281fa7779a9c3f2c2f394052ac7d32a17dbd9521d"
+  },
+  "raw_evidence": "target/linux-current247-boot-camp-persistence-followup-20261010-02"
+}
