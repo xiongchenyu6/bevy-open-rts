@@ -1322,7 +1322,6 @@ def write_runtime_asset_manifest() -> None:
 def write_reports(registry: dict[str, object]) -> None:
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSON.write_text(json.dumps(registry, indent=2, sort_keys=True) + "\n")
-    write_runtime_asset_manifest()
     entities: list[dict[str, object]] = registry["entities"]  # type: ignore[assignment]
     factions: list[dict[str, object]] = registry["factions"]  # type: ignore[assignment]
     procedural_only = [
@@ -1379,6 +1378,7 @@ def write_reports(registry: dict[str, object]) -> None:
         for entity_id in procedural_only:
             report.append(f"- {entity_id}: {PROCEDURAL_RENDER_IDS[entity_id]}")
     OUT_REPORT.write_text("\n".join(report) + "\n")
+    write_runtime_asset_manifest()
 
 
 def main() -> None:
