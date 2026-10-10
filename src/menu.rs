@@ -2398,6 +2398,12 @@ pub(crate) fn main_menu_brief_status_text(selection: SkirmishMenuSelection) -> S
 
 pub(crate) fn main_menu_summary_text(selection: SkirmishMenuSelection) -> String {
     let resources = selection.starting_resources();
+    let active = selection.active_teams();
+    let mode_label = if skirmish_has_cross_team_alliance(&selection.team_relations(), &active) {
+        t("团队战", "Team battle")
+    } else {
+        skirmish_mode_from_active_teams(&active).label()
+    };
     let focus_label = if selection.human_team().is_none() {
         t("观战焦点", "Spectate Focus")
     } else {
@@ -2409,7 +2415,7 @@ pub(crate) fn main_menu_summary_text(selection: SkirmishMenuSelection) -> String
     format!(
         "{}: {}  ·  {}: {}\n{}: {}/{}  ·  {}: {}/{}  ·  {}",
         t("模式", "Mode"),
-        selection.match_mode.label(),
+        mode_label,
         focus_label,
         selection.focus_team().label(),
         t("参战玩家", "Players"),

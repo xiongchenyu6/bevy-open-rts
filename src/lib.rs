@@ -4489,33 +4489,38 @@ pub(crate) fn update_main_menu_summary(
 }
 
 pub(crate) fn skirmish_opponents_text(selection: SkirmishMenuSelection) -> String {
-    let focus_team = selection.focus_team();
-    let active_teams = selection.active_teams();
+    let focus = selection.focus_team();
+    let active = selection.active_teams();
     let relations = selection.team_relations();
-    match selection.match_mode {
-        SkirmishMatchMode::OneVsOne | SkirmishMatchMode::AiVsAi => player_teams(active_teams.len())
-            .find(|team| *team != focus_team && relations.are_enemies(focus_team, *team))
-            .map(|team| team.label().to_string())
-            .unwrap_or_else(|| t("无", "None").to_string()),
-        SkirmishMatchMode::FreeForAll => player_teams(active_teams.len())
-            .filter(|team| *team != focus_team && relations.are_enemies(focus_team, *team))
-            .map(Team::label)
-            .collect::<Vec<_>>()
-            .join("/"),
-        SkirmishMatchMode::AlliedTwoVsOne => match (
-            allied_skirmish_ally(focus_team, active_teams.len()),
-            allied_skirmish_enemy(focus_team, active_teams.len()),
-        ) {
-            (Some(ally), Some(enemy)) => {
-                format!(
-                    "{}（{}: {}）",
-                    enemy.label(),
-                    t("盟友", "Ally"),
-                    ally.label()
-                )
-            }
-            _ => t("无", "None").to_string(),
-        },
+    let participants: Vec<_> = active
+        .iter()
+        .enumerate()
+        .filter_map(|(index, enabled)| enabled.then_some(Team::Player(index)))
+        .filter(|team| *team != focus)
+        .collect();
+    let enemies = participants
+        .iter()
+        .copied()
+        .filter(|team| relations.are_enemies(focus, *team))
+        .map(Team::label)
+        .collect::<Vec<_>>()
+        .join("/");
+    let allies = participants
+        .iter()
+        .copied()
+        .filter(|team| !relations.are_enemies(focus, *team))
+        .map(Team::label)
+        .collect::<Vec<_>>()
+        .join("/");
+    let enemies = if enemies.is_empty() {
+        t("无", "None").to_string()
+    } else {
+        enemies
+    };
+    if allies.is_empty() {
+        enemies
+    } else {
+        format!("{} ({}: {})", enemies, t("盟友", "Allies"), allies)
     }
 }
 
@@ -7379,6 +7384,8 @@ pub(crate) fn free_position_in_bounds(
 
 #[cfg(test)]
 mod match_tests;
+#[cfg(test)]
+mod menu_lobby_tests;
 #[cfg(test)]
 mod objective_hud_tests;
 

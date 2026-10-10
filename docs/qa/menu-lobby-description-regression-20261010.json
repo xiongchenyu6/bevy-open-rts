@@ -1,0 +1,19 @@
+{
+  "scope": "Lobby labels tested against actual runtime setup; rendered four-team layout remains pending",
+  "red": {
+    "actual_exit": 101,
+    "failed": 2,
+    "log": "target/menu-lobby-red-20261010.log"
+  },
+  "green": {
+    "focused_passed": 2,
+    "full_passed": 247,
+    "full_failed": 0,
+    "full_ignored": 1,
+    "native_build_exit": 0,
+    "evidence": "target/menu-lobby-shared-20261010/pin.json"
+  },
+  "behavior": "Mode and all enemy/ally labels derive from active teams and actual relations; match rules unchanged",
+  "source_before_formatter": "target/menu-lobby-before-format-20261010",
+  "final_package_verified": false
+}
