@@ -1,0 +1,18 @@
+{
+  "accepted_current_code": false,
+  "actual_build_exit": 0,
+  "reason": "Release dep-info points at previous244 snapshot and binary is identical to244 despite changed HUD source",
+  "dependency_record": "target/release/bevy-open-rts.d",
+  "rejected_result": "result.json",
+  "rejected_package": "target/linux-current245-package-20261010",
+  "dependent_smoke_stopped": true,
+  "retry_method": "cargo clean --release -p bevy-open-rts before compiling frozen245 source",
+  "original_dependency_paths": [
+    "target/linux-current244-snapshot-20261010/source/src/hud.rs",
+    "target/linux-current244-snapshot-20261010/source/src/lib.rs"
+  ],
+  "retry_service": "rts-linux-current245-release-retry02-20261010.service",
+  "observed_current_snapshot_compile": true,
+  "clean_result": "Removed 25 files, 368.7MiB total",
+  "scope": "Build provenance failure retained; retry and final package acceptance pending"
+}
