@@ -1,0 +1,53 @@
+{
+  "scope": "Actual unclipped Start/Back on both window widths; overscroll reverse-response contradicted; original driver failure retained",
+  "actual_reverse_scroll_red": [
+    {
+      "width": 1280,
+      "down_and_reverse_frame_sha256": "43afc706822cc1ee8b306785ac19f3077af399a835d37cd99cad95fac19502ae",
+      "single_reverse_response": false
+    },
+    {
+      "width": 900,
+      "down_and_reverse_frame_sha256": "a0828823cf95829add09fbb18c8ddb2e66568793bd1ebdc9593a42e15b8656f1",
+      "single_reverse_response": false
+    }
+  ],
+  "fullscreen_observed_geometry": {
+    "label": "fullscreen-menu",
+    "views": [
+      {
+        "id": 5,
+        "type": "con",
+        "pid": 3037971,
+        "shell": "xdg_shell",
+        "app_id": null,
+        "name": "Open RTS",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "window_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "deco_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "fullscreen_mode": 1
+      }
+    ]
+  },
+  "driver_failure": {
+    "error": "actual normal Fullscreen button did not produce client720",
+    "scope": "Driver failure preserved; runner keeps its own original240s cleanup deadline"
+  },
+  "next_correction": "Clamp ScrollPosition.y to actual ComputedNode content overflow; snapshot driver must await matching geometry label",
+  "full_ui_pass": false
+}
