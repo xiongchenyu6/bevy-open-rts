@@ -1,0 +1,13 @@
+{
+  "scope": "Read-only decoded RGB edge differences; numerical screening only, no visual tile/model acceptance",
+  "image_sha256": "4f8083b7e554b6cd8854cb5fd5fc1a0cefb43d4997ecd6e829b8af0a84a73991",
+  "size": [
+    1254,
+    1254
+  ],
+  "vertical_seam_mean_absolute_difference": 8.23498139287613,
+  "horizontal_seam_mean_absolute_difference": 9.217969165337587,
+  "sampled_interior_neighbor_mean_absolute_difference": 8.357252224291331,
+  "exact_tileable_edges": false,
+  "runtime_integrated": false
+}

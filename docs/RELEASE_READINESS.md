@@ -29,29 +29,34 @@ fixture passes. Costs, profile timers, six-pick budget and physical clearance
 remain unchanged. Exact packed-base snapshots motivate angular coverage and
 bounded expansion inside normal construction influence.
 
-The last fully verified simulation checkpoint is `81a8de8`:234 tests passed,
-zero failed and one ignored; all four native binaries built successfully.
-Blocked pursuit routes now use the actual mover clearance. All six recorded
-600-second timeout cases and two earlier regressions completed within unchanged
-600-simulation/180-wall-second limits. Evidence is in `MOVEMENT_PATH_QA.md`.
-The fresh3,726-case sweep uses the sealed `0295f5…` audit; its incomplete results
-must not be described as whole-map acceptance.
+The latest full simulation suite records237 passed, zero failed and one ignored
+at the harvest-contact/menu-cursor checkpoint. The harvest correction
+(`52385a4`) preserves legal cached contact routes and replans blocked gathering
+and dropoff approaches. Its real-cargo regression deposits six ore by tick225;
+this does not establish campaign completion. Later presentation/capture-only
+builds succeeded but do not create new four-binary or final-package parity.
+The earlier movement-clearance checkpoint completed eight failed-case rechecks
+within unchanged600-simulation/180-wall-second limits. Its fresh3,726-case sweep
+uses sealed `0295f5…`, predates the harvest correction and remains incomplete.
 
 All70 model-only portraits and the original roster preview are installed by
-`91d824b`. Exactly71 images changed; the other267 asset hashes were preserved at
-that integration checkpoint. Actual normal-input HUD checks at1920x1080 and
-900x720 pass, with readable portraits/cards/tooltips; full-roster paid/UI and
-final native/browser package verification remain open. The current runtime
-inventory has338 files and matches the active source ledger.
+`91d824b`. Normal-input HUD checks at1920x1080 and900x720 pass; full-roster
+paid/UI and final package verification remain open. Original menu background
+integration `07843b2` passed three post-integration native menu/setup images.
+Render-only outskirts `ef588b9` passed both supported tilt extremes with11
+frames each; all22 were visually reviewed. Original four-state cursor atlas
+`aa4193f` has native loaded-pixel/index/hotspot evidence, while its post-integration
+run and final browser pointer appearance/alignment remain pending. Unused legacy
+VFX removal `1309f29` reduces runtime inventory to332 files and326 payload ledger
+entries; private startup/paid-HUD smoke does not prove final combat/package behavior.
 
-The fresh normal-input M1 on that core still ends in HumanDefeat at283.286s.
-All103 running-state selection clicks match their requested actor IDs. A measured
-harvester contact blocked by an adjacent AA unit fails its real-cargo regression;
-its correction and the render-only map outskirts are currently unverified.
-Normal paid HUD actions produce14.45 seconds of mixed native audio with zero
-clipped samples; ASR recovers the English selection acknowledgment only. Full
-event coverage, combat mix and human listening remain open. All nine release
-gates above still apply.
+The fresh normal-input M1 on the harvest-fixed core still ends in HumanDefeat
+at481.7s. Earlier283.286s defeat remains preserved. The next ordinary paid
+counter strategy is under test; no mission costs, waves or stats were weakened.
+All six missions in one App remain unproven. Normal paid HUD actions produce
+14.45 seconds of mixed native audio with zero clipped samples; ASR recovers the
+English selection acknowledgment only. Full event coverage, combat mix and
+human listening remain open. All nine release gates above still apply.
 
 ## Verification policy
 
