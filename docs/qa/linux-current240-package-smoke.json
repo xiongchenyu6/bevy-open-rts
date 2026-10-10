@@ -1,0 +1,36 @@
+{
+  "scope": "Actualcurrent240 optimizedLinux archive readonly-installation nonroot AMD Vulkan startup/keyboardSaveLoad smoke; noNixmount; finalfullgameplay/performance/SteamRuntime/Windowsacceptancepending",
+  "actual_container_exit": 0,
+  "archive_sha256": "02a7c4187c0d8d16cae9de986599a86725ef8437b1bffc25e4a55b6760bee859",
+  "packaged_binary_sha256": "1541e983a6710311e27b215cc9080d56022337c6e42443a730228ba84bb48ac9",
+  "runtime_asset_count": 332,
+  "save_bytes_unchanged": true,
+  "root_reviewed_images": [
+    {
+      "path": "target/linux-current240-clean-keyboard-20261010/01-menu.png",
+      "sha256": "6840b44cc2c2bfa30a580f52c1be28168bb13b7f9ec504eb9949048a2acf34bf"
+    },
+    {
+      "path": "target/linux-current240-clean-keyboard-20261010/06-keyboard-loaded.png",
+      "sha256": "c2f0e864fac3a23e729c088164711be328fac7c0e0b873cbd9f4fe57d9c59e31"
+    },
+    {
+      "path": "target/linux-current240-clean-keyboard-20261010/07-resumed.png",
+      "sha256": "10d645e4f00c1dba7f17ed9f5a01e0038128c522cfea0d9a7d70debf7cf51290"
+    },
+    {
+      "path": "target/linux-current240-clean-keyboard-20261010/10-mouse-loaded.png",
+      "sha256": "321a15dee86698cac50bdde8ab1fcd6a05fd2da1d405b2370c7bede4d0d6396a"
+    }
+  ],
+  "observations": [
+    "Original menu/currentmodels rendered in clean environment",
+    "KeyboardLoad produced visible Game loaded message",
+    "Application alive at end; savefilewritten outside readonlyinstallation"
+  ],
+  "limitations": [
+    "Legacy mouse-menu coordinates missed controls; no mouse menu SaveLoad acceptance",
+    "07-resumed filename is historical harness label; actualframe shows Tacticalpause",
+    "No completecampaign or densecombat FPS acceptance"
+  ]
+}
