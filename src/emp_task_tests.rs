@@ -64,6 +64,7 @@ fn emp_pauses_construction_then_completes_after_actual_status_expiry() {
         .world_mut()
         .spawn((
             worker(),
+            MovementDomain::Terrain,
             Team::Player(0),
             Transform::from_xyz(1.0, 0.0, 0.0),
             Selectable { radius: 0.6 },

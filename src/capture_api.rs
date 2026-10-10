@@ -27,7 +27,7 @@ mod voice_audio;
 #[cfg(not(target_arch = "wasm32"))]
 pub use voice_audio::capture_voice_audio;
 
-mod audit_progress;
+pub(crate) mod audit_progress;
 mod repair_trace;
 mod skirmish_audit;
 pub use skirmish_audit::{SkirmishAuditConfig, run_skirmish_audit};
@@ -1398,6 +1398,11 @@ pub fn capture_construction_contact_debug(app: &mut App) -> serde_json::Value {
         })
         .map(|(_, transform, selectable, ..)| (transform.translation, selectable.radius))
         .collect();
+    let building_footprints: Vec<_> = query
+        .iter(world)
+        .filter(|(_, _, _, _, structure, _, _, _, _)| structure.is_some())
+        .map(|(_, transform, selectable, ..)| (transform.translation, selectable.radius))
+        .collect();
     let workers: Vec<_> = query
         .iter(world)
         .filter(|(entity, _, _, unit, _, _, _, _, hp)| {
@@ -1444,6 +1449,7 @@ pub fn capture_construction_contact_debug(app: &mut App) -> serde_json::Value {
                 target_radius,
                 grid,
                 &static_obstacles,
+                &building_footprints,
                 &occupied,
             );
             contacts.push(serde_json::json!({"worker":worker.to_bits(),"target":target.to_bits(),

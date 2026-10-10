@@ -677,62 +677,6 @@ pub(crate) fn is_economy_worker_selection_unit(unit: &Unit) -> bool {
     unit.id == "Worker"
 }
 
-pub(crate) fn spawn_refinery_free_worker(
-    commands: &mut Commands,
-    asset_server: &AssetServer,
-    next_id: &mut NextSpawnId,
-    structure_id: &'static str,
-    team: Team,
-    visible_team: Team,
-    refinery_position: Vec3,
-    build_origin: Vec3,
-    spawn_seed: u32,
-    bounds: MapBounds,
-    visual_faction: Option<SkirmishFaction>,
-) {
-    if structure_id != "Refinery" {
-        return;
-    }
-    let Some(spawn_at) =
-        refinery_free_worker_spawn_position(refinery_position, build_origin, spawn_seed, bounds)
-    else {
-        return;
-    };
-    spawn_unit_with_visual_faction(
-        commands,
-        asset_server,
-        next_id,
-        "Worker",
-        team,
-        spawn_at,
-        0,
-        visual_faction.or_else(|| default_visual_faction(team)),
-        visible_team,
-    );
-}
-
-pub(crate) fn refinery_free_worker_spawn_position(
-    refinery_position: Vec3,
-    build_origin: Vec3,
-    spawn_seed: u32,
-    bounds: MapBounds,
-) -> Option<Vec3> {
-    let refinery_def = registry::entity("Refinery")?;
-    let worker_def = registry::entity("Worker")?;
-    let mut direction = Vec3::new(
-        refinery_position.x - build_origin.x,
-        0.0,
-        refinery_position.z - build_origin.z,
-    );
-    if direction.length_squared() <= f32::EPSILON {
-        let angle = spawn_seed as f32 * 1.618_034;
-        direction = Vec3::new(angle.cos(), 0.0, angle.sin());
-    }
-    direction = direction.normalize();
-    let distance = refinery_def.radius + worker_def.radius + 0.35;
-    Some(bounds.clamp_ground_point(refinery_position + direction * distance, 1.0))
-}
-
 pub(crate) fn economy_tick(
     time: Res<Time>,
     mut economies: ResMut<Economies>,

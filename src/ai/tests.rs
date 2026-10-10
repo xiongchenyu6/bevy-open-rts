@@ -229,6 +229,27 @@ fn configured_remote_human_keeps_control_while_ai_slot_develops() {
     for _ in 0..1350 {
         app.update();
         let world = app.world_mut();
+        let mut builders = world.query::<(&Team, &Transform, &Selectable, &ConstructOrder)>();
+        let positions = builders
+            .iter(world)
+            .filter(|(team, ..)| **team == Team::Player(2))
+            .map(|(_, position, radius, _)| (position.translation, radius.radius))
+            .collect::<Vec<_>>();
+        let mut resources = world.query::<(&ResourceNode, &Transform, &Selectable)>();
+        for (position, radius) in positions {
+            for (resource, node, node_radius) in resources
+                .iter(world)
+                .filter(|(resource, ..)| resource.amount > 0)
+            {
+                let distance = xz_distance(position, node.translation);
+                assert!(
+                    distance + 1e-4 >= radius + node_radius.radius,
+                    "full-schedule constructor entered a resource body: position={position:?} resource={:?} distance={distance} physical={}",
+                    node.translation,
+                    radius + node_radius.radius
+                );
+            }
+        }
         let economy = world.resource::<Economies>().get(Team::Player(1));
         assert_eq!(
             (economy.ore, economy.crystal),
@@ -400,10 +421,7 @@ fn easy_ground_wave_finishes_alternate_spawn_with_enemy_scout() {
         file.write_all(&serde_json::to_vec_pretty(&result).unwrap())
             .unwrap();
     }
-    eprintln!(
-        "[ai-domain] phase={} clock={} winners={:?}",
-        result["phase"], result["clock_seconds"], result["winning_teams"]
-    );
+    eprintln!("[ai-domain] {result}");
     assert_eq!(
         result["starting_resources"],
         serde_json::json!({"ore":32,"crystal":16})
@@ -484,5 +502,82 @@ fn ai_wave_target_respects_runtime_ground_and_air_capabilities() {
     assert_eq!(
         nearest_ai_wave_enemy(Team::Player(0), origin, Some(&weapon), &relations, &targets),
         Some(air_target)
+    );
+}
+
+#[test]
+fn paid_alternate_refinery_workers_are_born_outside_resource_bodies() {
+    let mut app = build_game_app(GameAppMode::Headless);
+    app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
+        std::time::Duration::from_secs_f32(1.0 / 30.0),
+    ));
+    {
+        let mut settings = app.world_mut().resource_mut::<MatchSetupSettings>();
+        settings.map_path = "res://source/match/maps/PlainAndSimple.tscn";
+        settings.starting_resources = StartingResources::new(32, 16);
+        settings.startup_loadout = StartupLoadoutMode::GodotSkirmish;
+        settings.victory_condition = VictoryCondition::Annihilation;
+        settings.visible_player = VisiblePlayer::all_players(Team::Player(0));
+        for (player, difficulty, spawn) in
+            [(0, AiDifficulty::Easy, 1), (1, AiDifficulty::Beginner, 3)]
+        {
+            settings.player_controllers[player] = SkirmishPlayerController::Ai(difficulty);
+            settings.player_factions[player] = SkirmishFaction::Alliance;
+            settings.player_spawn_slots[player] = spawn;
+            settings
+                .ai_difficulties
+                .set_difficulty(Team::Player(player), difficulty);
+        }
+    }
+    app.world_mut()
+        .resource_mut::<NextState<AppScreen>>()
+        .set(AppScreen::InMatch);
+    for _ in 0..8 {
+        app.update();
+    }
+    let mut seen = {
+        let world = app.world_mut();
+        let mut query = world.query::<(Entity, &Unit)>();
+        query
+            .iter(world)
+            .filter(|(_, unit)| unit.id == "Worker")
+            .map(|(id, _)| id)
+            .collect::<std::collections::HashSet<_>>()
+    };
+    let mut paid_births = 0;
+    for _ in 0..18000 {
+        app.update();
+        let world = app.world_mut();
+        let clock = world.resource::<MatchState>().start_time_sec;
+        let mut nodes = world.query_filtered::<(&Transform, &Selectable), With<ResourceNode>>();
+        let nodes = nodes
+            .iter(world)
+            .map(|(p, r)| (p.translation, r.radius))
+            .collect::<Vec<_>>();
+        let mut workers = world.query::<(Entity, &Unit, &Transform, &Selectable)>();
+        for (id, unit, position, radius) in
+            workers.iter(world).filter(|(_, u, ..)| u.id == "Worker")
+        {
+            if !seen.insert(id) {
+                continue;
+            }
+            paid_births += 1;
+            for (node, node_radius) in &nodes {
+                assert!(
+                    xz_distance(position.translation, *node) + 1e-4 >= radius.radius + node_radius,
+                    "paid Refinery bonus Worker born inside resource: clock={clock} entity={id:?} position={:?} node={node:?} distance={} physical={}",
+                    position.translation,
+                    xz_distance(position.translation, *node),
+                    radius.radius + node_radius
+                );
+            }
+        }
+        if !matches!(world.resource::<MatchState>().phase, MatchPhase::Running) {
+            break;
+        }
+    }
+    assert!(
+        paid_births > 0,
+        "normal AI economy must actually train paid Workers"
     );
 }

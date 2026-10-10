@@ -1845,6 +1845,7 @@ pub(crate) fn move_units(
             Option<&ChronoRelay>,
             Option<&EmpDisabled>,
             &Health,
+            Option<&ConstructOrder>,
         )>,
         Query<(
             Entity,
@@ -1861,7 +1862,7 @@ pub(crate) fn move_units(
             Option<&PassiveSupportShield>,
         )>,
         Query<
-            (&Transform, &Selectable, Option<&Health>),
+            (&Transform, &Selectable, Option<&Health>, Option<&Structure>),
             (
                 Or<(With<Structure>, With<ResourceNode>, With<TerrainWall>)>,
                 Without<Unit>,
@@ -1874,14 +1875,27 @@ pub(crate) fn move_units(
         let obstacles = unit_queries.p3();
         obstacles
             .iter()
-            .filter_map(|(transform, selectable, health)| {
+            .filter_map(|(transform, selectable, health, structure)| {
                 if health.is_some_and(|health| health.current <= 0.0) {
                     return None;
                 }
                 Some(MovementObstacleSnapshot {
                     position: transform.translation,
                     radius: selectable.radius,
+                    is_structure: structure.is_some(),
                 })
+            })
+            .collect::<Vec<_>>()
+    };
+    let ground_bodies = {
+        let units = unit_queries.p1();
+        units
+            .iter()
+            .filter(|(_, _, _, _, _, domain, health)| {
+                **domain == MovementDomain::Terrain && health.current > 0.0
+            })
+            .map(|(entity, _, transform, selectable, _, _, _)| {
+                (entity, transform.translation, selectable.radius)
             })
             .collect::<Vec<_>>()
     };
@@ -1924,6 +1938,7 @@ pub(crate) fn move_units(
             chrono,
             emp,
             health,
+            constructing,
         ) in &mut movers
         {
             if health.current <= 0.0 || emp.is_some_and(|emp| emp.remaining > 0.0) {
@@ -1952,7 +1967,15 @@ pub(crate) fn move_units(
             target.y = transform.translation.y;
             let delta = target - transform.translation;
             let distance = delta.length();
-            if distance < MOVE_ORDER_REACHED_DISTANCE_M {
+            // Contact goals sit one adherence margin outside the target body.
+            // Construction requires the obstacle margin to remain after stopping.
+            let reached_distance = if constructing.is_some() {
+                MOVE_ORDER_REACHED_DISTANCE_M
+                    .min(UNIT_ADHERENCE_MARGIN_M - MOVEMENT_OBSTACLE_CLEARANCE_M)
+            } else {
+                MOVE_ORDER_REACHED_DISTANCE_M
+            };
+            if distance < reached_distance {
                 commands.entity(entity).try_remove::<MoveOrder>();
                 continue;
             }
@@ -1960,7 +1983,7 @@ pub(crate) fn move_units(
             let step = speed * time.delta_secs();
             let previous_position = transform.translation;
             let direction = delta.normalize();
-            let move_direction = if *domain == MovementDomain::Terrain {
+            let steered_direction = if *domain == MovementDomain::Terrain {
                 movement_direction_around_static_obstacles(
                     previous_position,
                     target,
@@ -1971,7 +1994,57 @@ pub(crate) fn move_units(
             } else {
                 direction
             };
-            let intended_position = previous_position + move_direction * step;
+            let move_direction = if *domain == MovementDomain::Terrain {
+                safe_static_movement_direction(
+                    previous_position,
+                    direction,
+                    steered_direction,
+                    selectable.radius,
+                    step.min(distance),
+                    &static_obstacles,
+                )
+            } else {
+                steered_direction
+            };
+            let move_direction = if constructing.is_some() && !unit.can_crush {
+                let clear = |candidate: Vec3| {
+                    ground_bodies.iter().all(|(other, position, radius)| {
+                        *other == entity
+                            || distance_point_to_xz_segment(
+                                *position,
+                                previous_position,
+                                previous_position + candidate * step.min(distance),
+                            ) + 1e-4
+                                >= selectable.radius + radius
+                    })
+                };
+                if clear(direction)
+                    && static_movement_segment_clear(
+                        previous_position,
+                        previous_position + direction * step.min(distance),
+                        selectable.radius,
+                        &static_obstacles,
+                    )
+                {
+                    direction
+                } else if clear(move_direction) {
+                    move_direction
+                } else if clear(direction)
+                    && static_movement_segment_clear(
+                        previous_position,
+                        previous_position + direction * step.min(distance),
+                        selectable.radius,
+                        &static_obstacles,
+                    )
+                {
+                    direction
+                } else {
+                    Vec3::ZERO
+                }
+            } else {
+                move_direction
+            };
+            let intended_position = previous_position + move_direction * step.min(distance);
             // Cliff faces are impassable on foot even when steering pushes into
             // them; A* already routes around, this is the last-resort guard.
             if *domain == MovementDomain::Terrain
@@ -2070,6 +2143,53 @@ pub(crate) struct CrushTargetSnapshot {
 pub(crate) struct MovementObstacleSnapshot {
     pub(crate) position: Vec3,
     pub(crate) radius: f32,
+    pub(crate) is_structure: bool,
+}
+
+pub(crate) fn static_movement_segment_clear(
+    from: Vec3,
+    to: Vec3,
+    radius: f32,
+    obstacles: &[MovementObstacleSnapshot],
+) -> bool {
+    obstacles.iter().all(|obstacle| {
+        let clearance = radius + obstacle.radius;
+        let before = xz_distance(from, obstacle.position);
+        let minimum = distance_point_to_xz_segment(obstacle.position, from, to);
+        if before + 1e-4 >= clearance {
+            minimum + 1e-4 >= clearance
+        } else {
+            let offset = Vec2::new(from.x - obstacle.position.x, from.z - obstacle.position.z);
+            let movement = Vec2::new(to.x - from.x, to.z - from.z);
+            obstacle.is_structure && offset.dot(movement) >= 0.0 && minimum + 1e-4 >= before
+        }
+    })
+}
+
+fn safe_static_movement_direction(
+    position: Vec3,
+    desired: Vec3,
+    steered: Vec3,
+    radius: f32,
+    step: f32,
+    obstacles: &[MovementObstacleSnapshot],
+) -> Vec3 {
+    let clear = |direction| {
+        static_movement_segment_clear(position, position + direction * step, radius, obstacles)
+    };
+    // A validated outward path must not be bent into a neighbouring body.
+    let escaping = obstacles.iter().any(|obstacle| {
+        obstacle.is_structure && xz_distance(position, obstacle.position) < radius + obstacle.radius
+    });
+    if escaping && clear(desired) {
+        desired
+    } else if clear(steered) {
+        steered
+    } else if clear(desired) {
+        desired
+    } else {
+        Vec3::ZERO
+    }
 }
 
 pub(crate) fn movement_direction_around_static_obstacles(
@@ -2879,3 +2999,97 @@ pub(crate) fn draw_health_bar(
 
 #[cfg(test)]
 mod damage_tests;
+
+#[cfg(test)]
+mod movement_body_tests {
+    use super::*;
+
+    #[test]
+    fn construction_arrival_budget_preserves_the_required_contact_clearance() {
+        let source = Vec3::new(14.727491, 0.0, 10.868742);
+        let goal = Vec3::new(14.692722, 0.0, 10.703424);
+        let target = Vec3::new(15.176391, 0.0, 13.003113);
+        let work_clearance = 0.6 + 1.45 + MOVEMENT_OBSTACLE_CLEARANCE_M;
+        let goal_distance = xz_distance(source, goal);
+        assert!(goal_distance < MOVE_ORDER_REACHED_DISTANCE_M);
+        assert!(xz_distance(source, target) < work_clearance);
+        let arrival_budget = UNIT_ADHERENCE_MARGIN_M - MOVEMENT_OBSTACLE_CLEARANCE_M;
+        assert!(goal_distance > arrival_budget);
+        assert!(xz_distance(goal, target) - arrival_budget >= work_clearance - 1e-5);
+    }
+
+    #[test]
+    fn unsafe_local_steering_uses_the_safe_desired_segment() {
+        let position = Vec3::new(15.494358, 0.05, 11.476780);
+        let desired_end = Vec3::new(15.436747, 0.05, 11.416569);
+        let steered_end = Vec3::new(15.503749, 0.05, 11.393977);
+        let obstacles = [MovementObstacleSnapshot {
+            position: Vec3::new(16.533001, 0.0, 10.838299),
+            radius: 0.6,
+            is_structure: false,
+        }];
+        assert!(!static_movement_segment_clear(
+            position,
+            steered_end,
+            0.6,
+            &obstacles
+        ));
+        assert!(static_movement_segment_clear(
+            position,
+            desired_end,
+            0.6,
+            &obstacles
+        ));
+        let step = position.distance(desired_end);
+        let result = safe_static_movement_direction(
+            position,
+            (desired_end - position).normalize(),
+            (steered_end - position).normalize(),
+            0.6,
+            step,
+            &obstacles,
+        );
+        assert!(result.length() > 0.9);
+        assert!(static_movement_segment_clear(
+            position,
+            position + result * step,
+            0.6,
+            &obstacles
+        ));
+    }
+
+    #[test]
+    fn only_existing_structure_overlap_can_move_continuously_outward() {
+        let mut obstacle = MovementObstacleSnapshot {
+            position: Vec3::ZERO,
+            radius: 1.0,
+            is_structure: true,
+        };
+        let from = Vec3::X;
+        assert!(static_movement_segment_clear(
+            from,
+            Vec3::X * 1.1,
+            0.6,
+            &[obstacle]
+        ));
+        assert!(!static_movement_segment_clear(
+            from,
+            Vec3::X * 0.9,
+            0.6,
+            &[obstacle]
+        ));
+        obstacle.is_structure = false;
+        assert!(!static_movement_segment_clear(
+            from,
+            Vec3::X * 1.1,
+            0.6,
+            &[obstacle]
+        ));
+        assert!(!static_movement_segment_clear(
+            Vec3::X * 2.0,
+            -Vec3::X * 2.0,
+            0.6,
+            &[obstacle]
+        ));
+    }
+}

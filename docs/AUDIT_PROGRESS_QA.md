@@ -34,3 +34,15 @@ hotspot. Some source-line resolution warnings occurred; symbol/call-stack eviden
 remains present. This sample is not a fix or a general performance claim. Next
 needed evidence is actual constructor targets, pending foundations, and contact
 route validity; timers, limits and gameplay costs remain unchanged.
+
+The detailed constructor collector is external, bounded, and opt-in. It records
+actual construction targets/remaining work, contact and endpoint checks, navigation
+revision and already computed route-search results. It never inserts an ECS resource
+or deferred command, and does not repeat path searches for telemetry. Bevy stores
+resources as entities: an abandoned intermediate diagnostic resource shifted game
+entity IDs and changed ID-dependent scout scheduling. That intermediate trace was
+not accepted as a gameplay fix. After removing the resource, paired trace/no-trace
+runs on `target/constructor-external-diagnostic-pin-20261010/skirmish_audit` both
+reproduced the original 180-second wall timeout; evidence is retained in
+`target/tech-divide-constructor-pair-04`. Construction/movement verification is
+recorded separately in `docs/CONSTRUCTION_NAV_QA.md`.

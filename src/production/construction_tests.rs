@@ -149,7 +149,7 @@ fn blocked_construction_contact_uses_an_alternate_side_and_finishes_by_walking()
 
 #[test]
 fn contact_selection_rejects_occupied_endpoints_and_unreachable_ring_cells() {
-    let source = Vec3::new(-23.93772, 0.0, -17.399445);
+    let mut source = Vec3::new(-23.93772, 0.0, -17.399445);
     let target = Vec3::new(-28.0, 0.0, -16.0);
     let obstacles = [(target, 1.5), (Vec3::new(-26.0, 0.0, -19.5), 1.5)];
     let occupied = [(Vec3::new(-25.110014, 0.0, -17.64278), 0.6)];
@@ -169,9 +169,21 @@ fn contact_selection_rejects_occupied_endpoints_and_unreachable_ring_cells() {
         &obstacles,
         &TerrainHeightField::default(),
     );
-    let approach =
-        reachable_unit_contact_approach(source, 0.6, target, 1.5, &grid, &obstacles, &occupied)
-            .unwrap();
+    assert!(
+        reachable_unit_contact_approach(
+            source, 0.6, target, 1.5, &grid, &obstacles, &obstacles, &occupied
+        )
+        .is_none(),
+        "already-overlapped mobile Worker must resolve through normal separation"
+    );
+    let away = (source - occupied[0].0).normalize();
+    source += away
+        * ((0.6 + occupied[0].1 + UNIT_SEPARATION_GAP_M) - xz_distance(source, occupied[0].0)
+            + 1e-4);
+    let approach = reachable_unit_contact_approach(
+        source, 0.6, target, 1.5, &grid, &obstacles, &obstacles, &occupied,
+    )
+    .unwrap();
     assert!(contact_position_is_clear(
         approach.target,
         0.6,
@@ -186,8 +198,10 @@ fn contact_selection_rejects_occupied_endpoints_and_unreachable_ring_cells() {
     );
     grid.blocked.fill(true);
     assert!(
-        reachable_unit_contact_approach(source, 0.6, target, 1.5, &grid, &obstacles, &occupied)
-            .is_none(),
+        reachable_unit_contact_approach(
+            source, 0.6, target, 1.5, &grid, &obstacles, &obstacles, &occupied
+        )
+        .is_none(),
         "an inaccessible ring must not snap to an unrelated open cell"
     );
 }
@@ -205,7 +219,21 @@ fn construction_waits_for_a_real_route_without_moving_or_advancing_work() {
     }
     app.update();
     let start = app.world().get::<Transform>(worker).unwrap().translation;
-    app.world_mut().resource_mut::<NavGrid>().blocked.fill(true);
+    // Close every physical exit with real hard walls. Aggregate raster cells
+    // alone cannot stand in for terrain when exact circles leave a clear leg.
+    let walls = (0..8)
+        .map(|index| {
+            let angle = index as f32 * std::f32::consts::TAU / 8.0;
+            let position = start + Vec3::new(angle.cos(), 0.0, angle.sin()) * 1.2;
+            app.world_mut()
+                .spawn((
+                    TerrainWall,
+                    Transform::from_translation(position),
+                    Selectable { radius: 0.6 },
+                ))
+                .id()
+        })
+        .collect::<Vec<_>>();
     for _ in 0..20 {
         app.update();
     }
@@ -223,6 +251,9 @@ fn construction_waits_for_a_real_route_without_moving_or_advancing_work() {
     assert!(app.world().get::<MoveOrder>(worker).is_none());
     assert!(app.world().get::<PlannedPath>(worker).is_none());
     assert!(app.world().get::<ConstructOrder>(worker).is_some());
+    for wall in walls {
+        app.world_mut().entity_mut(wall).despawn();
+    }
     let obstacles = [
         (Vec3::new(-28.0, 0.0, -16.0), 1.5),
         (Vec3::new(-26.0, 0.0, -19.5), 1.5),
@@ -297,10 +328,27 @@ fn allied_army_does_not_permanently_cut_off_an_open_construction_contact() {
     let source_cell = grid.cell_of(source);
     assert!(!grid.is_blocked(source_cell.0, source_cell.1));
     assert!(
-        reachable_unit_contact_approach(source, 0.6, target, 0.6, &grid, &obstacles, &[]).is_some()
+        reachable_unit_contact_approach(
+            source,
+            0.6,
+            target,
+            0.6,
+            &grid,
+            &obstacles,
+            &[obstacles[2], obstacles[3], obstacles[4], obstacles[5]],
+            &[]
+        )
+        .is_some()
     );
     let approach = reachable_unit_contact_approach(
-        source, 0.6, target, 0.6, &grid, &obstacles, &occupied,
+        source,
+        0.6,
+        target,
+        0.6,
+        &grid,
+        &obstacles,
+        &[obstacles[2], obstacles[3], obstacles[4], obstacles[5]],
+        &occupied,
     )
     .expect(
         "mobile allied troops must not permanently isolate a constructor with free target contacts",

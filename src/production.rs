@@ -724,14 +724,20 @@ pub(crate) fn cancel_queued_job_at_local_index(
 
 pub(crate) fn production_occupied_spawn_points(
     occupiers: &Query<
-        (Entity, &Transform, &Selectable, &Health),
-        Or<(With<Unit>, With<Structure>)>,
+        (Entity, &Transform, &Selectable, Option<&Health>),
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
     >,
 ) -> Vec<(Vec3, f32)> {
     occupiers
         .iter()
         .filter_map(|(_, transform, selectable, health)| {
-            (health.current > 0.0).then_some((transform.translation.with_y(0.0), selectable.radius))
+            (!health.is_some_and(|health| health.current <= 0.0))
+                .then_some((transform.translation.with_y(0.0), selectable.radius))
         })
         .collect()
 }
@@ -1042,7 +1048,7 @@ pub(crate) fn update_construct_orders(
         (With<Structure>, Without<Unit>),
     >,
     obstacles: Query<
-        (&Transform, &Selectable),
+        (&Transform, &Selectable, Option<&Structure>),
         (
             Or<(With<Structure>, With<ResourceNode>, With<TerrainWall>)>,
             Without<Unit>,
@@ -1052,7 +1058,13 @@ pub(crate) fn update_construct_orders(
 ) {
     let static_obstacles: Vec<_> = obstacles
         .iter()
-        .map(|(transform, selectable)| (transform.translation, selectable.radius))
+        .map(|(transform, selectable, _)| (transform.translation, selectable.radius))
+        .collect();
+    let building_footprints: Vec<_> = obstacles
+        .iter()
+        .filter_map(|(transform, selectable, structure)| {
+            structure.map(|_| (transform.translation, selectable.radius))
+        })
         .collect();
     let constructor_positions: Vec<_> = constructors
         .iter()
@@ -1121,11 +1133,14 @@ pub(crate) fn update_construct_orders(
             target_selectable.radius,
             CONSTRUCTION_ENTRY_MARGIN_M,
         );
-        if xz_distance(
+        let contact_distance = xz_distance(
             constructor_transform.translation,
             target_transform.translation,
-        ) > range
-        {
+        );
+        let target_collision_clearance = constructor_selectable.radius
+            + target_selectable.radius
+            + MOVEMENT_OBSTACLE_CLEARANCE_M;
+        if contact_distance > range || contact_distance < target_collision_clearance {
             if constructor_unit.speed <= 0.0 {
                 commands
                     .entity(constructor_entity)
@@ -1143,34 +1158,50 @@ pub(crate) fn update_construct_orders(
                         .map(|(_, position, radius)| (*position, *radius)),
                 )
                 .collect();
-            let approach_still_clear = move_order_targets_contact(
+            let targets_contact = move_order_targets_contact(
                 move_order,
                 target_transform.translation,
                 constructor_selectable.radius,
                 target_selectable.radius,
-            ) && move_order.is_some_and(|order| {
-                contact_position_is_clear(
-                    order.target,
-                    constructor_selectable.radius,
-                    &static_obstacles,
-                    &occupied,
-                ) && contact_route_is_open(
-                    &grid,
-                    constructor_transform.translation,
-                    order.target,
-                    planned_path,
-                )
+            );
+            let endpoint_clear = targets_contact.then(|| {
+                move_order.is_some_and(|order| {
+                    contact_position_is_clear(
+                        order.target,
+                        constructor_selectable.radius,
+                        &static_obstacles,
+                        &occupied,
+                    )
+                })
             });
+            let route_open = if endpoint_clear == Some(true) {
+                move_order.map(|order| {
+                    contact_route_is_open(
+                        &grid,
+                        constructor_transform.translation,
+                        order.target,
+                        planned_path,
+                    )
+                })
+            } else {
+                None
+            };
+            let approach_still_clear =
+                targets_contact && endpoint_clear == Some(true) && route_open == Some(true);
+            let mut route_search_succeeded = None;
             if !approach_still_clear {
-                if let Some(approach) = reachable_unit_contact_approach(
+                let approach = reachable_unit_contact_approach(
                     constructor_transform.translation,
                     constructor_selectable.radius,
                     target_transform.translation,
                     target_selectable.radius,
                     &grid,
                     &static_obstacles,
+                    &building_footprints,
                     &occupied,
-                ) {
+                );
+                route_search_succeeded = Some(approach.is_some());
+                if let Some(approach) = approach {
                     commands.entity(constructor_entity).try_insert(MoveOrder {
                         target: approach.target,
                     });
@@ -1194,8 +1225,26 @@ pub(crate) fn update_construct_orders(
                         .try_remove::<PlannedPath>();
                 }
             }
+            crate::capture_api::audit_progress::record_constructor_sample(|| {
+                serde_json::json!({
+                    "constructor":constructor_entity.to_bits(),"target":order.target.to_bits(),
+                    "distance":contact_distance,"entry_range":range,"target_collision_clearance":target_collision_clearance,"remaining_before":construction.remaining,
+                    "targets_contact":targets_contact,"endpoint_clear":endpoint_clear,"route_open":route_open,
+                    "route_search_succeeded":route_search_succeeded,"nav_revision":grid.version,
+                    "move_target":move_order.map(|order|order.target.to_array()),"path_goal":planned_path.map(|path|path.goal.to_array()),
+                    "remaining_waypoints":planned_path.map(|path|path.waypoints.len().saturating_sub(path.next)),
+                    "static_obstacles":static_obstacles.iter().take(128).map(|(position,radius)|serde_json::json!({"position":position.to_array(),"radius":radius})).collect::<Vec<_>>(),
+                    "occupied":occupied.iter().take(128).map(|(position,radius)|serde_json::json!({"position":position.to_array(),"radius":radius})).collect::<Vec<_>>()
+                })
+            });
             continue;
         }
+        crate::capture_api::audit_progress::record_constructor_sample(|| {
+            serde_json::json!({
+                "constructor":constructor_entity.to_bits(),"target":order.target.to_bits(),"distance":contact_distance,
+                "entry_range":range,"remaining_before":construction.remaining,"in_contact":true,"nav_revision":grid.version
+            })
+        });
 
         commands
             .entity(constructor_entity)
@@ -1575,8 +1624,18 @@ pub(crate) fn progress_under_construction_structures(
         &Health,
         &UnderConstruction,
     )>,
+    occupiers: Query<
+        (Entity, &Transform, &Selectable, Option<&Health>),
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
+    >,
 ) {
     let player_team = visible_player_team(visible_player.as_deref());
+    let mut occupied = production_occupied_spawn_points(&occupiers);
     for (entity, structure, team, transform, visual_faction, health, construction) in
         &mut structures
     {
@@ -1584,6 +1643,24 @@ pub(crate) fn progress_under_construction_structures(
             continue;
         }
 
+        let free_worker_spawn =
+            if construction.free_worker_origin.is_some() && structure.id == "Refinery" {
+                let worker_radius = registry::entity("Worker").expect("Worker registry").radius;
+                let Some(position) = find_production_spawn_position(
+                    transform.translation,
+                    structure.id,
+                    worker_radius,
+                    next_id.0 + 17,
+                    &occupied,
+                    *map_bounds,
+                ) else {
+                    continue;
+                };
+                occupied.push((position, worker_radius));
+                Some(position)
+            } else {
+                None
+            };
         commands.entity(entity).try_remove::<UnderConstruction>();
         spawn_construction_complete_flash(
             &mut commands,
@@ -1592,20 +1669,20 @@ pub(crate) fn progress_under_construction_structures(
         );
         // A completed refinery grants a Worker for every team. Human-owned
         // workers still gather manually, so the player keeps direct control.
-        if let Some(origin) = construction.free_worker_origin {
-            let spawn_seed = next_id.0 + 17;
-            spawn_refinery_free_worker(
+        if let Some(position) = free_worker_spawn {
+            spawn_unit_with_visual_faction(
                 &mut commands,
                 &asset_server,
                 &mut next_id,
-                structure.id,
+                "Worker",
                 *team,
+                position,
+                0,
+                visual_faction
+                    .copied()
+                    .map(|faction| faction.0)
+                    .or_else(|| default_visual_faction(*team)),
                 player_team,
-                transform.translation,
-                origin,
-                spawn_seed,
-                *map_bounds,
-                visual_faction.copied().map(|faction| faction.0),
             );
         }
         if *team == player_team {
@@ -1771,7 +1848,15 @@ pub(crate) fn process_build_queue(
         )>,
     >,
     structures: Query<StructureEntityItem<'_>>,
-    occupiers: Query<(Entity, &Transform, &Selectable, &Health), Or<(With<Unit>, With<Structure>)>>,
+    occupiers: Query<
+        (Entity, &Transform, &Selectable, Option<&Health>),
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
+    >,
 ) {
     let mut occupied_spawn_points = production_occupied_spawn_points(&occupiers);
     let player_team = visible_player_team(visible_player.as_deref());

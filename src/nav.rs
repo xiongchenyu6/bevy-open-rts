@@ -50,6 +50,7 @@ pub(crate) fn separate_units(
     time: Res<Time>,
     relations: Res<TeamRelations>,
     map_bounds: Res<MapBounds>,
+    terrain: Res<TerrainHeightField>,
     mut units: Query<
         (
             &Team,
@@ -62,7 +63,7 @@ pub(crate) fn separate_units(
         With<Unit>,
     >,
     obstacles: Query<
-        (&Transform, &Selectable, Option<&Health>),
+        (&Transform, &Selectable, Option<&Health>, Option<&Structure>),
         (
             Or<(With<Structure>, With<ResourceNode>, With<TerrainWall>)>,
             Without<Unit>,
@@ -126,27 +127,62 @@ pub(crate) fn separate_units(
             }
         }
     }
-    let blocked_by_obstacle = |position: Vec3, radius: f32| {
-        obstacles
-            .iter()
-            .filter(|(_, _, health)| !health.is_some_and(|health| health.current <= 0.0))
-            .any(|(transform, selectable, _)| {
-                xz_distance(position, transform.translation) < radius + selectable.radius
-            })
-    };
+    let obstacles = obstacles
+        .iter()
+        .filter(|(_, _, health, _)| !health.is_some_and(|health| health.current <= 0.0))
+        .map(
+            |(position, radius, _, building)| crate::combat::MovementObstacleSnapshot {
+                position: position.translation,
+                radius: radius.radius,
+                is_structure: building.is_some(),
+            },
+        )
+        .collect::<Vec<_>>();
     for (index, (_, _, _, selectable, mut transform, _)) in units.iter_mut().enumerate() {
-        let push = pushes[index];
+        let push = pushes[index].clamp_length_max(max_step);
         if push == Vec3::ZERO {
             continue;
         }
-        let push = push.clamp_length_max(max_step);
-        let mut candidate = transform.translation + push;
-        candidate.y = transform.translation.y;
-        candidate = map_bounds.clamp_ground_point(candidate, selectable.radius);
-        if blocked_by_obstacle(candidate, selectable.radius) {
-            continue;
+        let original = transform.translation;
+        // A blocked aggregate push may still have a safe component away from
+        // the overlapping ally and outward from an existing structure footprint.
+        for component in [
+            push,
+            Vec3::new(push.x, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, push.z),
+        ] {
+            if component == Vec3::ZERO {
+                continue;
+            }
+            let mut candidate =
+                map_bounds.clamp_ground_point(original + component, selectable.radius);
+            candidate.y = original.y;
+            if terrain.step_blocked(original, candidate)
+                || !crate::combat::static_movement_segment_clear(
+                    original,
+                    candidate,
+                    selectable.radius,
+                    &obstacles,
+                )
+            {
+                continue;
+            }
+            let peers_clear = snapshot.iter().enumerate().all(|(other, peer)| {
+                if other == index
+                    || !peer.active
+                    || relations.are_enemies(snapshot[index].team, peer.team)
+                {
+                    return true;
+                }
+                let before = xz_distance(original, peer.position);
+                distance_point_to_xz_segment(peer.position, original, candidate) + 1e-4
+                    >= before.min(selectable.radius + peer.radius)
+            });
+            if peers_clear {
+                transform.translation = candidate;
+                break;
+            }
         }
-        transform.translation = candidate;
     }
 }
 
@@ -161,6 +197,7 @@ pub(crate) struct NavGrid {
     pub(crate) width: i32,
     pub(crate) height: i32,
     pub(crate) blocked: Vec<bool>,
+    pub(crate) terrain_blocked: Vec<bool>,
 }
 
 impl NavGrid {
@@ -178,6 +215,7 @@ impl NavGrid {
         self.width = ((bounds.half_width * 2.0) / NAV_GRID_CELL_M).ceil() as i32;
         self.height = ((bounds.half_depth * 2.0) / NAV_GRID_CELL_M).ceil() as i32;
         self.blocked = vec![false; (self.width * self.height).max(0) as usize];
+        self.terrain_blocked = vec![false; self.blocked.len()];
         for &(position, radius) in obstacles {
             let reach = radius + NAV_OBSTACLE_INFLATE_M;
             let min_x = (((position.x - reach) - self.origin_x) / NAV_GRID_CELL_M).floor() as i32;
@@ -209,6 +247,7 @@ impl NavGrid {
                         });
                     if cliff {
                         self.blocked[(cz * self.width + cx) as usize] = true;
+                        self.terrain_blocked[(cz * self.width + cx) as usize] = true;
                     }
                 }
             }
@@ -257,6 +296,22 @@ impl NavGrid {
         true
     }
 
+    /// Static footprints are checked continuously by construction escape logic;
+    /// this independent mask preserves cliffs along its initial outward leg.
+    pub(crate) fn terrain_line_clear(&self, from: Vec3, to: Vec3) -> bool {
+        if self.terrain_blocked.is_empty() {
+            return true;
+        }
+        let steps = (xz_distance(from, to) / (NAV_GRID_CELL_M * 0.5))
+            .ceil()
+            .max(1.0) as i32;
+        (0..=steps).all(|step| {
+            let point = from.lerp(to, step as f32 / steps as f32);
+            let (x, z) = self.cell_of(point);
+            !self.terrain_blocked[(z * self.width + x) as usize]
+        })
+    }
+
     /// Nearest walkable cell to `cell`, spiralling outward (targets inside a base
     /// footprint resolve to its edge instead of failing).
     pub(crate) fn nearest_open_cell(&self, cell: (i32, i32)) -> Option<(i32, i32)> {
@@ -288,14 +343,55 @@ impl NavGrid {
 
     /// A* over the grid (8-directional, no corner cutting), then string-pulled into
     /// a short waypoint list (world positions). `None` when unreachable.
+    /// Single-goal navigation keeps the existing nearest-open endpoint policy.
     pub(crate) fn find_path(&self, from: Vec3, to: Vec3) -> Option<Vec<Vec3>> {
         if self.blocked.is_empty() {
             return None;
         }
         let start = self.nearest_open_cell(self.cell_of(from))?;
         let goal = self.nearest_open_cell(self.cell_of(to))?;
-        if start == goal {
-            return Some(vec![self.cell_center(goal.0, goal.1)]);
+        let mut path = self.find_path_cells(&[(start, 0.0)], &[goal])?;
+        if path.len() > 1 {
+            path.remove(0);
+        }
+        Some(path)
+    }
+
+    /// One search across validated physical escape starts and contact goals.
+    pub(crate) fn find_contact_path(
+        &self,
+        from: Vec3,
+        starts: &[Vec3],
+        goals: &[Vec3],
+    ) -> Option<(Vec3, Vec<Vec3>)> {
+        let starts = starts
+            .iter()
+            .map(|point| {
+                (
+                    self.cell_of(*point),
+                    xz_distance(from, *point) / NAV_GRID_CELL_M,
+                )
+            })
+            .collect::<Vec<_>>();
+        let goal_cells = goals
+            .iter()
+            .map(|point| self.cell_of(*point))
+            .collect::<Vec<_>>();
+        let path = self.find_path_cells(&starts, &goal_cells)?;
+        let goal_cell = self.cell_of(*path.last()?);
+        let target = *goals
+            .iter()
+            .find(|point| self.cell_of(**point) == goal_cell)?;
+        Some((target, path))
+    }
+
+    fn find_path_cells(
+        &self,
+        starts: &[((i32, i32), f32)],
+        goals: &[(i32, i32)],
+    ) -> Option<Vec<Vec3>> {
+        if starts.is_empty() || goals.is_empty() {
+            return None;
         }
         let index = |c: (i32, i32)| (c.1 * self.width + c.0) as usize;
         let octile = |a: (i32, i32), b: (i32, i32)| {
@@ -303,22 +399,32 @@ impl NavGrid {
             let dz = (a.1 - b.1).abs() as f32;
             dx.max(dz) + 0.414 * dx.min(dz)
         };
+        let heuristic = |cell| {
+            goals
+                .iter()
+                .map(|goal| octile(cell, *goal))
+                .fold(f32::INFINITY, f32::min)
+        };
+        let key = |f: f32| -((f * 1024.0) as i64);
         let mut open = std::collections::BinaryHeap::new();
         let mut g_cost = vec![f32::INFINITY; self.blocked.len()];
         let mut came_from = vec![u32::MAX; self.blocked.len()];
-        g_cost[index(start)] = 0.0;
-        // BinaryHeap is a max-heap: store negated f-cost scaled to an integer key.
-        let key = |f: f32| -((f * 1024.0) as i64);
-        open.push((key(octile(start, goal)), start));
-        let mut reached = false;
+        for &(start, cost) in starts {
+            if self.is_blocked(start.0, start.1) || cost >= g_cost[index(start)] {
+                continue;
+            }
+            g_cost[index(start)] = cost;
+            open.push((key(cost + heuristic(start)), start));
+        }
+        let mut reached = None;
         while let Some((_, cell)) = open.pop() {
-            if cell == goal {
-                reached = true;
+            if goals.contains(&cell) {
+                reached = Some(cell);
                 break;
             }
             let cell_g = g_cost[index(cell)];
             for (dx, dz, step_cost) in [
-                (1i32, 0i32, 1.0f32),
+                (1, 0, 1.0),
                 (-1, 0, 1.0),
                 (0, 1, 1.0),
                 (0, -1, 1.0),
@@ -331,7 +437,6 @@ impl NavGrid {
                 if self.is_blocked(next.0, next.1) {
                     continue;
                 }
-                // No cutting corners diagonally past a blocked cell.
                 if dx != 0
                     && dz != 0
                     && (self.is_blocked(cell.0 + dx, cell.1)
@@ -343,13 +448,11 @@ impl NavGrid {
                 if tentative < g_cost[index(next)] {
                     g_cost[index(next)] = tentative;
                     came_from[index(next)] = index(cell) as u32;
-                    open.push((key(tentative + octile(next, goal)), next));
+                    open.push((key(tentative + heuristic(next)), next));
                 }
             }
         }
-        if !reached {
-            return None;
-        }
+        let goal = reached?;
         let mut cells = vec![goal];
         let mut cursor = index(goal);
         while came_from[cursor] != u32::MAX {
@@ -357,10 +460,14 @@ impl NavGrid {
             cells.push((cursor as i32 % self.width, cursor as i32 / self.width));
         }
         cells.reverse();
-        // String pull: keep only waypoints that break line of sight.
-        let world: Vec<Vec3> = cells.iter().map(|&(x, z)| self.cell_center(x, z)).collect();
-        let mut waypoints = Vec::new();
-        let mut anchor = 0usize;
+        let world = cells
+            .iter()
+            .map(|&(x, z)| self.cell_center(x, z))
+            .collect::<Vec<_>>();
+        // Keep the validated physical start as a real first waypoint. A short
+        // initial overlap is escaped by normal movement, never a position write.
+        let mut waypoints = vec![world[0]];
+        let mut anchor = 0;
         while anchor + 1 < world.len() {
             let mut furthest = anchor + 1;
             for probe in (anchor + 1..world.len()).rev() {

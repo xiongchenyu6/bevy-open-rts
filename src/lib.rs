@@ -70,6 +70,7 @@ pub(crate) use save::*;
 mod combat;
 pub(crate) use combat::*;
 mod orders;
+pub(crate) use orders::contact_planning::*;
 pub(crate) use orders::*;
 mod production;
 pub(crate) use production::*;
@@ -2880,7 +2881,7 @@ pub fn build_game_app(mode: GameAppMode) -> App {
                 DefaultPlugins
                     .set(WindowPlugin {
                         primary_window: Some(Window {
-                            title: "Bevy Open RTS".to_string(),
+                            title: "Open RTS".to_string(),
                             resolution: WindowResolution::new(1280, 720),
                             canvas: Some("#bevy-canvas".to_string()),
                             fit_canvas_to_parent: true,
@@ -3241,6 +3242,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .in_set(SimulationPhase::Combat)
                 .run_if(match_in_progress),
             update_construct_orders
+                .after(separate_units)
                 .in_set(SimulationPhase::Combat)
                 .run_if(match_in_progress),
             (

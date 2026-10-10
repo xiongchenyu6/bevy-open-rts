@@ -93,7 +93,7 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
     let max_updates = config.max_seconds * 30 + 60;
     loop {
         if let Some(progress) = progress.as_mut() {
-            progress.before_update(app.world(), updates)?;
+            progress.before_update(app.world_mut(), updates)?;
         }
         let update_started = std::time::Instant::now();
         app.update();
@@ -206,6 +206,9 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
                 serde_json::json!({
                     "entity":entity.to_bits(), "team":team.economy_index(), "unit":unit.id,
                     "health":health.current, "position":position.translation.to_array(),
+                    "radius":world.get::<Selectable>(entity).map(|r|r.radius),
+                    "domain":world.get::<MovementDomain>(entity).map(|d|format!("{d:?}")),
+                    "construct_target":world.get::<ConstructOrder>(entity).map(|o|o.target.to_bits()),
                     "move_target":movement.map(|order|order.target.to_array()),
                     "attack_target":attack.map(|order|order.target.to_bits()),
                     "attack_target_position":attack.and_then(|order|world.get::<Transform>(order.target))
@@ -233,6 +236,25 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
                 })
             }).collect::<Vec<_>>())
     };
+    let timeout_footprints = if completed {
+        None
+    } else {
+        let mut query = world.query_filtered::<(
+            Entity,
+            &Transform,
+            &Selectable,
+            Option<&Structure>,
+            Option<&ResourceNode>,
+            Option<&Health>,
+            Option<&UnderConstruction>,
+        ), Or<(With<Structure>, With<ResourceNode>, With<TerrainWall>)>>(
+        );
+        Some(query.iter(world).map(|(entity, p, r, structure, resource, health, site)|
+            serde_json::json!({"entity":entity.to_bits(),"position":p.translation.to_array(),
+                "radius":r.radius,"structure":structure.map(|s|s.id),"resource":resource.is_some(),
+                "health":health.map(|h|h.current),"remaining":site.map(|s|s.remaining),
+                "total":site.map(|s|s.total)})).collect::<Vec<_>>())
+    };
     Ok(serde_json::json!({
         "schema":1, "config":config, "resolved_map_id":map.id, "resolved_map_path":map.godot_path,
         "active_player_slots":[0,1], "starting_resources":{"ore":32,"crystal":16},
@@ -242,5 +264,6 @@ pub fn run_skirmish_audit(config: &SkirmishAuditConfig) -> Result<serde_json::Va
         "initial_command_center_positions":initial_positions,
         "winning_teams":winners, "active_anchor_teams":active_anchors,
         "remaining_anchors":remaining_anchors, "teams":teams, "timeout_units":timeout_units,
+        "timeout_footprints":timeout_footprints,
     }))
 }
