@@ -1,0 +1,170 @@
+{
+  "scope": "Reusable observed normal-input recipe; later package requires its own actual screenshots and hashes before accepting coordinates",
+  "resolution": "Sway headless1280x720 screenshot including24px title bar; actual menu/client layout must match",
+  "requirements": [
+    "Exact readonly extracted installation; fresh isolated absolute XDG_DATA_HOME",
+    "Persistent standardUS evdev keyboard and pointer helpers from verified clean-input runtime; AMD RADV Vulkan",
+    "No capture executable, state setters, source/asset edits, hidden enemy reads or scripted victory",
+    "Screenshot after each stage and inspect actual text before advancing; unchanged original budgets",
+    "Keep all commands, process exits, archive/binary/profile hashes and original image mtimes"
+  ],
+  "stages": [
+    {
+      "name": "skip/reset",
+      "commands": [
+        "click 1040 190",
+        "wait 3",
+        "shot lesson-one",
+        "click 164 254",
+        "wait 2",
+        "shot skipped-campaign",
+        "click 640 646",
+        "wait 1",
+        "click 1040 190",
+        "wait 3",
+        "shot reset-lesson-one"
+      ]
+    },
+    {
+      "name": "select/gather",
+      "commands": [
+        "click 313 620",
+        "shot selected-worker",
+        "right 523 539",
+        "wait 12",
+        "shot gathered"
+      ],
+      "expect": "2/7 afterselect,3/7 andoregreater64 after realreturn",
+      "budget_seconds": 60
+    },
+    {
+      "name": "power",
+      "commands": [
+        "key 30",
+        "move 250 440",
+        "wait 1",
+        "shot power-green-ghost",
+        "click 250 440",
+        "wait 7",
+        "shot power-ready"
+      ],
+      "expect": "GREEN validPowerReactor ghost then4/7; do notclickredghost",
+      "construction_budget_after_successful_placement_seconds": 30
+    },
+    {
+      "name": "barracks",
+      "commands": [
+        "key 32",
+        "move 805 195",
+        "wait 1",
+        "shot barracks-green-ghost",
+        "click 805 195",
+        "wait 10",
+        "shot barracks-ready"
+      ],
+      "expect": "GREEN then5/7 andBuildingReadyBarracks",
+      "construction_budget_after_successful_placement_seconds": 30
+    },
+    {
+      "name": "train",
+      "commands": [
+        "click 805 195",
+        "wait 1",
+        "shot selected-barracks",
+        "key 17",
+        "key 17",
+        "key 17",
+        "key 17",
+        "shot paid-queue",
+        "wait 14",
+        "shot trained"
+      ],
+      "expect": "Barracksselected; fourpaidLightRifleInfantry,6/7",
+      "budget_seconds": 120
+    },
+    {
+      "name": "move",
+      "commands": [
+        "click 655 118",
+        "right 782 555",
+        "wait 5",
+        "shot moved"
+      ],
+      "expect": "actualselectedinfantrymovement,7/7",
+      "budget_seconds": 20
+    },
+    {
+      "name": "attack-public-scout",
+      "commands": [
+        "down 29",
+        "down 56",
+        "key 30",
+        "up 56",
+        "up 29",
+        "key 18",
+        "right 1110 430",
+        "wait 8",
+        "down 106",
+        "wait 2",
+        "up 106",
+        "shot scout-one",
+        "down 105",
+        "wait 1",
+        "up 105",
+        "key 18",
+        "right 640 430",
+        "wait 15",
+        "shot scout-two",
+        "key 18",
+        "right 1110 420",
+        "wait 10",
+        "down 106",
+        "wait 1",
+        "up 106",
+        "shot scout-three",
+        "key 18",
+        "right 640 430",
+        "wait 15",
+        "shot scout-four"
+      ],
+      "expect": "SelectedDrone1+Infantry4; onlypubliccamera/fogscouting, no hidden enemy coordinates",
+      "budget_seconds": 300
+    },
+    {
+      "name": "attack-visible-contact",
+      "commands": [
+        "key 18",
+        "right 1060 391",
+        "wait 15",
+        "shot natural-graduation"
+      ],
+      "precondition": "Actual current scout screenshot shows living RED enemyCommandCenter at thisscreenpoint; otherwise neverblindlyassume location",
+      "expect": "BootCampComplete naturalHQdestruction/ownlosses0; screenshotmtime before originalattackdeadline"
+    },
+    {
+      "name": "map/replay/persistence",
+      "commands": [
+        "click 484 525",
+        "wait 1",
+        "shot graduate-map",
+        "click 640 646",
+        "wait 1",
+        "shot replay-menu",
+        "restart",
+        "shot fresh-process-replay-menu",
+        "click 1040 190",
+        "wait 3",
+        "shot replay-lesson-one",
+        "down 29",
+        "down 56",
+        "key 30",
+        "up 56",
+        "up 29",
+        "shot starting-drone-only",
+        "finish"
+      ],
+      "expect": "Normalwindowcloseexit0/distinctactualPID; campaign.rontrainingtrueunchanged; freshmenuReplayBootCamp; lesson1/resources64/32; startingDroneonly/nofourinfantry"
+    }
+  ],
+  "limits": "Coordinates were observed on245; newer247menu labels/layout or camera/input differences require screenshot-based adaptation without grants/deadline extension."
+}

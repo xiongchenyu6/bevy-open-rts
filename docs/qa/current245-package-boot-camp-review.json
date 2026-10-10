@@ -1,0 +1,150 @@
+{
+  "scope": "Exact optimized Linux245 archive, normal Wayland keyboard/mouse, fresh profile; package lacks later247 changes and newer menu labels",
+  "archive_sha256": "481640cc032ea07e996e64fbfd7f9fc6e56565d243705117998972e4ba2fffc0",
+  "binary_sha256": "491f29eaafbf6e6398d669ccb99cd6eb248e6b47200ba99d1c21facc272f0fa9",
+  "actual_container_exit": 0,
+  "actual_game_container_pids": [
+    51,
+    421
+  ],
+  "actual_game_exits": [
+    [
+      51,
+      0
+    ],
+    [
+      421,
+      0
+    ]
+  ],
+  "fresh_process_persistence": {
+    "ron_before": "(version:1,training_complete:true,completed:[])",
+    "ron_after": "(version:1,training_complete:true,completed:[])",
+    "sha256_before": "2264aab2d7e7dae2d74a86b515a3d4d8dd630f89048565b8f47148db0d085e93",
+    "sha256_after": "2264aab2d7e7dae2d74a86b515a3d4d8dd630f89048565b8f47148db0d085e93",
+    "unchanged": true
+  },
+  "checks": {
+    "fresh_boot_camp_menu": true,
+    "normal_skip_to_campaign_map": true,
+    "normal_back_and_restart_lesson_one": true,
+    "seven_lessons": true,
+    "natural_victory": true,
+    "four_normally_paid_infantry": true,
+    "hidden_enemy_positions_used": false,
+    "state_resource_unit_injection": false,
+    "normal_graduate_campaign_map": true,
+    "same_process_replay_menu": true,
+    "fresh_process_replay_menu": true,
+    "replay_lesson_one_reset_and_only_starting_drone": true
+  },
+  "natural_result": {
+    "shown_match_time": "13:58",
+    "enemy_unit_kills": 2,
+    "enemy_structure_kills": 1,
+    "own_unit_losses": 0,
+    "own_structure_losses": 0
+  },
+  "budgets": [
+    {
+      "stage": "gather",
+      "started_monotonic_seconds": 181550.099576892,
+      "started_epoch_seconds_reconstructed": 1791640521.0137453,
+      "completion_screenshot_mtime_epoch": 1791640534.0241897,
+      "completion_observed_seconds": 13.010444402694702,
+      "original_budget_seconds": 60.0,
+      "image": "target/linux-current245-boot-camp-normal-20261010-01/05-gather-progress.png",
+      "sha256": "faeedb592623955bde41323ad02111f1e9c5cff08ba7fdb82eda1fee2c728591"
+    },
+    {
+      "stage": "power-construction",
+      "started_monotonic_seconds": 181773.937440661,
+      "started_epoch_seconds_reconstructed": 1791640744.851609,
+      "completion_screenshot_mtime_epoch": 1791640752.8549535,
+      "completion_observed_seconds": 8.003344535827637,
+      "original_budget_seconds": 30.0,
+      "image": "target/linux-current245-boot-camp-normal-20261010-01/10-power-completed.png",
+      "sha256": "e8b10bd882c7cdbb0d51b23e832a4ea5bdb66bde312a63f525b85fd191ed8242"
+    },
+    {
+      "stage": "barracks",
+      "started_monotonic_seconds": 181863.281680177,
+      "started_epoch_seconds_reconstructed": 1791640834.1958485,
+      "completion_screenshot_mtime_epoch": 1791640845.2444403,
+      "completion_observed_seconds": 11.04859185218811,
+      "original_budget_seconds": 30.0,
+      "image": "target/linux-current245-boot-camp-normal-20261010-01/12-barracks-completed.png",
+      "sha256": "16cf3660a82150f4b1c6ece1e80d43d00878083b2fdb09722040e66cea46fd1e"
+    },
+    {
+      "stage": "train",
+      "started_monotonic_seconds": 181957.748724199,
+      "started_epoch_seconds_reconstructed": 1791640928.6628926,
+      "completion_screenshot_mtime_epoch": 1791640945.7218866,
+      "completion_observed_seconds": 17.05899405479431,
+      "original_budget_seconds": 120.0,
+      "image": "target/linux-current245-boot-camp-normal-20261010-01/15-trained-infantry.png",
+      "sha256": "98806850d7546ec8e13c34016fdbfa967c111a25db52645cb6081eccba50b9b1"
+    },
+    {
+      "stage": "move",
+      "started_monotonic_seconds": 182017.66918374,
+      "started_epoch_seconds_reconstructed": 1791640988.583352,
+      "completion_screenshot_mtime_epoch": 1791640995.235615,
+      "completion_observed_seconds": 6.652262926101685,
+      "original_budget_seconds": 20.0,
+      "image": "target/linux-current245-boot-camp-normal-20261010-01/16-moved-infantry.png",
+      "sha256": "4e62087256b0ba62a2530257944df23b704f0676fedc26a2cc76403f7b4aaf7c"
+    },
+    {
+      "stage": "attack",
+      "started_monotonic_seconds": 182076.06645673,
+      "started_epoch_seconds_reconstructed": 1791641046.9806252,
+      "completion_screenshot_mtime_epoch": 1791641338.8815672,
+      "completion_observed_seconds": 291.90094208717346,
+      "original_budget_seconds": 300.0,
+      "image": "target/linux-current245-boot-camp-normal-20261010-01/21-visible-hq-attack.png",
+      "sha256": "be4989702b581835d0fc6d75bc97b70628a745a28bea3566450af758db159cdc"
+    }
+  ],
+  "preserved_failures": [
+    "07-power-built.png: rejected first placement overlaps HQ",
+    "08-power-second-ghost.png: red preview; no cost/no foundation",
+    "initial power wall-budget wrapper started before successful placement and refused input; stage-budgets.json retained; proper900-frame construction wait starts after successful placement in original helper"
+  ],
+  "all_images": {
+    "target/linux-current245-boot-camp-normal-20261010-01/00-fresh-menu.png": "6840b44cc2c2bfa30a580f52c1be28168bb13b7f9ec504eb9949048a2acf34bf",
+    "target/linux-current245-boot-camp-normal-20261010-01/01-training-start.png": "bfadc8a707ce4f41ea3d393fc9146cfd24560c5a14cdd8d949ee68684f81736e",
+    "target/linux-current245-boot-camp-normal-20261010-01/02-skipped.png": "cb1ee455477df7657e152850355bc73f4b5ae695ba2387f23c4b261b4d9166ad",
+    "target/linux-current245-boot-camp-normal-20261010-01/03-restarted-training.png": "efee1c60d9e55bfb56e94e8ab95b57b6c08e1569955b5aeed5b97c91a08b12f6",
+    "target/linux-current245-boot-camp-normal-20261010-01/04-select-worker.png": "2de61e0f2fce8c8fddad9b4c43fa0500c7c21e729e0045d37f3a51abc595893c",
+    "target/linux-current245-boot-camp-normal-20261010-01/05-gather-progress.png": "faeedb592623955bde41323ad02111f1e9c5cff08ba7fdb82eda1fee2c728591",
+    "target/linux-current245-boot-camp-normal-20261010-01/06-power-ghost.png": "3a7425170fe0513d4533ee283dc216ddd6a9c4ff55679a3261a2102a43d987f9",
+    "target/linux-current245-boot-camp-normal-20261010-01/07-power-built.png": "7e027bfb1d16b3f2be40fc93d19421c81bbbfbebb602b5fb5e93cd5985263bdd",
+    "target/linux-current245-boot-camp-normal-20261010-01/08-power-second-ghost.png": "562f018d87fc0f35f99c103001ec9eee1190e8a08d314d2b78b572754054161c",
+    "target/linux-current245-boot-camp-normal-20261010-01/09-power-third-ghost.png": "3a9da563ed1a341157841141b9a7578433be4d9c593c7849295a6d3392471c62",
+    "target/linux-current245-boot-camp-normal-20261010-01/10-power-completed.png": "e8b10bd882c7cdbb0d51b23e832a4ea5bdb66bde312a63f525b85fd191ed8242",
+    "target/linux-current245-boot-camp-normal-20261010-01/11-barracks-ghost.png": "46519e5cbf6ac174b909e8d99a2dae18922800e2dc173727175f08d6711db5d1",
+    "target/linux-current245-boot-camp-normal-20261010-01/12-barracks-completed.png": "16cf3660a82150f4b1c6ece1e80d43d00878083b2fdb09722040e66cea46fd1e",
+    "target/linux-current245-boot-camp-normal-20261010-01/13-barracks-selected.png": "503f714996fa516906730dcf6bf4b9a0e02965d278030da092b5947cd0544322",
+    "target/linux-current245-boot-camp-normal-20261010-01/14-paid-training-queue.png": "70864a97afef87be8a2c11c51e54fe0643b745a54dfb70c584975113b7cc3e6c",
+    "target/linux-current245-boot-camp-normal-20261010-01/15-trained-infantry.png": "98806850d7546ec8e13c34016fdbfa967c111a25db52645cb6081eccba50b9b1",
+    "target/linux-current245-boot-camp-normal-20261010-01/16-moved-infantry.png": "4e62087256b0ba62a2530257944df23b704f0676fedc26a2cc76403f7b4aaf7c",
+    "target/linux-current245-boot-camp-normal-20261010-01/17-first-scout.png": "66fd54eb879a2099c473ece7b3ee67aa0db83ecc390074a77c18c0da9bfe08fd",
+    "target/linux-current245-boot-camp-normal-20261010-01/18-second-scout.png": "d0bfb7353ebcb659e35b888d8f3f9569af4e875a8eed0809109f5a9322182e5d",
+    "target/linux-current245-boot-camp-normal-20261010-01/19-third-scout.png": "732457a3bff69c8c15772f05c5ad5952b92161dc6d1368e8b2095dff38dc0aa5",
+    "target/linux-current245-boot-camp-normal-20261010-01/20-fourth-scout.png": "9ea70b0ffaff17b7b50d9347bd1506a0529aa6d36ab050cadd8ed9cb1e84cc72",
+    "target/linux-current245-boot-camp-normal-20261010-01/21-visible-hq-attack.png": "be4989702b581835d0fc6d75bc97b70628a745a28bea3566450af758db159cdc",
+    "target/linux-current245-boot-camp-normal-20261010-01/22-campaign-map-after-graduation.png": "be631a15e72b0dabc436cdbcf4877e090658782950f6e9ed09e5e02b8ffcb1d6",
+    "target/linux-current245-boot-camp-normal-20261010-01/23-replay-menu-same-process.png": "3b3eaf822ba6d4f3a999b55c0f2f8431ed91e8e52bf782bba88456ea08001836",
+    "target/linux-current245-boot-camp-normal-20261010-01/24-replay-menu-fresh-process.png": "3b3eaf822ba6d4f3a999b55c0f2f8431ed91e8e52bf782bba88456ea08001836",
+    "target/linux-current245-boot-camp-normal-20261010-01/25-fresh-process-replay-lesson-one.png": "020952794745c67dfd43e6ce60f67171028328afafe86ce9ceb2c7c4cb4d57d3",
+    "target/linux-current245-boot-camp-normal-20261010-01/26-replay-starting-army.png": "78c723ac1a360aca5738318b9fb7ac6998c5628954c520e39c410092a793e15b"
+  },
+  "raw_evidence": "target/linux-current245-boot-camp-normal-20261010-01",
+  "not_claimed": [
+    "Current247 archive revalidation",
+    "Whole Steam readiness",
+    "Performance, all save-state continuity or browser behavior"
+  ]
+}
