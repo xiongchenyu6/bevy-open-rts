@@ -1,0 +1,117 @@
+{
+  "scope": "Exact SDK253 optimized Linux archive, normal-input Boot Camp/profile acceptance only",
+  "archive_sha256": "2e29876d38ee4db63a8a86de10514b97b5ce47b00808ff979520c781b592c072",
+  "binary_sha256": "a4d386a953a0c1fa69d14cafc21a49415dffc5ba67649e4b88714d73ed8927de",
+  "raw_evidence": "target/linux-current253-steamrt4-boot-camp-normal-20261011-01",
+  "actual_container_exit": 0,
+  "game_exits": [
+    [
+      58,
+      0
+    ],
+    [
+      317,
+      0
+    ]
+  ],
+  "forced_cleanup": false,
+  "installation_files_unchanged": true,
+  "archive_bytes_unchanged": true,
+  "total_wall_limit_seconds": 1200,
+  "phase_bounds": [
+    {
+      "stage": "gather",
+      "original_budget_seconds": 60,
+      "actual_action_start_epoch": 1791656802.8105435,
+      "completion_image": "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/05-gather-progress.png",
+      "elapsed_seconds": 12.937841176986694
+    },
+    {
+      "stage": "power-construction",
+      "original_budget_seconds": 30,
+      "actual_action_start_epoch": 1791656817.6367965,
+      "completion_image": "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/07-power-completed.png",
+      "elapsed_seconds": 7.907541513442993
+    },
+    {
+      "stage": "barracks",
+      "original_budget_seconds": 30,
+      "actual_action_start_epoch": 1791656827.4550562,
+      "completion_image": "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/09-barracks-completed.png",
+      "elapsed_seconds": 10.920220851898193
+    },
+    {
+      "stage": "train",
+      "original_budget_seconds": 120,
+      "actual_action_start_epoch": 1791656840.3190124,
+      "completion_image": "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/12-trained-infantry.png",
+      "elapsed_seconds": 16.976170539855957
+    },
+    {
+      "stage": "move",
+      "original_budget_seconds": 20,
+      "actual_action_start_epoch": 1791656857.301867,
+      "completion_image": "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/13-moved-infantry.png",
+      "elapsed_seconds": 6.577281713485718
+    },
+    {
+      "stage": "attack",
+      "original_budget_seconds": 300,
+      "actual_action_start_epoch": 1791656863.886122,
+      "completion_image": "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/19-natural-graduation.png",
+      "elapsed_seconds": 212.71793913841248
+    }
+  ],
+  "checks": [
+    "normal Skip Training and return",
+    "all seven lessons with real gathering, paid Power/Barracks and four Infantry",
+    "visible enemy HQ targeted only after screenshot18 review",
+    "natural graduation",
+    "normal Campaign Map and Replay menu",
+    "same-profile fresh-process Replay, lesson1,64/32,pop0/8,only starting Drone selected",
+    "both processes closed normally"
+  ],
+  "natural_result": {
+    "shown_match_time": "04:29",
+    "enemy_unit_kills": 0,
+    "enemy_structure_kills": 1,
+    "own_unit_losses": 0,
+    "own_structure_losses": 0
+  },
+  "profile": {
+    "ron": "(version:1,training_complete:true,completed:[])",
+    "sha256": "2264aab2d7e7dae2d74a86b515a3d4d8dd630f89048565b8f47148db0d085e93"
+  },
+  "images": {
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/00-fresh-menu.png": "6840b44cc2c2bfa30a580f52c1be28168bb13b7f9ec504eb9949048a2acf34bf",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/01-training-start.png": "aa778ae388ad383b5b2763199e8bed5dcac70d8244277a08bdc340e531da932e",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/02-skipped.png": "cb1ee455477df7657e152850355bc73f4b5ae695ba2387f23c4b261b4d9166ad",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/03-restarted-training.png": "adbedbf1c2a663664a37b8cac4962329bd83041229183818daa3b2c90ea8ec31",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/04-select-worker.png": "73465c10dfd44605bdc83d6355972be0b90421698038f837a0d417aaa18e3946",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/05-gather-progress.png": "b88d3c037126efc48c055930928b72718c47b3896827a3b4606588a3c1b45108",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/06-power-green-ghost.png": "59677b6fc2fecabab41b72e868a82f82c7bb1fccaa1c2b4dd2e1d07fbb64155a",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/07-power-completed.png": "62a9283c88f9b460592ce02ec9d79e4739e416a4c68d126ad2ca0e04d248acf7",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/08-barracks-green-ghost.png": "d2c2b25db830b9326dee40d4160f7209659cd5057c656dba462b4a9b64f5613c",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/09-barracks-completed.png": "d1a49887f11b6c6287d8a750d1e990ec4be5cb0bd11d0138ae0b3954c5c8b100",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/10-barracks-selected.png": "d51cc9e675dedb367464b0d66802b338c839a5a804a9a7fd2f9502e25d70f8d9",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/11-paid-training-queue.png": "fc0c795f30e4d93fb7f520c8a1dfeae862a55a28a3d00f672c8b90bc28c723bd",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/12-trained-infantry.png": "fe1e122d5b24553ac3817ea6a8a2cbd5f97388eb904a756530f40ce1d4782e6b",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/13-moved-infantry.png": "2af343d9ce9b55010cbc0725cc6b5ec49db58045d5896bba745b16e9bb1a72f9",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/14-whole-army.png": "25964b82e22ad92ad45df7143c890a6feaf80396d170627afe3abb0c6ae151cf",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/15-first-public-scout.png": "56afa713a8248f01ef25ba60134cad16fec739e032d9405ac27c372718ac0cdd",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/16-second-public-scout.png": "ea707bc715de9cbe535a9533cfc75fc37502d4e523025b5d4fd5141f3348cdd3",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/17-third-public-scout.png": "e88d84e1bd3cfe3e97b7f1ac3bcb41982c8d2287a2553616d51340073a17fdd6",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/18-fourth-public-scout.png": "ce4f3024c946f73a50d128a3c2aa408603384bd60e1d1b76ae878bc9fcfb7129",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/19-natural-graduation.png": "f13d9eb1891bc6c0e3588e3ee581310ed29f8115306c486ad63bcad98e6bf325",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/20-graduate-campaign-map.png": "be631a15e72b0dabc436cdbcf4877e090658782950f6e9ed09e5e02b8ffcb1d6",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/21-replay-menu-same-process.png": "3b3eaf822ba6d4f3a999b55c0f2f8431ed91e8e52bf782bba88456ea08001836",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/22-replay-menu-fresh-process.png": "3b3eaf822ba6d4f3a999b55c0f2f8431ed91e8e52bf782bba88456ea08001836",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/23-fresh-process-replay-lesson-one.png": "4499e5d693f6151f0ed67202a21359a8778116c7d850abfba045dee2a2f204db",
+    "target/linux-current253-steamrt4-boot-camp-normal-20261011-01/24-replay-starting-army.png": "75a696f6a6b3b79a780ae92edacfd1df8f86422674a8eccdda8b7147e2fd962d"
+  },
+  "limitations": [
+    "Boot Camp/profile scope only, not all release gates",
+    "Inherited raw container-result scope says CURRENT252; actual command, archive and executable hashes identify SDK253; original metadata retained",
+    "Ubuntu nonroot readonly installation/no Nix; not a hardware listening or performance acceptance"
+  ]
+}
