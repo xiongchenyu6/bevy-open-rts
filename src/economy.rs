@@ -489,8 +489,8 @@ pub(crate) fn resource_target_at_cursor(
     let (camera, camera_transform) = camera_q.single().ok()?;
     let mut nearest = None;
     let mut nearest_screen_distance = f32::MAX;
-    for (entity, transform, _selectable, _visibility, resource) in resources {
-        if resource.amount <= 0 {
+    for (entity, transform, _selectable, visibility, resource) in resources {
+        if !visibility.visible || resource.amount <= 0 {
             continue;
         }
         let Some((screen_distance, pick_radius)) = resource_cursor_pick_distance(
@@ -1822,3 +1822,6 @@ pub(crate) fn draw_resource_cargo_visual(
         hud.line(center + Vec3::Y * 0.04, center + Vec3::Y * 0.20, color);
     }
 }
+
+#[cfg(test)]
+mod resource_visibility_tests;

@@ -1,0 +1,47 @@
+{
+  "scope": "Minimal native visible-only resource screen-pick guard; not a rally, model-size, radius or complete player-flow fix",
+  "product_change": "resource_target_at_cursor skips VisibilityState.visible=false and depleted resources",
+  "preserved_red_fixture_compile_failure": "target/resource-visibility-red-snapshot-20261011/red01-result.json",
+  "meaningful_old_source_red": {
+    "raw": "target/resource-visibility-red-snapshot02-20261011/red01-result.json",
+    "actual_exit": 101,
+    "visibility_assertions_failed": 2,
+    "geometry_fact_passed": 1,
+    "actual_snapshot_compilation_and_inputs_unchanged": true
+  },
+  "verification": {
+    "raw": "target/resource-visibility-shared-20261011",
+    "project_only_dev_clean_exit": 0,
+    "focused_passed": 3,
+    "focused_failed": 0,
+    "full_passed": 263,
+    "full_failed": 0,
+    "full_ignored": 1,
+    "full_wall_seconds": 259.73,
+    "native_build_exit": 0,
+    "sources_and_332_assets_unchanged": true,
+    "bins": {
+      "bevy-open-rts": "e05a5bf32d13c33b49f6fd60e394c7b341b9efc60a749f6f10d7771cf8366e06",
+      "capture": "18b0765a85390fb30f31ec6a8e1dccf5f2240f1c0e226f86e6f4c9c751da65d8"
+    }
+  },
+  "checks": [
+    "A hidden closest node cannot override a visible nearby node in actual Camera/SystemState queries",
+    "All hidden nodes yield no resource hover/harvest screen target",
+    "Existing resource screen capsule and ground actor picker can disagree; geometry fact remains unchanged"
+  ],
+  "evidence_hashes": {
+    "target/resource-visibility-shared-20261011/focused.log": "6fc237697fb4271364397c27155e7c69364775dbdd826a72ad30e39f748a5c3a",
+    "target/resource-visibility-shared-20261011/full.log": "cb9a73c33f251cd96e741469581c25ebfc514f210fdd18ab300063b88841e8ff",
+    "target/resource-visibility-shared-20261011/build.log": "ed8d73babe80ee6b4216cd17c998a9d1df2cddcf8e0ab879463bb9770c2001a9",
+    "target/resource-visibility-shared-20261011/pin.json": "4d13a3f10df09bafb86c7bdd5af69fbbe1a688862baf4a08a207d787bc41ae07",
+    "target/resource-visibility-shared-20261011/focused.d": "e290bb355e9be823906e7fcdb4102ad82d4f3fda267eefc687c884eb96cd1a21",
+    "target/resource-visibility-shared-20261011/focused-dependency-proof.json": "f47a83635f6fe80d7ae1fc9f440a28539da224e6b9cf4a57a49a35fcee849945"
+  },
+  "limits": [
+    "Projection/query fixtures, not normal packaged player acceptance",
+    "Resource rally pointer/body calibration remains unresolved; no screen height/half-width, world radius or rally-target logic changed",
+    "Exact GLB measurements remain separate from unobserved runtime mesh bounds",
+    "SDK258 and browser13 are historical artifacts without this guard; SDK263 optimized runtime acceptance remains pending"
+  ]
+}
