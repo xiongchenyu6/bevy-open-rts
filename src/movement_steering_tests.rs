@@ -218,3 +218,80 @@ fn physical_reroute_cannot_cross_a_real_cliff_without_a_ramp() {
         .is_none()
     );
 }
+
+#[test]
+fn measured_big_arena_scout_without_path_escapes_hq_and_reaches_attack_range() {
+    let endpoint = r#"[[6,"CommandCenter","Player(0)",[30,0,30],2,20,null],[1,"CommandCenter","Player(1)",[-15,0,-40],2,20,null],[2,"Refinery","Player(1)",[-10.520679473876953,0,-37.778358459472656],1.5,14,null],[3,"OrePurifier","Player(1)",[-13.264057159423828,0,-35.3110237121582],1.6,16,null],[4,"PowerReactor","Player(1)",[-15.878107070922852,0,-33.055294036865234],1.45,12,null],[5,"ScoutRover","Player(0)",[-13.157827377319336,0.05,-38.23689270019531],0.55,5,null]]"#;
+    let (mut app, keys) = measured_app(endpoint);
+    *app.world_mut().resource_mut::<MapBounds>() = MapBounds {
+        half_width: 55.0,
+        half_depth: 55.0,
+    };
+    let scout = keys[&5];
+    let target = keys[&4];
+    let start = app.world().get::<Transform>(scout).unwrap().translation;
+    let goal = app.world().get::<Transform>(target).unwrap().translation;
+    let def = registry::entity("ScoutRover").unwrap();
+    let w = def.weapon.unwrap();
+    let weapon = Weapon::new(
+        w.range,
+        w.damage,
+        w.cooldown,
+        w.splash_radius,
+        w.splash_damage_multiplier,
+        w.structure_damage_multiplier,
+        w.can_attack_air,
+        w.can_attack_ground,
+    );
+    app.world_mut().entity_mut(scout).insert((
+        weapon,
+        AttackOrder { target },
+        MoveOrder { target: goal },
+    ));
+    let obstacles: Vec<_> = app
+        .world_mut()
+        .query_filtered::<(&Transform, &Selectable), With<Structure>>()
+        .iter(app.world())
+        .map(|(t, s)| MovementObstacleSnapshot {
+            position: t.translation,
+            radius: s.radius,
+            is_structure: true,
+        })
+        .collect();
+    let mut previous = start;
+    for tick in 0..180 {
+        app.update();
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::Running,
+            "fixture ended before movement tick{tick}"
+        );
+        let p = app.world().get::<Transform>(scout).unwrap().translation;
+        assert!(
+            static_movement_segment_clear(previous, p, 0.55, &obstacles),
+            "illegal static entry tick{tick}: {previous:?}->{p:?}"
+        );
+        assert!(
+            !app.world()
+                .resource::<TerrainHeightField>()
+                .step_blocked(previous, p)
+        );
+        assert!(
+            xz_distance(previous, p) <= def.speed / 30.0 + 0.001,
+            "teleport"
+        );
+        previous = p;
+    }
+    println!(
+        "case1885 Scout start{start:?} end{previous:?} targetdistance{}",
+        xz_distance(previous, goal)
+    );
+    assert!(
+        xz_distance(start, previous) > 1.0,
+        "measured MoveOrder/noPath Scout remains blocked"
+    );
+    assert!(
+        xz_distance(previous, goal) <= 4.0,
+        "Scout never reaches actual weapon range"
+    );
+}

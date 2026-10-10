@@ -2010,10 +2010,7 @@ pub(crate) fn move_units(
             // The shared grid uses a small inflation suitable for point routing.
             // Repair a physically blocked leg with the actual mover clearance.
             // Preserve its order goal and move normally along every real waypoint.
-            if *domain == MovementDomain::Terrain
-                && move_direction == Vec3::ZERO
-                && planned_path.is_some()
-            {
+            if *domain == MovementDomain::Terrain && move_direction == Vec3::ZERO {
                 if let Some(waypoints) = physical_movement_path(
                     previous_position,
                     order.target,
@@ -2022,11 +2019,16 @@ pub(crate) fn move_units(
                     &terrain,
                     *map_bounds,
                 ) {
-                    **planned_path.as_mut().unwrap() = PlannedPath {
+                    let path = PlannedPath {
                         goal: order.target,
                         waypoints,
                         next: 0,
                     };
+                    if let Some(existing) = planned_path.as_mut() {
+                        **existing = path;
+                    } else {
+                        commands.entity(entity).try_insert(path);
+                    }
                 } else {
                     commands.entity(entity).try_remove::<PlannedPath>();
                 }
@@ -2213,11 +2215,36 @@ pub(crate) fn physical_movement_path(
     grid.rebuild_with_terrain(bounds, &expanded, terrain);
     let start = grid.nearest_open_cell(grid.cell_of(position))?;
     let end = grid.nearest_open_cell(grid.cell_of(goal))?;
-    let (_, waypoints) = grid.find_contact_path(
-        position,
-        &[grid.cell_center(start.0, start.1)],
-        &[grid.cell_center(end.0, end.1)],
-    )?;
+    let goal_radius = xz_distance(goal, grid.cell_center(end.0, end.1)) + NAV_GRID_CELL_M;
+    let mut starts = Vec::new();
+    let mut goals = Vec::new();
+    // A single nearest cell can lie in a sealed pocket. Seed only continuous,
+    // physically legal escape legs; the existing search chooses a real route.
+    for dz in -12..=12 {
+        for dx in -12..=12 {
+            let cell = (start.0 + dx, start.1 + dz);
+            let point = grid.cell_center(cell.0, cell.1);
+            if !grid.is_blocked(cell.0, cell.1)
+                && xz_distance(point, bounds.clamp_ground_point(point, radius)) <= 1e-4
+                && grid.terrain_line_clear(position, point)
+                && !terrain.step_blocked(position, point)
+                && static_movement_segment_clear(position, point, radius, obstacles)
+            {
+                starts.push(point);
+            }
+            let cell = (end.0 + dx, end.1 + dz);
+            let point = grid.cell_center(cell.0, cell.1);
+            if !grid.is_blocked(cell.0, cell.1)
+                && xz_distance(point, goal) <= goal_radius
+                && grid.terrain_line_clear(goal, point)
+                && !terrain.step_blocked(goal, point)
+                && xz_distance(point, bounds.clamp_ground_point(point, radius)) <= 1e-4
+            {
+                goals.push(point);
+            }
+        }
+    }
+    let (_, waypoints) = grid.find_contact_path(position, &starts, &goals)?;
     let mut previous = position;
     for waypoint in &waypoints {
         if xz_distance(*waypoint, bounds.clamp_ground_point(*waypoint, radius)) > 1e-4

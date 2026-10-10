@@ -1,0 +1,105 @@
+{
+  "scope": "Measured blocked no-path pursuit correction; one exact failed configuration rechecked, broader sweep remains partial",
+  "old_case": "target/current244-all-starts-20261010/1885/result.json",
+  "old_repeats": [
+    {
+      "exit": 2,
+      "wall_seconds": 115.838263129
+    },
+    {
+      "exit": 2,
+      "wall_seconds": 109.661331904
+    }
+  ],
+  "repair_trace": {
+    "rows": 12003,
+    "clock_range": [
+      200.01376342773438,
+      600.0084228515625
+    ],
+    "target_entity": 51539606728,
+    "hp_range": [
+      3.4099984169006348,
+      6.939998149871826
+    ],
+    "manual_repair_starts": 157,
+    "manual_active_frames": 11073,
+    "blocked_scout_unique_positions": 1,
+    "bank_residual_is_not_exact_repair_spend": true
+  },
+  "fixture_correction": "Initial fixture lacked own HQ and ended after one update; those initial 180-tick claims withdrawn. RED02 adds distant own HQ and asserts Running at every tick.",
+  "original_red_combat_sha256": "cc8a17385f8af5014390ab4bc39dc4d24c0f24894a3337b9083da58218c207eb",
+  "red": {
+    "actual_exit": 101,
+    "assertion": "MoveOrder/noPath Scout remains blocked after 180 Running ticks"
+  },
+  "green": {
+    "actual_exit": 0,
+    "tests_passed": 5,
+    "ticks": 180,
+    "target_distance": 3.3819268,
+    "safety": [
+      "each actual static segment",
+      "terrain/cliff",
+      "speed bound/no teleport",
+      "resource body, wall and cliff negative regressions"
+    ]
+  },
+  "full_library": {
+    "passed": 267,
+    "failed": 0,
+    "ignored": 1
+  },
+  "native_build_actual_exit": 0,
+  "recheck": {
+    "actual_exit": 0,
+    "wall_seconds": 111.85472352898796,
+    "sim_limit": 600,
+    "wall_limit": 180,
+    "clock_seconds": 415.6534118652344,
+    "phase": "MatchFinished",
+    "winning_teams": [
+      0
+    ],
+    "config": {
+      "difficulties": [
+        "easy",
+        "beginner"
+      ],
+      "factions": [
+        "chaos",
+        "chaos"
+      ],
+      "map": "big_arena",
+      "max_seconds": 600,
+      "spawn_slots": [
+        2,
+        1
+      ]
+    },
+    "starting_resources": {
+      "crystal": 16,
+      "ore": 32
+    },
+    "startup_loadout": "GodotSkirmish"
+  },
+  "assets": {
+    "count": 332,
+    "private_vs_pin_differences": 0
+  },
+  "evidence_sha256": {
+    "target/case1885-red02-20261011/red.log": "c8b634df03961793f5dadaa311b16f6b4bc82912717397631fea5dddf04cec06",
+    "target/case1885-red02-20261011/result.json": "c7899bb05ac3a9b0271c9613a3e27b60360c1ab18e38bc4ce2830b0d2020ef0a",
+    "target/case1885-green04-20261011/green.log": "d71a4a2bf65f67bbbe44ac9d8db3f625bde99bf0a49b95c4d3b51a8e953b2934",
+    "target/case1885-movement-shared-20261011/full.log": "3747af41849ef2bc4f7dc21051a7c99dddd3e0e7d25ffd69ba82c02c88d72d8f",
+    "target/case1885-movement-shared-20261011/pin.json": "6fbe1b04909806021007d9122b4a1d82debcc703a5bdf238667e8e5bd3bc6aa2",
+    "target/case1885-current267-recheck-20261011/result.json": "5a4e6cf769d86dd5a5375aa9f35058fc331d4bb81a444984187822236e2c255d",
+    "target/case1885-current267-recheck-20261011/status.json": "edea084161cadde49b54544334b1a4f8c162caaf019f3ec4a3d3ecab62590e39",
+    "target/recheck244-case1885-attacked-trace-20261011/repair.jsonl": "0c4da65f15d7c9e817dd393d68658a1866a91ef682620960a111a7819071dad2"
+  },
+  "limits": [
+    "No costs, army caps, repair rate, collision radius or time budgets changed",
+    "No broad skirmish balance pass; running sweep is older frozen244",
+    "No GUI or paid-player movement acceptance from geometry fixture"
+  ]
+}
