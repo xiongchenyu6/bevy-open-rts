@@ -1,6 +1,8 @@
 //! Opt-in read-only evidence for the ordinary frontend. Never drives the lobby or game.
 use super::*;
 
+pub(super) mod ui;
+
 #[derive(Resource)]
 pub(super) struct OnlineObserver {
     pub(super) enabled: bool,
@@ -8,6 +10,8 @@ pub(super) struct OnlineObserver {
     last_report: String,
     last_context: serde_json::Value,
     dirty: bool,
+    ui_events: VecDeque<serde_json::Value>,
+    last_ui_state: serde_json::Value,
 }
 
 impl Default for OnlineObserver {
@@ -18,6 +22,8 @@ impl Default for OnlineObserver {
             last_report: String::new(),
             last_context: serde_json::Value::Null,
             dirty: false,
+            ui_events: VecDeque::new(),
+            last_ui_state: serde_json::Value::Null,
         }
     }
 }
@@ -78,6 +84,7 @@ pub(super) fn publish(
         "game_clock": match_state.start_time_sec,
         "snapshot_semantics": if session.is_host { "successfully_sent" } else { "validated_received_not_world_equivalence" },
         "snapshots": observer.snapshots.values().collect::<Vec<_>>(),
+        "ui_events": observer.ui_events,
     });
     let Ok(report) = serde_json::to_string(&report) else {
         return;
@@ -131,6 +138,139 @@ fn write_report(report: &str) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use bevy::ecs::system::RunSystemOnce;
+
+    fn actors(world: &mut World) -> Vec<(u64, [f32; 3], [f32; 4], [f32; 3], f32, f32)> {
+        let mut query = world.query::<(Entity, &Transform, &Health)>();
+        let mut result: Vec<_> = query
+            .iter(world)
+            .map(|(entity, transform, health)| {
+                (
+                    entity.to_bits(),
+                    transform.translation.to_array(),
+                    transform.rotation.to_array(),
+                    transform.scale.to_array(),
+                    health.current,
+                    health.max,
+                )
+            })
+            .collect();
+        result.sort_by_key(|a| a.0);
+        result
+    }
+
+    #[test]
+    fn enabled_ui_observer_preserves_actual_match_actors_economy_and_commands() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::InMatch);
+        for _ in 0..8 {
+            app.update();
+        }
+        let before = actors(app.world_mut());
+        assert!(!before.is_empty(), "actual normal match actors required");
+        let bank = {
+            let economies = app.world().resource::<Economies>();
+            (
+                economies.get(Team::Player(0)).ore,
+                economies.get(Team::Player(0)).crystal,
+            )
+        };
+        app.world_mut().resource_mut::<OnlineObserver>().enabled = true;
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .press(MouseButton::Left);
+        app.world_mut().run_system_once(ui::record).unwrap();
+        assert_eq!(actors(app.world_mut()), before);
+        let economies = app.world().resource::<Economies>();
+        assert_eq!(
+            (
+                economies.get(Team::Player(0)).ore,
+                economies.get(Team::Player(0)).crystal
+            ),
+            bank
+        );
+        assert!(
+            app.world()
+                .resource::<OnlineCommandOutbox>()
+                .pending
+                .is_empty()
+        );
+        assert!(app.world().resource::<OnlineSession>().room.is_none());
+        assert!(
+            app.world()
+                .resource::<OnlineVerificationHarness>()
+                .config
+                .is_none()
+        );
+        assert_eq!(app.world().resource::<OnlineObserver>().ui_events.len(), 1);
+    }
+
+    #[test]
+    fn ui_observer_is_event_driven_and_keeps_only_forty_actual_input_records() {
+        let mut app = build_game_app(GameAppMode::Headless);
+        app.world_mut().run_system_once(ui::record).unwrap();
+        assert!(
+            app.world()
+                .resource::<OnlineObserver>()
+                .ui_events
+                .is_empty()
+        );
+        app.world_mut().resource_mut::<OnlineObserver>().enabled = true;
+        app.world_mut().run_system_once(ui::record).unwrap();
+        let initial = app.world().resource::<OnlineObserver>().ui_events.len();
+        for _ in 0..10 {
+            app.world_mut().run_system_once(ui::record).unwrap();
+        }
+        assert_eq!(
+            app.world().resource::<OnlineObserver>().ui_events.len(),
+            initial
+        );
+        for index in 0..50 {
+            app.world_mut()
+                .resource_mut::<ButtonInput<MouseButton>>()
+                .release(MouseButton::Right);
+            app.world_mut()
+                .resource_mut::<ButtonInput<MouseButton>>()
+                .release(MouseButton::Left);
+            app.world_mut()
+                .resource_mut::<ButtonInput<MouseButton>>()
+                .clear();
+            app.world_mut()
+                .resource_mut::<ButtonInput<MouseButton>>()
+                .press(if index % 2 == 0 {
+                    MouseButton::Left
+                } else {
+                    MouseButton::Right
+                });
+            app.world_mut().run_system_once(ui::record).unwrap();
+        }
+        let observer = app.world().resource::<OnlineObserver>();
+        assert_eq!(observer.ui_events.len(), 40);
+        assert_eq!(
+            observer
+                .ui_events
+                .iter()
+                .filter(|e| e["right_pressed"] == true)
+                .count(),
+            20
+        );
+        assert_eq!(
+            observer
+                .ui_events
+                .iter()
+                .filter(|e| e["left_pressed"] == true)
+                .count(),
+            20
+        );
+        assert!(
+            observer
+                .ui_events
+                .iter()
+                .all(|event| event["left_pressed"] == true || event["right_pressed"] == true)
+        );
+    }
     #[test]
     fn observer_does_not_enter_lobby_create_room_or_submit_commands() {
         let mut app = build_game_app(GameAppMode::Headless);

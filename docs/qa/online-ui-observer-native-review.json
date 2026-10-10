@@ -1,0 +1,41 @@
+{
+  "scope": "PassiveUIevent instrumentation native verification; no gameplay/inputfix or browsercause acceptance",
+  "focused": {
+    "passed": 4,
+    "failed": 0
+  },
+  "full": {
+    "passed": 260,
+    "failed": 0,
+    "ignored": 1
+  },
+  "build_actual_exit": 0,
+  "bins": {
+    "bevy-open-rts": "5bc4d7e3549e2b12fd0ea1417c3a859cd9843af6e69f3ea9f99ce4b1dc5e42cb",
+    "capture": "ebdee2a8973f33dce48ba7bf0166ff8cc78ebf13cc71068c109dbf0b1113825f"
+  },
+  "assets": 332,
+  "inputs_unchanged": true,
+  "observed_only": [
+    "Logical/physicalWindow/cursor/scale/browserDPR",
+    "HudHitZonesactualrects/blockscursor",
+    "OwnselectedIDs/types andpendingplacementID",
+    "Cardaction/enabled/Interaction/display/visibility/computedphysicalbounds/containscursor",
+    "Existingpointer_ground terrain/camera result"
+  ],
+  "cadence": "Atmost40records; realLeft/Rightpress/release orselection/build-mode change. Defaultdisabled.",
+  "tests": [
+    "Naturallyspawnedmatchactors/transforms/health andbank unchanged byrecorder; noroom/verification/commands.",
+    "50alternatingLeft/Righttransitions retainlast40,20each; repeatedidleobservationproducesnorecords."
+  ],
+  "preserved_failures": [
+    "01 compile101: invalid.5macro literals/privatechildrecord visibility.",
+    "02 focused101:3PASS1fixtureFAIL because ButtonInput.clear preservedheldpress; fixture correctedrelease-before-press."
+  ],
+  "evidence": "target/online-ui-observer-shared04-20261011",
+  "limitations": [
+    "SDK258/currentWasm12 precede extraUIobserver; Wasm13 build/runtime separate.",
+    "Nativepass doesnotestablish whyremoteAcardlostselection; actualbrowsereventtrace ispending.",
+    "Normalpaidbuild,8peers,forcedTURN,reconnect andapplied-world equivalence remain separate gates."
+  ]
+}

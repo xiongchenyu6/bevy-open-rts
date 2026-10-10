@@ -1760,6 +1760,13 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
         .init_resource::<OnlineVerificationHarness>()
         .init_resource::<observer::OnlineObserver>()
         .add_systems(
+            Update,
+            observer::ui::record
+                .after(refresh_hud_hit_zones)
+                .before(select_entities)
+                .in_set(SimulationPhase::UiAndManagement),
+        )
+        .add_systems(
             Last,
             observer::publish.after(broadcast_online_world_snapshot),
         )
