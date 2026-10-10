@@ -1,0 +1,1596 @@
+{
+  "schema": 1,
+  "scope": "Source-only export inventory; no images generated or replaced",
+  "source_sha256": {
+    "src/generated_registry.rs": "3ed3f3401b9b629020037ab65d09c0ea6b6ff62ee6e3c9261784ab7fe58a125e",
+    "assets/data/godot_model_map.model_map.ron": "e1674c86f38d6c358ab768581b6280df02ab14344f5c9ec834ac539a93dc0e3c",
+    "src/capture_api/portrait_export.rs": "89e4dd7c2448e16bd4838e32f470c21e28f1c96171ff70979bf325e4426717d6"
+  },
+  "registry_icon_count": 70,
+  "outside_replacement_scope": [
+    {
+      "runtime_path": "ui/icons/AircraftFactory.png",
+      "entity_id": "AircraftFactory",
+      "label": "Aircraft Factory",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:1694",
+      "scene_path": "res://source/match/units/AircraftFactory.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/hangar_roundA.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/satelliteDish_detailed.glb"
+      ],
+      "render_parts_symbol": "PARTS_AIRCRAFTFACTORY",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:48",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/AntiAirTurret.png",
+      "entity_id": "AntiAirTurret",
+      "label": "Anti Air Turret",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:1750",
+      "scene_path": "res://source/match/units/AntiAirTurret.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/turret_double.glb"
+      ],
+      "render_parts_symbol": "PARTS_ANTIAIRTURRET",
+      "registry_render_part_count": 1,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:72",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/AntiGroundTurret.png",
+      "entity_id": "AntiGroundTurret",
+      "label": "Anti Ground Turret",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:1880",
+      "scene_path": "res://source/match/units/AntiGroundTurret.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/turret_single.glb"
+      ],
+      "render_parts_symbol": "PARTS_ANTIGROUNDTURRET",
+      "registry_render_part_count": 1,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:108",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/CommandCenter.png",
+      "entity_id": "CommandCenter",
+      "label": "Command Center",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2131",
+      "scene_path": "res://source/match/units/CommandCenter.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/barrels.glb",
+        "models/kenney-spacekit/corridor.glb",
+        "models/kenney-spacekit/corridor_corner.glb",
+        "models/kenney-spacekit/corridor_cornerRoundWindow.glb",
+        "models/kenney-spacekit/corridor_cross.glb",
+        "models/kenney-spacekit/corridor_detailed.glb",
+        "models/kenney-spacekit/corridor_end.glb",
+        "models/kenney-spacekit/corridor_open.glb",
+        "models/kenney-spacekit/corridor_windowClosed.glb",
+        "models/kenney-spacekit/machine_generator.glb",
+        "models/kenney-spacekit/machine_wireless.glb"
+      ],
+      "render_parts_symbol": "PARTS_COMMANDCENTER",
+      "registry_render_part_count": 14,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:210",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/Drone.png",
+      "entity_id": "Drone",
+      "label": "Drone",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2252",
+      "scene_path": "res://source/match/units/Drone.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/craft_speederA.glb"
+      ],
+      "render_parts_symbol": "PARTS_DRONE",
+      "registry_render_part_count": 1,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:330",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/Helicopter.png",
+      "entity_id": "Helicopter",
+      "label": "Helicopter",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3061",
+      "scene_path": "res://source/match/units/Helicopter.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/craft_racer.glb"
+      ],
+      "render_parts_symbol": "PARTS_HELICOPTER",
+      "registry_render_part_count": 1,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:666",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/Tank.png",
+      "entity_id": "Tank",
+      "label": "Tank",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5450",
+      "scene_path": "res://source/match/units/Tank.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1692",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/VehicleFactory.png",
+      "entity_id": "VehicleFactory",
+      "label": "Vehicle Factory",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5990",
+      "scene_path": "res://source/match/units/VehicleFactory.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/gate_complex.glb",
+        "models/kenney-spacekit/hangar_largeA.glb",
+        "models/kenney-spacekit/platform_large.glb"
+      ],
+      "render_parts_symbol": "PARTS_VEHICLEFACTORY",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1986",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    }
+  ],
+  "entity_count": 62,
+  "unique_runtime_paths": 62,
+  "shared_icon_paths": {},
+  "missing_faction_membership": [
+    "TechHospital",
+    "TechOilDerrick",
+    "TechRepairDepot"
+  ],
+  "missing_runtime_files": [],
+  "entities": [
+    {
+      "runtime_path": "ui/icons/AdvancedReactorPlant.png",
+      "entity_id": "AdvancedReactorPlant",
+      "label": "Advanced Reactor Plant",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:1638",
+      "scene_path": "res://source/match/units/AdvancedReactorPlant.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/chimney_detailed.glb",
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/rocket_fuelB.glb"
+      ],
+      "render_parts_symbol": "PARTS_ADVANCEDREACTORPLANT",
+      "registry_render_part_count": 5,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:6",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/AntiAirWalker.png",
+      "entity_id": "AntiAirWalker",
+      "label": "Anti Air Walker",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:1815",
+      "scene_path": "res://source/match/units/AntiAirWalker.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/rover.glb",
+        "models/kenney-spacekit/satelliteDish.glb",
+        "models/kenney-spacekit/turret_double.glb"
+      ],
+      "render_parts_symbol": "PARTS_ANTIAIRWALKER",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:84",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/ArcCoilDefenseTower.png",
+      "entity_id": "ArcCoilDefenseTower",
+      "label": "Arc Coil Defense Tower",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:1945",
+      "scene_path": "res://source/match/units/ArcCoilDefenseTower.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/satelliteDish.glb",
+        "models/kenney-spacekit/structure_closed.glb"
+      ],
+      "render_parts_symbol": "PARTS_ARCCOILDEFENSETOWER",
+      "registry_render_part_count": 4,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:120",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/Barracks.png",
+      "entity_id": "Barracks",
+      "label": "Barracks",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2010",
+      "scene_path": "res://source/match/units/Barracks.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/gate_simple.glb",
+        "models/kenney-spacekit/hangar_smallB.glb",
+        "models/kenney-spacekit/machine_wireless.glb",
+        "models/kenney-spacekit/platform_large.glb"
+      ],
+      "render_parts_symbol": "PARTS_BARRACKS",
+      "registry_render_part_count": 4,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:162",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/BomberVTOL.png",
+      "entity_id": "BomberVTOL",
+      "label": "Bomber VTOL",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2066",
+      "scene_path": "res://source/match/units/BomberVTOL.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/craft_cargoA.glb"
+      ],
+      "render_parts_symbol": "PARTS_BOMBERVTOL",
+      "registry_render_part_count": 1,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:198",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/CryoSprayer.png",
+      "entity_id": "CryoSprayer",
+      "label": "Cryo Sprayer",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2187",
+      "scene_path": "res://source/match/units/CryoSprayer.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/barrel.glb",
+        "models/kenney-spacekit/machine_barrel.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "render_parts_symbol": "PARTS_CRYOSPRAYER",
+      "registry_render_part_count": 4,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:300",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/DroneMineLayer.png",
+      "entity_id": "DroneMineLayer",
+      "label": "Drone Mine Layer",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2308",
+      "scene_path": "res://source/match/units/DroneMineLayer.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:342",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/EngineerDrone.png",
+      "entity_id": "EngineerDrone",
+      "label": "Engineer Drone",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2364",
+      "scene_path": "res://source/match/units/EngineerDrone.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/craft_speederA.glb",
+        "models/kenney-spacekit/machine_wireless.glb"
+      ],
+      "render_parts_symbol": "PARTS_ENGINEERDRONE",
+      "registry_render_part_count": 2,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:360",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/FieldMedic.png",
+      "entity_id": "FieldMedic",
+      "label": "Field Medic",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2420",
+      "scene_path": "res://source/match/units/FieldMedic.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/machine_wireless.glb"
+      ],
+      "render_parts_symbol": "PARTS_FIELDMEDIC",
+      "registry_render_part_count": 2,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:378",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/FlakHoverTank.png",
+      "entity_id": "FlakHoverTank",
+      "label": "Flak Hover Tank",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2476",
+      "scene_path": "res://source/match/units/FlakHoverTank.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:396",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/FlakRocketTeam.png",
+      "entity_id": "FlakRocketTeam",
+      "label": "Flak Rocket Team",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2541",
+      "scene_path": "res://source/match/units/FlakRocketTeam.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "render_parts_symbol": "PARTS_FLAKROCKETTEAM",
+      "registry_render_part_count": 4,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:426",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/FlakRocketTeamMk2.png",
+      "entity_id": "FlakRocketTeamMk2",
+      "label": "Flak Rocket Team Mk2",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2606",
+      "scene_path": "res://source/match/units/FlakRocketTeamMk2.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "render_parts_symbol": "PARTS_FLAKROCKETTEAMMK2",
+      "registry_render_part_count": 4,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:456",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/FlameAssaultBuggy.png",
+      "entity_id": "FlameAssaultBuggy",
+      "label": "Flame Assault Buggy",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2671",
+      "scene_path": "res://source/match/units/FlameAssaultBuggy.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:486",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/GrenadierTrooper.png",
+      "entity_id": "GrenadierTrooper",
+      "label": "Grenadier Trooper",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2736",
+      "scene_path": "res://source/match/units/GrenadierTrooper.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/barrel.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "render_parts_symbol": "PARTS_GRENADIERTROOPER",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:522",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/HammerSiegeTank.png",
+      "entity_id": "HammerSiegeTank",
+      "label": "Hammer Siege Tank",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2801",
+      "scene_path": "res://source/match/units/HammerSiegeTank.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:540",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/HeavyBombardmentAirship.png",
+      "entity_id": "HeavyBombardmentAirship",
+      "label": "Heavy Bombardment Airship",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2866",
+      "scene_path": "res://source/match/units/HeavyBombardmentAirship.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/craft_cargoB.glb"
+      ],
+      "render_parts_symbol": "PARTS_HEAVYBOMBARDMENTAIRSHIP",
+      "registry_render_part_count": 1,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:576",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/HeavyMachinegunTrooper.png",
+      "entity_id": "HeavyMachinegunTrooper",
+      "label": "Heavy Machinegun Trooper",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2931",
+      "scene_path": "res://source/match/units/HeavyMachinegunTrooper.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "render_parts_symbol": "PARTS_HEAVYMACHINEGUNTROOPER",
+      "registry_render_part_count": 2,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:588",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/HeavySiegeWalker.png",
+      "entity_id": "HeavySiegeWalker",
+      "label": "Heavy Siege Walker",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:2996",
+      "scene_path": "res://source/match/units/HeavySiegeWalker.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/craft_cargoA.glb",
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/supports_low.glb",
+        "models/kenney-spacekit/turret_double.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "render_parts_symbol": "PARTS_HEAVYSIEGEWALKER",
+      "registry_render_part_count": 9,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:606",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/InterceptorVTOL.png",
+      "entity_id": "InterceptorVTOL",
+      "label": "Interceptor VTOL",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3126",
+      "scene_path": "res://source/match/units/InterceptorVTOL.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/craft_speederD.glb"
+      ],
+      "render_parts_symbol": "PARTS_INTERCEPTORVTOL",
+      "registry_render_part_count": 1,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:678",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/JammerVehicle.png",
+      "entity_id": "JammerVehicle",
+      "label": "Jammer Vehicle",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3191",
+      "scene_path": "res://source/match/units/JammerVehicle.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:690",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/LanceBeamDefenseTower.png",
+      "entity_id": "LanceBeamDefenseTower",
+      "label": "Lance Beam Defense Tower",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3256",
+      "scene_path": "res://source/match/units/LanceBeamDefenseTower.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/structure_closed.glb",
+        "models/kenney-spacekit/turret_single.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "render_parts_symbol": "PARTS_LANCEBEAMDEFENSETOWER",
+      "registry_render_part_count": 4,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:714",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/LanceBeamTank.png",
+      "entity_id": "LanceBeamTank",
+      "label": "Lance Beam Tank",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3321",
+      "scene_path": "res://source/match/units/LanceBeamTank.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:750",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/LightRifleInfantry.png",
+      "entity_id": "LightRifleInfantry",
+      "label": "Light Rifle Infantry",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3442",
+      "scene_path": "res://source/match/units/LightRifleInfantry.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "render_parts_symbol": "PARTS_LIGHTRIFLEINFANTRY",
+      "registry_render_part_count": 2,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:792",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/LongbowMissileCrawler.png",
+      "entity_id": "LongbowMissileCrawler",
+      "label": "Longbow Missile Crawler",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3507",
+      "scene_path": "res://source/match/units/LongbowMissileCrawler.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:810",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/MirageScoutTank.png",
+      "entity_id": "MirageScoutTank",
+      "label": "Mirage Scout Tank",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3572",
+      "scene_path": "res://source/match/units/MirageScoutTank.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:864",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/MobileRepairCrawler.png",
+      "entity_id": "MobileRepairCrawler",
+      "label": "Mobile Repair Crawler",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3637",
+      "scene_path": "res://source/match/units/MobileRepairCrawler.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:888",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/MobileShieldProjector.png",
+      "entity_id": "MobileShieldProjector",
+      "label": "Mobile Shield Projector",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3693",
+      "scene_path": "res://source/match/units/MobileShieldProjector.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:912",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/ModularMissileCarrier.png",
+      "entity_id": "ModularMissileCarrier",
+      "label": "Modular Missile Carrier",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3749",
+      "scene_path": "res://source/match/units/ModularMissileCarrier.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:942",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/MortarTeam.png",
+      "entity_id": "MortarTeam",
+      "label": "Mortar Team",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3814",
+      "scene_path": "res://source/match/units/MortarTeam.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/barrels.glb",
+        "models/kenney-spacekit/rocket_baseA.glb"
+      ],
+      "render_parts_symbol": "PARTS_MORTARTEAM",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:972",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/OrePurifier.png",
+      "entity_id": "OrePurifier",
+      "label": "Ore Purifier",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3879",
+      "scene_path": "res://source/match/units/OrePurifier.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/barrels_rail.glb",
+        "models/kenney-spacekit/machine_barrelLarge.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/structure_detailed.glb"
+      ],
+      "render_parts_symbol": "PARTS_OREPURIFIER",
+      "registry_render_part_count": 4,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:996",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/PhaseSaboteur.png",
+      "entity_id": "PhaseSaboteur",
+      "label": "Phase Saboteur",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:3935",
+      "scene_path": "res://source/match/units/PhaseSaboteur.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/machine_wireless.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "render_parts_symbol": "PARTS_PHASESABOTEUR",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1032",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/PowerReactor.png",
+      "entity_id": "PowerReactor",
+      "label": "Power Reactor",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4000",
+      "scene_path": "res://source/match/units/PowerReactor.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/chimney_detailed.glb",
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/rocket_fuelB.glb"
+      ],
+      "render_parts_symbol": "PARTS_POWERREACTOR",
+      "registry_render_part_count": 5,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1056",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/PrismDefenseObelisk.png",
+      "entity_id": "PrismDefenseObelisk",
+      "label": "Prism Defense Obelisk",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4056",
+      "scene_path": "res://source/match/units/PrismDefenseObelisk.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/rock_crystalsLargeA.glb",
+        "models/kenney-spacekit/satelliteDish.glb",
+        "models/kenney-spacekit/structure_closed.glb"
+      ],
+      "render_parts_symbol": "PARTS_PRISMDEFENSEOBELISK",
+      "registry_render_part_count": 4,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1092",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/PulseRifleCommando.png",
+      "entity_id": "PulseRifleCommando",
+      "label": "Pulse Rifle Commando",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4121",
+      "scene_path": "res://source/match/units/PulseRifleCommando.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/machine_generator.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "render_parts_symbol": "PARTS_PULSERIFLECOMMANDO",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1128",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/RadarUplink.png",
+      "entity_id": "RadarUplink",
+      "label": "Radar Uplink",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4186",
+      "scene_path": "res://source/match/units/RadarUplink.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/machine_wirelessCable.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/satelliteDish_large.glb",
+        "models/kenney-spacekit/structure_closed.glb"
+      ],
+      "render_parts_symbol": "PARTS_RADARUPLINK",
+      "registry_render_part_count": 4,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1146",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/RailArtilleryWalker.png",
+      "entity_id": "RailArtilleryWalker",
+      "label": "Rail Artillery Walker",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4242",
+      "scene_path": "res://source/match/units/RailArtilleryWalker.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/craft_cargoA.glb",
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/supports_low.glb",
+        "models/kenney-spacekit/turret_single.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "render_parts_symbol": "PARTS_RAILARTILLERYWALKER",
+      "registry_render_part_count": 8,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1176",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/RailCannonBunker.png",
+      "entity_id": "RailCannonBunker",
+      "label": "Rail Cannon Bunker",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4307",
+      "scene_path": "res://source/match/units/RailCannonBunker.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/structure_closed.glb",
+        "models/kenney-spacekit/turret_double.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "render_parts_symbol": "PARTS_RAILCANNONBUNKER",
+      "registry_render_part_count": 4,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1230",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/RailSniperTeam.png",
+      "entity_id": "RailSniperTeam",
+      "label": "Rail Sniper Team",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4372",
+      "scene_path": "res://source/match/units/RailSniperTeam.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "render_parts_symbol": "PARTS_RAILSNIPERTEAM",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1266",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/RailgunTank.png",
+      "entity_id": "RailgunTank",
+      "label": "Railgun Tank",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4437",
+      "scene_path": "res://source/match/units/RailgunTank.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1290",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/Refinery.png",
+      "entity_id": "Refinery",
+      "label": "Refinery",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4502",
+      "scene_path": "res://source/match/units/Refinery.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/barrels_rail.glb",
+        "models/kenney-spacekit/chimney.glb",
+        "models/kenney-spacekit/machine_barrelLarge.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/structure_closed.glb"
+      ],
+      "render_parts_symbol": "PARTS_REFINERY",
+      "registry_render_part_count": 5,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1326",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/RepairPad.png",
+      "entity_id": "RepairPad",
+      "label": "Repair Pad",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4558",
+      "scene_path": "res://source/match/units/RepairPad.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/gate_complex.glb",
+        "models/kenney-spacekit/machine_wirelessCable.glb",
+        "models/kenney-spacekit/platform_large.glb"
+      ],
+      "render_parts_symbol": "PARTS_REPAIRPAD",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1368",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/RoboticsBay.png",
+      "entity_id": "RoboticsBay",
+      "label": "Robotics Bay",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4614",
+      "scene_path": "res://source/match/units/RoboticsBay.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/barrels.glb",
+        "models/kenney-spacekit/hangar_largeB.glb",
+        "models/kenney-spacekit/platform_large.glb"
+      ],
+      "render_parts_symbol": "PARTS_ROBOTICSBAY",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1410",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/RocketGunship.png",
+      "entity_id": "RocketGunship",
+      "label": "Rocket Gunship",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4670",
+      "scene_path": "res://source/match/units/RocketGunship.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/craft_speederC.glb",
+        "models/kenney-spacekit/rocket_finsA.glb"
+      ],
+      "render_parts_symbol": "PARTS_ROCKETGUNSHIP",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1440",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/RocketInfantry.png",
+      "entity_id": "RocketInfantry",
+      "label": "Rocket Infantry",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4735",
+      "scene_path": "res://source/match/units/RocketInfantry.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/rocket_topA.glb",
+        "models/kenney-spacekit/rocket_fuelA.glb"
+      ],
+      "render_parts_symbol": "PARTS_ROCKETINFANTRY",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1464",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/RocketTrooperRobot.png",
+      "entity_id": "RocketTrooperRobot",
+      "label": "Rocket Trooper Robot",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4800",
+      "scene_path": "res://source/match/units/RocketTrooperRobot.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/alien.glb",
+        "models/kenney-spacekit/machine_generator.glb",
+        "models/kenney-spacekit/rocket_topB.glb"
+      ],
+      "render_parts_symbol": "PARTS_ROCKETTROOPERROBOT",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1482",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/SaboteurInfiltrator.png",
+      "entity_id": "SaboteurInfiltrator",
+      "label": "Saboteur Infiltrator",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4865",
+      "scene_path": "res://source/match/units/SaboteurInfiltrator.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/machine_generator.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "render_parts_symbol": "PARTS_SABOTEURINFILTRATOR",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1500",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/ScoutRover.png",
+      "entity_id": "ScoutRover",
+      "label": "Scout Rover",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4930",
+      "scene_path": "res://source/match/units/ScoutRover.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1524",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/ShieldTrooper.png",
+      "entity_id": "ShieldTrooper",
+      "label": "Shield Trooper",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:4995",
+      "scene_path": "res://source/match/units/ShieldTrooper.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/machine_generator.glb"
+      ],
+      "render_parts_symbol": "PARTS_SHIELDTROOPER",
+      "registry_render_part_count": 2,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1536",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/ShockTrooper.png",
+      "entity_id": "ShockTrooper",
+      "label": "Shock Trooper",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5060",
+      "scene_path": "res://source/match/units/ShockTrooper.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/machine_generator.glb",
+        "models/kenney-spacekit/weapon_gun.glb"
+      ],
+      "render_parts_symbol": "PARTS_SHOCKTROOPER",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1554",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/SiegeAirship.png",
+      "entity_id": "SiegeAirship",
+      "label": "Siege Airship",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5125",
+      "scene_path": "res://source/match/units/SiegeAirship.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/craft_cargoB.glb",
+        "models/kenney-spacekit/machine_barrelLarge.glb"
+      ],
+      "render_parts_symbol": "PARTS_SIEGEAIRSHIP",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1578",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/SiegeArtilleryVehicle.png",
+      "entity_id": "SiegeArtilleryVehicle",
+      "label": "Siege Artillery Vehicle",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5190",
+      "scene_path": "res://source/match/units/SiegeArtilleryVehicle.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1602",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/SiegeDrillTank.png",
+      "entity_id": "SiegeDrillTank",
+      "label": "Siege Drill Tank",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5255",
+      "scene_path": "res://source/match/units/SiegeDrillTank.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1626",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/SniperScout.png",
+      "entity_id": "SniperScout",
+      "label": "Sniper Scout",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5320",
+      "scene_path": "res://source/match/units/SniperScout.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "render_parts_symbol": "PARTS_SNIPERSCOUT",
+      "registry_render_part_count": 2,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1650",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/TacticalOfficer.png",
+      "entity_id": "TacticalOfficer",
+      "label": "Tactical Officer",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5385",
+      "scene_path": "res://source/match/units/TacticalOfficer.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautA.glb",
+        "models/kenney-spacekit/satelliteDish.glb",
+        "models/kenney-spacekit/weapon_rifle.glb"
+      ],
+      "render_parts_symbol": "PARTS_TACTICALOFFICER",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1668",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/TechHospital.png",
+      "entity_id": "TechHospital",
+      "label": "Tech Hospital",
+      "role": "Structure",
+      "available_factions": [],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5636",
+      "scene_path": "res://source/match/units/TechHospital.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/hangar_roundGlass.glb",
+        "models/kenney-spacekit/machine_wireless.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/satelliteDish.glb"
+      ],
+      "render_parts_symbol": "PARTS_TECHHOSPITAL",
+      "registry_render_part_count": 4,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1776",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/TechLab.png",
+      "entity_id": "TechLab",
+      "label": "Tech Lab",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5692",
+      "scene_path": "res://source/match/units/TechLab.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/hangar_roundGlass.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/satelliteDish_detailed.glb"
+      ],
+      "render_parts_symbol": "PARTS_TECHLAB",
+      "registry_render_part_count": 3,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1812",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/TechOilDerrick.png",
+      "entity_id": "TechOilDerrick",
+      "label": "Tech Oil Derrick",
+      "role": "Structure",
+      "available_factions": [],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5748",
+      "scene_path": "res://source/match/units/TechOilDerrick.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/chimney_detailed.glb",
+        "models/kenney-spacekit/machine_barrelLarge.glb",
+        "models/kenney-spacekit/pipe_ringHighEnd.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/rocket_fuelA.glb"
+      ],
+      "render_parts_symbol": "PARTS_TECHOILDERRICK",
+      "registry_render_part_count": 6,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1842",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/TechRepairDepot.png",
+      "entity_id": "TechRepairDepot",
+      "label": "Tech Repair Depot",
+      "role": "Structure",
+      "available_factions": [],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5804",
+      "scene_path": "res://source/match/units/TechRepairDepot.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/machine_barrelLarge.glb",
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/machine_wireless.glb",
+        "models/kenney-spacekit/pipe_ring.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/rail_middle.glb"
+      ],
+      "render_parts_symbol": "PARTS_TECHREPAIRDEPOT",
+      "registry_render_part_count": 8,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1896",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/TeslaCrawlerMk2.png",
+      "entity_id": "TeslaCrawlerMk2",
+      "label": "Tesla Crawler Mk2",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5860",
+      "scene_path": "res://source/match/units/TeslaCrawlerMk2.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1950",
+      "assembly_source": "src/tank_models.rs::spawn_tank_model",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/TeslaFenceSegment.png",
+      "entity_id": "TeslaFenceSegment",
+      "label": "Tesla Fence Segment",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:5925",
+      "scene_path": "res://source/match/units/TeslaFenceSegment.tscn",
+      "model_assets": [],
+      "render_parts_symbol": "PARTS_TESLAFENCESEGMENT",
+      "registry_render_part_count": 0,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1980",
+      "assembly_source": "authored Tesla geometry through normal spawn/model processing",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/WeatherControlSpire.png",
+      "entity_id": "WeatherControlSpire",
+      "label": "Weather Control Spire",
+      "role": "Structure",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:6046",
+      "scene_path": "res://source/match/units/WeatherControlSpire.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/chimney_detailed.glb",
+        "models/kenney-spacekit/machine_generatorLarge.glb",
+        "models/kenney-spacekit/pipe_ringHighEnd.glb",
+        "models/kenney-spacekit/platform_large.glb",
+        "models/kenney-spacekit/satelliteDish_large.glb"
+      ],
+      "render_parts_symbol": "PARTS_WEATHERCONTROLSPIRE",
+      "registry_render_part_count": 5,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:1998",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    },
+    {
+      "runtime_path": "ui/icons/Worker.png",
+      "entity_id": "Worker",
+      "label": "Worker",
+      "role": "Unit",
+      "available_factions": [
+        "alliance",
+        "demon",
+        "chaos"
+      ],
+      "portrait_faction": "alliance",
+      "registry_source": "src/generated_registry.rs:6102",
+      "scene_path": "res://source/match/units/Worker.tscn",
+      "model_assets": [
+        "models/kenney-spacekit/astronautB.glb",
+        "models/kenney-spacekit/machine_wireless.glb"
+      ],
+      "render_parts_symbol": "PARTS_WORKER",
+      "registry_render_part_count": 2,
+      "model_map_source": "assets/data/godot_model_map.model_map.ron:2040",
+      "assembly_source": "normal spawn/model processing plus shared structure detail attachments",
+      "render_input": "full actual assembled game geometry; never legacy PNG"
+    }
+  ],
+  "roster_preview": {
+    "runtime_path": "ui/icons/RosterPreview.png",
+    "entity_id": null,
+    "references": [
+      "src/menu.rs:363",
+      "src/lib.rs:2603"
+    ],
+    "scope": "separate composed roster image; not a registry entity portrait"
+  },
+  "exporter": {
+    "source": "src/capture_api/portrait_export.rs",
+    "current_hardcoded_ids": [
+      "AdvancedReactorPlant",
+      "CommandCenter",
+      "Tank"
+    ],
+    "entrypoint": "export_portrait_stage",
+    "required_extension": "iterate validated entities and portrait_faction; retain actual spawn, rest-pose geometry parity, assembled AABB framing, RGBA alpha and independent rerender checks"
+  }
+}
