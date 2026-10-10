@@ -1,0 +1,419 @@
+{
+  "scope": "ExactSDK252 archive in officialRuntime4: three normalCtrlL/CtrlS cycles and fresh-process load/resave of naturally existing ownDrone/twoWorkers; precise saved worldY only",
+  "archive_sha256": "4e0c03f3319a0f48e287ea8d188571a35189ca90904699a95f2a9f6b1ddf9c75",
+  "binary_sha256": "19ac14c3d31a66f5165496a18504a36b1ad8054fd4e8aea92497de4a39fe2d44",
+  "actual_service_exit": 0,
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 2951060,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "index": 2,
+      "pid": 2953329,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "wall_seconds": 86.57920623500831,
+  "original_wall_limit_seconds": 240,
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "raw_evidence": "target/sdk252-save-y-repeat-20261011-01",
+  "raw_result_sha256": "f32524900a3a77c95ea19778dadd075adfe15b60f58b2d8d90a201a276830353",
+  "own_saved_positions": [
+    {
+      "session": 1,
+      "actual_save_sha256": "ab96a08f0846ad40ae211c4bd160619aeeea0dd1e3c79f3121bfea76c75c3fd9",
+      "snapshot": "target/sdk252-save-y-repeat-20261011-01/04-baseline-save.ron",
+      "own_units": [
+        {
+          "id": "Drone",
+          "key": 8589933885,
+          "position": [
+            -17.0,
+            1.5,
+            -20.0
+          ]
+        },
+        {
+          "id": "Worker",
+          "key": 8589933888,
+          "position": [
+            -18.0,
+            0.05000000074505806,
+            -15.0
+          ]
+        },
+        {
+          "id": "Worker",
+          "key": 8589933892,
+          "position": [
+            -12.0,
+            0.05000000074505806,
+            -15.0
+          ]
+        }
+      ],
+      "snapshot_sha256": "ab96a08f0846ad40ae211c4bd160619aeeea0dd1e3c79f3121bfea76c75c3fd9"
+    },
+    {
+      "session": 1,
+      "actual_save_sha256": "e7ba10880260f1439041c8747f348d0977d7996b9fa5746b53eebe75ca4647de",
+      "snapshot": "target/sdk252-save-y-repeat-20261011-01/cycle1-resaved.ron",
+      "own_units": [
+        {
+          "id": "Drone",
+          "key": 12884900587,
+          "position": [
+            -17.0,
+            1.5,
+            -20.0
+          ]
+        },
+        {
+          "id": "Worker",
+          "key": 12884900589,
+          "position": [
+            -18.0,
+            0.05000000074505806,
+            -15.0
+          ]
+        },
+        {
+          "id": "Worker",
+          "key": 12884900637,
+          "position": [
+            -12.0,
+            0.05000000074505806,
+            -15.0
+          ]
+        }
+      ],
+      "comparison": [
+        {
+          "id": "Drone",
+          "old_entity_key": 8589933885,
+          "new_entity_key": 12884900587,
+          "xz": [
+            -17.0,
+            -20.0
+          ],
+          "before_y": 1.5,
+          "after_y": 1.5,
+          "exact_f32_y_equal": true
+        },
+        {
+          "id": "Worker",
+          "old_entity_key": 8589933888,
+          "new_entity_key": 12884900589,
+          "xz": [
+            -18.0,
+            -15.0
+          ],
+          "before_y": 0.05000000074505806,
+          "after_y": 0.05000000074505806,
+          "exact_f32_y_equal": true
+        },
+        {
+          "id": "Worker",
+          "old_entity_key": 8589933892,
+          "new_entity_key": 12884900637,
+          "xz": [
+            -12.0,
+            -15.0
+          ],
+          "before_y": 0.05000000074505806,
+          "after_y": 0.05000000074505806,
+          "exact_f32_y_equal": true
+        }
+      ],
+      "snapshot_sha256": "e7ba10880260f1439041c8747f348d0977d7996b9fa5746b53eebe75ca4647de"
+    },
+    {
+      "session": 1,
+      "actual_save_sha256": "c919a9051997172f49e379d1c87face8b2c388d5dd03d9c4aa4c74bfeab80780",
+      "snapshot": "target/sdk252-save-y-repeat-20261011-01/cycle2-resaved.ron",
+      "own_units": [
+        {
+          "id": "Drone",
+          "key": 21474835873,
+          "position": [
+            -17.0,
+            1.5,
+            -20.0
+          ]
+        },
+        {
+          "id": "Worker",
+          "key": 17179868433,
+          "position": [
+            -18.0,
+            0.05000000074505806,
+            -15.0
+          ]
+        },
+        {
+          "id": "Worker",
+          "key": 21474835394,
+          "position": [
+            -12.0,
+            0.05000000074505806,
+            -15.0
+          ]
+        }
+      ],
+      "comparison": [
+        {
+          "id": "Drone",
+          "old_entity_key": 8589933885,
+          "new_entity_key": 21474835873,
+          "xz": [
+            -17.0,
+            -20.0
+          ],
+          "before_y": 1.5,
+          "after_y": 1.5,
+          "exact_f32_y_equal": true
+        },
+        {
+          "id": "Worker",
+          "old_entity_key": 8589933888,
+          "new_entity_key": 17179868433,
+          "xz": [
+            -18.0,
+            -15.0
+          ],
+          "before_y": 0.05000000074505806,
+          "after_y": 0.05000000074505806,
+          "exact_f32_y_equal": true
+        },
+        {
+          "id": "Worker",
+          "old_entity_key": 8589933892,
+          "new_entity_key": 21474835394,
+          "xz": [
+            -12.0,
+            -15.0
+          ],
+          "before_y": 0.05000000074505806,
+          "after_y": 0.05000000074505806,
+          "exact_f32_y_equal": true
+        }
+      ],
+      "snapshot_sha256": "c919a9051997172f49e379d1c87face8b2c388d5dd03d9c4aa4c74bfeab80780"
+    },
+    {
+      "session": 1,
+      "actual_save_sha256": "7a70d31256d29fc73d2ed7c3d01f235971108ec4d6cce76c8835b8165c94403d",
+      "snapshot": "target/sdk252-save-y-repeat-20261011-01/cycle3-resaved.ron",
+      "own_units": [
+        {
+          "id": "Drone",
+          "key": 21474835154,
+          "position": [
+            -17.0,
+            1.5,
+            -20.0
+          ]
+        },
+        {
+          "id": "Worker",
+          "key": 25769803259,
+          "position": [
+            -18.0,
+            0.05000000074505806,
+            -15.0
+          ]
+        },
+        {
+          "id": "Worker",
+          "key": 64424508407,
+          "position": [
+            -12.0,
+            0.05000000074505806,
+            -15.0
+          ]
+        }
+      ],
+      "comparison": [
+        {
+          "id": "Drone",
+          "old_entity_key": 8589933885,
+          "new_entity_key": 21474835154,
+          "xz": [
+            -17.0,
+            -20.0
+          ],
+          "before_y": 1.5,
+          "after_y": 1.5,
+          "exact_f32_y_equal": true
+        },
+        {
+          "id": "Worker",
+          "old_entity_key": 8589933888,
+          "new_entity_key": 25769803259,
+          "xz": [
+            -18.0,
+            -15.0
+          ],
+          "before_y": 0.05000000074505806,
+          "after_y": 0.05000000074505806,
+          "exact_f32_y_equal": true
+        },
+        {
+          "id": "Worker",
+          "old_entity_key": 8589933892,
+          "new_entity_key": 64424508407,
+          "xz": [
+            -12.0,
+            -15.0
+          ],
+          "before_y": 0.05000000074505806,
+          "after_y": 0.05000000074505806,
+          "exact_f32_y_equal": true
+        }
+      ],
+      "snapshot_sha256": "7a70d31256d29fc73d2ed7c3d01f235971108ec4d6cce76c8835b8165c94403d"
+    },
+    {
+      "session": 2,
+      "actual_save_sha256": "9a99a2324790e1f9cceccf4e83eab8388309d7045f35e38248a5fc72643baea7",
+      "snapshot": "target/sdk252-save-y-repeat-20261011-01/fresh-resaved.ron",
+      "own_units": [
+        {
+          "id": "Drone",
+          "key": 17179868515,
+          "position": [
+            -17.0,
+            1.5,
+            -20.0
+          ]
+        },
+        {
+          "id": "Worker",
+          "key": 12884900552,
+          "position": [
+            -18.0,
+            0.05000000074505806,
+            -15.0
+          ]
+        },
+        {
+          "id": "Worker",
+          "key": 12884900572,
+          "position": [
+            -12.0,
+            0.05000000074505806,
+            -15.0
+          ]
+        }
+      ],
+      "comparison": [
+        {
+          "id": "Drone",
+          "old_entity_key": 8589933885,
+          "new_entity_key": 17179868515,
+          "xz": [
+            -17.0,
+            -20.0
+          ],
+          "before_y": 1.5,
+          "after_y": 1.5,
+          "exact_f32_y_equal": true
+        },
+        {
+          "id": "Worker",
+          "old_entity_key": 8589933888,
+          "new_entity_key": 12884900552,
+          "xz": [
+            -18.0,
+            -15.0
+          ],
+          "before_y": 0.05000000074505806,
+          "after_y": 0.05000000074505806,
+          "exact_f32_y_equal": true
+        },
+        {
+          "id": "Worker",
+          "old_entity_key": 8589933892,
+          "new_entity_key": 12884900572,
+          "xz": [
+            -12.0,
+            -15.0
+          ],
+          "before_y": 0.05000000074505806,
+          "after_y": 0.05000000074505806,
+          "exact_f32_y_equal": true
+        }
+      ],
+      "snapshot_sha256": "9a99a2324790e1f9cceccf4e83eab8388309d7045f35e38248a5fc72643baea7"
+    }
+  ],
+  "load_byte_checks": [
+    {
+      "session": 1,
+      "before": "ab96a08f0846ad40ae211c4bd160619aeeea0dd1e3c79f3121bfea76c75c3fd9",
+      "after": "ab96a08f0846ad40ae211c4bd160619aeeea0dd1e3c79f3121bfea76c75c3fd9",
+      "unchanged": true
+    },
+    {
+      "session": 1,
+      "before": "e7ba10880260f1439041c8747f348d0977d7996b9fa5746b53eebe75ca4647de",
+      "after": "e7ba10880260f1439041c8747f348d0977d7996b9fa5746b53eebe75ca4647de",
+      "unchanged": true
+    },
+    {
+      "session": 1,
+      "before": "c919a9051997172f49e379d1c87face8b2c388d5dd03d9c4aa4c74bfeab80780",
+      "after": "c919a9051997172f49e379d1c87face8b2c388d5dd03d9c4aa4c74bfeab80780",
+      "unchanged": true
+    },
+    {
+      "session": 2,
+      "before": "7a70d31256d29fc73d2ed7c3d01f235971108ec4d6cce76c8835b8165c94403d",
+      "after": "7a70d31256d29fc73d2ed7c3d01f235971108ec4d6cce76c8835b8165c94403d",
+      "unchanged": true
+    }
+  ],
+  "all_images": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-normal-skirmish": "9736b8094695f987759ae4cb94a98a694b30ac85e1b9295b1f76fb3477f6f3b9",
+    "02-before-save": "b22071d0f1ea40c161b32acad971fef3addc2211d54b8e1b8da99b5b7d289970",
+    "03-paused-before-save": "20f7a286e753a12d932b55357f731a4ba8a0b4b492f9454f1c79dce5e953736d",
+    "04-baseline-save": "757d48da664154e5d43d4f9ba2b0758a66da7ac9770afb24fbe2dac42522c9dc",
+    "cycle1-loaded": "76039784de52ce5f2390bf978e18bd86f60e9e1b34308616ec63f7b2d9fe1e7b",
+    "cycle1-paused": "7742bcb0c17ca68e261a2cdccfc610a27ebb265c3471326d60118d7e21cd36e0",
+    "cycle1-resaved": "83e255715543a84bc2f2351e9c6ad3064e5a80af8aebe000eae67dafe3965200",
+    "cycle2-loaded": "71528cfe73c7cfc538f45d79652da0ae314334f523f52350df8af03ca099466c",
+    "cycle2-paused": "4c772aa1032d2f174b93e237d742785747a28a916ec586f48fa3843bae06fb1f",
+    "cycle2-resaved": "8187640b61bc9a8d433ce1497b4de83f31da3137e06b7db8a0ffe42efcb70c21",
+    "cycle3-loaded": "870e2a588b09cc210d2736c102fd386ae39e98841394de1c9c1d9bf8d04b29b3",
+    "cycle3-paused": "44eae3ef9191f0417e00dd0741232a68acf906a4bc288d832a6b5ba056867c2e",
+    "cycle3-resaved": "0476b121999c9297e3c66c15cbabe03a5573f3f0486a49c7a1dfd8a93c6a846f",
+    "fresh-menu": "3a1b0c34a5ad6bcb741f6508928a07bbd8b05f51dd40ee075db04423aa247217",
+    "fresh-before-load": "1b85871ca198dc67b74ea4473289f168fba3ddf37bfc26f89b4bf507fac50e21",
+    "fresh-loaded": "b11ad54113fdd832dd6cdf7a30d11622bd81f4c1c1a14d7366847bbdc7ae670a",
+    "fresh-paused": "e878ab5602a3a4d3aa716f77fe5c9798d047849d6b49fd7f5a7b75548572614d",
+    "fresh-resaved": "227d5ceaac3b597494a93881914c1430a3505da9f627dd0f9da5517f57d256c3"
+  },
+  "visual_review": {
+    "all19_frames_directly_reviewed": true,
+    "old_doubled_height_top_clipping_absent": true,
+    "drone_height_and_shadow_consistent": true,
+    "headquarters_and_two_workers_layout_consistent": true,
+    "camera_changes_not_used_as_world_y_evidence": true,
+    "f10_pause_and_actual_save_load_feedback_visible": true,
+    "windowed_setup_back_clipping_retained": true,
+    "client_context": "1280x720 exterior includes compositor titlebar; initialsetup Back cuts atbottom; fullUIacceptancefalse"
+  },
+  "limits": [
+    "OwnidleDrone1.5/Worker.05 worldY andexactXZ only",
+    "Noallorders/effects/paidjobs/economy/fog/weather/broadersavegate claim",
+    "NooverallUIgate claim; windowedBackclip remains inthisfrozenpackage",
+    "SDK250 defect artifacts unchanged; laterpackages needtheir ownproof"
+  ]
+}
