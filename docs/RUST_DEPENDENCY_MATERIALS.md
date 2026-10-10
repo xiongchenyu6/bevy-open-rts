@@ -51,3 +51,11 @@ crate-level MIT declaration alone does not describe this source inventory.
 Final component use and distribution applicability remain to be reviewed.
 The original source companion already contains those complete crate archives;
 these extracted texts supplement its historical top-level notice collection.
+
+## Inline notice audit
+
+A checksum-verified scan of the three exact published archives also checks Rust
+source, Markdown and Cargo manifests for embedded copyright/license statements.
+Only manifest license declarations are found; no full original notice is recovered.
+Member hashes and matching lines are recorded in `rust-missing-notice-audit.json`.
+The missing-material and final distribution review requirements remain open.

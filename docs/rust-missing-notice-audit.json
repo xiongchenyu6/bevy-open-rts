@@ -22,7 +22,41 @@
         "src/comptime.rs",
         "src/lib.rs",
         "src/runtime.rs"
-      ]
+      ],
+      "inline_notice_review": {
+        "archive_checksum_verified": true,
+        "scanned_source_and_markdown_and_manifest_files": [
+          {
+            "member": "constgebra-0.1.4/Cargo.toml",
+            "sha256": "4059f220c736b6f8462f439079a05a7fda77fffb6215bc9e955b6afca3b9209d"
+          },
+          {
+            "member": "constgebra-0.1.4/README.md",
+            "sha256": "ca7fd771ad7ead0110483a8d3ff1afe74c9243b76cfd2d29ba3c538a86fc1ad6"
+          },
+          {
+            "member": "constgebra-0.1.4/src/comptime.rs",
+            "sha256": "1cffd04787a6e52a241cb8914d939b702613d08c265b4e1ceb7578ae977007de"
+          },
+          {
+            "member": "constgebra-0.1.4/src/lib.rs",
+            "sha256": "6619bac32b6998490128a6ba0ca0e5fb47b0d19deff0c3fff0c9479e08d57307"
+          },
+          {
+            "member": "constgebra-0.1.4/src/runtime.rs",
+            "sha256": "1b123a6429ec21f846fbe0a9b98fd2fd153239484b01272736f9cb93b4b8e07b"
+          }
+        ],
+        "notice_keywords": [
+          {
+            "member": "constgebra-0.1.4/Cargo.toml",
+            "line": 26,
+            "text": "license = \"MIT OR Apache-2.0\""
+          }
+        ],
+        "original_full_notice_found": false,
+        "scope": "Exact published source text scan; manifest SPDX declarations retained, no rights clearance"
+      }
     },
     {
       "name": "hexf-parse",
@@ -50,7 +84,29 @@
         "src/lib.rs",
         "tests",
         "tests/example.rs"
-      ]
+      ],
+      "inline_notice_review": {
+        "archive_checksum_verified": true,
+        "scanned_source_and_markdown_and_manifest_files": [
+          {
+            "member": "hexf-parse-0.2.1/Cargo.toml",
+            "sha256": "dd7274968556f3f3309df5615d94437ec4e4823777cc440f91177b2170cbe2a7"
+          },
+          {
+            "member": "hexf-parse-0.2.1/src/lib.rs",
+            "sha256": "511b164642efe470e88323b8afe0274e797805ff2441f0173b5b005ad4b4d1b1"
+          }
+        ],
+        "notice_keywords": [
+          {
+            "member": "hexf-parse-0.2.1/Cargo.toml",
+            "line": 21,
+            "text": "license = \"CC0-1.0\""
+          }
+        ],
+        "original_full_notice_found": false,
+        "scope": "Exact published source text scan; manifest SPDX declarations retained, no rights clearance"
+      }
     },
     {
       "name": "simd_helpers",
@@ -70,7 +126,37 @@
         "src/lib.rs",
         "tests",
         "tests/cold_for.rs"
-      ]
+      ],
+      "inline_notice_review": {
+        "archive_checksum_verified": true,
+        "scanned_source_and_markdown_and_manifest_files": [
+          {
+            "member": "simd_helpers-0.1.0/Cargo.toml",
+            "sha256": "42364d200c5cc7792960bdf10354a108b6c68ca49f2e1567967e2d5b1dba37a6"
+          },
+          {
+            "member": "simd_helpers-0.1.0/README.md",
+            "sha256": "e672b974ba905441c8eee630f10bc351f4e8e462c99d178b334ae3e48d8ca7f5"
+          },
+          {
+            "member": "simd_helpers-0.1.0/src/lib.rs",
+            "sha256": "7776fe38ba2018bdd2e744e42b0affa34966797ededdf381144bb92bb41e194c"
+          },
+          {
+            "member": "simd_helpers-0.1.0/tests/cold_for.rs",
+            "sha256": "930a9b0c072b7036d57ef9df3f5c24716e24b75d7a2aebf9d89ff8c69d68fadb"
+          }
+        ],
+        "notice_keywords": [
+          {
+            "member": "simd_helpers-0.1.0/Cargo.toml",
+            "line": 21,
+            "text": "license = \"MIT\""
+          }
+        ],
+        "original_full_notice_found": false,
+        "scope": "Exact published source text scan; manifest SPDX declarations retained, no rights clearance"
+      }
     }
   ],
   "remaining_requirement": "Obtain or establish applicable original notice materials before final distribution review; do not synthesize copyright notices."
