@@ -1,0 +1,102 @@
+{
+  "scope": "Exact parameterized SDK archive; normal paid three-Infantry Barracks queue across same/freshprocess load; production scope only",
+  "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+  "binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 4175035,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "index": 2,
+      "pid": 4178566,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "wall_seconds": 121.11758284599637,
+  "comparisons": [
+    {
+      "elapsed": 0.2606658935546875,
+      "producer_keys": [
+        25769802076,
+        81604376969
+      ],
+      "queue_entries": 3,
+      "passed": true
+    },
+    {
+      "elapsed": 0.25852203369140625,
+      "producer_keys": [
+        81604376969,
+        12884900812
+      ],
+      "queue_entries": 3,
+      "passed": true
+    }
+  ],
+  "load_byte_checks": [
+    {
+      "session": 1,
+      "before": "975d44764a03d56989cdfd081c77ba3c2a318acbecb18c8b0c98455e9355cc57",
+      "after": "975d44764a03d56989cdfd081c77ba3c2a318acbecb18c8b0c98455e9355cc57",
+      "unchanged": true
+    },
+    {
+      "session": 2,
+      "before": "733ba5a97f68a5c135ae53e1319a1bfc3cef916ab6d5133c59693eed9a138c18",
+      "after": "733ba5a97f68a5c135ae53e1319a1bfc3cef916ab6d5133c59693eed9a138c18",
+      "unchanged": true
+    }
+  ],
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "00-fresh-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-baseline-paused": "991282bd72581ff3751b4da24fd7938b19e0fce824929b4ed5b997bbbeb9c2ca",
+    "02-power-card-tooltip": "40180a165c007cdc70770f7c844b4bac9abb915936bec7caee83fbe97319acae",
+    "02-power-preview": "24df10819f95ee510af19990254823f27f8ed8fa80e8c5e2d4d55324d1efb426",
+    "03-power-completed": "cea300704561c2059b8b90778f6ec53e73532d531e5db8cfb2aefc5e40a129ca",
+    "04-barracks-preview": "4c50591a33e29984f86f985d22d38d64c828ad3b62f9016fa21b35c2baefc8df",
+    "05-buildings-paid": "b8583f6e0aa52dff07efdc2ce3dac70507d30c3cb045806765bbdc62c58e4c7a",
+    "06-infantry-card-tooltip": "15f2195b730d2898c137d72b6e491f75aa910b30ec63e06f7540eb09b08b0efd",
+    "07-partial-paid-queue": "229bc1aa118845488c6bb879f1ae350f4c8a037544f54209f81a92cc053d3ee0",
+    "08-same-process-loaded": "8d67c2e7a2621b55b99cfffa6ee33a50d07f8665e7fa0a816f268df31fa6b137",
+    "09-same-process-resaved": "18ec664e0d8db294eca93377b0320de73d7bc2b1e11e3f303b0f17a406a5411e",
+    "10-fresh-menu": "15860bb9448d5b178b611aa9e69455ac17b87b0a6417061cabfeba4b7acf20ef",
+    "11-fresh-process-loaded": "b69e4c0fb9098c9cf34a74a7a8d9b5817f5423ccd2d02039623629c837c4cb49",
+    "12-fresh-process-resaved": "0a3323b3662aa528daeea900133dcaa26d10e271169435860a559870e2169ae8",
+    "13-three-paid-infantry-completed": "875ad3f542d4e0770c127fe2c9eb4735fc5bf3e2daac7a6aca2c4d1757e6d0f7"
+  },
+  "evidence_directory": "target/sdk267-save-queue-20261011-01",
+  "result_sha256": "9125b4f2e2f9bfebf29d0d247bdc4bf643ec52c5ebc4860085acdbe3b3f385f2",
+  "original_wall_limit_seconds": 240,
+  "bank_start": [
+    32,
+    16
+  ],
+  "bank_after_power_barracks": [
+    26,
+    14
+  ],
+  "bank_after_three_infantry": [
+    23,
+    14
+  ],
+  "paid_jobs": 3,
+  "job_cost": [
+    1,
+    0
+  ],
+  "job_total_seconds": 3,
+  "natural_finished_infantry": 3,
+  "final_jobs": 0,
+  "agent_paid_buildings_and_completed_infantry_images_reviewed": true,
+  "passed": true,
+  "limits": [
+    "One real Barracks active Infantry job plus two paid queued tails; no rally or broader save-state claim.",
+    "Current SDK267 schema4; historical253 schema3 evidence remains unchanged."
+  ]
+}
