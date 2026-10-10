@@ -1,0 +1,37 @@
+{
+  "scope": "Current245 result-HUD source optimized package, basic clean save/load; full gameplay/performance/rights remain open",
+  "build": {
+    "actual_exit": 0,
+    "frozen_inputs_unchanged": true,
+    "wall_seconds": 725.9898862280243,
+    "scope": "Frozen current245 optimizedLinux QA candidate; performance/runtime/finalrelease gates pending",
+    "command": [
+      "/nix/store/gmgfpzc0w2pgby0lmq9r88m39albiyfw-cargo-1.98.1/bin/cargo",
+      "rustc",
+      "--locked",
+      "--offline",
+      "--release",
+      "--jobs",
+      "1",
+      "--bin",
+      "bevy-open-rts",
+      "--",
+      "-Clto=thin",
+      "-Ccodegen-units=8",
+      "-Cllvm-args=-threads=1"
+    ],
+    "binary_sha256": "91b5fc7cd770d9af6886cda2a29bea7eb657bd1f5fd4bbdabe66ae1cb8919ab6",
+    "binary_bytes": 103425664
+  },
+  "archive_sha256": "481640cc032ea07e996e64fbfd7f9fc6e56565d243705117998972e4ba2fffc0",
+  "packed_binary_sha256": "491f29eaafbf6e6398d669ccb99cd6eb248e6b47200ba99d1c21facc272f0fa9",
+  "actual_clean_exit": 0,
+  "installation_readonly": true,
+  "nonroot_uid": 65534,
+  "no_nix_mount": true,
+  "keyboard_save_sha256": "fcd9c3258a0f69b7cb2bda46e0e79cec790f434149ff222fbd95672e5c1b96d1",
+  "mouse_save_sha256": "7004d25f8bfa1f2810a417c72eba45a5d8a08d5a71675d1665879202eeb40fa2",
+  "both_load_paths_preserve_bytes": true,
+  "dep_info_current_snapshot_verified": true,
+  "final_release_ready": false
+}
