@@ -1,0 +1,34 @@
+{
+  "scope": "Reproducible frozen244 BigArena Chaos Easy/Beginner timeout at starts2/1; unresolved, not current-source acceptance",
+  "simulation_limit_seconds": 600,
+  "wall_limit_seconds": 180,
+  "runs": [
+    {
+      "directory": "target/current244-all-starts-20261010/1885",
+      "actual_exit": 2,
+      "wall_seconds": 95.19145865700557,
+      "clock_seconds": 600.0084228515625,
+      "result_sha256": "62aa4e9f0923e4fd6f8cc2ad12a86abcafddc8bf5f12b1f84fd6b32f6956e22f",
+      "status_sha256": "82322f9c244e54cb4dfb6adcd867c3c7116f98c7a83039584935f5aedc0f9469"
+    },
+    {
+      "directory": "target/recheck244-case1885-20261011",
+      "actual_exit": 2,
+      "wall_seconds": 115.83826312900055,
+      "clock_seconds": 600.0084228515625,
+      "result_sha256": "62aa4e9f0923e4fd6f8cc2ad12a86abcafddc8bf5f12b1f84fd6b32f6956e22f",
+      "status_sha256": "d31411bacea883d826a039b358e86450bb25d9c4b2b247d830f21d7593469dfc"
+    },
+    {
+      "directory": "target/recheck244-case1885-attacked-trace-20261011",
+      "actual_exit": 2,
+      "wall_seconds": 109.66133190397522,
+      "clock_seconds": 600.0084228515625,
+      "result_sha256": "62aa4e9f0923e4fd6f8cc2ad12a86abcafddc8bf5f12b1f84fd6b32f6956e22f",
+      "status_sha256": "7716bb4c2889620323b5a950ca7616a0e31bb0ff9372966e8fb14ba315e51042"
+    }
+  ],
+  "first_repeat_trace_limit": "First trace watched a different living reactor; its HP history does not describe the attacked reactor.",
+  "fix_status": "Original-source regression fails; initial noPath fallback also fails. Further diagnosis pending.",
+  "source_audit_sha256": "c4f395dd8853a41da1768c8752e7116159b7ccef3c1be44afe1def300f8616f1"
+}
