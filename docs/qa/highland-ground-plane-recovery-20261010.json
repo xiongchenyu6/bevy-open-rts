@@ -1,5 +1,5 @@
 {
-  "scope": "Normal construction recovery on elevated terrain; mission result still pending",
+  "scope": "Mission4 standalone normal-input construction recovery and victory; not six-mission chain acceptance",
   "capture_sha256": "055b38fd9fd9145c38f2fd9fdb0512573a30347e27829972ea8ec96df377362f",
   "site_entity": 38654705179,
   "site_position": [
@@ -21,5 +21,19 @@
   "new_builders_after_normal_right_click": [
     4294966764
   ],
-  "new_builder_has_move_and_path": true
+  "new_builder_has_move_and_path": true,
+  "mission_result": {
+    "actual_exit": 0,
+    "wall_seconds": 204.3522835620097,
+    "visual_time": "05:00",
+    "visual_result": "Held the line",
+    "next_mission_verified": true,
+    "profile_sha256": "f81947ee7d0e4afa4fb5cf512077a0873aa57d4e1d09b96f7f9fe4a99ab87aad",
+    "completed": [
+      "highland_bastion_stand"
+    ],
+    "screenshot": "screenshots/steam-quality/current245-highland-20261010/02_victory.png",
+    "screenshot_sha256": "8d63e9770519197a2d80aa591563a6150aca12857cc712d4b3968943eb207d5c",
+    "objective_and_command_feedback_absent_in_result_frame": true
+  }
 }
