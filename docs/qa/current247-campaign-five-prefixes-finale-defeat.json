@@ -1,0 +1,109 @@
+{
+  "scope": "Current247 same-App five normal-input victories with actual disk prefix parsing; finale defeat retained",
+  "binary_sha256": "1f9fe504b6aa142447c82d8c6af55dd658b0cf068f153daaa6399c42b1fd76ad",
+  "prefixes": [
+    {
+      "index": 0,
+      "completed": [
+        "hold_the_line"
+      ],
+      "file": "screenshots/steam-quality/current247-campaign-persistent-focused-20261010/0/campaign-after.ron",
+      "sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d"
+    },
+    {
+      "index": 1,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost"
+      ],
+      "file": "screenshots/steam-quality/current247-campaign-persistent-focused-20261010/1/campaign-after.ron",
+      "sha256": "49a2d1643b35bdc53c65186dff35bb82e29e9c7d92f72d20472cda617e645fc2"
+    },
+    {
+      "index": 2,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost",
+        "canyon_siege"
+      ],
+      "file": "screenshots/steam-quality/current247-campaign-persistent-focused-20261010/2/campaign-after.ron",
+      "sha256": "1426d6501034241653895738b720208fb07fc93c3f1bcfdcc552ae7bfd1e365f"
+    },
+    {
+      "index": 3,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost",
+        "canyon_siege",
+        "highland_bastion_stand"
+      ],
+      "file": "screenshots/steam-quality/current247-campaign-persistent-focused-20261010/3/campaign-after.ron",
+      "sha256": "d723d3da24dc005cc7ac9f18e36ae7f8de7a1d73a59065e9c0b450185a8bc559"
+    },
+    {
+      "index": 4,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost",
+        "canyon_siege",
+        "highland_bastion_stand",
+        "twin_front"
+      ],
+      "file": "screenshots/steam-quality/current247-campaign-persistent-focused-20261010/4/campaign-after.ron",
+      "sha256": "98e8bb2e9615d44baf9e2ebbd533489aa696b34a30bbaf21ce5331642de65b46"
+    }
+  ],
+  "process": {
+    "exit_code": 1,
+    "same_application": true,
+    "all_six_disk_prefixes_verified": false,
+    "accepted": false,
+    "errors": []
+  },
+  "failed_mission_number": 6,
+  "failure_clock": 105.39873504638672,
+  "failure_match_running": false,
+  "living_enemy_units": [
+    {
+      "id": "Worker",
+      "hp": 6.0,
+      "domain": "Terrain"
+    },
+    {
+      "id": "Worker",
+      "hp": 6.0,
+      "domain": "Terrain"
+    },
+    {
+      "id": "Worker",
+      "hp": 6.0,
+      "domain": "Terrain"
+    },
+    {
+      "id": "Worker",
+      "hp": 6.0,
+      "domain": "Terrain"
+    },
+    {
+      "id": "Worker",
+      "hp": 6.0,
+      "domain": "Terrain"
+    },
+    {
+      "id": "ScoutRover",
+      "hp": 0.5,
+      "domain": "Terrain"
+    },
+    {
+      "id": "LightRifleInfantry",
+      "hp": 4.0,
+      "domain": "Terrain"
+    },
+    {
+      "id": "Tank",
+      "hp": 5.0,
+      "domain": "Terrain"
+    }
+  ],
+  "six_mission_complete": false
+}
