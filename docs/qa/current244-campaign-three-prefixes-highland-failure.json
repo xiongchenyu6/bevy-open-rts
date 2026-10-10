@@ -1,0 +1,45 @@
+{
+  "scope": "Actual same-App first-three mission and disk prefix proof; fourth mission failed",
+  "prefixes": [
+    {
+      "index": 0,
+      "completed": [
+        "hold_the_line"
+      ],
+      "sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d"
+    },
+    {
+      "index": 1,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost"
+      ],
+      "sha256": "49a2d1643b35bdc53c65186dff35bb82e29e9c7d92f72d20472cda617e645fc2"
+    },
+    {
+      "index": 2,
+      "completed": [
+        "hold_the_line",
+        "strike_the_outpost",
+        "canyon_siege"
+      ],
+      "sha256": "1426d6501034241653895738b720208fb07fc93c3f1bcfdcc552ae7bfd1e365f"
+    }
+  ],
+  "child_exit": 1,
+  "six_mission_complete": false,
+  "fourth_mission_failure": {
+    "structure": "AntiGroundTurret",
+    "foundation_position": [
+      -12.0,
+      1.4,
+      2.999897
+    ],
+    "remaining": 1.0,
+    "free_worker_reachable": true,
+    "contact_waypoint_count": 1,
+    "harness_bug": "Site lookup zeros foundation Y but compares to elevated placement Y with 3D distance",
+    "correction": "Compare both positions with Y=0",
+    "runtime_correction_verified": false
+  }
+}
