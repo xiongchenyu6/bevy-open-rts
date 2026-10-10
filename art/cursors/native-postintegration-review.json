@@ -1,0 +1,45 @@
+{
+  "scope": "Post-integration actual normal-input native cursor asset/state metadata on isolated current332 assets; no OS-pointer or browser visual/alignment claim",
+  "binary_sha256": "301377984894c593670dcc4470b475aed3ae2e0a80bced3b9dccb07d07af14bc",
+  "runtime_atlas_sha256": "6df4fb3f03b92fb601718577027b8e72990ae7736a8afdf4bbcbb611766c6155",
+  "actual_loaded_rgba_sha256": "4f8ea4fc13fb2a48bb729a954b64dd65d52cc8ac7a40f315294fa3ee555f97d3",
+  "runtime_atlas_matches_current_repository": true,
+  "copied_current_assets": 332,
+  "runner_modified_repository_assets": false,
+  "repository_assets_unchanged": true,
+  "child_exit": 0,
+  "schema_pass": true,
+  "elapsed_seconds": 15.219725347007625,
+  "phase_indices": [
+    0,
+    1,
+    0,
+    2,
+    3,
+    0,
+    0
+  ],
+  "normal_budget_before": [
+    32,
+    16
+  ],
+  "normal_budget_after": [
+    25,
+    14
+  ],
+  "actual_paid_completed": [
+    "PowerReactor",
+    "Barracks",
+    "LightRifleInfantry"
+  ],
+  "source_evidence": "target/cursor-native-postintegration-20261010-03",
+  "evidence_sha256": {
+    "result.json": "6811dc9b7bc96b97ca9fb3390401fa65f49ce955d2689b0f76e975948def96d2",
+    "observed/observations.json": "964eccc9598a1ed5d7718dd82cfc8df94ec84f4029d2fa780c52982df6ae15a0",
+    "observed/selection-diagnostics.json": "9498a5a7c976e6b92ef6d44ae882e09a7b71c73a6da215744de5144e1e0f6356",
+    "observed/result.json": "0ef0e67e93877e0aad9ffef67f330375ccf0b013459b613b367bf98b6420124c"
+  },
+  "native_os_pointer_visual_verified": false,
+  "final_current_wasm_four_state_visual_and_alignment_verified": false,
+  "final_package_verified": false
+}
