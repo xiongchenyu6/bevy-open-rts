@@ -1,0 +1,90 @@
+{
+  "scope": "Preserved controller failures for exact SDK267 normal Mission1; no natural victory or gameplay defect established",
+  "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+  "binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+  "limits": {
+    "wall": 900,
+    "simulation": 900,
+    "speed": 1,
+    "construction_wall": 30,
+    "picture_review_wall": 45
+  },
+  "runs": [
+    {
+      "evidence": "target/sdk267-mission1-normal-defense-20261011-01",
+      "result_sha256": "0fc94032d606a1e51f8b27fb866d264188c1b46ffe38e80a1185ce59093bc097",
+      "actual_game_exits": [
+        {
+          "pid": 29764,
+          "actual_exit": -15,
+          "normal_window_close": false
+        }
+      ],
+      "error": "Original45second currentdefense picture gate exhausted",
+      "wall_seconds": 89.14014330500504,
+      "accepted": false,
+      "forced_cleanup": true
+    },
+    {
+      "evidence": "target/sdk267-mission1-normal-defense-20261011-02",
+      "result_sha256": "b7108985c8fb7f5adef077c9be28c85ba732c7d347a0164721feae66d555db52",
+      "actual_game_exits": [
+        {
+          "pid": 56708,
+          "actual_exit": -15,
+          "normal_window_close": false
+        }
+      ],
+      "error": "Actualcard must openPowerghost",
+      "wall_seconds": 48.09893553497386,
+      "accepted": false,
+      "forced_cleanup": true
+    },
+    {
+      "evidence": "target/sdk267-mission1-normal-defense-20261011-03",
+      "result_sha256": "c2f02308ed6d5c61e4e0b9246f022df8c1d31689b7ec194522dca254cdea60e8",
+      "actual_game_exits": [
+        {
+          "pid": 65964,
+          "actual_exit": -15,
+          "normal_window_close": false
+        }
+      ],
+      "error": "Original45second currentdefense picture gate exhausted",
+      "wall_seconds": 141.83491126500303,
+      "accepted": false,
+      "forced_cleanup": true
+    }
+  ],
+  "bounded_success_inside_failed_run03": {
+    "green": {
+      "image_before_sha256": "7d872677e8fd9142d0d4c9d7e66be7d308dac18a91e8281b7bddf53c35af27c8",
+      "image_after_sha256": "c549c2e1569b15add314874f56e5404a6dac1367d7108517979ed31e7ba2a572",
+      "point": [
+        250,
+        440
+      ],
+      "green_changed_pixels": 48319,
+      "red_changed_pixels": 825,
+      "changed_pixels": 52168,
+      "passed": true
+    },
+    "actual_paid_cost": [
+      3,
+      1
+    ],
+    "construction_wall": 6.359722001012415
+  },
+  "root_direct_render_review": {
+    "image": "target/sdk267-mission1-normal-defense-20261011-03/20-defense-review-000.png",
+    "sha256": "90f76f2395f33ea4799bbf9de6991a29139ee1f29e43f7ab178739e484ba34b2",
+    "completed_power_visible": true,
+    "bank": [
+      45,
+      23
+    ],
+    "power_capacity": 26,
+    "natural_mission_victory": false
+  },
+  "interpretation": "01 and03 missed unchanged picture-review gates;02 used stale first-selection card geometry.03 refreshed geometry through ordinary HUD input and proved paid Power completion, then failed before turret placement. All three failures and forced cleanup remain failures. Routine controller automation must be completed before another retry."
+}
