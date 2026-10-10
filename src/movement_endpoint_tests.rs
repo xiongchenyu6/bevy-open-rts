@@ -427,3 +427,6 @@ fn measured_harvester_routes_around_adjacent_aa_and_delivers_real_cargo() {
     assert_eq!(app.world().get::<Health>(worker).unwrap().current, 6.0);
     assert_eq!(app.world().get::<Health>(turret).unwrap().current, 8.0);
 }
+
+#[path = "movement_endpoint_tests/robotics_contact.rs"]
+mod robotics_contact;

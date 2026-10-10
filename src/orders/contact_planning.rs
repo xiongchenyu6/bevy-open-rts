@@ -462,11 +462,39 @@ pub(crate) fn reachable_unit_contact_approach(
                 }
             }
             waypoints.push(target);
-            return Some(ContactApproach { target, waypoints });
+            let mut anchor = source_position;
+            let physically_clear = waypoints.iter().all(|point| {
+                let clear = grid.terrain_line_clear(anchor, *point)
+                    && contact_escape_segment_is_clear(
+                        anchor,
+                        *point,
+                        source_radius,
+                        obstacles,
+                        buildings,
+                        occupied,
+                        false,
+                    );
+                anchor = *point;
+                clear
+            });
+            if physically_clear {
+                return Some(ContactApproach { target, waypoints });
+            }
         }
     }
-    None
+    local_contact::refined_contact_approach(
+        source_position,
+        source_radius,
+        &candidates,
+        grid,
+        obstacles,
+        buildings,
+        occupied,
+    )
 }
+
+#[path = "contact_planning/local_contact.rs"]
+mod local_contact;
 
 pub(crate) fn contact_action_entry_range(
     source_radius: f32,

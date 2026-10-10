@@ -1,0 +1,91 @@
+//! Bounded refinement for physically clear contact gaps missed by coarse cells.
+use super::*;
+use std::collections::{HashMap, VecDeque};
+
+pub(super) fn refined_contact_approach(
+    source: Vec3,
+    radius: f32,
+    goals: &[Vec3],
+    grid: &NavGrid,
+    obstacles: &[(Vec3, f32)],
+    buildings: &[(Vec3, f32)],
+    occupied: &[(Vec3, f32)],
+) -> Option<ContactApproach> {
+    if grid.blocked.is_empty() {
+        return None;
+    }
+    let step = NAV_GRID_CELL_M * 0.5;
+    let origin = (
+        ((source.x - grid.origin_x) / step).floor() as i32,
+        ((source.z - grid.origin_z) / step).floor() as i32,
+    );
+    let point = |cell: (i32, i32)| {
+        Vec3::new(
+            grid.origin_x + (cell.0 as f32 + 0.5) * step,
+            source.y,
+            grid.origin_z + (cell.1 as f32 + 0.5) * step,
+        )
+    };
+    let inside = |cell: (i32, i32)| {
+        cell.0 >= 0
+            && cell.1 >= 0
+            && cell.0 < grid.width * 2
+            && cell.1 < grid.height * 2
+            && (cell.0 - origin.0).abs() <= 24
+            && (cell.1 - origin.1).abs() <= 24
+    };
+    let clear = |from, to| {
+        grid.line_clear(from, to)
+            && grid.terrain_line_clear(from, to)
+            && contact_escape_segment_is_clear(
+                from, to, radius, obstacles, buildings, occupied, false,
+            )
+    };
+    let goals: Vec<_> = goals
+        .iter()
+        .copied()
+        .filter(|goal| contact_position_is_clear(*goal, radius, obstacles, occupied))
+        .collect();
+    let mut parents = HashMap::new();
+    let mut queue = VecDeque::new();
+    for dz in -4..=4 {
+        for dx in -4..=4 {
+            let cell = (origin.0 + dx, origin.1 + dz);
+            if inside(cell) && clear(source, point(cell)) {
+                parents.insert(cell, None);
+                queue.push_back(cell);
+            }
+        }
+    }
+    while let Some(cell) = queue.pop_front() {
+        let current = point(cell);
+        if let Some(target) = goals
+            .iter()
+            .copied()
+            .find(|goal| xz_distance(current, *goal) <= step * 1.5 && clear(current, *goal))
+        {
+            let mut waypoints = vec![current];
+            let mut cursor = cell;
+            while let Some(previous) = parents[&cursor] {
+                waypoints.push(point(previous));
+                cursor = previous;
+            }
+            waypoints.reverse();
+            waypoints.push(target);
+            return Some(ContactApproach { target, waypoints });
+        }
+        for dz in -1..=1 {
+            for dx in -1..=1 {
+                if dx == 0 && dz == 0 {
+                    continue;
+                }
+                let next = (cell.0 + dx, cell.1 + dz);
+                if inside(next) && !parents.contains_key(&next) && clear(current, point(next)) {
+                    parents.insert(next, Some(cell));
+                    queue.push_back(next);
+                }
+            }
+        }
+    }
+    None
+}

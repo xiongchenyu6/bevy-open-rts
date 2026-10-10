@@ -419,3 +419,33 @@ returns6/0, passive0/0, spend6/0. The factory completes at45.233s with the origi
 movement/contact/body and deadline assertions retained. Focused GREEN passes,
 and `logs/campaign-harvest-full-02.log` records237passed/0failed/1ignored43.68s.
 Fresh original-population M1 acceptance remains pending on the newly built core.
+
+### Robotics contact refinement (2026-10-10)
+
+The unchanged original AA baseline on capture `ec18900c…` ended in actual
+HumanDefeat481.7s; this is not a campaign pass. The following normal paid-counter
+recipe reduced the M1 Tank quota9→6 and added a legally built Robotics Bay and
+2Longbows. Its first run (`current-campaign-m1-paid-counter`, capture30137798…)
+stopped at138.6s while still Running/HQ20: the paid Robotics foundation remained
+unfinished after the original900-tick deadline. No Longbow was born in that run.
+
+The recorded all-body Crossfire fixture reproduces the construction stall.
+The actual mobile-aware coarse search has74valid starts/12goals but no route;
+the mobile-ignoring fallback returns a leg that the existing physical guard
+rejects. RED and chosen-branch diagnostics remain in
+`logs/campaign-robotics-contact-{red-01,diagnostic-03}.log`. The correction rejects
+physically invalid coarse routes, then uses a bounded half-cell contact search
+within the existing12-coarse-cell neighborhood and32candidate goals. It retains
+global static-grid, terrain and physical-body guards and changes no global
+navigation resolution, collision margin, cost, health or movement threshold.
+
+Actual full-schedule GREEN completes the Robotics site at187ticks (~6.23s).
+Every Worker step preserves real body clearance and the existing no-teleport
+bound; Worker HP and the bank remain unchanged. This is a recorded geometry
+fixture, not paid campaign acceptance. The final contacts suite passes20/0,
+including the original inaccessible-ring and real cliff/sealed-wall checks.
+Full library verification passes238/0/1 in40.94s and four native builds exit0.
+`target/robotics-contact-shared-20261010/pin.json` validates all Rust/Cargo inputs
+and332current runtime assets; sealed capture SHA256 is
+`97860f68f4aa2dd5146e4911e97f9d8970bd0dc246b4ba921d722a3fdf6592fd`.
+The same paid-counter M1 is now undergoing fresh normal-input acceptance.
