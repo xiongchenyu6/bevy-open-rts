@@ -4170,12 +4170,18 @@ pub(crate) fn cursor_minimap_local(window: &Window) -> Option<Vec2> {
 pub(crate) fn clear_battle_hud_on_match_end(
     mut commands: Commands,
     match_state: Res<MatchState>,
+    mut command_mode: ResMut<CommandMode>,
+    mut command_feedback: Query<&mut Text, With<StatsText>>,
     mut battle_log: ResMut<BattleLog>,
     log_roots: Query<(Entity, Option<&Children>), With<BattleLogRoot>>,
     mut objective_root: Query<&mut Visibility, With<ObjectiveTrackerRoot>>,
 ) {
     if match_state.is_running() {
         return;
+    }
+    clear_targeting_modes(&mut command_mode);
+    for mut text in &mut command_feedback {
+        text.0.clear();
     }
     if !battle_log.entries.is_empty() {
         battle_log.entries.clear();

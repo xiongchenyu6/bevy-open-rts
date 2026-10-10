@@ -1,0 +1,18 @@
+{
+  "scope": "Actual headless match schedule regression; fresh rendered result verification pending",
+  "red": {
+    "actual_exit": 101,
+    "log": "target/result-command-hud-red-20261010.log",
+    "failed": 1
+  },
+  "green": {
+    "focused_log": "target/result-hud-highland-shared-20261010/focused.log",
+    "focused_passed": 3,
+    "full_log": "target/result-hud-highland-shared-20261010/full.log",
+    "full_passed": 245,
+    "full_failed": 0,
+    "full_ignored": 1
+  },
+  "behavior": "Existing result cleanup clears pending targeting modes and StatsText command feedback on both victory and defeat",
+  "final_package_verified": false
+}

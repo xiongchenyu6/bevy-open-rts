@@ -46,6 +46,30 @@ fn objective_hud_hides_when_match_resolves() {
 }
 
 #[test]
+fn resolved_match_clears_pending_command_feedback() {
+    for phase in [MatchPhase::HumanVictory, MatchPhase::HumanDefeat] {
+        let (mut app, _, _) = objective_scene();
+        let feedback = app
+            .world_mut()
+            .spawn((Text::new("Mode: Attack-Move"), StatsText))
+            .id();
+        app.world_mut().resource_mut::<CommandMode>().attack_move = true;
+        app.world_mut().resource_mut::<MatchState>().phase = phase;
+        app.update();
+        assert!(
+            app.world().get::<Text>(feedback).unwrap().0.is_empty(),
+            "resolved match retained command feedback"
+        );
+        assert!(
+            !app.world()
+                .resource::<CommandMode>()
+                .has_pending_interaction(),
+            "resolved match retained a targeting mode"
+        );
+    }
+}
+
+#[test]
 fn objective_hud_headquarters_mission_uses_mission_goal() {
     let (mut app, _, text) = objective_scene();
     assert_eq!(
