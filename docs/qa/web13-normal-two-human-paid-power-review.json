@@ -1,0 +1,89 @@
+{
+  "scope": "Two physical browser Human peers: normal lobby and paid Power completion; partial multiplayer evidence only",
+  "artifact": {
+    "wasm_sha256": "ecf0c5ed30591fd5debe683fdfbe9f3bbed38a0c97d95634df5f0004ecd7847c",
+    "assets": 332,
+    "source_boundary": "Wasm13 observer source, before subsequent ResourceVisibility/core changes"
+  },
+  "actual_exit": 0,
+  "deadline_seconds": 240,
+  "normal_inputs": [
+    "Online",
+    "Host",
+    "Join displayed public room code",
+    "Ready",
+    "Start",
+    "dismiss briefing",
+    "select actual Worker",
+    "click Power card",
+    "green visible placement",
+    "place on ordinary ground"
+  ],
+  "starting_bank": [
+    32,
+    16
+  ],
+  "power_cost": [
+    3,
+    1
+  ],
+  "final_bank": [
+    29,
+    15
+  ],
+  "final_clock_seconds": 11.13539981842041,
+  "host_guest_latest_snapshot_equal": true,
+  "guest_last_applied_tick": 44,
+  "completed_power": [
+    {
+      "cargo": null,
+      "construction": null,
+      "health": [
+        12.0,
+        12.0
+      ],
+      "id": 9,
+      "kind": {
+        "Structure": {
+          "id": "PowerReactor"
+        }
+      },
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "team": {
+        "Player": 1
+      },
+      "translation": [
+        10.831581115722656,
+        0.0,
+        -17.498512268066406
+      ],
+      "veterancy": null,
+      "visual_faction": "Demon"
+    }
+  ],
+  "evidence_sha256": {
+    "target/web13-physical-allacked13-20261011/wrapper-result.json": "eb14a4c3b7592ddf20834eaeaab7aa802d284a7874d460d40571d8ccb7ba1a54",
+    "target/web13-physical-allacked13-20261011/host-09-authoritative-state-observation.json": "18019bb7aa7e55c710e4a42d27e0f1791594d5c7c267a37b1d410b20f3f8d822",
+    "target/web13-physical-allacked13-20261011/p1-09-paid-state-observation.json": "1eed9fcbb9c450ce98474e14a345ffa64f5c172068c64f8347a446b508a1157a",
+    "target/web13-physical-allacked13-20261011/placement-next-actual-frame-observer.json": "39627b108c43e183f32bb1cfd09ac7919b628d77af2e62f444fc9566ae296739",
+    "target/web13-physical-allacked13-20261011/p1-09-paid-state.png": "4a32e26ffd78916009d31c9c5a7e8f1b7c69e9fb96914526c9bd5b94ebaab185",
+    "target/web13-physical-allacked13-20261011/p1-08-candidate-Power-preview.png": "a7f9b65b00d371eed218ac8afc4e37f747e2cd5ab2c66b43d17ccf72b338cc76",
+    "target/web13-physical-allacked13-20261011/actual-preview-pixels.json": "9eb30fefc52b9e3ea02edb7e3bb8bb43bd833b928b529c47a4befd052fef5bee"
+  },
+  "limitations": [
+    "Guest validated DTO equality and last-applied tick are not independent guest-world equivalence",
+    "No eight-peer, forced-TURN, reconnect, human-AI queue-control or long-session acceptance",
+    "Software-rendered functional QA; no performance or human audio-quality claim"
+  ],
+  "broader_multiplayer_acceptance": false
+}
