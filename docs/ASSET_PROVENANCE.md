@@ -315,3 +315,15 @@ integration; `art/cursors/runtime-integration.json` distinguishes this from the
 pending post-integration run. Native offscreen screenshots omit the OS pointer.
 Final browser four-state appearance, click alignment and packaged behavior
 remain unverified. Legacy atlas bytes are archived outside runtime assets.
+
+## Original armor surface integration (2026-10-10)
+
+`assets/textures/armor-matte-original-v2.png` replaces the unresolved legacy
+painted-steel texture. Built-in image generation, the original candidate and
+its targeted smoother revision have prompts and hashes in `art/armor-surface/`.
+The first candidate was rejected after actual models showed excessive grain.
+The second passed a private900×720 headquarters/Worker/Barracks sample; its
+post-integration run, broader vehicle review and final package remain pending.
+Original portrait render evidence predates this texture change and is preserved
+as historical evidence, rather than claimed as exact new-material parity.
+Provider-term and distribution review remain open. Runtime inventory stays332.

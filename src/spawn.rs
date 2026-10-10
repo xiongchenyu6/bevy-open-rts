@@ -768,7 +768,7 @@ pub(crate) fn spawn_faction_identity_marker_model(
     }
 }
 
-pub(crate) const ARMOR_SURFACE_PATH: &str = "textures/armor-painted-steel.png";
+pub(crate) const ARMOR_SURFACE_PATH: &str = "textures/armor-matte-original-v2.png";
 
 pub(crate) fn load_armor_surface(asset_server: &AssetServer) -> Handle<Image> {
     use bevy::image::{

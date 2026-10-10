@@ -1,0 +1,13 @@
+{
+  "scope": "Read-only numerical screening; actual model review is separately recorded",
+  "size": [
+    1254,
+    1254
+  ],
+  "sha256": "c0ec0a674a2eeb038c417131eec5470e9ad35c0729d1884be5f6c26a8a2d420c",
+  "horizontal_mean_difference": 3.241892610313663,
+  "vertical_mean_difference": 3.553429027113238,
+  "interior_neighbor_mean_difference": 2.849472377405338,
+  "exact_edge_match": false,
+  "runtime_integrated": false
+}

@@ -58,7 +58,7 @@
       "absent_from_upstream": 19
     },
     "textures": {
-      "absent_from_upstream": 1
+      "generated_original": 1
     },
     "translations": {
       "different": 2,
@@ -176,7 +176,7 @@
     },
     {
       "path": "assets/migration/asset_manifest.json",
-      "sha256": "0b078f25b7649e66bcef3cf83812431ce2420e6881fd58c5ce528c47a8937c0c",
+      "sha256": "3f4434888d40564f0a4d2fb3f17e622a8c84e7977d17e6daebf437ebe53bb6c7",
       "comparison": "authored_runtime_inventory",
       "provenance": "scripts/generate_registry.py --asset-manifest-only",
       "scope": "Current runtime file inventory, not imported Godot source membership"
@@ -2988,9 +2988,10 @@
       }
     },
     {
-      "path": "assets/textures/armor-painted-steel.png",
-      "sha256": "45ab058733c993262a1d913ebb1c63f7ceedeccd808e53a143a62e4a5d8a7327",
-      "comparison": "absent_from_upstream"
+      "path": "assets/textures/armor-matte-original-v2.png",
+      "sha256": "c0ec0a674a2eeb038c417131eec5470e9ad35c0729d1884be5f6c26a8a2d420c",
+      "comparison": "generated_original",
+      "generation_record": "art/armor-surface/candidates-v2/provenance.json"
     },
     {
       "path": "assets/translations/main_menu.csv",
@@ -5172,6 +5173,13 @@
     {
       "path": "assets/ui/cursors/rts_cursor_atlas.png",
       "sha256": "a41bc41a4f6a324055fdd6b252a780dd5506d6ec341b17b1a0d75d8985c30847",
+      "comparison": "absent_from_upstream"
+    }
+  ],
+  "retired_armor_textures": [
+    {
+      "path": "assets/textures/armor-painted-steel.png",
+      "sha256": "45ab058733c993262a1d913ebb1c63f7ceedeccd808e53a143a62e4a5d8a7327",
       "comparison": "absent_from_upstream"
     }
   ]

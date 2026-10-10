@@ -1,0 +1,11 @@
+{
+  "runtime_path": "assets/textures/armor-matte-original-v2.png",
+  "source_sha256": "c0ec0a674a2eeb038c417131eec5470e9ad35c0729d1884be5f6c26a8a2d420c",
+  "source_record": "art/armor-surface/candidates-v2/provenance.json",
+  "private_native_model_evidence": "art/armor-surface/candidates-v2/native-model-review.json",
+  "post_integration_verified": false,
+  "all_vehicle_models_verified": false,
+  "final_package_verified": false,
+  "distribution_review_complete": false,
+  "older_portrait_render_checkpoint": "Existing portraits were rendered with previous texture; historical proofs remain unchanged and do not prove exact new runtime surface parity"
+}
