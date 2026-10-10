@@ -3,6 +3,7 @@ use super::*;
 use bevy_open_rts::{
     capture_campaign_resources, capture_campaign_state, capture_campaign_units,
     capture_disk_mine_state, capture_live_mine_state, capture_save_restore_ready,
+    capture_world_click_safety,
 };
 use serde_json::Value;
 
@@ -46,9 +47,7 @@ fn select(app: &mut App, key: u64) -> Result<(), String> {
 fn click(app: &mut App, at: Vec3, button: MouseButton) -> Result<(), String> {
     save_effects::focus(app, at);
     let screen = capture_world_to_screen(app, at).ok_or("world target offscreen")?;
-    if screen.x < 180.0 || screen.x > 900.0 || screen.y < 150.0 || screen.y > 540.0 {
-        return Err(format!("world click blocked by HUD: {screen:?}"));
-    }
+    capture_world_click_safety(app, screen, Vec2::new(WIDTH as f32, HEIGHT as f32))?;
     capture_click_screen(app, screen, button);
     Ok(())
 }

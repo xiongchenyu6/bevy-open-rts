@@ -60,11 +60,7 @@ fn ground_click(app: &mut App, position: Vec3) -> Result<(), String> {
         app.update();
     }
     let screen = capture_world_to_screen(app, position).ok_or("ground command offscreen")?;
-    if screen.x < 180.0 || screen.x > 900.0 || screen.y < 150.0 || screen.y > 540.0 {
-        return Err(format!(
-            "ground command outside click-safe world area: {screen:?}"
-        ));
-    }
+    bevy_open_rts::capture_world_click_safety(app, screen, Vec2::new(WIDTH as f32, HEIGHT as f32))?;
     println!(
         "[capture] ground click {position:?} screen={screen:?} shift={}",
         app.world()

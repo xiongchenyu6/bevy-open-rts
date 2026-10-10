@@ -1,0 +1,84 @@
+{
+  "schema": 3,
+  "scope": "Normal-input native save and separate-process mouse Load; bounded to listed states",
+  "flows": [
+    {
+      "kind": "orders",
+      "scope": "Harvest target remap, deposited resources and two Shift-queued moves completed",
+      "create": {
+        "result": "logs/save-orders-current239-create-01-result.json",
+        "result_sha256": "d9b9cbaced252c6e36bec8b283b8d246149650f433bcaac0c24def45f69e6092",
+        "observations": "screenshots/steam-quality/save-orders-current239-create-01/observations.json",
+        "observations_sha256": "6932d4861c75205771d159e0325f0fbbf3ad4bf39583e32e46b3062180b3dad8",
+        "pid": 1475584,
+        "binary_sha256": "758caf88f13307ba1b4a624b6b6d976274fa481afc67e64fd70d24c352d6e93d",
+        "save_sha256": "de0be59a8e45c021350fe43296a5e1a950457f2e37ca34dbb4e8ece475e1b262"
+      },
+      "resume": {
+        "result": "logs/save-orders-current239-resume-01-result.json",
+        "result_sha256": "4311b501a2b0dc467dde6aaf72f05f4f354cd07729071d2227932d9dd59409b0",
+        "observations": "screenshots/steam-quality/save-orders-current239-resume-01/observations.json",
+        "observations_sha256": "e316f7e808657b6c8fb25a7ab8f28f18141f7ca5efebee1cbe1d66c73fb08045",
+        "pid": 1475939,
+        "binary_sha256": "758caf88f13307ba1b4a624b6b6d976274fa481afc67e64fd70d24c352d6e93d",
+        "save_sha256": "de0be59a8e45c021350fe43296a5e1a950457f2e37ca34dbb4e8ece475e1b262"
+      }
+    },
+    {
+      "kind": "mines",
+      "scope": "Paid mine/source remap, arming/layer continuity and causal exact4 damage",
+      "create": {
+        "result": "logs/save-mines-current240-create-01-result.json",
+        "result_sha256": "1de0c87f419f00e2aab84a7b4400a0c0b93b0680cb8d837beb390e0787f6468d",
+        "observations": "screenshots/steam-quality/save-mines-current240-create-01/observations.json",
+        "observations_sha256": "dabec80d8856a947348bdc7caf5ba1189b43f69d01e8ec9edf490749ded2e218",
+        "pid": 1530731,
+        "binary_sha256": "c998f5b33fee01d20bd8accb50a3dea52f5a51f19de5477d5eb194b3e4a55ba0",
+        "save_sha256": "9ff3d9398ccda9666ccd3892cf4808c2b29c0682e9e2b617cea897a4f295159f"
+      },
+      "resume": {
+        "result": "logs/save-mines-current240-resume-01-result.json",
+        "result_sha256": "7fbf5ed803b1f678cf9b3195e6264c06dfd3ce91925067578a0cb941adef6063",
+        "observations": "screenshots/steam-quality/save-mines-current240-resume-01/observations.json",
+        "observations_sha256": "881ffa920f4d82dfaf3cd2c01ff4afcd57d90b81bcd1058e93aeac8749ead782",
+        "pid": 1533051,
+        "binary_sha256": "c998f5b33fee01d20bd8accb50a3dea52f5a51f19de5477d5eb194b3e4a55ba0",
+        "save_sha256": "9ff3d9398ccda9666ccd3892cf4808c2b29c0682e9e2b617cea897a4f295159f"
+      }
+    },
+    {
+      "kind": "effects",
+      "scope": "F1 Radar Sweep and F5 Shield Overdrive remap, timers, cooldowns and normal expiry",
+      "create": {
+        "result": "logs/save-effects-current240-create-02-result.json",
+        "result_sha256": "671029559e7de70caafdcbbaddd7a33f6dd1990de88e02531f0caa1b1bfbe673",
+        "observations": "screenshots/steam-quality/save-effects-current240-create-02/observations.json",
+        "observations_sha256": "5f27e467109de62a410f948b617db8e471ef33e4240d7429b81dcf22695f8f38",
+        "pid": 1537601,
+        "binary_sha256": "ad28098f2ec984cfc60bf7ce9e460226918b6a9840d98245afb3d133587f32e3",
+        "save_sha256": "35265a8770b6feb33635b62d231e718568a54706361cbde9d0263342ef19f21b"
+      },
+      "resume": {
+        "result": "logs/save-effects-current240-resume-02-result.json",
+        "result_sha256": "dff924c7217e3ad911b3264d59e80ec8bb3a2e51088ffbf1cfb4b9c3c0f4ae4f",
+        "observations": "screenshots/steam-quality/save-effects-current240-resume-02/observations.json",
+        "observations_sha256": "3acea091dac4719973fd48b8a86426210bba50b97dc75348798dd80abbbaf74a",
+        "pid": 1538493,
+        "binary_sha256": "ad28098f2ec984cfc60bf7ce9e460226918b6a9840d98245afb3d133587f32e3",
+        "save_sha256": "35265a8770b6feb33635b62d231e718568a54706361cbde9d0263342ef19f21b"
+      }
+    }
+  ],
+  "runtime_asset_count": 332,
+  "failed_evidence_preserved": [
+    "logs/save-effects-current239-resume-01-result.json",
+    "logs/save-effects-current240-resume-01-result.json",
+    "logs/save-mines-current239-create-01-result.json"
+  ],
+  "unverified": [
+    "Natural-input midfade weather continuity",
+    "Active paid construction and build job fresh-process continuity on current core",
+    "Other support powers and temporary statuses",
+    "Final packaged executable continuity"
+  ]
+}

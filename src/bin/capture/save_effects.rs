@@ -83,9 +83,7 @@ fn fire(app: &mut App, key: KeyCode, at: Vec3) -> Result<(), String> {
     focus(app, at);
     tap_key(app, key);
     let screen = capture_world_to_screen(app, at).ok_or("support target offscreen")?;
-    if screen.x < 180.0 || screen.x > 900.0 || screen.y < 150.0 || screen.y > 540.0 {
-        return Err(format!("support target blocked by HUD: {screen:?}"));
-    }
+    bevy_open_rts::capture_world_click_safety(app, screen, Vec2::new(WIDTH as f32, HEIGHT as f32))?;
     capture_click_screen(app, screen, MouseButton::Left);
     Ok(())
 }
@@ -199,13 +197,25 @@ pub(super) fn resume(evidence: &Path, dir: &Path) -> Result<(), String> {
     let elapsed = number(&restored["clock"]) - number(&expected["clock"]);
     let old_reveal = reveal(expected).ok_or("saved reveal missing")?;
     let new_reveal = reveal(&restored).ok_or("loaded reveal missing")?;
+    std::fs::write(
+            dir.join("restore_fields.json"),
+            serde_json::to_vec_pretty(&serde_json::json!({
+                "process_id":std::process::id(),"expected":expected,"restored":restored,
+                "old_target_key":old["key"],"new_target_key":worker["key"],
+                "elapsed":elapsed,"old_shield":old_shield,"new_shield":new_shield,
+                "old_reveal":old_reveal,"new_reveal":new_reveal,
+                "shield_timer_delta":old_shield.0-new_shield.0-elapsed,
+                "reveal_timer_delta":number(&old_reveal["remaining"])-number(&new_reveal["remaining"])-elapsed
+            })).unwrap(),
+        ).map_err(|e|e.to_string())?;
     if old["key"] == worker["key"]
         || old_shield.1 != new_shield.1
         || (old_shield.0 - new_shield.0 - elapsed).abs() > 0.1
-        || old_reveal["position"] != new_reveal["position"]
+        || point(&old_reveal["position"]) != point(&new_reveal["position"])
         || (number(&old_reveal["remaining"]) - number(&new_reveal["remaining"]) - elapsed).abs()
             > 0.1
     {
+        shoot(&mut app, &handle, dir.join("failure_restore_fields.png"));
         return Err("effect target remap/remaining timer/scale/reveal position mismatch".into());
     }
     for index in [0, 4] {

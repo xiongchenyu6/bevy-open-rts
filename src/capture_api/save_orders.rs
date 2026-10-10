@@ -22,3 +22,45 @@ pub fn capture_live_order_state(app: &mut App) -> Result<serde_json::Value, Stri
 pub fn capture_disk_order_state() -> Result<serde_json::Value, String> {
     read_save_file(quicksave_path()?).map(view)
 }
+
+/// Validate projected capture input against the actual camera/window and HUD.
+/// Reads only; it never changes selection, command mode, entities or resources.
+pub fn capture_world_click_safety(
+    app: &mut App,
+    point: Vec2,
+    fallback_size: Vec2,
+) -> Result<(), String> {
+    let world = app.world_mut();
+    let viewport = world
+        .query_filtered::<&Camera, With<MainCamera>>()
+        .iter(world)
+        .next()
+        .and_then(Camera::logical_viewport_size);
+    let window_size = world
+        .query_filtered::<&Window, With<PrimaryWindow>>()
+        .iter(world)
+        .next()
+        .map(|window| Vec2::new(window.width(), window.height()));
+    let size = viewport.or(window_size).unwrap_or(fallback_size);
+    if !point.is_finite()
+        || !size.is_finite()
+        || point.x < 0.0
+        || point.y < 0.0
+        || point.x >= size.x
+        || point.y >= size.y
+    {
+        return Err(format!(
+            "projected point outside actual viewport: {point:?}, size={size:?}"
+        ));
+    }
+    if cursor_is_over_top_status_hud(point)
+        || world
+            .get_resource::<HudHitZones>()
+            .is_some_and(|zones| zones.blocks_world(point))
+    {
+        return Err(format!(
+            "projected point blocked by actual HUD: {point:?}, size={size:?}"
+        ));
+    }
+    Ok(())
+}

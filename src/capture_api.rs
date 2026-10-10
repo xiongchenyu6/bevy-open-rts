@@ -49,7 +49,7 @@ pub use skirmish_audit::{SkirmishAuditConfig, run_skirmish_audit};
 #[cfg(not(target_arch = "wasm32"))]
 mod save_orders;
 #[cfg(not(target_arch = "wasm32"))]
-pub use save_orders::{capture_disk_order_state, capture_live_order_state};
+pub use save_orders::{capture_disk_order_state, capture_live_order_state, capture_world_click_safety};
 
 #[cfg(not(target_arch = "wasm32"))]
 mod save_effects;
