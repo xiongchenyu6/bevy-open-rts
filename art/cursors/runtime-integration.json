@@ -1,0 +1,13 @@
+{
+  "runtime_path": "assets/ui/cursors/rts_cursor_atlas.png",
+  "previous_sha256": "a41bc41a4f6a324055fdd6b252a780dd5506d6ec341b17b1a0d75d8985c30847",
+  "current_sha256": "6df4fb3f03b92fb601718577027b8e72990ae7736a8afdf4bbcbb611766c6155",
+  "source": "art/cursors/candidates-v1/rts_cursor_atlas.svg",
+  "native_metadata_evidence": "art/cursors/candidates-v1/native-state-review.json",
+  "root_visual_review": "Four32px glyphs inspected on dark/light review sheet: distinct arrow/move crosshair/attack target/build hammer; border contrast remains readable.",
+  "native_loaded_rgba_and_four_states_verified": true,
+  "post_integration_run_verified": false,
+  "native_os_pointer_visual_verified": false,
+  "final_current_wasm_four_state_visual_and_alignment_verified": false,
+  "final_package_verified": false
+}

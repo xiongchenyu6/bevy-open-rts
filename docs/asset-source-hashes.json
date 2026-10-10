@@ -66,7 +66,8 @@
     },
     "ui": {
       "generated_original": 1,
-      "absent_from_upstream": 25,
+      "absent_from_upstream": 24,
+      "authored_original_svg_raster": 1,
       "generated_original_model_portrait": 70,
       "identical": 2,
       "generated_original_roster": 1
@@ -3046,8 +3047,9 @@
     },
     {
       "path": "assets/ui/cursors/rts_cursor_atlas.png",
-      "sha256": "a41bc41a4f6a324055fdd6b252a780dd5506d6ec341b17b1a0d75d8985c30847",
-      "comparison": "absent_from_upstream"
+      "sha256": "6df4fb3f03b92fb601718577027b8e72990ae7736a8afdf4bbcbb611766c6155",
+      "comparison": "authored_original_svg_raster",
+      "generation_record": "art/cursors/candidates-v1/manifest.json"
     },
     {
       "path": "assets/ui/factions/alliance_emblem.png",
@@ -5165,5 +5167,12 @@
     "static_audit": "target/unused-vfx-media-candidate-audit-20261010.json",
     "private_runtime_check": "target/unused-vfx-private-hud-20261010/independent-verification.json",
     "scope": "Unused texture removal; procedural combat effects retained; final packaged combat verification pending"
-  }
+  },
+  "retired_cursor_atlases": [
+    {
+      "path": "assets/ui/cursors/rts_cursor_atlas.png",
+      "sha256": "a41bc41a4f6a324055fdd6b252a780dd5506d6ec341b17b1a0d75d8985c30847",
+      "comparison": "absent_from_upstream"
+    }
+  ]
 }

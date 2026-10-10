@@ -304,3 +304,14 @@ data contained no texture references. A private asset copy without these files
 passed startup and normal paid building/production HUD checks; this is not a
 full combat or final package test. Procedural effects in `src/combat_vfx.rs`
 remain active. Current inventory is 332 files, with 326 payload ledger entries.
+
+## Original cursor atlas integration (2026-10-10)
+
+The runtime four-frame cursor atlas now uses repository-authored SVG geometry
+with reproducible resvg rasterization. Source SVGs, 32px dark/light visual checks,
+frame layout and hotspots are recorded in `art/cursors/candidates-v1/`. Normal
+native controls verified loaded RGBA pixels and all four cursor indices before
+integration; `art/cursors/runtime-integration.json` distinguishes this from the
+pending post-integration run. Native offscreen screenshots omit the OS pointer.
+Final browser four-state appearance, click alignment and packaged behavior
+remain unverified. Legacy atlas bytes are archived outside runtime assets.
