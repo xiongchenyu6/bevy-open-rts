@@ -1,0 +1,32 @@
+{
+  "scope": "Opt-in read-only normal-frontend observer; native tests/build only, browser URL opt-in proof pending",
+  "focused": {
+    "passed": 2,
+    "failed": 0
+  },
+  "full": {
+    "passed": 255,
+    "failed": 0,
+    "ignored": 1
+  },
+  "native_build_actual_exit": 0,
+  "bins": {
+    "bevy-open-rts": "c8eea714720ef36c522b2c1ba6f906402c12409425a1d4e578b0c3d405ecbff6",
+    "capture": "2c2ff04be9212f0045adfd9c40e57e4e20569ccc721973c82fa8f3288c5fa028"
+  },
+  "assets": 332,
+  "inputs_unchanged": true,
+  "snapshot_semantics": {
+    "host": "successfully sent full DTO reconstructed from current world",
+    "guest": "validated received Full or reconstructed Delta DTO; not proof of applied world equivalence",
+    "separate_application_evidence": "last_applied_tick must catch up and actual world/scene/paid-job continuity must be checked independently"
+  },
+  "privacy": "No session_key, host/join tokens, SDP contents or TURN credentials published. Browser driver records only selected ICE stats and safe signal-type counts.",
+  "cadence": "New snapshot/public lobby/phase/applicationtick events only; free-running game_clock excluded from change key.",
+  "limitations": [
+    "Manual enabled-resource native fixture does not substitute actual browser online_observe=1 behavior proof.",
+    "Old Wasm10 normal physical room creation passed; Join stalled at ICE=new/no route. No Ready/match/paid-build/reconnect/eight-peer acceptance.",
+    "Eight real peers, forced relay, same-session grace and final artifact remain open."
+  ],
+  "evidence": "target/online-observer-shared-20261011"
+}

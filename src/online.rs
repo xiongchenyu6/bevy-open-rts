@@ -30,6 +30,8 @@ use uuid::Uuid;
 
 use crate::*;
 
+mod observer;
+
 const RTS_ONLINE_PROTOCOL: u16 = 4;
 const ONLINE_DEFAULT_SERVICE_URL: &str = "https://open-bevy-signaling.xiongchenyu6.workers.dev";
 const ONLINE_MAX_STATUS_BYTES: usize = 180;
@@ -1081,6 +1083,7 @@ struct OnlineSnapshotBroadcastParams<'w, 's> {
     transport: ResMut<'w, OnlineTransport>,
     replication: ResMut<'w, OnlineMatchReplication>,
     verification: ResMut<'w, OnlineVerificationHarness>,
+    observer: ResMut<'w, observer::OnlineObserver>,
     entities: Query<'w, 's, OnlineSnapshotSource<'static>>,
     network_entities: Query<'w, 's, (Entity, &'static NetworkEntityId)>,
     economies: Res<'w, Economies>,
@@ -1625,6 +1628,9 @@ impl OnlineVerificationHarness {
 
 #[cfg(not(target_arch = "wasm32"))]
 fn online_verification_config() -> Option<OnlineVerificationConfig> {
+    if observer::requested() {
+        return None;
+    }
     let role = std::env::var("OPEN_BEVY_ONLINE_VERIFY_ROLE").ok()?;
     let role = OnlineVerificationRole::parse(&role)?;
     let run_id = std::env::var("OPEN_BEVY_ONLINE_VERIFY_RUN").ok()?;
@@ -1649,6 +1655,9 @@ fn online_verification_config() -> Option<OnlineVerificationConfig> {
 
 #[cfg(target_arch = "wasm32")]
 fn online_verification_config() -> Option<OnlineVerificationConfig> {
+    if observer::requested() {
+        return None;
+    }
     let search = web_sys::window()?.location().search().ok()?;
     let params = web_sys::UrlSearchParams::new_with_str(&search).ok()?;
     let role = OnlineVerificationRole::parse(&params.get("online_verify")?)?;
@@ -1749,6 +1758,11 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
         .init_resource::<OnlineCommandInbox>()
         .init_resource::<OnlineLifecycleControl>()
         .init_resource::<OnlineVerificationHarness>()
+        .init_resource::<observer::OnlineObserver>()
+        .add_systems(
+            Last,
+            observer::publish.after(broadcast_online_world_snapshot),
+        )
         .add_systems(OnEnter(AppScreen::OnlineLobby), enter_online_lobby)
         .add_systems(OnEnter(AppScreen::InMatch), reset_online_match_replication)
         .add_systems(
@@ -3380,6 +3394,7 @@ fn poll_online_transport(
     mut setup: ResMut<MatchSetupSettings>,
     mut next_state: ResMut<NextState<AppScreen>>,
     mut verification: ResMut<OnlineVerificationHarness>,
+    mut observer: ResMut<observer::OnlineObserver>,
 ) {
     let Some(socket) = transport.socket.as_mut() else {
         return;
@@ -3497,6 +3512,7 @@ fn poll_online_transport(
                     && let Some(snapshot) = replication.pending_snapshot.as_ref()
                 {
                     control_verification::record_snapshot(&mut verification, snapshot);
+                    observer.record(snapshot);
                 }
             }
         }
@@ -4842,6 +4858,7 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
         mut transport,
         mut replication,
         mut verification,
+        mut observer,
         entities,
         network_entities,
         economies,
@@ -5071,6 +5088,7 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
     match socket.broadcast_snapshot(&payload) {
         Ok(()) => {
             control_verification::record_snapshot(&mut verification, &snapshot);
+            observer.record(&snapshot);
             if let Some(baseline) = new_baseline {
                 replication.send_baseline = Some(baseline);
             }
