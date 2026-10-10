@@ -10,6 +10,8 @@ use serde::{Deserialize, Serialize};
 use crate::*;
 
 mod continuity;
+#[cfg(test)]
+mod position_tests;
 pub(crate) use continuity::*;
 
 // Web builds keep saves in memory only — the disk path is native-only.
@@ -745,6 +747,8 @@ pub(crate) fn apply_loaded_save(world: &mut World) {
             cargo.crystal = crystal;
         }
         if let Some(mut transform) = world.get_mut::<Transform>(entity) {
+            // Saved positions are world coordinates; normal spawn adds authored height.
+            transform.translation = Vec3::from_array(saved.position);
             transform.rotation = Quat::from_rotation_y(saved.yaw);
         }
     }

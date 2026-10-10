@@ -1,0 +1,9 @@
+# Saved unit world positions
+
+Loading now restores each unit's exact saved world translation after the normal spawn path. The collector already stores world coordinates, including authored height; spawning adds that height for new units. Previously load restored yaw without correcting this extra offset. No global spawn behavior, registry values, costs, timers or schema changed; version 3 remains unchanged.
+
+Two meaningful RED tests compiled and failed through the real collect/apply pipeline: Drone Y became 3.0 instead of 1.5, and Worker Y became 0.1 instead of 0.05. After the minimal correction both tests pass exact translation checks across a first load, three new collect/resave/load cycles, and serialized loading through RestartingMatch/OnEnter in a fresh App. Actors are naturally spawned with normal 32/16 Godot startup; the existing yaw field is exercised with a nonzero fixture rotation, and normal spawn scale remains unchanged. This is system regression evidence, not an injected normal-player scenario.
+
+The full current-root library run passes 252 tests with one ignored. Main and capture builds exit 0; source/Cargo/config and 332 asset hashes match before/after. Actual compilation and dependency metadata identify the current repository. Exact hashes and counts are in [the portable record](qa/save-world-position-review.json); raw logs and immutable binaries remain in `target/save-world-position-shared-20261011`.
+
+The older SDK250 archive's [Runtime4 normal Save/Load flow](RUNTIME4_BASIC_SAVE_LOAD_QA.md) still demonstrates basic IO and normal process closes, but its actor continuity is contradicted by the saved/loaded Drone screenshots and RED assertions. It is not relabeled as the fixed build. A rebuilt official Runtime4 archive and normal-input scene comparison remain required for final package continuity acceptance.

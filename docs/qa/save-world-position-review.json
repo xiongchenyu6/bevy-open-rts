@@ -1,0 +1,51 @@
+{
+  "scope": "Saved unit world-translation product correction; full rebuilt official-runtime archive still requires its own player-flow proof",
+  "cause": "collect saves already-elevated Transform.translation; normal unit spawn adds authored height; previous load patched yaw but not exact translation",
+  "red": {
+    "actual_exit": 101,
+    "tests_failed": 2,
+    "actual_drone_y": 3.0,
+    "expected_drone_y": 1.5,
+    "actual_worker_y": 0.1,
+    "expected_worker_y": 0.05,
+    "compile_succeeded": true,
+    "source_path": "current repository",
+    "raw_log_sha256": "ae89e28e41989af94bab0b870f9b61d98b305dce793324fe1071c07eadce1e1c"
+  },
+  "green": {
+    "focused_passed": 2,
+    "focused_seconds": 2.89,
+    "full_passed": 252,
+    "full_failed": 0,
+    "full_ignored": 1,
+    "full_seconds": 117.99,
+    "main_capture_build_exit": 0,
+    "build_seconds": 121,
+    "bins": {
+      "bevy-open-rts": "97397de68997d6777a010e8dc65994271710c517faf19f7921d41c03093abbb6",
+      "capture": "bf897a00f94472ded510423eb715bdb09706edaa7f2ec4cbe02d612e241db74d"
+    },
+    "sources_assets_unchanged": true,
+    "asset_count": 332,
+    "dep_provenance": {
+      "manifest_dir": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts",
+      "dep_info_sha256": "d4985f1641b5fc28c4aab16c0bb6b6fa22532d8ff2dcd27f8fb5b5285ab68d4a",
+      "new_position_tests_in_dependency_list": true,
+      "red_snapshot_paths_present": false
+    }
+  },
+  "coverage": [
+    "Naturally spawned Drone and ground Workers at normal32/16 Godot startup",
+    "Exact translation after first collect/apply load",
+    "Three new collect/resave/apply cycles without accumulated Y drift",
+    "Serialized save restored through actual RestartingMatch/OnEnter in a fresh App",
+    "Existing nonzero saved yaw and normal spawn scale preserved"
+  ],
+  "source_change": "Only set Transform.translation to saved.position in the existing post-spawn unit patch; retain yaw and scale behavior",
+  "save_schema_version": 3,
+  "owned_sources": {
+    "src/save.rs": "a22f1fab41717cd79adb130d5817b479d9bfdbc0299dccee5eabfcfa6c8d6858",
+    "src/save/position_tests.rs": "0f0599f0eadd06ee66d4bc401d34d61c1e46abd8ccb18cbfd2da8091d1da8763"
+  },
+  "artifact_boundary": "Old SDK250 ff2e5fb7/5bc82513 basic IO remains passed, but actor continuity is contradicted by preserved screenshots and RED. New debug252 source/pins do not relabel that old archive; new SDK/runtime rerun pending."
+}
