@@ -84,3 +84,14 @@ checks installed image hashes and retains current original-output provenance.
 Post-integration native UI and final-package checks are distinct from the private
 candidate menu/HUD reviews. All-70 paid gameplay/UI coverage and final package
 acceptance are not implied by this integration.
+
+## Current material change awaiting new exports
+
+The reviewed original armor texture was integrated by `ad16eb6` after the
+71-image render checkpoint. Existing portraits and roster still depict the
+previous surface. Their rendering evidence remains historical; it does not
+establish exact current-material parity or remove the previous surface input
+source gap from those derived images. Regenerate all70 portraits twice and the
+roster from a newly built exporter, validate output/source hashes and framing,
+then review and integrate the new outputs before final asset acceptance.
+The live inventory now contains332 files following unused VFX retirement.
