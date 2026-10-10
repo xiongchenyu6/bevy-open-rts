@@ -1,0 +1,53 @@
+{
+  "scope": "Pinned official Steam Runtime4 SDK, checksum-verified official Rust and local packaging tools prepared; project build/runtime gates pending",
+  "sdk": {
+    "scope": "Official Steam Runtime4 SDK acquisition only; no project build or runtime acceptance",
+    "actual_exit": 0,
+    "wall_seconds": 127.63621638598852,
+    "image_id": "sha256:a311b6d632bd5ca4086ee6fc2d89da33d8111d6fba16d84578dcfb3a1bcb5347",
+    "repo_digests": [
+      "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00"
+    ],
+    "discovered_config_identity_matches": true,
+    "sdk_info_exit": 0
+  },
+  "sdk_os_release": "PRETTY_NAME=\"Steam Runtime 4\"\nNAME=\"Steam Runtime\"\nVERSION_ID=\"4\"\nVERSION=\"4\"\nVERSION_CODENAME=steamrt4\nDEBIAN_VERSION_FULL=13.6\nID=steamrt\nID_LIKE=debian\nHOME_URL=\"https://store.steampowered.com/\"\nSUPPORT_URL=\"https://help.steampowered.com/\"\nBUG_REPORT_URL=\"https://github.com/ValveSoftware/steam-runtime/issues\"\nBUILD_ID=\"4.0.20260805.254769\"\nVARIANT=SDK\nVARIANT_ID=\"com.valvesoftware.steamruntime.sdk-amd64_i386-steamrt4\"\n/usr/bin/cc\n",
+  "rust": {
+    "scope": "Official Rust toolchain installation in pinned Steam Runtime4 SDK; no project build or gameplay result",
+    "version": "1.95.0",
+    "components": {
+      "rustc": {
+        "url": "https://static.rust-lang.org/dist/rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+        "sha256": "8426a3d170a5879f5682f5fbdd024a1779b3951e7baba685af2d6dc32a6dfc15",
+        "bytes": 80351960
+      },
+      "rust-std": {
+        "url": "https://static.rust-lang.org/dist/rust-std-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+        "sha256": "047ea7098803d3500fa1072e9cee5392697e21525559e4458128a2bf874aa382",
+        "bytes": 29573972
+      },
+      "cargo": {
+        "url": "https://static.rust-lang.org/dist/cargo-1.95.0-x86_64-unknown-linux-gnu.tar.xz",
+        "sha256": "e74edd2cf7d0f1f1383b4f00eb90c843750bc489e2ccf7214e6476678a907425",
+        "bytes": 10984780
+      }
+    },
+    "image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+    "install_exit": 0,
+    "prepared": true,
+    "wall_seconds": 14.793386453005951
+  },
+  "rust_version_output": [
+    "rustc 1.95.0 (59807616e 2026-04-14)",
+    "cargo 1.95.0 (f2d3ce0bd 2026-03-21)"
+  ],
+  "packaging_tools": {
+    "scope": "Pinned SDK-derived local packaging tools only; no game build/runtime acceptance",
+    "actual_exit": 0,
+    "wall_seconds": 12.642097306990763,
+    "image_id": "sha256:b78a537676c4aacd878a7239072bc4a45dc758922355a1103e923a44e302ba0c"
+  },
+  "packaging_versions": "patchelf 0.18.0\nlibc6:amd64\t2.41-12+deb13u3\npatchelf\t0.18.0-1.4\n",
+  "dockerfile_sha256": "afba36355884c3e3dca4ba311c1b1a69d056839546583999f5bdd56cac359eef",
+  "full_runtime_gate_complete": false
+}
