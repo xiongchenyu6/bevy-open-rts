@@ -82,3 +82,41 @@ readiness.
 
 All compiler commands use locked dependencies, one Cargo job, Rust 1.95 and the
 same restricted systemd compiler environment. Runtime asset roots are absolute.
+
+
+Paid spatial validation (2026-10-10)
+-----------------------------------
+
+AI production now validates the existing normal production spawn search before
+charging faction costs, and reserves successful deferred spawn positions within
+the update. Purchased foundations count against the existing structure cap.
+Building placement validates physical occupancy and normal base influence before
+debit. Economy placement retains six attempts, using evenly spaced directions
+and bounded outward distances when the inner base is occupied. Costs, profile
+intervals, difficulty caps and match deadlines remain unchanged.
+
+Meaningful failing regressions reproduced the actual first paid Tank entering a
+resource body in case0012, blocked production charging resources, and pending
+defenses exceeding the cap. Additional tests cover same-update reservations,
+blocked sites, sector aliasing, and the recorded crowded Radar/RoboticsBay sites.
+The focused placement suite passed8 tests; the original seven AI development
+tests passed with their unchanged45s/180s/600s windows. The full library suite
+passed229 tests, failed0, ignored1 (176.20s), followed by all four native builds
+with exit0. Logs: `logs/ai-placement-shared-14-{full,build}.log`; numeric results:
+`target/ai-placement-shared-14-result.json`.
+
+The immutable audit SHA256 is
+`5ac59455c5d15d2e2156e149037edf44cf19aae83cde7fa81ccc1c04feba0436`,
+recorded with source inputs and338 asset hashes in
+`target/ai-placement-shared-20261010/pin.json`. Exact previous failing cases0012,
+0076,0684,0825 and0831 all completed under normal32/16 startup and unchanged
+600 simulated/180 wall-second limits. Independent raw configuration/resource
+validation is in
+`target/ai-placement-failed-rechecks-20261010/verification.json`. Case0076 is
+the one-based log entry77; case0077 is a different configuration.
+
+The prior fad484 sweep was stopped as a semantic supersession, with its partial
+433 observations (420 completed,11 simulation timeouts,2 wall timeouts) and
+inflight0433 preserved in its semantic-stop record. A fresh3726 ordered-start
+sweep uses the new pin and an isolated338-file asset copy. These are configuration
+observations, not independent seeds or a general balance/release claim.

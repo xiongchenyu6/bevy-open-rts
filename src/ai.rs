@@ -735,7 +735,17 @@ pub(crate) fn ai_director(
     targets: Query<(Entity, &Team, &Transform), With<Health>>,
     wave_targets: Query<(Entity, &Team, &Transform, &Health, &MovementDomain)>,
     weapons: Query<&Weapon>,
+    occupiers: Query<
+        (Entity, &Transform, &Selectable, Option<&Health>),
+        Or<(
+            With<Unit>,
+            With<Structure>,
+            With<ResourceNode>,
+            With<TerrainWall>,
+        )>,
+    >,
 ) {
+    let mut occupied_spawn_points = production_occupied_spawn_points(&occupiers);
     let delta = time.delta_secs();
     let player_team = visible_player_team(visible_player.as_deref());
     let controlled_team = controlled_player_team(visible_player.as_deref());
@@ -815,6 +825,7 @@ pub(crate) fn ai_director(
                     &structures,
                     *resources.map_bounds,
                     player_team,
+                    &mut occupied_spawn_points,
                 );
             }
         }
@@ -870,9 +881,7 @@ pub(crate) fn ai_director(
                 && requirements_met(def, team, &structures)
                 && let Some(origin) =
                     ai_structure_build_origin(team, build_kind, &structures, &targets)
-                && resources.economies.get_mut(team).spend(def.cost)
-            {
-                let spawn_at = ai_structure_build_position(
+                && let Some(spawn_at) = ai_structure_build_position(
                     team,
                     origin,
                     id,
@@ -881,7 +890,13 @@ pub(crate) fn ai_director(
                     &targets,
                     *resources.map_bounds,
                     &resources.terrain,
-                );
+                    &occupied_spawn_points,
+                )
+                && nearest_base_construction_anchor(team, spawn_at, def.radius, &structures)
+                    .is_some()
+                && resources.economies.get_mut(team).spend(def.cost)
+            {
+                occupied_spawn_points.push((spawn_at, def.radius));
                 spawn_structure_under_construction_for_faction(
                     &mut commands,
                     &asset_server,
@@ -927,6 +942,7 @@ pub(crate) fn ai_director(
                     &structures,
                     *resources.map_bounds,
                     player_team,
+                    &mut occupied_spawn_points,
                 );
             }
         }
@@ -1006,6 +1022,8 @@ pub(crate) fn ai_director(
                 &structures,
                 &units,
                 &capture_structures,
+                *resources.map_bounds,
+                &mut occupied_spawn_points,
             );
         } else if !profile.capture_enabled {
             resources.director.capture_timer[idx] = profile.capture_interval;
@@ -1025,6 +1043,8 @@ pub(crate) fn ai_director(
                 &structures,
                 &units,
                 &capture_structures,
+                *resources.map_bounds,
+                &mut occupied_spawn_points,
             );
         } else if !profile.saboteur_enabled {
             resources.director.saboteur_timer[idx] = profile.saboteur_interval;
@@ -1228,25 +1248,48 @@ pub(crate) fn ai_structure_build_position(
     targets: &Query<(Entity, &Team, &Transform), With<Health>>,
     bounds: MapBounds,
     terrain: &TerrainHeightField,
-) -> Vec3 {
-    // Retry with shifted seeds when a pick lands on a cliff edge or ramp; the
-    // AI base plateau is flat, so a nearby legal spot always exists.
+    occupied: &[(Vec3, f32)],
+) -> Option<Vec3> {
+    // The same bounded picks must fit actual footprints as well as terrain.
+    // A blocked attempt keeps its funds and waits for the normal build interval.
     let radius = registry::entity(structure_id).map_or(2.0, |def| def.radius);
     for attempt in 0..6u32 {
-        let candidate = ai_structure_build_position_unchecked(
-            team,
-            origin,
-            structure_id,
-            build_kind,
-            seed + attempt * 101,
-            targets,
-            bounds,
-        );
-        if terrain_site_is_buildable(terrain, candidate, radius) {
-            return candidate;
+        let candidate = match build_kind {
+            AiStructureBuildKind::Economy => {
+                let angle =
+                    (seed + 19) as f32 * 1.618_034 + attempt as f32 * std::f32::consts::TAU / 6.0;
+                let anchor_radius = registry::entity("CommandCenter")
+                    .expect("CommandCenter registry")
+                    .radius;
+                let influence = anchor_radius + radius + BASE_CONSTRUCTION_RADIUS_M;
+                let distance = (5.0 + attempt as f32 * 2.0).min(influence - 0.05);
+                bounds.clamp_ground_point(
+                    Vec3::new(
+                        origin.x + angle.cos() * distance,
+                        0.0,
+                        origin.z + angle.sin() * distance,
+                    ),
+                    radius,
+                )
+            }
+            _ => ai_structure_build_position_unchecked(
+                team,
+                origin,
+                structure_id,
+                build_kind,
+                seed + attempt,
+                targets,
+                bounds,
+            ),
+        };
+        let terrain_clear = terrain_site_is_buildable(terrain, candidate, radius);
+        let physical_clear =
+            terrain_clear.then(|| is_spawn_position_free(candidate, radius, occupied, bounds));
+        if physical_clear == Some(true) {
+            return Some(candidate);
         }
     }
-    origin
+    None
 }
 
 pub(crate) fn ai_structure_build_position_unchecked(
@@ -1358,10 +1401,8 @@ pub(crate) fn ai_structure_under_max(
     }
     let count = structures
         .iter()
-        .filter(|(structure, structure_team, _, under_construction)| {
-            structure_is_constructed(*under_construction)
-                && **structure_team == team
-                && structure.id == structure_id
+        .filter(|(structure, structure_team, _, _)| {
+            **structure_team == team && structure.id == structure_id
         })
         .count();
     count < max
@@ -2369,6 +2410,7 @@ pub(crate) fn try_spawn_ai_trained_unit(
     structures: &Query<StructurePrereqItem<'_>>,
     map_bounds: MapBounds,
     player_team: Team,
+    occupied: &mut Vec<(Vec3, f32)>,
 ) -> bool {
     let Some(def) = registry::entity(id) else {
         return false;
@@ -2381,6 +2423,16 @@ pub(crate) fn try_spawn_ai_trained_unit(
     else {
         return false;
     };
+    let Some(spawn_at) = find_production_spawn_position(
+        origin,
+        producer_id,
+        def.radius,
+        next_id.0,
+        occupied,
+        map_bounds,
+    ) else {
+        return false;
+    };
     if !economies
         .get_mut(team)
         .spend(faction_unit_cost(Some(faction), def.cost))
@@ -2388,7 +2440,7 @@ pub(crate) fn try_spawn_ai_trained_unit(
         return false;
     }
 
-    let spawn_at = free_position_in_bounds(origin, next_id.0, 2.7, map_bounds);
+    occupied.push((spawn_at, def.radius));
     let initial_rank = economies.get(team).production_veterancy_rank(producer_id);
     spawn_unit_for_faction(
         commands,
@@ -2434,6 +2486,8 @@ pub(crate) fn run_ai_capture_logic(
         Without<Selected>,
     >,
     capture_structures: &Query<CaptureStructureTargetItem<'_>, With<Structure>>,
+    map_bounds: MapBounds,
+    occupied: &mut Vec<(Vec3, f32)>,
 ) {
     let mut engineer_count = 0usize;
     let mut idle_engineer = None;
@@ -2502,6 +2556,16 @@ pub(crate) fn run_ai_capture_logic(
     let Some(target) = best_ai_capture_target(team, origin, capture_structures) else {
         return;
     };
+    let Some(spawn_at) = find_production_spawn_position(
+        origin,
+        producer_id,
+        def.radius,
+        next_id.0 + 13,
+        occupied,
+        map_bounds,
+    ) else {
+        return;
+    };
     if !economies
         .get_mut(team)
         .spend(faction_unit_cost(Some(faction), def.cost))
@@ -2509,7 +2573,7 @@ pub(crate) fn run_ai_capture_logic(
         return;
     }
 
-    let spawn_at = free_position(origin, next_id.0 + 13, 2.4);
+    occupied.push((spawn_at, def.radius));
     let initial_rank = economies.get(team).production_veterancy_rank(producer_id);
     let engineer = spawn_unit_for_faction(
         commands,
@@ -2555,6 +2619,8 @@ pub(crate) fn run_ai_saboteur_logic(
         Without<Selected>,
     >,
     capture_structures: &Query<CaptureStructureTargetItem<'_>, With<Structure>>,
+    map_bounds: MapBounds,
+    occupied: &mut Vec<(Vec3, f32)>,
 ) {
     let Some(saboteur_def) = registry::entity(AI_SABOTEUR_ID) else {
         return;
@@ -2631,6 +2697,16 @@ pub(crate) fn run_ai_saboteur_logic(
     else {
         return;
     };
+    let Some(spawn_at) = find_production_spawn_position(
+        origin,
+        producer_id,
+        saboteur_def.radius,
+        next_id.0 + 17,
+        occupied,
+        map_bounds,
+    ) else {
+        return;
+    };
     if !economies
         .get_mut(team)
         .spend(faction_unit_cost(Some(faction), saboteur_def.cost))
@@ -2638,7 +2714,7 @@ pub(crate) fn run_ai_saboteur_logic(
         return;
     }
 
-    let spawn_at = free_position(origin, next_id.0 + 17, 2.2);
+    occupied.push((spawn_at, saboteur_def.radius));
     let initial_rank = economies.get(team).production_veterancy_rank(producer_id);
     let saboteur = spawn_unit_for_faction(
         commands,
@@ -3020,3 +3096,7 @@ mod tests;
 #[cfg(test)]
 #[path = "ai/match_reset_tests.rs"]
 mod match_reset_tests;
+
+#[cfg(test)]
+#[path = "ai/placement_tests.rs"]
+mod placement_tests;

@@ -2,12 +2,12 @@ use super::*;
 
 #[test]
 fn normal_chaos_builds_paid_technology_and_armed_advanced_army() {
-    observe_paid_chaos_progress(None);
     let map = SKIRMISH_MAPS
         .iter()
         .find(|map| map.id == "big_arena")
         .unwrap();
     observe_paid_chaos_progress(Some(map.godot_path));
+    observe_paid_chaos_progress(None);
 }
 
 fn observe_paid_chaos_progress(distant_map: Option<&'static str>) {
