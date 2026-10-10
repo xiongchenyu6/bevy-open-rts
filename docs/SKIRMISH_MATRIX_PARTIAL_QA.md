@@ -1,5 +1,7 @@
 # Current fixed-pin skirmish matrix review
 
+Latest checkpoint: [2,005 terminal cases](qa/current244-matrix-2005-review.json), with 2,004 completed and one simulation timeout. Big Arena Chaos Easy versus Chaos Beginner at starts 2/1 remained Running after 600 seconds. The scan continues; this failure is unresolved. The 692-case snapshot below is historical.
+
 The independently verified snapshot covers 692 of 3726 planned cases: all 692 completed, with zero simulation timeouts, wall timeouts, process errors or integrity errors. Plain & Simple and Four Corners each have all 324 planned cases; Tech Divide has the next 44. The matrix remains active. This is partial evidence, not completion or a general balance verdict. Exact hashes, version differences and the live process observation are in [the portable record](qa/current244-skirmish-partial-review.json).
 
 The verifier checks the independently enumerated ordered-start plan, unique contiguous terminal indices, raw configuration, actual exit classifications, 32 Ore / 16 Crystal, Godot Skirmish opening, authored spawn coordinates, map identity, fixed 600 simulation / 180 wall-second limits, typed totals, phase and winning teams. Annihilation follows the current game rule: Command Centers and Workers retain a team; surviving other troops or structures are not automatically a false victory. All 332 isolated asset hashes match the source pin. The actual running child uses the copied audit binary and that isolated asset root.
