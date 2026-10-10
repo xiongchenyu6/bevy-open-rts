@@ -1,0 +1,64 @@
+{
+  "scope": "Mission5 standalone normal Worker retreat input verified; overall actual defeat, not a campaign fix",
+  "process": {
+    "actual_exit": 1,
+    "wall_seconds": 363.3089543170063,
+    "binary_sha256": "54bef4d80fccfd61742bd6130f8f378451e0f4e0cff989e1c86e75db26ed506a",
+    "scope": "Mission5 normal worker retreat diagnostic from legitimate scenario setup; not six-mission chain proof",
+    "profile": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current250-worker-anchor-retreat-profile-20261010"
+  },
+  "retreat_clock": 279.9198913574219,
+  "retreat_worker": {
+    "active_orders": [
+      {
+        "Move": [
+          -32.0,
+          0.0,
+          -32.0
+        ]
+      }
+    ],
+    "chrono_remaining": null,
+    "chrono_speed_multiplier": null,
+    "constructing": false,
+    "contact_snapshot_present": true,
+    "emp_remaining": null,
+    "entity": 42949672431,
+    "groups": [],
+    "harvest_kind": null,
+    "harvesting": false,
+    "holding": false,
+    "hp": 6.0,
+    "id": "Worker",
+    "live_snapshot_present": true,
+    "move_target": [
+      -32.0,
+      0.0,
+      -32.0
+    ],
+    "movement_domain": "Terrain",
+    "moving": true,
+    "path_goal": [
+      -32.0,
+      0.0,
+      -32.0
+    ],
+    "path_next_index": 0,
+    "path_next_position": [
+      -29.75,
+      0.0,
+      -31.25
+    ],
+    "position": [
+      -23.1104793548584,
+      0.05000000074505806,
+      -27.620759963989258
+    ],
+    "unit_speed": 2.5
+  },
+  "terminal_clock": 294.7162780761719,
+  "terminal_phase": "HumanDefeat",
+  "runtime_normal_retreat_verified": true,
+  "campaign_completion": false,
+  "interpretation": "Retreat starts after most army losses and does not prevent defeat; earlier defensive strategy remains unresolved"
+}
