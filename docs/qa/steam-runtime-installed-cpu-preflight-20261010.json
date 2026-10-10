@@ -1,0 +1,68 @@
+{
+  "scope": "Historical installed Sniper CPU preflight only; no graphics, gameplay or Runtime4 acceptance",
+  "versions": "#Name\tVersion\t\tRuntime\tRuntime_Version\tComment\ndepot\t0.20240916.101795\t\t\t# Overall version number\npressure-vessel\t0.20240916.0\tscout\t\t# pressure-vessel-bin.tar.gz\nscripts\t0.20240916.0\t\t\t# from steam-runtime-tools\nsniper\t0.20240916.101795\tsniper\t0.20240916.101795\t# sniper_platform_0.20240916.101795/\n",
+  "launcher_sha256": "346c20fb2476a4c156c990a50ca74f058459a24d10cf8d3ab43e91a230de9af2",
+  "attempts": {
+    "preflight": {
+      "scope": "Installed historical Sniper CPU command preflight only; no game/GPU/Runtime4 compatibility claim",
+      "exit": 1,
+      "wall_seconds": 0.11439411001629196,
+      "command": [
+        "/home/freeman.xiong/.local/share/Steam/ubuntu12_64/steam-runtime-sniper/run",
+        "--",
+        "/bin/sh",
+        "-c",
+        "cat /etc/os-release; printf \"runtime-command-reached\\n\""
+      ],
+      "versions": "#Name\tVersion\t\tRuntime\tRuntime_Version\tComment\ndepot\t0.20240916.101795\t\t\t# Overall version number\npressure-vessel\t0.20240916.0\tscout\t\t# pressure-vessel-bin.tar.gz\nscripts\t0.20240916.0\t\t\t# from steam-runtime-tools\nsniper\t0.20240916.101795\tsniper\t0.20240916.101795\t# sniper_platform_0.20240916.101795/\n",
+      "log_sha256": "79546b163efcd8987e7374f39169947d5f9097ace99c16e1a51864d2abde772c"
+    },
+    "preflight-retry02": {
+      "scope": "Historical installed Sniper CPU preflight only; not current recommended Runtime4",
+      "exit": 1,
+      "wall_seconds": 0.06465252401540056,
+      "command": [
+        "/home/freeman.xiong/.local/share/Steam/ubuntu12_64/steam-runtime-sniper/run",
+        "--",
+        "/bin/sh",
+        "-c",
+        "cat /etc/os-release"
+      ],
+      "log_sha256": "a18a93e3594f76cdb3ae616bf2959b9c24a6c7f1a57134e593ad86046e94479a"
+    },
+    "preflight-retry03": {
+      "scope": "Historical Sniper CPU preflight; source-supported SYSTEM_PATH workaround",
+      "exit": 1,
+      "wall_seconds": 0.7165813769970555,
+      "command": [
+        "/home/freeman.xiong/.local/share/Steam/ubuntu12_64/steam-runtime-sniper/run",
+        "--",
+        "/bin/sh",
+        "-c",
+        "cat /etc/os-release"
+      ],
+      "log_sha256": "81277da45a42d14bb29791ebcf617bee01ce56759bafc11fedbaf8a6a2cee398"
+    },
+    "preflight-retry04": {
+      "scope": "Historical Sniper CPU command preflight without host graphics import; no game or GPU acceptance",
+      "exit": 0,
+      "wall_seconds": 1.569286468991777,
+      "command": [
+        "/home/freeman.xiong/.local/share/Steam/ubuntu12_64/steam-runtime-sniper/run",
+        "--graphics-provider=",
+        "--",
+        "/bin/sh",
+        "-c",
+        "cat /etc/os-release"
+      ],
+      "log_sha256": "386d6961061abb118807af7dfd51060a625254a0ef0023fced728665027b6132"
+    }
+  },
+  "diagnosis": {
+    "path": "Launcher resets PATH; SYSTEM_PATH=/run/current-system/sw/bin:/usr/bin:/bin reaches host graphics import",
+    "graphics_import": "Fails opening root-only /var/cache/ldconfig/ld.so.cache",
+    "cpu_only": "--graphics-provider= permits successful runtime /etc/os-release command"
+  },
+  "installed_steam_files_modified": false,
+  "full_runtime_gate_complete": false
+}
