@@ -1,0 +1,65 @@
+{
+  "scope": "Integrated71 runtime bounded HUD review and flat-map viewport diagnosis; not all70 paid/UI or finalpackage acceptance",
+  "capture_sha256": "f435c1b9d01dcb9fe4880422bb4bcadf8d37731f8aaa8182c052111ff5c1c3a4",
+  "images": [
+    {
+      "path": "target/integrated-portrait-viewport-hud-20261010/1920/00_worker.png",
+      "sha256": "33ebd4bb41a6b62fd542dd63b7510cb36254c46c6c466f71b3a51d4a16975c90",
+      "identical_to_root_viewed_private_sample": true
+    },
+    {
+      "path": "target/integrated-portrait-viewport-hud-20261010/1920/01_disabled_tooltip.png",
+      "sha256": "2b9cb1a66e21ea62aa7f1b4af8ee1af86730348ddb54b906dbee34649cb95c95",
+      "identical_to_root_viewed_private_sample": true
+    },
+    {
+      "path": "target/integrated-portrait-viewport-hud-20261010/1920/02_production_queue.png",
+      "sha256": "4c1bcd4e6c5e4f2a7554b211e616325e94aec11635508672fb40ec7b469b9347",
+      "identical_to_root_viewed_private_sample": false
+    },
+    {
+      "path": "target/integrated-portrait-viewport-hud-20261010/900/00_worker.png",
+      "sha256": "96dd708b7d44a744dc9efaaf82c44f7ef7c6c1e38003caecc19f06b781a49e29",
+      "identical_to_root_viewed_private_sample": true
+    },
+    {
+      "path": "target/integrated-portrait-viewport-hud-20261010/900/01_disabled_tooltip.png",
+      "sha256": "a2bad11a2679c8ebcd34ea2be7d527614c68c7604137cf9f6472a1583b588a60",
+      "identical_to_root_viewed_private_sample": true
+    },
+    {
+      "path": "target/integrated-portrait-viewport-hud-20261010/900/02_production_queue.png",
+      "sha256": "3d0f0c1c22cc5451995c7ef2135515c052db128aa1e38aa48b8eef3487896d55",
+      "identical_to_root_viewed_private_sample": true
+    }
+  ],
+  "child_exits": [
+    0,
+    0
+  ],
+  "runtime_assets_unchanged_during_capture": true,
+  "visual_review": "Portraits/cards/tooltips readable in six samples; five PNGs identical to already reviewed private-stage samples and remaining1920 production screenshot directly reviewed.",
+  "camera_diagnosis": [
+    {
+      "width": 1920,
+      "snapshot_count": 48,
+      "outside_corner_histogram": {
+        "1": 2,
+        "3": 22,
+        "2": 24
+      }
+    },
+    {
+      "width": 900,
+      "snapshot_count": 48,
+      "outside_corner_histogram": {
+        "0": 2,
+        "2": 46
+      }
+    }
+  ],
+  "camera_scope": "Actual rendered camera ray intersections with flatY0 ground during construction snapshots. These are not exact screenshot-time samples; unexplored in-map fog is not classified as a defect.",
+  "camera_edge_presentation_complete": false,
+  "full_roster_paid_verified": false,
+  "final_package_verified": false
+}
