@@ -1,0 +1,108 @@
+{
+  "scope": "Partial read-only verification of the fixed source pin; not full-matrix or current247-library equivalence",
+  "planned": 3726,
+  "terminal_snapshot": 692,
+  "counts": {
+    "completed": 692
+  },
+  "complete_matrix": false,
+  "integrity_verified": true,
+  "errors": [],
+  "failures": [],
+  "audit_sha256": "c4f395dd8853a41da1768c8752e7116159b7ccef3c1be44afe1def300f8616f1",
+  "manifest_sha256": "22a48ce6df07265635d1ba8c7fcbcf4050f73ca362f072fb63192361ce9e5dac",
+  "private_asset_count": 332,
+  "private_asset_hashes_match": true,
+  "current_source_files_differing_from_pin": [
+    "src/bin/capture/campaign_bot/finale.rs",
+    "src/bin/capture/campaign_bot/twin.rs",
+    "src/bin/capture/campaign_bot.rs",
+    "src/bin/capture.rs",
+    "src/capture_api.rs",
+    "src/hud.rs",
+    "src/lib.rs",
+    "src/menu.rs",
+    "src/objective_hud_tests.rs"
+  ],
+  "current_source_files_added_since_pin": [
+    "src/bin/capture/campaign_bot/focus_target.rs",
+    "src/bin/capture/campaign_bot/survivors.rs",
+    "src/menu_lobby_tests.rs"
+  ],
+  "inflight_directories": [
+    "0692"
+  ],
+  "interpretation": "Completion means current Annihilation policy: only Command Centers and Workers retain a team. Other surviving units/structures do not invalidate this policy. No independent seeds/repeats/random maps claimed.",
+  "snapshot_utc": "2026-10-10T13:52:44.471378+00:00",
+  "completed_by_map": {
+    "plain_and_simple": 324,
+    "four_corners": 324,
+    "tech_divide": 44
+  },
+  "terminal_evidence_hashlist_sha256": "c78c63f98eb1bb099916eef8e2fd22c1ea2b4d9f7426bc14ea8c8a35c2d7d85d",
+  "max_simulation_seconds": 537.05712890625,
+  "max_wall_seconds": 165.19051787801436,
+  "mean_wall_seconds": 16.504181055963105,
+  "validator_negative_checks": {
+    "baseline_accepted": true,
+    "malformed_rejected": [
+      "false_pass_exit",
+      "wrong_resources",
+      "wrong_spawn",
+      "wrong_winner",
+      "duplicate_index",
+      "missing_manifest_case"
+    ],
+    "original_evidence_untouched": true
+  },
+  "live_process_observation": {
+    "unit": "rts-current244-all-starts-20261010.service",
+    "systemd": {
+      "ActiveState": "active",
+      "InvocationID": "5553c93a3e2f4e1594d38a8e22931c78",
+      "MainPID": "1841197"
+    },
+    "children": [
+      {
+        "pid": 1841884,
+        "exe": "/nix/store/lb41b0anx1f98y9y5s9mdv97gjgsq740-python3-3.14.7/bin/python3.14",
+        "arguments": [
+          "/etc/profiles/per-user/freeman.xiong/bin/python3",
+          "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current244-skirmish-matrix-20261010.py",
+          "--matrix",
+          "all",
+          "--all-slots",
+          "--seconds",
+          "600",
+          "--wall-seconds",
+          "180",
+          "--binary",
+          "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/objective-foundation-shared-20261010/skirmish_audit",
+          "--output",
+          "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current244-all-starts-20261010"
+        ],
+        "BEVY_ASSET_ROOT": ""
+      },
+      {
+        "pid": 2370998,
+        "exe": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current244-all-starts-20261010/skirmish_audit",
+        "arguments": [
+          "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current244-all-starts-20261010/skirmish_audit",
+          "tech_divide",
+          "chaos",
+          "normal",
+          "0",
+          "chaos",
+          "hard",
+          "2",
+          "600",
+          "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/current244-all-starts-20261010/0700/result.json"
+        ],
+        "BEVY_ASSET_ROOT": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/objective-foundation-audit-assets-20261010"
+      }
+    ],
+    "scope": "Only public task argv and asset-root environment variable read; no secrets or unrelated processes."
+  },
+  "version_boundary": "The objective-foundation audit pin is fixed; the later 247-test library checkpoint includes settlement UI/menu/read-only QA changes. Different source-file hashes and new files are listed; no binary equivalence is claimed.",
+  "old_matrix": "The older movement-clearance sweep remains a separate immutable version. Its results are not included."
+}
