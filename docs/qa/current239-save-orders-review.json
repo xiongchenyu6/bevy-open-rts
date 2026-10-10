@@ -1,0 +1,14 @@
+{
+  "scope": "Nativecurrent239 capture freshprocess schema3 harvest reference and queued-order continuity; not finalpackage or allstatus/job/weather coverage",
+  "binary_sha256": "758caf88f13307ba1b4a624b6b6d976274fa481afc67e64fd70d24c352d6e93d",
+  "actual_create_exit": 0,
+  "actual_resume_exit": 0,
+  "creator_pid": 1475584,
+  "resume_pid": 1475939,
+  "different_processes_verified": true,
+  "save_sha256": "de0be59a8e45c021350fe43296a5e1a950457f2e37ca34dbb4e8ece475e1b262",
+  "saved_bytes_unchanged": true,
+  "target_reference_remapped": true,
+  "source_observation_sha256": "e316f7e808657b6c8fb25a7ab8f28f18141f7ca5efebee1cbe1d66c73fb08045",
+  "final_package_verified": false
+}
