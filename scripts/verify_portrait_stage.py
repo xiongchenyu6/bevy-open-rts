@@ -31,6 +31,11 @@ def verify(inventory_path, directory):
             row = pairs[entity, run]
             if row["runtime_path"] != source["runtime_path"] or row["faction"] != source["portrait_faction"]:
                 raise ValueError(f"Wrong portrait identity/faction: {entity}")
+            marker_count = {"alliance": 2, "demon": 3, "chaos": 2}[source["portrait_faction"]]
+            if (row.get("reference_scope") != "model-only parity; not whole-scene parity"
+                    or row.get("excluded_contextual_marker_count") != marker_count
+                    or row["geometry"].get("excluded_contextual_marker_count") != marker_count):
+                raise ValueError(f"Missing model-only scope or contextual marker exclusion: {entity}")
             if not row["asset_only_full_game_reference_verified"] or row["live_gameplay_reference_verified"]:
                 raise ValueError(f"Incorrect reference scope: {entity}")
         header = images[0].read_bytes()[:33]
