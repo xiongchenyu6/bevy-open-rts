@@ -60,12 +60,14 @@ unchanged saves, target remapping, exact4 mine damage, shield scale.25 and norma
 expiry. Active construction, paid production and natural midfade weather are
 under test; broader effects and final-package continuity remain unproven.
 
-Campaign M1 still fails: the centered-contact counter run loses at621.1s;
+The campaign harness index1 (Mission2: Strike the Outpost) failed earlier: the centered-contact counter run loses at621.1s;
 spaced construction with2Ore/2Crystal loses at241.3s despite normal resources.
-Both failures are preserved. No six-mission same-App acceptance is claimed.
+Both failures are preserved. The normal Radar/group retry subsequently won
+at176.5s with HQ20; this proves Mission2 only. A fresh six-mission same-App
+chain starts at index0 and remains incomplete.
 The earlier movement-clearance3,726-case sweep predates current contact fixes;
-it remains incomplete and has one recorded600-second timeout (0939), currently
-being rechecked with the same limits on current240. Eight prior timeout cases
+it remains incomplete and has one recorded600-second timeout (0939), reproduced
+on current240 at the same limit; read-only trace shows AI crystal starvation. Eight prior timeout cases
 passed bounded rechecks; these do not prove the full map matrix. Natural audio
 output/selection-ack ASR remain bounded; full events, mix and human listening
 are still open. All nine release gates remain in scope.
