@@ -1,0 +1,462 @@
+{
+  "scope": "Current observer homepage and normal physical Host/Join late transport proof; not readiness or paid/control acceptance",
+  "wasm_sha256": "eeecc6960588376b828f5bf2723a584efd3534af346f577cde895a69f5052cd4",
+  "build_actual_exit": 0,
+  "build_source_assets_unchanged": true,
+  "assets": 332,
+  "normal_menu": {
+    "host": {
+      "passed": true,
+      "context": {
+        "app_screen": "MainMenu",
+        "assigned_slot": null,
+        "is_host": false,
+        "last_applied_tick": 0,
+        "last_sent_tick": 0,
+        "lobby": null,
+        "local_player_id": null,
+        "match_phase": "Running",
+        "observe_only": true,
+        "online_phase": "Home",
+        "protocol": 4,
+        "room_code": null,
+        "schema": 1
+      },
+      "legacyDriverElementPresent": false
+    },
+    "p1": {
+      "passed": true,
+      "context": {
+        "app_screen": "MainMenu",
+        "assigned_slot": null,
+        "is_host": false,
+        "last_applied_tick": 0,
+        "last_sent_tick": 0,
+        "lobby": null,
+        "local_player_id": null,
+        "match_phase": "Running",
+        "observe_only": true,
+        "online_phase": "Home",
+        "protocol": 4,
+        "room_code": null,
+        "schema": 1
+      },
+      "legacyDriverElementPresent": false
+    }
+  },
+  "driver": {
+    "actual_driver_exit": 1,
+    "error": "Strict240sec frontend deadline",
+    "real_contexts": 2,
+    "roles": [
+      "host",
+      "p1"
+    ],
+    "events": 12,
+    "diagnostics": [],
+    "workflow_only": true,
+    "acceptance_pass": false,
+    "reason": "Physical workflow alone is not acceptance; review actual DTO/applied ticks and route/paid/reconnect/eight-peer evidence independently."
+  },
+  "late_connections": {
+    "host": {
+      "connections": [
+        {
+          "connectionState": "connected",
+          "iceConnectionState": "connected",
+          "signalingState": "stable",
+          "iceGatheringState": "complete",
+          "localDescriptionType": "offer",
+          "remoteDescriptionType": "answer",
+          "candidateCount": 11,
+          "candidateErrors": [
+            {
+              "code": 701
+            },
+            {
+              "code": 701
+            },
+            {
+              "code": 701
+            },
+            {
+              "code": 701
+            },
+            {
+              "code": 701
+            },
+            {
+              "code": 701
+            }
+          ],
+          "descriptionStages": [
+            {
+              "stage": "createOffer-called",
+              "time": 119919.80000001192,
+              "descriptionType": null
+            },
+            {
+              "stage": "createOffer-resolved",
+              "time": 119928.5,
+              "descriptionType": null
+            },
+            {
+              "stage": "setLocalDescription-called",
+              "time": 119928.80000001192,
+              "descriptionType": "offer"
+            },
+            {
+              "stage": "setLocalDescription-resolved",
+              "time": 119931.19999998808,
+              "descriptionType": "offer"
+            },
+            {
+              "stage": "setRemoteDescription-called",
+              "time": 160219.90000000596,
+              "descriptionType": "answer"
+            },
+            {
+              "stage": "setRemoteDescription-resolved",
+              "time": 160223.09999999404,
+              "descriptionType": "answer"
+            }
+          ],
+          "routes": [
+            {
+              "nominated": true,
+              "bytesSent": 2495,
+              "bytesReceived": 2529,
+              "localType": "host",
+              "remoteType": "host"
+            }
+          ]
+        }
+      ],
+      "signalCounts": {
+        "received_idassigned": 1,
+        "received_newpeer": 1,
+        "sent_signal": 1,
+        "sent_offer": 1,
+        "received_signal": 2,
+        "received_answer": 1,
+        "received_icecandidate": 1
+      },
+      "signalTrace": [
+        {
+          "time": 63910.19999998808,
+          "direction": "received",
+          "tag": "idassigned"
+        },
+        {
+          "time": 119835.30000001192,
+          "direction": "received",
+          "tag": "newpeer"
+        },
+        {
+          "time": 159874.09999999404,
+          "direction": "sent",
+          "tag": "signal"
+        },
+        {
+          "time": 159874.09999999404,
+          "direction": "sent",
+          "tag": "offer"
+        },
+        {
+          "time": 160219.19999998808,
+          "direction": "received",
+          "tag": "signal"
+        },
+        {
+          "time": 160219.19999998808,
+          "direction": "received",
+          "tag": "answer"
+        },
+        {
+          "time": 160220.59999999404,
+          "direction": "received",
+          "tag": "signal"
+        },
+        {
+          "time": 160220.59999999404,
+          "direction": "received",
+          "tag": "icecandidate"
+        }
+      ],
+      "socketStates": [
+        1
+      ],
+      "legacyDriverElementPresent": false,
+      "dto": {
+        "context": {
+          "app_screen": "OnlineLobby",
+          "assigned_slot": 0,
+          "is_host": true,
+          "last_applied_tick": 0,
+          "last_sent_tick": 0,
+          "lobby": {
+            "host_player_id": 1,
+            "map_id": "plain_and_simple",
+            "revision": 2,
+            "room_code": "C326C9B6",
+            "slots": [
+              {
+                "color_slot": 0,
+                "faction": "Alliance",
+                "occupant": {
+                  "Human": {
+                    "connected": true,
+                    "name": "Commander-H11",
+                    "player_id": 1,
+                    "ready": true
+                  }
+                },
+                "spawn_slot": 0,
+                "team_id": 0
+              },
+              {
+                "color_slot": 1,
+                "faction": "Demon",
+                "occupant": {
+                  "Human": {
+                    "connected": true,
+                    "name": "Commander-P11",
+                    "player_id": 2,
+                    "ready": false
+                  }
+                },
+                "spawn_slot": 1,
+                "team_id": 1
+              },
+              {
+                "color_slot": 2,
+                "faction": "Chaos",
+                "occupant": "Closed",
+                "spawn_slot": 2,
+                "team_id": 2
+              },
+              {
+                "color_slot": 3,
+                "faction": "Alliance",
+                "occupant": "Closed",
+                "spawn_slot": 3,
+                "team_id": 3
+              }
+            ],
+            "starting_resources_index": 3,
+            "victory_condition_index": 0
+          },
+          "local_player_id": 1,
+          "match_phase": "Running",
+          "observe_only": true,
+          "online_phase": "Lobby",
+          "protocol": 4,
+          "room_code": "C326C9B6",
+          "schema": 1
+        },
+        "game_clock": 0.0,
+        "snapshot_semantics": "successfully_sent",
+        "snapshots": []
+      }
+    },
+    "p1": {
+      "connections": [
+        {
+          "connectionState": "connected",
+          "iceConnectionState": "connected",
+          "signalingState": "stable",
+          "iceGatheringState": "complete",
+          "localDescriptionType": "answer",
+          "remoteDescriptionType": "offer",
+          "candidateCount": 2,
+          "candidateErrors": [
+            {
+              "code": 701
+            },
+            {
+              "code": 701
+            },
+            {
+              "code": 701
+            },
+            {
+              "code": 701
+            }
+          ],
+          "descriptionStages": [
+            {
+              "stage": "setRemoteDescription-called",
+              "time": 149522.90000000596,
+              "descriptionType": "offer"
+            },
+            {
+              "stage": "setRemoteDescription-resolved",
+              "time": 149530.09999999404,
+              "descriptionType": "offer"
+            },
+            {
+              "stage": "createAnswer-called",
+              "time": 149530.5,
+              "descriptionType": null
+            },
+            {
+              "stage": "createAnswer-resolved",
+              "time": 149562.70000001788,
+              "descriptionType": null
+            },
+            {
+              "stage": "setLocalDescription-called",
+              "time": 149563.09999999404,
+              "descriptionType": "answer"
+            },
+            {
+              "stage": "setLocalDescription-resolved",
+              "time": 149564.20000001788,
+              "descriptionType": "answer"
+            }
+          ],
+          "routes": [
+            {
+              "nominated": true,
+              "bytesSent": 2529,
+              "bytesReceived": 2495,
+              "localType": "host",
+              "remoteType": "host"
+            }
+          ]
+        }
+      ],
+      "signalCounts": {
+        "received_idassigned": 1,
+        "received_signal": 1,
+        "received_offer": 1,
+        "sent_signal": 2,
+        "sent_answer": 1,
+        "sent_icecandidate": 1
+      },
+      "signalTrace": [
+        {
+          "time": 109371.20000001788,
+          "direction": "received",
+          "tag": "idassigned"
+        },
+        {
+          "time": 149392.70000001788,
+          "direction": "received",
+          "tag": "signal"
+        },
+        {
+          "time": 149392.70000001788,
+          "direction": "received",
+          "tag": "offer"
+        },
+        {
+          "time": 149720.5,
+          "direction": "sent",
+          "tag": "signal"
+        },
+        {
+          "time": 149720.5,
+          "direction": "sent",
+          "tag": "answer"
+        },
+        {
+          "time": 149721,
+          "direction": "sent",
+          "tag": "signal"
+        },
+        {
+          "time": 149721,
+          "direction": "sent",
+          "tag": "icecandidate"
+        }
+      ],
+      "socketStates": [
+        1
+      ],
+      "legacyDriverElementPresent": false,
+      "dto": {
+        "context": {
+          "app_screen": "OnlineLobby",
+          "assigned_slot": 1,
+          "is_host": false,
+          "last_applied_tick": 0,
+          "last_sent_tick": 0,
+          "lobby": {
+            "host_player_id": 1,
+            "map_id": "plain_and_simple",
+            "revision": 2,
+            "room_code": "C326C9B6",
+            "slots": [
+              {
+                "color_slot": 0,
+                "faction": "Alliance",
+                "occupant": {
+                  "Human": {
+                    "connected": true,
+                    "name": "Commander-H11",
+                    "player_id": 1,
+                    "ready": true
+                  }
+                },
+                "spawn_slot": 0,
+                "team_id": 0
+              },
+              {
+                "color_slot": 1,
+                "faction": "Demon",
+                "occupant": {
+                  "Human": {
+                    "connected": true,
+                    "name": "Commander-P11",
+                    "player_id": 2,
+                    "ready": false
+                  }
+                },
+                "spawn_slot": 1,
+                "team_id": 1
+              },
+              {
+                "color_slot": 2,
+                "faction": "Chaos",
+                "occupant": "Closed",
+                "spawn_slot": 2,
+                "team_id": 2
+              },
+              {
+                "color_slot": 3,
+                "faction": "Alliance",
+                "occupant": "Closed",
+                "spawn_slot": 3,
+                "team_id": 3
+              }
+            ],
+            "starting_resources_index": 3,
+            "victory_condition_index": 0
+          },
+          "local_player_id": 2,
+          "match_phase": "Running",
+          "observe_only": true,
+          "online_phase": "Lobby",
+          "protocol": 4,
+          "room_code": "C326C9B6",
+          "schema": 1
+        },
+        "game_clock": 0.0,
+        "snapshot_semantics": "validated_received_not_world_equivalence",
+        "snapshots": []
+      }
+    }
+  },
+  "timing_seconds": {
+    "setLocalDescriptionResolved_to_offerSent": 39.9429,
+    "createOfferCalled_to_answerReceived": 40.2994
+  },
+  "limitations": [
+    "Actualdriverexit1 strict240deadline retained, regardless missing-unit default ExecMainStatus0.",
+    "No guestReady click, match, paidPower, same-tick matchDTO, reconnect,8peer or forcedTURN proof.",
+    "Selected route was host-host, not relay.",
+    "Current source predates subsequent saveSchema4 work."
+  ],
+  "evidence": "target/web11-physical-observer-online-20261011"
+}
