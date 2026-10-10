@@ -50,7 +50,8 @@ The current optimized Linux candidate compiles with unchanged frozen inputs.
 Its archive passes independent379-file/332-asset/nine-Rust-notice integrity
 checks. Ubuntu24.04.5 runs the exact readonly archive as a nonroot user with
 AMD Vulkan and no Nix mount; keyboard Save/Load passes with unchanged save bytes.
-Legacy mouse-menu coordinates miss controls, so that path is not accepted.
+The old mouse Save closes the menu; the harness then clicks Load without
+reopening it, so mouse Save/Load as a complete path is not accepted.
 See `docs/qa/linux-current240-package-smoke.json`. Complete package playthrough,
 dense combat performance, Steam Runtime and native Windows remain open.
 
