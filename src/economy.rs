@@ -7,6 +7,8 @@ use bevy::prelude::*;
 
 use crate::*;
 
+#[cfg(test)]
+mod ai_resource_tests;
 mod harvest_contact;
 use harvest_contact::update_harvest_contact_route;
 
@@ -760,6 +762,10 @@ pub(crate) fn auto_assign_idle_resource_collectors(
     active_teams: Option<Res<ActiveTeams>>,
     visible_player: Option<Res<VisiblePlayer>>,
     match_setup: Option<Res<MatchSetupSettings>>,
+    economies: Res<Economies>,
+    factions: Res<PlayerFactions>,
+    structures: Query<StructurePrereqItem<'_>>,
+    harvesters: Query<(&Team, &Health, &HarvestOrder), With<Unit>>,
     units: Query<
         (
             Entity,
@@ -769,8 +775,21 @@ pub(crate) fn auto_assign_idle_resource_collectors(
             &Health,
             &ResourceCargo,
             Option<&OrderQueue>,
+            Option<&HarvestOrder>,
+            Option<&MoveOrder>,
+            Option<&PlannedPath>,
         ),
-        (With<Unit>, IdleUnitOrderFilter),
+        (
+            With<Unit>,
+            Without<FollowOrder>,
+            Without<AttackOrder>,
+            Without<CaptureOrder>,
+            Without<GarrisonOrder>,
+            Without<RepairOrder>,
+            Without<ConstructOrder>,
+            Without<AttackMoveOrder>,
+            Without<PatrolOrder>,
+        ),
     >,
     resources: Query<(Entity, &Transform, &Selectable, &ResourceNode)>,
     dropoffs: Query<
@@ -789,7 +808,23 @@ pub(crate) fn auto_assign_idle_resource_collectors(
     // Only the AI auto-harvests. The human player gathers manually (select a
     // worker, right-click an ore node) so their workers never wander off alone.
     let player_team = controlled_player_team(visible_player.as_deref());
-    for (entity, team, unit, transform, health, cargo, order_queue) in &units {
+    let mut crystal_collectors = std::collections::HashSet::new();
+    for (team, health, harvest) in &harvesters {
+        if health.current > 0.0
+            && (harvest.last_kind == Some(ResourceKind::Crystal)
+                || harvest
+                    .resource
+                    .and_then(|entity| resources.get(entity).ok())
+                    .is_some_and(|(_, _, _, node)| {
+                        node.kind == ResourceKind::Crystal && node.amount > 0
+                    }))
+        {
+            crystal_collectors.insert(*team);
+        }
+    }
+    for (entity, team, unit, transform, health, cargo, order_queue, harvest, movement, path) in
+        &units
+    {
         if !team_is_ai_controlled(*team, player_team, match_setup.as_deref())
             || !team_is_active(*team, active_teams.as_deref())
             || !can_unit_collect_resources(unit)
@@ -804,12 +839,69 @@ pub(crate) fn auto_assign_idle_resource_collectors(
         if nearest_resource_dropoff(*team, transform.translation, &dropoffs).is_none() {
             continue;
         }
-        let nearest_resource = nearest_resource_entity(
-            transform.translation,
-            None,
-            &resources,
-            Some(RESOURCE_SEARCH_RADIUS_M),
-        );
+        // Existing paid product/technology costs determine demand, not a guessed reserve.
+        let crystal_needed = !crystal_collectors.contains(team)
+            && match_setup
+                .as_ref()
+                .and_then(|setup| {
+                    team.economy_index()
+                        .and_then(|idx| setup.player_controllers.get(idx))
+                })
+                .and_then(|controller| controller.ai_difficulty())
+                .is_some_and(|difficulty| {
+                    let faction = factions.slot_faction(*team);
+                    let profile = faction_ai_profile_for_difficulty(faction, difficulty);
+                    let economy = economies.get(*team);
+                    let lacks_crystal = |def: &registry::EntityDef| {
+                        economy.ore >= def.cost.ore && economy.crystal < def.cost.crystal
+                    };
+                    profile
+                        .production_priority
+                        .iter()
+                        .filter_map(|id| registry::entity(id))
+                        .any(|def| {
+                            def.weapon.is_some_and(|weapon| weapon.can_attack_ground)
+                                && lacks_crystal(def)
+                                && requirements_met(def, *team, &structures)
+                                && ai_production_origin_for_faction(
+                                    *team,
+                                    faction,
+                                    def.id,
+                                    &structures,
+                                )
+                                .is_some()
+                        })
+                        || next_ai_technology_structure(*team, faction, &structures)
+                            .and_then(registry::entity)
+                            .is_some_and(lacks_crystal)
+                });
+        let crystal = crystal_needed
+            .then(|| {
+                nearest_resource_entity(
+                    transform.translation,
+                    Some(ResourceKind::Crystal),
+                    &resources,
+                    Some(RESOURCE_SEARCH_RADIUS_M),
+                )
+            })
+            .flatten();
+        if let Some(_) = harvest {
+            // Let carried goods finish their normal delivery; never discard paid income.
+            if crystal.is_none() || cargo.has_any() {
+                continue;
+            }
+        } else if movement.is_some() || path.is_some() {
+            // A direct movement order is not an idle worker or an AI harvest leg.
+            continue;
+        }
+        let nearest_resource = crystal.or_else(|| {
+            nearest_resource_entity(
+                transform.translation,
+                None,
+                &resources,
+                Some(RESOURCE_SEARCH_RADIUS_M),
+            )
+        });
         let state = if cargo.has_any() && (cargo.is_full() || nearest_resource.is_none()) {
             HarvestState::MovingToDropoff
         } else {
@@ -817,6 +909,13 @@ pub(crate) fn auto_assign_idle_resource_collectors(
         };
         if nearest_resource.is_none() && state == HarvestState::MovingToResource {
             continue;
+        }
+        if crystal.is_some() {
+            crystal_collectors.insert(*team);
+            commands
+                .entity(entity)
+                .try_remove::<MoveOrder>()
+                .try_remove::<PlannedPath>();
         }
         commands.entity(entity).try_insert(HarvestOrder {
             resource: nearest_resource,

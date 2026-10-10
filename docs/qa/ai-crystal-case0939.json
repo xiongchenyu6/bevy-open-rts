@@ -1,0 +1,73 @@
+{
+  "scope": "Exact0939 AI crystal income correction; not all maps/difficulties or release readiness",
+  "config": {
+    "difficulties": [
+      "beginner",
+      "easy"
+    ],
+    "factions": [
+      "chaos",
+      "chaos"
+    ],
+    "map": "tech_divide",
+    "max_seconds": 600,
+    "spawn_slots": [
+      2,
+      0
+    ]
+  },
+  "resources": {
+    "crystal": 16,
+    "ore": 32
+  },
+  "simulation_limit": 600,
+  "wall_limit": 180,
+  "source_checkpoint": {
+    "focused_passed": 2,
+    "full_passed": 242,
+    "full_ignored": 1,
+    "results": {
+      "focused": 0,
+      "full": 0,
+      "build": 0
+    },
+    "inputs_unchanged": true,
+    "asset_count": 332
+  },
+  "audit_sha256": "380a06014e407472939b75a547c876b8a24ca2cf2c89a2e6f2721c87a10d6028",
+  "before": {
+    "actual_exit": 2,
+    "clock": 600.0084228515625,
+    "team1_crystal_dropoff_estimate": 0,
+    "observed_scout_births": 44,
+    "ore_purifier_manual_repair_starts": 0
+  },
+  "after": {
+    "actual_exit": 0,
+    "winning_teams": [
+      1
+    ],
+    "clock": 238.9220733642578,
+    "wall_seconds": 74.23286104699946,
+    "team1_dropoff_estimate": [
+      389,
+      30
+    ],
+    "first_crystal_delivery_clock": 94.9322280883789,
+    "observed_combat_and_worker_births": {
+      "ShieldTrooper": 1,
+      "Worker": 3,
+      "ScoutRover": 2,
+      "RocketGunship": 1
+    },
+    "trace_rows": 7168,
+    "assets_unchanged": true
+  },
+  "raw_hashes": {
+    "result.json": "900c43a5f85a4b0e6e4ea5fa0e92b64e763e1df6aa59afbbc0ce51bc1cab446c",
+    "process-result.json": "995969b65b97c5a935d78f43d633c5f04e77a3a6fb6a4c7b68e65a39a01af670",
+    "repair-economy.jsonl": "948691a2aba488884898d3cc64a3c557d6a6c6efad0a69bac55e906abd055297",
+    "progress.jsonl": "23f52d3478e12155f1c02c447b2ff5cbd64f4d20f7cc53021c8b493e0c5cc301"
+  },
+  "independent_checks": "Exact config/resources/anchors/binary hash/actual exit/winner/limits/332 asset parity asserted. Cargo dropoff numbers remain observer estimates, not exact total-spend transactions."
+}
