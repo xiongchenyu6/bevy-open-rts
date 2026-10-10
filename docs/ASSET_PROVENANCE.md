@@ -238,3 +238,14 @@ audio-only base/small transcription in `target/voice-hello-asr-review-20261010/`
 exits0: both recover “Ready for orders”, differing only in punctuation, with no
 reference text supplied. Listening/tone and in-game mixing remain unverified;
 no runtime substitution is accepted.
+
+
+`target/voice-ogg-candidates-20261010/` stages32 clean-path Vorbis candidates
+(16 unique files and17 enum mappings per language; SupportPowerFired reuses
+Ack2). Both FFmpeg runs finish successfully, and all32 decoded PCM hashes match
+without clipping. OGG container bytes differ because their stream serials vary;
+byte reproducibility is not claimed. An independent ffprobe/header and SHA check
+confirms all32 first-run files are Vorbis, mono24kHz. The manifest retains
+source WAV hashes, complete event mapping and encoder commands. Actual Bevy
+loading, event playback, volume controls, listening and mixing still require
+verification; no runtime paths or assets have been replaced.
