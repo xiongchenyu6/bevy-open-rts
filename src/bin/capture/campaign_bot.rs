@@ -952,6 +952,56 @@ pub(super) fn log_state(
     for unit in &units {
         *types.entry(unit.id).or_insert(0usize) += 1;
     }
+    // Join read-only snapshots without advancing the application between reads.
+    let live = bevy_open_rts::capture_live_mine_state(app)?;
+    let contact = capture_construction_contact_debug(app);
+    let live_units: BTreeMap<_, _> = live["units"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|actor| actor["key"].as_u64().map(|key| (key, actor)))
+        .collect();
+    let contact_entities: BTreeMap<_, _> = contact["entities"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|actor| actor["entity"].as_u64().map(|key| (key, actor)))
+        .collect();
+    let unit_orders: Vec<_> = units.iter()
+        .filter(|unit| unit.combat || unit.id == "Worker")
+        .map(|unit| {
+            let key = unit.entity.to_bits();
+            let saved = live_units.get(&key).copied();
+            let debug = contact_entities.get(&key).copied();
+            serde_json::json!({
+                "id": unit.id, "entity": key, "position": unit.position.to_array(),
+                "hp": unit.health, "groups": unit.groups, "moving": unit.moving,
+                "holding": unit.holding, "constructing": unit.constructing,
+                "harvesting": unit.harvesting, "harvest_kind": unit.harvest_kind,
+                "move_target": unit.move_target.map(|point| point.to_array()),
+                "live_snapshot_present": saved.is_some(), "contact_snapshot_present": debug.is_some(),
+                "active_orders": saved.map(|actor| &actor["active"]),
+                "path_goal": debug.map(|actor| &actor["path_goal"]),
+                "path_next_index": debug.map(|actor| &actor["path_next"]),
+                "path_next_position": debug.map(|actor| &actor["path_next_position"]),
+                "emp_remaining": debug.map(|actor| &actor["emp_remaining"]),
+            })
+        }).collect();
+    let visible_enemy_headquarters: Vec<_> = live["structures"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|actor| {
+            actor["team"].as_u64() == Some(1)
+                && actor["id"].as_str() == Some("CommandCenter")
+                && actor["visible"].as_bool() == Some(true)
+                && actor["health"].as_f64().is_some_and(|health| health > 0.0)
+        })
+        .map(|actor| {
+            serde_json::json!({"entity": actor["key"], "position": actor["position"],
+            "hp": actor["health"], "visible": actor["visible"]})
+        })
+        .collect();
     let value = serde_json::json!({
         "stage": stage, "clock": state.clock, "phase": capture_match_phase_label(app),
         "resources": capture_player_resources(app), "low_power": state.low_power,
@@ -961,7 +1011,9 @@ pub(super) fn log_state(
         "defenders": grouped(&units,DEFENSE).iter().map(|id| id.to_bits()).collect::<Vec<_>>(),
         "attackers": grouped(&units,ASSAULT).iter().map(|id| id.to_bits()).collect::<Vec<_>>(),
         "threats": state.threats.iter().map(|threat| serde_json::json!({"id":threat.id,"domain":threat.domain,"position":threat.position.to_array(),"hp":threat.health})).collect::<Vec<_>>(),
-        "unit_orders": units.iter().filter(|unit| unit.combat || unit.id == "Worker").map(|unit| serde_json::json!({"id":unit.id,"entity":unit.entity.to_bits(),"position":unit.position.to_array(),"hp":unit.health,"groups":unit.groups,"moving":unit.moving,"holding":unit.holding,"constructing":unit.constructing,"harvesting":unit.harvesting,"harvest_kind":unit.harvest_kind,"move_target":unit.move_target.map(|p|p.to_array())})).collect::<Vec<_>>(),
+        "unit_orders": unit_orders,
+        "observation_clocks": {"campaign": state.clock, "live": live["clock"], "contact": contact["clock"]},
+        "visible_enemy_headquarters": visible_enemy_headquarters,
     });
     writeln!(trace, "{value}").map_err(|error| error.to_string())?;
     trace.flush().map_err(|error| error.to_string())?;

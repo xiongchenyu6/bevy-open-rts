@@ -293,3 +293,20 @@ passed `python3 -m py_compile`; its generated report is
 The next diagnostic run awaits the constructor/Nav seal and will capture the
 existing order, path and visibility views without changing quotas or stats.
 **M1 and the full same-App campaign remain unaccepted.**
+
+## Prepared native observation capture
+
+The capture defaults now render1920×1080 directly into the native image target;
+window size, cursor centers and click bounds share those dimensions. Explicit
+semantic/HUD fixture dimensions and simulation tick arrays retain their settings.
+Campaign telemetry now joins own entity keys to active Move/AttackMove/Attack
+orders, path goal/index/next waypoint and EMP snapshots without an intervening
+application update. Missing joins are explicit, and absent components remain
+null. Enemy HQ observations require actual visible=true, team1 and positive HP;
+raw diagnostic threats remain separate from visible action decisions.
+
+The unified full27 library run passed219 tests,0 failed,1 ignored. The native
+build and fresh unchanged-quota M1 observation run are still pending at this
+checkpoint. Neither1920 gameplay PNG dimensions nor the new telemetry fields
+have yet been accepted from an actual run. This change supplies observations;
+it does not accept M1 or the six-mission campaign.

@@ -1382,6 +1382,7 @@ pub fn capture_construction_contact_debug(app: &mut App) -> serde_json::Value {
             "move_target": world.get::<MoveOrder>(entity).map(|order| order.target.to_array()),
             "path_goal": world.get::<PlannedPath>(entity).map(|path| path.goal.to_array()),
             "path_next": world.get::<PlannedPath>(entity).map(|path| path.next),
+            "path_next_position": world.get::<PlannedPath>(entity).and_then(|path| path.waypoints.get(path.next)).map(|point| point.to_array()),
             "emp_remaining": world.get::<EmpDisabled>(entity).map(|emp| emp.remaining),
             "construction_remaining": world.get::<UnderConstruction>(entity).map(|site| site.remaining),
             "queued_count": world.get::<OrderQueue>(entity).map(|queue| queue.orders.len()).unwrap_or(0),

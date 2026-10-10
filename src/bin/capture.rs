@@ -90,8 +90,8 @@ use bevy_open_rts::{
 #[path = "capture/campaign_bot.rs"]
 mod campaign_bot;
 
-const WIDTH: u32 = 1280;
-const HEIGHT: u32 = 720;
+const WIDTH: u32 = 1920;
+const HEIGHT: u32 = 1080;
 const WIDE_MENU_WIDTH: u32 = 2048;
 const WIDE_MENU_HEIGHT: u32 = 1224;
 const MODEL_HARNESS_WIDTH: u32 = 1600;
