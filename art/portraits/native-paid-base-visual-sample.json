@@ -1,0 +1,27 @@
+{
+  "scope": "Bounded current native model visual sample from a failed mission run; not mission completion or full roster paid acceptance",
+  "capture_sha256": "4e35e921c31fcb88ee5defae873ede17f621aee79140532b36fe7bdef9677521",
+  "paid_building_visual_samples": [
+    "PowerReactor",
+    "VehicleFactory"
+  ],
+  "startup_worker_visual_sample": true,
+  "samples": [
+    {
+      "image": "screenshots/steam-quality/current-campaign-m1-runtime-framed/setup-01-after-build-PowerReactor.png",
+      "sha256": "57ea468520d69e891ea4c6ceb4097f9d2279456e46e5d675392c48f3da47b47c",
+      "scope": "Normal campaign input completed building; root visual correspondence with staged model, not pixel/geometry equality"
+    },
+    {
+      "image": "screenshots/steam-quality/current-campaign-m1-runtime-framed/setup-03-after-build-VehicleFactory.png",
+      "sha256": "a0dce866ddbd82fcccc3e02a0ca2255da53fae49461d5ad77bbd456723f21353",
+      "scope": "Normal campaign input completed building; root visual correspondence with staged model, not pixel/geometry equality"
+    }
+  ],
+  "findings": [
+    "Completed buildings visibly correspond to the new assembled-model portrait candidates.",
+    "Current runtime Worker portrait depicts different art from the current Worker model; new candidate integration is still pending."
+  ],
+  "runtime_portraits_replaced": false,
+  "all70_paid_comparison_complete": false
+}
