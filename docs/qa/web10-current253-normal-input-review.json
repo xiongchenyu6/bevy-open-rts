@@ -1,0 +1,213 @@
+{
+  "scope": "Local unpublished current253 Wasm10 normal menu and Skirmish input review",
+  "build": {
+    "actual_exit": 0,
+    "source_and_assets_unchanged": true,
+    "wall_seconds": 36.773245063988725,
+    "scope": "Frozen current browserQA build; runtime/finalrelease acceptance pending",
+    "wasm_sha256": "aa026d0f8a730f5e3bbb89911c62d873cd58f2f68c60150661b8a7ba48e4e755",
+    "wasm_bytes": 26964360,
+    "site_path": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build10-snapshot-20261011/source/web",
+    "input_manifest_sha256": "13a6fae74071edcce56fe0f9bc017e91081a25e2149b006263204252bf369cfe",
+    "clean_actual_exit": 0,
+    "source_commit": "b4463983e1c2f2b6ddfb54926baea1ba34e0c12d",
+    "asset_count": 332,
+    "retained_home": "/home/freeman.xiong"
+  },
+  "initial_packaging_failure": {
+    "actual_exit": 1,
+    "cause": "Snapshot-local target path absent after successful Rust compilation; retry used shared compiled artifact through isolated symlink."
+  },
+  "runs": {
+    "menu": {
+      "process": {
+        "actual_exit": 0,
+        "wall_seconds": 43.60670730800484,
+        "site_unchanged": true,
+        "wasm_sha256": "aa026d0f8a730f5e3bbb89911c62d873cd58f2f68c60150661b8a7ba48e4e755",
+        "scope": "Normal canvas menu/wheel/Back inputs; screenshots require review; Worker proof separate"
+      },
+      "report": {
+        "passed": true,
+        "gameUrl": "http://127.0.0.1:8870/",
+        "results": [
+          {
+            "viewport": [
+              1280,
+              720
+            ],
+            "passed": true,
+            "error": null,
+            "readiness": {
+              "language": "en",
+              "width": 1280,
+              "height": 720,
+              "ready": "true",
+              "done": "145",
+              "total": "145",
+              "loadingHidden": true,
+              "unsupported": false
+            },
+            "completed": [
+              "menu",
+              "01-setup",
+              "01a-scrolled-end",
+              "01b-one-reverse",
+              "01c-back-menu"
+            ],
+            "diagnostics": [],
+            "scope": "Real mouse/keyboard canvas inputs; menu/footer/wheel/Back screenshots require visual inspection; no Worker/briefing claim"
+          },
+          {
+            "viewport": [
+              900,
+              720
+            ],
+            "passed": true,
+            "error": null,
+            "readiness": {
+              "language": "en",
+              "width": 900,
+              "height": 720,
+              "ready": "true",
+              "done": "145",
+              "total": "145",
+              "loadingHidden": true,
+              "unsupported": false
+            },
+            "completed": [
+              "menu",
+              "01-setup",
+              "01a-scrolled-end",
+              "01b-one-reverse",
+              "01c-back-menu"
+            ],
+            "diagnostics": [],
+            "scope": "Real mouse/keyboard canvas inputs; menu/footer/wheel/Back screenshots require visual inspection; no Worker/briefing claim"
+          }
+        ]
+      }
+    },
+    "worker": {
+      "process": {
+        "actual_exit": 0,
+        "wall_seconds": 346.50483922701096,
+        "site_unchanged": true,
+        "wasm_sha256": "aa026d0f8a730f5e3bbb89911c62d873cd58f2f68c60150661b8a7ba48e4e755",
+        "scope": "Normal canvas menu/wheel/Back inputs; screenshots require review; Worker proof separate"
+      },
+      "report": {
+        "passed": true,
+        "gameUrl": "http://127.0.0.1:8870/",
+        "results": [
+          {
+            "viewport": [
+              1280,
+              720
+            ],
+            "passed": true,
+            "error": null,
+            "readiness": {
+              "language": "en",
+              "width": 1280,
+              "height": 720,
+              "ready": "true",
+              "done": "145",
+              "total": "145",
+              "loadingHidden": true,
+              "unsupported": false
+            },
+            "completed": [
+              "menu",
+              "02-match",
+              "02a-briefing-dismissed",
+              "02b-zoomed-out",
+              "02c-zoom-2",
+              "02c-zoom-3",
+              "02c-zoom-4",
+              "02c-zoom-5",
+              "03-unit-selected",
+              "04-unit-moved"
+            ],
+            "diagnostics": [],
+            "scope": "Real mouse/keyboard canvas inputs; menu/footer/wheel/Back screenshots require visual inspection; no Worker/briefing claim"
+          },
+          {
+            "viewport": [
+              900,
+              720
+            ],
+            "passed": true,
+            "error": null,
+            "readiness": {
+              "language": "en",
+              "width": 900,
+              "height": 720,
+              "ready": "true",
+              "done": "145",
+              "total": "145",
+              "loadingHidden": true,
+              "unsupported": false
+            },
+            "completed": [
+              "menu",
+              "02-match",
+              "02a-briefing-dismissed",
+              "02b-zoomed-out",
+              "02c-zoom-2",
+              "02c-zoom-3",
+              "02c-zoom-4",
+              "03-unit-selected",
+              "04-unit-moved"
+            ],
+            "diagnostics": [],
+            "scope": "Real mouse/keyboard canvas inputs; menu/footer/wheel/Back screenshots require visual inspection; no Worker/briefing claim"
+          }
+        ]
+      }
+    }
+  },
+  "visual_findings": [
+    "At1280 and900, large down-wheel clips body heading; one reverse restores it immediately while Start/Back remain fixed.",
+    "Normal Back returns Open RTS menu at both sizes.",
+    "Fresh visible briefingX dismisses panel before normal wheel zoom.",
+    "Authored two-Worker/one-Drone start remains unchanged; selected Worker has compact four-segment foot indicator rather than large full ring.",
+    "Normal right-click moves selected Worker at both sizes; English Worker HUD remains readable."
+  ],
+  "limitations": [
+    "SwiftShader functional rendering; no performance or hardware GPU claim.",
+    "No deployment, online cross-client, campaign completion, natural audio mixing or full game acceptance.",
+    "Raw worker wrapper scope string inherited menu wording; actual worker action files/report/images define its normal Skirmish scope."
+  ],
+  "screenshots": {
+    "target/web10-menu-qa-20261011/900x720/01-setup.png": "f88eda304f2f26fafbc5c84f66b77e6c83941506ccb29cc5b96791334b637be1",
+    "target/web10-menu-qa-20261011/900x720/01c-back-menu.png": "a7b71936a03b4a57f1a3c99ed4e1b62e9aacb9fde0b4ec7654536ea4fe9205db",
+    "target/web10-menu-qa-20261011/900x720/01b-one-reverse.png": "87fafde1e9fea05c1c1639a5f7b74f895072aa6d92d4d6a53a0e87c867c05280",
+    "target/web10-menu-qa-20261011/900x720/00-menu.png": "a7b71936a03b4a57f1a3c99ed4e1b62e9aacb9fde0b4ec7654536ea4fe9205db",
+    "target/web10-menu-qa-20261011/900x720/01a-scrolled-end.png": "18de1beefe42daf477012342b72fb296602f3954a7187ef7e85c58377c12354c",
+    "target/web10-menu-qa-20261011/1280x720/01-setup.png": "68296dc6bc8bfc5e2ce8cc16681ad014137a6dfdb5aaef6a28407d50d81cc65e",
+    "target/web10-menu-qa-20261011/1280x720/01c-back-menu.png": "204d1409fc868ed32d5c1dd23d988dbd269053e45293d735dc15762051fefaa5",
+    "target/web10-menu-qa-20261011/1280x720/01b-one-reverse.png": "0d50609079f183c48f8d58fa91151130901111d59f446ded47ad479a11997ca1",
+    "target/web10-menu-qa-20261011/1280x720/00-menu.png": "204d1409fc868ed32d5c1dd23d988dbd269053e45293d735dc15762051fefaa5",
+    "target/web10-menu-qa-20261011/1280x720/01a-scrolled-end.png": "090fcc895f9ac9c4766db0df057829f99a2b376d6a9f93c1231c72774076d029",
+    "target/web10-worker-qa-20261011/900x720/02c-zoom-3.png": "07361142722dcd63b89821cb0298fdd2bff3acad0211853e24ab4cb210f1a73a",
+    "target/web10-worker-qa-20261011/900x720/03-unit-selected.png": "f549366fe7bdc1ed7cf702708d26e4c57f8b40555fc8671a0c9229f8d26a6f5e",
+    "target/web10-worker-qa-20261011/900x720/00-menu.png": "a7b71936a03b4a57f1a3c99ed4e1b62e9aacb9fde0b4ec7654536ea4fe9205db",
+    "target/web10-worker-qa-20261011/900x720/02a-briefing-dismissed.png": "bd6d59964168bd1fb02d698d4f90daeb3119d26bbf2124b0de9df4ab8739a80a",
+    "target/web10-worker-qa-20261011/900x720/02c-zoom-2.png": "d09692ccd652c6dfed0e0f7671eae1ad77bdf6a109565194494651ad57a206d5",
+    "target/web10-worker-qa-20261011/900x720/02-match.png": "f3554f707d10313df10415cd75b0a5826e68727208d6a750e777ed05630ed284",
+    "target/web10-worker-qa-20261011/900x720/04-unit-moved.png": "60b970783e663c5e626c30b70786369d248a61cb010baedfc0f8983c505d5a38",
+    "target/web10-worker-qa-20261011/900x720/02c-zoom-4.png": "2c7d668f4ff2ce46b9288e2ff0a3e0aa38f9f4afdf59c6193d100f3553245d31",
+    "target/web10-worker-qa-20261011/900x720/02b-zoomed-out.png": "9c2e13ad5488d8de421a9de29552824b45c0b0d4a8deef357ebfe4641fb95db4",
+    "target/web10-worker-qa-20261011/1280x720/02c-zoom-3.png": "d48731a8b7641f7f9690e4518bec6205f459e607104656e9c40a462e52321bcc",
+    "target/web10-worker-qa-20261011/1280x720/02c-zoom-5.png": "b4d72441e5253cba819b4bf373b3e5af0cb2f826a681f80d4d9479bc5c55e888",
+    "target/web10-worker-qa-20261011/1280x720/03-unit-selected.png": "5b39349cdc790241d5f989f250d9ac3a6a5314ba913d65de5946394f47e0c113",
+    "target/web10-worker-qa-20261011/1280x720/00-menu.png": "204d1409fc868ed32d5c1dd23d988dbd269053e45293d735dc15762051fefaa5",
+    "target/web10-worker-qa-20261011/1280x720/02a-briefing-dismissed.png": "745c0dd1705263a62a07ccaf849249f461b15125b18698e8b9eb4b1f1bae45a2",
+    "target/web10-worker-qa-20261011/1280x720/02c-zoom-2.png": "a8ef5ce9c3dd1c8f14fe4e2ec650a46bcf9f0caf464d96ddf93b76fadbc0758e",
+    "target/web10-worker-qa-20261011/1280x720/02-match.png": "5e10518b745315177997e5801242c3e3159c54b1380c17bfa07c2e8ec228549f",
+    "target/web10-worker-qa-20261011/1280x720/04-unit-moved.png": "58e297da71ef6bd0049eff493e2c08108ee7a2c13e16cb4c90e6c60a88ae5bcd",
+    "target/web10-worker-qa-20261011/1280x720/02c-zoom-4.png": "03448d52b7e8f93bdd7d8ecfc37b8fd5fbe40779d0f3aec9c7b59e86605b5937",
+    "target/web10-worker-qa-20261011/1280x720/02b-zoomed-out.png": "dbf712dbac8a3535d368b5ab92fa6d9694c8cad03c34df5779bb26ace7b78779"
+  }
+}

@@ -1,0 +1,7 @@
+# Current253 browser input review
+
+An isolated current253 source snapshot and 332 runtime assets produced Wasm10 SHA aa026d0f8a730f5e3bbb89911c62d873cd58f2f68c60150661b8a7ba48e4e755 (26,964,360 bytes), build ID a06810ccf0cdf554. Rust release compilation passed in 10m19s. Initial packaging failed because the snapshot lacked a local target path; the preserved retry used the compiled artifact via an isolated target symlink and passed in 36.77s. Source/assets matched before and after. The user's working web shell was untouched.
+
+Fresh Chromium/SwiftShader contexts at 1280×720 and 900×720 used normal canvas inputs only. Menu QA exited 0 in 43.61s: Start/Back stayed fixed, one reverse wheel immediately restored scrolled body content, and Back returned to the menu. Skirmish QA exited 0 in 346.50s: visible briefing dismissal, wheel zoom, actual Worker selection and normal right-click movement passed at both sizes. Reviewed selection images show compact foot arcs and readable English HUD. Both reports contain no page/console/request errors; the site stayed unchanged.
+
+[Portable evidence and screenshot hashes](qa/web10-current253-normal-input-review.json) preserve raw run references and the initial packaging failure. These are local functional checks, not deployment, hardware performance, online, campaign or audio acceptance. Current253 Steam Runtime/native evidence remains a separate artifact scope.
