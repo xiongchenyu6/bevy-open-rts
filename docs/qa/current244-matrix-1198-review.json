@@ -1,0 +1,46 @@
+{
+  "scope": "Independent 1198-case snapshot of fixed current244 source; not complete matrix or current252 equivalence",
+  "planned": 3726,
+  "terminal_snapshot": 1198,
+  "counts": {
+    "completed": 1198
+  },
+  "complete_matrix": false,
+  "integrity_verified": true,
+  "errors": [],
+  "failures": [],
+  "matrix": "target/current244-all-starts-20261010",
+  "source_pin": "target/objective-foundation-shared-20261010/pin.json",
+  "audit_sha256": "c4f395dd8853a41da1768c8752e7116159b7ccef3c1be44afe1def300f8616f1",
+  "manifest_sha256": "22a48ce6df07265635d1ba8c7fcbcf4050f73ca362f072fb63192361ce9e5dac",
+  "private_asset_count": 332,
+  "private_asset_hashes_match": true,
+  "current_source_files_differing_from_pin": [
+    "src/audio.rs",
+    "src/bin/capture/campaign_bot/finale.rs",
+    "src/bin/capture/campaign_bot/twin.rs",
+    "src/bin/capture/campaign_bot.rs",
+    "src/bin/capture.rs",
+    "src/capture_api.rs",
+    "src/hud.rs",
+    "src/lib.rs",
+    "src/menu.rs",
+    "src/objective_hud_tests.rs",
+    "src/online.rs",
+    "src/save.rs",
+    "src/support_powers.rs"
+  ],
+  "current_source_files_added_since_pin": [
+    "src/bin/capture/campaign_bot/focus_target.rs",
+    "src/bin/capture/campaign_bot/survivors.rs",
+    "src/menu_lobby_tests.rs",
+    "src/save/position_tests.rs",
+    "src/support_powers/audio_tests.rs"
+  ],
+  "inflight_directories": [
+    "1198"
+  ],
+  "interpretation": "Completion means current Annihilation policy: only Command Centers and Workers retain a team. Other surviving units/structures do not invalidate this policy. No independent seeds/repeats/random maps claimed.",
+  "per_case_evidence": "target/current244-matrix-independent-20261011.json",
+  "per_case_evidence_sha256": "7beaffa09a6b4664ae077b28e9b09dcdb582334420100e4f6466709309a09423"
+}
