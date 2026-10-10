@@ -265,14 +265,31 @@ used. Isolated M1 and the full same-App campaign remain **unaccepted**.
 
 Capture SHA256 `a7d68de26f8ae90fd366f7f8d0839d776857ba6652bdc720efc700835dc9b849`
 ran `current-campaign-m1-aa-counter/` with two normally paid AntiAirWalkers.
-Walker jobs appeared at34/44 seconds; the first live walker appeared64.1 seconds
-and both were present77 seconds, assigned to home defense. Actual visible-air
-interception reduced the heavy airship from27 to2HP at201.9 seconds. HQ remained
-20/20 and home defense survived substantially longer.
+The archived log records Walker queues at34/44 seconds; periodic telemetry first
+observes one live walker at64.1 seconds and both at77 seconds in home defense.
+These sample times are not exact birth times. Raw HeavyAirship entries include
+27HP earlier and2HP at201.9 seconds, but lack entity keys; they do not establish
+that both samples describe the same airship or identify the damage source.
 
-The run nevertheless ended **HumanDefeat at443.7 seconds**, actual child exit1.
-Enemy HQ remained20HP. The assault repeatedly lost units before reaching that
-objective. Late stock308ore/78crystal, Factory16HP and normal power exclude an
-observed resource shortage or destroyed-factory explanation. The counter proof
-is useful but **does not accept M1 or the full campaign**. The exact failed
-telemetry, construction trace and contact snapshot remain preserved.
+The run ended **HumanDefeat at443.7 seconds**, actual child exit1 in
+`process-result.json`. Telemetry records own HQ20HP at440.014 seconds,
+11.3375HP at440.581, then absent at443.747. The failure contact snapshot records
+the enemy HQ at20HP. Late telemetry records308ore/78crystal, Factory16HP and
+normal power; these observations do not establish the cause of the defeat or
+whether any queued job was blocked.
+
+The log records two **visible CommandCenter assault anchors** at lines160/173,
+bounded by logged clocks201.9–215.9 and215.9–232.3. Thus the enemy HQ was visible
+when those actions were selected; the exact event times and HQ HP were not logged.
+The construction trace contains245 snapshots from1.9 to104.8 seconds, so it
+cannot explain the later assault path. Periodic telemetry lacks attack targets,
+AttackMove destinations, PlannedPath details and EMP state. Unit absence in a
+later sample is not independently classified as a death.
+
+The read-only analyzer `scripts/analyze_campaign_observations.py` records source
+hashes, observations and missing fields. It was run against this evidence and
+passed `python3 -m py_compile`; its generated report is
+`target/campaign-m1-aa-observations-report.json`. It issues no gameplay inputs.
+The next diagnostic run awaits the constructor/Nav seal and will capture the
+existing order, path and visibility views without changing quotas or stats.
+**M1 and the full same-App campaign remain unaccepted.**
