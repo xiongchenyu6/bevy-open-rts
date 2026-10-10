@@ -709,6 +709,17 @@ pub(crate) fn entity_visual_world_center(
     aabb_map: &std::collections::HashMap<Entity, (GlobalTransform, Aabb)>,
     model_roots: &std::collections::HashSet<Entity>,
 ) -> Option<Vec3> {
+    entity_visual_world_bounds(root, children_map, aabb_map, model_roots)
+        .map(|(min, max)| (min + max) * 0.5)
+}
+
+/// Actual transformed GLB-subtree AABB, shared by alignment and passive geometry evidence.
+pub(crate) fn entity_visual_world_bounds(
+    root: Entity,
+    children_map: &std::collections::HashMap<Entity, Vec<Entity>>,
+    aabb_map: &std::collections::HashMap<Entity, (GlobalTransform, Aabb)>,
+    model_roots: &std::collections::HashSet<Entity>,
+) -> Option<(Vec3, Vec3)> {
     let mut min = Vec3::splat(f32::MAX);
     let mut max = Vec3::splat(f32::MIN);
     let mut found = false;
@@ -745,7 +756,7 @@ pub(crate) fn entity_visual_world_center(
             }
         }
     }
-    found.then(|| (min + max) * 0.5)
+    found.then_some((min, max))
 }
 
 /// Builds child + AABB lookup maps over the whole world (for visual-center math).

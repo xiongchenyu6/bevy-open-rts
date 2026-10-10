@@ -1,5 +1,7 @@
 //! Passive input-frame evidence. Actor, input, layout and targeting queries are read-only.
 use super::*;
+#[cfg(not(target_arch = "wasm32"))]
+mod resource_geometry;
 
 pub(in crate::online) fn record(
     mut observer: ResMut<OnlineObserver>,
@@ -31,6 +33,8 @@ pub(in crate::online) fn record(
         &UiGlobalTransform,
         Option<&InheritedVisibility>,
     )>,
+    #[cfg(not(target_arch = "wasm32"))]
+    geometry: resource_geometry::Queries,
 ) {
     if !observer.enabled {
         return;
@@ -67,15 +71,25 @@ pub(in crate::online) fn record(
     }
     let cursor = window.and_then(|w| w.cursor_position());
     let physical = window.and_then(|w| w.physical_cursor_position());
+    let cursor_ground = window.and_then(|w| pointer_ground(w, &cameras, &terrain));
     let mut card_rows: Vec<_>=cards.iter().map(|(slot,action,availability,interaction,node,computed,transform,visible)|{
         let size=computed.size();let center=transform.translation;
         serde_json::json!({"slot":slot.0,"action":format!("{action:?}"),"enabled":availability.enabled,"interaction":format!("{interaction:?}"),"display":format!("{:?}",node.display),"inherited_visible":visible.map(|v|v.get()),"physical_center":center.to_array(),"physical_size":size.to_array(),"physical_min":(center-size*0.5).to_array(),"physical_max":(center+size*0.5).to_array(),"contains_physical_cursor":physical.is_some_and(|p|computed.contains_point(*transform,p))})
     }).collect();
     card_rows.sort_by_key(|v| v["slot"].as_u64());
     let event = serde_json::json!({"elapsed":time.elapsed_secs(),"left_pressed":pressed,"left_released":released,"right_pressed":right_pressed,"right_released":right_released,"state":state,
-        "cursor_ground":window.and_then(|w|pointer_ground(w,&cameras,&terrain)).map(|p|p.to_array()),
+        "cursor_ground":cursor_ground.map(|p|p.to_array()),
         "window":window.map(|w|serde_json::json!({"logical_size":[w.width(),w.height()],"physical_size":[w.physical_width(),w.physical_height()],"scale_factor":w.scale_factor(),"browser_dpr":browser_dpr,"cursor_logical":cursor.map(|p|p.to_array()),"cursor_physical":physical.map(|p|p.to_array())})),
         "hud_blocks_cursor":cursor.is_some_and(|p|zones.blocks_world(p)),"hud_rects":zones.world_rects.iter().map(|(a,b)|[a.to_array(),b.to_array()]).collect::<Vec<_>>(),"cards":card_rows});
+    #[cfg(not(target_arch = "wasm32"))]
+    let event = if resource_geometry::requested() {
+        let mut event = event;
+        event.as_object_mut().expect("UI observation is an object").insert(
+            "native_resource_geometry".to_string(),
+            resource_geometry::snapshot(&geometry, &cameras, visible_player.team, cursor, cursor_ground),
+        );
+        event
+    } else { event };
     observer.last_ui_state = state;
     observer.ui_events.push_back(event);
     while observer.ui_events.len() > 40 {

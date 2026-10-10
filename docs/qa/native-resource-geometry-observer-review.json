@@ -1,0 +1,86 @@
+{
+  "scope": "Native-only default-off read-only resource geometry observer; no gameplay calibration fix",
+  "required_opt_in": [
+    "OPEN_BEVY_ONLINE_OBSERVE_STATUS=<absolute output>",
+    "OPEN_BEVY_RESOURCE_GEOMETRY_OBSERVE=1"
+  ],
+  "filter": "Only visible resources or actual own Harvest-referenced roots; no unrelated hidden resource output",
+  "data": "Actual GLB subtree GT+AABB corners/visibility, camera matrix/clip/viewport, ground/body anchors and current declared capsule",
+  "normal_resource_system_or_actor_registration_added": false,
+  "event_bound": 40,
+  "verification": {
+    "focused": {
+      "passed": 3,
+      "failed": 0
+    },
+    "full": {
+      "passed": 266,
+      "failed": 0,
+      "ignored": 1
+    },
+    "native_build_exit": 0,
+    "inputs_unchanged": true,
+    "asset_count": 332,
+    "bins": {
+      "bevy-open-rts": "e1990f742f998cfb578f2fe2a90366452b9dac18bce75e555a1a7ad0e14ce481",
+      "capture": "f9a330ad11df8200fd0a645c06b9a853f4a5c381b0c3bef8814ce3e64f929e4d"
+    },
+    "raw": "target/resource-geometry-shared02-20261011"
+  },
+  "runtime": {
+    "raw": "target/native-resource-geometry-20261011-01",
+    "actual_game_exits": [
+      {
+        "index": 1,
+        "pid": 3806916,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "wall_seconds": 48.841748542996356,
+    "forced_cleanup": false,
+    "pinned_assets_unchanged": true,
+    "observed_ore_height": 0.3275500237941742,
+    "observed_ore_size": [
+      0.4586200714111328,
+      0.2975500226020813,
+      0.5056056976318359
+    ],
+    "body_center_screen": [
+      389.2357482910156,
+      1071.4342041015625
+    ],
+    "logical_viewport": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        1276.0,
+        690.0
+      ]
+    ],
+    "declared_capsule": {
+      "declared_half_width": 0.8500000238418579,
+      "declared_height": 1.7000000476837158,
+      "distance_pixels": 626.8937377929688,
+      "inside": false,
+      "pick_radius_pixels": 95.0
+    }
+  },
+  "evidence_hashes": {
+    "target/resource-geometry-shared02-20261011/focused.log": "a2bf230075665f6182b754b7f5c1a48131e629cd4f1ab604cd2ddef020292200",
+    "target/resource-geometry-shared02-20261011/full.log": "d0821b2643cbbbca10cc863b319b785ed47bd6e54ed020c5c3e0df2f2b8f88e4",
+    "target/resource-geometry-shared02-20261011/build.log": "0a1eb6ba63361ba0f4bd9a75d0042c79c20d91b010d02b7e9df0daacc403bf33",
+    "target/resource-geometry-shared02-20261011/pin.json": "cb84765eaa6fbfe637ed0239677ba7404bd5168d3a2feea74474689bf87287cc",
+    "target/native-resource-geometry-20261011-01/result.json": "55b6127008a22b4a8106d90df63a92f018c7ff850b227977acb7448301e618e6",
+    "target/native-resource-geometry-20261011-01/online-observer.json": "69e8d9f9c083225762528945ca3a3a35812d8bc7851ef6de1d38ad1c07410ecd"
+  },
+  "preserved_launcher_failure": "target/resource-geometry-shared-20261011/launcher-result.json",
+  "limits": [
+    "Loaded geometry is measured; its off-viewport body is not a reviewed visible mineral click",
+    "Delayed Harvest attribution is resolved separately as HQ dropoff then automatic Ore retarget",
+    "No height/width/radius/rally logic or timer/actor/fog/input setters changed",
+    "Normal optimized SDK resource-rally continuity remains pending"
+  ]
+}

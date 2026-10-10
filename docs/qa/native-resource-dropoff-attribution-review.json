@@ -1,0 +1,65 @@
+{
+  "scope": "Sealed native main with opt-in read-only resource geometry, Nix runtime, normal offline immediate-dropoff/automatic-retarget diagnostic only; not optimized SDK or resource continuity acceptance",
+  "binary_sha256": "e1990f742f998cfb578f2fe2a90366452b9dac18bce75e555a1a7ad0e14ce481",
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 3826666,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_game_cleanup": false,
+  "wall_seconds": 50.46634907901171,
+  "immediate_harvest_orders": [
+    {
+      "kind": "Harvest",
+      "target": 8589933868,
+      "state": 2
+    }
+  ],
+  "later_harvest_orders": [
+    {
+      "kind": "Harvest",
+      "target": 8589933916,
+      "state": 0
+    }
+  ],
+  "naturally_retargeted_resource": {
+    "key": 8589933916,
+    "kind": 0,
+    "position": [
+      -17.470190048217773,
+      0.0,
+      -9.429200172424316
+    ],
+    "amount": 240
+  },
+  "installation_unchanged": true,
+  "artifact_pin_unchanged": true,
+  "pinned_332_assets_unchanged": true,
+  "passed": true,
+  "raw_evidence": "target/native-resource-dropoff-attribution-20261011-02",
+  "original_wall_seconds": 240,
+  "result_sha256": "90ea3d28d665a7e66f6ac1d3e9204787907b74a2740014c88b89ed74922ec037",
+  "screenshots": {
+    "00-native-main-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-paused-baseline": "8e3403f624a5a03049c78bc39278a710316fc1f456a7fd551b88693c9cb49c74",
+    "02-worker-selected-normal-zoom": "d92589032b8138da7fcd4c3d59f0595f212eba6cf2175bfd1e648b8d503393ac",
+    "03-paused-immediate-worker-rightclick": "853f9196f1aeff12108794d40c9c52a7930a259f48d2481ebe82b1e3123c3c9b",
+    "04-natural-after-dropoff-retarget": "ee71b5d6880b62c3809f3f72bb87d9cbd03b8e4f76d5928a3916a4a0ac7de7a8",
+    "05-hq-selected-before-same-point": "cbd931236cb364319a67db964c19874078500430fe9c4500f2914e831140bf91",
+    "06-hq-rightclick-same-point": "ed039ac2975bdd850e707f0668c0cd9e53f4fdacbe253ad77a22a1f606ae916d"
+  },
+  "root_independent_review": {
+    "normal_exit_and_parity_checked": true,
+    "initial_paused_frame_directly_viewed": true,
+    "exact_hq_state2_then_ore_state0_checked": true
+  },
+  "conclusion": "The fixed pixel commanded an empty Worker to the HQ dropoff. Normal simulation then automatically retargeted Ore; delayed Harvest was not proof of a direct mineral click.",
+  "limits": [
+    "Nix-linked native diagnostic only, not optimized SDK or resource-rally continuity acceptance",
+    "No camera/projection, rally-picking or model-height gameplay fix is established by this input",
+    "Unidentified mineral-like pixels are not asserted to be the saved Ore body"
+  ]
+}

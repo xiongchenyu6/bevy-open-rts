@@ -201,5 +201,7 @@
     "No rally/height/radius product changes claimed",
     "The delayed own-Harvest node does not prove the initial cursor hit that node: a headquarters dropoff order can naturally retarget to nearby ore. Initial paused order verification is pending; do not infer picker disagreement from the delayed save alone."
   ],
-  "full_card_rects_retained_in_hashed_raw_observer": true
+  "full_card_rects_retained_in_hashed_raw_observer": true,
+  "later_attribution_correction": "A subsequent normal paused immediate-save diagnostic proved HQ dropoff state2 followed by automatic Ore retarget state0. Delayed Harvest in this record is not a direct resource click witness.",
+  "attribution_record": "docs/qa/native-resource-dropoff-attribution-review.json"
 }
