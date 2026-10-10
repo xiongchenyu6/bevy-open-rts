@@ -1,0 +1,21 @@
+{
+  "scope": "Private originalv2 armor actual headquarters/Worker/Barracks and normal paidHUD at900x720 only",
+  "actual_exit": 0,
+  "wall_seconds": 12.095620474981843,
+  "repository_assets_unchanged": true,
+  "reviewed_images": [
+    {
+      "path": "target/armor-candidate-v2-private-hud-20261010/900/00_worker.png",
+      "sha256": "9df7c2113b8e2c7d56aacd6a6b9320b00b6a39631475f6557177fc4732ab4089"
+    },
+    {
+      "path": "target/armor-candidate-v2-private-hud-20261010/900/02_production_queue.png",
+      "sha256": "91e5a000ddf069428bdbc88aae16447686f5833cafcd040c08d6187d8ec0c491"
+    }
+  ],
+  "root_visual_review": "Headquarters and Barracks have restrained matte grain, clean facets and clear green faction strips. Previous excessive concrete-like speckling is no longer visible at this viewport. Worker and HUD remain readable.",
+  "accepted_for_bounded_model_sample": true,
+  "runtime_integrated": false,
+  "all_vehicle_models_verified": false,
+  "final_package_verified": false
+}
