@@ -45,12 +45,21 @@
           {
             "member": "constgebra-0.1.4/src/runtime.rs",
             "sha256": "1b123a6429ec21f846fbe0a9b98fd2fd153239484b01272736f9cb93b4b8e07b"
+          },
+          {
+            "member": "constgebra-0.1.4/Cargo.toml.orig",
+            "sha256": "dd3370ff7a11ee8ac10e8f96f9ba599c1fb2cd73379a301f43ea056fa2e7b87c"
           }
         ],
         "notice_keywords": [
           {
             "member": "constgebra-0.1.4/Cargo.toml",
             "line": 26,
+            "text": "license = \"MIT OR Apache-2.0\""
+          },
+          {
+            "member": "constgebra-0.1.4/Cargo.toml.orig",
+            "line": 5,
             "text": "license = \"MIT OR Apache-2.0\""
           }
         ],
@@ -95,12 +104,21 @@
           {
             "member": "hexf-parse-0.2.1/src/lib.rs",
             "sha256": "511b164642efe470e88323b8afe0274e797805ff2441f0173b5b005ad4b4d1b1"
+          },
+          {
+            "member": "hexf-parse-0.2.1/Cargo.toml.orig",
+            "sha256": "4a56dbdbc12054fd33b7a2634a45cbbe6fe12f5e6f4081002cbfa527f7220c70"
           }
         ],
         "notice_keywords": [
           {
             "member": "hexf-parse-0.2.1/Cargo.toml",
             "line": 21,
+            "text": "license = \"CC0-1.0\""
+          },
+          {
+            "member": "hexf-parse-0.2.1/Cargo.toml.orig",
+            "line": 10,
             "text": "license = \"CC0-1.0\""
           }
         ],
@@ -145,12 +163,21 @@
           {
             "member": "simd_helpers-0.1.0/tests/cold_for.rs",
             "sha256": "930a9b0c072b7036d57ef9df3f5c24716e24b75d7a2aebf9d89ff8c69d68fadb"
+          },
+          {
+            "member": "simd_helpers-0.1.0/Cargo.toml.orig",
+            "sha256": "b41497677a5498040f2eb3fc089e3c2c38c413dca64f41dc57a115e26480461d"
           }
         ],
         "notice_keywords": [
           {
             "member": "simd_helpers-0.1.0/Cargo.toml",
             "line": 21,
+            "text": "license = \"MIT\""
+          },
+          {
+            "member": "simd_helpers-0.1.0/Cargo.toml.orig",
+            "line": 10,
             "text": "license = \"MIT\""
           }
         ],
