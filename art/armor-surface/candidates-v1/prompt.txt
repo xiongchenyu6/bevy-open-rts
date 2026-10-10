@@ -1,0 +1,6 @@
+Use case: stylized-concept
+Asset type: square seamless repeatable albedo texture for small low-poly RTS vehicle armor meshes.
+Primary request: create an original neutral painted steel surface, subtle fine matte grain and tiny restrained wear, uniform pale neutral grey across the entire image. A flat orthographic material swatch filling every pixel, no object, no perspective, no scene.
+Materials/textures: fine non-directional powder-coated steel microtexture, very low contrast so player team colors and low-poly geometry remain clear; no panel borders or bolts.
+Lighting: evenly lit albedo only, no baked shadows, highlights, vignette or gradients.
+Constraints: seamlessly tileable on all four edges, square, no text/logos/watermarks, no external reference artwork, no rust stains, no strong scratches or large features.

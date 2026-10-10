@@ -1,0 +1,12 @@
+{
+  "backend": "built-in image_gen",
+  "input_images": [],
+  "source_path": "art/armor-surface/candidates-v1/armor-matte-original-v1.png",
+  "source_sha256": "4f8083b7e554b6cd8854cb5fd5fc1a0cefb43d4997ecd6e829b8af0a84a73991",
+  "prompt_path": "art/armor-surface/candidates-v1/prompt.txt",
+  "prompt_sha256": "7fc9f1f07f01b2de726bb871150f7f4a8f66cfd82ba414416afce79f207ec549",
+  "runtime_integrated": false,
+  "tile_seam_review_complete": false,
+  "final_package_verified": false,
+  "terms_and_distribution_review_complete": false
+}
