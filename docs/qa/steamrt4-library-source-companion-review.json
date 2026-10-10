@@ -1,0 +1,10 @@
+{
+  "scope": "Local exact SDK library source companion integrity only; no published source offer, build-obligation or legal clearance",
+  "components": 6,
+  "verified_source_files": 19,
+  "archive_members": 20,
+  "archive_sha256": "fd631d0eff89e553150a5bd624d7b4dab2c4063ddaee44a107dec55ac3543193",
+  "archive_bytes": 120439378,
+  "published": false,
+  "legal_clearance": false
+}
