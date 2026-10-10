@@ -448,4 +448,12 @@ Full library verification passes238/0/1 in40.94s and four native builds exit0.
 `target/robotics-contact-shared-20261010/pin.json` validates all Rust/Cargo inputs
 and332current runtime assets; sealed capture SHA256 is
 `97860f68f4aa2dd5146e4911e97f9d8970bd0dc246b4ba921d722a3fdf6592fd`.
-The same paid-counter M1 is now undergoing fresh normal-input acceptance.
+Fresh same-recipe M1 on that pin (`current-campaign-m1-contact-counter`)
+again stopped at138.6s while Running/HQ20, with the Robotics site unfinished.
+The original measured fixture passes, but this real-population run is not
+accepted. Its living builder had moved to(-13.837750,-21.006952) and retained
+ConstructOrder with no MoveOrder/path. External flat-body analysis finds a
+physical quarter-cell route, while the source-centered6m window does not reach
+that route's valid contact end. This is a diagnostic observation, not an
+executed movement fix. A second recorded-endpoint regression and a same-budget
+window-centering candidate are prepared outside Rust source pending verification.
