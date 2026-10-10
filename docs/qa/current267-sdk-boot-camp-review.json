@@ -72,13 +72,22 @@
   },
   "visual_review": {
     "agent_current_ghosts_lessons_reveal_graduation_replay_reviewed": true,
-    "root_current_enemy_hq_frame_reviewed": true
+    "root_current_enemy_hq_frame_reviewed": true,
+    "root_graduation_and_fresh_replay_frames_reviewed": true
   },
   "limits": [
     "Natural visible resource income observed during lesson2; resource-node depletion was not separately measured.",
     "No actor/resource/fog/timer setters, hidden enemy coordinates or valid-save edits.",
     "Initial executable lookup failed before service/game and was corrected to actual Python; no game timeout or restart concealed.",
-    "Normal controls and bounded first-session scope only; save-state breadth, audio and performance remain separate."
+    "Normal controls and bounded first-session scope only; save-state breadth, audio and performance remain separate.",
+    "SDK-built game under the recorded thin Ubuntu input container; this does not prove complete Boot Camp under official Steam Runtime4."
   ],
-  "passed": true
+  "passed": true,
+  "runtime_environment": {
+    "container_image": "rts-local-thin-input-runtime:20261008",
+    "uid_gid": "65534:65534",
+    "installation_readonly": true,
+    "official_runtime4_bootcamp_verified": false
+  },
+  "independent_review": "All27 PNG hashes, actual container exit0, both process exit records, persisted completion RON hash/true flag and160.395-second first-completion bound verified."
 }
