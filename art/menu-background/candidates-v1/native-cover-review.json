@@ -1,0 +1,31 @@
+{
+  "scope": "Private original menu background with responsive cover cropping; not runtime or final package acceptance",
+  "capture_sha256": "6118910aebc16d6af34d5f6b3b51375cf146a3b489b320424976ad776e039920",
+  "source_image_sha256": "c74a20e551d368392f8a6ca9d600e8ce5cf374d659776b10511bb572014e053c",
+  "crop_source_sha256": "9694db90f0c5298d78cd553b7a501c1c32ae0dfb8abf3e81ecd56ace7ae4cca1",
+  "shots": [
+    {
+      "path": "target/menu-original-cover-ui-20261010/menu-1920.png",
+      "sha256": "f5d945db2a8665c451eb09ae0ee85ecdfadb8d8d25fed2c04ee87386c5aecbdf",
+      "exit": 0
+    },
+    {
+      "path": "target/menu-original-cover-ui-20261010/menu-900.png",
+      "sha256": "26406d7d825f8c4781e5e77bf68b4d3023db18dd9bad3781b842960ced8e18ea",
+      "exit": 0
+    },
+    {
+      "path": "target/menu-original-cover-ui-20261010/menu-setup-1920.png",
+      "sha256": "3a9de7813eb65b1a0814b4e8f7dc0562f65e45f95d46a98cd065952be5b573cd",
+      "exit": 0
+    }
+  ],
+  "visual_verdict": "pass for these three samples",
+  "findings": [
+    "The 900x720 main menu now fills the viewport without the previous top/bottom letterboxing.",
+    "The 1920x1080 main menu and setup retain readable English labels and intact card/button boundaries.",
+    "Scenery is center-cropped to preserve its proportions; no observed stretching or background subject blocking the controls."
+  ],
+  "runtime_replaced": false,
+  "final_package_verified": false
+}
