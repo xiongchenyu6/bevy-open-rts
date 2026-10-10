@@ -28,5 +28,18 @@
     "underlying_path_failure_fixed": false,
     "original_power_failure_reproduced": false
   },
-  "six_mission_complete": false
+  "six_mission_complete": false,
+  "terminal_diagnostic": {
+    "actual_exit": 1,
+    "clock": 116.83189392089844,
+    "match_running": true,
+    "flow_active": true,
+    "living_own_units": 20,
+    "living_own_structures": 8,
+    "harness_error": "headquarters lost",
+    "game_defeat_observed": false,
+    "failure_contact": "screenshots/steam-quality/current-campaign-chain-foundation-20261010/2/failure-contact.json",
+    "failure_contact_sha256": "81961cd610bdea0b01bcab6bb269d8c43d5c8c1145e2239735d0d158f2342c2f",
+    "next_action": "Make ordinary-input harness respect actual match state after HQ loss; investigate defense and continue existing survivors without grants"
+  }
 }
