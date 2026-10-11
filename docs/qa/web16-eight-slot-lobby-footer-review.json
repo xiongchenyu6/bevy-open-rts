@@ -1,0 +1,58 @@
+{
+  "scope": "Wasm16/native275 normalhost-only four/six/eight-slot lobby footer andwheel visualQA; no8-humanpeerclaim",
+  "wasm_sha256": "35a495542c3432156fd6b243118f9ae2e295be8922f135fce7e47277a894901d",
+  "wasm_bytes": 27035275,
+  "assets": 332,
+  "viewport": [
+    1280,
+    720
+  ],
+  "hardware": "AMD RADV, no fallback",
+  "actual_exit": 0,
+  "node_driver_exits": [
+    0,
+    0
+  ],
+  "deadline_seconds": 90,
+  "timestamp_derived_wall_seconds": 76.18814086914062,
+  "normal_browser_closure": true,
+  "physical_flow": [
+    "Online",
+    "Create publicroom",
+    "Freshfour-slotMap275189 review",
+    "Publicmap/revision/slots guards FourCorners4 andTechDivide6",
+    "Freshsix-slotMap267154 review",
+    "BigArena8",
+    "Wheel900down",
+    "OneWheel120up"
+  ],
+  "visual_review": {
+    "four_and_six_slot_footers_visible": true,
+    "eight_slot_Ready_Start_Leave_fully_visible": true,
+    "footer_stays_fixed_before_down_up": true,
+    "down_reveals_slots_seven_eight": true,
+    "one_reverse_scroll_immediate": true
+  },
+  "old_red": "docs/qa/web14-eight-slot-lobby-footer-red-review.json",
+  "first_preflight_failure": {
+    "actual_exit": 1,
+    "browser_launched": false,
+    "reason": "Wrapper site-before-assignment NameError; correctedsealedmanifestpath, failurepreserved"
+  },
+  "no_game_lobby_actor_setters": true,
+  "match_started": false,
+  "eight_real_peer_pass": false,
+  "reconnect_pass": false,
+  "other_viewport_sizes_verified": false,
+  "evidence_sha256": {
+    "target/web16-host-lobby-geometry02-20261011/final-supervisor-result.json": "64d9cdb2db931a4bfca812351b9f2b6abaa4ec8dce306e9a35ce03c9c0a0dfb1",
+    "target/web16-host-lobby-geometry02-20261011/lobby-geometry-workflow.json": "40051ec06b79de0b35f19b3c3567b1566fde0638d5f83595d7d02deb6bfde269",
+    "target/web16-host-lobby-geometry02-20261011/host-02-created-four-slots.png": "6fae8a39224c686a35c1d46dc419655b80908d0b50e860dc24c4a28be1e90ff2",
+    "target/web16-host-lobby-geometry02-20261011/host-03-map-1-tech_divide.png": "47aed55cf02731ded1b7c2fa07189fc291df1e5a8fb0c9130387fae6b314f0a2",
+    "target/web16-host-lobby-geometry02-20261011/host-03-map-2-big_arena.png": "f5412e3a0967810f39ee07962425fac3aa0c941700b81a04f3d740dbe66b8866",
+    "target/web16-host-lobby-geometry02-20261011/host-04-big-arena-wheel-down.png": "998fc9b0504e751f7d1cb52c28eef4c858b654a32100e21e744ad5b445a14c7c",
+    "target/web16-host-lobby-geometry02-20261011/host-05-big-arena-one-wheel-up.png": "75e11bfa9fe28ee120ce1d3230be5e140727b5c3bf0ddaa160f799536e78ddbc",
+    "target/web16-host-lobby-geometry02-20261011/host-03-map-2-big_arena-observation.json": "82666e979a4a595bceb581ba23954cf075472bfac9e7d3a2f9ed784d28d9c6c7",
+    "target/web16-host-lobby-geometry02-20261011/capture-stage-timings.json": "e5fa3775ccb794f8b8f7189cc0205e262b6d6eb373a1418a23ed4e115437bdf6"
+  }
+}
