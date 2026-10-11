@@ -388,9 +388,28 @@ pub(crate) fn update_match_end_overlay(
     visible_player: Res<VisiblePlayer>,
     mut overlay_q: Query<
         (&mut Visibility, &Children),
-        (With<MatchEndOverlay>, Without<CommandStack>),
+        (
+            With<MatchEndOverlay>,
+            Without<CommandStack>,
+            Without<CommandTooltip>,
+        ),
     >,
-    mut command_stacks: Query<&mut Visibility, (With<CommandStack>, Without<MatchEndOverlay>)>,
+    mut command_stacks: Query<
+        &mut Visibility,
+        (
+            With<CommandStack>,
+            Without<MatchEndOverlay>,
+            Without<CommandTooltip>,
+        ),
+    >,
+    mut command_tooltips: Query<
+        &mut Visibility,
+        (
+            With<CommandTooltip>,
+            Without<MatchEndOverlay>,
+            Without<CommandStack>,
+        ),
+    >,
     mut title_text_q: Query<
         &mut Text,
         (
@@ -422,6 +441,12 @@ pub(crate) fn update_match_end_overlay(
         } else {
             Visibility::Hidden
         };
+    }
+    // Tooltip updates stop with simulation; clear any last hovered command.
+    if !match_state.is_running() {
+        for mut visibility in &mut command_tooltips {
+            *visibility = Visibility::Hidden;
+        }
     }
     if overlay_q.is_empty() {
         return;
@@ -540,5 +565,47 @@ pub(crate) fn update_campaign_continue_button(
             t("遭遇战设置", "Skirmish Setup")
         }
         .to_string();
+    }
+}
+
+#[cfg(test)]
+mod tooltip_cleanup_tests {
+    use super::*;
+
+    #[test]
+    fn finished_match_clears_last_hover_tooltip_without_revealing_hidden_tooltips() {
+        let mut app = App::new();
+        app.init_resource::<MatchState>()
+            .init_resource::<TutorialState>()
+            .init_resource::<Economies>()
+            .init_resource::<VisiblePlayer>()
+            .add_systems(Update, update_match_end_overlay);
+        let tooltip = app
+            .world_mut()
+            .spawn((CommandTooltip, Visibility::Hidden))
+            .id();
+        let stack = app
+            .world_mut()
+            .spawn((CommandStack, Visibility::Inherited))
+            .id();
+        app.update();
+        assert_eq!(
+            *app.world().get::<Visibility>(tooltip).unwrap(),
+            Visibility::Hidden
+        );
+        *app.world_mut().get_mut::<Visibility>(tooltip).unwrap() = Visibility::Inherited;
+        for phase in [MatchPhase::HumanVictory, MatchPhase::HumanDefeat] {
+            app.world_mut().resource_mut::<MatchState>().phase = phase;
+            app.update();
+            assert_eq!(
+                *app.world().get::<Visibility>(tooltip).unwrap(),
+                Visibility::Hidden
+            );
+            assert_eq!(
+                *app.world().get::<Visibility>(stack).unwrap(),
+                Visibility::Hidden
+            );
+            *app.world_mut().get_mut::<Visibility>(tooltip).unwrap() = Visibility::Inherited;
+        }
     }
 }

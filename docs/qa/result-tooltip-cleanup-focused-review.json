@@ -1,0 +1,22 @@
+{
+  "scope": "Result overlay clears stale command tooltip; focused native regression only",
+  "trigger": "Actual SDK267 Mission1 victory screenshot retains W Train Tank tooltip after command panel disappears",
+  "red_screenshot": "target/sdk267-mission1-normal-defense-20261011-10/90-natural-mission1-victory.png",
+  "red_screenshot_sha256": "98d254481434924ba53e33c8769426f5aaac56ccb9715ad1a7b09f9198ecb823",
+  "change": "Existing result overlay hides command tooltip on finished matches. Running matches leave tooltip visibility under hover systems. Disjoint queries preserve Bevy visibility borrow safety.",
+  "focused_result": {
+    "actual_exit": 0,
+    "wall_seconds": 133.0611226010078,
+    "source_sha256": "9b214704d571731d6a520333caa0394a676414c36dd27a3f9f6726a40b4027d7",
+    "source_unchanged": true
+  },
+  "test": "Real App update hides last hovered tooltip for both HumanVictory and HumanDefeat, and does not reveal hidden tooltip while Running",
+  "full_suite_pass": false,
+  "current_render_verified": false,
+  "final_package_contains_fix": false,
+  "evidence_sha256": {
+    "target/result-tooltip-focused-20261011/result.json": "4f171ccb1dc00670f6697c0816dcc19e9b45b94c7fa265f3fe517f86fd7556ab",
+    "target/result-tooltip-focused-20261011/focused.log": "5b405409b6ac57ab7902c29e0d1b90611795bfbd61a0a1baec753451faf737ed"
+  },
+  "preflight_failure": "target/result-tooltip-focused-preflight-failure-20261011.json"
+}
