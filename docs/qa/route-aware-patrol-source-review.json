@@ -1,0 +1,51 @@
+{
+  "scope": "Product short/medium Patrol turn-region correction; actual scheduled unit tests, not browser origin/ECS or final shipping/player proof",
+  "implementation": "Continuous turnaround margin ((leg_length - existing2mturnDistance)*0.5), clamped by existingordinaryMoveArrival.22 and existingmaximumTurn2. Forresolvablemediumlegs itleaves2mtravel betweenregions; tinygoals retainordinaryarrivalresolution. Longlegs>=6m keeporiginal2mturning. No globalconstants/radii/damage/cost/timer/targets modified.",
+  "RED_short": {
+    "actual_exit": 101,
+    "passed": 0,
+    "failed": 2,
+    "Running_frames": 180,
+    "leg_length": 2.4237376,
+    "Drone_maxtravel": 0.5333315,
+    "armed_HMG_maxtravel": 0.46667296,
+    "healthy_Drone_fixture_HPsight_note": "InitialRED healthy7/7.5, no combat orvision targets; normalizedtoactual6/10 beforeGREEN. Movement behavior independentofthosevalues."
+  },
+  "preserved_rejected_proposal": "Initial<=4mbranch passed2.42m but left4.1munchanged; notcommitted orshipped.",
+  "RED_medium": {
+    "actual_exit": 101,
+    "failed": 2,
+    "leg_length": 4.1,
+    "post_firstturn_Drone_span": 0.1333332,
+    "post_firstturn_HMG_span": 0.18666649,
+    "Running_frames": 180,
+    "tested_proposal_at4_1_identical_to_original296": true
+  },
+  "GREEN": {
+    "patrol_passed": 6,
+    "endpoint_passed": 12,
+    "EMP_passed": 3,
+    "contextual_harvest_passed": 1,
+    "check": 0,
+    "allstage_exits": 0,
+    "wall_seconds": 90.09293413162231,
+    "short_actor_bothendpoint_visits_and_return": true,
+    "medium_post_firstturn_span_over1_5m": true,
+    "longroute_and_armed_engagement_preserved": true,
+    "continuous_speed_height_no_teleport_assertions": true
+  },
+  "browser_boundary": "W25goalactualexported; browseractororiginnotexported. W25notice/clock/partialvisiblemotion separate; no fullPatrolcycleclaim fromnativefixtures.",
+  "evidence_sha256": {
+    "target/short-patrol-red-20261012/red.log": "a70e98c66a97c1e5735b63a422fc8e4c5f2ef97455282e4aa1e941aac967cbc7",
+    "target/medium-patrol-red-20261012/red.log": "3fdca19aed2574d8c3a09251c83dd074b86d7e30324a34a0ae2405baeb49e8f7",
+    "target/route-patrol-green-20261012/focused.log": "932eec4463e33101426241eb24a4170af01cad94edf6470b4f68183407633079",
+    "target/route-patrol-green-20261012/movement.log": "8d56af5327cb4aad83352f6b05adc2d7f01bfd6ba0d4f241a2e2b591f258bdb8",
+    "target/route-patrol-green-20261012/emp.log": "ee9fec83ee05c680ba2e52275a4e0a08168449b6e58de2b7c75379abf2aeff85",
+    "target/route-patrol-green-20261012/result.json": "e7425fee68412a79bf3376a9048b4e7aa7a8b4689e63cb66374d0bc7e8d58547"
+  },
+  "pending": [
+    "Fullsuite/check/build newpin",
+    "NewofficialSDK and actualshortPatrolnormalinput proof",
+    "Futurecurrentbrowserartifact/runtime proof"
+  ]
+}

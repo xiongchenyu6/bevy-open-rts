@@ -578,3 +578,120 @@ fn armed_patrol_still_engages_compatible_visible_enemy() {
     assert!(app.world().get::<MoveOrder>(soldier).is_none());
     assert!(app.world().get::<PatrolOrder>(soldier).is_some());
 }
+
+fn measured_patrol_trajectory(unit_id: &str, destination: Vec3) -> (bool, bool, f32, f32) {
+    let scene = format!(
+        r#"[[1,"CommandCenter","Player(0)",[20,0,20],2,30,null],[2,"CommandCenter","Player(1)",[-20,0,20],2,30,null],[3,"{unit_id}","Player(0)",[-17,{},-20],{},{},null]]"#,
+        if unit_id == "Drone" { 1.5 } else { 0.05 },
+        if unit_id == "Drone" { 0.6 } else { 0.48 },
+        if unit_id == "Drone" { 6 } else { 7 }
+    );
+    let (mut app, keys) = measured_app(&scene);
+    let actor = keys[&3];
+    let origin = app.world().get::<Transform>(actor).unwrap().translation;
+    let speed = app.world().get::<Unit>(actor).unwrap().speed;
+    app.world_mut().entity_mut(actor).insert((
+        VisionRadius(if unit_id == "Drone" { 10.0 } else { 7.5 }),
+        PatrolOrder {
+            origin,
+            destination,
+            moving_to_destination: true,
+        },
+    ));
+    if unit_id == "HeavyMachinegunTrooper" {
+        app.world_mut().entity_mut(actor).insert(Weapon {
+            range: 4.5,
+            damage: 1.0,
+            cooldown: 1.0,
+            cooldown_left: 0.0,
+            splash_radius: 0.0,
+            splash_damage_multiplier: 0.0,
+            structure_damage_multiplier: 1.0,
+            can_attack_air: false,
+            can_attack_ground: true,
+        });
+    }
+    let mut reached_far_end = false;
+    let mut returned = false;
+    let mut previous = origin;
+    let mut maximum_travel = 0.0_f32;
+    let axis = Vec3::new(destination.x - origin.x, 0.0, destination.z - origin.z).normalize();
+    let mut turned = false;
+    let mut post_turn_min = f32::INFINITY;
+    let mut post_turn_max = f32::NEG_INFINITY;
+    for tick in 0..180 {
+        app.update();
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::Running
+        );
+        let position = app.world().get::<Transform>(actor).unwrap().translation;
+        assert!(
+            xz_distance(position, previous) <= speed / 30.0 + 0.01,
+            "No teleport at tick{tick}"
+        );
+        assert_eq!(position.y, origin.y);
+        maximum_travel = maximum_travel.max(xz_distance(position, origin));
+        turned |= !app
+            .world()
+            .get::<PatrolOrder>(actor)
+            .unwrap()
+            .moving_to_destination;
+        if turned {
+            let along = (position - origin).dot(axis);
+            post_turn_min = post_turn_min.min(along);
+            post_turn_max = post_turn_max.max(along);
+        }
+        if xz_distance(position, destination) <= 0.35 {
+            reached_far_end = true;
+        }
+        if reached_far_end && xz_distance(position, origin) <= 0.35 {
+            returned = true;
+        }
+        previous = position;
+    }
+    (
+        reached_far_end,
+        returned,
+        maximum_travel,
+        post_turn_max - post_turn_min,
+    )
+}
+
+fn assert_short_patrol_visits_both_ends(unit_id: &str) {
+    let (reached, returned, travel, _) =
+        measured_patrol_trajectory(unit_id, Vec3::new(-18.541737, 0.0, -18.129826));
+    assert!(
+        reached && returned && travel > 2.0,
+        "{unit_id} short patrol must visit both ends, travel{travel}"
+    );
+}
+
+#[test]
+fn short_drone_patrol_visits_both_ends_without_turn_zone_oscillation() {
+    assert_short_patrol_visits_both_ends("Drone");
+}
+
+#[test]
+fn short_armed_patrol_visits_both_ends_without_turn_zone_oscillation() {
+    assert_short_patrol_visits_both_ends("HeavyMachinegunTrooper");
+}
+
+#[test]
+fn medium_drone_patrol_sustains_travel_after_first_turn() {
+    let (_, _, _, span) = measured_patrol_trajectory("Drone", Vec3::new(-12.9, 0.0, -20.0));
+    assert!(
+        span > 1.5,
+        "4.1m Drone leg must keep traversing after first turn, span{span}"
+    );
+}
+
+#[test]
+fn medium_armed_patrol_sustains_travel_after_first_turn() {
+    let (_, _, _, span) =
+        measured_patrol_trajectory("HeavyMachinegunTrooper", Vec3::new(-12.9, 0.0, -20.0));
+    assert!(
+        span > 1.5,
+        "4.1m armed leg must keep traversing after first turn, span{span}"
+    );
+}

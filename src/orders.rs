@@ -2782,7 +2782,14 @@ pub(crate) fn update_attack_move_and_patrol_orders(
                 continue;
             }
 
-            if xz_distance(transform.translation, current_target) <= PATROL_TURN_DISTANCE {
+            // Leave one normal turn-distance of travel between turnaround
+            // regions. Nearby points otherwise immediately reverse again.
+            // Ordinary move arrival is the lower bound; long legs retain the
+            // existing wider tolerance without a discontinuity at four metres.
+            let leg_length = xz_distance(patrol_order.origin, patrol_order.destination);
+            let turn_distance = ((leg_length - PATROL_TURN_DISTANCE) * 0.5)
+                .clamp(MOVE_ORDER_REACHED_DISTANCE_M, PATROL_TURN_DISTANCE);
+            if xz_distance(transform.translation, current_target) <= turn_distance {
                 let moving_to_destination = !patrol_order.moving_to_destination;
                 let next_target = if moving_to_destination {
                     patrol_order.destination
