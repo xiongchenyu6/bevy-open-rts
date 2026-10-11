@@ -1,0 +1,144 @@
+{
+  "scope": "Independent partial old244 matrix; not final current release acceptance",
+  "original_check06": {
+    "path": "target/current244-matrix-independent-20261011-check06.json",
+    "sha256": "69b36c2a615944b36156b7929b2c70b7ffb5feed171d7b3c002cda124d254923",
+    "integrity_verified": false,
+    "error": "332 false resolved-map mismatches from verifier applying legacy paths to four Bevy-authored maps"
+  },
+  "pinned_source": {
+    "commit": "3fc2bf668239557565449469785a08dc0b88838d",
+    "path": "src/maps.rs",
+    "sha256": "e1e5dec2b91e44c800864c142f03503daed13afe97d5b819681412e6e0c52881",
+    "matches_source_pin": true
+  },
+  "corrected_verifier": "Exact authored paths per map; no permissive alternate paths",
+  "check07": {
+    "path": "target/current244-matrix-independent-20261011-check07.json",
+    "sha256": "e273aad28e9d899adf05f4e173d1384aec5606edcd0ba4f9362373ea1f757fe5",
+    "actual_exit": 2,
+    "terminal_snapshot": 3304,
+    "counts": {
+      "completed": 3299,
+      "simulation_timeout": 2,
+      "wall_timeout": 3
+    },
+    "integrity_verified": true,
+    "errors": [],
+    "failures": [
+      {
+        "index": 1885,
+        "config": {
+          "map": "big_arena",
+          "factions": [
+            "chaos",
+            "chaos"
+          ],
+          "difficulties": [
+            "easy",
+            "beginner"
+          ],
+          "spawn_slots": [
+            2,
+            1
+          ],
+          "max_seconds": 600
+        },
+        "classification": "simulation_timeout",
+        "exit_code": 2,
+        "evidence": "target/current244-all-starts-20261010/1885"
+      },
+      {
+        "index": 2220,
+        "config": {
+          "map": "big_arena",
+          "factions": [
+            "chaos",
+            "alliance"
+          ],
+          "difficulties": [
+            "normal",
+            "normal"
+          ],
+          "spawn_slots": [
+            4,
+            0
+          ],
+          "max_seconds": 600
+        },
+        "classification": "wall_timeout",
+        "exit_code": null,
+        "evidence": "target/current244-all-starts-20261010/2220"
+      },
+      {
+        "index": 2641,
+        "config": {
+          "map": "big_arena",
+          "factions": [
+            "chaos",
+            "chaos"
+          ],
+          "difficulties": [
+            "easy",
+            "beginner"
+          ],
+          "spawn_slots": [
+            6,
+            1
+          ],
+          "max_seconds": 600
+        },
+        "classification": "wall_timeout",
+        "exit_code": null,
+        "evidence": "target/current244-all-starts-20261010/2641"
+      },
+      {
+        "index": 2668,
+        "config": {
+          "map": "big_arena",
+          "factions": [
+            "chaos",
+            "chaos"
+          ],
+          "difficulties": [
+            "easy",
+            "beginner"
+          ],
+          "spawn_slots": [
+            6,
+            2
+          ],
+          "max_seconds": 600
+        },
+        "classification": "simulation_timeout",
+        "exit_code": 2,
+        "evidence": "target/current244-all-starts-20261010/2668"
+      },
+      {
+        "index": 3276,
+        "config": {
+          "map": "crossfire",
+          "factions": [
+            "alliance",
+            "alliance"
+          ],
+          "difficulties": [
+            "beginner",
+            "easy"
+          ],
+          "spawn_slots": [
+            3,
+            0
+          ],
+          "max_seconds": 600
+        },
+        "classification": "wall_timeout",
+        "exit_code": null,
+        "evidence": "target/current244-all-starts-20261010/3276"
+      }
+    ],
+    "audit_sha256": "c4f395dd8853a41da1768c8752e7116159b7ccef3c1be44afe1def300f8616f1",
+    "complete_matrix": false
+  },
+  "remaining": "Old244 wall-timeout3276 needs current optimized rerun; full scan ongoing; final source full matrix/repeats/independent seeds unverified"
+}
