@@ -1,0 +1,426 @@
+{
+  "scope": "Two real normal-input browser game guest/host signaling loss recovery on exactWasm20 and private native server+real loopbackSTUN; not deployed shipping multiplayer gate",
+  "source_fix_commit": "3f2276d",
+  "wasm_sha256": "9c95ccc35b38e1a9b23ddc85ccfe8347e99975a6dd09fbb3b6968a8633b4dc10",
+  "native_backend_sha256": "c61c8a2c601bd6ad0256f068b38b984bf4aa3ae177cb8c2656f9363b26cd5e83",
+  "physical_frontend": [
+    "normalHost/Join/Ready/Start",
+    "normalbriefingdismiss/AltC/I/paidWorker/move",
+    "normalresumedpaidcommands"
+  ],
+  "fault": "Close one actual local signalingWebSocket; no actor/HP/bank/order/clock/world setters; unchangedRTCconstructor",
+  "fixtures": "RFC5389UDPBinding responder127.0.0.1 mapsACTUALsender viaXOR-MAPPED-ADDRESS; positive/invalidCPUcases andChromevalidURLconstructor checked; localSTUN host/prflx/srflx scope, notpurehost-only andnotTURN",
+  "cases": [
+    {
+      "evidence_directory": "target/web20-local-guest-reconnect-20261011-03",
+      "fault_role": "p1",
+      "actual_supervisor_exit": 0,
+      "actual_node_exit": 0,
+      "actual_driver_exit": 0,
+      "wall_seconds": 35.738,
+      "original_wall_bound_seconds": 240,
+      "resume_ms": 1915,
+      "unchanged_grace_seconds": 30,
+      "host_authenticated_peer_before": "d70acdeb-c60a-4491-9f61-a4bcbcdef1fa",
+      "host_authenticated_peer_after": "d70acdeb-c60a-4491-9f61-a4bcbcdef1fa",
+      "same_player_slot_room_owned_entity_bindings": true,
+      "host_UUID_changed": false,
+      "independent_actual_guest_ECS": {
+        "pre": {
+          "common_exact_ticks": 117,
+          "first_tick": 7,
+          "last_tick": 123,
+          "minimum_required": 16,
+          "component_differences": 0,
+          "resource_job_support_elapsed_clock_differences": 0,
+          "full_render_world_equivalence_claim": false
+        },
+        "post": {
+          "common_exact_ticks": 88,
+          "first_tick": 124,
+          "last_tick": 226,
+          "minimum_required": 16,
+          "component_differences": 0,
+          "resource_job_support_elapsed_clock_differences": 0,
+          "full_render_world_equivalence_claim": false
+        }
+      },
+      "NEW_guest_normal_paid_receipt": {
+        "before_tick": 174,
+        "receipt_tick": 182,
+        "before_ore": 28,
+        "after_ore": 26,
+        "cost": [
+          2,
+          0
+        ],
+        "producer": 5,
+        "independent_ECS_confirmed": true
+      },
+      "NEW_host_normal_paid_receipt": null,
+      "actual_latest_RTC_connections": {
+        "host": {
+          "connectionState": "connected",
+          "iceConnectionState": "connected",
+          "signalingState": "stable",
+          "iceGatheringState": "complete",
+          "localDescriptionType": "offer",
+          "remoteDescriptionType": "answer",
+          "candidateCount": 2,
+          "candidateErrors": [],
+          "descriptionStages": [
+            {
+              "stage": "createOffer-called",
+              "time": 24000,
+              "descriptionType": null
+            },
+            {
+              "stage": "createOffer-resolved",
+              "time": 24017.09999999404,
+              "descriptionType": null
+            },
+            {
+              "stage": "setLocalDescription-called",
+              "time": 24017.19999998808,
+              "descriptionType": "offer"
+            },
+            {
+              "stage": "setLocalDescription-resolved",
+              "time": 24034.79999998212,
+              "descriptionType": "offer"
+            },
+            {
+              "stage": "setRemoteDescription-called",
+              "time": 24281.90000000596,
+              "descriptionType": "answer"
+            },
+            {
+              "stage": "setRemoteDescription-resolved",
+              "time": 24283,
+              "descriptionType": "answer"
+            }
+          ],
+          "routes": [
+            {
+              "state": "succeeded",
+              "nominated": true,
+              "bytesSent": 26078,
+              "bytesReceived": 4570,
+              "localType": "host",
+              "remoteType": "host"
+            }
+          ]
+        },
+        "p1": {
+          "connectionState": "connected",
+          "iceConnectionState": "connected",
+          "signalingState": "stable",
+          "iceGatheringState": "complete",
+          "localDescriptionType": "answer",
+          "remoteDescriptionType": "offer",
+          "candidateCount": 2,
+          "candidateErrors": [],
+          "descriptionStages": [
+            {
+              "stage": "setRemoteDescription-called",
+              "time": 24166.79999998212,
+              "descriptionType": "offer"
+            },
+            {
+              "stage": "setRemoteDescription-resolved",
+              "time": 24185.40000000596,
+              "descriptionType": "offer"
+            },
+            {
+              "stage": "createAnswer-called",
+              "time": 24185.5,
+              "descriptionType": null
+            },
+            {
+              "stage": "createAnswer-resolved",
+              "time": 24210.5,
+              "descriptionType": null
+            },
+            {
+              "stage": "setLocalDescription-called",
+              "time": 24210.69999998808,
+              "descriptionType": "answer"
+            },
+            {
+              "stage": "setLocalDescription-resolved",
+              "time": 24233.5,
+              "descriptionType": "answer"
+            }
+          ],
+          "routes": [
+            {
+              "state": "succeeded",
+              "nominated": true,
+              "bytesSent": 4570,
+              "bytesReceived": 26078,
+              "localType": "host",
+              "remoteType": "host"
+            }
+          ]
+        }
+      },
+      "normal_browser_close": true,
+      "browser_close_ms": 284,
+      "observed_diagnostics_retained": [
+        {
+          "sampling_error": "Error: page.evaluate: Target page, context or browser has been closed"
+        }
+      ],
+      "STUN": {
+        "accepted_binding_requests": 8,
+        "invalid_requests_dropped": 0,
+        "normal_fixture_stop": true
+      },
+      "direct_render_review": {
+        "before_and_after_visible_ownHQ_workers": true,
+        "images_sha256": {
+          "p1-actual-before-fault-visible-HQ.png": "16affc2507402b88219869a371d7bbbc4738fdded97825475d283efa63808675",
+          "p1-actual-recovered-paid-scene.png": "94c519a880b7532605edb88c7895af1616bf3cfc034720f841cbabbcf01bcf97",
+          "p1-actual-resumed-ownHQ-scene.png": "9973b29022d1b145eb0bcef56cabd1b1488ff21e610218093c94489990a4b0ff"
+        }
+      },
+      "raw_sha256": {
+        "artifact.json": "b108f8e66794267f19e3c09e922423823230f099b17727dfe618d965852ea96a",
+        "fault.json": "f8da2df08bfc31b9d45f518bb10386de1792a7f0add7d2adedabd9788868a380",
+        "resume.json": "3954ec85d4d2dbca8c0bef036929c9e311c89c0d3672f1c0aed988529ea61907",
+        "supervisor.json": "d4d9d548a18d7e54e1ce4dddfd423628f18545c9f56c3ff4a364e5f8e19092ff",
+        "final-result.json": "21de251599575a583d70b59ed68b56948582cb740229718a1da32bb4cee263d8",
+        "before-loss.json": "c21399106fb82a53a259ebb404a83480c5304aa8ec6aae50de1c9fa742b83623",
+        "reconnect-proof.json": "b133f7387ba321ee0845b97a7bbff34daaa5969fc121bc8ee8b949c6ce1fe006",
+        "host-final-state-observation.json": "e58a8711d718a5dfabd634bd484a036aff85b182f8561c332e2257b82af5070a",
+        "p1-final-state-observation.json": "355826392b281fa130ea694ae7b7c161a21b2e7b2ff6db367b0943be6588dd8d",
+        "p1-current-resumed-ownHQ-binding.json": "a149fe022fcc6253f5b91a5eec0480c22f88342425b6aa9d20ad4a3b7cd4b5c9",
+        "stun-results.json": "ef40435eb087847e11c43df836877532ae5213080182660437455da15c8f5e48"
+      }
+    },
+    {
+      "evidence_directory": "target/web20-local-host-reconnect-20261011-01",
+      "fault_role": "host",
+      "actual_supervisor_exit": 0,
+      "actual_node_exit": 0,
+      "actual_driver_exit": 0,
+      "wall_seconds": 42.387,
+      "original_wall_bound_seconds": 240,
+      "resume_ms": 1684,
+      "unchanged_grace_seconds": 30,
+      "host_authenticated_peer_before": "1e098f70-d0be-4047-8299-cb36e999a76a",
+      "host_authenticated_peer_after": "d265c548-e0cd-4fbb-a417-4ecbe98babc4",
+      "same_player_slot_room_owned_entity_bindings": true,
+      "host_UUID_changed": true,
+      "independent_actual_guest_ECS": {
+        "pre": {
+          "common_exact_ticks": 132,
+          "first_tick": 6,
+          "last_tick": 137,
+          "minimum_required": 16,
+          "component_differences": 0,
+          "resource_job_support_elapsed_clock_differences": 0,
+          "full_render_world_equivalence_claim": false
+        },
+        "post": {
+          "common_exact_ticks": 114,
+          "first_tick": 138,
+          "last_tick": 291,
+          "minimum_required": 16,
+          "component_differences": 0,
+          "resource_job_support_elapsed_clock_differences": 0,
+          "full_render_world_equivalence_claim": false
+        }
+      },
+      "NEW_guest_normal_paid_receipt": {
+        "before_tick": 200,
+        "receipt_tick": 210,
+        "before_ore": 28,
+        "after_ore": 26,
+        "cost": [
+          2,
+          0
+        ],
+        "producer": 5,
+        "independent_ECS_confirmed": true
+      },
+      "NEW_host_normal_paid_receipt": {
+        "before_tick": 230,
+        "receipt_tick": 240,
+        "before_ore": 32,
+        "after_ore": 30,
+        "cost": [
+          2,
+          0
+        ]
+      },
+      "actual_latest_RTC_connections": {
+        "host": {
+          "connectionState": "connected",
+          "iceConnectionState": "connected",
+          "signalingState": "stable",
+          "iceGatheringState": "complete",
+          "localDescriptionType": "offer",
+          "remoteDescriptionType": "answer",
+          "candidateCount": 2,
+          "candidateErrors": [],
+          "descriptionStages": [
+            {
+              "stage": "createOffer-called",
+              "time": 26972.09999999404,
+              "descriptionType": null
+            },
+            {
+              "stage": "createOffer-resolved",
+              "time": 26972.5,
+              "descriptionType": null
+            },
+            {
+              "stage": "setLocalDescription-called",
+              "time": 26972.69999998808,
+              "descriptionType": "offer"
+            },
+            {
+              "stage": "setLocalDescription-resolved",
+              "time": 26973.09999999404,
+              "descriptionType": "offer"
+            },
+            {
+              "stage": "setRemoteDescription-called",
+              "time": 27282.09999999404,
+              "descriptionType": "answer"
+            },
+            {
+              "stage": "setRemoteDescription-resolved",
+              "time": 27283.09999999404,
+              "descriptionType": "answer"
+            }
+          ],
+          "routes": [
+            {
+              "state": "succeeded",
+              "nominated": true,
+              "bytesSent": 35248,
+              "bytesReceived": 6833,
+              "localType": "host",
+              "remoteType": "prflx"
+            }
+          ]
+        },
+        "p1": {
+          "connectionState": "connected",
+          "iceConnectionState": "connected",
+          "signalingState": "stable",
+          "iceGatheringState": "complete",
+          "localDescriptionType": "answer",
+          "remoteDescriptionType": "offer",
+          "candidateCount": 1,
+          "candidateErrors": [],
+          "descriptionStages": [
+            {
+              "stage": "setRemoteDescription-called",
+              "time": 27153.90000000596,
+              "descriptionType": "offer"
+            },
+            {
+              "stage": "setRemoteDescription-resolved",
+              "time": 27155.19999998808,
+              "descriptionType": "offer"
+            },
+            {
+              "stage": "createAnswer-called",
+              "time": 27155.29999998212,
+              "descriptionType": null
+            },
+            {
+              "stage": "createAnswer-resolved",
+              "time": 27174.29999998212,
+              "descriptionType": null
+            },
+            {
+              "stage": "setLocalDescription-called",
+              "time": 27174.40000000596,
+              "descriptionType": "answer"
+            },
+            {
+              "stage": "setLocalDescription-resolved",
+              "time": 27192,
+              "descriptionType": "answer"
+            }
+          ],
+          "routes": [
+            {
+              "state": "succeeded",
+              "nominated": true,
+              "bytesSent": 6833,
+              "bytesReceived": 35248,
+              "localType": "prflx",
+              "remoteType": "host"
+            }
+          ]
+        }
+      },
+      "normal_browser_close": true,
+      "browser_close_ms": 302,
+      "observed_diagnostics_retained": [
+        {
+          "role": "p1",
+          "error_name": "Error",
+          "unreachable": false
+        },
+        {
+          "sampling_error": "Error: page.evaluate: Target page, context or browser has been closed"
+        }
+      ],
+      "STUN": {
+        "accepted_binding_requests": 22,
+        "invalid_requests_dropped": 0,
+        "normal_fixture_stop": true
+      },
+      "direct_render_review": {
+        "before_and_after_visible_ownHQ_workers": true,
+        "images_sha256": {
+          "host-actual-before-fault-visible-HQ.png": "69fc1b046a07b864fdb1738f504dac3b39c24ab2c24165eb91d64ceb7b3ae474",
+          "p1-actual-before-fault-visible-HQ.png": "921912fd58e3bd3f6a63374934755506bd0a1abaf4a1b238fbe81c69b60d29d8",
+          "host-actual-recovered-paid-scene.png": "6f10c54ad4e5da5ba2d301e4ff70434bb197fb7ff3689bc6e5849d61f01f5d67",
+          "p1-actual-recovered-paid-scene.png": "13a2e442ac8719f0bfd6891a761efdf34a805bef8907387ed4d6d3a999b24aa1",
+          "p1-actual-resumed-ownHQ-scene.png": "94cf6b4075d3feec846e516f69c0ded9130eae548413501a2fe969f13467a579"
+        }
+      },
+      "raw_sha256": {
+        "artifact.json": "b68290e4f4d103a62ef8f4a8674a478805902e4dbebdda519d51cbd642f17e92",
+        "fault.json": "1d8ff5fbf6e8373839da1c35079357c2c780d7d1dae46979cc9bddcff10db69b",
+        "resume.json": "30c3e7c124d3ac80b044c6a3a54d1ba65e00b98e2aeb7fa7facb5a3805f7149b",
+        "supervisor.json": "7775f105f7d17c40c6183fec07219e7489cdaf3e9f26f1f29264cb46e75e0c30",
+        "final-result.json": "21de251599575a583d70b59ed68b56948582cb740229718a1da32bb4cee263d8",
+        "before-loss.json": "4f6224eea05117f37f9527fa4624ed4495ac2b20762c045f148ec45faf60c09b",
+        "reconnect-proof.json": "cc82bd62e45caf773ac580e133c5e66e860dde037a608e07acf5c39330185069",
+        "host-final-state-observation.json": "adfd3d23814b3675778c917fd82124fb44e0a802b7414f93b86d0129c1b5926c",
+        "p1-final-state-observation.json": "8ff1e3bd22530c423a3c4c1e9d088205ec43bb438454df1aec02714c22c02fe2",
+        "p1-current-resumed-ownHQ-binding.json": "616c9b9cfc1e6dbe6f894d0b56831198ba384c650c5e7fc489295ffab54880df",
+        "stun-results.json": "4595e3be93cb742bb826c222114e01fc9a87a683ae340110739ee2fa1f76cff8"
+      }
+    }
+  ],
+  "all_prior_evidence_retained": [
+    "W19guest01 original240timeout/unreachable",
+    "W19diagnostic02 unchangedemptyICEconfigurationSyntaxError",
+    "W19STUN03 footerROI falsefailure",
+    "W19STUN04 realworldreentry/postpaidfailure",
+    "W20guest01 already-selectedHQ changed-event oraclefailure",
+    "W20guest02 originaloverall1 incorrectelapsed-clockequality; offlineexactdata0 butrenderoffscreenunaccepted"
+  ],
+  "limits": [
+    "Not8peer recovery or8finalcore normalgame rerun",
+    "No publishedCFhost-authority API deployment/capability acceptance",
+    "No fullpublishedICE/TURNreconnecttiming acceptance",
+    "No freshbrowserprocess/userreload identity recovery claim",
+    "ActualguesttypedECScompared to sentDTO, interpolatedrenderposes recorded separately",
+    "Hostcaseobserved nonfatal Errorpageerror causeunclassified; retained, no panic/invariantsfailed"
+  ],
+  "credentials_and_SDP_not_persisted": true,
+  "gameplay_source_or_stats_timers_unmodified_by_runtime_harness": true,
+  "public_deployment": false,
+  "local_bounded_game_recovery_review_pass": true,
+  "full_multiplayer_gate_pass": false
+}
