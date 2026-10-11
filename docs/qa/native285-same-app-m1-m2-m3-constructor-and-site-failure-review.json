@@ -1,0 +1,64 @@
+{
+  "scope": "Normal same-App M1/M2 wins and M3 paid constructor progress; full six workflowFAILED",
+  "actual_exit": 1,
+  "wall_seconds": 1698.9409093320137,
+  "error": "Original45second unknownsite review exhausted",
+  "forced_cleanup": true,
+  "runtime_launch_count": 1,
+  "completed_missions": [
+    "hold_the_line",
+    "strike_the_outpost"
+  ],
+  "same_game_pid": [
+    1005233,
+    1005233
+  ],
+  "normal_m3_paid_powers": [
+    {
+      "id": "PowerReactor",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        865,
+        181
+      ],
+      "completed_count": 1,
+      "construction_wall": 8.17820086699794
+    },
+    {
+      "id": "PowerReactor",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        340,
+        181
+      ],
+      "completed_count": 2,
+      "construction_wall": 8.156335011997726
+    }
+  ],
+  "second_power_frame_directly_inspected": true,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "archive_sha256": "249199240f79baea4bf6a4fc5914478a7db636b2fb00fab55f850f0254417fc2",
+  "binary_sha256": "0f94f73dfd29c279caf9d6a32a6e03b3eeaf071140f55858fe2e3c44ea0c04bc",
+  "recorded_camera_cause": "Candidate clientY9 falls inside12.42px top edge-pan band. First turret cameraZ changed6.8m while using a stale pixel plan; missing per-hover matrices not inferred.",
+  "dimension_correction": "64 in saved settings is starting Ore; RingValley authored mapwidth60. SaveSettings contains no map_size field.",
+  "prepared_fix": "Own WORLD sites with actual mapbounds, fresh normal cancel/rearm camera projections, edge/HUD exclusion; originalgreen/payment/site30/review45/stage900/total5400 limits unchanged",
+  "evidence": {
+    "target/sdk285-six-mission-normal-20261011-04/result.json": "38b6f64d344ad4bec486470254a0b3436979060e6eba1fabb0a5fbc46824c623",
+    "target/sdk285-six-mission-normal-20261011-04/mission-rows.json": "625477a266c3cf61bed9e9c596fa5e4bd73d329ad7cfb0111a56b2b1db2d0818",
+    "target/sdk285-six-mission-normal-20261011-04/03/auto-01-PowerReactor-completed.png": "c51a2906d7416697c284053eec4e341e5e452f0f6a48dcae2fb3376d4566f2cd",
+    "target/sdk285-six-mission-normal-20261011-04/03/auto-02-PowerReactor-completed.png": "0a9d57b54b6966ff65831702c0b001e488e865d19b48497f5d25bdf24b558e9a"
+  },
+  "limits": [
+    "No M3 victory/full sixmission pass",
+    "Fresh powers use normal new sites/idleworkers; exact old failed-worker replay remains separate unit evidence",
+    "Mouse-picking ambiguity remains open",
+    "Fresh UI08 normal05 currentlyrunning; no acceptance yet"
+  ]
+}

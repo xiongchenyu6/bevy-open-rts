@@ -1,0 +1,82 @@
+{
+  "scope": "Preserved W18 actual workflow failure plus offline same-data verification; no successful relabel",
+  "actual_exit": 1,
+  "error": "Error: spawnSync python3 ETIMEDOUT",
+  "offline_verifier_actual_exit": 1,
+  "normal_browser_close": true,
+  "all_seven_ECS_fields_exact": true,
+  "guests": {
+    "p1": {
+      "actual_common_world_ticks": 243,
+      "paid_job_ticks": 12,
+      "own_worker_count": 3,
+      "motion_over_half_metre": true,
+      "positive_routes": 7
+    },
+    "p2": {
+      "actual_common_world_ticks": 266,
+      "paid_job_ticks": 16,
+      "own_worker_count": 3,
+      "motion_over_half_metre": false,
+      "positive_routes": 7
+    },
+    "p3": {
+      "actual_common_world_ticks": 267,
+      "paid_job_ticks": 15,
+      "own_worker_count": 3,
+      "motion_over_half_metre": true,
+      "positive_routes": 7
+    },
+    "p4": {
+      "actual_common_world_ticks": 250,
+      "paid_job_ticks": 16,
+      "own_worker_count": 3,
+      "motion_over_half_metre": true,
+      "positive_routes": 7
+    },
+    "p5": {
+      "actual_common_world_ticks": 273,
+      "paid_job_ticks": 16,
+      "own_worker_count": 3,
+      "motion_over_half_metre": true,
+      "positive_routes": 7
+    },
+    "p6": {
+      "actual_common_world_ticks": 277,
+      "paid_job_ticks": 12,
+      "own_worker_count": 3,
+      "motion_over_half_metre": true,
+      "positive_routes": 7
+    },
+    "p7": {
+      "actual_common_world_ticks": 253,
+      "paid_job_ticks": 13,
+      "own_worker_count": 3,
+      "motion_over_half_metre": true,
+      "positive_routes": 7
+    }
+  },
+  "measured_observer_payload": {
+    "old_guest_bytes": 2894206,
+    "new_guest_bytes": 648635,
+    "old_host_bytes": 1092371,
+    "new_host_bytes": 233016
+  },
+  "p2_motion_oracle_issue": "Right ground position0.7103m from own HQ; source supports contextual dropoff ahead of Move. Cargo6 already existed before click, no new harvest/nav-defect claim.",
+  "prepared_fixes": [
+    "Remove duplicate inline10s verification; unchanged parent independently verifies after normal browser cleanup; gameplay240 bound unchanged",
+    "Choose visibly empty public ground away from own HQ/resources; preparation pending"
+  ],
+  "evidence": {
+    "target/web18-eight-human-20261011-01/result.json": "fd68123d4a39261a83d1558a803d46d0cbb7a94956a6ee266d45021476006649",
+    "target/web18-eight-human-20261011-01/wrapper-result.json": "204c083463133bbe24a6739a6183721c1c88eb6e3cf2d7cf8d754a22bd38d188",
+    "target/web18-eight-human-20261011-01/eight-human-world-proof.json": "39e633656029c611ec0ebdaca31d883559c27536ada1722d94e38f6a629c6256",
+    "target/web18-eight-human-20261011-01/p2-paid-and-motion-start.json": "c07bbad2faf3d5ed347f803ff80a563046e2fde997493f15110b8202ffabe7fb",
+    "target/web18-eight-human-20261011-01/p2-normal-ground-right-move-gesture.json": "88beef2da23191e34616888de5f35a93f8e12d2520a77d3a15d2c21f8707e3ff"
+  },
+  "limits": [
+    "Six guests move, p2 not; complete paid/motion gateFAIL",
+    "No fullmatch, hostcontrols or signalingreconnect acceptance",
+    "No per-frame performance claim"
+  ]
+}
