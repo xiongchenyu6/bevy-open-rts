@@ -1,0 +1,1624 @@
+{
+  "scope": "CPU readonly OWN/visible-resource/current-camera candidate trace; no hiddenenemy/action/read, no actualRally/routing acceptance",
+  "own_snapshot_sha256": "a66ecfd11bbc560fc54382559ba3188275830af3b98b28360c428b02e54d6a2d",
+  "original7": [
+    {
+      "offset": [
+        4,
+        4
+      ],
+      "world": [
+        -18.0,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        5,
+        3
+      ],
+      "world": [
+        -17.0,
+        0.0,
+        -19.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3,
+        5
+      ],
+      "world": [
+        -19.0,
+        0.0,
+        -17.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        5,
+        0
+      ],
+      "world": [
+        -17.0,
+        0.0,
+        -22.0
+      ],
+      "own_actor_blocks": [
+        {
+          "key": 4294966719,
+          "type": "Worker",
+          "distance": 0.533257931935924,
+          "required_clearance": 1.68,
+          "position": [
+            -16.734281539916992,
+            0.05000000074505806,
+            -22.462339401245117
+          ]
+        }
+      ],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        0,
+        5
+      ],
+      "world": [
+        -22.0,
+        0.0,
+        -17.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -4,
+        4
+      ],
+      "world": [
+        -26.0,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -3,
+        5
+      ],
+      "world": [
+        -25.0,
+        0.0,
+        -17.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [
+        {
+          "key": 4294966685,
+          "kind": "Crystal",
+          "distance": 1.4142135623730951,
+          "required_clearance": 1.68
+        }
+      ],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    }
+  ],
+  "bounded_candidate_search": "OwnHQ half-meter lattice radius3.2..6m, no budget/clearance change",
+  "eligible_alternatives": [
+    {
+      "offset": [
+        -4.5,
+        2.5
+      ],
+      "world": [
+        -26.5,
+        0.0,
+        -19.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        185,
+        588
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        -2.0,
+        -5.5
+      ],
+      "world": [
+        -24.0,
+        0.0,
+        -27.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        506,
+        59
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        0.5,
+        3.5
+      ],
+      "world": [
+        -21.5,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        694,
+        695
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        1.0,
+        3.5
+      ],
+      "world": [
+        -21.0,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        748,
+        695
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        1.5,
+        3.0
+      ],
+      "world": [
+        -20.5,
+        0.0,
+        -19.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        796,
+        640
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        1.5,
+        3.5
+      ],
+      "world": [
+        -20.5,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        802,
+        695
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        2.0,
+        -5.5
+      ],
+      "world": [
+        -20.0,
+        0.0,
+        -27.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        774,
+        59
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        2.0,
+        2.5
+      ],
+      "world": [
+        -20.0,
+        0.0,
+        -19.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        842,
+        588
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        2.0,
+        3.0
+      ],
+      "world": [
+        -20.0,
+        0.0,
+        -19.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        849,
+        640
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        2.0,
+        3.5
+      ],
+      "world": [
+        -20.0,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        856,
+        695
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        2.5,
+        2.0
+      ],
+      "world": [
+        -19.5,
+        0.0,
+        -20.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        885,
+        540
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        2.5,
+        2.5
+      ],
+      "world": [
+        -19.5,
+        0.0,
+        -19.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        893,
+        588
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        2.5,
+        3.0
+      ],
+      "world": [
+        -19.5,
+        0.0,
+        -19.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        901,
+        640
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    },
+    {
+      "offset": [
+        2.5,
+        3.5
+      ],
+      "world": [
+        -19.5,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "point": [
+        910,
+        695
+      ],
+      "projection_eligible": true,
+      "eligible": true
+    }
+  ],
+  "physical_clear_but_projection_rejected": [
+    {
+      "offset": [
+        -5.0,
+        2.5
+      ],
+      "world": [
+        -27.0,
+        0.0,
+        -19.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -5.0,
+        3.0
+      ],
+      "world": [
+        -27.0,
+        0.0,
+        -19.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -4.5,
+        3.0
+      ],
+      "world": [
+        -26.5,
+        0.0,
+        -19.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -4.5,
+        3.5
+      ],
+      "world": [
+        -26.5,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -4.0,
+        3.5
+      ],
+      "world": [
+        -26.0,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -4.0,
+        4.0
+      ],
+      "world": [
+        -26.0,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -3.5,
+        4.0
+      ],
+      "world": [
+        -25.5,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -3.5,
+        4.5
+      ],
+      "world": [
+        -25.5,
+        0.0,
+        -17.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -3.0,
+        4.0
+      ],
+      "world": [
+        -25.0,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -3.0,
+        4.5
+      ],
+      "world": [
+        -25.0,
+        0.0,
+        -17.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -2.5,
+        4.0
+      ],
+      "world": [
+        -24.5,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -2.0,
+        4.0
+      ],
+      "world": [
+        -24.0,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -1.5,
+        3.5
+      ],
+      "world": [
+        -23.5,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -1.5,
+        4.0
+      ],
+      "world": [
+        -23.5,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -1.0,
+        3.5
+      ],
+      "world": [
+        -23.0,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -1.0,
+        4.0
+      ],
+      "world": [
+        -23.0,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -1.0,
+        4.5
+      ],
+      "world": [
+        -23.0,
+        0.0,
+        -17.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -0.5,
+        3.5
+      ],
+      "world": [
+        -22.5,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -0.5,
+        4.0
+      ],
+      "world": [
+        -22.5,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -0.5,
+        4.5
+      ],
+      "world": [
+        -22.5,
+        0.0,
+        -17.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        -0.5,
+        5.0
+      ],
+      "world": [
+        -22.5,
+        0.0,
+        -17.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        0.0,
+        3.5
+      ],
+      "world": [
+        -22.0,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        0.0,
+        4.0
+      ],
+      "world": [
+        -22.0,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        0.0,
+        4.5
+      ],
+      "world": [
+        -22.0,
+        0.0,
+        -17.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        0.0,
+        5.0
+      ],
+      "world": [
+        -22.0,
+        0.0,
+        -17.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        0.0,
+        5.5
+      ],
+      "world": [
+        -22.0,
+        0.0,
+        -16.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        0.0,
+        6.0
+      ],
+      "world": [
+        -22.0,
+        0.0,
+        -16.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        0.5,
+        4.0
+      ],
+      "world": [
+        -21.5,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        0.5,
+        4.5
+      ],
+      "world": [
+        -21.5,
+        0.0,
+        -17.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        0.5,
+        5.0
+      ],
+      "world": [
+        -21.5,
+        0.0,
+        -17.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        0.5,
+        5.5
+      ],
+      "world": [
+        -21.5,
+        0.0,
+        -16.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        1.0,
+        4.0
+      ],
+      "world": [
+        -21.0,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        1.0,
+        4.5
+      ],
+      "world": [
+        -21.0,
+        0.0,
+        -17.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        1.0,
+        5.0
+      ],
+      "world": [
+        -21.0,
+        0.0,
+        -17.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        1.0,
+        5.5
+      ],
+      "world": [
+        -21.0,
+        0.0,
+        -16.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        1.5,
+        4.0
+      ],
+      "world": [
+        -20.5,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        1.5,
+        4.5
+      ],
+      "world": [
+        -20.5,
+        0.0,
+        -17.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        1.5,
+        5.0
+      ],
+      "world": [
+        -20.5,
+        0.0,
+        -17.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        1.5,
+        5.5
+      ],
+      "world": [
+        -20.5,
+        0.0,
+        -16.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        2.0,
+        4.0
+      ],
+      "world": [
+        -20.0,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        2.0,
+        4.5
+      ],
+      "world": [
+        -20.0,
+        0.0,
+        -17.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        2.0,
+        5.0
+      ],
+      "world": [
+        -20.0,
+        0.0,
+        -17.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        2.0,
+        5.5
+      ],
+      "world": [
+        -20.0,
+        0.0,
+        -16.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        2.5,
+        4.0
+      ],
+      "world": [
+        -19.5,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        2.5,
+        4.5
+      ],
+      "world": [
+        -19.5,
+        0.0,
+        -17.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        2.5,
+        5.0
+      ],
+      "world": [
+        -19.5,
+        0.0,
+        -17.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.0,
+        2.0
+      ],
+      "world": [
+        -19.0,
+        0.0,
+        -20.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.0,
+        2.5
+      ],
+      "world": [
+        -19.0,
+        0.0,
+        -19.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.0,
+        3.0
+      ],
+      "world": [
+        -19.0,
+        0.0,
+        -19.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.0,
+        3.5
+      ],
+      "world": [
+        -19.0,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.0,
+        4.0
+      ],
+      "world": [
+        -19.0,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.0,
+        4.5
+      ],
+      "world": [
+        -19.0,
+        0.0,
+        -17.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.0,
+        5.0
+      ],
+      "world": [
+        -19.0,
+        0.0,
+        -17.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.5,
+        2.0
+      ],
+      "world": [
+        -18.5,
+        0.0,
+        -20.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.5,
+        2.5
+      ],
+      "world": [
+        -18.5,
+        0.0,
+        -19.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.5,
+        3.0
+      ],
+      "world": [
+        -18.5,
+        0.0,
+        -19.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.5,
+        3.5
+      ],
+      "world": [
+        -18.5,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.5,
+        4.0
+      ],
+      "world": [
+        -18.5,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        3.5,
+        4.5
+      ],
+      "world": [
+        -18.5,
+        0.0,
+        -17.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        4.0,
+        1.5
+      ],
+      "world": [
+        -18.0,
+        0.0,
+        -20.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        4.0,
+        2.0
+      ],
+      "world": [
+        -18.0,
+        0.0,
+        -20.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        4.0,
+        2.5
+      ],
+      "world": [
+        -18.0,
+        0.0,
+        -19.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        4.0,
+        3.0
+      ],
+      "world": [
+        -18.0,
+        0.0,
+        -19.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        4.0,
+        3.5
+      ],
+      "world": [
+        -18.0,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        4.0,
+        4.0
+      ],
+      "world": [
+        -18.0,
+        0.0,
+        -18.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody outside currentviewport",
+      "eligible": false
+    },
+    {
+      "offset": [
+        4.5,
+        1.5
+      ],
+      "world": [
+        -17.5,
+        0.0,
+        -20.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        4.5,
+        2.0
+      ],
+      "world": [
+        -17.5,
+        0.0,
+        -20.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        4.5,
+        2.5
+      ],
+      "world": [
+        -17.5,
+        0.0,
+        -19.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        4.5,
+        3.0
+      ],
+      "world": [
+        -17.5,
+        0.0,
+        -19.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        4.5,
+        3.5
+      ],
+      "world": [
+        -17.5,
+        0.0,
+        -18.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        5.0,
+        1.5
+      ],
+      "world": [
+        -17.0,
+        0.0,
+        -20.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        5.0,
+        2.0
+      ],
+      "world": [
+        -17.0,
+        0.0,
+        -20.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        5.0,
+        2.5
+      ],
+      "world": [
+        -17.0,
+        0.0,
+        -19.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        5.0,
+        3.0
+      ],
+      "world": [
+        -17.0,
+        0.0,
+        -19.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        5.5,
+        1.5
+      ],
+      "world": [
+        -16.5,
+        0.0,
+        -20.5
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    },
+    {
+      "offset": [
+        5.5,
+        2.0
+      ],
+      "world": [
+        -16.5,
+        0.0,
+        -20.0
+      ],
+      "own_actor_blocks": [],
+      "visible_resource_blocks": [],
+      "projection_eligible": false,
+      "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+      "eligible": false
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "scope": "SDK300 freshM2 withgenuineearnedMission1 progress; exactmenu/card/Ore income and6paidbuildings only. All7Rallyproposals rejected BEFORERallyreview/Train; no newborn/defender/combat/missionacceptance",
+  "raw_root": "target/sdk300-fresh-m2-rally-20261012-07",
+  "actual_error": "No bounded publicly clear OWN-HQ assembly ground",
+  "actual_income": {
+    "returned_ore": 36,
+    "referenced_node_consumed": 37,
+    "paid_building_costs": [
+      20,
+      9
+    ],
+    "bank": [
+      80,
+      23
+    ],
+    "clock": 53.5924186706543
+  },
+  "root_independent_current_menu_review_ages": [
+    14.214,
+    23.788
+  ],
+  "rejection_summary": "5 physicallyclear candidates outsideviewport;1 physicallyclear HUDblocked;(5,0) Workerblocked+HUD;(-3,5) Crystalblocked+outsideviewport. Counts overlap because physical/projection checked separately.",
+  "no_Rally_request_or_Train": true,
+  "normal_exits": [
+    {
+      "pid": 3267933,
+      "supervisor_pid": 3267790,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "bounds": {
+    "wall": 900,
+    "simulation": 900,
+    "arrival": 30,
+    "review": 45
+  },
+  "not_current_assembly_approval": "Roothistorical07pixelbareground observation isnot08approval; requirefreshcurrentPNG45gate",
+  "evidence_sha256": {
+    "result.json": "3fc9602d411fdd220083f7960733882d610ce4f4a2d4dffc5968280b0e1357e8",
+    "candidate-rejection-trace.json": "f4e2e0bd6097451cbe1277b3518ec17550a1a1b247a452d57c8a1f56bac18b57",
+    "actual-assembly-failure.png": "c9243ba219c7c5026bdcaf0c8ad9b4113fc4a3ed0d5d11306c2703f03c57a9a3",
+    "income-receipt.json": "64b23f58b8343923830a4518096d9cf4c81c4c821ff6bf6e07ca0b6b49b77779"
+  }
+}
