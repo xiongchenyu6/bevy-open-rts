@@ -7,6 +7,17 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Latest Verified Checkpoints
 
+- The current SDK291 archive (399 files, 332 assets) launches through the
+  official Steam Runtime 4 launcher, renders the reviewed main menu and closes
+  normally with exit 0; installation and archive hashes remain unchanged
+  ([current runtime startup](qa/native291-trickle-official-runtime4-menu-review.json)).
+  A fresh normal-input tutorial verifies Skip and the first six lessons, including
+  earned Ore, paid Power/Barracks completion, four trained infantry and movement.
+  Reconnaissance is too slow to establish graduation; the unfinished attempt closes
+  normally and remains incomplete
+  ([partial tutorial](qa/native291-runtime4-bootcamp-partial-review.json)).
+  Complete graduation, persisted completion, fresh Replay and audible output
+  remain required on this final artifact.
 - The frozen native285 official-SDK matrix completes **3,726/3,726** cases
   within the original 600s simulation and 180s per-case wall limits. Independent
   verification accepts every terminal result, binary identity and all 332 assets.

@@ -1,0 +1,39 @@
+{
+  "scope": "Exact current399 package official Runtime4 startup/menu/normal close only; no Boot Camp or campaign acceptance",
+  "artifact": {
+    "scope": "Official SDK current trickle-source archive identity only; final native runtime/player acceptance pending",
+    "actual_exit": 0,
+    "archive": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-trickle-package-20261011/archive/bevy-open-rts-linux-x86_64.tar.gz",
+    "archive_sha256": "2a6b917240812daa7c9d201db57cbe88ed49f08aded1ea99e695cc44c6e49f49",
+    "package": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-trickle-extracted-20261011/bevy-open-rts-linux-x86_64",
+    "binary_sha256": "f4fb85245a88307b651e22c6dabd54e53e0f38351c052c262e4f418d40b6acd7",
+    "files": 399
+  },
+  "result": {
+    "scope": "Exact current399 package official Runtime4 startup/menu/normal close only; no Boot Camp or campaign acceptance",
+    "actual_exit": 0,
+    "exits": [
+      {
+        "pid": 2247536,
+        "supervisor_pid": 2247490,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "screenshots": {
+      "actual-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c"
+    },
+    "installation_archive_unchanged": true
+  },
+  "root_direct_visual_review": {
+    "menu_visible": true,
+    "six_command_buttons_visible": true,
+    "no_black_or_missing_scene": true
+  },
+  "limitations": [
+    "Boot Camp completion/Skip/Replay not tested here",
+    "Audio output not tested; runtime reports missing audio endpoint",
+    "Windows and complete campaign remain open"
+  ],
+  "evidence_directory": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/native291-trickle-runtime4-smoke-20261011-01"
+}

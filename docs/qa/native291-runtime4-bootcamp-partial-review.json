@@ -1,0 +1,70 @@
+{
+  "scope": "Exact399 official Steam Runtime4 normal tutorial partial evidence; workflow incomplete",
+  "session": {
+    "exits": [
+      {
+        "pid": 2253580,
+        "supervisor_pid": 2253517,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "screenshots": {
+      "00-fresh-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+      "01-training-start.png": "600fe39939b1dbf5de76653d8eb7f66e37de77b872879d98c7d342ac33a92435",
+      "02-skipped.png": "e86d4590d7494b238f60ba4b926fd0f2c5229d15398ddcc44c8a76b1234608df",
+      "02-pause-menu.png": "e86d4590d7494b238f60ba4b926fd0f2c5229d15398ddcc44c8a76b1234608df",
+      "05-gather-progress.png": "d53d5e4c01946555f084816778231cab590c06d87680bf99ff274b5c7f14a367",
+      "06-power-preview.png": "56a27ccc1c0f78e4148dfad4ee7d00b85f919d082246ef1aa2358fc4d734436c",
+      "07-power-at-site.png": "a8f9cd719ee0c7e863c988becd8f05bbe84e55869d8bd0d0bda60c30d32fac2f",
+      "08-power-paid.png": "5e2ab364484c97d2d2c2b72364ad7172e5e598154a49a8fce563314693cf1c8d",
+      "09-power-completed.png": "1ccdf6b4bf3acef8f6cc37d08c70bb12f2af94ddfd6f294625b70fe2871306c7",
+      "10-barracks-preview.png": "8da34a6999248f7f99ae50a2cdb740db4ba6d418d3e32855e10a6e4d9a8a0356",
+      "11-barracks-paid.png": "6ed238de31377ff07581f818bc81e235c9db115eb81afb7075f74b9cd8ba24f3",
+      "12-barracks-completed.png": "085751a3f16cbd64246d5a413934ca593b16823bddebe62642058fc86b57c646",
+      "13-infantry-paid.png": "b6d0ee183eb3b18f10ea71eec3b6c5f5b96320818d3f288536c2f38f798b59f8",
+      "14-infantry-ready.png": "869049ba3151d1c73cdf769ee38f8c38e2219a4544078b5c2ae3c675b0a57003",
+      "15-army-movement.png": "3ff92ee5f60ab0514b47486b431d0b2532e336deb63090c19dbc1b72c430e479",
+      "16-public-scout.png": "754f430bb14b3ba4ba0a2f1b65ba9990ea5c717b0bd749eb1cf5effd75909b60",
+      "17-army-focus.png": "e42ec006120208e90f03a969ca214d5ce88606132623b6d27f9dc47de2369335",
+      "18-base-focus.png": "e42ec006120208e90f03a969ca214d5ce88606132623b6d27f9dc47de2369335",
+      "19-real-base-focus.png": "838176c05f5e1f6f3752b6cdc7bc1333345a233a9787616a37ff795948b5b67d",
+      "20-scout-progress.png": "6c5f626db3bda9a41bbf32fd2609edbf7d54e3c4707edf050cfea7b98927d24b",
+      "21-scout-forward.png": "603a1b4970b4a93b6c0d7a747387eeac2fef7536d158e61238db15c264e4c50a",
+      "22-scout-forward.png": "a2574ee8afd4d5a1fbf77563db109279de6b21505bf73c7ef95837ecf496c05a",
+      "23-scout-forward.png": "d043576d310376f86d919fc986fff01f92ff7399eefae9ce40f76181fee14363",
+      "24-scout-forward.png": "88244fc441ba03f06b3c8656ed6fe309c14c46530b1616469c1c2317928687f6",
+      "25-scout-forward.png": "e100a80c0b08aa0c6eccff332368f68b0b131d4f6a5c69525669c78561018ef6",
+      "26-final-unfinished.png": "fb63fd0d5fe8d99df0da0511fabf185a1efa356851abd9c7c7c9d57c9947abf6"
+    },
+    "archive_installation_unchanged": true,
+    "scope": "Normal physical Runtime4 tutorial evidence; outcome requires review"
+  },
+  "root_direct_visual_review": {
+    "lesson1_initial_bank": [
+      64,
+      32
+    ],
+    "skip_returns_campaign_menu": true,
+    "earned_ore_bank": [
+      70,
+      32
+    ],
+    "power_green_preview_paid_and_completed": true,
+    "barracks_green_preview_paid_and_completed": true,
+    "four_infantry_price_ore": 4,
+    "four_infantry_ready": true,
+    "movement_advances_to_lesson7": true,
+    "last_frame_lesson": "7/7 Attack the enemy base",
+    "graduation_verified": false
+  },
+  "failure": "Manual reconnaissance was too slow; closed normally without graduation. Not a product failure diagnosis. Initial 2s camera pan entered fog, then many short pan/attack gestures delayed progress.",
+  "attack_bound": {
+    "start_wall": 312.08816756203305,
+    "budget_seconds": 300,
+    "whole_session_seconds": 900
+  },
+  "last_recorded_action_wall": 581.1062952450011,
+  "complete_boot_camp_acceptance": false,
+  "evidence_directory": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/native291-runtime4-bootcamp-normal-20261011-02"
+}
