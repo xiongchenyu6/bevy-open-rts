@@ -28,8 +28,9 @@ A bounded regression or an older package cannot establish final release readines
   endpoints and medium routes travel1.975m after the first turn. Nine screenshot
   hashes and trajectories are independently checked; actual game exit is0,
   with no forced cleanup and unchanged installation/archive. Raw evidence is
-  [portable Patrol proof](qa/sdk300-short-medium-patrol-review.json); browser verification
-  remains pending. SDK296/W25 results retain their older artifact scope and all
+  [portable Patrol proof](qa/sdk300-short-medium-patrol-review.json). The bounded
+  Wasm26 visual result below covers the native300 source; exact browser distances
+  remain unverified. SDK296/W25 results retain their older artifact scope and all
   nine release gates remain open.
 - Native296 passes296 tests with0 failures and1 ignored; all three native checks
   and builds pass. Its official-SDK package contains399 files/332 assets
@@ -112,8 +113,8 @@ A bounded regression or an older package cannot establish final release readines
   **3,726/3,726** unique terminal cases with no integrity errors or failures.
   Driver and independent verifier exit0; recorded evidence hashes are rechecked
   ([complete frozen matrix](qa/native291-complete-authored-start-matrix-review.json)).
-  Four current source files differ from that pin. This proves the frozen291
-  matrix only; current300 coverage, independent seeds, random maps, statistical
+  Subsequent movement, UI and Hold changes prevent treating that pin as current.
+  This proves the frozen291 matrix only; current305 coverage, independent seeds, random maps, statistical
   balance and human gameplay remain open.
 - The frozen native285 official-SDK matrix completes **3,726/3,726** cases
   within the original 600s simulation and 180s per-case wall limits. Independent
@@ -130,7 +131,7 @@ A bounded regression or an older package cannot establish final release readines
   have zero differences ([local recovery proof](qa/web20-local-game-reconnect-review.json)).
   Public TURN, deployed authority, eight-player recovery and complete matches
   remain unverified. The retained nonfatal host-case browser error is unclassified.
-- Current native lifecycle regressions pass 291 tests with zero failures and one
+- Historical native lifecycle regressions pass 291 tests with zero failures and one
   ignored test. The resumed Welcome preserves an established match rather than
   re-entering scene setup ([lifecycle proof](qa/online-resumed-welcome-lifecycle-review.json)).
   A real full-ICE TURN guest reconnect subsequently panicked in Matchbox's
