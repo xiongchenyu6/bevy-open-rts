@@ -95,6 +95,7 @@ WASM_OPT_BIN="$(resolve_wasm_opt || true)"
 [ -n "$WASM_OPT_BIN" ] && echo ">> wasm-opt: $("$WASM_OPT_BIN" --version)"
 
 cargo build --locked --release --target wasm32-unknown-unknown --features webgpu --bin bevy-open-rts
+WEB_CARGO_OUTPUT_DIR="${CARGO_TARGET_DIR:-target}"
 
 rm -rf web/pkg web/assets
 mkdir -p web/pkg
@@ -102,7 +103,7 @@ mkdir -p web/pkg
   --target web \
   --out-dir web/pkg \
   --out-name bevy_open_rts \
-  target/wasm32-unknown-unknown/release/bevy-open-rts.wasm
+  "$WEB_CARGO_OUTPUT_DIR/wasm32-unknown-unknown/release/bevy-open-rts.wasm"
 
 if [ -n "$WASM_OPT_BIN" ]; then
   BG="web/pkg/bevy_open_rts_bg.wasm"

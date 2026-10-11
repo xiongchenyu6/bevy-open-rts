@@ -1,0 +1,20 @@
+{
+  "scope": "Packaging-only retry of actual completed Wasm15 release compilation; original exit1 retained; no Cargo/clean/recompile",
+  "actual_exit": 0,
+  "raw_compiled_sha256": "704a5233034328cab2e34d95140ea0fb9d5f747fd7a8f476a701afe2c1c721b2",
+  "raw_compiled_bytes": 52326865,
+  "wasm_sha256": "1bd898b4881234fc2aa1d50b29e03e9086018cd8c516003efe613a5a9ef0c436",
+  "wasm_bytes": 27028537,
+  "build_id": "a6b6437343322866",
+  "source_and_assets_unchanged": true,
+  "bindgen_version": "0.2.128",
+  "wall_seconds": 125.44416112097679,
+  "compilation_evidence": "target/web-current-build15-snapshot-20261011",
+  "original_wrapper_actual_exit": 1,
+  "original_failure": "Cargo release compilation finished; wasm-bindgen used relative target path despite absolute CARGO_TARGET_DIR",
+  "compiled_dependency_files_verified": 51,
+  "packaging_evidence": "target/web-current-build15-packaging02-20261011",
+  "recorded_inputs": 620,
+  "runtime_acceptance": false,
+  "public_deployment": false
+}
