@@ -1,0 +1,61 @@
+{
+  "scope": "Normalhostonly Online/Create/Mapcycles layout diagnostic, no eight-human claim",
+  "wasm_sha256": "65f27ec9f326d8a1d4ad7a8eae5a4eefd4ddc36b9dc6fed07a48b3a508fe628a",
+  "viewport": [
+    1280,
+    720
+  ],
+  "hardware": "AMD RADV",
+  "actual_exit": 0,
+  "deadline_seconds": 90,
+  "public_maps_slots": [
+    [
+      "plain_and_simple",
+      4
+    ],
+    [
+      "four_corners",
+      4
+    ],
+    [
+      "tech_divide",
+      6
+    ],
+    [
+      "big_arena",
+      8
+    ]
+  ],
+  "normal_input_review": {
+    "four_slot_Map": [
+      275,
+      189
+    ],
+    "six_slot_Map": [
+      267,
+      154
+    ],
+    "wheel_down": 900,
+    "one_wheel_up": -120
+  },
+  "image_review": {
+    "eight_slots_visible": true,
+    "Ready_visible": true,
+    "Start_visible": false,
+    "Leave_visible": false,
+    "wheel_reveals_missing_footer": false
+  },
+  "wheel_down_up_png_identical": true,
+  "product_accessibility_pass": false,
+  "first_probe_actual_exit": 124,
+  "first_probe_scope": "Boundedmanualimagehandoff reachedsixslots only; preserved, no eight-slot/clippingclaim fromthatprobe",
+  "no_lobby_or_actor_setters": true,
+  "evidence_sha256": {
+    "target/web14-host-lobby-geometry02-20261011/final-supervisor-result.json": "64d9cdb2db931a4bfca812351b9f2b6abaa4ec8dce306e9a35ce03c9c0a0dfb1",
+    "target/web14-host-lobby-geometry02-20261011/lobby-geometry-workflow.json": "40051ec06b79de0b35f19b3c3567b1566fde0638d5f83595d7d02deb6bfde269",
+    "target/web14-host-lobby-geometry02-20261011/host-03-map-2-big_arena.png": "2afe94252582b67b236a0930d2172f5e215a43a287ea3fd849980e4c89908502",
+    "target/web14-host-lobby-geometry02-20261011/host-04-big-arena-wheel-down.png": "b1673740a677b46bf43a0659f329d283596ed371ebaf47c7f85719edb7305dd5",
+    "target/web14-host-lobby-geometry02-20261011/host-05-big-arena-one-wheel-up.png": "b1673740a677b46bf43a0659f329d283596ed371ebaf47c7f85719edb7305dd5",
+    "target/web14-host-lobby-geometry02-20261011/host-03-map-2-big_arena-observation.json": "339f04a3ef379786a02c417601d35e1f63b626869f975eb7983948c494b3c7dc"
+  }
+}
