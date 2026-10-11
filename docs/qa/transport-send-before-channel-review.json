@@ -23,5 +23,31 @@
     "green.log": "be97867696e8bb50fc8f98c513734a7f6b98bb93cbd75dae97e43431cfed1520"
   },
   "real_TURN_recovery_verified_after_fix": false,
-  "all_release_gates_remain_open": true
+  "all_release_gates_remain_open": true,
+  "full_native_verification": {
+    "source_count": 124,
+    "asset_count": 332,
+    "binary_count": 3,
+    "independently_hashed": true,
+    "results": {
+      "focused": 0,
+      "stale-lobby": 0,
+      "full": 0,
+      "check": 0,
+      "build": 0
+    },
+    "native_full_tests": {
+      "passed": 291,
+      "failed": 0,
+      "ignored": 1
+    },
+    "scope": "Current native peer-channel guard source and binary verification; fixed-Wasm TURN runtime acceptance pending",
+    "pin_sha256": "67dff996b0c28766e868010ae0f011bba25c84be0ad8a6c14f3d3b30eb05e89b",
+    "bins": {
+      "bevy-open-rts": "9b87988f22c6b1dfe1ac8ac3d73d71d77e2f87d505c0d26e1bec038c50b5aa85",
+      "capture": "78e3c7fb12f27cefe0141a4e816715fbf9586bf8a367cf6f3ea11086c941db40",
+      "skirmish_audit": "3c148b5fd93b634f3b1f8f62e95d639f1abc96baf97f167c676e558f4f15e5ef"
+    },
+    "raw_evidence": "target/transport-peer-channel-shared-20261011"
+  }
 }

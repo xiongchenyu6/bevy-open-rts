@@ -57,5 +57,23 @@
     "installation_unchanged": true,
     "archive_unchanged": true
   },
-  "interpretation": "The early six Ore witness remains valid. Later normal auto-retarget income exceeded original-node depletion, so the single-node whole-opening attribution check failed. Original workflow remains failed; mission victory unverified."
+  "interpretation": "The early six Ore witness remains valid. Later normal auto-retarget income exceeded original-node depletion, so the single-node whole-opening attribution check failed. Original workflow remains failed; mission victory unverified.",
+  "fresh_economy05_witness": {
+    "scope": "Fresh normal input runtime latched genuine early retained own-state witness; workflow and victory still pending",
+    "actual_returned_ore": 6,
+    "referenced_node_consumed": 6,
+    "paid_costs": [
+      5,
+      3
+    ],
+    "bank": [
+      65,
+      29
+    ],
+    "clock": 14.125732421875,
+    "raw_evidence": "target/sdk291-fresh-m3-economy-20261011-05/03",
+    "image_directly_viewed": true,
+    "image_visible": "Own HQ, paid Power and Anti-Air turret, selected Worker, bank65/29",
+    "image_sha256": "4cdd6126be78c5f4586030b9dbe23b38faae54d43d0e2a0772d2b4e430461ec5"
+  }
 }
