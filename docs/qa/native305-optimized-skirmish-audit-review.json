@@ -1,0 +1,33 @@
+{
+  "scope": "Current305 officialSDK optimized headless audit build/integrity only; new matrix NOT launched",
+  "actual_exit": 0,
+  "wall_seconds": 424.2051442989614,
+  "source_count": 143,
+  "asset_count": 332,
+  "audit_binary_sha256": "5846ee1bf69363f3f5823319ed0797dcfd563b49a9e8ba9c2925421d4adb6228",
+  "audit_bytes": 103556784,
+  "actual_clean_root_package_release": true,
+  "actual_current_root_compile_path": "/workspace",
+  "inherited_raw_pin_shipping_claim_is_stale": true,
+  "authoritative_build_scope": "OfficialSDK optimized same frozen305 source; only SDKresult/hash/source guards support this claim, inherited Debug/pending template remains raw unchanged",
+  "initial_seal_watcher_failure": "Exact compile-string assertion omitted Cargo version v0.1.0; journal retained; no build failure",
+  "verified_current305_dependency_cache_reused": true,
+  "snapshot_and_current_sources_assets_hashes_match": true,
+  "installed399_inventory_archive_unchanged": true,
+  "canonical_native_fourbin_pin": "target/hold-separation-shared-20261012/pin.json",
+  "evidence_hashes": {
+    "target/native305-hold-steamrt4-optimized-audit-20261012/result.json": "5536fdbe1c5be7bf49fee6464ba65832229304d4a7d7630b5c00d22b274cfa4b",
+    "target/native305-hold-steamrt4-optimized-audit-20261012/pin.json": "584aab8c1728dc3fa4891cda179d7076e8fc913b645002b8648e78f1bf06561d",
+    "target/native305-hold-steamrt4-optimized-audit-20261012/clean-local.log": "f0ad7cd0491c5269f20065b43fc50afb4f9d2ae1609b450a0cb13280f2e1f952",
+    "target/native305-hold-steamrt4-optimized-audit-20261012/build.log": "3cebffb2f44f0ce69297b634c8b289916ceee1498430f5bfd53b30de5f25d92d"
+  },
+  "boundaries": [
+    "No current3053726 coverage",
+    "Oldcurrent300 matrix remains historical unchanged",
+    "No player/render/independentseed/winrate acceptance"
+  ],
+  "audit_pin": "target/native305-hold-steamrt4-optimized-audit-20261012/pin.json",
+  "audit_binary": "target/native305-hold-steamrt4-optimized-audit-20261012/skirmish_audit",
+  "frozen_sources": "target/linux-native305-hold-sdk-snapshot-20261012/source",
+  "frozen_assets": "target/linux-native305-hold-sdk-snapshot-20261012/source/assets"
+}
