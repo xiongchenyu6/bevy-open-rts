@@ -1,0 +1,76 @@
+[
+  {
+    "key": 2675764623221,
+    "id": "RocketInfantry",
+    "actual_Move_then_arrived_Hold": true,
+    "body_review": {
+      "image_sha256": "aa9c7a91b7761317e73b5ad5daf15f2006ca5b540c98440302bdd23edaf41518",
+      "review_age": 11.011057526047807,
+      "point": [
+        186,
+        555
+      ],
+      "kind": "visible OWN body selection",
+      "approved": true,
+      "reason": null,
+      "shared_deadline_epoch": 1791744349.5446618,
+      "camera_review_attempts": []
+    },
+    "ground_review": {
+      "image_sha256": "d293d1f711cf0a626ea4b9a0b8e4b701e6e51d80571acf672c212f0b566663d5",
+      "review_age": 13.61367121397052,
+      "point": [
+        934,
+        540
+      ],
+      "kind": "visible clear OWN-HQ-relative Move ground",
+      "approved": true,
+      "reason": null,
+      "shared_deadline_epoch": 1791744364.9346094
+    },
+    "arrival_wall": 10.834364731970709,
+    "actual_position": [
+      -19.008244,
+      0.05,
+      -19.78255
+    ],
+    "weapon_range": 6.0
+  },
+  {
+    "key": 2598455211871,
+    "id": "AntiAirWalker",
+    "actual_Move_then_arrived_Hold": true,
+    "body_review": {
+      "image_sha256": "3c78cc1f58676e48ac31adbcea778a261550a9391c63a57c51067bc075c372f5",
+      "review_age": 8.208866228000261,
+      "point": [
+        137,
+        249
+      ],
+      "kind": "visible OWN body selection",
+      "approved": true,
+      "reason": null,
+      "shared_deadline_epoch": 1791744397.853345,
+      "camera_review_attempts": []
+    },
+    "ground_review": {
+      "image_sha256": "6e6568073488e1e20b8cd0b663041289cd4a1d45333f9ecae5be0c10fc7c5e0e",
+      "review_age": 13.013729372993112,
+      "point": [
+        796,
+        640
+      ],
+      "kind": "visible clear OWN-HQ-relative Move ground",
+      "approved": true,
+      "reason": null,
+      "shared_deadline_epoch": 1791744410.4431944
+    },
+    "arrival_wall": 16.01422765798634,
+    "actual_position": [
+      -20.693453,
+      0.05,
+      -18.912222
+    ],
+    "weapon_range": 7.5
+  }
+]

@@ -1,0 +1,64 @@
+{
+  "scope": "SDK296 freshM2: normalOre income +2actualsingledefenders Move/arrival/Hold; thirddefenderbody occluded after2orbits/shared45, nofullpolicy/combat/missionacceptance",
+  "raw_root": "target/sdk296-fresh-m2-income-20261012-06",
+  "actual_error": "Original45 current member image review exhausted",
+  "third_actor_request": {
+    "image": "member-whole-opening-511101106012-body-angle-2.png",
+    "image_sha256": "365e1686c46d12f847fd595982c41353cde2a10ec1eeac34f755d2d8b8292e9d",
+    "review_file": "member-defense-review.json",
+    "kind": "visible OWN body selection",
+    "actor_key": 511101106012,
+    "actor_type": "RocketInfantry",
+    "point": [
+      1144,
+      404
+    ],
+    "original_review_seconds": 45,
+    "deadline_utc_epoch": 1791744448.5179675,
+    "allow_occlusion_reframe": true
+  },
+  "dedicated_reviewer": "/root/visual_reviewer",
+  "actual_body_reviews": "Angle0[124,463]andangle1[608,51]occluded timelynegative;angle2[1144,404]stillroofcovered, shareddeadlineexpired, no latewrite",
+  "camera_inputs": "Atmost2normalrightBracket orbits; actualcameraDTO changes, OWNactor/bank/clock/pose/health exactstatic eachorbit",
+  "partial_defender_arrivals": [
+    {
+      "id": "RocketInfantry",
+      "key": 2675764623221,
+      "arrival_wall": 10.834364731970709,
+      "weapon_range": 6.0
+    },
+    {
+      "id": "AntiAirWalker",
+      "key": 2598455211871,
+      "arrival_wall": 16.01422765798634,
+      "weapon_range": 7.5
+    }
+  ],
+  "original_bounds": {
+    "mission_wall": 900,
+    "mission_simulation": 900,
+    "arrival": 30,
+    "shared_body_review": 45,
+    "max_orbit_reframes": 2
+  },
+  "normal_exits": [
+    {
+      "pid": 3213585,
+      "supervisor_pid": 3213536,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "evidence_sha256": {
+    "partial-arrival-Hold-receipts.json": "812ebbe38c7f52b8340b50908bb6ee3c7854e916f5aec5e1d10bbd9bfaf20345",
+    "member-whole-opening-511101106012-body-angle-1.png": "452b327b5a8429eac43139fc40e3f136e09184de19f4313944a6757b122da88b",
+    "result.json": "6b243013bdb36ab16ff9c294d60278d744e88a9a4259efdb917fbb70d74769d0",
+    "member-whole-opening-511101106012-body-angle-2.png": "365e1686c46d12f847fd595982c41353cde2a10ec1eeac34f755d2d8b8292e9d",
+    "actual-camera-review.json": "1d33acec1775393c24d4dd94e7fd3456bcc8958b1809400e6bcd45a1be0e107f",
+    "income-receipt.json": "34566ae304b43925c87149603719a1e10de15b7e881958911d70e56a56513213",
+    "member-whole-opening-511101106012-body-angle-0.png": "0e9413e92af449513bc2e226162fc48fce0fe7f06111f15de14155f394323961"
+  }
+}
