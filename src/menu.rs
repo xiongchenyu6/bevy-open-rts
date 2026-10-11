@@ -8,7 +8,9 @@ use bevy::prelude::*;
 use crate::*;
 
 mod backdrop;
+mod preferences;
 pub(crate) use backdrop::update_menu_backdrop_crop;
+pub(crate) use preferences::{persist_player_preferences, restore_player_preferences};
 
 pub(crate) const MENU_BACKGROUND_PATH: &str = "ui/background-original-v1.png";
 
@@ -82,7 +84,8 @@ pub(crate) struct OptionsMenuButton {
     pub(crate) action: OptionsMenuAction,
 }
 
-#[derive(Resource, Clone, Copy, Debug)]
+#[derive(Resource, Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(crate) struct MenuOptionsState {
     pub(crate) fullscreen: bool,
     pub(crate) language: Language,

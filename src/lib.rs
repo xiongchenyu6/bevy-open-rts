@@ -2414,7 +2414,15 @@ pub(crate) fn add_main_menu_scene(app: &mut App) -> &mut App {
             .before(clear_global_progress::<AppScreen>)
             .before(assets_loading_reset::<AppScreen>),
     );
-    app.add_systems(
+    app.add_systems(Startup, restore_player_preferences)
+    .add_systems(
+        Update,
+        persist_player_preferences
+            .after(options_menu_buttons)
+            .after(front_menu_buttons)
+            .after(toggle_language_hotkey),
+    )
+    .add_systems(
         OnEnter(AppScreen::AssetLoading),
         (queue_startup_loading_assets, setup_asset_loading_screen).chain(),
     )
@@ -3549,7 +3557,7 @@ pub(crate) enum PlayerControlMode {
 // limit), the active language is mirrored into a process-global flag that the
 // `t(zh, en)` helper reads. `sync_locale` keeps the flag in step with the
 // `Locale` resource each frame.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub(crate) enum Language {
     Zh,
     En,

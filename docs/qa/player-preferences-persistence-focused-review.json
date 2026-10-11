@@ -1,0 +1,35 @@
+{
+  "scope": "Player preferences persistence correction; native disk regressions only",
+  "actual_failure": "docs/qa/sdk267-audio-channels-reset-failure-review.json",
+  "storage": {
+    "native": "writable player data/preferences.ron",
+    "browser": "localStorage open-rts-preferences"
+  },
+  "saved_preferences": [
+    "volume channels",
+    "language",
+    "fullscreen",
+    "mouse restriction",
+    "camera tilt/speed/edge pan",
+    "damage numbers"
+  ],
+  "validation": "version1 and finite/range checks; invalid existing files preserved",
+  "focused_result": {
+    "actual_exit": 0,
+    "wall_seconds": 115.31945126599749,
+    "source_sha256": "e7fbdeeb655ff6399bfbaee473586dd6c68442064222758fbecb6f2b21144271",
+    "source_unchanged": true
+  },
+  "focused_tests_passed": 2,
+  "after_focused_change": "Fresh profiles derive fullscreen option from actual Window mode, preventing unrelated audio changes from persisting an incorrect default fullscreen flag. This final small startup adjustment awaits consolidated checks.",
+  "current_source_sha256": "3784993229280be6b0f54ed53ed012188e144d5deac84d6ede5683323a1620ce",
+  "full_suite_verified": false,
+  "actual_normal_restart_verified": false,
+  "browser_storage_verified": false,
+  "windows_verified": false,
+  "optimized_package_contains_fix": false,
+  "evidence_sha256": {
+    "target/player-preferences-focused-20261011/focused.log": "f334ffe3bdaced78b6c83ff9fdd3b1ab3691ac8f2156a7ab879a4d4ec8f41ad0",
+    "target/player-preferences-focused-20261011/result.json": "6a65e5945f608397d6a7577f7d1a1952bb6c3aaaf6ec07ca55492470b11603db"
+  }
+}
