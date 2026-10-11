@@ -59,5 +59,6 @@ The six runtime files total3.28MB, decode successfully and resolve from every
 campaign entry. Source PNGs remain unchanged. Mission5 native briefing was inspected at1280×720 in
 `screenshots/steam-quality/current-campaign-twin-early-cover-2/00_briefing.png`: art
 loads, title/copy are readable and no clipping appears. Remaining mission images,
-smaller layouts and browser presentation still require verification. Legacy JPEGs are temporarily retained for sealed
-older validation programs and must be removed before final distribution.
+smaller layouts and browser presentation still require verification. The source tree and independently verified UI08 Linux package contain only the
+six current `-v2.jpg` illustrations. Legacy JPEGs have been removed; historical
+source hashes remain in the provenance ledger.
