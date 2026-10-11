@@ -1,0 +1,33 @@
+{
+  "scope": "Complete authored-start matrix on frozen native291 officialSDK audit; not current296 equivalence or independent-seed balance",
+  "planned": 3726,
+  "completed_unique_terminal_cases": 3726,
+  "actual_driver_exit": 0,
+  "actual_independent_verifier_exit": 0,
+  "integrity_errors": [],
+  "terminal_failures": [],
+  "source_audit_sha256": "24d29796b3f9e7da3075884ab92ec20b47178e4bde615230f823e8a7f6667eb4",
+  "assets": 332,
+  "current_source_files_differing_from_pin": [
+    "src/hud.rs",
+    "src/match_tests.rs",
+    "src/movement_endpoint_tests.rs",
+    "src/orders.rs"
+  ],
+  "root_checks": [
+    "Structuredcomplete/integrity flags and verifieractualexit0",
+    "All3726observations present, indicesunique andclassificationcompleted"
+  ],
+  "raw_scope_note": "Raw verifier retains legacy partial/current247 template text. Structured complete_matrix and all3726terminal observations prove the full frozen291 run; raw file is preserved unchanged.",
+  "limitations": [
+    "No current296 behavioral equivalence",
+    "No independent seeds or statistical win-rate claim",
+    "No random-map/balance/performance/human gameplay acceptance"
+  ],
+  "evidence_sha256": {
+    "result.json": "f1c5c2c077f4b2027a93e3c770a3e6bcf9279e9f33caa1dbce6bbec2e3d905ab",
+    "verification-result.json": "f7f5141a362874422f42619645388b3a02a78829103b9c1c65ea8a423ed1757b",
+    "independent-final.json": "2acc4bb30184f2e1ae6eed9a573e76a4552bcc724e479a49d5573800dd99fff6",
+    "input.json": "ddd6f47facc5d3be2d633351aa042b56cb1957bff048eac4e829a3016e4988a8"
+  }
+}
