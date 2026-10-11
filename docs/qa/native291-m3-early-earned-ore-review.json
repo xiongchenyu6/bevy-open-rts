@@ -1,0 +1,44 @@
+{
+  "scope": "SDK291 fresh M3 through normal Campaign card3 on genuinely earned prefix2; early visible Ore click and returned income only",
+  "raw_evidence": "target/sdk291-fresh-m3-economy-20261011-04",
+  "earned_prefix_sha256": "49a2d1643b35bdc53c65186dff35bb82e29e9c7d92f72d20472cda617e645fc2",
+  "ore_current_frame_direct_review": {
+    "reviewed_image_sha256": "520f58427108cd7dbcd5292967bfec5ef7ed5e8a33dd3c1899f1a64dcb4c3d52",
+    "visible_information_only": true,
+    "resource_point": [
+      765,
+      94
+    ],
+    "review": "Root directly viewed current Ore pale/green body at76594, above fog and outside HUD."
+  },
+  "immediate_paused_owned_Harvest_verified": true,
+  "early_returned_income": {
+    "scope": "Readonly retained early economic snapshot; full economy04 opening and M3 victory remain pending",
+    "clock": 14.260835647583008,
+    "bank": [
+      65,
+      29
+    ],
+    "actual_paid_costs": [
+      5,
+      3
+    ],
+    "initial_bank": [
+      64,
+      32
+    ],
+    "returned_ore": 6,
+    "known_harvest_node_consumed": 6,
+    "own_units_lost": 0,
+    "own_structures_lost": 0,
+    "own_dropoff_survives": true,
+    "snapshot": "target/sdk291-fresh-m3-economy-20261011-04/03/auto-02-AntiAirTurret-progress.ron",
+    "snapshot_sha256": "103e6592ba26e15c59ba000984beb5998039ed95238a6608b32779e4881a158f"
+  },
+  "safety_of_attribution": "No losses/refund opportunity, own Command Center alive, unchanged crystal after paid cost accounting, exact consumed originally clicked node. No bank/resource/order setters.",
+  "workflow_still_running": true,
+  "full_opening_pass": false,
+  "mission_victory_pass": false,
+  "same_application_six_mission_pass": false,
+  "all_release_gates_remain_open": true
+}
