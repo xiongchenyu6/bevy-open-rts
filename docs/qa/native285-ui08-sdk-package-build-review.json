@@ -1,0 +1,29 @@
+{
+  "scope": "UI08 official SDK optimized build and extracted package identity only; Steam release acceptance remains open",
+  "actual_build_exit": 0,
+  "clean_project_exit": 0,
+  "package_exit": 0,
+  "integrity_exit": 0,
+  "wall_seconds": 593.1709530630033,
+  "image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+  "raw_binary_sha256": "1f7472a2d83b7b15aa8b73f176dd88e4a8d40a690542a06c1bfa438020ee36e3",
+  "installed_binary_sha256": "6cd96f98f0c11f33dc66e8197a44b49f6bc81895f141ae95fd713e6eb7e1c323",
+  "archive_sha256": "94d12dee34104cda0d27b1801a9f8da7342db840e6e428d88cdab087c5386d4e",
+  "frozen_files": 769,
+  "source_inputs": 120,
+  "assets": 332,
+  "installed_files": 381,
+  "independently_verified": true,
+  "evidence": {
+    "target/linux-native285-ui08-steamrt4-sdk-20261011/result.json": "00d6479bd374ace69132c5aa8527907063c4bcba66511d7c082bde5aeaeda361",
+    "target/linux-native285-ui08-sdk-snapshot-20261011/input.json": "02b92500e186411372cc667b2bd1182fb1aa50a395bfd5271d69a5d6c66ff424",
+    "target/linux-native285-ui08-package-20261011/result.json": "abf98f3f0688860226f06e693eacba5944c17f752df61becbe92774365813653",
+    "target/linux-native285-ui08-extracted-20261011/ready.json": "4491977ae607ac4ba7bcd324f7793561509f73d07aa49e92cfda781eaeae03f5",
+    "target/linux-native285-ui08-extracted-20261011/bevy-open-rts-linux-x86_64/BUILD_INFO.json": "ddcac09a3b18a4ea4d76c9b655acbda6f9b5d08772eec0d64fe82b8db781fef5"
+  },
+  "limits": [
+    "Campaign six05 remains live; only mission one victory has been directly reviewed",
+    "This candidate predates the cutscene UiTransform correction currently under test",
+    "BootCamp, complete same-process campaign, save fidelity, Windows, full multiplayer, performance and release assets remain unaccepted"
+  ]
+}
