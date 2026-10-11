@@ -1,0 +1,47 @@
+{
+  "scope": "Second real eight-context readiness failure; sequentialReady alone did not succeed",
+  "driver_result": {
+    "actual_driver_exit": 1,
+    "error": "Error: Bounded p1 own-ready",
+    "real_contexts": 8,
+    "roles": [
+      "host",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6",
+      "p7"
+    ],
+    "events": 0,
+    "diagnostics": [],
+    "normal_browser_close": true,
+    "closed_wall_ms": 1791690376011,
+    "browser_close_ms": 976,
+    "deadline_seconds": 240,
+    "eight_gate_verified_by_separate_verifier": false,
+    "reconnect_pass": false,
+    "forced_relay_required": true
+  },
+  "supervisor": {
+    "node_actual_exit": 1,
+    "driver_actual_exit": 1,
+    "actual_exit": 1,
+    "deadline_seconds": 240
+  },
+  "root_direct_before_click_image": true,
+  "local_revision_at_click": 14,
+  "local_open_slots_at_click": 3,
+  "finding": "Guest own join acknowledgment did not imply its local view had received all seven guest joins. The actual pre-click image shows open slots. Display catchup/rebuild cause is not established.",
+  "next_guard": "Wait host and every guest public view for eight actual connected Human occupants, then fresh host revision before each normalReady click. Original240 retained.",
+  "product_code_changed": false,
+  "eight_control_pass": false,
+  "evidence_sha256": {
+    "target/web16-eight-human-20261011-02/result.json": "d5b853fc0e66a9493a7b9ce2f9bfc599c91b7671452891847b8e53d6896254cc",
+    "target/web16-eight-human-20261011-02/final-supervisor-result.json": "204c083463133bbe24a6739a6183721c1c88eb6e3cf2d7cf8d754a22bd38d188",
+    "target/web16-eight-human-20261011-02/p1-actual-footer-before-ready.png": "e4f189f412cc711e9480831301c7cc90122a532f074632055cb2d6a389753d3e",
+    "target/web16-eight-human-20261011-02/p1-normal-Ready-down-raw.json": "24b4712fa883a7716b988ac45de8f13022649f31167f4e2859f66e966a722018",
+    "target/web16-eight-human-20261011-02/p1-normal-Ready-gesture.json": "6b0a880651b4b12c6dd71c65d9c0f3fc7ea0b516d282228cafafe7d3d97e572f"
+  }
+}
