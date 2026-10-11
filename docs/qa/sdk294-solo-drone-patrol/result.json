@@ -1,0 +1,90 @@
+{
+  "scope": "Normal starter SoloDrone Patrol smoke; no spawned/paid extra units; not campaign acceptance",
+  "passed": true,
+  "original_wall": 600,
+  "original_natural_stage": 30,
+  "actual_receipt": {
+    "drone_key": 8589933885,
+    "before": [
+      -17.0,
+      1.5,
+      -20.0
+    ],
+    "after": [
+      -13.078867,
+      1.5,
+      -18.036327
+    ],
+    "xz_delta": 4.385350117677948,
+    "clock_delta": 5.409334182739258,
+    "issued_continuity": {
+      "active": "[\n                    Move((-11.000982, 0.0, -16.995739)),\n                    Patrol(\n                        origin: (-17.0, 1.5, -20.0),\n                        destination: (-11.000982, 0.0, -16.995739),\n                    ),\n                ]",
+      "effects": "(\n                    emp: None,\n                    shield: None,\n                    chrono: None,\n                    projector_remaining: None,\n                    income_remaining: None,\n                )",
+      "deployment": "None",
+      "ai_wave_member": "false",
+      "ai_scout": "None",
+      "mine_layer": "None",
+      "queued": "[]",
+      "hold": "false",
+      "capture_elapsed": "0.0",
+      "harvest_remaining": "0.0",
+      "harvest_kind": "None",
+      "harvest_state": "None",
+      "patrol_forward": "true",
+      "weapon_remaining": "0.0",
+      "mine": "None"
+    },
+    "after_continuity": {
+      "active": "[\n                    Move((-17.0, 1.5, -20.0)),\n                    Patrol(\n                        origin: (-17.0, 1.5, -20.0),\n                        destination: (-11.000982, 0.0, -16.995739),\n                    ),\n                ]",
+      "effects": "(\n                    emp: None,\n                    shield: None,\n                    chrono: None,\n                    projector_remaining: None,\n                    income_remaining: None,\n                )",
+      "deployment": "None",
+      "ai_wave_member": "false",
+      "ai_scout": "None",
+      "mine_layer": "None",
+      "queued": "[]",
+      "hold": "false",
+      "capture_elapsed": "0.0",
+      "harvest_remaining": "0.0",
+      "harvest_kind": "None",
+      "harvest_state": "None",
+      "patrol_forward": "false",
+      "weapon_remaining": "0.0",
+      "mine": "None"
+    },
+    "normal_ground_point": [
+      1009,
+      452
+    ],
+    "selected": [
+      {
+        "local_entity": 8589933885,
+        "network_id": 2,
+        "type": "Drone"
+      }
+    ],
+    "bank": [
+      32,
+      16
+    ]
+  },
+  "program_flow_passed": true,
+  "normal_exits": [
+    {
+      "pid": 2916909,
+      "supervisor_pid": 2916854,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "01/00-normal-main-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01/05-current-mixed-before-ground.png": "8dff88aa4005977f42202548a211ed47eb174dc876ead165b1067aa5d22c1852",
+    "01/06-actual-Patrol-mode.png": "25d2ce234d0bd14dc6d53b98c267cf5775d6b6883393d77a5dafbdbd0d86f8c5",
+    "01/08-solo-Drone-paused-issued.png": "9880dc4483dbfac83c0d40918f9a273919ae698bbd3e86e87998b13205ac7d37",
+    "01/10-solo-Drone-after-natural-motion.png": "d84132f2afda7873de6e3ad56f94ebff73ecfc0f383ad51b7689b7d8eeb54908"
+  },
+  "wall_seconds": 54.49535561399534
+}

@@ -1,0 +1,64 @@
+{
+  "drone_key": 8589933885,
+  "before": [
+    -17.0,
+    1.5,
+    -20.0
+  ],
+  "after": [
+    -13.078867,
+    1.5,
+    -18.036327
+  ],
+  "xz_delta": 4.385350117677948,
+  "clock_delta": 5.409334182739258,
+  "issued_continuity": {
+    "active": "[\n                    Move((-11.000982, 0.0, -16.995739)),\n                    Patrol(\n                        origin: (-17.0, 1.5, -20.0),\n                        destination: (-11.000982, 0.0, -16.995739),\n                    ),\n                ]",
+    "effects": "(\n                    emp: None,\n                    shield: None,\n                    chrono: None,\n                    projector_remaining: None,\n                    income_remaining: None,\n                )",
+    "deployment": "None",
+    "ai_wave_member": "false",
+    "ai_scout": "None",
+    "mine_layer": "None",
+    "queued": "[]",
+    "hold": "false",
+    "capture_elapsed": "0.0",
+    "harvest_remaining": "0.0",
+    "harvest_kind": "None",
+    "harvest_state": "None",
+    "patrol_forward": "true",
+    "weapon_remaining": "0.0",
+    "mine": "None"
+  },
+  "after_continuity": {
+    "active": "[\n                    Move((-17.0, 1.5, -20.0)),\n                    Patrol(\n                        origin: (-17.0, 1.5, -20.0),\n                        destination: (-11.000982, 0.0, -16.995739),\n                    ),\n                ]",
+    "effects": "(\n                    emp: None,\n                    shield: None,\n                    chrono: None,\n                    projector_remaining: None,\n                    income_remaining: None,\n                )",
+    "deployment": "None",
+    "ai_wave_member": "false",
+    "ai_scout": "None",
+    "mine_layer": "None",
+    "queued": "[]",
+    "hold": "false",
+    "capture_elapsed": "0.0",
+    "harvest_remaining": "0.0",
+    "harvest_kind": "None",
+    "harvest_state": "None",
+    "patrol_forward": "false",
+    "weapon_remaining": "0.0",
+    "mine": "None"
+  },
+  "normal_ground_point": [
+    1009,
+    452
+  ],
+  "selected": [
+    {
+      "local_entity": 8589933885,
+      "network_id": 2,
+      "type": "Drone"
+    }
+  ],
+  "bank": [
+    32,
+    16
+  ]
+}

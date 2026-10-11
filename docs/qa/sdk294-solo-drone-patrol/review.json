@@ -1,0 +1,39 @@
+{
+  "scope": "Bounded SDK294 normal SoloDrone Patrol and natural turn; no Worker/all-controls/campaign acceptance",
+  "ready_binary_sha256": "85b1871dabf4fb7d235d499dad6d7f0fb42207491b1dff25fe0656cc9d30b8e8",
+  "ready_archive_sha256": "76aaa6754e67d031a7ca8d41e9ad13539bc374ebef11af7ce166b47396312b6e",
+  "controls": "Normal initial Skirmish32/16; CtrlAltA selects only starterDrone; actual enabledW Patrolcard then strict nonHUD clear-ground RMB; F10 resume and pause; CtrlS own readonly RON",
+  "limits": {
+    "whole_wall": 600,
+    "natural_stage": 30
+  },
+  "observed": {
+    "xz_displacement": 4.385350117677948,
+    "game_seconds": 5.409334182739258,
+    "world_y_exact": 1.5,
+    "patrol_forward_before": true,
+    "patrol_forward_after": false,
+    "move_before": "destination",
+    "move_after": "origin",
+    "bank": [
+      32,
+      16
+    ]
+  },
+  "personally_inspected_pngs": [
+    "06-actual-Patrol-mode.png",
+    "10-solo-Drone-after-natural-motion.png"
+  ],
+  "normal_close_exit": 0,
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "raw_full_run": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk294-solo-drone-patrol-20261012-01",
+  "evidence_sha256": {
+    "result.json": "fccb01b9e394c504938ef0c4fbf4abac5d9f6dee77fc00a26a182f9db1af4616",
+    "patrol-observation.json": "f8dc3b419bd4b132ae6960ce6874098b97910ddf62a62dad24f1749df3ddfce7",
+    "06-actual-Patrol-mode.png": "25d2ce234d0bd14dc6d53b98c267cf5775d6b6883393d77a5dafbdbd0d86f8c5",
+    "08-solo-Drone-paused-issued.png": "9880dc4483dbfac83c0d40918f9a273919ae698bbd3e86e87998b13205ac7d37",
+    "10-solo-Drone-after-natural-motion.png": "d84132f2afda7873de6e3ad56f94ebff73ecfc0f383ad51b7689b7d8eeb54908"
+  }
+}
