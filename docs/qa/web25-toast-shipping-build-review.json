@@ -1,0 +1,31 @@
+{
+  "scope": "Current native296 shipping Wasm25 integrity only; browser runtime/public deployment not performed",
+  "actual_exit": 0,
+  "wall_seconds": 628.8182128170156,
+  "source_commit": "cfab00530269f53868a19874d5b6a8b4b81392aa",
+  "tested_product_source": "c37a8bb",
+  "native_pin_sha256": "e08030ac0925d74dbef8a9eb395766172bf5b9b2f517eecd8bada198ae9e0120",
+  "sources": 142,
+  "assets": 332,
+  "fork_files": 15,
+  "clean4_localpackages": 0,
+  "actual4_frozen_compile_paths_verified": true,
+  "shipping_lock_bindgen_version": "0.2.128",
+  "bindgen_site_exit": 0,
+  "wasm_sha256": "4ef2044621406ba42e145450d5f092b97ef019a2b4698f02f49d6dfb4bf40dd8",
+  "wasm_bytes": 27080319,
+  "build_id": "bdf75e58ad1c2da7",
+  "private_alias": "web/qa-wasm25",
+  "protected_USER_index_styles_flake_AGENTS_unchanged": true,
+  "evidence_sha256": {
+    "target/web-current-build25-snapshot-20261012/result.json": "7d2afe4de6831c33ac09cabe7ede4710bd3ba3c562aaf93e41524be2f568f6cd",
+    "target/web-current-build25-snapshot-20261012/input.json": "5cd616ea7587ca50f3c3a0aaea0d7ebe673aff1ec6150ef374743df6aa701938",
+    "target/web-current-build25-snapshot-20261012/seal.json": "4f0aaf4dc747ebb94d145e7ab9085c83adf851530e64cf39cc55e735f4b2270a",
+    "target/web-current-build25-snapshot-20261012/build.log": "4c11a31a10b5601dd5cb39a1c33abe4f8db44015c696c3ac47bf86bdead82e07"
+  },
+  "boundaries": [
+    "SDK296 normaltoast images verified separately",
+    "BrowserW25runtime remains pending",
+    "No deploy/GPU/browserlaunch"
+  ]
+}
