@@ -215,6 +215,7 @@ pub(crate) struct SelectionDragBox;
 
 #[derive(Clone)]
 pub(crate) struct BattleLogEntry {
+    pub(crate) tactical_pause_notice: bool,
     pub(crate) message: String,
     pub(crate) remaining: f32,
     pub(crate) focus: Option<Vec3>,
@@ -1431,6 +1432,7 @@ pub(crate) struct ObjectiveTrackerSnapshot {
 pub(crate) fn update_battle_log(
     mut commands: Commands,
     time: Res<Time>,
+    real_time: Res<Time<Real>>,
     mut battle_log: ResMut<BattleLog>,
     mut latest_battle_event: ResMut<LatestBattleEvent>,
     root_q: Query<(Entity, &BattleLogRoot, Option<&Children>)>,
@@ -1438,7 +1440,13 @@ pub(crate) fn update_battle_log(
     let delta = time.delta_secs();
     battle_log.under_attack_cooldown = (battle_log.under_attack_cooldown - delta).max(0.0);
     for entry in &mut battle_log.entries {
-        entry.remaining -= delta;
+        // Passive UI notices expire even while tactical pause freezes simulation.
+        // Focused combat entries own virtual-time minimap pings and keep that clock.
+        entry.remaining -= if entry.focus.is_none() {
+            real_time.delta_secs()
+        } else {
+            delta
+        };
         if entry.minimap_ping_active {
             entry.minimap_ping_remaining = (entry.minimap_ping_remaining - delta).max(0.0);
             entry.minimap_ping_active = entry.minimap_ping_remaining > 0.0;
@@ -1592,10 +1600,17 @@ pub(crate) fn push_battle_log_with_kind(
     ping_kind: BattleEventPingKind,
 ) {
     let message = message.into();
+    if focus.is_none() && ping_kind == BattleEventPingKind::Generic {
+        // Alternating Save/Pause notices are still duplicates; keep the newest one.
+        battle_log.entries.retain(|entry| {
+            entry.focus.is_some() || entry.ping_kind != ping_kind || entry.message != message
+        });
+    }
     // Collapse repeats (e.g. spamming "资源不足"): if the newest entry says the
     // same thing, just refresh its lifetime instead of stacking duplicates.
     if let Some(last) = battle_log.entries.back_mut()
         && last.message == message
+        && (focus.is_some() || last.focus.is_none())
     {
         last.remaining = BATTLE_LOG_ENTRY_TTL_SECONDS;
         if focus.is_some() {
@@ -1606,6 +1621,7 @@ pub(crate) fn push_battle_log_with_kind(
         return;
     }
     battle_log.entries.push_back(BattleLogEntry {
+        tactical_pause_notice: false,
         message,
         remaining: BATTLE_LOG_ENTRY_TTL_SECONDS,
         focus,
@@ -3784,6 +3800,16 @@ pub(crate) fn update_match_end_charts(
 #[derive(Resource, Default)]
 pub(crate) struct TacticalPause(pub(crate) bool);
 
+fn push_tactical_pause_notice(battle_log: &mut BattleLog, message: &str) {
+    battle_log
+        .entries
+        .retain(|entry| !entry.tactical_pause_notice);
+    push_battle_log(battle_log, message, None);
+    if let Some(entry) = battle_log.entries.back_mut() {
+        entry.tactical_pause_notice = true;
+    }
+}
+
 pub(crate) fn tactical_pause_hotkey(
     keyboard: Res<ButtonInput<KeyCode>>,
     match_speed: Res<MatchSpeed>,
@@ -3797,17 +3823,16 @@ pub(crate) fn tactical_pause_hotkey(
     pause.0 = !pause.0;
     if pause.0 {
         virtual_time.set_relative_speed(0.0);
-        push_battle_log(
+        push_tactical_pause_notice(
             &mut battle_log,
             t(
                 "战术暂停 — 可继续下达指令 (F10 恢复)",
                 "Tactical pause — orders still accepted (F10 resumes)",
             ),
-            None,
         );
     } else {
         virtual_time.set_relative_speed(match_speed.preset.scale());
-        push_battle_log(&mut battle_log, t("已恢复", "Resumed"), None);
+        push_tactical_pause_notice(&mut battle_log, t("已恢复", "Resumed"));
     }
 }
 

@@ -2864,3 +2864,113 @@ fn promotion_battle_log_entries_coalesce() {
     assert_eq!(log.entries.len(), 3);
     assert!(!log.entries.back().unwrap().message.contains('×'));
 }
+
+#[test]
+fn repeated_save_and_pause_notices_show_only_current_state_without_hiding_failures() {
+    let mut app = App::new();
+    app.init_resource::<ButtonInput<KeyCode>>()
+        .init_resource::<MatchSpeed>()
+        .init_resource::<TacticalPause>()
+        .init_resource::<Time<Virtual>>()
+        .init_resource::<BattleLog>()
+        .add_systems(Update, tactical_pause_hotkey);
+    let saved = t("已存档 (Ctrl+L 读档)", "Game saved (Ctrl+L to load)");
+    let paused = t(
+        "战术暂停 — 可继续下达指令 (F10 恢复)",
+        "Tactical pause — orders still accepted (F10 resumes)",
+    );
+    let resumed = t("已恢复", "Resumed");
+    let focus = Vec3::new(3.0, 0.0, 4.0);
+    {
+        let mut log = app.world_mut().resource_mut::<BattleLog>();
+        push_battle_log(&mut log, "Save failed: disk full", None);
+        push_battle_log(&mut log, "Cannot build: occupied", None);
+        push_battle_log(&mut log, "Base under attack", Some(focus));
+    }
+    for expected_pause in [true, false, true] {
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .clear();
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .press(KeyCode::F10);
+        app.update();
+        assert_eq!(
+            app.world().resource::<TacticalPause>().0,
+            expected_pause,
+            "Actual F10 transition required each iteration"
+        );
+        app.world_mut()
+            .resource_mut::<ButtonInput<KeyCode>>()
+            .release(KeyCode::F10);
+        push_battle_log(
+            &mut app.world_mut().resource_mut::<BattleLog>(),
+            saved,
+            None,
+        );
+    }
+    assert!(app.world().resource::<TacticalPause>().0);
+    let log = app.world().resource::<BattleLog>();
+    assert_eq!(
+        log.entries.iter().filter(|e| e.message == saved).count(),
+        1,
+        "Alternating normal notices must not duplicate successful saves"
+    );
+    assert_eq!(
+        log.entries.iter().filter(|e| e.message == paused).count(),
+        1
+    );
+    assert!(
+        !log.entries.iter().any(|e| e.message == resumed),
+        "Old resumed status contradicts current pause"
+    );
+    assert!(
+        log.entries
+            .iter()
+            .any(|e| e.message == "Save failed: disk full")
+    );
+    assert!(
+        log.entries
+            .iter()
+            .any(|e| e.message == "Cannot build: occupied")
+    );
+    assert!(log.entries.iter().any(|e| e.message == "Base under attack"
+        && e.focus == Some(focus)
+        && e.minimap_ping_active));
+}
+
+#[test]
+fn paused_notice_expires_in_real_time_without_advancing_focused_combat_pings() {
+    let mut app = App::new();
+    app.init_resource::<Time>()
+        .init_resource::<Time<Real>>()
+        .init_resource::<BattleLog>()
+        .init_resource::<LatestBattleEvent>()
+        .add_systems(Update, update_battle_log);
+    let focus = Vec3::new(3.0, 0.0, 4.0);
+    {
+        let mut log = app.world_mut().resource_mut::<BattleLog>();
+        push_battle_log(&mut log, "Game saved (Ctrl+L to load)", None);
+        push_battle_log(&mut log, "Base under attack", Some(focus));
+        log.under_attack_cooldown = 5.0;
+    }
+    app.world_mut()
+        .resource_mut::<Time<Real>>()
+        .advance_by(std::time::Duration::from_secs(7));
+    app.update();
+    let log = app.world().resource::<BattleLog>();
+    assert_eq!(
+        log.entries.len(),
+        1,
+        "Paused UI notice should expire after seven real seconds"
+    );
+    let entry = log.entries.front().unwrap();
+    assert_eq!(entry.focus, Some(focus));
+    assert_eq!(entry.remaining, BATTLE_LOG_ENTRY_TTL_SECONDS);
+    assert!(entry.minimap_ping_active);
+    assert_eq!(
+        entry.minimap_ping_remaining,
+        BATTLE_EVENT_PING_LIFETIME_SECONDS
+    );
+    assert_eq!(log.under_attack_cooldown, 5.0);
+}

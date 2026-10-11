@@ -1,0 +1,48 @@
+{
+  "scope": "Passive HUD notice source/regression evidence; new native rendered acceptance pending",
+  "visible_RED": "SDK294 DronePatrol screenshot shows5duplicateSave/Pause/Resume lines acrossHQ",
+  "implementation": "NonfocusedGeneric exactmessages coalesce across deque; latest tacticalPause/Resume replaces prior state through taggedentry. Nonfocused notices useRealTime expiry; focusedcombat lifetime/pings/underattackcooldown remainVirtual.",
+  "owned_sources": [
+    "src/hud.rs",
+    "src/match_tests.rs"
+  ],
+  "RED02": {
+    "actual_exit": 101,
+    "actual_root_compile": true,
+    "pass": 1,
+    "fail": 2,
+    "actualF10states": [
+      true,
+      false,
+      true
+    ],
+    "saved_count": 3,
+    "expected_saved_count": 1,
+    "sevenRealSecondsPausedNoticeDidNotExpire": true
+  },
+  "preserved_RED01": "Expiry failure valid; toggle test pass was invalid fixture (ButtonInput.clear leavespressedkey). Corrected release/actualstateassertions yieldRED02genuine bothfailures.",
+  "GREEN": {
+    "focused": 3,
+    "promotion": 1,
+    "passiveHUDclick": 1,
+    "check": 0,
+    "all_actual_exits": 0,
+    "wall_seconds": 309.82634115219116,
+    "actualF10stateCaller": true,
+    "Save_success_common_push_path_only_no_fileIOclaim": true,
+    "distinct_failures_and_focused_combat_preserved": true,
+    "paused_expiry_real7s_no_virtual_ping_or_cooldown_advance": true
+  },
+  "source_assets_runtime_boundaries": [
+    "UIclockonly; no gameplaytimer/stat/order/actorchange",
+    "SDK294/W24 immutable old UI evidence not relabeled",
+    "Actual normal CtrlS/F10 newartifact screenshot required beforepolishcomplete"
+  ],
+  "evidence_sha256": {
+    "target/toast-notices-red02-20261012/red.log": "9ae9b7ae0153bf4d38fc11936808f277a2018e60979bf8d972b259c817b01a5b",
+    "target/toast-notices-red02-20261012/result.json": "d018c506aecab9c2176b2428fdf61dcde86094dcb3400bf13a02a08cf5b13247",
+    "target/toast-notices-green-20261012/focused.log": "e741142c82912ffa75f85e3ecb92d8f613cf2c97f8a19056d89c0096d122a65c",
+    "target/toast-notices-green-20261012/result.json": "d35359a3e7805d0fa3a6e0193e760515a5b511d20e286e13a1151bd453427193",
+    "docs/qa/sdk294-solo-drone-patrol/10-solo-Drone-after-natural-motion.png": "d84132f2afda7873de6e3ad56f94ebff73ecfc0f383ad51b7689b7d8eeb54908"
+  }
+}
