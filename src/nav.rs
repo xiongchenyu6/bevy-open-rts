@@ -6,6 +6,9 @@ use bevy::prelude::*;
 
 use crate::*;
 
+mod endpoints;
+pub(crate) use endpoints::resolve_ground_move_endpoints;
+
 // Unit-vs-unit separation (boids-lite): extra clearance kept between allied unit
 // circles, and the max speed at which overlapping units get pushed apart.
 pub(crate) const UNIT_SEPARATION_GAP_M: f32 = 0.05;

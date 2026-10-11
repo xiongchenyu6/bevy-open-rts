@@ -3260,7 +3260,11 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .run_if(match_in_progress),
             (
                 settle_new_entities_on_terrain.before(rebuild_nav_grid),
-                rebuild_nav_grid.before(plan_unit_paths),
+                rebuild_nav_grid.before(resolve_ground_move_endpoints),
+                resolve_ground_move_endpoints
+                    .after(update_attack_move_and_patrol_orders)
+                    .after(progress_queued_orders)
+                    .before(plan_unit_paths),
                 plan_unit_paths.before(move_units),
             )
                 .in_set(SimulationPhase::Combat)
