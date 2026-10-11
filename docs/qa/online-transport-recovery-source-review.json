@@ -1,0 +1,84 @@
+{
+  "scope": "Product recovery source verified by regression, full library and private local HTTP/WS/RTC; NOT full deployed game reconnect acceptance",
+  "behavior": [
+    "Transient transport stop retains room/session/player/slot/world/ticks; explicitLeave remainsauthoritative reset",
+    "Retains originalTransportConfig/hostticket; loopgenerations rejectstaleerrors andnormalcompletedloopisdetected",
+    "Guest refreshestrusted same-room/build/protocol hostUUID duringrecovery andneveracceptsarbitrarymeshWelcome",
+    "Authorityrefreshafterrebuilddoesnotrebuildsocketrepeatedly; Hello retriesuseRealTime independentlyofsimulationpause",
+    "Native/CF roomdescriptors derivecurrenthostUUIDfromticket-authorizedregistration/livehostrole"
+  ],
+  "red": {
+    "actual_exit": 101,
+    "passed": 0,
+    "failed": 1,
+    "compiled": true,
+    "assertion": "Original actualprocess_online_lifecycle resets phaseHome instead of retainingInMatch",
+    "evidence": "target/transport-recovery-shared03-20261011/red.log"
+  },
+  "green": {
+    "focused_passed": 3,
+    "focused_failed": 0,
+    "full_passed": 289,
+    "full_failed": 0,
+    "full_ignored": 1,
+    "full_seconds": 314.24,
+    "stage_exits": {
+      "focused": 0,
+      "protocol": 0,
+      "signaling": 0,
+      "net": 0,
+      "cf": 0,
+      "full": 0,
+      "check": 0,
+      "build": 0
+    },
+    "production_inputs": 124,
+    "assets": 332,
+    "unchanged": true
+  },
+  "integration": {
+    "actual_signaling_exit": 0,
+    "http_websocket_passed": 9,
+    "seconds": 0.3,
+    "actual_transport_exit": 0,
+    "local_real_rtc_passed": 1,
+    "rtc_seconds": 0.06,
+    "deployed_service_ignored": 1,
+    "total_wall_seconds": 47.60146760940552,
+    "http_contract": "ActualGETfirsthostUUID,disconnectedNone,re-registeredhostnewUUID and existingpeer_count2"
+  },
+  "bins": {
+    "bevy-open-rts": "2883ab4ef42ae7b31431f371b68aa84fd8d517df91478b62151b327fa02d426f",
+    "capture": "4a8e2bb2cd54a6c39c7930a2eff957f6890b922207fc6ef21326aa7a33aee615",
+    "skirmish_audit": "a5083ebed8a9282d5016b4e813a8ff7831b3a31a2187a567e341555136b3fce7"
+  },
+  "owned_source_sha256": {
+    "src/online.rs": "16dcfea0a4efd1d1aa8c890b6ec305209de720229dba11de35a95c3ab48cd442",
+    "src/online/recovery.rs": "c665c834f374c1b180e91540a78315f3e94435630e847b464c44c7384b5f3d6f",
+    "crates/open-bevy-net/src/lib.rs": "478a6cd9b09f0ded3abdb92d7b313e0e49181e10fc690bc5e52abbf3846e20ea",
+    "crates/open-bevy-protocol/src/lib.rs": "7fccc982f5bfcb03557bff35b41e68559c452c7adfad31e19fa8bf45430b04b3",
+    "services/open-bevy-signaling/src/lib.rs": "88870ba78bf763101ae5da4b554b5a2f33d44909da9dc2dbd974fbc0c98de4e7",
+    "services/open-bevy-signaling/cloudflare-worker/src/lib.rs": "c119944de8f4ce652d0be37e1b187c8c787c68a8ee2eeb7e5c71a8ddc0e4b8f0",
+    "services/open-bevy-signaling/tests/signaling.rs": "6ae02993210aaf92ba0fe537f5cf0a9730267c49c5dab2d1ee835b476511a634"
+  },
+  "final_pin": "target/transport-recovery-integration-20261011/final-pin.json",
+  "preserved_failures": [
+    {
+      "path": "target/transport-recovery-shared-20261011",
+      "kind": "Compile101 E0308, not RED assertion"
+    },
+    {
+      "path": "target/transport-recovery-shared02-20261011/semantic-stop.json",
+      "kind": "Intentionalpartialstop to fix authorityrefresh gap; not full pass"
+    }
+  ],
+  "remaining": [
+    "No deployment performed; currentpublishedprovider newhostidentityfield not verified",
+    "Realgameguestandhosttransportloss/reconnect within original30secondgrace not proven",
+    "PublishedfullICE40\u201380secondgathering observed earlier; recoverytiming must be measured without extendinggrace or narrowingICE",
+    "FreshfinalSDK/Wasm/playerflow onthissource pending"
+  ],
+  "gameplay_world_stats_timers_protocol_schema_unchanged": true,
+  "network_hello_timer_uses_real_time": true,
+  "gpu_launched": false
+}

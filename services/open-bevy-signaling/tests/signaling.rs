@@ -1,7 +1,7 @@
 use futures_util::{SinkExt, StreamExt};
 use matchbox_protocol::{JsonPeerEvent, JsonPeerRequest, PeerId};
 use open_bevy_protocol::{
-    BuildId, CreateRoomRequest, CreateRoomResponse, GameId, RoomVisibility,
+    BuildId, CreateRoomRequest, CreateRoomResponse, GameId, RoomDescriptor, RoomVisibility,
     SESSION_PROTOCOL_VERSION,
 };
 use open_bevy_signaling::{AppState, ServerConfig, build_router};
@@ -277,6 +277,20 @@ async fn host_can_resume_with_the_same_ticket_without_dropping_players() {
     let room = create_room(&server, RoomVisibility::Public, 4).await;
     let mut host = connect_host(&room, "Host").await;
     let first_host_id = assigned_id(&mut host).await;
+    let lookup = format!(
+        "{}/v1/rooms/integration-game/{TEST_GAME_PROTOCOL}/{}",
+        server.http_base, room.room.room_code
+    );
+    let descriptor: RoomDescriptor = reqwest::get(&lookup)
+        .await
+        .unwrap()
+        .error_for_status()
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert!(descriptor.host_connected);
+    assert_eq!(descriptor.host_peer_id, Some(first_host_id.0.to_string()));
     let mut player = connect_player(&room, "Player").await.unwrap();
     let player_id = assigned_id(&mut player).await;
     assert_eq!(
@@ -289,10 +303,30 @@ async fn host_can_resume_with_the_same_ticket_without_dropping_players() {
         receive_event(&mut player).await,
         JsonPeerEvent::PeerLeft(first_host_id)
     );
+    let disconnected: RoomDescriptor = reqwest::get(&lookup)
+        .await
+        .unwrap()
+        .error_for_status()
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert!(!disconnected.host_connected && disconnected.host_peer_id.is_none());
 
     let mut resumed_host = connect_host(&room, "Host").await;
     let resumed_host_id = assigned_id(&mut resumed_host).await;
     assert_ne!(resumed_host_id, first_host_id);
+    let recovered: RoomDescriptor = reqwest::get(&lookup)
+        .await
+        .unwrap()
+        .error_for_status()
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    assert!(recovered.host_connected);
+    assert_eq!(recovered.host_peer_id, Some(resumed_host_id.0.to_string()));
+    assert_eq!(recovered.peer_count, 2, "existing player remains admitted");
     assert_eq!(
         receive_event(&mut player).await,
         JsonPeerEvent::NewPeer(resumed_host_id)

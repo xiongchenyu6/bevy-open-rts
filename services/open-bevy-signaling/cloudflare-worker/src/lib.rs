@@ -541,6 +541,7 @@ impl RoomDirectory {
                     max_peers: request.max_peers,
                     peer_count: 0,
                     host_connected: false,
+                    host_peer_id: None,
                     created_at_unix_ms: now,
                     expires_at_unix_ms: expires_at,
                     metadata: request.metadata.clone(),
@@ -914,6 +915,10 @@ impl GameRoom {
         let peers = self.connected_peers();
         room.descriptor.peer_count = u16::try_from(peers.len()).unwrap_or(u16::MAX);
         room.descriptor.host_connected = peers.iter().any(|(_, peer)| peer.role == PeerRole::Host);
+        room.descriptor.host_peer_id = peers
+            .iter()
+            .find(|(_, peer)| peer.role == PeerRole::Host)
+            .map(|(_, peer)| peer.peer_id.to_string());
     }
 
     async fn persist_and_publish(&self, room: &PersistedRoom) -> Result<()> {
@@ -1061,6 +1066,7 @@ mod tests {
                 max_peers: 4,
                 peer_count: 0,
                 host_connected: false,
+                host_peer_id: None,
                 created_at_unix_ms: 1,
                 expires_at_unix_ms: 2,
                 metadata: BTreeMap::new(),

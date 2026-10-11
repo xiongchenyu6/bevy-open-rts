@@ -1483,6 +1483,12 @@ impl OnlineSession {
 #[derive(Resource, Default)]
 struct OnlineTransport {
     socket: Option<WebRtcTransport>,
+    config: Option<TransportConfig>,
+    generation: u64,
+    recovering: bool,
+    needs_rebuild: bool,
+    authority_pending: bool,
+    retry_elapsed: f32,
 }
 
 #[derive(Resource, Clone)]
@@ -1498,10 +1504,18 @@ enum OnlineAsyncResult {
     Created(Result<(CreateRoomResponse, ServiceConfigResponse), String>),
     Joined(Result<(RoomDescriptor, ServiceConfigResponse), String>),
     Rooms(Result<RoomListResponse, String>),
-    TransportStopped(String),
+    TransportStopped {
+        generation: u64,
+        reason: String,
+    },
+    RecoveryAuthority {
+        generation: u64,
+        result: Result<RoomDescriptor, String>,
+    },
 }
 
 mod control_verification;
+mod recovery;
 
 #[cfg(target_arch = "wasm32")]
 const ONLINE_VERIFICATION_STATUS_ELEMENT_ID: &str = "open-bevy-online-verification";
@@ -1788,6 +1802,7 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
             (
                 process_online_async_results,
                 poll_online_transport,
+                recovery::recover_transport,
                 process_online_lifecycle,
                 apply_pending_online_snapshot,
             )
@@ -3369,14 +3384,19 @@ fn process_online_async_results(
                 });
             }
             OnlineAsyncResult::Rooms(Err(error)) => session.set_status(error),
-            OnlineAsyncResult::TransportStopped(error) => {
-                if session.phase != OnlinePhase::Home {
-                    lifecycle.transport_stopped_reason = Some(error.clone());
-                    session.set_status(format!(
-                        "{}: {error}",
-                        t("网络连接已停止", "Network connection stopped")
-                    ));
+            OnlineAsyncResult::TransportStopped { generation, reason } => {
+                if recovery::note_transport_stopped(&mut transport, &session, generation) {
+                    lifecycle.transport_stopped_reason = Some(reason);
                 }
+            }
+            OnlineAsyncResult::RecoveryAuthority { generation, result } => {
+                recovery::accept_authority(
+                    &mut session,
+                    &mut transport,
+                    &inbox,
+                    generation,
+                    result,
+                );
             }
         }
     }
@@ -3390,9 +3410,11 @@ fn install_online_transport(
     if let Some(socket) = transport.socket.as_mut() {
         socket.close();
     }
+    transport.generation = transport.generation.saturating_add(1);
+    transport.config = Some(config.clone());
     let (socket, message_loop) = WebRtcTransport::connect(config).map_err(client_error_text)?;
     transport.socket = Some(socket);
-    spawn_message_loop(inbox.clone(), message_loop);
+    spawn_message_loop(inbox.clone(), transport.generation, message_loop);
     Ok(())
 }
 
@@ -3401,12 +3423,18 @@ fn disconnect_online(session: &mut OnlineSession, transport: &mut OnlineTranspor
         socket.close();
     }
     transport.socket = None;
+    transport.generation = transport.generation.saturating_add(1);
+    transport.config = None;
+    transport.recovering = false;
+    transport.needs_rebuild = false;
+    transport.authority_pending = false;
+    transport.retry_elapsed = 0.0;
     session.reset_connection();
     session.set_status(t("已离开联机房间", "Left online room"));
 }
 
 fn poll_online_transport(
-    time: Res<Time>,
+    time: Res<Time<Real>>,
     mut session: ResMut<OnlineSession>,
     mut transport: ResMut<OnlineTransport>,
     mut replication: ResMut<OnlineMatchReplication>,
@@ -3417,12 +3445,13 @@ fn poll_online_transport(
     mut verification: ResMut<OnlineVerificationHarness>,
     mut observer: ResMut<observer::OnlineObserver>,
 ) {
+    let recovering = transport.recovering;
     let Some(socket) = transport.socket.as_mut() else {
         return;
     };
     if !session.is_host
-        && session.phase == OnlinePhase::Connecting
-        && session.local_player_id.is_none()
+        && (session.phase == OnlinePhase::Connecting || recovering)
+        && (session.local_player_id.is_none() || recovering)
         && let Some(host_peer) = session.host_peer
     {
         session.hello_retry_elapsed += time.delta_secs();
@@ -3441,10 +3470,11 @@ fn poll_online_transport(
             }
         }
     }
+    let mut welcomed = false;
     let events = match socket.poll() {
         Ok(events) => events,
         Err(error) => {
-            session.set_status(client_error_text(error));
+            lifecycle.transport_stopped_reason = Some(client_error_text(error));
             return;
         }
     };
@@ -3480,6 +3510,7 @@ fn poll_online_transport(
                         session.ui_dirty = true;
                     }
                 } else if session.host_peer == Some(peer) {
+                    lifecycle.transport_stopped_reason = Some("Host peer disconnected".to_string());
                     session.set_status(t(
                         "房主连接中断，等待自动恢复…",
                         "Host disconnected; waiting for automatic resume...",
@@ -3497,6 +3528,7 @@ fn poll_online_transport(
                         continue;
                     }
                 };
+                let welcome = matches!(&message, OnlineReliableMessage::Welcome { .. });
                 process_reliable_message(
                     &mut session,
                     socket,
@@ -3507,6 +3539,8 @@ fn poll_online_transport(
                     &mut setup,
                     &mut next_state,
                 );
+                welcomed |=
+                    welcome && session.host_peer == Some(peer) && session.local_player_id.is_some();
             }
             TransportEvent::SnapshotMessage { peer, payload } => {
                 if session.is_host
@@ -3529,6 +3563,9 @@ fn poll_online_transport(
                 }
             }
         }
+    }
+    if welcomed {
+        transport.recovering = false;
     }
 }
 
@@ -3556,14 +3593,29 @@ fn process_online_lifecycle(
         return;
     }
     if let Some(reason) = lifecycle.transport_stopped_reason.take() {
-        disconnect_online(&mut session, &mut transport);
+        if session.is_host && !transport.recovering && transport.config.is_some() {
+            let in_match = session.phase == OnlinePhase::InMatch;
+            let OnlineSession {
+                host_runtime,
+                lobby,
+                ..
+            } = &mut *session;
+            if let Some((runtime, lobby)) = host_runtime.as_mut().zip(lobby.as_mut()) {
+                let peers: Vec<_> = runtime.peer_players.keys().copied().collect();
+                for peer in peers {
+                    if let Some(player) = runtime.disconnect(lobby, peer)
+                        && in_match
+                    {
+                        lifecycle.note_disconnect(player);
+                    }
+                }
+            }
+        }
+        recovery::request_recovery(&mut transport);
         session.set_status(format!(
             "{}: {reason}",
-            t("网络连接已停止", "Network connection stopped")
+            t("正在恢复网络连接", "Restoring network connection")
         ));
-        lifecycle.reset_match();
-        next_state.set(AppScreen::OnlineLobby);
-        return;
     }
 
     if lifecycle.local_leave_session {
@@ -6327,26 +6379,30 @@ where
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-fn spawn_message_loop(inbox: OnlineAsyncInbox, message_loop: MessageLoopFuture) {
+fn spawn_message_loop(inbox: OnlineAsyncInbox, generation: u64, message_loop: MessageLoopFuture) {
     IoTaskPool::get()
         .spawn(async move {
-            if let Err(error) = message_loop.await
-                && let Ok(mut queue) = inbox.0.lock()
-            {
-                queue.push_back(OnlineAsyncResult::TransportStopped(error.to_string()));
+            let reason = match message_loop.await {
+                Ok(()) => "Transport loop completed".to_string(),
+                Err(error) => error.to_string(),
+            };
+            if let Ok(mut queue) = inbox.0.lock() {
+                queue.push_back(OnlineAsyncResult::TransportStopped { generation, reason });
             }
         })
         .detach();
 }
 
 #[cfg(target_arch = "wasm32")]
-fn spawn_message_loop(inbox: OnlineAsyncInbox, message_loop: MessageLoopFuture) {
+fn spawn_message_loop(inbox: OnlineAsyncInbox, generation: u64, message_loop: MessageLoopFuture) {
     IoTaskPool::get()
         .spawn_local(async move {
-            if let Err(error) = message_loop.await
-                && let Ok(mut queue) = inbox.0.lock()
-            {
-                queue.push_back(OnlineAsyncResult::TransportStopped(error.to_string()));
+            let reason = match message_loop.await {
+                Ok(()) => "Transport loop completed".to_string(),
+                Err(error) => error.to_string(),
+            };
+            if let Ok(mut queue) = inbox.0.lock() {
+                queue.push_back(OnlineAsyncResult::TransportStopped { generation, reason });
             }
         })
         .detach();

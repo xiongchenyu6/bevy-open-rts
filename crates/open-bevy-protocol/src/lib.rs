@@ -201,6 +201,8 @@ pub struct RoomDescriptor {
     pub max_peers: u16,
     pub peer_count: u16,
     pub host_connected: bool,
+    /// Live host UUID from host-ticket-authorized signaling registration.
+    pub host_peer_id: Option<String>,
     pub created_at_unix_ms: u64,
     pub expires_at_unix_ms: u64,
     pub metadata: BTreeMap<String, String>,

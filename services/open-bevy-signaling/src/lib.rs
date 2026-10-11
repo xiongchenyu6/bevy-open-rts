@@ -915,6 +915,7 @@ fn room_descriptor(key: &RoomKey, room: &Room) -> RoomDescriptor {
         max_peers: room.max_peers,
         peer_count: u16::try_from(room.peers.len()).unwrap_or(u16::MAX),
         host_connected: room.host_peer.is_some(),
+        host_peer_id: room.host_peer.map(|peer| peer.0.to_string()),
         created_at_unix_ms: room.created_at_unix_ms,
         expires_at_unix_ms: room.expires_at_unix_ms,
         metadata: room.metadata.clone(),
@@ -1004,6 +1005,64 @@ mod tests {
             .https_only(true)
             .build()
             .expect("TURN HTTPS client must have a crypto provider");
+    }
+
+    #[tokio::test]
+    async fn descriptor_host_identity_tracks_only_ticket_authorized_registration_and_recovery() {
+        let state = AppState::new(ServerConfig::default());
+        let created = state
+            .create_room(CreateRoomRequest {
+                game_id: GameId::new("test-game").unwrap(),
+                build_id: BuildId::new("test-build").unwrap(),
+                session_protocol: SESSION_PROTOCOL_VERSION,
+                game_protocol: 7,
+                max_peers: 8,
+                visibility: RoomVisibility::Public,
+                metadata: Default::default(),
+            })
+            .await
+            .unwrap();
+        let key = RoomKey {
+            game_id: created.room.game_id.clone(),
+            game_protocol: 7,
+            room_code: created.room.room_code.clone(),
+        };
+        let mut host = ValidatedSignalQuery {
+            name: PlayerName::new("Host").unwrap(),
+            role: PeerRole::Host,
+            ticket: Some("wrong-ticket".into()),
+            build_id: created.room.build_id.clone(),
+        };
+        assert!(state.register_peer(&key, &host).await.is_err());
+        host.ticket = Some(created.host_token);
+        let first = state.register_peer(&key, &host).await.unwrap().peer_id;
+        let player = ValidatedSignalQuery {
+            name: PlayerName::new("Guest").unwrap(),
+            role: PeerRole::Player,
+            ticket: None,
+            build_id: created.room.build_id,
+        };
+        state.register_peer(&key, &player).await.unwrap();
+        {
+            let rooms = state.inner.rooms.read().await;
+            assert_eq!(
+                room_descriptor(&key, rooms.get(&key).unwrap()).host_peer_id,
+                Some(first.0.to_string())
+            );
+        }
+        state.disconnect_peer(&key, first).await;
+        {
+            let rooms = state.inner.rooms.read().await;
+            let descriptor = room_descriptor(&key, rooms.get(&key).unwrap());
+            assert!(!descriptor.host_connected && descriptor.host_peer_id.is_none());
+        }
+        let replacement = state.register_peer(&key, &host).await.unwrap().peer_id;
+        assert_ne!(replacement, first);
+        let rooms = state.inner.rooms.read().await;
+        assert_eq!(
+            room_descriptor(&key, rooms.get(&key).unwrap()).host_peer_id,
+            Some(replacement.0.to_string())
+        );
     }
 
     #[tokio::test]

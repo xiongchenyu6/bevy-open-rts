@@ -657,6 +657,7 @@ mod tests {
             max_peers: 4,
             peer_count: 1,
             host_connected: true,
+            host_peer_id: None,
             created_at_unix_ms: 1,
             expires_at_unix_ms: 2,
             metadata: BTreeMap::new(),
