@@ -1,0 +1,141 @@
+{
+  "scope": "Eight real browser contexts/public human occupants; normalReady acknowledgment failure before match, not eightplayer acceptance",
+  "driver_result": {
+    "actual_driver_exit": 1,
+    "error": "Error: Bounded p6 own-ready",
+    "real_contexts": 8,
+    "roles": [
+      "host",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6",
+      "p7"
+    ],
+    "events": 0,
+    "diagnostics": [],
+    "normal_browser_close": true,
+    "closed_wall_ms": 1791689990622,
+    "browser_close_ms": 1152,
+    "deadline_seconds": 240,
+    "eight_gate_verified_by_separate_verifier": false,
+    "reconnect_pass": false,
+    "forced_relay_required": true
+  },
+  "supervisor": {
+    "node_actual_exit": 1,
+    "driver_actual_exit": 1,
+    "actual_exit": 1,
+    "deadline_seconds": 240
+  },
+  "deadline_seconds": 240,
+  "public_humans": [
+    {
+      "connected": true,
+      "name": "Commander-H8",
+      "player_id": 1,
+      "ready": true
+    },
+    {
+      "connected": true,
+      "name": "Commander-p18",
+      "player_id": 2,
+      "ready": false
+    },
+    {
+      "connected": true,
+      "name": "Commander-p68",
+      "player_id": 3,
+      "ready": false
+    },
+    {
+      "connected": true,
+      "name": "Commander-p48",
+      "player_id": 4,
+      "ready": false
+    },
+    {
+      "connected": true,
+      "name": "Commander-p78",
+      "player_id": 5,
+      "ready": false
+    },
+    {
+      "connected": true,
+      "name": "Commander-p28",
+      "player_id": 6,
+      "ready": false
+    },
+    {
+      "connected": true,
+      "name": "Commander-p38",
+      "player_id": 7,
+      "ready": true
+    },
+    {
+      "connected": true,
+      "name": "Commander-p58",
+      "player_id": 8,
+      "ready": true
+    }
+  ],
+  "normal_browser_close": true,
+  "root_direct_guest_footer_review": true,
+  "ready_point": {
+    "source_png_sha256": "bd594c4959aef8cd70cbb4a81416f9d69b0b98eb7876c64e01e669246bd93bbb",
+    "viewport": [
+      1280,
+      720
+    ],
+    "actual_full_width_rectangles": [
+      {
+        "min": [
+          92,
+          571
+        ],
+        "max": [
+          1187,
+          608
+        ],
+        "center": [
+          640,
+          589.5
+        ]
+      },
+      {
+        "min": [
+          92,
+          619
+        ],
+        "max": [
+          1187,
+          656
+        ],
+        "center": [
+          640,
+          637.5
+        ]
+      }
+    ],
+    "source_order": [
+      "Ready",
+      "Leave"
+    ],
+    "geometry_only_not_action_injection": true
+  },
+  "cause_unproven": "Several guests remain unready after concurrent ordinary clicks; no command delivery or UI-rebuild cause established. Next independent run uses sequential real clicks and per-guest fresh footer frames.",
+  "product_source_changed": false,
+  "match_started": false,
+  "eight_control_pass": false,
+  "evidence_sha256": {
+    "target/web16-eight-human-20261011-01/eight-sample-183.json": "630e441ecf0524853b7f14852b59deef2eb0367aad6c119339348ffa0662b426",
+    "target/web16-eight-human-20261011-01/result.json": "09ae4cf86e77722cc3d0c5ee5d063d25620a53e8ce77d8296a9d5296205c08cc",
+    "target/web16-eight-human-20261011-01/final-supervisor-result.json": "204c083463133bbe24a6739a6183721c1c88eb6e3cf2d7cf8d754a22bd38d188",
+    "target/web16-eight-human-20261011-01/p1-actual-guest-two-button-footer.png": "bd594c4959aef8cd70cbb4a81416f9d69b0b98eb7876c64e01e669246bd93bbb",
+    "target/web16-eight-human-20261011-01/actual-guest-footer-roi.json": "a40e014632c935f925ec60c7078aee52a5ca4dba08898944d20f6fdd4e6b90c0",
+    "target/web16-eight-human-20261011-01/p6-normal-Ready-gesture.json": "9ba9217f20a9a17ad325f3cd5465c6ec3b3ad45c85fc3fa86dedb5d1d293874e",
+    "target/web16-eight-human-20261011-01/p6-normal-Ready-up-raw.json": "090c6c9d8d23f83729570cfb8d60ea35245ec94e576c68899ad0bc36bd82ef35"
+  }
+}
