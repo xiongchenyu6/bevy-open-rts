@@ -65,13 +65,14 @@ metadata are recorded under `official_kenney_archives` and
 
 - Armor albedo: [ASSETS.md](../ASSETS.md) records built-in imagegen generation,
   date and use for `textures/armor-painted-steel.png`.
-- Six campaign JPEGs: commit `ea91fd9` records ComfyUI/FLUX.1-dev generation;
-  `scripts/gen_cutscene_art.py` identifies the checkpoint and workflow. Preserve
-  per-image prompts, seeds, checkpoint identity and applicable terms. The
-  [current FLUX license](https://huggingface.co/black-forest-labs/FLUX.1-dev/blob/main/LICENSE.md)
-  distinguishes model use from generated outputs and includes a commercial-output
-  clause; a noncommercial model label alone does not establish that images are
-  prohibited. Generation-time evidence and output review remain missing.
+- Current campaign art: all six `assets/campaign/mission_0N-v2.jpg` files
+  derive from the original built-in imagegen PNGs recorded under
+  `art/campaign/candidates/`. Encoding commands and source/runtime hashes are in
+  `art/campaign/runtime-derivatives-20261010.json`. All six current code references,
+  active ledger hashes and SDK294 packaged files match those records. Retired
+  ComfyUI/FLUX JPEGs are absent from the runtime tree and SDK294 package; their
+  hashes remain historical evidence under `retired_campaign_art` in the ledger.
+  Generated-asset terms and final commercial-rights review remain open.
 - Local Godot-era tool records dated June 14–16 recover all 19 SFX recipes,
   the oscillator-only music recipe, and generated-sheet copies for 27 icons,
   including RosterPreview. The JSON inventory preserves only relevant recipes,
