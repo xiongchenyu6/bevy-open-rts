@@ -1,0 +1,86 @@
+{
+  "scope": "ExactSDK267 normalMission3 entry and paidPower construction FAILURE; no campaign acceptance",
+  "evidence_directory": "target/sdk267-mission3-normal-20261011-01",
+  "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+  "binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+  "raw_result_sha256": "91085634d8a8700b30d979871e760fd347d92bfc5431e43aaca4c84cdcc3b45f",
+  "passed": false,
+  "wall_seconds": 84.21134235398495,
+  "original_wall_limit": 900,
+  "original_site_limit_seconds": 30,
+  "failure": "Original30second PowerReactor deadline exhausted",
+  "forced_cleanup": true,
+  "actual_game_processes": [
+    {
+      "index": 1,
+      "pid": 634859,
+      "command": [
+        "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/steamrt4-runtime-depot-20261010/SteamLinuxRuntime_4/run",
+        "--graphics-provider=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/steam-runtime-ubuntu-graphics-provider-20261010/root",
+        "--filesystem=/tmp/rts-campaign-entry-oggnfvdx",
+        "--filesystem=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk267-mission3-normal-20261011-01",
+        "--filesystem=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk267-mission1-normal-defense-20261011-10/user-data",
+        "--filesystem=/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-current267-steamrt4-extracted02-20261011/bevy-open-rts-linux-x86_64:ro",
+        "--",
+        "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-current267-steamrt4-extracted02-20261011/bevy-open-rts-linux-x86_64/launch.sh"
+      ],
+      "actual_exit": -15,
+      "normal_window_close": false
+    }
+  ],
+  "mission_observations": {
+    "schema": 4,
+    "mission_id": "canyon_siege",
+    "map_path": "bevy://maps/RingValley",
+    "starting_ore": 64,
+    "starting_crystal": 32,
+    "actual_ore": 64,
+    "actual_crystal": 32,
+    "player_controllers_ron": "[\n            1,\n            5,\n        ]",
+    "player_factions_ron": "[\n            0,\n            1,\n        ]",
+    "clock_sec": 1.646318,
+    "save_sha256": "712c57994425fceb8a78f9204a7869cf40ecd4e34237c3772957b7a67eb17fe5",
+    "active_teams_ron": "[\n            true,\n            true,\n        ]"
+  },
+  "actual_paid_cost": [
+    3,
+    1
+  ],
+  "bank_after_payment": [
+    61,
+    31
+  ],
+  "observed_state": "Power remainednormalized1/1; healthyWorker initiallyMove+Construct thenstalledConstructonly, noMove/noHold/noEMP, otherWorkerfree.",
+  "diagnostic_fixture_path": "target/m3-ring-valley-paid-construction-fixture.json",
+  "diagnostic_fixture_sha256": "e153411244780a6122c26305793fa3881c20e83944145f09b5887ab4229df09c",
+  "screenshots": {
+    "00-normal-main-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-normal-campaign-map": "fc63e96dc1f73e2dd0a289d529b7cf34f36d98d6d5f53359abe2adc0393f6212",
+    "04-real-mission3-briefing": "650ffa3aa7ce9b5c044591cbe455dce26b6c619f2cc62e7701f7d383461853c3",
+    "05-enter-dismissed-briefing": "db1c77497aee93b18a6c594ff603c6c890593bb7d02e7777aabc8535532651c3",
+    "06-tactical-pause": "0c42be735cd18dc8ea5a16d1357b6ca20c1d833cc91e75663e2c33dbb8ffa006",
+    "07-actual-mission-save": "6bb9234e993f035b124ea13f4893078e7c0c11f2fde3a647f796f328f84e9339",
+    "08-real-mission3-initial-paused": "30ba487c39ff506a364ac0354dd90758b4191d91fefc7628bc2f50adbc7f991d",
+    "actual-own-worker-candidate-before-click": "c155aa82dd1aa8060b47f1ca0f99f4feb451f9123f5ece044f37cf83860d3ddd",
+    "auto-01-PowerReactor-tab-tooltip": "0ffc47764f537b99445aca94af133e7fdb9a1d0f73cff89b55dc1a3b88c908cc",
+    "auto-01-PowerReactor-before-ghost": "0ffc47764f537b99445aca94af133e7fdb9a1d0f73cff89b55dc1a3b88c908cc",
+    "auto-01-PowerReactor-build-tooltip": "ded7c2594423ccbf6c8f41e982bcd01fafc6ae722dc30ada75619381eb1baaec",
+    "auto-01-PowerReactor-ghost-0": "08488760d63366f317f3157f80188677c93278579ca821356320aa88d466a437"
+  },
+  "normal_save_hashes": {
+    "07-actual-mission-save.ron": "712c57994425fceb8a78f9204a7869cf40ecd4e34237c3772957b7a67eb17fe5",
+    "auto-01-PowerReactor-before.ron": "712c57994425fceb8a78f9204a7869cf40ecd4e34237c3772957b7a67eb17fe5",
+    "auto-01-PowerReactor-paid.ron": "81c8bb34ef1832b3db34cc2dafdd8678e31237e8b1e21050b78430a5b9566083",
+    "auto-01-PowerReactor-progress.ron": "8ab23f58d27647c736ca91e1ae5d9851208e4a649c8c008c4318986baecb23bb",
+    "auto-current-own-worker-poses.ron": "1ea149a63e7b670eb09cd2afcee58b6f4bd08ae0bb81a69225216d03c59deb46",
+    "current-own-base-PowerReactor.ron": "712c57994425fceb8a78f9204a7869cf40ecd4e34237c3772957b7a67eb17fe5",
+    "historical-before-campaign.ron": "49a2d1643b35bdc53c65186dff35bb82e29e9c7d92f72d20472cda617e645fc2"
+  },
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "limits": [
+    "No Worker2 substitution/sitechange/corefix accepted; actualnavigation replay assignedAIowner beforeanotherGPU attempt.",
+    "OwnAIRDrone proximity andoccupiedquery domain behavior are correlations, not causalbug claims.",
+    "Genuineprofile remainscompletedMission1and2 only; Mission3 naturalvictory/persistence unproven."
+  ]
+}
