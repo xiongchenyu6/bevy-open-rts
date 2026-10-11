@@ -1,0 +1,45 @@
+{
+  "scope": "CurrentSDK294 physical same-App attempt: onlyMission1 accepted; naturalMission2 defeat, noMission3policy acceptance/sixcompletion",
+  "actual_result": {
+    "passed": false,
+    "error": "Actual natural HumanDefeat; campaign cannot advance",
+    "wall_seconds": 1088.419380870997,
+    "actual_game_exits": [
+      {
+        "pid": 2953811,
+        "supervisor_pid": 2953560,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "runtime_launch_count": 1,
+    "forced_game_cleanup": false,
+    "installation_unchanged": true,
+    "archive_unchanged": true
+  },
+  "exact_prefix": [
+    "hold_the_line"
+  ],
+  "same_game_pid": 2953811,
+  "mission1_actual": "HumanVictory04:00; zerofriendlylosses; realreviewedNextclick",
+  "mission2_actual": "HumanDefeat04:11; enemy13units6buildings destroyed; friendly17units1building lost",
+  "bounded_causality": "HQ20 and2liveWorkers last243.4457; finalelimination mechanism not recorded. No assertion ofcapture/damage/navbug. Counterslostandnoincome observed, notproof solecause.",
+  "original_limits": {
+    "current_image_review": 45,
+    "construction_site": 30,
+    "mission_wall": 900,
+    "mission_simulation": 900,
+    "aggregate_wall": 5400
+  },
+  "raw_root": "target/sdk294-six-same-app-20261012-01",
+  "result_sha256": "43194a9338fcf712cb57f3348970810c8c7d9ab298415f4d423773673e60ce60",
+  "campaign_sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+  "failure_png_sha256": "854e463b1898b6bc10a0cb7a8ea82e94680536004fc9b78f8bc9438895e5039d",
+  "personally_viewed_current": [
+    "normal-first-main-menu.png",
+    "normal-campaign-map-fresh.png",
+    "01/normal-next-current-public.png",
+    "02/actual-chain-failure.png"
+  ],
+  "firstmenu_review_age_seconds": 38.079046
+}
