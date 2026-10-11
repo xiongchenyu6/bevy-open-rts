@@ -87,10 +87,11 @@
       "actual_render_motion_over_half_metre": true
     }
   },
-  "preserved_failure": "p1 Worker remained stationary; actual contextual Follow, not desired ground Move, under investigation from raw input and order traces",
+  "preserved_failure": "p1 Worker remained stationary. The recorded click lies within newly produced own Worker52 follow-pick radius; deterministic source replay predicts Follow and stopping distance explains no movement. Actual order type was not exported, so this remains a supported inference rather than a directly observed Follow component.",
   "original_wall_bound_seconds": 240,
   "whole_workflow_pass": false,
   "eight_player_reconnect_pass": false,
   "full_match_pass": false,
-  "all_release_gates_remain_open": true
+  "all_release_gates_remain_open": true,
+  "cause_review": "target/online-web22-eight-human-repeat02-prepared-20261011/cause-review.json"
 }
