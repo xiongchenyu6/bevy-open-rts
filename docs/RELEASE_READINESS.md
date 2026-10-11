@@ -30,7 +30,15 @@ A bounded regression or an older package cannot establish final release readines
   sends; eight transport tests, a real local two-peer channel exchange, the
   291-pass game suite, check and three native builds pass with 124 sources and
   332 assets independently hashed ([send guard proof](qa/transport-send-before-channel-review.json)).
-  Fixed-Wasm TURN recovery remains pending.
+  W22 now passes two normal-input browser cases over real provider relay-to-relay
+  routes with a private native authority: guest signaling loss resumes in1.613s,
+  host loss in4.484s, within the original30s limit. Independent actual guest ECS
+  comparisons match128/120 pre/post ticks for guest loss and133/148 for host loss;
+  both roles execute new paid commands and final frames are directly reviewed
+  ([bounded real TURN proof](qa/web22-real-turn-game-recovery-review.json)).
+  The API config preserves both servers/eight URLs; the existing product adapter
+  uses all six URLs of the authenticated TURN entry. Public deployed authority,
+  eight-player recovery, complete matches and browser reload remain unverified.
 - SDK291 fresh Mission3 verifies a visible Ore-body click, immediate owned
   Harvest, and exactly six returned Ore with six consumed from that node,
   no losses and a surviving dropoff ([early income proof](qa/native291-m3-early-earned-ore-review.json)).
