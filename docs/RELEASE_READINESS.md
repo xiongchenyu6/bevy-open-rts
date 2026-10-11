@@ -7,7 +7,15 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Latest Verified Checkpoints
 
-- Current native300 passes300 tests with0 failures and1 ignored; all three
+- Latest source `4f8e588` prevents allied separation from displacing held units.
+  Two genuine scheduled REDs show0.844m/0.817m drift; unchanged GREEN scenarios
+  keep held translation exactly zero while friendly movement still works.
+  Current-source tests pass305/0/1ignored, all-target checks and four native
+  builds pass;143 sources,332 assets and four binary hashes are independently
+  rechecked ([contract proof](qa/hold-separation-contract-20261012/review.json)).
+  The earlier cached303 run is invalid and retained. Official SDK305 packaging
+  and actual player verification remain pending; no Mission2 victory is claimed.
+- Previous native300 passes300 tests with0 failures and1 ignored; all three
   native checks and builds pass. Short and medium Patrol regressions reject the
   former endpoint oscillation. The official-SDK package contains399 files/332
   assets; its recorded evidence and complete installation inventory have been
