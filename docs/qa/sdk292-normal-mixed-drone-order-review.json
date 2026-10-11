@@ -1,0 +1,147 @@
+{
+  "scope": "New official SDK292 Runtime4 normal paid mixed Drone/HMG regression. Not M3 victory or six same-App acceptance.",
+  "package": {
+    "ready": "target/linux-native292-unarmed-extracted-20261011/ready.json",
+    "binary_sha256": "9de865dea62439e84c7908b9d7721db01994aa6abc67888bff71437710259402",
+    "archive_sha256": "1913e6dcab45a5af3188fc1c37a30a885d2b7cca7edccfc8da7c7b63acc3e4e6",
+    "files": 399,
+    "assets": 332
+  },
+  "raw_output": "target/sdk292-normal-mixed-drone-20261011-01",
+  "actual_pass": true,
+  "original_bounds": {
+    "whole": 600,
+    "site_and_natural_birth": 30
+  },
+  "actual_wall_seconds": 127.81599719496444,
+  "normal_game_exits": [
+    {
+      "pid": 2701675,
+      "supervisor_pid": 2701506,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "actual_paid_receipt": {
+    "paid_rows": [
+      {
+        "id": "PowerReactor",
+        "cost": [
+          3,
+          1
+        ],
+        "point": [
+          865,
+          181
+        ],
+        "completed_count": 1,
+        "construction_wall": 8.18043344898615
+      },
+      {
+        "id": "Barracks",
+        "cost": [
+          3,
+          1
+        ],
+        "point": [
+          340,
+          181
+        ],
+        "completed_count": 1,
+        "construction_wall": 8.335383035009727
+      },
+      {
+        "producer": "Barracks",
+        "unit": "HeavyMachinegunTrooper",
+        "queued_paid_count": 1,
+        "bank": [
+          24,
+          13
+        ]
+      }
+    ],
+    "bank": [
+      24,
+      13
+    ],
+    "actual_drone_key": 8589933885,
+    "actual_HMG_key": 257698036003,
+    "normal_ground_point": [
+      1009,
+      452
+    ],
+    "drone_before": [
+      -17.0,
+      1.5,
+      -20.0
+    ],
+    "drone_after": [
+      -11.158726,
+      1.5,
+      -17.074736
+    ],
+    "actual_drone_xz_delta": 6.532813437774876,
+    "height_exact_unchanged": true,
+    "normal_elapsed_wait_seconds": 5,
+    "actual_game_clock_delta": 5.425409317016602,
+    "whole_mixed_snapshot_schema": 4
+  },
+  "issued_actual_orders": {
+    "Drone": "Move only, no AttackMove",
+    "HeavyMachinegunTrooper": "Move plus AttackMove",
+    "both_hold": false,
+    "same_actual_ground_target": [
+      -11.000982,
+      0,
+      -16.995739
+    ]
+  },
+  "actual_saved_clocks": [
+    28.81059,
+    34.236
+  ],
+  "actual_saved_Drone_y": [
+    1.5,
+    1.5
+  ],
+  "direct_frame_review": [
+    "01/05-current-mixed-before-ground.png",
+    "01/06-actual-AttackMove-mode.png",
+    "01/10-mixed-after-natural-motion.png"
+  ],
+  "all_nineteen_png_hashes_verified": true,
+  "screenshots": {
+    "01/00-normal-main-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01/auto-01-PowerReactor-tab-tooltip.png": "12c3739ac87da886d9067f84752d5079d0a3a7b1d1aa36ce20a0eb58f19dfa06",
+    "01/auto-01-PowerReactor-candidate-0-before-ghost.png": "15f2260f629d7c33d36555eb8f4c525d2e0d417e993069d53d75e2c2e76f0cf4",
+    "01/auto-01-PowerReactor-candidate-0-build-tooltip.png": "af5e31ea8e171fa63f8da8957f71f15975bbd59e66ea6758aa444446a21f601d",
+    "01/auto-01-PowerReactor-ghost-0.png": "551012302a4db96e5b16951611ce976edd44e833cf209d7372ac29354863b86e",
+    "01/auto-01-PowerReactor-completed.png": "75a85458b790539a30ce572381283ae25ebf9dccafe9c727a6836e17b7ef6f33",
+    "01/auto-02-Barracks-tab-tooltip.png": "a63e8d2cb93cfcb8f4e12c27e7780b903635b1a2d390f52cdc88fa631a32d4a9",
+    "01/auto-02-Barracks-candidate-0-before-ghost.png": "273300bea2134abf14c808a77bec1c27d1c9ea216ef81ac33866c03835621e80",
+    "01/auto-02-Barracks-candidate-0-build-tooltip.png": "ed3beb6970d72d52f208383d1f288c2936e59e92949dfbed73532280c6a0552e",
+    "01/auto-02-Barracks-ghost-0.png": "8117ab3a41e988f359c8d10aaa1396819e271b8f4c0f49bc9b6641c7cfabc0f6",
+    "01/auto-02-Barracks-candidate-1-before-ghost.png": "273300bea2134abf14c808a77bec1c27d1c9ea216ef81ac33866c03835621e80",
+    "01/auto-02-Barracks-candidate-1-build-tooltip.png": "ed3beb6970d72d52f208383d1f288c2936e59e92949dfbed73532280c6a0552e",
+    "01/auto-02-Barracks-ghost-1.png": "81de52baec22d309dbc0828ef6046d8401d45c9f27fc23d1746da125b96336ed",
+    "01/auto-02-Barracks-completed.png": "650c81c6a1a23f3b11a62f84eff15813bf8895c251ba05718bdecaa76c2b4a4f",
+    "01/02-paid-HMG-0-tooltip.png": "3a3733460c7837fe6c351981216296af2beebef420dd2976f7eec6610b60acdc",
+    "01/05-current-mixed-before-ground.png": "8ed6c86fd646e5fc9f25012fd578f9a6baa5876a3ff790e79e6dd97b40e298f9",
+    "01/06-actual-AttackMove-mode.png": "b87890eabe61a8260229ecc5139f326dad006cece378e5dee140c9d2a375ad70",
+    "01/08-mixed-paused-issued.png": "1e262b4dd537bfa013587a85f9aea57101c2c21b08efaa7d5c2203a64bbd1783",
+    "01/10-mixed-after-natural-motion.png": "ef8164855049ababffe10504a7fea37bf0d3a664f77f2bdf378761752600ea02"
+  },
+  "raw_sha256": {
+    "result.json": "cc6143327bc25b75482703f780b3186ea1ed75302248979d7f3ed5f44e6b4d5d",
+    "01/07-mixed-issued.ron": "e41c28784a1c6204e988fd48f904f5b39908428837f93b9ece904d68dac8b4af",
+    "01/09-after-natural-five-seconds.ron": "b45ea1fe2282ed265908a840cffc554a6497f2b7f696449c8bcfc5b6a551951f"
+  },
+  "limitations": [
+    "No campaign outcome or fullmatch performance claim",
+    "Earlier399 package proofs remain historical",
+    "Human audio listening not tested"
+  ]
+}
