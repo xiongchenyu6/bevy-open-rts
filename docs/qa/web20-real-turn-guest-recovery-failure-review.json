@@ -90,5 +90,40 @@
     "visible": "Own red HQ and Workers, selected HQ, bank28/16, active Worker72% production",
     "image_sha256": "7abd06cc6fded8e3dfff04a53cec76956618708ea27930f840b7190ead8aaa70",
     "scope": "Before fault only, no resumed render claim"
-  }
+  },
+  "post_fault_actual_clock_chronology": {
+    "scope": "Readonly actual sampled clock chronology; does not identify panic cause",
+    "fault_wall_ms": 1791710726983,
+    "first_post_fault": {
+      "sample": "sample-45.json",
+      "host": {
+        "tick": 135,
+        "wall_ms": 1791710727000,
+        "online_phase": "InMatch"
+      },
+      "p1": {
+        "tick": 135,
+        "wall_ms": 1791710727021,
+        "online_phase": "InMatch"
+      }
+    },
+    "last": {
+      "sample": "sample-279.json",
+      "host": {
+        "tick": 434,
+        "wall_ms": 1791710756976,
+        "online_phase": "InMatch"
+      },
+      "p1": {
+        "tick": 135,
+        "wall_ms": 1791710756985,
+        "online_phase": "InMatch"
+      }
+    },
+    "guest_max_post_fault_tick": 135,
+    "host_last_tick": 434,
+    "raw_report": "target/web20-real-turn-guest-reconnect-20261011-01/actual-post-fault-freeze-chronology.json",
+    "raw_report_sha256": "0b90dedd4591bfbd93acc17e14540a41797925fd5948e60e8bc016a36d4b5c31"
+  },
+  "source_location_limitation": "Sealed Wasm20 has no name custom section; wasm-function22332 is insufficient to identify Rust source. Sanitized panic source diagnostics required."
 }
