@@ -38,6 +38,13 @@ A bounded regression or an older package cannot establish final release readines
   hashes also match ([current asset identity](qa/native300-active-asset-ledger-review.json)).
   This verifies payload identity only. Generated terms, commercial rights and
   library obligations remain open.
+- Fresh SDK300 Mission2 diagnostics earn36 Ore and complete six paid buildings
+  for20/9, leaving80/23. The run stops before any Rally command or unit training:
+  the fixed assembly proposals are offscreen, under HUD or occupied. It closes
+  normally with unchanged package/archive
+  ([actual bounded failure](qa/sdk300-fresh-m2-rally07/review.json)).
+  Recorded OWN/public geometry identifies14 alternatives; they require fresh
+  screenshot review before use. No defender, combat or mission pass is claimed.
 - Original capsule/library and client-icon candidates export reproducibly, with
   directly inspected crops and small title samples
   ([capsules](../art/steam/capsules-v2/README.md), [icons](../art/steam/icons-v1/README.md)).
