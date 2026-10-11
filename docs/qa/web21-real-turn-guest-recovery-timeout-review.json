@@ -1,0 +1,85 @@
+{
+  "scope": "Actual full published ICE relay-relay guest signaling fault on fixed W21; private local authority; not deployed service acceptance",
+  "wasm_sha256": "87e32d392b14bc7e05f06c2613c5c4e220931bbc090770252799178c68a89c7f",
+  "actual_exit": 1,
+  "resume": {
+    "resumed": false,
+    "elapsed_ms": 30025,
+    "within_original_30_seconds": false,
+    "host_peer_before": "1044cebe-143a-4cf6-a06f-60408cbf5f3a",
+    "host_peer_after": "1044cebe-143a-4cf6-a06f-60408cbf5f3a"
+  },
+  "driver": {
+    "actual_driver_exit": 1,
+    "error": "Error: Actual game resume missed unchanged30second grace",
+    "real_contexts": 2,
+    "roles": [
+      "host",
+      "p1"
+    ],
+    "events": 0,
+    "diagnostics": [],
+    "normal_browser_close": true,
+    "closed_wall_ms": 1791713305665,
+    "browser_close_ms": 317,
+    "deadline_seconds": 240,
+    "physical_actions_completed": false,
+    "independent_verification_pending": true,
+    "reconnect_claim_pending_independent_verification": true,
+    "forced_relay_required": true
+  },
+  "secret_cleanup": {
+    "private_credentials_file_removed": true,
+    "credentials_in_argv": false,
+    "full_config_unmodified": true
+  },
+  "raw_evidence": "target/web21-real-turn-guest-reconnect-20261011-01",
+  "panic_observed": false,
+  "interpretation": "No crash recorded within original test window after send guard. Actual recovery still fails original30-second bound; root cause of remaining delay unproven.",
+  "recovery_pass": false,
+  "all_release_gates_remain_open": true,
+  "replacement_connection_at_last_poll": {
+    "host": {
+      "connectionState": "new",
+      "iceConnectionState": "new",
+      "signalingState": "have-local-offer",
+      "iceGatheringState": "gathering",
+      "localDescriptionType": "offer",
+      "remoteDescriptionType": null,
+      "candidateCount": 10,
+      "descriptionStages": [
+        {
+          "stage": "createOffer-called",
+          "time": 105680.70000001788,
+          "descriptionType": null
+        },
+        {
+          "stage": "createOffer-resolved",
+          "time": 105700.90000000596,
+          "descriptionType": null
+        },
+        {
+          "stage": "setLocalDescription-called",
+          "time": 105701.10000002384,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "setLocalDescription-resolved",
+          "time": 105702.30000001192,
+          "descriptionType": "offer"
+        }
+      ],
+      "routes": []
+    },
+    "guest_connection_count": 1,
+    "guest_socket_states": [
+      3,
+      1
+    ],
+    "evidence_files": [
+      "host-transport-poll-264-observation.json",
+      "p1-transport-poll-264-observation.json"
+    ]
+  },
+  "source_semantics": "matchbox_socket0.14 wasm.rs waits for complete ICE gathering before sending Offer and Answer. The observed replacement offer has not reached the guest before the original recovery deadline."
+}
