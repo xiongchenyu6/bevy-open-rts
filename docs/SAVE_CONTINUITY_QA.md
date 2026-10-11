@@ -1,5 +1,18 @@
 # Current native save continuity
 
+Current SDK296 verifies normal starter-Drone Patrol through same-process and
+fresh-process Ctrl+L. Saved endpoints, current leg, Move target, height1.5,
+resources32/16 and all36,864 fog cells restore exactly. The fog state is
+nontrivial:6,045 explored cells and30,819 unexplored cells. After fresh load,
+13 baseline/resumed samples show both Patrol legs over5.351 game seconds.
+Both game processes exit normally, with the archive and installation unchanged
+([current bounded Patrol save proof](qa/sdk296-normal-drone-patrol-save-review.json)).
+
+The original coarse-sampling attempt remains failed, and the later compositor
+bootstrap failure occurred before a game launch. Neither is relabeled by this
+passing attempt. Mines, other statuses, support powers, garrisons, repair,
+weather and broader final-package save coverage remain open.
+
 Normal native Ore-body validation now passes: ordinary camera pan and a directly reviewed visible model click set the Ore rally, one paid Worker costs two Ore, and same/fresh-process loads remap both producer and resource references. The Worker receives the restored Harvest order; bank remains 30/16 and both processes exit normally ([bounded native proof](qa/native-visible-ore-rally-review.json)). This debug/Nix artifact predates the movement fix and does not establish final optimized-package acceptance or collected resource income.
 
 Current source uses save format 4. It now preserves an optional rally entity reference as well as the ground target and mode; restored references are remapped to the actual Worker or mineral. Invalid references are rejected. Older formats are unsupported, with the existing readable incompatibility message and no migration layer. Three focused integration tests and the complete 258-pass library suite verified repeated fresh-App remapping, real paid Worker Follow/Harvest behavior and dangling-target rejection; main and capture builds passed with source and asset hashes unchanged. [The schema4 record](qa/native-schema4-rally-entity-review.json) retains both meaningful old-source failures and the separate cache-reuse failure. The rebuilt optimized SDK258 package separately passed normal own-Worker rally continuity: actual same-process and fresh-process loads remapped the target and producer, and one normally paid Worker completed with a Follow order to the restored target. The bank remained 30/16 and both processes closed normally with exit 0 in 87.288/240 seconds. [The packaged own-Worker review](qa/current258-sdk-own-worker-rally-review.json) pins executable/archive identity, real RON and independent frame review. Resource rally and negative-file cases remain separate; their failed first attempts are retained. The schema3 results below remain historical artifact evidence.
