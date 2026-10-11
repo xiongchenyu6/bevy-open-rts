@@ -1,0 +1,293 @@
+{
+  "scope": "Normal same-App campaign02 partial progress and harness planning failure; not six-mission acceptance",
+  "actual_exit": 1,
+  "wall_seconds": 647.6846110959887,
+  "error": "No currentlyinviewport OWNbase planning sites",
+  "forced_cleanup": true,
+  "runtime_launch_count": 1,
+  "normal_m1_victory_and_same_pid_next": true,
+  "completed_mission_rows": [
+    {
+      "mission": "hold_the_line",
+      "same_runtime_pid": 904583,
+      "initial": {
+        "mission_id": "hold_the_line",
+        "map_path": "bevy://maps/CanyonPass",
+        "configured_resources": [
+          48,
+          24
+        ],
+        "bank": [
+          48,
+          24
+        ],
+        "schema": 4,
+        "clock": 0.016296256333589554,
+        "controllers": [
+          1,
+          2
+        ],
+        "factions": [
+          0,
+          1
+        ],
+        "spawn_slots": [
+          0,
+          1
+        ],
+        "own": {
+          "clock": 0.016296256333589554,
+          "ore": 48,
+          "crystal": 24,
+          "units": [
+            {
+              "key": 4294966723,
+              "id": "Drone",
+              "position": [
+                -20.0,
+                1.5,
+                -2.0
+              ],
+              "active": [],
+              "queued": [],
+              "cargo_ron": "None"
+            },
+            {
+              "key": 4294966721,
+              "id": "Worker",
+              "position": [
+                -21.0,
+                0.05000000074505806,
+                3.0
+              ],
+              "active": [],
+              "queued": [],
+              "cargo_ron": "Some((0, 0))"
+            },
+            {
+              "key": 4294966718,
+              "id": "Worker",
+              "position": [
+                -15.0,
+                0.05000000074505806,
+                3.0
+              ],
+              "active": [],
+              "queued": [],
+              "cargo_ron": "Some((0, 0))"
+            }
+          ],
+          "structures": [
+            {
+              "key": 4294966738,
+              "id": "CommandCenter",
+              "position": [
+                -18.0,
+                0.0,
+                0.0
+              ],
+              "construction": null,
+              "cost": null
+            }
+          ],
+          "own_harvest_resources": [],
+          "jobs": []
+        },
+        "raw_own_save": "01/normal-initial.ron"
+      },
+      "actual_outcome": {
+        "normal_input_only": true,
+        "natural_victory": true,
+        "own_headquarters_alive": true,
+        "last_own_hq_health": 20.0,
+        "simulation_seconds": 240.0094451904297,
+        "readonly_context": {
+          "app_screen": "InMatch",
+          "assigned_slot": null,
+          "is_host": false,
+          "last_applied_tick": 0,
+          "last_sent_tick": 0,
+          "lobby": null,
+          "local_player_id": null,
+          "match_phase": "HumanVictory",
+          "observe_only": true,
+          "online_phase": "Home",
+          "protocol": 4,
+          "room_code": null,
+          "schema": 1
+        },
+        "wall_seconds": 507.4251883029938,
+        "public_result_png": "01/natural-result.png",
+        "paid_rows": [
+          {
+            "id": "PowerReactor",
+            "cost": [
+              3,
+              1
+            ],
+            "point": [
+              865,
+              181
+            ],
+            "completed_count": 1,
+            "construction_wall": 9.841575555998133
+          },
+          {
+            "id": "AntiGroundTurret",
+            "cost": [
+              2,
+              2
+            ],
+            "point": [
+              415,
+              181
+            ],
+            "completed_count": 1,
+            "construction_wall": 8.126258914999198
+          },
+          {
+            "id": "AntiGroundTurret",
+            "cost": [
+              2,
+              2
+            ],
+            "point": [
+              354,
+              129
+            ],
+            "completed_count": 2,
+            "construction_wall": 8.070700181997381
+          },
+          {
+            "id": "Barracks",
+            "cost": [
+              3,
+              1
+            ],
+            "point": [
+              640,
+              129
+            ],
+            "completed_count": 1,
+            "construction_wall": 8.092874813999515
+          },
+          {
+            "producer": "Barracks",
+            "unit": "HeavyMachinegunTrooper",
+            "queued_paid_count": 1,
+            "bank": [
+              36,
+              17
+            ]
+          },
+          {
+            "producer": "Barracks",
+            "unit": "HeavyMachinegunTrooper",
+            "queued_paid_count": 1,
+            "bank": [
+              34,
+              16
+            ]
+          },
+          {
+            "producer": "Barracks",
+            "unit": "HeavyMachinegunTrooper",
+            "queued_paid_count": 1,
+            "bank": [
+              32,
+              15
+            ]
+          },
+          {
+            "id": "VehicleFactory",
+            "cost": [
+              6,
+              0
+            ],
+            "point": [
+              1112,
+              239
+            ],
+            "completed_count": 1,
+            "construction_wall": 9.950079190020915
+          },
+          {
+            "producer": "VehicleFactory",
+            "unit": "Tank",
+            "queued_paid_count": 1,
+            "bank": [
+              23,
+              14
+            ]
+          },
+          {
+            "producer": "VehicleFactory",
+            "unit": "Tank",
+            "queued_paid_count": 1,
+            "bank": [
+              20,
+              13
+            ]
+          },
+          {
+            "producer": "VehicleFactory",
+            "unit": "Tank",
+            "queued_paid_count": 1,
+            "bank": [
+              17,
+              12
+            ]
+          },
+          {
+            "producer": "VehicleFactory",
+            "unit": "Tank",
+            "queued_paid_count": 1,
+            "bank": [
+              14,
+              11
+            ]
+          },
+          {
+            "producer": "VehicleFactory",
+            "unit": "Tank",
+            "queued_paid_count": 1,
+            "bank": [
+              11,
+              10
+            ]
+          },
+          {
+            "producer": "VehicleFactory",
+            "unit": "Tank",
+            "queued_paid_count": 1,
+            "bank": [
+              8,
+              9
+            ]
+          }
+        ],
+        "visual_adjudication_pending": true
+      },
+      "completion_prefix": [
+        "hold_the_line"
+      ]
+    }
+  ],
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "archive_sha256": "249199240f79baea4bf6a4fc5914478a7db636b2fb00fab55f850f0254417fc2",
+  "binary_sha256": "0f94f73dfd29c279caf9d6a32a6e03b3eeaf071140f55858fe2e3c44ea0c04bc",
+  "camera_failure": "Normal body click entered actual top edge-pan band; subsequent camera snapshot projected all candidate own-base sites outside viewport. No M3/nav conclusion.",
+  "prepared_correction": "Normal Alt+C ownHQ focus, visible healthy free ownWorker restoration, strict HUD/viewport/edge-pan guards; fresh03 currentlyrunning",
+  "evidence": {
+    "target/sdk285-six-mission-normal-20261011-02/result.json": "3bea7caeae95a772c83bcd6d06b8a3753edd40923524a86c1525a691ffceb502",
+    "target/sdk285-six-mission-normal-20261011-02/mission-rows.json": "424be3469604d558197cb9060899a36d93fa06e4f7b7e68c88b59672cf7ce1a6",
+    "target/sdk285-six-mission-normal-20261011-02/01/natural-result.png": "6c39b9f2826675baa69f449ae430081859183908d3e607bc7811811029882746",
+    "target/sdk285-six-mission-normal-20261011-02/01/normal-next-before.png": "7d26db8faaff78282f36c4532b68262ab8c988aaff7a9148ea084649ccba7913"
+  },
+  "limits": [
+    "M2 outcome/M3/six-mission chain not accepted",
+    "First failed PID-loader preflight retained separately",
+    "Fresh final render and normal final exits pending"
+  ]
+}

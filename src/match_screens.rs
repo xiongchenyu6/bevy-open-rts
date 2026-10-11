@@ -7,7 +7,7 @@ use crate::*;
 
 pub(crate) const MATCH_END_TITLE_COLOR: Color = Color::srgb(0.98, 0.96, 0.42);
 
-pub(crate) const MATCH_END_BG_COLOR: Color = Color::srgba(0.04, 0.05, 0.08, 0.86);
+pub(crate) const MATCH_END_BG_COLOR: Color = Color::srgba(0.04, 0.05, 0.08, 0.96);
 
 pub(crate) const MATCH_END_TITLE_FONT_SIZE: f32 = 34.0;
 
@@ -465,7 +465,11 @@ pub(crate) fn update_match_end_overlay(
         **title_text = if tutorial.stage == TutorialStage::Complete {
             t("基础训练完成", "Boot Camp Complete")
         } else {
-            t("对局结算", "Match Results")
+            match match_state.phase {
+                MatchPhase::HumanVictory => t("胜利", "Victory"),
+                MatchPhase::HumanDefeat => t("失利", "Defeat"),
+                MatchPhase::Running | MatchPhase::MatchFinished => t("战斗结束", "Battle Over"),
+            }
         }
         .to_string();
     }

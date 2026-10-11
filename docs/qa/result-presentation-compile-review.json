@@ -1,0 +1,25 @@
+{
+  "scope": "Result presentation compile correction; fresh rendered acceptance pending",
+  "trigger": "Root directly inspected native285 normal M1 victory frame: generic Match Results heading and battlefield models visible through statistics backdrop",
+  "changes": [
+    "Show Victory/Defeat for actual local match phase; retain Boot Camp completion and neutral Battle Over",
+    "Increase result panel background opacity0.86\u21920.96"
+  ],
+  "compile_check": {
+    "actual_exit": 0,
+    "wall_seconds": 21.469334811990848,
+    "source_sha256": "43bb57cf2fd46fba09c959ad3ddef8565635aba3d281f95315ab834de40c0b06",
+    "source_unchanged": true,
+    "scope": "Result title/backdrop compile check only; fresh rendered verification pending"
+  },
+  "evidence": {
+    "target/result-presentation-check-20261011/result.json": "44120aa8bdec2b362bf6b60b707553ec32bc4be4a3677eb725f2898fdd6d201d",
+    "target/result-presentation-check-20261011/check.log": "c58234c5e010d82d285dc85984909569b1758d5b742e701fae612ee3d55534d9",
+    "target/sdk285-six-mission-normal-20261011-02/01/natural-result.png": "6c39b9f2826675baa69f449ae430081859183908d3e607bc7811811029882746"
+  },
+  "limits": [
+    "No fresh frame of corrected UI yet",
+    "Current frozen native285/SDK/Wasm17 artifacts unchanged",
+    "No gameplay statistics, win conditions or mission logic changed"
+  ]
+}
