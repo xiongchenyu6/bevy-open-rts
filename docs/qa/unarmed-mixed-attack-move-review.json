@@ -1,0 +1,67 @@
+{
+  "scope": "Product order selection correction, native regression/check evidence; current399 GPU/campaign artifacts remain old source",
+  "causal_actual399_receipts": {
+    "issued": "target/sdk399-fresh-m3-double-AA-20261011-04/03/actual-front-guard-issued.ron",
+    "later": "target/sdk399-fresh-m3-double-AA-20261011-04/03/normal-own-000.ron",
+    "Drone_entity": 4294966722,
+    "clocks": [
+      39.36509323120117,
+      82.5383529663086
+    ],
+    "unchanged_position": [
+      -24,
+      1.5,
+      -24
+    ],
+    "AttackMove_destination": [
+      -17.992857,
+      0,
+      -21.501482
+    ]
+  },
+  "implementation": "Only weapon-capable mobile units receive AttackMove. Unarmed mobile units use existing Move; contextual orders remain earlier in resolver. No stats/radii/costs/timers changes.",
+  "RED": {
+    "actual_exit": 101,
+    "actual_root_recompile": true,
+    "failed": 1,
+    "passed": 0,
+    "full_schedule_Running_updates": 60,
+    "observed_start_equals_end": true,
+    "wall_seconds": 178.7228524684906
+  },
+  "GREEN": {
+    "focused_passed": 1,
+    "endpoint_suite_passed": 6,
+    "contextual_harvest_passed": 1,
+    "check_lib_main_capture": 0,
+    "results": {
+      "focused": 0,
+      "movement": 0,
+      "contextual": 0,
+      "check": 0
+    },
+    "wall_seconds": 82.97384119033813,
+    "actual_root_compile": true,
+    "Drone_progress_over1m": true,
+    "airborne_height_unchanged": true,
+    "armed_HMG_desired_AttackMove_preserved": true
+  },
+  "source_inputs": {
+    "source_material_files": 142,
+    "assets": 332,
+    "before_after_equal": true
+  },
+  "preserved_nonproof": "RED01 returned0 but executed0tests due relocated cache; preserved and not calledRED. RED02 cleaned ONLY root dev package before genuine compile/assertion failure.",
+  "evidence_sha256": {
+    "target/unarmed-attack-move-red02-20261011/red.log": "ee094673c1046438e7beb6088a0834152b0c2c48a542538afcb165503319053a",
+    "target/unarmed-attack-move-green-20261011/focused.log": "c4e7ddbac0006ead71a7fa3a40420b01ec3d8fc600303c930550a6b0215c5f1a",
+    "target/unarmed-attack-move-green-20261011/movement.log": "9bdcf2a9b4774be7b219759ff93010407b5d83ac42abe12a79f659f01b161b0c",
+    "target/unarmed-attack-move-green-20261011/contextual.log": "548e1b6ca5488b25962643b7fdb6dfcaa47dc7ff63ba63c1eb684f5738a79c00",
+    "target/unarmed-attack-move-green-20261011/check.log": "9cf19f8967e87baf855820c4b29c8f701de2e1611b8146701affb604548172d3",
+    "target/unarmed-attack-move-green-20261011/result.json": "56ddc04ab9bb4caf488da0f8d04034f7090cc406177950d4953dd74b364667b2"
+  },
+  "pending": [
+    "Full consolidated suite/new shipping binaries/new officialSDK/Web artifacts",
+    "Actual normal mixed-cohort runtime verification; no claim current399 M306 contains fix"
+  ]
+}

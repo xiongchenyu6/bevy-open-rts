@@ -430,3 +430,59 @@ fn measured_harvester_routes_around_adjacent_aa_and_delivers_real_cargo() {
 
 #[path = "movement_endpoint_tests/robotics_contact.rs"]
 mod robotics_contact;
+
+#[test]
+fn mixed_attack_move_moves_unarmed_drone_without_changing_armed_order() {
+    let scene = r#"[[1,"CommandCenter","Player(0)",[20,0,20],2,30,null],[2,"CommandCenter","Player(1)",[-20,0,20],2,30,null],[3,"Drone","Player(0)",[-24,1.5,-24],0.6,6,null],[4,"HeavyMachinegunTrooper","Player(0)",[-22,0.05,-24],0.48,7,null]]"#;
+    let (mut app, keys) = measured_app(scene);
+    let destination = Vec3::new(-17.992857, 0.0, -21.501482);
+    let choices = OrderTargetChoices {
+        supply_crate_position: None,
+        resource_target: None,
+        resource_dropoff_target: None,
+        enemy_target: None,
+        repair_target: None,
+        construct_target: None,
+        garrison_target: None,
+        follow_target: None,
+    };
+    let context = UnitOrderContext {
+        force_move: false,
+        enemy_target_capturable: false,
+        attack_move: true,
+        patrol: false,
+        origin: Vec3::new(-24.0, 1.5, -24.0),
+        point: destination,
+        offset: Vec3::ZERO,
+    };
+    let drone = keys[&3];
+    let armed = keys[&4];
+    let drone_order =
+        desired_order_for_selected_unit(app.world().get::<Unit>(drone).unwrap(), choices, context)
+            .unwrap();
+    let armed_order =
+        desired_order_for_selected_unit(app.world().get::<Unit>(armed).unwrap(), choices, context)
+            .unwrap();
+    assert!(matches!(armed_order, UnitQueuedOrder::AttackMove(p) if p == destination));
+    let start = app.world().get::<Transform>(drone).unwrap().translation;
+    let expected_drone_order = drone_order.clone();
+    app.world_mut().commands().queue(move |world: &mut World| {
+        issue_unit_order(&mut world.commands(), drone, drone_order.clone());
+        issue_unit_order(&mut world.commands(), armed, armed_order);
+    });
+    for _ in 0..60 {
+        app.update();
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::Running
+        );
+    }
+    let end = app.world().get::<Transform>(drone).unwrap().translation;
+    assert!(
+        end.distance(start) > 1.0,
+        "Unarmed Drone must actually move in the shared schedule: {start:?} -> {end:?}"
+    );
+    assert!(matches!(expected_drone_order, UnitQueuedOrder::Move(p) if p == destination));
+    assert!(app.world().get::<AttackMoveOrder>(drone).is_none());
+    assert_eq!(end.y, start.y, "No airborne height change");
+}

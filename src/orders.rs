@@ -788,7 +788,7 @@ pub(crate) fn desired_order_for_selected_unit(
         return None;
     }
     let destination = context.point + context.offset;
-    Some(if context.attack_move {
+    Some(if context.attack_move && unit_supports_attack_move(unit) {
         UnitQueuedOrder::AttackMove(destination)
     } else if context.patrol {
         UnitQueuedOrder::Patrol {
