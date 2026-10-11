@@ -1,0 +1,63 @@
+{
+  "scope": "SDK286 exact readonly Linux archive normal fresh-profile seven-lesson BootCamp,skip,naturalcompletion,fresh-processreplay; broaderrelease pending",
+  "archive_sha256": "d96c767537044b0bd91208cc2760004961416d5241878341154482cf8e6c3194",
+  "binary_sha256": "71602fd1b31d7bafb78fe325a621fb40a051b6c2fa0a953016900cee44a25dee",
+  "container_exit": 0,
+  "game_pid_exits": [
+    [
+      66,
+      0
+    ],
+    [
+      502,
+      0
+    ]
+  ],
+  "total_wall_limit_seconds": 1200,
+  "attack_limit_seconds": 300,
+  "completion_frame_seconds_after_attack_start": 86.27448511123657,
+  "direct_visual_completion": {
+    "label": "Boot Camp Complete",
+    "time": "04:34",
+    "enemy_building_kills": 1,
+    "own_unit_losses": 0,
+    "own_building_losses": 0
+  },
+  "normal_observed_flow": [
+    "MouseWorkerselection",
+    "Ore64to70to82fromnormalgathering",
+    "PaidPower3/1andBarracks3/1naturallycompleted",
+    "FourpaidLightRifleInfantry",
+    "Normalarmymovement",
+    "PublicfogscoutingrevealedactualredHQbeforenormalattack"
+  ],
+  "persisted_training_complete": true,
+  "fresh_replay_review": "Lesson1/7,64/32,pop0/8,onlystartingDrone selected,twoWorkers,noformerarmy/buildings",
+  "installation_and_archive_unchanged": true,
+  "evidence": {
+    "target/linux-native286-steamrt4-boot-camp-normal-20261011-01/container-result.json": "5889cdec253d14d8e20b9bdd3348cbf0c93405f09ead7105d3df551b004a9df9",
+    "target/linux-native286-steamrt4-boot-camp-normal-20261011-01/user-data/bevy-open-rts/campaign.ron": "2264aab2d7e7dae2d74a86b515a3d4d8dd630f89048565b8f47148db0d085e93",
+    "target/linux-native286-steamrt4-boot-camp-normal-20261011-01/control.log": "029b85478cb5acda4249e1b9bd78c2b1f9c06b7b648fd8f8b7790013175d3117"
+  },
+  "screenshots": {
+    "00-fresh-menu": "6840b44cc2c2bfa30a580f52c1be28168bb13b7f9ec504eb9949048a2acf34bf",
+    "01-training-start": "ed3481523de90b50dc811da8c587418d8265bcbf9f7136a8ea7f30d07a81f391",
+    "02-skipped": "cb1ee455477df7657e152850355bc73f4b5ae695ba2387f23c4b261b4d9166ad",
+    "03-restarted-training": "84ef087a0d072f4044b10165f5ab057cdf618e8cec4f23085475eabed75961bd",
+    "04-selected-worker": "a680531895c0fca55e6554b5bf7d122ab70573d40afc0ab4c263d98f03527876",
+    "05-gather-progress": "97b0ccfdb0499d1d464e1b552e4ac0788565734b0ffa822f389122b18068040a",
+    "12-power-completed": "ab9c3fba9f1e857988b22f5340b8f856a5ea288d6a8d2bcab2778dbc7f18928d",
+    "17-barracks-completed": "eed84710fff87e9c13c3dd7dc69adb60f0e9e8b6fc377dbc7cc5191ca72f28e3",
+    "19-four-infantry-paid": "223254e698f0e9895522d040d8e145a11adb3d68508a833fdedef17d949b04fb",
+    "20-infantry-ready": "0917073f2b0f52236947ea90926df13d2483f67815b05bd8a1a74ed98474c1e9",
+    "21-normal-army-movement": "689f3580d14c16f0bedda7866d3394f31be3871ed2d003cd61613cdee9702a73",
+    "23-public-scout-progress": "0c02e15dff653300f8fed71124acf5373b197740fb4277de7c5bc5b2e835050d",
+    "24-normal-attack-progress": "88650f5781c3cea634ce41994ab7615340bb912ba9de9a415630066e551bfb0b",
+    "30-replay-starting-army": "f99fdd1f92c6993b0e8842fa1b0596f07bd0b37e8b8ca6a68aa96f6e110cc8f9"
+  },
+  "limits": [
+    "Linuxnonrootprivatecontainer; officialRuntime4launcherandWindowsremainseparate",
+    "Currentrecoverypatchisnotinthissealedartifact",
+    "Fullcampaign/save/audio/performance/storemedia notaccepted"
+  ]
+}
