@@ -1,0 +1,23 @@
+{
+  "scope": "Partial1371/3726 deterministic frozen native285 optimized SDK matrix; not complete or final UI08 source equivalence",
+  "actual_verifier_exit": 0,
+  "complete_matrix": false,
+  "terminal_snapshot": 1371,
+  "planned": 3726,
+  "counts": {
+    "completed": 1371
+  },
+  "integrity_verified": true,
+  "errors": [],
+  "failures": [],
+  "audit_sha256": "e2e35a191dba62c1ca4d47ff140b24c1d9cee8650a9e36812b232241c80d2bca",
+  "assets_verified": 332,
+  "evidence": {
+    "target/native285-matrix-independent-20261011-check01.json": "cc7c8ac439cd9f68d5240a4aaf020546cf0217364cd44dbe70e9e7b2cb25a319"
+  },
+  "limits": [
+    "Driver stilllive; exit0 verifies this partial snapshot, not full coverage",
+    "FinalUI08 differs only in result presentation and opt-in observer retention but is a separate artifact",
+    "No independent seeds/repeats/random-map balance or player/render acceptance"
+  ]
+}
