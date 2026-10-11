@@ -1,0 +1,31 @@
+{
+  "scope": "Official SDK native285 optimized archive build/integrity identity only; final player acceptance pending",
+  "actual_build_exit": 0,
+  "clean_project_exit": 0,
+  "wall_seconds": 477.08482637500856,
+  "image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+  "raw_binary_sha256": "b0bb0ddcb0cf19079a9e74f89f42bdb4f6d937f0c25ae424866ebf6b95a74245",
+  "installed_binary_sha256": "0f94f73dfd29c279caf9d6a32a6e03b3eeaf071140f55858fe2e3c44ea0c04bc",
+  "archive_sha256": "249199240f79baea4bf6a4fc5914478a7db636b2fb00fab55f850f0254417fc2",
+  "frozen_files": 762,
+  "source_inputs": 120,
+  "assets": 332,
+  "installed_files": 381,
+  "inputs_unchanged": true,
+  "independently_verified": true,
+  "package_exit": 0,
+  "integrity_exit": 0,
+  "evidence": {
+    "target/linux-native285-next-steamrt4-sdk-20261011/result.json": "a030b10dd92daedd04c47f283ab38756040fecf75be33a4388e9958510e951f2",
+    "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native285-next-sdk-snapshot-20261011/input.json": "e04be4424672e78602c1b382f264ceecaa5f13c452a0915b12eac3472e40e10a",
+    "target/linux-native285-steamrt4-package-20261011/result.json": "5723ed5259343e3f8d11aced2f1c5c709f164a88676e1372913fb4552519fb2c",
+    "target/linux-native285-steamrt4-extracted-20261011/ready.json": "8c305eab58f84122ec35128f2f28ab613a103d83dc0fbd729f0b6f24f684e21a",
+    "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native285-steamrt4-extracted-20261011/bevy-open-rts-linux-x86_64/BUILD_INFO.json": "95669a58cfc27341f047bb3fe218911f47993fc3d84013e48f4d061d56f26664"
+  },
+  "limits": [
+    "First campaign attempt fails harness loader-PID preflight before any mission and is preserved",
+    "Fresh campaign02 currently underway; not accepted yet",
+    "BootCamp, full campaign/save/audio/performance/Windows on final artifact remain open",
+    "Fresh browser full workflow failed independently; native build does not prove online acceptance"
+  ]
+}
