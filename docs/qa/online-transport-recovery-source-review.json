@@ -78,7 +78,8 @@
     "PublishedfullICE40\u201380secondgathering observed earlier; recoverytiming must be measured without extendinggrace or narrowingICE",
     "FreshfinalSDK/Wasm/playerflow onthissource pending"
   ],
-  "gameplay_world_stats_timers_protocol_schema_unchanged": true,
   "network_hello_timer_uses_real_time": true,
-  "gpu_launched": false
+  "gpu_launched": false,
+  "gameplay_stats_timers_and_game_replication_schema_unchanged": true,
+  "signaling_room_descriptor_changed": "Addsoptionalcurrenthost_peer_idfromauthorizedlivehost; servercapability/deploymentvalidationpending"
 }
