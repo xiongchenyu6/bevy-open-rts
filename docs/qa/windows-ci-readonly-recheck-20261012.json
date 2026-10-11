@@ -1,0 +1,43 @@
+{
+  "scope": "Read-only current GitHub workflow availability and latest10 runs; no build, CI dispatch or Windows runtime acceptance",
+  "checked_utc": "2026-10-11T19:37:53.969517+00:00",
+  "queries": [
+    {
+      "command": [
+        "gh",
+        "run",
+        "list",
+        "--workflow",
+        "release-desktop.yml",
+        "--limit",
+        "5",
+        "--json",
+        "databaseId,headSha,status,conclusion,event,createdAt"
+      ],
+      "actual_exit": 1,
+      "stdout": "",
+      "stderr": "HTTP 404: workflow release-desktop.yml not found on the default branch (https://api.github.com/repos/xiongchenyu6/bevy-open-rts/actions/workflows/release-desktop.yml)\n"
+    },
+    {
+      "command": [
+        "gh",
+        "run",
+        "list",
+        "--limit",
+        "10",
+        "--json",
+        "databaseId,headSha,status,conclusion,workflowName,createdAt,event"
+      ],
+      "actual_exit": 0,
+      "stdout": "[{\"conclusion\":\"success\",\"createdAt\":\"2026-10-11T18:05:58Z\",\"databaseId\":38162381784,\"event\":\"dynamic\",\"headSha\":\"aebc7947a30f0963bfceae9065baad711459ac87\",\"status\":\"completed\",\"workflowName\":\"Dependabot Updates\"},{\"conclusion\":\"success\",\"createdAt\":\"2026-10-04T18:02:39Z\",\"databaseId\":37222843390,\"event\":\"dynamic\",\"headSha\":\"aebc7947a30f0963bfceae9065baad711459ac87\",\"status\":\"completed\",\"workflowName\":\"Dependabot Updates\"},{\"conclusion\":\"success\",\"createdAt\":\"2026-09-27T18:02:37Z\",\"databaseId\":36339167594,\"event\":\"dynamic\",\"headSha\":\"aebc7947a30f0963bfceae9065baad711459ac87\",\"status\":\"completed\",\"workflowName\":\"Dependabot Updates\"},{\"conclusion\":\"success\",\"createdAt\":\"2026-09-20T18:02:33Z\",\"databaseId\":35527771098,\"event\":\"dynamic\",\"headSha\":\"aebc7947a30f0963bfceae9065baad711459ac87\",\"status\":\"completed\",\"workflowName\":\"Dependabot Updates\"},{\"conclusion\":\"success\",\"createdAt\":\"2026-09-13T18:02:37Z\",\"databaseId\":34773400086,\"event\":\"dynamic\",\"headSha\":\"aebc7947a30f0963bfceae9065baad711459ac87\",\"status\":\"completed\",\"workflowName\":\"Dependabot Updates\"},{\"conclusion\":\"success\",\"createdAt\":\"2026-09-06T18:02:43Z\",\"databaseId\":34050462102,\"event\":\"dynamic\",\"headSha\":\"aebc7947a30f0963bfceae9065baad711459ac87\",\"status\":\"completed\",\"workflowName\":\"Dependabot Updates\"},{\"conclusion\":\"success\",\"createdAt\":\"2026-08-30T18:02:48Z\",\"databaseId\":33326936466,\"event\":\"dynamic\",\"headSha\":\"aebc7947a30f0963bfceae9065baad711459ac87\",\"status\":\"completed\",\"workflowName\":\"Dependabot Updates\"},{\"conclusion\":\"success\",\"createdAt\":\"2026-08-23T18:02:45Z\",\"databaseId\":32656780843,\"event\":\"dynamic\",\"headSha\":\"aebc7947a30f0963bfceae9065baad711459ac87\",\"status\":\"completed\",\"workflowName\":\"Dependabot Updates\"},{\"conclusion\":\"success\",\"createdAt\":\"2026-08-16T18:02:41Z\",\"databaseId\":31963414108,\"event\":\"dynamic\",\"headSha\":\"aebc7947a30f0963bfceae9065baad711459ac87\",\"status\":\"completed\",\"workflowName\":\"Dependabot Updates\"},{\"conclusion\":\"success\",\"createdAt\":\"2026-08-09T18:02:47Z\",\"databaseId\":31328009558,\"event\":\"dynamic\",\"headSha\":\"aebc7947a30f0963bfceae9065baad711459ac87\",\"status\":\"completed\",\"workflowName\":\"Dependabot Updates\"}]\n",
+      "stderr": ""
+    }
+  ],
+  "current_MSVC_artifact_identified": false,
+  "interpretation": "Default-branch workflow lookup returns404; latest10 observed runs are Dependabot Updates. These queries do not exhaust all historical runs. Local GNU/Wine checkpoints remain historical and do not establish current native MSVC acceptance.",
+  "limitations": [
+    "No Windows build or workflow dispatch performed",
+    "No native Windows hardware or audio/player flow verified",
+    "Current MSVC delivery gate remains open"
+  ]
+}

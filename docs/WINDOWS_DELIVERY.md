@@ -36,6 +36,15 @@ an error, not a reason to write into the installation. Direct launch also works
 with adjacent assets; the launcher supplies an explicit asset root and writable
 working folder.
 
+## Current CI availability
+
+A read-only check on2026-10-12 returns404 for the default-branch desktop
+workflow lookup. The latest10 observed runs are Dependabot Updates; no current
+MSVC artifact is identified by those queries
+([recorded check](qa/windows-ci-readonly-recheck-20261012.json)). This is not an
+exhaustive history audit. The local workflow still needs to be made available
+on GitHub before it can run. No workflow dispatch or publication was performed.
+
 ## Linux cross-build
 
 ```sh
