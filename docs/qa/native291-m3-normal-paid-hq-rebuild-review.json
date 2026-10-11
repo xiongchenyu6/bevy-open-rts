@@ -1,0 +1,38 @@
+{
+  "scope": "Normal Load and paid HQ rebuild followed by natural HumanDefeat; not M3 victory",
+  "starting_bank": [
+    80,
+    16
+  ],
+  "paid_cost": [
+    8,
+    8
+  ],
+  "paid_bank": [
+    72,
+    8
+  ],
+  "completed_own_hq_count": 1,
+  "completion_clock": 77.400390625,
+  "construction_wall_seconds": 10.158571762003703,
+  "original_site_wall_bound": 30,
+  "image_directly_viewed": true,
+  "image_sha256": "9630f85069301508c3aef1ca7b3bfa31f049237b9b13d5cbba81716e1869f107",
+  "raw_evidence": "target/sdk291-retained-m3-recovery-20261011-07/01",
+  "all_release_gates_remain_open": true,
+  "natural_outcome": "HumanDefeat",
+  "natural_outcome_clock": 93.0024,
+  "diagnostic_workflow_passed": true,
+  "natural_outcome_frame_directly_viewed": true,
+  "mission_victory": false,
+  "six_mission_campaign_pass": false,
+  "actual_game_exits": [
+    {
+      "pid": 2134244,
+      "supervisor_pid": 2134144,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "raw_terminal_result": "target/sdk291-retained-m3-recovery-20261011-07/result.json"
+}
