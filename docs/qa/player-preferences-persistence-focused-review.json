@@ -21,8 +21,8 @@
     "source_unchanged": true
   },
   "focused_tests_passed": 2,
-  "after_focused_change": "Fresh profiles derive fullscreen option from actual Window mode, preventing unrelated audio changes from persisting an incorrect default fullscreen flag. This final small startup adjustment awaits consolidated checks.",
-  "current_source_sha256": "3784993229280be6b0f54ed53ed012188e144d5deac84d6ede5683323a1620ce",
+  "after_focused_change": "Fresh profiles derive fullscreen option from actual Window mode, preventing unrelated audio changes from persisting an incorrect default fullscreen flag. This final small startup adjustment awaits consolidated checks. Native writes also use the existing campaign temporary-file/rename pattern, pending consolidated validation.",
+  "current_source_sha256": "3b13a7693339a0ae9c5ef6ce9d7e6d003e1ca64235796dd396e4fb10c67fc5b2",
   "full_suite_verified": false,
   "actual_normal_restart_verified": false,
   "browser_storage_verified": false,

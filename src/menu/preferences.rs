@@ -52,7 +52,9 @@ fn save_path(path: &std::path::Path, options: MenuOptionsState) -> Result<(), St
     decode(&text)?;
     std::fs::create_dir_all(path.parent().ok_or("No preferences directory")?)
         .map_err(|e| e.to_string())?;
-    std::fs::write(path, text).map_err(|e| e.to_string())
+    let temporary = path.with_extension(format!("{}.tmp", std::process::id()));
+    std::fs::write(&temporary, text).map_err(|e| e.to_string())?;
+    std::fs::rename(&temporary, path).map_err(|e| e.to_string())
 }
 
 fn load() -> Result<Option<MenuOptionsState>, String> {
