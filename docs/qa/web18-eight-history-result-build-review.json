@@ -1,0 +1,33 @@
+{
+  "scope": "Frozen Wasm18 build identity; actual browser/throughput/result render acceptance pending",
+  "actual_exit": 0,
+  "clean_actual_exit": 0,
+  "wall_seconds": 798.4195632839983,
+  "wasm_sha256": "f81ce0d7d9a7b2d43a7a9a7cfe67e20dbf7a680efc13af535cce83bd37b3d68c",
+  "wasm_bytes": 27073194,
+  "source_commit_at_freeze": "d7ef3d7887434c782cb7d27a416704d9bc3e6152",
+  "source_inputs": 120,
+  "assets": 332,
+  "independently_verified": true,
+  "native_stage_results": {
+    "focused": 0,
+    "full": 0,
+    "check": 0,
+    "build": 0
+  },
+  "changes": [
+    "Eight-entry actual-world and DTO retention; UI history40 unchanged",
+    "Explicit local Victory/Defeat heading and darker result panel"
+  ],
+  "evidence": {
+    "target/web-current-build18-snapshot-20261011/result.json": "0c170ba0c49753969d14d241717326525fb6299ecd5f668e48d7ffde8664b24c",
+    "target/web-current-build18-snapshot-20261011/input.json": "3bea84df243e0920c9c36efec9fb1ba74e091a6f7d4b7d5f8bbd8ddc4c6aa77c",
+    "target/web-current-build18-snapshot-20261011/build.log": "9838dd35f6c3c72bf3610356fe443eeaec34d44b504af75f5b14987b64dd9745"
+  },
+  "limits": [
+    "Actual eight-person test waits current native campaign and GPU cleanup",
+    "No measured payload or speedup result yet",
+    "No fresh corrected result frame yet",
+    "Full match, host actions and signaling reconnect remain open"
+  ]
+}
