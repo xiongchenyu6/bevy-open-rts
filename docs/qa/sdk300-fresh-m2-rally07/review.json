@@ -44,5 +44,13 @@
     "candidate-rejection-trace.json": "f4e2e0bd6097451cbe1277b3518ec17550a1a1b247a452d57c8a1f56bac18b57",
     "actual-assembly-failure.png": "c9243ba219c7c5026bdcaf0c8ad9b4113fc4a3ed0d5d11306c2703f03c57a9a3",
     "income-receipt.json": "64b23f58b8343923830a4518096d9cf4c81c4c821ff6bf6e07ca0b6b49b77779"
+  },
+  "root_independent_review": {
+    "own_before_RON_sha_matches": true,
+    "original_7_rejections_verified": true,
+    "all_14_alternative_clearance_projection_checks_verified": true,
+    "actual_failure_PNG_directly_viewed": true,
+    "own_before_sha256": "a66ecfd11bbc560fc54382559ba3188275830af3b98b28360c428b02e54d6a2d",
+    "future_current_Rally_PNG_approval_still_required": true
   }
 }
