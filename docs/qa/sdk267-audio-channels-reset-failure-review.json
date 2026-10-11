@@ -1,0 +1,48 @@
+{
+  "scope": "ExactSDK267 normal volume controls and restart failure; not isolated all-channel acceptance",
+  "container_actual_exit": 137,
+  "wall_seconds": 220.56872469501104,
+  "original_deadline": 600,
+  "semantic_stop": true,
+  "external_container_stop": true,
+  "reason": [
+    "Cue recorder crossed phase boundary",
+    "Fresh-process Options resetsSFX/Voice0 to100; subsequentnamedchannelsinvalid"
+  ],
+  "game_exits": "76 0\n474 0\n",
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "raw_forced_cleanup_false_is_wrapper_only": true,
+  "direct_options_review": {
+    "all_zero": {
+      "Master": 100,
+      "Music": 0,
+      "SFX": 0,
+      "Voice": 0
+    },
+    "music_only_after_restart": {
+      "Master": 100,
+      "Music": 100,
+      "SFX": 100,
+      "Voice": 100
+    }
+  },
+  "closed_idle_zero_review": {
+    "scope": "Closed all-zero idle sample only; no cue or whole channel acceptance",
+    "sample_count": 484344,
+    "duration_seconds": 5.04525,
+    "nonzero": 0,
+    "sha256": "295a6792b8346a80d1be06a264e6e2cf84a1febb35754b8b3bb702cb003b27ee"
+  },
+  "all_channels_pass": false,
+  "evidence_sha256": {
+    "target/sdk267-audio-channels-20261011-01/container-result.json": "9ef673af5c17de515569a7aacd678552ee3927b1d451445c69d12b8b9487d550",
+    "target/sdk267-audio-channels-20261011-01/control.log": "dc91cd14a96557176aecdb14865834a3d38f50fd6545afa95e0da8ee38656687",
+    "target/sdk267-audio-channels-20261011-01/game-exits.txt": "969cf548e46c7c08ebe39a0d6a859837ae660b23c9321b6cf476d40372865773",
+    "target/sdk267-audio-channels-20261011-01/all_zero-options.png": "c0f8d5fcd4c15cdd6b09f0f107769af0647eda475b0de383560fcc95eaea8173",
+    "target/sdk267-audio-channels-20261011-01/music_only-options.png": "59012a0a88164d21aea04761d88a03f771febf5e5ec598b75f20c0421a22ec2e",
+    "target/sdk267-audio-channels-20261011-01/root-cue-boundary-defect.json": "00e7b85779bf133b7b0f8d1253cf67c55d194d4813febd122ea63cc2833964b7",
+    "target/sdk267-audio-channels-20261011-01/root-all-zero-options-review.json": "845ddc38063ea471825132017a66e387c350025e386a964423cebba47c4f33ed",
+    "target/sdk267-audio-channels-20261011-01/root-closed-idle-zero-review.json": "88249bde8a1469a1c244c565c9a5fc95d149d565916665bf6712bee2e0e068e9"
+  }
+}
