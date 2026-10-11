@@ -1,0 +1,91 @@
+{
+  "scope": "Eight real normal frontend humans, each including host paid/move; seven independent actual guest ECS streams; current real TURN6/private local authority",
+  "root_independent_verifier_exit": 0,
+  "players": {
+    "host": {
+      "passed": true,
+      "workers": 3,
+      "component_motion": true,
+      "render_motion": true,
+      "guest_exact": null,
+      "guest_common_ticks": null
+    },
+    "p1": {
+      "passed": true,
+      "workers": 3,
+      "component_motion": true,
+      "render_motion": true,
+      "guest_exact": true,
+      "guest_common_ticks": 341
+    },
+    "p2": {
+      "passed": true,
+      "workers": 3,
+      "component_motion": true,
+      "render_motion": true,
+      "guest_exact": true,
+      "guest_common_ticks": 378
+    },
+    "p3": {
+      "passed": true,
+      "workers": 3,
+      "component_motion": true,
+      "render_motion": true,
+      "guest_exact": true,
+      "guest_common_ticks": 357
+    },
+    "p4": {
+      "passed": true,
+      "workers": 3,
+      "component_motion": true,
+      "render_motion": true,
+      "guest_exact": true,
+      "guest_common_ticks": 356
+    },
+    "p5": {
+      "passed": true,
+      "workers": 3,
+      "component_motion": true,
+      "render_motion": true,
+      "guest_exact": true,
+      "guest_common_ticks": 354
+    },
+    "p6": {
+      "passed": true,
+      "workers": 3,
+      "component_motion": true,
+      "render_motion": true,
+      "guest_exact": true,
+      "guest_common_ticks": 375
+    },
+    "p7": {
+      "passed": true,
+      "workers": 3,
+      "component_motion": true,
+      "render_motion": true,
+      "guest_exact": true,
+      "guest_common_ticks": 344
+    }
+  },
+  "directed_mapped_links": 56,
+  "route_failures": [],
+  "root_direct_frame_review": [
+    "host-paid-Worker-and-movement-final.png",
+    "p1-paid-Worker-and-movement-final.png"
+  ],
+  "hashes": {
+    "eight-human-world-proof.json": "e10cf2923dd1dabc4a89414bbb6adfed275409c20ba6baeb4ee746deebcbbde4",
+    "final-result.json": "edb21660f712c04115a6c1d64b7ae0fa17f12ba58e5c2b2804c110ed16f0be89",
+    "result.json": "ac18f84be52798ffb20a19c04d5e70bd1b77e7ae214f08cf2623271c4d558326",
+    "host-paid-Worker-and-movement-final.png": "4ad06ed7aa66791fb679618b94978e30dce34509a132bac6deb043dd4f390bb4",
+    "p1-paid-Worker-and-movement-final.png": "319d475358b414e78fccef7e50a0de94beaec68e077e050f878e034079391560"
+  },
+  "diagnostic": "One sampler page.evaluate raced normal browser closure; retained in result.json, no clean-diagnostic claim",
+  "limitations": [
+    "No full combat match",
+    "No eight-player reconnect",
+    "No public deployed authority",
+    "Old failed01/02 remain failed"
+  ],
+  "evidence_directory": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web22-eight-human-real-turn-20261011-03"
+}
