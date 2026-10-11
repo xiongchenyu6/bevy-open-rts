@@ -5,6 +5,7 @@ import hashlib
 import itertools
 import json
 import math
+import struct
 from collections import Counter
 from pathlib import Path
 
@@ -21,6 +22,15 @@ MAPS = {
 }
 FACTIONS = ('alliance','demon','chaos')
 LEVELS = ('beginner','easy','normal','hard')
+
+
+def expected_start_positions(case):
+    width, starts = MAPS[case['map']]
+    # Both Highland base spawns lie inside authored level-one plateaus.
+    # Terrain settling assigns the Rust f32 TERRAIN_LEVEL_HEIGHT (1.4).
+    height = struct.unpack('f', struct.pack('f', 1.4))[0] if case['map'] == 'highland_bastion' else 0.0
+    return [{'player': team, 'position': [starts[slot][0]-width/2, height, starts[slot][1]-width/2]}
+            for team, slot in enumerate(case['spawn_slots'])]
 
 
 def digest(path):
@@ -79,8 +89,7 @@ def verify(matrix, pin_path, asset_root):
                 require(result.get('starting_resources') == {'ore':32,'crystal':16} and result.get('startup_loadout') == 'GodotSkirmish',str(result_path),'opening differs')
                 require(result.get('resolved_map_id') == case['map'] and result.get('resolved_map_path') == ({'plain_and_simple':'res://source/match/maps/PlainAndSimple.tscn','four_corners':'res://source/match/maps/FourCorners.tscn','tech_divide':'res://source/match/maps/TechDivide.tscn','big_arena':'res://source/match/maps/BigArena.tscn','canyon_pass':'bevy://maps/CanyonPass','crossfire':'bevy://maps/Crossfire','ring_valley':'bevy://maps/RingValley','highland_bastion':'bevy://maps/HighlandBastion'}[case['map']]),str(result_path),'resolved map differs')
                 require(result.get('victory_condition') == 'Annihilation' and result.get('active_player_slots') == [0,1],str(result_path),'victory/active player policy differs')
-                width,starts=MAPS[case['map']]
-                positions=[{'player':team,'position':[starts[slot][0]-width/2,0.0,starts[slot][1]-width/2]} for team,slot in enumerate(case['spawn_slots'])]
+                positions=expected_start_positions(case)
                 require(result.get('initial_command_center_positions') == positions,str(result_path),'actual start coordinates differ')
                 winners=result.get('winning_teams');teams=result.get('teams',[])
                 require(status.get('winning_teams') == winners,str(path),'winner disagreement')

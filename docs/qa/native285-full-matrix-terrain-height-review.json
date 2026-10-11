@@ -1,0 +1,43 @@
+{
+  "scope": "Full fixed native285 matrix only; not current291 equivalence, repeats, random maps, or balance acceptance",
+  "planned": 3726,
+  "completed": 3726,
+  "integrity_verified": true,
+  "audit_sha256": "e2e35a191dba62c1ca4d47ff140b24c1d9cee8650a9e36812b232241c80d2bca",
+  "original_failed_report": "target/native285-matrix-independent-20261011-final.json",
+  "corrected_report": "target/native285-matrix-independent-20261011-final02.json",
+  "cause": "Verifier assumed flat Y for Highland Bastion. Frozen maps.rs defines level-one west/east plateaus containing both spawn points; terrain.rs settles structures to f32 1.4. Actual output matches that height.",
+  "negative_checks": [
+    {
+      "mutation": "flat_height",
+      "rejected": true,
+      "errors": [
+        {
+          "where": "/tmp/rts-matrix-negative-5kefv8d4/3672/result.json",
+          "error": "actual start coordinates differ"
+        }
+      ]
+    },
+    {
+      "mutation": "wrong_horizontal_start",
+      "rejected": true,
+      "errors": [
+        {
+          "where": "/tmp/rts-matrix-negative-5kefv8d4/3672/result.json",
+          "error": "actual start coordinates differ"
+        }
+      ]
+    },
+    {
+      "mutation": "wrong_plateau_height",
+      "rejected": true,
+      "errors": [
+        {
+          "where": "/tmp/rts-matrix-negative-5kefv8d4/3672/result.json",
+          "error": "actual start coordinates differ"
+        }
+      ]
+    }
+  ],
+  "all_release_gates_remain_open": true
+}
