@@ -1,0 +1,94 @@
+{
+  "scope": "CurrentW25 actualofflinebrowser notice/clock andsmallvisiblemotion acceptance only; fullPatrolcycle explicitlywithheld",
+  "actual_supervisor_driver_node_exits": [
+    0,
+    0,
+    0
+  ],
+  "wall_seconds": 88.417,
+  "original_bound": 240,
+  "Wasm_sha256": "4ef2044621406ba42e145450d5f092b97ef019a2b4698f02f49d6dfb4bf40dd8",
+  "ordinary_physical_inputs": true,
+  "dedicated_reviewer_only_current_SHA_gates": true,
+  "reviewer_report": {
+    "visible_information_only": true,
+    "driver_exit": 0,
+    "full_patrol_behavior_accepted": false,
+    "review_ages_seconds": {
+      "02-match": 12.608875513076782,
+      "00-menu": 8.040676593780518,
+      "06-selected-Drone": 16.3826744556427,
+      "05-before-Drone-selection": 6.715447902679443,
+      "07-Patrol-mode": 15.745193719863892
+    },
+    "notice_expiry_visible": true,
+    "notice_finding": "03 shows Saving is desktop-only and Tactical pause notices;04 both absent. Objective remains.",
+    "hq_anchor_stable_all_nine_motion_frames": true,
+    "visible_drone_motion": true,
+    "motion_finding": "All nine actual motion PNGs inspected. Drone orientation changes; ground selection center shifts modestly around [447,240] and route endpoint alternates between [320,350] and [475,218]. HQ and workers remain fixed. Drone is not visibly shown reaching distant [320,350] endpoint or completing a full 5-8m traversal. Small visible motion/route change is supported; completed patrol cycle is unverified.",
+    "offline_ecs_or_patrol_flag_claimed": false,
+    "images": {
+      "03-current-notices.png": "90543dd854ab82fa9074494c190abbbbb5f35f04523a5f23ca6a429ca79a2769",
+      "04-expired-notices.png": "58b24ef3b669043d1839809335533256fc77fa08e2274fdfa107b83da9ef5cf5",
+      "08-motion-00.png": "30282954ce97ebc0115f432b8326aa2eb86c515159e5f73d0afebb7d8abd31c9",
+      "08-motion-01.png": "abf2ee6b4b2dd36a2f46a508ececd0de3b79566709262fdb1f626b6eceb13aff",
+      "08-motion-02.png": "e09da8c2e5de8955edc807a83cbd5354ab3ce5bb0412a02c63c0f85cae9377d8",
+      "08-motion-03.png": "a6785a7bcd98b089d042ea569bfd383903d5cb256bafb0e0496ce213b20e7fab",
+      "08-motion-04.png": "13564e7fbdff858dffed4ac51d1f7fe6ce9364abaf402fce04bc513510bfc32d",
+      "08-motion-05.png": "76ea73ec70c7c8f1f7c5f49369d36a3fe0442bca950f2a9e3fc7abdd95ccbdb0",
+      "08-motion-06.png": "fef8bedcdddb9dceddb208f51f633b01288623ceeade9b7ac026154fdf139523",
+      "08-motion-07.png": "e6f4e71a243e34b96dc1eb4e7a672ec8563cb7174a6405a52d54f906b793b53d",
+      "08-motion-08.png": "17843e1dcb103777254fc178ddc5cdef7a21497d508b97bf2332625e5e25afa3"
+    }
+  },
+  "fresh_paused_clock": {
+    "before": 15.854618072509766,
+    "after": 15.854618072509766,
+    "observer_fresh_actual_mouse_events": true,
+    "expected_save_notice": "Saving is desktop-only",
+    "browser_quicksave": false
+  },
+  "browser_quicksave_supported": false,
+  "actual_ground_and_identity": {
+    "selected_own": {
+      "local_entity": 8589933886,
+      "network_id": 2,
+      "type": "Drone"
+    },
+    "actual_ground": [
+      -18.541736602783203,
+      0,
+      -18.129825592041016
+    ],
+    "no_offline_positions_or_Patrol_components_exported": true
+  },
+  "normal_browser_closed_no_GPU_children": true,
+  "bounds": [
+    "No offlineECS positions/PatrolOrder flags exported orclaimed",
+    "All9motionframes reviewed: anchorstable/smallmotion only; distantendpoint/full5-8m traversal notshown",
+    "Browseroriginfor2.42m hypothesis isnotexported; nativefixturebugproof isseparate",
+    "Run01/02/03 failures preserved unchanged; no reclassification",
+    "No deployment/actor/resource/timer setters"
+  ],
+  "evidence_sha256": {
+    "target/web25-offline-toast-patrol-20261012-04/result.json": "a9669910bc0a7a32ffdeddadf1cf32647f71b5dc440b228773e60e4563a8f42b",
+    "target/web25-offline-toast-patrol-20261012-04/supervisor-result.json": "a53f4d602b2276fad8c9e10ac8c0500defbd222a53a51b9d456bd44b43308d4d",
+    "target/web25-offline-toast-patrol-20261012-04/visual-adjudication.json": "2740582c90f101fcf8ba44e16355042c22a977f4a4136b1ce15212b279d0d2bd",
+    "target/web25-offline-toast-patrol-20261012-04/cleanup-review.json": "f344fcce7db84dfcadf7f61f1d033a896f94f09e8c88415412513d47d07d73f8",
+    "target/web25-offline-toast-patrol-20261012-04/paused-clock.json": "a990d0cce6f87bf49e6c8a08df3848d8d87910dd463f78078dba74152a41f88e",
+    "target/web25-offline-toast-patrol-20261012-04/patrol-input.json": "d17dc31fd292e8b7a0e4dcf5487f6ab701de8d5e30750b6ccee6f1a0288183ba"
+  },
+  "portable_image_sha256": {
+    "docs/qa/web25-notice-partial-motion/08-motion-07.png": "e6f4e71a243e34b96dc1eb4e7a672ec8563cb7174a6405a52d54f906b793b53d",
+    "docs/qa/web25-notice-partial-motion/08-motion-02.png": "e09da8c2e5de8955edc807a83cbd5354ab3ce5bb0412a02c63c0f85cae9377d8",
+    "docs/qa/web25-notice-partial-motion/03-current-notices.png": "90543dd854ab82fa9074494c190abbbbb5f35f04523a5f23ca6a429ca79a2769",
+    "docs/qa/web25-notice-partial-motion/08-motion-03.png": "a6785a7bcd98b089d042ea569bfd383903d5cb256bafb0e0496ce213b20e7fab",
+    "docs/qa/web25-notice-partial-motion/08-motion-05.png": "76ea73ec70c7c8f1f7c5f49369d36a3fe0442bca950f2a9e3fc7abdd95ccbdb0",
+    "docs/qa/web25-notice-partial-motion/08-motion-00.png": "30282954ce97ebc0115f432b8326aa2eb86c515159e5f73d0afebb7d8abd31c9",
+    "docs/qa/web25-notice-partial-motion/08-motion-01.png": "abf2ee6b4b2dd36a2f46a508ececd0de3b79566709262fdb1f626b6eceb13aff",
+    "docs/qa/web25-notice-partial-motion/08-motion-04.png": "13564e7fbdff858dffed4ac51d1f7fe6ce9364abaf402fce04bc513510bfc32d",
+    "docs/qa/web25-notice-partial-motion/08-motion-08.png": "17843e1dcb103777254fc178ddc5cdef7a21497d508b97bf2332625e5e25afa3",
+    "docs/qa/web25-notice-partial-motion/08-motion-06.png": "fef8bedcdddb9dceddb208f51f633b01288623ceeade9b7ac026154fdf139523",
+    "docs/qa/web25-notice-partial-motion/04-expired-notices.png": "58b24ef3b669043d1839809335533256fc77fa08e2274fdfa107b83da9ef5cf5"
+  }
+}
