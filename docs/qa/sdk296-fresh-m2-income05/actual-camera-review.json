@@ -1,0 +1,113 @@
+{
+  "scope": "Read-only actualcamera/OWNprojection diagnostics; no bodyvisibility/runtime-success claim",
+  "actual_rightbracket_hold_wall": 0.694058187014889,
+  "actual_camera_matrix_before": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0,
+    -0.0,
+    0.5226873159408569,
+    -0.85252445936203,
+    0.0,
+    0.0,
+    0.85252445936203,
+    0.5226873159408569,
+    0.0,
+    -22.0,
+    8.14285659790039,
+    -17.007572174072266,
+    1.0
+  ],
+  "actual_camera_matrix_after": [
+    -0.04430246353149414,
+    2.9802322387695312e-08,
+    -0.9990183115005493,
+    0.0,
+    -0.8516875505447388,
+    0.5226871967315674,
+    0.037768810987472534,
+    0.0,
+    0.5221742391586304,
+    0.8525246381759644,
+    -0.023156404495239258,
+    0.0,
+    -17.012474060058594,
+    8.14285659790039,
+    -22.221176147460938,
+    1.0
+  ],
+  "actual_camera_changed": true,
+  "paused_actor_clock_bank_pose_health_exact": true,
+  "actor": {
+    "key": 4217657882590,
+    "id": "RocketInfantry",
+    "position": [
+      -27.885730743408203,
+      0.05000000074505806,
+      -20.769197463989258
+    ],
+    "active": [],
+    "queued": [],
+    "cargo_ron": "None"
+  },
+  "projection_checks": [
+    {
+      "stage": "before",
+      "height": 0,
+      "point": [
+        87,
+        469
+      ],
+      "rounded_own_ties": [],
+      "eligible": true
+    },
+    {
+      "stage": "before",
+      "height": 0.08,
+      "point": [
+        83,
+        466
+      ],
+      "rounded_own_ties": [],
+      "eligible": true
+    },
+    {
+      "stage": "before",
+      "height": 0.2,
+      "point": [
+        76,
+        461
+      ],
+      "rounded_own_ties": [],
+      "eligible": true
+    },
+    {
+      "stage": "after",
+      "height": 0,
+      "point": [
+        576,
+        37
+      ],
+      "eligible": false,
+      "rejection": "Inside actual edgepan band"
+    },
+    {
+      "stage": "after",
+      "height": 0.08,
+      "point": [
+        576,
+        33
+      ],
+      "eligible": false,
+      "rejection": "Inside actual edgepan band"
+    },
+    {
+      "stage": "after",
+      "height": 0.2,
+      "eligible": false,
+      "rejection": "Actualownedbody outside currentviewport"
+    }
+  ],
+  "actual_result": "Stopped beforeangle1request; max2anglebudget notcompleted"
+}

@@ -1,0 +1,32 @@
+{
+  "scope": "SDK296 freshM2: normalOreincome, actualDronebody selection, pausedcamera orbit verified; reprojectedRocketoutsideeligibleviewport so no defender/combat/mission acceptance",
+  "raw_root": "target/sdk296-fresh-m2-income-20261012-05",
+  "normal_exits": [
+    {
+      "pid": 3173936,
+      "supervisor_pid": 3173811,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "actual_error": "No unambiguous current visible OWN body candidate",
+  "body_rejection": "initialRocketpoint87,469 occluded, dedicatedreviewerapprovedfalse; afterrightbracketfoot576,37 violatesedgepanband; secondangle notused",
+  "camera_footprint_scope": "RawactualMainCameraDTO changes, OWNunit/bank/clock/pose/healthunchanged; notfog/nav/visibility-rule change",
+  "personally_viewed_actual_after_orbit_png": true,
+  "original_limits": {
+    "mission_wall": 900,
+    "mission_simulation": 900,
+    "arrival": 30,
+    "body_shared_review": 45,
+    "max_orbit_reframes": 2
+  },
+  "evidence_sha256": {
+    "result.json": "727b96e9a0dd48ea55c021274b9ddb6cf797c7a6574ecb62adb3e032c2ff6580",
+    "actual-camera-review.json": "118c7598a95cd55927ad97e41fcf0db0daec1fff40de556de36eb30848d212c2",
+    "income-receipt.json": "4d60676164eb3b56e4bda9fb91056ce3650c70713a198cf56ea981ac0f7f0efc",
+    "actual-after-orbit.png": "765fe0f9375f59bfa4d906ed99102e85f882b1781e7d86a51846331f7557c735"
+  }
+}
