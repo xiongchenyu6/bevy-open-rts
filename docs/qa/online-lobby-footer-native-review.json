@@ -1,0 +1,53 @@
+{
+  "scope": "Online lobby scrolling body and persistentfooter source/native verification; correctedruntimevisual stillpending",
+  "actual_render_red": "docs/qa/web14-eight-slot-lobby-footer-red-review.json",
+  "initial_test_compile_failure": {
+    "actual_exit": 101,
+    "reason": "TestcomparedexistingenumwithoutPartialEq; fixedtestvariantcomparisononly"
+  },
+  "assertion_red": {
+    "actual_exit": 101,
+    "failed": 2,
+    "passed": 0,
+    "assertions": [
+      "Actual4/8lobbytree lacks scrollbody",
+      "Mousewheel leavesbodyoffset0 instead of clamped400"
+    ]
+  },
+  "green": {
+    "actual_exit": 0,
+    "passed": 2,
+    "scope": [
+      "Actual4/8lobbytree footer actions outside scrollbody, nonshrinkingfooter",
+      "RealMouseWheel messages clampstoredScrollPosition and immediatelyreverse oneup"
+    ]
+  },
+  "full_library": {
+    "passed": 275,
+    "failed": 0,
+    "ignored": 1
+  },
+  "check_actual_exit": 0,
+  "native_three_build_actual_exit": 0,
+  "bins": {
+    "bevy-open-rts": "458b985451af661c0eeb96e0f7215e4194601e38f923056d6c3d19f9ed3385b6",
+    "capture": "f3533fc60089a9999594624fee56e7a17045929fe42586ab22067c4ebab1638f",
+    "skirmish_audit": "cf99a9471e1e2f4cf1848a0f0e725f7945c62929d6d999025036ab1d00a4a27b"
+  },
+  "source_assets_unchanged": true,
+  "asset_count": 332,
+  "home_panel_values_unchanged": true,
+  "network_gameplay_actor_changes": false,
+  "runtime_corrected_footer_visual_verified": false,
+  "eight_peer_claim": false,
+  "evidence_sha256": {
+    "target/online-lobby-footer-red-20261011/result.json": "f8155435d2f151f1756886c3f2f687d60c9c50a833732e00c9a36db25fb3131c",
+    "target/online-lobby-footer-red02-20261011/result.json": "e16d0f4da0e8f01e95992c7f40c8115ec114853c43427dc64115095a76ae4f41",
+    "target/online-lobby-footer-red02-20261011/red.log": "ac64e0b548bd2382290538e98fbbbb8c4aeb3725f748618e646b518fc52dd1cb",
+    "target/online-lobby-footer-green-20261011/result.json": "caa60091c9815f2321345b285fb8527aed60a78b6c4496a261c376db9d992a66",
+    "target/online-lobby-footer-green-20261011/green.log": "22f191bd996931e810fe11ff24f9a9b0af7bdc62213b862c0ff30356bb1e47f8",
+    "target/online-lobby-footer-shared-20261011/result.json": "8c9b3757d11aec72a61e3330b1d24525de28d52211c8b10959fa9607d7916085",
+    "target/online-lobby-footer-shared-20261011/full.log": "f31183493167e60ebb876370a8eb506305c245b8a1acc5f2e2b00d2e8904f0cc",
+    "target/online-lobby-footer-shared-20261011/pin.json": "f10b95d7b31717d8500ac9313209936b04a811d42daae6da32be4a660877293f"
+  }
+}

@@ -30,6 +30,7 @@ use uuid::Uuid;
 
 use crate::*;
 
+mod lobby_ui;
 mod observer;
 
 const RTS_ONLINE_PROTOCOL: u16 = 4;
@@ -1761,6 +1762,10 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
         .init_resource::<observer::OnlineObserver>()
         .add_systems(
             Update,
+            lobby_ui::scroll.run_if(in_state(AppScreen::OnlineLobby)),
+        )
+        .add_systems(
+            Update,
             observer::ui::record
                 .after(refresh_hud_hit_zones)
                 .before(select_entities)
@@ -1933,7 +1938,7 @@ fn rebuild_online_ui(
         });
 }
 
-fn online_panel_node(width: f32) -> impl Bundle {
+fn online_panel_node(width: f32) -> (Node, BorderColor, BackgroundColor) {
     (
         Node {
             width: Val::Percent(92.0),
@@ -2090,8 +2095,8 @@ fn spawn_online_lobby(
         spawn_online_home(root, session, font);
         return;
     };
-    root.spawn(online_panel_node(1240.0))
-        .with_children(|panel| {
+    root.spawn(lobby_ui::panel()).with_children(|panel| {
+        panel.spawn(lobby_ui::body()).with_children(|panel| {
             spawn_online_title(
                 panel,
                 format!(
@@ -2153,6 +2158,8 @@ fn spawn_online_lobby(
             for (slot_index, slot) in lobby.slots.iter().enumerate() {
                 spawn_online_slot_row(panel, session, slot_index, slot, &font);
             }
+        });
+        panel.spawn(lobby_ui::footer()).with_children(|panel| {
             let local_ready = session
                 .local_player_id
                 .and_then(|id| lobby.human_slot(id))
@@ -2189,6 +2196,7 @@ fn spawn_online_lobby(
                 true,
             );
         });
+    });
 }
 
 fn spawn_online_slot_row(
