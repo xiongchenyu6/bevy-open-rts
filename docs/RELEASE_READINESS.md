@@ -49,7 +49,8 @@ A bounded regression or an older package cannot establish final release readines
   build exit0 in655.457s. Independent checks verify143 sources,332 assets,
   four frozen compile paths,642 non-web inputs, exact Wasm bytes and gzip
   equality. Protected originals remain unchanged; only a private QA alias is
-  created. Actual browser operation and public deployment remain unverified.
+  created ([shipping proof](qa/web27-hold-shipping-build-review.json)). Actual
+  browser operation and public deployment remain unverified.
 - Wasm26 builds successfully from the native300 source pin. Its actual Wasm
   bytes, input manifest and641 non-web frozen inputs are independently rehashed
   ([browser build proof](qa/web26-route-patrol-shipping-build-review.json)).
