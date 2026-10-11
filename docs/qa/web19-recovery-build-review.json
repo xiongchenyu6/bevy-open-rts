@@ -1,0 +1,24 @@
+{
+  "scope": "W19 frozen browser build for transport recovery/cutscene correction; real browser recovery pending",
+  "actual_build_exit": 0,
+  "clean_actual_exit": 0,
+  "wall_seconds": 612.474285740027,
+  "source_commit": "8bc9470dbfc4866eaf873bc266c3c87702cb7e23",
+  "wasm_sha256": "ab89136bfcc030ec57ae48272debba772ea7b6dad26938b694f0bb40ad975fa3",
+  "wasm_bytes": 27079398,
+  "frozen_input_files": 628,
+  "all_three_local_packages_actually_recompiled": true,
+  "input_source_and_assets_independently_verified": true,
+  "evidence": {
+    "target/web-current-build19-retry02-20261011/result.json": "46d6be6175a137b08efad89b1e521633bda6454e9a3e290faa268733d6a6b1b8",
+    "target/web-current-build19-retry02-20261011/input.json": "30844b3ac5bb5670e00915dbf7efc99e56e99a932896fc99c2533531583591da",
+    "target/web-current-build19-retry02-20261011/build.log": "676c14b4950b09bfe4d4c3d8c0a321a431a8a383b0030759a5920643762706de",
+    "target/web-current-build19-retry02-20261011/clean-project-wasm.log": "ebca841f6d409bb86ed986258988d1e722b323daab11dcfe4897810b86f105c5"
+  },
+  "preserved_failure": "W19attempt01 actual101: newhost_peer_id presentinfrozensource but staleWasmprotocolartifact hadoldtype; no current-code success claim",
+  "limits": [
+    "Local unpublished build only",
+    "No real game reconnect/30second grace/TURN/complete multiplayer claim",
+    "Native SDK286 campaign evidence predates transport recovery"
+  ]
+}
