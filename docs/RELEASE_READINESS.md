@@ -7,6 +7,13 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Latest Verified Checkpoints
 
+- Current SDK291 official Runtime4 passes six normal volume-control phases and
+  final fresh-process reload in541.025s of the original600s limit. Twelve private
+  game-only PCM sections verify channel isolation, master mute and restored output
+  with no clipped samples; seven actual game exits are0 and399 installation files
+  plus archive bytes remain unchanged
+  ([current audio controls](qa/native291-official-runtime4-audio-controls-review.json)).
+  This does not establish all17 natural cues, human mixing review or Windows/browser audio.
 - The current SDK291 archive (399 files, 332 assets) launches through the
   official Steam Runtime 4 launcher, renders the reviewed main menu and closes
   normally with exit 0; installation and archive hashes remain unchanged

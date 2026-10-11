@@ -1,0 +1,262 @@
+{
+  "scope": "Exact current399 official Runtime4 ordinary volume controls, natural selected-Worker Move/ack PCM and fresh-process settings persistence; no all17 cue or mixing acceptance",
+  "artifact": {
+    "scope": "Official SDK current trickle-source archive identity only; final native runtime/player acceptance pending",
+    "actual_exit": 0,
+    "archive": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-trickle-package-20261011/archive/bevy-open-rts-linux-x86_64.tar.gz",
+    "archive_sha256": "2a6b917240812daa7c9d201db57cbe88ed49f08aded1ea99e695cc44c6e49f49",
+    "package": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-trickle-extracted-20261011/bevy-open-rts-linux-x86_64",
+    "binary_sha256": "f4fb85245a88307b651e22c6dabd54e53e0f38351c052c262e4f418d40b6acd7",
+    "files": 399
+  },
+  "actual_controller_exit": 0,
+  "root_independent_pcm_verifier_exit": 0,
+  "wall_seconds": 541.0246539340005,
+  "original_bound_seconds": 600,
+  "normal_game_exits": [
+    {
+      "pid": 2534701,
+      "supervisor_pid": 2534642,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "pid": 2539527,
+      "supervisor_pid": 2539478,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "pid": 2542979,
+      "supervisor_pid": 2542909,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "pid": 2547177,
+      "supervisor_pid": 2547114,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "pid": 2551392,
+      "supervisor_pid": 2551346,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "pid": 2556229,
+      "supervisor_pid": 2556141,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "pid": 2559869,
+      "supervisor_pid": 2559824,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "root_independently_rehashed_installation_files": 399,
+  "archive_bytes_unchanged": true,
+  "root_direct_options_review": {
+    "six_adjusted_phase_images": true,
+    "final_fresh_reload_all_volumes_100percent": true
+  },
+  "phase_values": [
+    {
+      "name": "all_zero",
+      "normal_prefs_before": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "normal_prefs_written": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "fresh_process_loaded_previous_exact": false
+    },
+    {
+      "name": "music_only",
+      "normal_prefs_before": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "normal_prefs_written": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "fresh_process_loaded_previous_exact": true
+    },
+    {
+      "name": "voice_only",
+      "normal_prefs_before": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "normal_prefs_written": [
+        1,
+        0,
+        0,
+        1
+      ],
+      "fresh_process_loaded_previous_exact": true
+    },
+    {
+      "name": "sfx_only",
+      "normal_prefs_before": [
+        1,
+        0,
+        0,
+        1
+      ],
+      "normal_prefs_written": [
+        1,
+        0,
+        1,
+        0
+      ],
+      "fresh_process_loaded_previous_exact": true
+    },
+    {
+      "name": "master_muted",
+      "normal_prefs_before": [
+        1,
+        0,
+        1,
+        0
+      ],
+      "normal_prefs_written": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "fresh_process_loaded_previous_exact": true
+    },
+    {
+      "name": "all_restored",
+      "normal_prefs_before": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "normal_prefs_written": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "fresh_process_loaded_previous_exact": true
+    }
+  ],
+  "pcm_metrics": {
+    "all_zero-idle": {
+      "duration": 5.323791666666667,
+      "nonzero_samples": 0,
+      "rms": 0.0,
+      "clipped_samples": 0,
+      "sha256": "e728767819c7b4e5869b4cb2f92ad8a2ca1ce6cebe65f781caedb85f69d2073b"
+    },
+    "all_zero-cues": {
+      "duration": 12.009520833333333,
+      "nonzero_samples": 0,
+      "rms": 0.0,
+      "clipped_samples": 0,
+      "sha256": "7afce20fef0719fe9a6adb8a433d40f7d927f58df0f805e6d8aa23e607d0cdbb"
+    },
+    "music_only-idle": {
+      "duration": 5.354770833333333,
+      "nonzero_samples": 508646,
+      "rms": 95.81766486360443,
+      "clipped_samples": 0,
+      "sha256": "4b44e9f033f9c910c8d23d188d7fac0bcebc7d96db36fe5f24fbcef91cb9e722"
+    },
+    "music_only-cues": {
+      "duration": 12.071416666666666,
+      "nonzero_samples": 1146260,
+      "rms": 94.74084576407665,
+      "clipped_samples": 0,
+      "sha256": "66297d53d5786032e07487e0047803ac8965ddff643de576212a76244f29485f"
+    },
+    "voice_only-idle": {
+      "duration": 5.3238125,
+      "nonzero_samples": 0,
+      "rms": 0.0,
+      "clipped_samples": 0,
+      "sha256": "b0b58491f329a7bc15412c46560b3eb0ab8edd0f053a0abb1f92dcc6eacbd2d9"
+    },
+    "voice_only-cues": {
+      "duration": 11.947604166666666,
+      "nonzero_samples": 256534,
+      "rms": 1292.5664945973913,
+      "clipped_samples": 0,
+      "sha256": "4b0cd6ebf3101266e662cf9bf17795ff33cd4b81378612b3e930ebac587591fb"
+    },
+    "sfx_only-idle": {
+      "duration": 5.292854166666666,
+      "nonzero_samples": 0,
+      "rms": 0.0,
+      "clipped_samples": 0,
+      "sha256": "4e5d868ea26c0ced99615c24e6f6d693ff175cdce78961644ba8ef984aa271f3"
+    },
+    "sfx_only-cues": {
+      "duration": 12.040479166666668,
+      "nonzero_samples": 34122,
+      "rms": 24.31101642913554,
+      "clipped_samples": 0,
+      "sha256": "acfc9a099d90f336207c0793046579035069f3e5e48026f581a43b907051bac4"
+    },
+    "master_muted-idle": {
+      "duration": 5.3238125,
+      "nonzero_samples": 0,
+      "rms": 0.0,
+      "clipped_samples": 0,
+      "sha256": "b0b58491f329a7bc15412c46560b3eb0ab8edd0f053a0abb1f92dcc6eacbd2d9"
+    },
+    "master_muted-cues": {
+      "duration": 12.071416666666666,
+      "nonzero_samples": 0,
+      "rms": 0.0,
+      "clipped_samples": 0,
+      "sha256": "3ab63bf6d96c51bead3d2120321d19894ed7615ab946bf88345975a70e98e534"
+    },
+    "all_restored-idle": {
+      "duration": 5.3238125,
+      "nonzero_samples": 505692,
+      "rms": 95.888205544654,
+      "clipped_samples": 0,
+      "sha256": "ce47c64ae1cfb3f1bbdf0aaecbc13deb06ec3cd65293449ba99325b8b00bfc2a"
+    },
+    "all_restored-cues": {
+      "duration": 12.102375,
+      "nonzero_samples": 1152024,
+      "rms": 1288.1140071747848,
+      "clipped_samples": 0,
+      "sha256": "905171de7000af1c3ac5ebc811c8cfaa6b28db7b2c1983a6c1ced64993c9d38e"
+    }
+  },
+  "private_cleanup": {
+    "private_server_closed": true,
+    "host_audio_default_unchanged": true,
+    "microphone_or_desktop_capture": false
+  },
+  "limitations": [
+    "All17 natural production/support/combat/outcome cues remain required",
+    "Human voice and mix quality review remains open",
+    "Windows/browser audio remains open"
+  ],
+  "prior_failures": "01/02/03 remain failed; no retroactive relabeling",
+  "evidence_directory": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/native291-runtime4-audio-20261011-04"
+}
