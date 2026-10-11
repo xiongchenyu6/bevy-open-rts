@@ -6012,6 +6012,29 @@ fn accept_online_welcome(
     if session.local_player_id.is_some() && session.host_peer != Some(peer) {
         return;
     }
+    if session
+        .local_player_id
+        .is_some_and(|existing| existing != player_id)
+        || session
+            .assigned_slot
+            .is_some_and(|existing| existing != assigned_slot)
+    {
+        session.set_status(t(
+            "重连玩家身份或槽位不匹配",
+            "Reconnect player identity or slot does not match",
+        ));
+        return;
+    }
+    let established_match = session.phase == OnlinePhase::InMatch
+        && session.local_player_id.is_some()
+        && session.match_config.is_some();
+    if established_match && match_config.is_some() && session.match_config != match_config {
+        session.set_status(t(
+            "重连对局配置不匹配",
+            "Reconnect match configuration does not match",
+        ));
+        return;
+    }
     session.host_peer = Some(peer);
     session.local_player_id = Some(player_id);
     session.assigned_slot = Some(assigned_slot);
@@ -6019,14 +6042,16 @@ fn accept_online_welcome(
     match match_config {
         Some(config) => match online_match_setup(&config, assigned_slot) {
             Ok(settings) => {
-                *setup = settings;
+                if !established_match {
+                    *setup = settings;
+                    next_state.set(AppScreen::InMatch);
+                }
                 session.match_config = Some(config);
                 session.phase = OnlinePhase::InMatch;
                 session.set_status(t(
                     "已恢复主机连接，正在同步对局…",
                     "Host connection restored; synchronizing match...",
                 ));
-                next_state.set(AppScreen::InMatch);
             }
             Err(error) => session.set_status(error),
         },

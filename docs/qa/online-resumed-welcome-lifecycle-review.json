@@ -1,0 +1,68 @@
+{
+  "scope": "Causal resumedWelcome match-reentry fix; source verification, new final browser runtime pending",
+  "observed_runtime_failure": {
+    "artifact": "Wasm19 ab89136b\u2026 unchangedlocalnativebackend/realSTUN",
+    "actual_exit": 1,
+    "actual_partial_network_resume_ms": 1974,
+    "same_player_slot_room": true,
+    "actual_selectedHQ_local_entity_before": 34359737801,
+    "actual_selectedHQ_local_entity_after": 38654705155,
+    "network_id_unchanged": 5,
+    "acknowledged_enabled_TrainWorker": true,
+    "post_resume_bank": 28,
+    "new_job_or_debit_observed": false,
+    "evidence_directory": "target/web19-local-guest-stun04-20261011",
+    "actual_game_reconnect_pass": false
+  },
+  "red": {
+    "actual_exit": 101,
+    "compiled": true,
+    "passed": 0,
+    "failed": 1,
+    "seconds": 1.63,
+    "assertion": "ActualHQentitybinding mustsurvive registeredApp.update after resumedWelcome",
+    "evidence": "target/welcome-reentry-red-20261011/red.log"
+  },
+  "change": "Established InMatch with SAMEknownplayer/slot/config refresheshandshake/lobby only; never schedulesNextState(InMatch) or overwritesMatchSetup. Rejectknownidentity/slot/config mismatch. Initialjoin/staleLobby stilltransition normally.",
+  "green": {
+    "focused_passed": 5,
+    "focused_failed": 0,
+    "seconds": 0.9,
+    "stale_lobby_passed": 1,
+    "full_passed": 291,
+    "full_failed": 0,
+    "full_ignored": 1,
+    "full_seconds": 251.58,
+    "check_exit": 0,
+    "build_exit": 0,
+    "native_build_seconds": 130,
+    "source_count": 124,
+    "assets": 332,
+    "all_final_hashes_verified": true,
+    "actual_registered_lifecycle_assertions": [
+      "naturallyspawnedownHQentitybits",
+      "Selected",
+      "Transform",
+      "commandnext_sequence7",
+      "last_applied_tick44"
+    ],
+    "fixture_not_runtime_proof": true
+  },
+  "bins": {
+    "bevy-open-rts": "0bb82eabd4cfa9ec52dd50f82a1b222c7da552577472435a1b19824279bbaaca",
+    "capture": "f8d98dddbe5cf36ef89b858253dfb71e0349bd1c14e772e4d8828a7e478a9ef7",
+    "skirmish_audit": "28211ffe72563e5cbf33111ba450f97c873b38f6854f668bae2d0c695faba50d"
+  },
+  "owned_source_sha256": {
+    "src/online.rs": "c1b1c3da88ea75a82d338e9646a8e3594c04e35d741469aeefec8d16d5ef5aee",
+    "src/online/recovery.rs": "593bcd13bb1c8a91efa0fa3ceb23a5aba7678d59db8c607afdf9dd3a90ed53d9"
+  },
+  "final_pin": "target/welcome-reentry-shared-20261011/final-pin.json",
+  "remaining": [
+    "NewWasm/runtimeguestloss+hostlosscases withinunchanged30secondgrace",
+    "Publicproviderhostauthorityfield/deploymentvalidation",
+    "FullpublishedICE/TURNrecovery separatefromrealprivateSTUNfixture"
+  ],
+  "no_actor_world_stat_or_timer_writes_in_fix": true,
+  "no_deployment": true
+}

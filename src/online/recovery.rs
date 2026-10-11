@@ -282,6 +282,131 @@ mod tests {
     }
 
     #[test]
+    fn registered_reconnect_welcome_keeps_actual_entity_selection_sequence_and_applied_tick() {
+        let mut app = fixture();
+        let mut lobby = OnlineLobbySnapshot::new("ABC12345".into(), "Host".into());
+        lobby.slots[1].occupant = OnlineSlotOccupant::Human {
+            player_id: 2,
+            name: "Guest".into(),
+            ready: true,
+            connected: true,
+        };
+        let config = OnlineMatchConfig::from(&lobby);
+        *app.world_mut().resource_mut::<MatchSetupSettings>() =
+            online_match_setup(&config, 1).unwrap();
+        app.world_mut().resource_mut::<OnlineSession>().match_config = Some(config.clone());
+        app.world_mut()
+            .resource_mut::<NextState<AppScreen>>()
+            .set(AppScreen::InMatch);
+        for _ in 0..8 {
+            app.update();
+        }
+        assert_eq!(
+            *app.world().resource::<State<AppScreen>>().get(),
+            AppScreen::InMatch
+        );
+        let actor = app
+            .world_mut()
+            .query::<(Entity, &Structure, &Team)>()
+            .iter(app.world())
+            .find(|(_, structure, team)| {
+                structure.id == "CommandCenter" && **team == Team::Player(1)
+            })
+            .unwrap()
+            .0;
+        app.world_mut().entity_mut(actor).insert(Selected);
+        app.world_mut()
+            .resource_mut::<OnlineCommandOutbox>()
+            .next_sequence = 7;
+        app.world_mut()
+            .resource_mut::<OnlineMatchReplication>()
+            .last_applied_tick = 44;
+        let transform = *app.world().get::<Transform>(actor).unwrap();
+        let mut session = app.world_mut().remove_resource::<OnlineSession>().unwrap();
+        let mut setup = app
+            .world_mut()
+            .remove_resource::<MatchSetupSettings>()
+            .unwrap();
+        let mut next = app
+            .world_mut()
+            .remove_resource::<NextState<AppScreen>>()
+            .unwrap();
+        accept_online_welcome(
+            &mut session,
+            peer(1),
+            2,
+            1,
+            lobby,
+            Some(config),
+            &mut setup,
+            &mut next,
+        );
+        app.world_mut().insert_resource(session);
+        app.world_mut().insert_resource(setup);
+        app.world_mut().insert_resource(next);
+        // This real registered update would run ALL OnEnter(InMatch) hooks if
+        // Welcome mistakenly requested a same-state re-entry.
+        app.update();
+        assert!(
+            app.world().get_entity(actor).is_ok(),
+            "Actual HQ entity binding must survive resumed Welcome"
+        );
+        assert!(app.world().get::<Selected>(actor).is_some());
+        assert_eq!(*app.world().get::<Transform>(actor).unwrap(), transform);
+        assert_eq!(
+            app.world().resource::<OnlineCommandOutbox>().next_sequence,
+            7
+        );
+        assert_eq!(
+            app.world()
+                .resource::<OnlineMatchReplication>()
+                .last_applied_tick,
+            44
+        );
+    }
+
+    #[test]
+    fn established_match_welcome_rejects_player_slot_or_config_switch() {
+        let mut app = fixture();
+        let mut lobby = OnlineLobbySnapshot::new("ABC12345".into(), "Host".into());
+        lobby.slots[1].occupant = OnlineSlotOccupant::Human {
+            player_id: 2,
+            name: "Guest".into(),
+            ready: true,
+            connected: true,
+        };
+        let config = OnlineMatchConfig::from(&lobby);
+        let mut session = app.world_mut().remove_resource::<OnlineSession>().unwrap();
+        session.match_config = Some(config.clone());
+        let mut setup = MatchSetupSettings::default();
+        let mut next = NextState::<AppScreen>::default();
+        for (player, slot, incoming) in [
+            (3, 1, config.clone()),
+            (2, 0, config.clone()),
+            (2, 1, {
+                let mut changed = config.clone();
+                changed.starting_resources_index = 0;
+                changed
+            }),
+        ] {
+            accept_online_welcome(
+                &mut session,
+                peer(1),
+                player,
+                slot,
+                lobby.clone(),
+                Some(incoming),
+                &mut setup,
+                &mut next,
+            );
+            assert_eq!(session.local_player_id, Some(2));
+            assert_eq!(session.assigned_slot, Some(1));
+            assert_eq!(session.match_config, Some(config.clone()));
+            assert!(matches!(next, NextState::Unchanged));
+        }
+    }
+
+    #[test]
     fn resumed_guest_reuses_same_slot_without_new_admission_or_duplicate_player() {
         let mut lobby = OnlineLobbySnapshot::new("ABC12345".into(), "Host".into());
         let mut runtime = HostLobbyRuntime::new("host-key".into());
