@@ -1,0 +1,36 @@
+{
+  "scope": "Current native300 shipping Wasm26 integrity only; browser runtime adjudication separate, no public deployment",
+  "actual_exit": 0,
+  "wall_seconds": 566.2718255440122,
+  "source_commit": "b044c6dfee801c95b521cd03676ab119fc9eeba4",
+  "tested_product_source": "206f365",
+  "native_pin_sha256": "f9c25adc91d9a52b5b9cd673bc3d91ed02bec30e514c43982ad5f5caee661ea7",
+  "sources": 142,
+  "assets": 332,
+  "fork_files": 15,
+  "clean4_localpackages": 0,
+  "actual4_frozen_compilepaths": true,
+  "shipping_lock_bindgen": "0.2.128",
+  "bindgen_site_exit": 0,
+  "wasm_sha256": "f9df5efeb5a9323da51e80ff3e2bdeef22b2968773f53af2957039bc82994054",
+  "bytes": 27080461,
+  "build_id": "9b10e3792dd64e5a",
+  "private_alias": "web/qa-wasm26",
+  "protected_originals_unchanged": true,
+  "evidence_sha256": {
+    "target/web-current-build26-snapshot-20261012/result.json": "757d4de200c2b909b277ace82d49a1a21c5f48ab2d7f2d4104274294d0cbfbd0",
+    "target/web-current-build26-snapshot-20261012/input.json": "3d23da1a6ab7d42efe25836557b5942fdb72560c9514494e1702d16232c6b299",
+    "target/web-current-build26-snapshot-20261012/seal.json": "e8eb147ff7b2c615d7ad789234337d396d22ecfca8c36b6ded5d6012298a3c32",
+    "target/web-current-build26-snapshot-20261012/build.log": "c2db63a2337d914a0260da69c76438ece4ac1d0838019b27549229fbbd8c6237"
+  },
+  "boundaries": [
+    "NativeSDK300 short/medium actual proof separate6079d0b",
+    "BrowserW26 runtime adjudication separate; attempt01 failed before inputs due review deadline",
+    "No public deployment"
+  ],
+  "root_independent_verification": {
+    "wasm_bytes_and_sha256": true,
+    "input_manifest_sha256": true,
+    "all_non_web_frozen_files": 641
+  }
+}
