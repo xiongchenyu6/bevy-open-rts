@@ -1,0 +1,87 @@
+{
+  "scope": "Exact SDK291 current399 archive, official Steam Runtime4, fresh profile normal seven-lesson graduation and fresh-process Replay; Skip separately verified on unchanged artifact in prior02",
+  "artifact": {
+    "scope": "Official SDK current trickle-source archive identity only; final native runtime/player acceptance pending",
+    "actual_exit": 0,
+    "archive": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-trickle-package-20261011/archive/bevy-open-rts-linux-x86_64.tar.gz",
+    "archive_sha256": "2a6b917240812daa7c9d201db57cbe88ed49f08aded1ea99e695cc44c6e49f49",
+    "package": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-trickle-extracted-20261011/bevy-open-rts-linux-x86_64",
+    "binary_sha256": "f4fb85245a88307b651e22c6dabd54e53e0f38351c052c262e4f418d40b6acd7",
+    "files": 399
+  },
+  "session": {
+    "exits": [
+      {
+        "pid": 2303473,
+        "supervisor_pid": 2303282,
+        "actual_exit": 0,
+        "normal_window_close": true
+      },
+      {
+        "pid": 2321898,
+        "supervisor_pid": 2321844,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "screenshots": {
+      "00-fresh-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+      "01-training-start.png": "41a975c529860e7954aaecab87183334a91fec97dc812179ca9b17f578727c3a",
+      "02-gathered.png": "dbeeb9d40cd669c47099c3598ee680a325625e4a604d052e5494e55d703ab0cd",
+      "03-power-preview.png": "d6d5867843d39940766a630b31ca504f95f20afd0c22ecd5b0ae5b1e354519fb",
+      "04-power-paid.png": "8dd42ffea09125b7648023019899216f46212ba282a41962ac38158b6b6e4afc",
+      "05-power-completed.png": "4ecfe63a6da1bb945cdc40dd01e4cd49fdef52453b7e575ef5b8718bf51d5c17",
+      "06-barracks-preview.png": "eaeb61e27698dd9f0a3e7e2c212c71148f36eacfc51984792114412e07a31e44",
+      "07-barracks-paid.png": "50d001fc7b55b0061fda990a18e7effef62d3361924ed8f300c280d668043926",
+      "08-barracks-completed.png": "960a3cf355e57c6b0a29279736e27cec38ba799db3fa91d2779b0ea97574353d",
+      "09-infantry-paid.png": "d6bb8c1e80a192b1d461ea271d5a3e680ab2638552b3f6a3cbcc1cc3e6cdb05a",
+      "10-infantry-ready.png": "278e7a53b4d9fb90cd255369ce86454b5d362c24dfe465e87ecb8f08493ac2a6",
+      "11-movement.png": "167937006620a817081ba9971e6d85a5c690de26719e190bbf30a15de0dbee59",
+      "12-public-scout.png": "cb0ce23c74b699e9a10aa4450e1c8ff06587082e935fd248976794def21b76cf",
+      "13-scout-progress.png": "f6210ec50311f5effd260110a357afefe4f145532ad6722236cd99ecbb79f0f6",
+      "14-attack-progress.png": "3b242db8ffe2d9afb82282dc9b6c7dd82c8b8b1c84ea6c65fedbeb34aa98fae0",
+      "15-completed-menu.png": "1901e746bee34b1e0f217c5f2a133d5b2e2ec24a582d9d259d5476ec69e53e0f",
+      "16-fresh-replay-menu.png": "1901e746bee34b1e0f217c5f2a133d5b2e2ec24a582d9d259d5476ec69e53e0f",
+      "17-replay-lesson-one.png": "0c3f7ec2ff697b4f5d7650500f74e6699c2868fe7e00a76a1ede26aef06ab35e"
+    },
+    "archive_installation_unchanged": true,
+    "scope": "Normal physical Runtime4 tutorial evidence; outcome requires review"
+  },
+  "root_independent_inventory_match": true,
+  "archive_sha256_verified": true,
+  "persisted_profile": "(version:1,training_complete:true,completed:[])",
+  "profile_sha256": "2264aab2d7e7dae2d74a86b515a3d4d8dd630f89048565b8f47148db0d085e93",
+  "attack_observed_completion_upper_bound_seconds": 154.70071920799091,
+  "original_attack_budget_seconds": 300,
+  "original_whole_session_seconds": 900,
+  "root_direct_visual_review": {
+    "gather_bank": [
+      70,
+      32
+    ],
+    "power_and_barracks_green_previews": true,
+    "paid_buildings_completed": true,
+    "four_paid_infantry_ready": true,
+    "movement_advanced_lesson": true,
+    "natural_graduation_caption": "Boot Camp Complete",
+    "result_time": "04:30",
+    "enemy_buildings_destroyed": 1,
+    "own_unit_structure_losses": [
+      0,
+      0
+    ],
+    "fresh_menu_caption": "Replay Boot Camp",
+    "fresh_replay_lesson": "1/7 Select a worker",
+    "fresh_replay_bank": [
+      64,
+      32
+    ]
+  },
+  "limitations": [
+    "Audio not verified: no audio endpoint in isolated session",
+    "Windows first-session acceptance remains required",
+    "Full campaign and other release gates remain open"
+  ],
+  "prior_attempts": "01 stdin failed;02 incomplete. Both retained without relabeling.",
+  "evidence_directory": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/native291-runtime4-bootcamp-normal-20261011-03"
+}

@@ -16,8 +16,13 @@ A bounded regression or an older package cannot establish final release readines
   Reconnaissance is too slow to establish graduation; the unfinished attempt closes
   normally and remains incomplete
   ([partial tutorial](qa/native291-runtime4-bootcamp-partial-review.json)).
-  Complete graduation, persisted completion, fresh Replay and audible output
-  remain required on this final artifact.
+  A subsequent fresh run on the unchanged artifact naturally completes all seven
+  lessons through normal input and persists training completion. A second process
+  renders Replay Boot Camp and starts lesson one at64/32. Both actual game exits
+  are0 and all399 installation files/archive hashes remain unchanged; the attack
+  completion observation is within154.701s of the original300s bound
+  ([current official Runtime4 tutorial](qa/native291-official-runtime4-bootcamp-review.json)).
+  Audio and Windows first-session acceptance remain required.
 - The frozen native285 official-SDK matrix completes **3,726/3,726** cases
   within the original 600s simulation and 180s per-case wall limits. Independent
   verification accepts every terminal result, binary identity and all 332 assets.
