@@ -1,0 +1,114 @@
+{
+  "scope": "Partial immutable old244 sweep; not current final-artifact coverage",
+  "report": "target/current244-matrix-independent-20261011-check05.json",
+  "report_sha256": "28b347253e2e9362317c24a93dbed0edb7753b0f6c3d835989b1bca3ee7a6981",
+  "terminal_snapshot": 2823,
+  "counts": {
+    "completed": 2819,
+    "simulation_timeout": 2,
+    "wall_timeout": 2
+  },
+  "integrity_verified": true,
+  "errors": [],
+  "actual_verifier_exit": 2,
+  "failures": [
+    {
+      "index": 1885,
+      "config": {
+        "map": "big_arena",
+        "factions": [
+          "chaos",
+          "chaos"
+        ],
+        "difficulties": [
+          "easy",
+          "beginner"
+        ],
+        "spawn_slots": [
+          2,
+          1
+        ],
+        "max_seconds": 600
+      },
+      "classification": "simulation_timeout",
+      "exit_code": 2,
+      "evidence": "target/current244-all-starts-20261010/1885"
+    },
+    {
+      "index": 2220,
+      "config": {
+        "map": "big_arena",
+        "factions": [
+          "chaos",
+          "alliance"
+        ],
+        "difficulties": [
+          "normal",
+          "normal"
+        ],
+        "spawn_slots": [
+          4,
+          0
+        ],
+        "max_seconds": 600
+      },
+      "classification": "wall_timeout",
+      "exit_code": null,
+      "evidence": "target/current244-all-starts-20261010/2220"
+    },
+    {
+      "index": 2641,
+      "config": {
+        "map": "big_arena",
+        "factions": [
+          "chaos",
+          "chaos"
+        ],
+        "difficulties": [
+          "easy",
+          "beginner"
+        ],
+        "spawn_slots": [
+          6,
+          1
+        ],
+        "max_seconds": 600
+      },
+      "classification": "wall_timeout",
+      "exit_code": null,
+      "evidence": "target/current244-all-starts-20261010/2641"
+    },
+    {
+      "index": 2668,
+      "config": {
+        "map": "big_arena",
+        "factions": [
+          "chaos",
+          "chaos"
+        ],
+        "difficulties": [
+          "easy",
+          "beginner"
+        ],
+        "spawn_slots": [
+          6,
+          2
+        ],
+        "max_seconds": 600
+      },
+      "classification": "simulation_timeout",
+      "exit_code": 2,
+      "evidence": "target/current244-all-starts-20261010/2668"
+    }
+  ],
+  "matrix_still_running": true,
+  "verified_main_pid": 1841197,
+  "current267_rechecks_only": [
+    1885,
+    2220
+  ],
+  "new_cases_pending_recheck": [
+    2641,
+    2668
+  ]
+}
