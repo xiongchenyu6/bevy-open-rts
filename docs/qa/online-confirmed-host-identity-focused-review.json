@@ -1,0 +1,35 @@
+{
+  "scope": "Focused protocol unit regression only; actual eight-human Wasm acceptance pending",
+  "problem": "PeerConnected overwrote a welcomed guest host_peer with each later mesh guest, matching W16 stale join-time lobby views",
+  "changes": [
+    "Send candidate Hello before Welcome; retain confirmed host afterwards",
+    "Ignore foreign Welcome after own player assignment",
+    "Retain established peer identity during transport disconnection; explicit room reset clears it"
+  ],
+  "tests": {
+    "actual_exit": 0,
+    "passed": 2,
+    "failed": 0,
+    "log": "target/constructor-host-identity-shared02-20261011/focused.log",
+    "sha256": "fc8c1695756cfe1d0eb4c8431598d5003a0c9f8395b1f90754f1933f62307671",
+    "cases": [
+      "Six later mesh peers cannot overwrite host or local assignment; foreign Welcome ignored; same-host handshake allowed; reset clears identity",
+      "Initial guest can try later host candidates; host never emits Hello"
+    ]
+  },
+  "source_sha256": {
+    "src/online.rs": "3447f87f893c3be95cb79aaf44e529d3a9499e1cc73f442ab68990bf574af75d",
+    "src/online/host_identity.rs": "4cf80a09265fb3a79c508390ecefaa589f5444fa456b0bc4dcd01ece19797355"
+  },
+  "compile_failure_preserved": {
+    "path": "target/constructor-host-identity-shared-20261011/focused.log",
+    "actual_exit": 101,
+    "reason": "E0624 child method visibility; corrected pub(super)"
+  },
+  "limits": [
+    "No compiled behavioral RED baseline",
+    "No fresh browser eight-human result yet",
+    "Signaling re-registration creates new peer UUID; complete signaling reconnect is still open",
+    "Consolidated full/check/build still running"
+  ]
+}

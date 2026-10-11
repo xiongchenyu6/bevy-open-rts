@@ -30,6 +30,7 @@ use uuid::Uuid;
 
 use crate::*;
 
+mod host_identity;
 mod lobby_ui;
 mod observer;
 
@@ -3450,14 +3451,7 @@ fn poll_online_transport(
     for event in events {
         match event {
             TransportEvent::PeerConnected(peer) => {
-                if !session.is_host {
-                    session.host_peer = Some(peer);
-                    session.hello_retry_elapsed = 0.0;
-                    let hello = OnlineReliableMessage::Hello {
-                        protocol: RTS_ONLINE_PROTOCOL,
-                        session_key: session.session_key.clone(),
-                        player_name: session.player_name.clone(),
-                    };
+                if let Some(hello) = session.hello_for_connected_peer(peer) {
                     if let Err(error) = send_online_message(socket, peer, &hello) {
                         session.set_status(format!(
                             "{}: {error}",
@@ -3486,7 +3480,6 @@ fn poll_online_transport(
                         session.ui_dirty = true;
                     }
                 } else if session.host_peer == Some(peer) {
-                    session.host_peer = None;
                     session.set_status(t(
                         "房主连接中断，等待自动恢复…",
                         "Host disconnected; waiting for automatic resume...",
@@ -5964,6 +5957,9 @@ fn accept_online_welcome(
     setup: &mut MatchSetupSettings,
     next_state: &mut NextState<AppScreen>,
 ) {
+    if session.local_player_id.is_some() && session.host_peer != Some(peer) {
+        return;
+    }
     session.host_peer = Some(peer);
     session.local_player_id = Some(player_id);
     session.assigned_slot = Some(assigned_slot);
