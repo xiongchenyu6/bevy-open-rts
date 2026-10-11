@@ -1,0 +1,60 @@
+{
+  "scope": "Exact current267 native audit case2641 repeat02 without CPU quota; unresolved wall timeout",
+  "process_result": {
+    "scope": "Exact immutable case repeat; wall timeout alone is not gameplay failure evidence",
+    "config": {
+      "map": "big_arena",
+      "factions": [
+        "chaos",
+        "chaos"
+      ],
+      "difficulties": [
+        "easy",
+        "beginner"
+      ],
+      "spawn_slots": [
+        6,
+        1
+      ],
+      "max_seconds": 600
+    },
+    "command": [
+      "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/case1885-movement-shared-20261011/skirmish_audit",
+      "big_arena",
+      "chaos",
+      "easy",
+      "6",
+      "chaos",
+      "beginner",
+      "1",
+      "600",
+      "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/repeat267-case2641-20261011-02/result.json"
+    ],
+    "binary_sha256": "3f7994f460e16c4d4d8483e976cc6e71b03688e342030de5f0175717ecb1605f",
+    "asset_count": 332,
+    "asset_pin_sha256": "6fbe1b04909806021007d9122b4a1d82debcc703a5bdf238667e8e5bd3bc6aa2",
+    "simulation_limit": 600,
+    "wall_limit": 180,
+    "nice": 10,
+    "trace_enabled": false,
+    "child_pid": 416042,
+    "actual_exit": 124,
+    "classification": "wall_timeout",
+    "wall_seconds": 180.01332770800218,
+    "result_present": false,
+    "binary_unchanged": true,
+    "assets_unchanged": true
+  },
+  "scheduling": {
+    "nice": 10,
+    "cpu_quota": null
+  },
+  "concurrent_work": "Historical CPU matrix and focused Cargo compile; no browser/game GPU after campaign normal closure",
+  "assessment": "Actual124 at unchanged180s with no simulation result; no proof of an infinite match. Earlier throttled failure preserved separately.",
+  "evidence_sha256": {
+    "target/repeat267-case2641-20261011-02/input.json": "f43aa40278dfdc54a243a3e3d0dc3dbc93cf51032c613f9bba2e6cf70b094485",
+    "target/repeat267-case2641-20261011-02/live.json": "16742ce1ccf45b1a8977a25786e52c49ec2712830009a6c9910f0ab1ee3c8a1b",
+    "target/repeat267-case2641-20261011-02/process-result.json": "4abcfeee6e2a75dc6ec605c7be4e068245fb4c7afb520e87e117f685d64eea65",
+    "target/repeat267-case2641-20261011-02/runtime.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
