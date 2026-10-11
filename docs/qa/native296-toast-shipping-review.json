@@ -1,0 +1,53 @@
+{
+  "scope": "Current passive-notice fix native full/build and officialSDK shipping integrity; rendered normal player proof pending",
+  "source_commit": "c37a8bb",
+  "native": {
+    "full_passed": 296,
+    "failed": 0,
+    "ignored": 1,
+    "full_seconds": 376.72,
+    "check3bins": 0,
+    "build3bins": 0,
+    "sources": 142,
+    "assets": 332,
+    "bins": {
+      "bevy-open-rts": "22359c1c6d65ed6f29b3b589ef92d84d77c51023833d46bd0813459e2ebb71ed",
+      "capture": "8e2df792bea343642a1913636bd2a0bbf10c9fdf16a974c518ec08c01cc3f0f3",
+      "skirmish_audit": "7e305c0d8bf99efa753c089697822ab641c277cf9cf6a56a790f4a1e97622715"
+    },
+    "source_assets_unchanged": true
+  },
+  "Root_independent_native_pin_scope": "Root reported actual streaming verification of all142current sources+332assets+3sealedbins exit0; child independently repeated afterSDK.",
+  "SDK": {
+    "image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+    "actual_exit": 0,
+    "clean4localpackages": 0,
+    "actual4workspace_compilepaths": true,
+    "wall_seconds": 516.5437984910095,
+    "raw_ELF_sha256": "c28e1746e25758e25c445acdeff25c4c147e2d51ad04d740b82c88f9cedb91eb",
+    "readonly_frozen_sources_unchanged": true
+  },
+  "package": {
+    "actual_exit": 0,
+    "integrity": 0,
+    "files": 399,
+    "assets": 332,
+    "official_Runtime4_notices": 13,
+    "local_fork_notices": 5,
+    "archive_sha256": "19787ebddd97570e66d3b2576a1343a03cf66f6d875704ad84ab97ecd4a104cc",
+    "installed_ELF_sha256": "165996cd616a91380a6a64785f134481ff466c8c744d34f6a35dc41f3821b1c0",
+    "ready": "target/linux-native296-toasts-extracted-20261012/ready.json"
+  },
+  "evidence_sha256": {
+    "target/toasts-native296-shared-20261012/pin.json": "e08030ac0925d74dbef8a9eb395766172bf5b9b2f517eecd8bada198ae9e0120",
+    "target/toasts-native296-shared-20261012/full.log": "85cfe7b01de86aa29303f378887615bbf4dff1e897e70f40a0c9d6d4a80c52d8",
+    "target/linux-native296-toasts-steamrt4-sdk-20261012/result.json": "c6b74484dda8ad4bb9bbfb9efc08df1eef308db91bffecf2541d374b4fe55a3d",
+    "target/linux-native296-toasts-package-20261012/result.json": "8edb49fc9c739d769805f0c81aa58b35c4b246a720f40b395defdbe7eaf00c55",
+    "target/linux-native296-toasts-extracted-20261012/ready.json": "45e29e5d17c516263a7d32cb2941212110347bbe535c38f186a41abf823d7e44"
+  },
+  "boundaries": [
+    "UInotice real-time expiry only; focusedcombat/ping/cooldown virtual clocks preserved",
+    "Actual normal CtrlS/F10 image proof pending; no visualcompleteclaim",
+    "SDK294/W24 remain immutable prior checkpoints; noW25/publicdeployment"
+  ]
+}
