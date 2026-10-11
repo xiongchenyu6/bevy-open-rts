@@ -1,0 +1,80 @@
+{
+  "scope": "Local Matchbox0.14 WASM proper ICE trickle source/compile plus native validation; real game forcedTURN recovery is pending",
+  "baseline_failures": {
+    "W20_diagnostic02": {
+      "actual_exit": 1,
+      "panic_source": "matchbox_socket-0.14.0/src/webrtc_socket/mod.rs:279:30",
+      "cause": "Retry Hello queued for missing peer datachannel; separately fixed by connected-peer send guard"
+    },
+    "W21_guest01": {
+      "actual_exit": 1,
+      "resume_ms": 30025,
+      "new_host_RTC": "have-local-offer/gathering10candidates/noRemoteDescription",
+      "guest": "new WebSocket open, only old RTC",
+      "unchanged_grace_seconds": 30
+    }
+  },
+  "change": {
+    "files": [
+      "Cargo.toml",
+      "Cargo.lock",
+      "crates/matchbox-socket/"
+    ],
+    "upstream_modified_Rust": [
+      "src/webrtc_socket/wasm.rs"
+    ],
+    "native_files_byte_identical": true,
+    "candidate_handler": "Installed before local SDP and retained through buffered/ongoing candidate processing until channels open; RAII clears handler before Closure drop",
+    "SDP": "Offer/Answer immediately after setLocalDescription; obsolete full-gather wait removed",
+    "normal_close": "Candidate sender/serialization and late channel-open notification do not panic; rejected candidate warning contains no candidate payload",
+    "no_gameplay_protocol_clock_cost_or_cap_changes": true,
+    "lock": "Only Matchbox registry source/checksum removed; Windows dependency edges retained"
+  },
+  "ICE_scope": {
+    "API": "Both published entries/eight URL strings preserved",
+    "actual_product_adapter": "Selects credentialed TURN entry with all six TURN URL strings; separate STUN entry not used",
+    "QA_policy": "Forced relay only; no URL/credential filtering"
+  },
+  "verification": {
+    "first_attempt": {
+      "path": "target/matchbox-trickle-shared-20261011",
+      "actual_exit": 101,
+      "reason": "Direct dependency package selection unified workspace dev Tokio net into WASM and mio rejects WASM; before fork compile"
+    },
+    "second_attempt": {
+      "path": "target/matchbox-trickle-shared02-20261011",
+      "results": {
+        "wasm-harness-lock": 0,
+        "wasm-fork-check": 0,
+        "native-rtc": 0,
+        "focused": 0,
+        "full": 0,
+        "check": 0,
+        "build": 0
+      },
+      "isolated_WASM": "Actual current fork typecheck; independent offline harness lock, not shipping dependency identity",
+      "native_RTC": "1 passed/.05sec; deployed test1ignored",
+      "focused_recovery": "5 passed/0failed/.92sec",
+      "full": "291 passed/0failed/1ignored234.33sec",
+      "build": "Three native bins actual0/3m48",
+      "source_assets_unchanged": true
+    }
+  },
+  "pin": {
+    "sources": 142,
+    "fork_files": 15,
+    "assets": 332,
+    "sha256": "4361112ab465baf148018db8467905d4dd74e1237593e734e1d3c5de269ead1e",
+    "bins": {
+      "bevy-open-rts": "d38817bec500221ef7c3f7dfa1b802ab64d096bf299f1123c0f70862dc4fef22",
+      "capture": "0c387613f3e8838a0f61024306047107c6fa74624368376156d01b25711edf81",
+      "skirmish_audit": "fea83bb8d8cba2688dab64360af604475d60bd1fb0e1f1f13b0849d7dc9c8b91"
+    }
+  },
+  "remaining": [
+    "Exact shipping WASM compile against product lock",
+    "Real published TURN guest and host recovery within unchanged30sec/240sec",
+    "Browser early callback/pending candidate/normal cancellation behavior",
+    "Eight peers and public deployed authority recovery remain separate gates"
+  ]
+}

@@ -88,3 +88,7 @@ panic = "abort"
 
 [profile.dev.package."*"]
 opt-level = 2
+
+# Local WASM ICE trickle fix; licensed upstream source and provenance live with the fork.
+[patch.crates-io]
+matchbox_socket = { path = "crates/matchbox-socket" }

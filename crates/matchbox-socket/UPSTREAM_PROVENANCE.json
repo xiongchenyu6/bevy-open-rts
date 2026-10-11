@@ -1,0 +1,21 @@
+{
+  "crate": "matchbox_socket",
+  "version": "0.14.0",
+  "registry_archive_sha256": "11ee21421327e145fab424cadb542bef9f745a8938b9eb8c81d3286e98f18be9",
+  "upstream_commit": "62d79c338757e4d1d33613317e511338c595ba0f",
+  "licenses": {
+    "LICENSE-MIT": {
+      "url": "https://raw.githubusercontent.com/johanhelsing/matchbox/62d79c338757e4d1d33613317e511338c595ba0f/LICENSE-MIT",
+      "sha256": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1"
+    },
+    "LICENSE-APACHE": {
+      "url": "https://raw.githubusercontent.com/johanhelsing/matchbox/62d79c338757e4d1d33613317e511338c595ba0f/LICENSE-APACHE",
+      "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9"
+    }
+  },
+  "scope": "Local upstream fork: WASM ICE trickle patch; native implementation unchanged; actual browser recovery pending",
+  "modified_files": [
+    "src/webrtc_socket/wasm.rs"
+  ],
+  "production_or_lock_changes": true
+}
