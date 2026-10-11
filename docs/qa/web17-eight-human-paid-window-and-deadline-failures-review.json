@@ -1,0 +1,59 @@
+{
+  "scope": "Preserved failed real eight-human W17 workflows; no success relabel",
+  "wasm_sha256": "1b17c9f57b6a4a06ecd344823c9dd69fefeff33729618e65099e35edac21b721",
+  "cases": [
+    {
+      "attempt": "02",
+      "actual_exit": 1,
+      "driver_error": "Error: Bounded p3 actual-payment-and-paid-Worker-job",
+      "real_contexts": 8,
+      "original_wall_limit": 240,
+      "evidence": {
+        "target/web17-eight-human-20261011-02/result.json": "c85fb9b9334f0daa8d3e36666c12beb7963c2477b6e0b436cb0cd68f9d341a60",
+        "target/web17-eight-human-20261011-02/wrapper-result.json": "204c083463133bbe24a6739a6183721c1c88eb6e3cf2d7cf8d754a22bd38d188",
+        "target/web17-eight-human-20261011-02/independent-paid-job-history.json": "20e0ca82fa1e8b7bb9fde2e2ceaf519b30bc655aa36663cea2b3b6977a04c108"
+      },
+      "preserved_received_paid_queue_ticks": {
+        "p2": 16,
+        "p5": 16,
+        "p1": 23,
+        "p4": 23,
+        "p6": 23,
+        "p7": 23,
+        "p3": 18
+      },
+      "scope": "All seven received real paid Worker jobs; failed runtime observation window, no complete paid/movement acceptance"
+    },
+    {
+      "attempt": "03",
+      "actual_exit": 124,
+      "driver_error": "Error: page.waitForTimeout: Target page, context or browser has been closed",
+      "real_contexts": 8,
+      "original_wall_limit": 240,
+      "evidence": {
+        "target/web17-eight-human-20261011-03/result.json": "c46885bb366d6e40ae7daf0ed85118c8fc30faa5df6d5b5a9433e5f66c0c5f2e",
+        "target/web17-eight-human-20261011-03/wrapper-result.json": "4f60b28e3f34c92357dec83e5efff1de43367eb36654e6efe98239b4fa20aa7d"
+      },
+      "normal_movement_gesture_receipts": 7,
+      "forced_deadline_cleanup": true,
+      "scope": "All seven normal movement gestures recorded; deadline124, no final peer-route/world verifier or complete acceptance"
+    }
+  ],
+  "measured_last_observer_payload_bytes": {
+    "host": 1092371,
+    "guests_min": 2894206,
+    "guests_max": 2901212,
+    "samples_per_second": 2
+  },
+  "prepared_fixes": [
+    "Latch only actual observed paid jobs, rejecting wrong role/slot/old tick/no-job; recorded CPU fixture passes",
+    "Reduce per-step reads to compact cloned observer data while preserving full raw sampling",
+    "QA-only snapshot and actual-world retention8 instead of40; input history40; focused13/full285/check/build pass; cumulative16+comparison threshold unchanged"
+  ],
+  "next": "Wasm18 compilation and normal same-App campaign04 currently running; freshWasm18 test queued after both terminal and actual GPU cleanup",
+  "limits": [
+    "No eight-human full paid/movement acceptance",
+    "No host gameplay/fullmatch/reconnect/final performance acceptance",
+    "Normal browser close flag from driver finally cannot override supervisor124 forced cleanup"
+  ]
+}
