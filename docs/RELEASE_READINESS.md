@@ -7,7 +7,12 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Latest Verified Checkpoints
 
-- Latest source `4f8e588` prevents allied separation from displacing held units.
+- Current worktree resolves physically blocked terrain formation endpoints. The
+  genuine save-restored diagnostic changes4/5 arrivals to5/5 within the same
+  30s; canonical tests now pass309/0/1ignored. All-target checking and four
+  native builds are still running. Current official-SDK packaging and actual
+  normal-input repair verification remain pending.
+- Previous source `4f8e588` prevents allied separation from displacing held units.
   Two genuine scheduled REDs show0.844m/0.817m drift; unchanged GREEN scenarios
   keep held translation exactly zero while friendly movement still works.
   Current-source tests pass305/0/1ignored, all-target checks and four native
@@ -133,11 +138,12 @@ A bounded regression or an older package cannot establish final release readines
   completion observation is within154.701s of the original300s bound
   ([current official Runtime4 tutorial](qa/native291-official-runtime4-bootcamp-review.json)).
   Audio and Windows first-session acceptance remain required.
-- Frozen native300 matrix partial verification accepts2,668/3,726 unique
-  terminal cases with zero failures/integrity errors
-  ([partial snapshot](qa/native300-matrix-partial2668-review.json)). Its driver
-  remains live; native305 is queued behind it and has no matrix cases yet.
-  Neither partial300 coverage nor a queued305 job closes balance acceptance.
+- Frozen native300 matrix completes3,726/3,726 unique terminal cases with zero
+  failures/integrity errors; driver and independent verifier exit0
+  ([complete matrix](qa/native300-complete-matrix-review.json)). The earlier
+  [2,668-case snapshot](qa/native300-matrix-partial2668-review.json) remains
+  historical. Frozen305 has started after300; both precede the current formation
+  endpoint fix and establish no current309 coverage or balance acceptance.
 - The frozen native291 official-SDK authored-start matrix completes
   **3,726/3,726** unique terminal cases with no integrity errors or failures.
   Driver and independent verifier exit0; recorded evidence hashes are rechecked

@@ -1,0 +1,21 @@
+{
+  "scope": "Complete immutable native300 authored-start matrix only; newerHold+formationendpoint source not covered",
+  "completed": 3726,
+  "planned": 3726,
+  "actual_driver_exit": 0,
+  "actual_independent_verifier_exit": 0,
+  "driver_wall_seconds": 14121.472915095976,
+  "binary_sha256": "c540968d4c1073c22b81e4f458a1bda9761cbc8b4939ed1341f63caec08968d5",
+  "private_asset_count": 332,
+  "private_asset_hashes_match": true,
+  "evidence_sha256": {
+    "docs/qa/native300-complete-matrix/independent-root-final01.json": "6d085cb471a2897e37e73b4fadd42aece451de34f6e79a33f41f8edc13ec011d",
+    "docs/qa/native300-complete-matrix/result.json": "a98fb79fc86c0893de025e797fdc22a9f0f48c2c43b69a0e7079c0e3e9ddb906",
+    "docs/qa/native300-complete-matrix/verification-result.json": "f7f5141a362874422f42619645388b3a02a78829103b9c1c65ea8a423ed1757b"
+  },
+  "boundaries": [
+    "Annihilation policy retains teams throughCommandCenters+Workers only",
+    "No independent seeds/randommaps/statisticalbalance/playerhardware/Windows acceptance",
+    "Raw verifier scope template sayspartial/current247; exactstructuredplanned/completed/pin fields provefrozen300allcases only"
+  ]
+}
