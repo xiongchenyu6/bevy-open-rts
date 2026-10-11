@@ -25,6 +25,18 @@ A bounded regression or an older package cannot establish final release readines
 - Current native lifecycle regressions pass 291 tests with zero failures and one
   ignored test. The resumed Welcome preserves an established match rather than
   re-entering scene setup ([lifecycle proof](qa/online-resumed-welcome-lifecycle-review.json)).
+  A real full-ICE TURN guest reconnect subsequently panicked in Matchbox's
+  missing-peer data-channel expectation. The transport now rejects premature
+  sends; eight transport tests, a real local two-peer channel exchange, the
+  291-pass game suite, check and three native builds pass with 124 sources and
+  332 assets independently hashed ([send guard proof](qa/transport-send-before-channel-review.json)).
+  Fixed-Wasm TURN recovery remains pending.
+- SDK291 fresh Mission3 verifies a visible Ore-body click, immediate owned
+  Harvest, and exactly six returned Ore with six consumed from that node,
+  no losses and a surviving dropoff ([early income proof](qa/native291-m3-early-earned-ore-review.json)).
+  A fresh run retains the strict witness during normal paid defenses. Its later
+  construction window fails amid actual combat losses; no Mission3 victory or
+  complete campaign acceptance is established.
   These checkpoints leave all nine release gates open.
 
 ## Acceptance Gates
