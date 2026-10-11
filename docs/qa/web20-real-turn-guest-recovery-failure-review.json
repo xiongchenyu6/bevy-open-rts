@@ -72,5 +72,23 @@
       "localType": "relay",
       "remoteType": "relay"
     }
-  ]
+  ],
+  "pre_fault_independent_ECS": {
+    "common_exact_ticks": 127,
+    "first_tick": 6,
+    "last_tick": 133,
+    "entity_component_mismatches": 0,
+    "resource_job_support_clock_differences": 0,
+    "render_pose_differences": 8,
+    "replicated_ECS_fields_exact": true,
+    "render_world_equivalence_claim": false,
+    "raw_report": "target/web20-real-turn-guest-reconnect-20261011-01/independent-pre-fault-only.json",
+    "raw_report_sha256": "95858597764966a32bae0f0b52e6641dddbb8d603f0eaaf9020d95becbbdc0f5"
+  },
+  "pre_fault_render_review": {
+    "directly_viewed": true,
+    "visible": "Own red HQ and Workers, selected HQ, bank28/16, active Worker72% production",
+    "image_sha256": "7abd06cc6fded8e3dfff04a53cec76956618708ea27930f840b7190ead8aaa70",
+    "scope": "Before fault only, no resumed render claim"
+  }
 }
