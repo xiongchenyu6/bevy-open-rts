@@ -1,0 +1,83 @@
+{
+  "scope": "UI08 normal M3 paid opening through second ground turret; not mission victory or complete campaign",
+  "game_pid": 1171304,
+  "preceding_natural_victories": [
+    "hold_the_line",
+    "strike_the_outpost"
+  ],
+  "paid_opening": [
+    {
+      "structure": "PowerReactor",
+      "cost": [
+        3,
+        1
+      ],
+      "completion_wall_seconds": 8.09256755001843
+    },
+    {
+      "structure": "PowerReactor",
+      "cost": [
+        3,
+        1
+      ],
+      "completion_wall_seconds": 8.11582610302139
+    },
+    {
+      "structure": "VehicleFactory",
+      "cost": [
+        6,
+        0
+      ],
+      "completion_wall_seconds": 9.894222864997573
+    },
+    {
+      "structure": "RadarUplink",
+      "cost": [
+        4,
+        3
+      ],
+      "completion_wall_seconds": 13.655994752014522
+    },
+    {
+      "structure": "AntiAirTurret",
+      "cost": [
+        2,
+        2
+      ],
+      "completion_wall_seconds": 10.03488125599688
+    },
+    {
+      "structure": "AntiGroundTurret",
+      "cost": [
+        2,
+        2
+      ],
+      "completion_wall_seconds": 8.22216062399093
+    },
+    {
+      "structure": "AntiGroundTurret",
+      "cost": [
+        2,
+        2
+      ],
+      "completion_wall_seconds": 10.159177618013928
+    }
+  ],
+  "candidate_records": 5,
+  "evaluated_ghosts": 4,
+  "rejected_before_ghost": 1,
+  "camera_before_and_build_equal_all_evaluated_ghosts": true,
+  "final_green_changed_pixels": 3114,
+  "unchanged_site_wall_limit_seconds": 30,
+  "completed_frame_directly_reviewed": true,
+  "evidence": {
+    "target/sdk285-ui08-six-mission-normal-20261011-05/03/automatic-opening.json": "0536b3b2e0de09043061b9442ee68e369f2a804c17f360f54330cd28d3606da1",
+    "target/sdk285-ui08-six-mission-normal-20261011-05/03/auto-07-AntiGroundTurret-fresh-candidate-trace.json": "2665a5de053f1a847b85f7f665427eb9787e312a00b44f293bc850974b20326a",
+    "target/sdk285-ui08-six-mission-normal-20261011-05/03/auto-07-AntiGroundTurret-completed.png": "1efdf475d91960c2dacc4f9b9d06b931b24dfb2eaf2a794f60d9033b7cf6e4f2"
+  },
+  "limits": [
+    "M3victory,M4\u20136,finalprefixandnormalexits pending",
+    "New normal sites/workers; exact old failed-worker replay is separate unit evidence",
+    "Placement changes are harness corrections; mouse-picking ambiguity remains open"
+  ]
+}
