@@ -1,0 +1,32 @@
+{
+  "scope": "NormalSDK305 M2 firstAA Move/Hold only; HMGgroundplanning failed before remainderdefense/assault/victory",
+  "actual_runner_exit": 1,
+  "actual_game_exit": 0,
+  "wall_seconds": 519.9003936419613,
+  "forced_cleanup": false,
+  "installation_archive_unchanged": true,
+  "failure": "No eligible publicly clear group defense ground",
+  "root_verified_AA_held_keys": [
+    184683591447,
+    335007446798
+  ],
+  "root_verified_AA_HQ_distance_m": [
+    5.277354,
+    3.611037
+  ],
+  "AA_no_Move_Hold_true": true,
+  "all_20_HMG_proposals_rejected": true,
+  "evidence_sha256": {
+    "docs/qa/sdk305-m2-grouping11/AA-defense-receipts.json": "1690d9d0d4b714ee14c8bc791530466a2ab604cb13c87324c9ed7e89a4951e7e",
+    "docs/qa/sdk305-m2-grouping11/result.json": "c250d029b80d8142d3a7a9e6e792b7d98fec5df648d480afbd351124c840a1f5",
+    "docs/qa/sdk305-m2-grouping11/AA-held.ron": "3c315bead1e32e8fef498725f285447e9317ac17d80e38afc990523c96fd6ad4",
+    "docs/qa/sdk305-m2-grouping11/actual-M2-failure.png": "9b10427eedcfcb3cf0c1af0e1d29547c75976ade6d9083d7b3095b95b3fad142",
+    "docs/qa/sdk305-m2-grouping11/sole-reviewer-terminal-summary.json": "a3f1f4be704ff1c6d05140ec2e4ed45a879508b4b8736d182d14b5aef4bc79b4",
+    "docs/qa/sdk305-m2-grouping11/HMG-rejected-ground-candidates.json": "93581077fbe5da537ff3ff59a2d40dda9a5a7ecb03c2baceccd41a72401bf54b"
+  },
+  "boundaries": [
+    "No HMG/Rocket/Tank group arrival, assault or normalM2 win",
+    "Historical08 clickpoint .22 accuracy not claimed",
+    "NoNavimpossibilityclaim; OWN macroclearance scene has no available HMG ring center"
+  ]
+}

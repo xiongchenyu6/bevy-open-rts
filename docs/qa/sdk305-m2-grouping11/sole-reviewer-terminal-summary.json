@@ -1,0 +1,218 @@
+{
+  "scope": "SDK305 normal-player Mission2 successor11 diagnostic; no six-chain acceptance",
+  "passed": false,
+  "failure": "No eligible publicly clear group defense ground",
+  "failed_cohort": "HeavyMachinegunTrooper x3",
+  "candidate_count": 20,
+  "eligible_candidates": 0,
+  "candidate_actor_block_counts": {
+    "Drone": 4,
+    "VehicleFactory": 4,
+    "Barracks": 5,
+    "Worker": 6,
+    "AntiAirWalker": 3,
+    "PowerReactor": 4,
+    "HeavyMachinegunTrooper": 4,
+    "Tank": 9,
+    "AntiGroundTurret": 3,
+    "RocketInfantry": 2,
+    "RadarUplink": 3
+  },
+  "successful_AntiAirWalker_receipt": [
+    {
+      "type": "AntiAirWalker",
+      "keys": [
+        184683591447,
+        335007446798
+      ],
+      "formation_goals": {
+        "184683591447": [
+          -26.951056,
+          0.0,
+          -19.905794
+        ],
+        "335007446798": [
+          -24.058674,
+          0.0,
+          -19.100424
+        ]
+      },
+      "frames": [
+        {
+          "clock": 89.49546813964844,
+          "actors": {
+            "184683591447": {
+              "position": [
+                -20.543552,
+                0.05,
+                -19.334347
+              ],
+              "active": [
+                "Move((-26.951056, 0.0, -19.905794))"
+              ],
+              "actual_goal_distance": 6.433129812449383
+            },
+            "335007446798": {
+              "position": [
+                -17.541822,
+                0.05,
+                -19.505789
+              ],
+              "active": [
+                "Move((-24.058674, 0.0, -19.100424))"
+              ],
+              "actual_goal_distance": 6.529638640317625
+            }
+          }
+        },
+        {
+          "clock": 91.5571517944336,
+          "actors": {
+            "184683591447": {
+              "position": [
+                -23.652176,
+                0.05,
+                -18.811369
+              ],
+              "active": [
+                "Move((-26.951056, 0.0, -19.905794))"
+              ],
+              "actual_goal_distance": 3.476043057130479
+            },
+            "335007446798": {
+              "position": [
+                -19.17384,
+                0.05,
+                -18.861582
+              ],
+              "active": [
+                "Move((-24.058674, 0.0, -19.100424))"
+              ],
+              "actual_goal_distance": 4.89092513830666
+            }
+          }
+        },
+        {
+          "clock": 93.4881591796875,
+          "actors": {
+            "184683591447": {
+              "position": [
+                -26.800207,
+                0.05,
+                -19.807177
+              ],
+              "active": [],
+              "actual_goal_distance": 0.18703137033663747
+            },
+            "335007446798": {
+              "position": [
+                -20.53009,
+                0.05,
+                -18.893145
+              ],
+              "active": [
+                "Move((-24.058674, 0.0, -19.100424))"
+              ],
+              "actual_goal_distance": 3.535020456644769
+            }
+          }
+        },
+        {
+          "clock": 95.36508178710938,
+          "actors": {
+            "184683591447": {
+              "position": [
+                -26.800207,
+                0.05,
+                -19.807177
+              ],
+              "active": [],
+              "actual_goal_distance": 0.18703137033663747
+            },
+            "335007446798": {
+              "position": [
+                -23.907242,
+                0.05,
+                -18.93373
+              ],
+              "active": [],
+              "actual_goal_distance": 0.23069143950307264
+            }
+          }
+        }
+      ],
+      "ground_review": {
+        "image_sha256": "7a00b4508c83028e4331653cafe1acde833eada7021745ed73a3b82c14501db8",
+        "age": 6.407452569983434,
+        "point": [
+          286,
+          588
+        ],
+        "cohort": "group11-AntiAirWalker"
+      },
+      "Move_completed_in_actual_HQ_range": true,
+      "point_accuracy_scope": "Distances recorded; historical08 .22 click-point arrival not claimed"
+    }
+  ],
+  "wall_seconds": 519.9003936419613,
+  "actual_exits": [
+    {
+      "pid": 3618864,
+      "supervisor_pid": 3618800,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "prefix_sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+  "failure_png_sha256": "9b10427eedcfcb3cf0c1af0e1d29547c75976ade6d9083d7b3095b95b3fad142",
+  "persisted_reviews": [
+    {
+      "file": "target/sdk305-fresh-m2-grouping-20261012-11/normal-M2-main-menu-review.json",
+      "request_mtime_ns": "1791756733119982211",
+      "review_age_seconds": 5.493924856185913,
+      "image_sha256": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c"
+    },
+    {
+      "file": "target/sdk305-fresh-m2-grouping-20261012-11/normal-M2-campaign-card-review.json",
+      "request_mtime_ns": "1791756741512168505",
+      "review_age_seconds": 7.014362096786499,
+      "image_sha256": "f984f67a6974baf3be64d2f7cf94c0ed69cd2dc9047caa2945bcc9380a4706bf"
+    },
+    {
+      "file": "target/sdk305-fresh-m2-grouping-20261012-11/02/group-defense-review.json",
+      "request_mtime_ns": "1791757193360024053",
+      "review_age_seconds": 6.4018778800964355,
+      "image_sha256": "7a00b4508c83028e4331653cafe1acde833eada7021745ed73a3b82c14501db8"
+    },
+    {
+      "file": "target/sdk305-fresh-m2-grouping-20261012-11/02/assembly-ground-review.json",
+      "request_mtime_ns": "1791757061256523916",
+      "review_age_seconds": 6.515121698379517,
+      "image_sha256": "617aa0bcb8c6f929804c6625751f8012aca09602b0eb57d057ec6b16e9f158eb"
+    },
+    {
+      "file": "target/sdk305-fresh-m2-grouping-20261012-11/02/economy-visible-ore-review.json",
+      "request_mtime_ns": "1791756762674527051",
+      "review_age_seconds": 5.643929719924927,
+      "image_sha256": "5ed1e0fc757c07fbf518d18aa3bb06b503df4a95888a8b4bfe75e4a939e61648"
+    },
+    {
+      "file": "target/sdk305-fresh-m2-grouping-20261012-11/02/member-defense-review.json",
+      "request_mtime_ns": "1791757177752391635",
+      "review_age_seconds": 6.067258834838867,
+      "image_sha256": "a99347c5d22d1ad2fcbd04e18948f3de218ae5f4aa0561942be925ba7fa22e48"
+    }
+  ],
+  "consumed_reviews_approx_age_seconds": {
+    "VehicleFactoryAssembly": 7.6455,
+    "DroneBodySelection": 7.3436
+  },
+  "review45_exhausted": false,
+  "unit": "ActiveState=failed\nMainPID=0\nExecMainStatus=1\nControlGroup=\n",
+  "remaining_runtime_supervisor_runner_pids": [],
+  "recorded_at_epoch": 1791757286.846207,
+  "GPU_released": true
+}

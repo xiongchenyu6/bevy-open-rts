@@ -1,0 +1,598 @@
+[
+  {
+    "world": [
+      -24.5,
+      0.0,
+      -24.0
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 4294966721,
+        "id": "Drone",
+        "distance": 0.5,
+        "required_clearance": 1.68
+      },
+      {
+        "key": 1108101560601,
+        "id": "VehicleFactory",
+        "distance": 1.8125443034769932,
+        "required_clearance": 2.58
+      },
+      {
+        "key": 4831838206239,
+        "id": "Barracks",
+        "distance": 2.501330052313438,
+        "required_clearance": 2.5300000000000002
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      444,
+      239
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -24.5,
+      0.0,
+      -20.0
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 4294966716,
+        "id": "Worker",
+        "distance": 0.6019646722459195,
+        "required_clearance": 1.68
+      },
+      {
+        "key": 335007446798,
+        "id": "AntiAirWalker",
+        "distance": 1.2199572687596074,
+        "required_clearance": 1.8299999999999998
+      },
+      {
+        "key": 4831838206239,
+        "id": "Barracks",
+        "distance": 2.501333102446655,
+        "required_clearance": 2.5300000000000002
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      395,
+      540
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -19.5,
+      0.0,
+      -24.0
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 42949671111,
+        "id": "PowerReactor",
+        "distance": 1.1271844157563207,
+        "required_clearance": 2.5300000000000002
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      836,
+      239
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -19.5,
+      0.0,
+      -20.0
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 4973572126577,
+        "id": "HeavyMachinegunTrooper",
+        "distance": 1.4325001670773687,
+        "required_clearance": 1.5599999999999998
+      },
+      {
+        "key": 274877904485,
+        "id": "Tank",
+        "distance": 0.5660854458418886,
+        "required_clearance": 1.98
+      },
+      {
+        "key": 369367184974,
+        "id": "Tank",
+        "distance": 1.284472510465813,
+        "required_clearance": 1.98
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      885,
+      540
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -24.0,
+      0.0,
+      -24.5
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 4294966721,
+        "id": "Drone",
+        "distance": 0.5,
+        "required_clearance": 1.68
+      },
+      {
+        "key": 1108101560601,
+        "id": "VehicleFactory",
+        "distance": 2.0698076669914114,
+        "required_clearance": 2.58
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      487,
+      210
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -24.0,
+      0.0,
+      -19.5
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 4294966716,
+        "id": "Worker",
+        "distance": 0.8308461160239121,
+        "required_clearance": 1.68
+      },
+      {
+        "key": 335007446798,
+        "id": "AntiAirWalker",
+        "distance": 0.5738176806629378,
+        "required_clearance": 1.8299999999999998
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      438,
+      588
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -20.0,
+      0.0,
+      -24.5
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 42949671111,
+        "id": "PowerReactor",
+        "distance": 1.1259188340719162,
+        "required_clearance": 2.5300000000000002
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      793,
+      210
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -20.0,
+      0.0,
+      -19.5
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 4973572126577,
+        "id": "HeavyMachinegunTrooper",
+        "distance": 0.9532127646784977,
+        "required_clearance": 1.5599999999999998
+      },
+      {
+        "key": 274877904485,
+        "id": "Tank",
+        "distance": 1.2112560395299257,
+        "required_clearance": 1.98
+      },
+      {
+        "key": 369367184974,
+        "id": "Tank",
+        "distance": 0.8612183362658234,
+        "required_clearance": 1.98
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      842,
+      588
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -25.0,
+      0.0,
+      -23.5
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 4294966721,
+        "id": "Drone",
+        "distance": 1.118033988749895,
+        "required_clearance": 1.68
+      },
+      {
+        "key": 1108101560601,
+        "id": "VehicleFactory",
+        "distance": 1.812878905442216,
+        "required_clearance": 2.58
+      },
+      {
+        "key": 4831838206239,
+        "id": "Barracks",
+        "distance": 1.8040054577231794,
+        "required_clearance": 2.5300000000000002
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      398,
+      270
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -25.0,
+      0.0,
+      -20.5
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 4294966716,
+        "id": "Worker",
+        "distance": 1.0170632550398497,
+        "required_clearance": 1.68
+      },
+      {
+        "key": 4831838206239,
+        "id": "Barracks",
+        "distance": 1.8040086295765925,
+        "required_clearance": 2.5300000000000002
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      355,
+      494
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -19.0,
+      0.0,
+      -23.5
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 3139621091350,
+        "id": "AntiGroundTurret",
+        "distance": 1.5000049328025387,
+        "required_clearance": 1.68
+      },
+      {
+        "key": 42949671111,
+        "id": "PowerReactor",
+        "distance": 1.5077785624321538,
+        "required_clearance": 2.5300000000000002
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      882,
+      270
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -19.0,
+      0.0,
+      -20.5
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 6902012442660,
+        "id": "RocketInfantry",
+        "distance": 1.158585290361676,
+        "required_clearance": 1.53
+      },
+      {
+        "key": 274877904485,
+        "id": "Tank",
+        "distance": 0.4168504176443858,
+        "required_clearance": 1.98
+      },
+      {
+        "key": 369367184974,
+        "id": "Tank",
+        "distance": 1.8862773490566607,
+        "required_clearance": 1.98
+      },
+      {
+        "key": 3139621091350,
+        "id": "AntiGroundTurret",
+        "distance": 1.5000087474824089,
+        "required_clearance": 1.68
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      925,
+      494
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -23.5,
+      0.0,
+      -25.0
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 4294966721,
+        "id": "Drone",
+        "distance": 1.118033988749895,
+        "required_clearance": 1.68
+      },
+      {
+        "key": 1108101560601,
+        "id": "VehicleFactory",
+        "distance": 2.5065695092308853,
+        "required_clearance": 2.58
+      },
+      {
+        "key": 1374389532945,
+        "id": "RadarUplink",
+        "distance": 1.8031735469706645,
+        "required_clearance": 2.48
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      528,
+      181
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -23.5,
+      0.0,
+      -19.0
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 4294966716,
+        "id": "Worker",
+        "distance": 1.4206509319294107,
+        "required_clearance": 1.68
+      },
+      {
+        "key": 4294966719,
+        "id": "Worker",
+        "distance": 1.4476697823786426,
+        "required_clearance": 1.68
+      },
+      {
+        "key": 335007446798,
+        "id": "AntiAirWalker",
+        "distance": 0.4125987441611831,
+        "required_clearance": 1.8299999999999998
+      }
+    ],
+    "visible_resource_blocks": [],
+    "projection_eligible": false,
+    "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+    "eligible": false
+  },
+  {
+    "world": [
+      -20.5,
+      0.0,
+      -25.0
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 42949671111,
+        "id": "PowerReactor",
+        "distance": 1.5049391132905705,
+        "required_clearance": 2.5300000000000002
+      },
+      {
+        "key": 1374389532945,
+        "id": "RadarUplink",
+        "distance": 1.8031735469706645,
+        "required_clearance": 2.48
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      752,
+      181
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -20.5,
+      0.0,
+      -19.0
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 4973572126577,
+        "id": "HeavyMachinegunTrooper",
+        "distance": 0.8747413450931429,
+        "required_clearance": 1.5599999999999998
+      },
+      {
+        "key": 274877904485,
+        "id": "Tank",
+        "distance": 1.9010075367029537,
+        "required_clearance": 1.98
+      },
+      {
+        "key": 369367184974,
+        "id": "Tank",
+        "distance": 0.9129755830790864,
+        "required_clearance": 1.98
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      796,
+      640
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -25.5,
+      0.0,
+      -22.0
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 4831838206239,
+        "id": "Barracks",
+        "distance": 0.5022182464635828,
+        "required_clearance": 2.5300000000000002
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      335,
+      373
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -18.5,
+      0.0,
+      -22.0
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 6902012442660,
+        "id": "RocketInfantry",
+        "distance": 0.7413970948581662,
+        "required_clearance": 1.53
+      },
+      {
+        "key": 274877904485,
+        "id": "Tank",
+        "distance": 1.7054257155907748,
+        "required_clearance": 1.98
+      },
+      {
+        "key": 3139621091350,
+        "id": "AntiGroundTurret",
+        "distance": 0.49547004700074154,
+        "required_clearance": 1.68
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      945,
+      373
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -22.0,
+      0.0,
+      -25.5
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 1374389532945,
+        "id": "RadarUplink",
+        "distance": 0.5007171630859375,
+        "required_clearance": 2.48
+      }
+    ],
+    "visible_resource_blocks": [],
+    "point": [
+      640,
+      155
+    ],
+    "projection_eligible": true,
+    "eligible": false
+  },
+  {
+    "world": [
+      -22.0,
+      0.0,
+      -18.5
+    ],
+    "own_actor_blocks": [
+      {
+        "key": 322122544786,
+        "id": "HeavyMachinegunTrooper",
+        "distance": 1.4542143972928814,
+        "required_clearance": 1.5599999999999998
+      },
+      {
+        "key": 4294966719,
+        "id": "Worker",
+        "distance": 0.6587063143230246,
+        "required_clearance": 1.68
+      }
+    ],
+    "visible_resource_blocks": [],
+    "projection_eligible": false,
+    "projection_rejection": "Actualownedbody blockedbycurrentHUDrect",
+    "eligible": false
+  }
+]
