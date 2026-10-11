@@ -1,0 +1,51 @@
+{
+  "scope": "Current309ad73 unarmed mixed attack-move source, native regression/build and officialSteamRuntime4 package integrity; new normal player-flow acceptance pending",
+  "native": {
+    "full_passed": 292,
+    "full_failed": 0,
+    "full_ignored": 1,
+    "full_seconds": 248.24,
+    "check3bins": 0,
+    "build3bins": 0,
+    "sources": 142,
+    "assets": 332,
+    "source_assets_unchanged": true
+  },
+  "officialSDK": {
+    "image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+    "toolchain": "Rust1.95",
+    "offline_locked_jobs1": true,
+    "clean_all4_local_packages": 0,
+    "actual_compile_all4_local_paths": true,
+    "build_exit": 0,
+    "wall_seconds": 420.39188639598433,
+    "raw_ELF_sha256": "8133f80fffe9a405f8300a919fdcc4b76db189c3b70437e9801eb77c049e27fb",
+    "frozen_inputs_unchanged": true
+  },
+  "package": {
+    "actual_exit": 0,
+    "independent_integrity_exit": 0,
+    "files": 399,
+    "assets": 332,
+    "official_Runtime4_notices": 13,
+    "local_fork_notice_materials": 5,
+    "archive_sha256": "1913e6dcab45a5af3188fc1c37a30a885d2b7cca7edccfc8da7c7b63acc3e4e6",
+    "installed_ELF_sha256": "9de865dea62439e84c7908b9d7721db01994aa6abc67888bff71437710259402",
+    "ready": "target/linux-native292-unarmed-extracted-20261011/ready.json"
+  },
+  "preserved_failure": "First SDK coordinator exited1 before Cargo/snapshot because reused collector omitted3unchanged local manifests (139vs142). Independent oldpin hashes verified each; inventory corrected without source mutation. Fresh02 all stages0.",
+  "limitations": [
+    "No claim old399 audio/campaign run contains sourcefix",
+    "New normal mixed Drone/HMG attack-move player verification pending",
+    "No public deployment"
+  ],
+  "evidence_sha256": {
+    "target/unarmed-native292-shared-20261011/pin.json": "cbf089c90fb993bf68164f045cce244fb67792c80891a790db506fc42da2dc96",
+    "target/unarmed-native292-shared-20261011/result.json": "9b2f1b553f0cd74cbd973339b9c7b60b7cee0ee5088a44557809b45cdef5cdba",
+    "target/unarmed-native292-shared-20261011/full.log": "86f076af12fcbac7e01f9aede829817902387d1a471caf0c21aeb48c366bab8a",
+    "target/linux-native292-unarmed-steamrt4-sdk-20261011/result.json": "4d0ab970bd3e49c620f1c3106d8822d81fb453b21d852df5d6ec351905cf0631",
+    "target/linux-native292-unarmed-package-20261011/result.json": "3eb46cadd7fe8bc692923b3964175025004e8791025ca66edebf6ba8ffb5802e",
+    "target/linux-native292-unarmed-package-20261011/independent-integrity.json": "cfcaeb8c5661348d8d6b066c33c5f35a8107febca8c1f27d7b70b404c6650474",
+    "target/linux-native292-unarmed-extracted-20261011/ready.json": "3312170c687068f92c60cde6c7f249c767fe04715512630393d4552b7f1e9ab0"
+  }
+}
