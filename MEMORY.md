@@ -507,3 +507,5 @@ Latest construction checkpoint:
   firstfailedGPUstartup preserved, retryservice success. Windowsbuildactive.
 
 - 2026-10-11: Wasm16 host-only1280×720 eight-slot footer acceptance is recorded in `docs/qa/web16-eight-slot-lobby-footer-review.json` (actual0/original90s). Root rehashed nine raw/image evidence files and viewed reverse-scroll frame; no eight-human or other-DPI claim. SDK267 Mission1 natural victory plus separate genuine-profile menu persistence is bounded evidence; original09 workflow remains failed due late final review/forced cleanup.
+
+- 2026-10-11: Exact SDK267 audio channel normal-input launcher/325-command recipe/closed-PCM verifier are prepared at `target/audio-channel-isolation-runnable-20261011/`; syntax checks pass, no launch or channel pass claimed. Uses private null sink, fresh profile, five normal processes, read-only install, original600s. Verify Options screenshots independently; SFX-only selection/movement output is intentionally unproven and must fail if silent. Mission2 owns next GPU slot.
