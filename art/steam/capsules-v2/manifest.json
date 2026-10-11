@@ -1,0 +1,59 @@
+{
+  "scope": "Steam capsule composition candidates; not final store approval or gameplay captures",
+  "dimensions_source": "https://partner.steamgames.com/doc/store/assets?l=english",
+  "checked": "2026-10-12",
+  "generator_sha256": "31e05027a20af1b95f5cbae22b2701f66b5fbbf096691da2065ce9218d598334",
+  "keyart_sha256": "dfb14c0c7f46a83034918f8a342212d09f3d19ba4548646c31fd58dfde7bf713",
+  "wordmark_generator_sha256": "c463d3306f5598c0a95336cf9ae1281fa3e184803e8d525c74320d8a36f9eefd",
+  "rasterizer": "0.48.1",
+  "records": [
+    {
+      "name": "header",
+      "width": 920,
+      "height": 430,
+      "svg_sha256": "1d267b2a712c1796cdea2a671378b61e055b663dda29bd63dd1f461411d22f21",
+      "png_sha256": "19b4f4b1798abb955d4f0570ca729796d91e0e92a46b5478a4a39118b6077711"
+    },
+    {
+      "name": "small",
+      "width": 462,
+      "height": 174,
+      "svg_sha256": "2434e14adc5757bda647bcc0dbf2da3c2e0e512dbbeaea340b9138ad313a0bf0",
+      "png_sha256": "19c253de5fb4c01b975d708ad00839ce43aab2198c4be3f2473943dc7c6a8471"
+    },
+    {
+      "name": "main",
+      "width": 1232,
+      "height": 706,
+      "svg_sha256": "99c63b354c2e314f3b20b8cd4b15b8bf4c1ebcf929846e360492d96a524af00d",
+      "png_sha256": "7d86b26c35047f84bf926a9cb9ccc7175fab22bff8d46c81ee6ac7a89cce0cca"
+    },
+    {
+      "name": "vertical",
+      "width": 748,
+      "height": 896,
+      "svg_sha256": "a59195896cebc932ed56f11b4c62ddb8545620b3d2e16c0e8828479f9bef2f25",
+      "png_sha256": "97e95dcd6f010f75305b385d4842386b740ce8b70d6cccc50921727d614b1210"
+    },
+    {
+      "name": "library-capsule",
+      "width": 600,
+      "height": 900,
+      "svg_sha256": "0f1c2df39bb2a57e2c23ea3d07ac1fc3eaa702176d20ec09c0b1ca1c0218f6d3",
+      "png_sha256": "b078c99d95340821d54931517501512dc48643c879b0029b8560b19c67550c85"
+    },
+    {
+      "name": "library-hero",
+      "width": 3840,
+      "height": 1240,
+      "svg_sha256": "87c0bbc5057f5367c3b47b1354b2c55e79dcacde2e6783377f9cb19366ecae68",
+      "png_sha256": "4d7c50844219ef2444057da41ebaa2ba5dd574499b46b219324542d96eb0f2b8"
+    }
+  ],
+  "remaining": [
+    "Small-size and crop visual review",
+    "Steam-client placement",
+    "Final commercial rights review",
+    "Actual final gameplay screenshots and trailer"
+  ]
+}

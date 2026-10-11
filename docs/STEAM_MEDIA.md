@@ -1,7 +1,11 @@
 # Steam media preparation
 
 Current artifacts are drafts. Final gameplay captures and capsule compositions
-remain release requirements; the original wordmark is under
+remain release requirements; six reviewed original composition candidates are in
+[art/steam/capsules-v2](../art/steam/capsules-v2/README.md). They export at current
+Steam dimensions and reproduce exactly, with legible title samples down to126px.
+Final client placement, rights and gameplay media remain open.
+The original wordmark is under
 [art/branding](../art/branding/README.md).
 
 ## Export sizes
