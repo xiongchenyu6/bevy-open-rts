@@ -1,0 +1,86 @@
+{
+  "scope": "W18 eight normal frontend participants; seven guests paid Worker production/movement and actual ECS consistency; fullmatch/reconnect/hostgameplay remain open",
+  "actual_supervisor_exit": 0,
+  "runtime_deadline_seconds": 240,
+  "normal_browser_close": true,
+  "participants": 8,
+  "guest_results": [
+    {
+      "role": "p1",
+      "common_actual_world_ticks": 255,
+      "actual_paid_Worker_job_ticks": 17,
+      "own_Workers_after_paid_production": 3,
+      "movement_over_half_metre": true,
+      "component_mismatches": 0,
+      "resource_job_support_clock_differences": 0
+    },
+    {
+      "role": "p2",
+      "common_actual_world_ticks": 281,
+      "actual_paid_Worker_job_ticks": 13,
+      "own_Workers_after_paid_production": 3,
+      "movement_over_half_metre": true,
+      "component_mismatches": 0,
+      "resource_job_support_clock_differences": 0
+    },
+    {
+      "role": "p3",
+      "common_actual_world_ticks": 295,
+      "actual_paid_Worker_job_ticks": 17,
+      "own_Workers_after_paid_production": 3,
+      "movement_over_half_metre": true,
+      "component_mismatches": 0,
+      "resource_job_support_clock_differences": 0
+    },
+    {
+      "role": "p4",
+      "common_actual_world_ticks": 265,
+      "actual_paid_Worker_job_ticks": 13,
+      "own_Workers_after_paid_production": 3,
+      "movement_over_half_metre": true,
+      "component_mismatches": 0,
+      "resource_job_support_clock_differences": 0
+    },
+    {
+      "role": "p5",
+      "common_actual_world_ticks": 264,
+      "actual_paid_Worker_job_ticks": 13,
+      "own_Workers_after_paid_production": 3,
+      "movement_over_half_metre": true,
+      "component_mismatches": 0,
+      "resource_job_support_clock_differences": 0
+    },
+    {
+      "role": "p6",
+      "common_actual_world_ticks": 290,
+      "actual_paid_Worker_job_ticks": 17,
+      "own_Workers_after_paid_production": 3,
+      "movement_over_half_metre": true,
+      "component_mismatches": 0,
+      "resource_job_support_clock_differences": 0
+    },
+    {
+      "role": "p7",
+      "common_actual_world_ticks": 299,
+      "actual_paid_Worker_job_ticks": 17,
+      "own_Workers_after_paid_production": 3,
+      "movement_over_half_metre": true,
+      "component_mismatches": 0,
+      "resource_job_support_clock_differences": 0
+    }
+  ],
+  "forced_TURN_eight_peers_pass": false,
+  "reconnect_pass": false,
+  "render_world_equivalence_claim": false,
+  "evidence": {
+    "target/web18-eight-human-20261011-02/eight-human-world-proof.json": "07dd13be5d6c17a0c433ac210d392189e45b7fe510c62eff98183e49f653384f",
+    "target/web18-eight-human-20261011-02/result.json": "ea8a21d82f65af50edaa29ca6fb253c35d7b7035dedd669be1ac0c5c7acc1dcf",
+    "target/web18-eight-human-20261011-02/final-supervisor-result.json": "eb14a4c3b7592ddf20834eaeaab7aa802d284a7874d460d40571d8ccb7ba1a54"
+  },
+  "limits": [
+    "Host paid/gameplay controls not exercised",
+    "No complete combat match or reconnect acceptance",
+    "Render interpolation differs from authoritative ECS; no full render-world identity claim",
+    "Earlier W17/W18 failed attempts remain retained"
+  ]
+}
