@@ -4,10 +4,10 @@ use std::collections::{HashMap, VecDeque};
 
 pub(super) fn refined_contact_approach(
     source: Vec3,
-    target_position: Vec3,
     radius: f32,
     goals: &[Vec3],
     grid: &NavGrid,
+    routing: &NavGrid,
     obstacles: &[(Vec3, f32)],
     buildings: &[(Vec3, f32)],
     occupied: &[(Vec3, f32)],
@@ -16,18 +16,9 @@ pub(super) fn refined_contact_approach(
         return None;
     }
     let step = NAV_GRID_CELL_M * 0.5;
-    let center = source.lerp(target_position, 0.5);
-    let origin = (
-        ((center.x - grid.origin_x) / step).floor() as i32,
-        ((center.z - grid.origin_z) / step).floor() as i32,
-    );
     let source_cell = (
         ((source.x - grid.origin_x) / step).floor() as i32,
         ((source.z - grid.origin_z) / step).floor() as i32,
-    );
-    let target_cell = (
-        ((target_position.x - grid.origin_x) / step).floor() as i32,
-        ((target_position.z - grid.origin_z) / step).floor() as i32,
     );
     let point = |cell: (i32, i32)| {
         Vec3::new(
@@ -41,10 +32,10 @@ pub(super) fn refined_contact_approach(
             && cell.1 >= 0
             && cell.0 < grid.width * 2
             && cell.1 < grid.height * 2
-            && (cell.0 - origin.0).abs() <= 24
-            && (cell.1 - origin.1).abs() <= 24
+            && (cell.0 - source_cell.0).abs() <= 24
+            && (cell.1 - source_cell.1).abs() <= 24
     };
-    if !inside(source_cell) || !inside(target_cell) {
+    if !inside(source_cell) {
         return None;
     }
     let clear = |from, to| {
@@ -104,5 +95,59 @@ pub(super) fn refined_contact_approach(
             }
         }
     }
-    None
+    // Fine cells recover a physically valid exit from a coarse-grid pocket.
+    // Reuse one global search for the remaining detour instead of enlarging
+    // the existing 49x49 fine-node budget or jumping to an unvalidated seed.
+    let mut coarse_prefixes = HashMap::new();
+    for cell in parents.keys().copied() {
+        let fine = point(cell);
+        let coarse_cell = routing.cell_of(fine);
+        let coarse = routing.cell_center(coarse_cell.0, coarse_cell.1);
+        if !routing.is_blocked(coarse_cell.0, coarse_cell.1)
+            && contact_position_is_clear(coarse, radius, obstacles, occupied)
+            && clear(fine, coarse)
+        {
+            coarse_prefixes
+                .entry(coarse_cell)
+                .and_modify(|previous| {
+                    if cell < *previous {
+                        *previous = cell;
+                    }
+                })
+                .or_insert(cell);
+        }
+    }
+    let mut coarse_cells = coarse_prefixes.keys().copied().collect::<Vec<_>>();
+    coarse_cells.sort_unstable();
+    let starts = coarse_cells
+        .iter()
+        .map(|&(x, z)| routing.cell_center(x, z))
+        .collect::<Vec<_>>();
+    let coarse_goals = goals
+        .iter()
+        .copied()
+        .filter(|goal| {
+            let cell = routing.cell_of(*goal);
+            !routing.is_blocked(cell.0, cell.1)
+        })
+        .collect::<Vec<_>>();
+    let (target, global) = routing.find_contact_path(source, &starts, &coarse_goals)?;
+    let first = *global.first()?;
+    let mut cursor = *coarse_prefixes.get(&routing.cell_of(first))?;
+    let mut waypoints = vec![point(cursor)];
+    while let Some(previous) = parents[&cursor] {
+        waypoints.push(point(previous));
+        cursor = previous;
+    }
+    waypoints.reverse();
+    waypoints.extend(global);
+    waypoints.push(target);
+    let mut anchor = source;
+    for next in &waypoints {
+        if !clear(anchor, *next) {
+            return None;
+        }
+        anchor = *next;
+    }
+    Some(ContactApproach { target, waypoints })
 }

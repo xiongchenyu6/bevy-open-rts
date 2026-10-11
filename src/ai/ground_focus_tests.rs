@@ -1,6 +1,34 @@
 use super::*;
 use bevy::ecs::system::RunSystemOnce;
 
+fn observed_ground_members(world: &mut World) -> Vec<(u64, &'static str, Option<u64>, bool)> {
+    let mut query = world.query::<(
+        Entity,
+        &Team,
+        &Unit,
+        &Weapon,
+        &Health,
+        Option<&AttackOrder>,
+        Option<&AiAttackWaveMember>,
+    )>();
+    let mut rows = query
+        .iter(world)
+        .filter(|(_, team, _, weapon, health, _, _)| {
+            **team == Team::Player(0) && weapon.can_attack_ground && health.current > 0.0
+        })
+        .map(|(e, _, unit, _, _, attack, member)| {
+            (
+                e.to_bits(),
+                unit.id,
+                attack.map(|a| a.target.to_bits()),
+                member.is_some(),
+            )
+        })
+        .collect::<Vec<_>>();
+    rows.sort_by_key(|row| row.0);
+    rows
+}
+
 #[test]
 fn normal_easy_ground_wave_members_concentrate_fire_against_repaired_city() {
     let mut app = build_game_app(GameAppMode::Headless);
@@ -77,7 +105,53 @@ fn normal_easy_ground_wave_members_concentrate_fire_against_repaired_city() {
         "normal2668 at{} wave relationship{rows:?}",
         app.world().resource::<MatchState>().start_time_sec
     );
-    assert_eq!(rows.len(), 3, "normal paid Easy army must exist");
+    let mut natural_refresh = false;
+    let remaining = app.world().resource::<AiDirector>().attack_timer[0];
+    let start = app.world().resource::<MatchState>().start_time_sec;
+    let deadline = start + remaining + 0.1;
+    while app.world().resource::<MatchState>().start_time_sec <= deadline {
+        assert!(app.world().resource::<MatchState>().is_running());
+        let before = app.world().resource::<AiDirector>().attack_timer[0];
+        let eligible_before = observed_ground_members(app.world_mut());
+        app.update();
+        let after = app.world().resource::<AiDirector>().attack_timer[0];
+        if after > before {
+            let after_rows = observed_ground_members(app.world_mut());
+            eprintln!(
+                "NATURAL shared refresh {}",
+                serde_json::json!({"clock":app.world().resource::<MatchState>().start_time_sec,"before":before,"after":after,"members_before":eligible_before,"members_after":after_rows})
+            );
+            natural_refresh = true;
+            break;
+        }
+    }
+    assert!(
+        natural_refresh,
+        "Actual existing profile refresh must occur without timer writes"
+    );
+    assert_eq!(
+        rows.len(),
+        3,
+        "normal paid Easy army must exist at the initial observation"
+    );
+    // Targets can die and be reacquired between the existing profile refreshes.
+    // Check the real registered refresh rather than an unrelated checkpoint.
+    let rows = observed_ground_members(app.world_mut())
+        .into_iter()
+        .map(|(entity, id, target, member)| {
+            (
+                entity,
+                id,
+                target.expect("Live ground-wave member retains its attack at refresh"),
+                member,
+            )
+        })
+        .collect::<Vec<_>>();
+    assert_eq!(
+        rows.len(),
+        3,
+        "Same normal paid army survives its natural refresh"
+    );
     assert!(
         rows.iter().all(|r| r.3),
         "actual attackers must be assigned wave members"
@@ -89,7 +163,7 @@ fn normal_easy_ground_wave_members_concentrate_fire_against_repaired_city() {
     assert_eq!(
         targets.len(),
         1,
-        "ground wave keeps split fire into individually repaired structures"
+        "Natural shared refresh concentrates eligible ground-wave fire"
     );
     // The same registered director must leave explicit orders and player control
     // intact even when the other members have an unambiguous shared target.

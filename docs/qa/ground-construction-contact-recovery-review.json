@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "scope": "Shared construction ground-domain occupancy and bounded fine-prefix/global contact recovery; source285 library/native pin, actual updated SDK/player/browser flows pending",
+  "changes": {
+    "air_occupancy": "advance_unit_construction uses actual living Terrain units for ground contact occupancy, consistent with ordinary movement/separation. No actual Drone removal or Worker substitution.",
+    "coarse_pocket_recovery": "Existing quarter-metre fine BFS retains49x49 node limit, now centered on source; physically reachable fine prefixes feed one existing global contact A* using existing worker-inflated mask. Combined real waypoints validated continuously against original static/mobile/terrain contracts; goals unchanged.",
+    "unchanged": [
+      "costs",
+      "HP and radii",
+      "income and repair",
+      "unit caps",
+      "AI profiles and timing",
+      "normal player orders and queues",
+      "map/terrain limits"
+    ],
+    "fixture_data": "Actual SDK267 normal paid M3 progress save, only whitespace outside strings removed; all serialized fields retained, not actor/resource grants."
+  },
+  "m3_reproduction": {
+    "original_frontend_failure": "target/sdk267-mission3-normal-20261011-01",
+    "builder_initial_saved_position": [
+      -25.236988,
+      0.05,
+      -23.840286
+    ],
+    "air_drone_position": [
+      -24,
+      1.5,
+      -24
+    ],
+    "actual_xz_distance": 1.2472562,
+    "ground_body_gap_required": 1.25,
+    "paid_power_cost": [
+      3,
+      1
+    ],
+    "actual_bank": [
+      61,
+      31
+    ],
+    "actual_remaining_before": [
+      1,
+      1
+    ],
+    "red": {
+      "exit": 101,
+      "passed": 1,
+      "failed": 1,
+      "full_schedule_seconds": 30,
+      "final_clock": 60.368507,
+      "final_remaining": 1,
+      "builder_unchanged": true,
+      "all_domain_route": false,
+      "ground_domain_route": true
+    },
+    "green": {
+      "exit": 0,
+      "passed": 2,
+      "failed": 0,
+      "same_actual_worker_complete_clock": 35.235558,
+      "elapsed_simulation_seconds": 5,
+      "speed_and_no_teleport_checks": true,
+      "bank_unchanged": [
+        61,
+        31
+      ],
+      "genuine_ground_gap_rejection_preserved": true
+    }
+  },
+  "big_arena2641_reproduction": {
+    "optimized279_match_pass_remains_separate": "Root optimized samecore audit completed277.087sim/37.304wall; debug wall-only failures do not prove simulation stall",
+    "recorded_constructor_route_issue": "Exact recorded140s circle geometry admits97continuous fine witness legs, but both coarse searches originallyNone106starts/19goals and oldlocalrefinementNone. No first-leg rejection inferred.",
+    "red": {
+      "exit": 101,
+      "assertion_failure_not_compile_failure": true,
+      "actual_authored_terrain_and_existing_physical_witness_passed": true
+    },
+    "green": {
+      "exit": 0,
+      "actual_multi_waypoint_route_continuous": true,
+      "actual_map_bounds_and_original_terrain_static_mobile_guards": true,
+      "hard_terrain_blocked_map_returns_None": true,
+      "normal_paid_factory_completed_clock": 153.57051,
+      "ordinary_movement_and_separation_speed_caps_checked": true
+    }
+  },
+  "ai_oracle_correction": {
+    "preserved_failure": "Old instantaneous200s equality failed full101 (282PASS/1FAIL/1ignored); retained unchanged diagnostic also101",
+    "actual_chronology": {
+      "last_shared_refresh_clock": 186.0107727,
+      "shared_target": 588410518521,
+      "shared_target_death_clock": 189.5782013,
+      "arbitrary200s_targets": [
+        794568948611,
+        12884901045
+      ],
+      "next_natural_shared_refresh_clock": 204.0146179,
+      "all_three_target_after_refresh": 794568948611
+    },
+    "stronger_invariant": "Real paid army existence at200 retained; same three living wave members share a target immediately after NATURAL registered App refresh, with no normal-phase timer writes. Explicit unit-only protection fixture manipulations stay separate."
+  },
+  "final_validation": {
+    "protocol_focused": {
+      "passed": 2,
+      "exit": 0,
+      "owner_commit": "dbf035a",
+      "scope": "Established host identity/mesh and same-established-peer handshake unit checks, not runtime reconnect"
+    },
+    "ai_focused": {
+      "passed": 1,
+      "exit": 0
+    },
+    "contact_focused": {
+      "passed": 18,
+      "exit": 0
+    },
+    "movement_focused": {
+      "passed": 5,
+      "exit": 0
+    },
+    "full": {
+      "passed": 285,
+      "failed": 0,
+      "ignored": 1,
+      "actual_exit": 0,
+      "seconds": 256.58
+    },
+    "check_exit": 0,
+    "native_three_build_exit": 0,
+    "native_build_seconds": 194,
+    "inputs_unchanged": true,
+    "source_input_count": 120,
+    "asset_count": 332,
+    "bins": {
+      "bevy-open-rts": "044c627e6d275c18473028274d5afb0f4289c93e5e28c4757920fb104159c695",
+      "capture": "d809f43afccad96435642a8595f6cd792b9a087bc8b99f92e0b628b654553af1",
+      "skirmish_audit": "4fe180cc751c7f7e11ad6b939aa64c83c8fe0bafdf3e091c09495581c1280dd8"
+    },
+    "pin_path": "target/constructor-host-identity-shared02-20261011/pin.json"
+  },
+  "retained_failed_attempts": [
+    "Original M3 normal physical run (forced cleanup, not pass)",
+    "Original BigArena fine-route assertion RED101",
+    "Original full101 instantaneousAIoracle failure",
+    "Host identity first consolidation compile101/E0624; corrected by owner pub(super), not protocol assertion RED"
+  ],
+  "limitations": [
+    "No new official SDK/player frontend M3 rerun or visual screenshot accepted by this source-only proof.",
+    "No final eight-human/TURN/reconnect browser claim; old W16 eight failure is preserved.",
+    "No whole ordered-start/random-seed/balance/release acceptance claim."
+  ],
+  "artifact_sha256": {
+    "target/m3-constructor-domain-red-20261011/red.log": "fd3ef41934bc6443c267d35d6f8a0c397a3283c198cbdedc4325b95ac498b504",
+    "target/m3-constructor-domain-red-20261011/result.json": "3b84f128b3cbff221215f0856da9b0eaf41657a943f078cb0823488ce7fb2b0b",
+    "target/m3-constructor-domain-green-20261011/green.log": "2f389f8c442d7126a347a938717916d04eba383df3a6876bf38246d8b18ac9b0",
+    "target/m3-constructor-domain-green-20261011/result.json": "e552fb89ffd64d70fb06a7fa646cdb6e8a4d26b4e6b5f7aa632628e4a767913b",
+    "target/case2641-contact-replay-red-20261011/red.log": "521e74d5fd9ea5711a5dd64677b87859c0f523aff2432b347dd717d8c1db3f12",
+    "target/case2641-contact-replay-red-20261011/result.json": "aba0a19289701615c0a3adc7351f9dc1df2fa7012a1d6886f192a23c210c5629",
+    "target/case2641-contact-replay-green-20261011/green.log": "393f892e1e9122f96ee2086c61f626876f99863ce3b4e99a35b0bbdecdf19f44",
+    "target/case2641-contact-replay-green-20261011/result.json": "eb503830bd680e30fc6503ac1c5349483d051dd42afedd11022f2b3fcb9c94e5",
+    "target/constructor-contact-shared-20261011/full.log": "a44c8e6d38404f7181b74aefc47664eaec0ee77fe3d5997023ee34415c09c04d",
+    "target/constructor-contact-shared-20261011/result.json": "28643f2987c14fb3ba7619a8fb27a0d0c3ebd8b2c4de02ff505992fe01643276",
+    "target/ai-ground-focus-natural-refresh-diagnostic-20261011/green.log": "52f1a6158b20ec9b493849789cb005d691fffbb57899b29210e5bb0a7859018c",
+    "target/ai-ground-focus-natural-refresh-diagnostic-20261011/result.json": "dfca287708c2781003cac14e1fbebf025b6260e507859c55cb0b8310dd053a53",
+    "target/constructor-host-identity-shared-20261011/result.json": "ea4c68d3229b22448054fc8d6d87822e3d02804639c8efd4ac4e9937a04b9aa0",
+    "target/constructor-host-identity-shared02-20261011/focused.log": "fc8c1695756cfe1d0eb4c8431598d5003a0c9f8395b1f90754f1933f62307671",
+    "target/constructor-host-identity-shared02-20261011/ai.log": "4a72538e6d87eafb66bb453cc7834ae9aacade6e9d064ba4ad96342110e169d6",
+    "target/constructor-host-identity-shared02-20261011/contact.log": "aa60f9b966df5d3c081d020be57e52d341f5a027997fb0d2621c0a38e93c7523",
+    "target/constructor-host-identity-shared02-20261011/movement.log": "b0cd5bf9371a8506eac564e97587324a7af1e301cd49cd83d8b585b27d6ac05c",
+    "target/constructor-host-identity-shared02-20261011/full.log": "13dcf041d9e46fe00f1201e2b8eee431372ba53f96e66be33f432d64ada81cee",
+    "target/constructor-host-identity-shared02-20261011/check.log": "80ce13c2eae27c99a8a3133660975d681bd9630447064f451d32fe3744fd2936",
+    "target/constructor-host-identity-shared02-20261011/build.log": "c10e5d97b59a818556c7fd24354e82cd8ed0a2f36699503e89f3af31bcce7995",
+    "target/constructor-host-identity-shared02-20261011/pin.json": "e223768fdae3ab8fc34dce7606464503bb8949792b968e2d741270c72986624c",
+    "target/sdk267-mission3-normal-20261011-01/auto-01-PowerReactor-progress.ron": "8ab23f58d27647c736ca91e1ae5d9851208e4a649c8c008c4318986baecb23bb",
+    "src/orders/contact_planning/fixtures/m3-normal-paid-progress.ron": "63121eec03abe9d20e4aec413f8e80833db6a55b5fa41acfa0a2176535c1b244"
+  }
+}

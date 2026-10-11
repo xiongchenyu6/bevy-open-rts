@@ -329,6 +329,7 @@ pub(crate) fn reachable_unit_contact_approach(
     // Prefer routes around mobile units. If their inflated grid cells seal a
     // narrow passage, use the static route and let normal movement resolve
     // mobile collisions. Contact endpoints must remain genuinely unoccupied.
+    let mut refinement_routing = None;
     for include_mobile_obstacles in [true, false] {
         let mut routing = NavGrid {
             version: grid.version,
@@ -481,13 +482,14 @@ pub(crate) fn reachable_unit_contact_approach(
                 return Some(ContactApproach { target, waypoints });
             }
         }
+        refinement_routing = Some(routing);
     }
     local_contact::refined_contact_approach(
         source_position,
-        target_position,
         source_radius,
         &candidates,
         grid,
+        refinement_routing.as_ref()?,
         obstacles,
         buildings,
         occupied,
@@ -522,3 +524,11 @@ pub(crate) fn move_order_targets_contact(
 #[cfg(test)]
 #[path = "contact_escape_tests.rs"]
 mod contact_escape_tests;
+
+#[cfg(test)]
+#[path = "contact_planning/case2641_replay_tests.rs"]
+mod case2641_replay_tests;
+
+#[cfg(test)]
+#[path = "contact_planning/m3_constructor_tests.rs"]
+mod m3_constructor_tests;

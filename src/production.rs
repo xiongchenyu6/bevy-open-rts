@@ -1054,7 +1054,10 @@ pub(crate) fn update_construct_orders(
             Without<Unit>,
         ),
     >,
-    other_units: Query<(&Transform, &Selectable, &Health), (With<Unit>, Without<ConstructOrder>)>,
+    other_units: Query<
+        (&Transform, &Selectable, &Health, &MovementDomain),
+        (With<Unit>, Without<ConstructOrder>),
+    >,
 ) {
     let static_obstacles: Vec<_> = obstacles
         .iter()
@@ -1075,8 +1078,10 @@ pub(crate) fn update_construct_orders(
         .collect();
     let other_positions: Vec<_> = other_units
         .iter()
-        .filter(|(_, _, health)| health.current > 0.0)
-        .map(|(transform, selectable, _)| (transform.translation, selectable.radius))
+        .filter(|(_, _, health, domain)| {
+            health.current > 0.0 && **domain == MovementDomain::Terrain
+        })
+        .map(|(transform, selectable, _, _)| (transform.translation, selectable.radius))
         .collect();
     for (
         constructor_entity,
