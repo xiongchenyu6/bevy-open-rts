@@ -1,0 +1,30 @@
+{
+  "scope": "Current native292 shipping Wasm23 build integrity; no browser/runtime/deployment acceptance",
+  "actual_exit": 0,
+  "wall_seconds": 614.4832497839816,
+  "source_commit": "a60915ae6e79435b921beee5ec1b9036e5bb4d6c",
+  "native_pin": "target/unarmed-native292-shared-20261011/pin.json",
+  "native_pin_sha256": "cbf089c90fb993bf68164f045cce244fb67792c80891a790db506fc42da2dc96",
+  "native_source_count": 142,
+  "assets": 332,
+  "fork_files": 15,
+  "all4localpackages_projectclean": 0,
+  "actual4snapshot_compile_paths_verified": true,
+  "lockedShipping_wasm_bindgen_version": "0.2.128",
+  "retained_real_HOME": "/home/freeman.xiong",
+  "bindgen_and_site_actual_exit": 0,
+  "wasm_sha256": "7fc0234b1e39d36378b51fb6b72cc629d1178dbb3f96d84ce5cd80be6c3d0fe3",
+  "wasm_bytes": 27079141,
+  "build_id": "c26d5ba0a60f8bee",
+  "private_alias": "web/qa-wasm23",
+  "frozen_source_assets_unchanged": true,
+  "protected_original_index_styles_flake_AGENTS_unchanged": true,
+  "evidence": {
+    "target/web-current-build23-snapshot-20261011/result.json": "97c4a479ed0c4d69aae721b4f28de9735a7740aadc06b9d5168bf3718fcabc1c",
+    "target/web-current-build23-snapshot-20261011/input.json": "9e4cf13d027181a7e26a9fea905ab0a0c3ddef9cd1896a84a1f3d02672654614",
+    "target/web-current-build23-snapshot-20261011/seal.json": "c2438f3c250e4eedde5a8e1da42b4a32f839c2656c715f4b05b3a62787bf87bb",
+    "target/web-current-build23-snapshot-20261011/build.log": "94312a0fbbe6bf7b84b1f7de3c8b0d8aa5f14a2289ebc48fec64758588c63ed7",
+    "target/web-current-build23-snapshot-20261011/clean-project-wasm.log": "705317368ca1294647bded1ef1b29bbb82f44076542e816eb2e696f513ab3e09"
+  },
+  "open": "Normal browser/player verification remains pending; oldW22/SDK399 evidence is not relabeled"
+}
