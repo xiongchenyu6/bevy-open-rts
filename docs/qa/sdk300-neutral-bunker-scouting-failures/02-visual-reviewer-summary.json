@@ -1,0 +1,20 @@
+{
+  "visible_information_only": true,
+  "actual_pngs_inspected": 5,
+  "reviews_written": 4,
+  "review_ages_seconds": [
+    38.0172905921936,
+    21.00791835784912,
+    20.545810222625732,
+    38.26530146598816
+  ],
+  "scout1_first_poll_age_seconds": 17.44318389892578,
+  "scout1_review_written": false,
+  "failure": "Scout1 view-to-write turnaround exhausted remaining27.56s; unchangedSHA/exactstringmtime passed then original45deadline guard rejected. No late gate.",
+  "visible_bunker_confirmations": 0,
+  "capture_verified": false,
+  "garrison_verified": false,
+  "save_continuity_verified": false,
+  "cleanup_process_matches": [],
+  "gpu_released": true
+}

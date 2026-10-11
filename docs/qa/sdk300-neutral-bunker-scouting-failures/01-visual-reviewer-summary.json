@@ -1,0 +1,28 @@
+{
+  "visible_information_only": true,
+  "actual_pngs_inspected": 11,
+  "reviews_written": 11,
+  "review_ages_seconds": [
+    22.843024253845215,
+    23.65256953239441,
+    24.79046106338501,
+    40.24216341972351,
+    39.6479971408844,
+    43.05659198760986,
+    38.90230083465576,
+    43.690226316452026,
+    31.019996881484985,
+    39.62416410446167,
+    44.716267108917236
+  ],
+  "setup_confirmed": "Current Four Corners, Alliance, Rich32/16, HumanPlayer1 and AI EasyPlayer2 visible.",
+  "public_scout_frames": 8,
+  "visible_bunker_confirmations": 0,
+  "capture_verified": false,
+  "garrison_verified": false,
+  "save_continuity_verified": false,
+  "terminal_error": "No current visible Bunker within bounded public scouting",
+  "late_approvals": 0,
+  "cleanup_process_matches": [],
+  "gpu_released": true
+}

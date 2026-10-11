@@ -1,0 +1,25 @@
+{
+  "scope": "Exact SDK300 normal map/paid setup and bounded public scouting failures only; not capture/garrison/save acceptance",
+  "attempts": {
+    "01": {
+      "error": "No current visible Bunker within bounded public scouting",
+      "wall_seconds": 657.991727821005,
+      "no_capture_garrison_save_acceptance": true
+    },
+    "02": {
+      "error": "Original45 current public review exhausted",
+      "wall_seconds": 390.4907713289722,
+      "no_capture_garrison_save_acceptance": true
+    }
+  },
+  "root_direct_last_scout_view": true,
+  "source_inspected_next_strategy": "hud.rs minimap_input supports normal Radar-online minimap right-click movement; public map centre/visible markers, no hidden neutral coordinates",
+  "sdk300_is_before_current_live_Hold_fix": true,
+  "files_sha256": {
+    "docs/qa/sdk300-neutral-bunker-scouting-failures/01-last-public-scout.png": "7b7015e774f453ef105c71c8efba329ad98ef6c99455884cd38e573492489323",
+    "docs/qa/sdk300-neutral-bunker-scouting-failures/01-result.json": "bc13bc6b135c9db40cbf73c61a5cd645a799e6973917456af4130f1b8b1ff01f",
+    "docs/qa/sdk300-neutral-bunker-scouting-failures/01-visual-reviewer-summary.json": "158d07f7ab8ee3db2e72e820fd761abe97ac0e27eb7107c97c0d3a5de19e21d7",
+    "docs/qa/sdk300-neutral-bunker-scouting-failures/02-result.json": "8a8b4b96940e16e9c67bc78c681f494ba88aa3cb8db57ab5cbf5dcec209d3ee9",
+    "docs/qa/sdk300-neutral-bunker-scouting-failures/02-visual-reviewer-summary.json": "ff3609f06b571d8f42307add44ec16cda6e8bfbebc34a34f88e9cadeb21f0201"
+  }
+}
