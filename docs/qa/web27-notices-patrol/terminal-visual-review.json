@@ -1,0 +1,58 @@
+{
+  "bounded_visual_pass": true,
+  "scope": "Normal browser OWN Drone selection/enabled Patrol card/terrain RMB; sustained recurrent visible movement and turn across17 actual frames; paused transient notice expiry only. No ECS/actor-pose/Patrol-component/Hold or whole-game acceptance.",
+  "motion_images_directly_reviewed": 17,
+  "visible_motion_finding": "Same selected Drone visibly moves relative to stationary HQ across all17 frames. Body orientation changes from earlier frames to11 onward, with route line swapping visible endpoints. Recurrent travel/return is visible; fixed objective banner overlaps airborne body in some frames.",
+  "notices_directly_reviewed": [
+    "03-current-notices.png",
+    "04-expired-notices.png"
+  ],
+  "visible_notice_finding": "Saving is desktop-only and Tactical pause orders still accepted F10 resumes visible before; both gone after7.5wall while actual fresh observed paused game clock equal.",
+  "paused_clock": {
+    "before": 12.19340705871582,
+    "after": 12.19340705871582,
+    "observer_fresh_actual_mouse_events": true,
+    "expected_save_notice": "Saving is desktop-only",
+    "browser_quicksave": false
+  },
+  "actual_browser_closed": true,
+  "browser_page_errors": [],
+  "actual_node_exit": 0,
+  "actual_driver_exit": 0,
+  "actual_supervisor_exit": 0,
+  "wall_seconds": 80.97,
+  "actual_png_sha256": {
+    "00-menu.png": "1c61d2dd393b755cdf1e3bfbad84db7e8d61af521cc374ae727301d0cc43b26c",
+    "01-setup.png": "5e8ebd62753cf55839e6f97aaca6cb4ee3a42f477bacd0f69d589750040b4789",
+    "02-match.png": "ff3dbd35546c014559efa9503bc2d6565c58ccab0ee45f8101b2c5dbac876a80",
+    "03-current-notices.png": "1a64f35b68753846dd7fc4d2f9864a7036cdd5ea8b3463c3f8262d2724a7ee4e",
+    "04-expired-notices.png": "4b67e5d538fc0212dfd902d8845186d66b887223910d88bed5fe5aa6858dc7b8",
+    "05-before-Drone-selection.png": "e9c2d4ba13a2498135e095f157559781eb8a62303db74fd25603d4ba4ff024a0",
+    "06-selected-Drone.png": "11124957c28d3505c65dd6e3b2b0aa53ef88da9557025a6eaeb24cf5ee31ff43",
+    "07-Patrol-mode.png": "ee8581df904473d85e5e85285f73ce765966f784fc8d910cdc8309819fca0e80",
+    "08-motion-00.png": "0b3e0da833d07b8f0103fcf47f00a42f2cf6223e19f1c0c6175bde2b2e916675",
+    "08-motion-01.png": "fe1b33fb122e70fc149f10d3dc323a7115196b62814ea433810da6e67ced98df",
+    "08-motion-02.png": "994f17f29d6b0499c77667cece4e4dd9352fa9c2b32bbda361058d72ebbeeef9",
+    "08-motion-03.png": "f18e2bbbbbce76c2e974a32de77c6a2cb9648344f901e1a992654544eb7fc105",
+    "08-motion-04.png": "6dfd7cad060572a1565ea08c9a2c3edd36b2a9e5a50f0b10e0561bfdd4112f55",
+    "08-motion-05.png": "27c802d33bbd13cb433cee3f7ef0c2c0d2e5cbb4bc1b3a385e1a5fd632aad28c",
+    "08-motion-06.png": "427928277e42eda7f5428784fb71edb206e1ae83f52f71622cbcda94ed468a1a",
+    "08-motion-07.png": "6cc503055e7fa84d8937c5e3b55ab72dc9b09f8c018057cd2f714de060ec1238",
+    "08-motion-08.png": "d2a46e9b621a7fdf00509aeb852b2e849069d15cee0b686b9e63007a50b0a446",
+    "08-motion-09.png": "32ff4b673940d8ea382c9c5da49d8c4bee631d3444bd483ecb7220e85733e5a4",
+    "08-motion-10.png": "e8b90e7c4fe55ca242a50f382ec8f1e69f9522f6c0c084b1c74b9d8918c6f51b",
+    "08-motion-11.png": "007d2fb7fb304da789318de43004891574bdd55ea7a42d9cf76cf09242620b36",
+    "08-motion-12.png": "faa349d6262ac50001d111435c90dbddc64b373c1f2088f12aba6196fb4bba10",
+    "08-motion-13.png": "2432aa9e309a2a24f44437bfc17a39c36c7fcf27f66b2008b67da2e24fa6dec1",
+    "08-motion-14.png": "5b288461a4d32c7373bc05370a91767c7bf712b50ef8b89afc29c2145bf68470",
+    "08-motion-15.png": "4b7e8a4d5601b9f18e07e0f59062f63d83e929b7a1eef2e0b6a5c05e2fb4d3a7",
+    "08-motion-16.png": "dd831eb77f97f8f584f30df4690fb769be183ebd4a348a5270a568f219417790"
+  },
+  "managed_unit_terminal": "inactive/dead, Result success, ExecMainStatus0, empty ControlGroup",
+  "matching_recipe_browser_or_driver_processes": [],
+  "recipe_GPU_released": true,
+  "original_bounds": [
+    240,
+    30
+  ]
+}

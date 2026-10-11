@@ -1,0 +1,10 @@
+{
+  "actual_driver_exit": 0,
+  "failure": null,
+  "errors": [],
+  "wall_seconds": 80.97,
+  "original_wall_seconds": 240,
+  "normal_browser_closed": true,
+  "visual_adjudication_pending": true,
+  "scope": "Physical offline inputs/ownselection/card/dirtyclock; no offline ECS/Patrolflag/position proof"
+}

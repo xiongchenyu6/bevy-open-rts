@@ -63,7 +63,12 @@ A bounded regression or an older package cannot establish final release readines
   same Worker, compact foot arcs, no huge ring, empty browser errors and
   supervisor/node/driver exit0 in36.132s
   ([actual selection proof](qa/web27-worker-selection-review.json)). Broader
-  browser operation and public deployment remain unverified.
+  Long-Patrol visual review also passes all17 motion frames; transient notices
+  disappear after7.5 wall seconds with paused clock unchanged, errors empty
+  and all browser exits0 in80.97s
+  ([bounded Patrol/notice proof](qa/web27-notices-patrol-review.json)). Some
+  airborne body frames overlap the objective banner; broader UI readability,
+  exact browser distances, other player flows and public deployment remain open.
 - Wasm26 builds successfully from the native300 source pin. Its actual Wasm
   bytes, input manifest and641 non-web frozen inputs are independently rehashed
   ([browser build proof](qa/web26-route-patrol-shipping-build-review.json)).
