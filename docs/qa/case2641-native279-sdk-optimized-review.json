@@ -1,0 +1,45 @@
+{
+  "scope": "Same frozen native279 core officialSDK optimized audit exact2641; not whole matrix or player acceptance",
+  "config": {
+    "difficulties": [
+      "easy",
+      "beginner"
+    ],
+    "factions": [
+      "chaos",
+      "chaos"
+    ],
+    "map": "big_arena",
+    "max_seconds": 600,
+    "spawn_slots": [
+      6,
+      1
+    ]
+  },
+  "actual_exit": 0,
+  "simulation_seconds": 277.0872497558594,
+  "wall_seconds": 37.30387131898897,
+  "original_limits": {
+    "simulation": 600,
+    "wall": 180
+  },
+  "starting_resources": {
+    "crystal": 16,
+    "ore": 32
+  },
+  "startup_loadout": "GodotSkirmish",
+  "winning_teams": [
+    0
+  ],
+  "binary_sha256": "00d8da869811548b26c2ab87728f8235227a76826a7d272372e2f242c6edb3dc",
+  "debug_failures_retained": [
+    "docs/qa/case2641-current267-unthrottled-repeat-review.json",
+    "docs/qa/case2641-native279-progress-review.json"
+  ],
+  "interpretation": "Optimized same-core case finishes within unchanged limits. Debug wall timeout alone did not establish an infinite match. Unreachable construction contact remains a separate unproven planner issue; no claim it is repaired.",
+  "evidence_sha256": {
+    "target/native279-sdk-optimized-case2641-20261011/result.json": "cda8ffdbc59d659715ae3c593f8e9a0ebd630c61fbeb4db1bc96d3e8b0a41780",
+    "target/native279-sdk-optimized-case2641-20261011/status.json": "c1b50548d1a2eb356d31f56492425524482c9cf9c9ba66cdf06dc7178d6a4614",
+    "target/native279-sdk-optimized-case2641-20261011/runtime.log": "f9059539877d9f25247e0b16a2a6fcc5336e3882365be9cec91b348c779116ed"
+  }
+}

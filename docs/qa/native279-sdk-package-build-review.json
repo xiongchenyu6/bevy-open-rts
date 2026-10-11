@@ -1,0 +1,31 @@
+{
+  "scope": "Native279 officialSDK optimized archive build/integrity only; new player/render acceptance pending",
+  "native_pin": "target/ai-ground-focus-shared-20261011/pin.json",
+  "full_native_tests": {
+    "passed": 279,
+    "failed": 0,
+    "ignored": 1
+  },
+  "frozen_source_files": 743,
+  "assets": 332,
+  "build_actual_exit": 0,
+  "clean_actual_exit": 0,
+  "build_wall_seconds": 454.8470802340016,
+  "raw_binary_sha256": "e1a34c25839d867f198c1d5525269204394a03f2265fdb36d198135d2f3c93e9",
+  "archive_sha256": "f4aa63636fef9ce24bff6845a4bd651f998454ac0db189a9e5aef91e6980e60e",
+  "installed_binary_sha256": "2ea8f248f092ebabede4b1bb299d3bc446604e8ea62534c4a5dc938afc4c161a",
+  "installed_files": 381,
+  "package_actual_exit": 0,
+  "independent_integrity_exit": 0,
+  "sdk_runtime_notices_restored": true,
+  "root_independent_frozen_and_raw_hash_verification": true,
+  "new_package_runtime_verified": false,
+  "windows_verified": false,
+  "evidence_sha256": {
+    "target/linux-native279-next-steamrt4-sdk-20261011/result.json": "34d09e09af1cf9a35990fc69df88c6ef3ec67b992f8d93d532b58d3e32877aaf",
+    "target/linux-native279-next-sdk-snapshot-20261011/input.json": "9b98325ea4adf729d711a3648d50bdc3fbf84ab81378ec090d859f6994082381",
+    "target/linux-native279-steamrt4-package-20261011/result.json": "f76a1039b74fcb133e89af45ebd5ee04b01bec96d5c826cc4c2db5a88a6640e0",
+    "target/linux-native279-steamrt4-package-20261011/independent-integrity.json": "861610776f261479e50e452ca707461ee3a758a940ceb718b665ff2e89a7eebb",
+    "target/linux-native279-steamrt4-extracted-20261011/ready.json": "1366767febd06689573e2caab5e7927fcf95886e56585697933dc6006fbb867f"
+  }
+}
