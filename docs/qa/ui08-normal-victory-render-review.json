@@ -1,0 +1,29 @@
+{
+  "scope": "Actual normal M1 victory result presentation on exactUI08 package; ongoing six-flow not accepted",
+  "frame_directly_inspected": true,
+  "visible_heading": "Victory",
+  "reason": "Held the line",
+  "visible_time": "04:00",
+  "visible_enemy_unit_kills": 14,
+  "visible_own_losses": {
+    "units": 0,
+    "buildings": 0
+  },
+  "visible_bank": {
+    "ore": 38,
+    "crystal": 24
+  },
+  "statistics_readable_against_darker_panel": true,
+  "NextMission_visible": true,
+  "normal_same_process_next_to_m2": true,
+  "same_runtime_pid": 1171304,
+  "frame": "target/sdk285-ui08-six-mission-normal-20261011-05/01/natural-result.png",
+  "frame_sha256": "0a60d3bc9835cec60bc07160ed8ccd9ed1295a637af0f1baf65ac1f6e5527b9a",
+  "archive_sha256": "94d12dee34104cda0d27b1801a9f8da7342db840e6e428d88cdab087c5386d4e",
+  "binary_sha256": "6cd96f98f0c11f33dc66e8197a44b49f6bc81895f141ae95fd713e6eb7e1c323",
+  "limits": [
+    "Only one actual victory viewport/frame; defeat/otherDPI/windowplatform layouts notaccepted",
+    "Six mission runtime stilllive, no finalnormalexit or prefix6 yet",
+    "CutsceneUITransform correction is later source and not part ofthisarchive"
+  ]
+}
