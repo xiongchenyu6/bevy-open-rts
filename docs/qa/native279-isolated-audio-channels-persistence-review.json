@@ -1,0 +1,178 @@
+{
+  "scope": "Exactnative279 optimizedSDK archive normal channel-volume and fresh-process persistence; privateUbuntu output container, not fullofficialRuntime4/browser/Windows/humanmixing acceptance",
+  "archive_sha256": "f4aa63636fef9ce24bff6845a4bd651f998454ac0db189a9e5aef91e6980e60e",
+  "binary_sha256": "2ea8f248f092ebabede4b1bb299d3bc446604e8ea62534c4a5dc938afc4c161a",
+  "container_actual_exit": 0,
+  "wall_seconds": 448.2546231430024,
+  "original_deadline": 600,
+  "normal_game_exits": [
+    [
+      "76",
+      "0"
+    ],
+    [
+      "477",
+      "0"
+    ],
+    [
+      "629",
+      "0"
+    ],
+    [
+      "861",
+      "0"
+    ],
+    [
+      "1093",
+      "0"
+    ]
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "root_direct_options_reviews": {
+    "all_zero": {
+      "Master": 100,
+      "Music": 0,
+      "SFX": 0,
+      "Voice": 0
+    },
+    "music_only": {
+      "Master": 100,
+      "Music": 100,
+      "SFX": 0,
+      "Voice": 0
+    },
+    "voice_only": {
+      "Master": 100,
+      "Music": 0,
+      "SFX": 0,
+      "Voice": 100
+    },
+    "sfx_only": {
+      "Master": 100,
+      "Music": 0,
+      "SFX": 100,
+      "Voice": 0
+    },
+    "all_restored": {
+      "Master": 100,
+      "Music": 100,
+      "SFX": 100,
+      "Voice": 100
+    }
+  },
+  "normal_inputs": "Options plus/minus clicks only; normal fresh Skirmish and ownWorker selection/right movement; normal window close/restart. No preference edits, state grants or setters.",
+  "private_output_only": true,
+  "no_host_microphone_or_desktop_capture": true,
+  "sole_playback_client_matches_game_pid_each_phase": true,
+  "closed_pcm_verifier_exit": 0,
+  "metrics": {
+    "all_zero-idle": {
+      "duration_seconds": 5.04525,
+      "nonzero_samples": 0,
+      "rms": 0.0,
+      "clipped_samples": 0,
+      "sha256": "295a6792b8346a80d1be06a264e6e2cf84a1febb35754b8b3bb702cb003b27ee"
+    },
+    "all_zero-cues": {
+      "duration_seconds": 6.592854166666666,
+      "nonzero_samples": 0,
+      "rms": 0.0,
+      "clipped_samples": 0,
+      "sha256": "ccf7c17a3879e2e98928cf935a1c6c34f57f7198c8e5b33dd1c93fcd6c22aff6"
+    },
+    "music_only-idle": {
+      "duration_seconds": 5.014270833333334,
+      "nonzero_samples": 476046,
+      "rms": 94.96775877202933,
+      "clipped_samples": 0,
+      "sha256": "deba75279de61dd818855e6b223a5d17445cf082f0a1cf18c19d383a0ad3b2b6"
+    },
+    "music_only-cues": {
+      "duration_seconds": 6.592875,
+      "nonzero_samples": 625916,
+      "rms": 93.81809713162305,
+      "clipped_samples": 0,
+      "sha256": "96d79660c8cbc7ad9ca656c842fa665036d0058108423e142fdd5ec654ae500d"
+    },
+    "voice_only-idle": {
+      "duration_seconds": 5.014270833333334,
+      "nonzero_samples": 0,
+      "rms": 0.0,
+      "clipped_samples": 0,
+      "sha256": "cd4a60306d7effde6ec2bbbf770adda58a44bc7123ecde955631c31196b94e24"
+    },
+    "voice_only-cues": {
+      "duration_seconds": 6.592854166666666,
+      "nonzero_samples": 174222,
+      "rms": 1412.3095167437114,
+      "clipped_samples": 0,
+      "sha256": "e763904cacbf705a5489fa6f61e2829007c4a1334965a9d5add187f7d5cb097e"
+    },
+    "sfx_only-idle": {
+      "duration_seconds": 4.983333333333333,
+      "nonzero_samples": 0,
+      "rms": 0.0,
+      "clipped_samples": 0,
+      "sha256": "e4b6d1a68b8149231d44e90ddb1a8d5e6df84c5d6229c6b522feaf201a60fe60"
+    },
+    "sfx_only-cues": {
+      "duration_seconds": 6.6237916666666665,
+      "nonzero_samples": 20844,
+      "rms": 29.88872978619101,
+      "clipped_samples": 0,
+      "sha256": "c2b367de9ae1a04264ea0fbce99f26607dd14fdff04ec22d6ac9e4b35fd2ad59"
+    },
+    "all_restored-idle": {
+      "duration_seconds": 5.014291666666667,
+      "nonzero_samples": 476048,
+      "rms": 94.96932304671934,
+      "clipped_samples": 0,
+      "sha256": "e8a161899285ca8260182320992fe75efeaaed696c6ef4d30a8fe1179709ddd4"
+    },
+    "all_restored-cues": {
+      "duration_seconds": 6.6238125,
+      "nonzero_samples": 630712,
+      "rms": 1412.4791123104499,
+      "clipped_samples": 0,
+      "sha256": "1a634606857ee5896749f3779b8de3839519475b4531177f85b5f5ed77cf32fe"
+    }
+  },
+  "previous_failure_preserved": "docs/qa/sdk267-audio-channels-reset-failure-review.json",
+  "human_listening_verified": false,
+  "all_natural_triggers_verified": false,
+  "full_runtime4_audio_verified": false,
+  "evidence_sha256": {
+    "target/sdk279-audio-channels-20261011-01/container-result.json": "7772f9d228f19f80506ada308d5fe4619f756b9f74c18148f2a494a7ac1f51a5",
+    "target/sdk279-audio-channels-20261011-01/channel-metrics.json": "75c1ed20d762f5577a588abf24ec179622aaeb240c44ba1a3c7ced85dc0bc76c",
+    "target/sdk279-audio-channels-20261011-01/game-exits.txt": "7283d6d4a53c116984c65b0d699ec805e5b23dbe07bdfdb471e490c87c8c95ac",
+    "target/sdk279-audio-channels-20261011-01/control.log": "dffebbdaa46e72faa3ac5634915af1bee23550db04fdcb1a6ff994980c97e04c",
+    "target/sdk279-audio-channels-20261011-01/user-data/bevy-open-rts/preferences.ron": "5631caed1130c4ce81e337e2a95894e55a3bf8d9dadd77598335f5c3c2a70591",
+    "target/sdk279-audio-channels-20261011-01/all_zero-options.png": "b5715748ebcdd2827e9d01003caa14b1ba511f3e7c7aeb3f96c2133dbf7d41dd",
+    "target/sdk279-audio-channels-20261011-01/music_only-options.png": "8dcea3359b957b07cc637915db003d4be75b538149e78ee1c7924f511acc0601",
+    "target/sdk279-audio-channels-20261011-01/voice_only-options.png": "eadca90a76194292ec8a06639517e02ecefb4ca2f8f8edbf282f8a93414c08dd",
+    "target/sdk279-audio-channels-20261011-01/sfx_only-options.png": "4086e012ff677c6a14952731a03d5d65298f0778865aa0387ba0f91a6b8741ca",
+    "target/sdk279-audio-channels-20261011-01/all_restored-options.png": "515f650a26a20b606d9935221d6841f641ae968fb9eb5df5e900fbb723955a49",
+    "target/sdk279-audio-channels-20261011-01/audio/all_zero-idle.wav": "295a6792b8346a80d1be06a264e6e2cf84a1febb35754b8b3bb702cb003b27ee",
+    "target/sdk279-audio-channels-20261011-01/audio/all_zero-idle-clients.txt": "d86dd88799e4035615c040b9281ec60649de935cec275abc2d9665a53e2ddb8c",
+    "target/sdk279-audio-channels-20261011-01/audio/all_zero-cues.wav": "ccf7c17a3879e2e98928cf935a1c6c34f57f7198c8e5b33dd1c93fcd6c22aff6",
+    "target/sdk279-audio-channels-20261011-01/audio/all_zero-cues-clients.txt": "2d41b28e2e54ca4608ab53efae6c40cfd98d33e6d8472d19ffd274ce4b2ac915",
+    "target/sdk279-audio-channels-20261011-01/audio/music_only-idle.wav": "deba75279de61dd818855e6b223a5d17445cf082f0a1cf18c19d383a0ad3b2b6",
+    "target/sdk279-audio-channels-20261011-01/audio/music_only-idle-clients.txt": "e53b86c4359244ac9e580fb096873cf410091cf9f7b675c4dbf511aad2c1c915",
+    "target/sdk279-audio-channels-20261011-01/audio/music_only-cues.wav": "96d79660c8cbc7ad9ca656c842fa665036d0058108423e142fdd5ec654ae500d",
+    "target/sdk279-audio-channels-20261011-01/audio/music_only-cues-clients.txt": "5ef74e39ed65291ee99bcd349c6a3af9396ec637b247b27a4d0cbdb0795996f0",
+    "target/sdk279-audio-channels-20261011-01/audio/voice_only-idle.wav": "cd4a60306d7effde6ec2bbbf770adda58a44bc7123ecde955631c31196b94e24",
+    "target/sdk279-audio-channels-20261011-01/audio/voice_only-idle-clients.txt": "46b36122cc156f04b8e072902d857c8a36848071f94f744c87a59adf48dd7087",
+    "target/sdk279-audio-channels-20261011-01/audio/voice_only-cues.wav": "e763904cacbf705a5489fa6f61e2829007c4a1334965a9d5add187f7d5cb097e",
+    "target/sdk279-audio-channels-20261011-01/audio/voice_only-cues-clients.txt": "2f8345777632a42219267155e77e0ce636c5695f9ea9931ecc13241284dcca95",
+    "target/sdk279-audio-channels-20261011-01/audio/sfx_only-idle.wav": "e4b6d1a68b8149231d44e90ddb1a8d5e6df84c5d6229c6b522feaf201a60fe60",
+    "target/sdk279-audio-channels-20261011-01/audio/sfx_only-idle-clients.txt": "5b7781c2a6f994043646a27295c69abc291e4b589b70599929eac6edb32e4171",
+    "target/sdk279-audio-channels-20261011-01/audio/sfx_only-cues.wav": "c2b367de9ae1a04264ea0fbce99f26607dd14fdff04ec22d6ac9e4b35fd2ad59",
+    "target/sdk279-audio-channels-20261011-01/audio/sfx_only-cues-clients.txt": "6d97f642293fe9ed45c79428a2d08ace0eb56b7b82bf5d7f30954ae129fc7a22",
+    "target/sdk279-audio-channels-20261011-01/audio/all_restored-idle.wav": "e8a161899285ca8260182320992fe75efeaaed696c6ef4d30a8fe1179709ddd4",
+    "target/sdk279-audio-channels-20261011-01/audio/all_restored-idle-clients.txt": "9ce5904eee3ad28dd24ed6cda449b54a4e2b3aec15d88ddf5ce10b75c7387613",
+    "target/sdk279-audio-channels-20261011-01/audio/all_restored-cues.wav": "1a634606857ee5896749f3779b8de3839519475b4531177f85b5f5ed77cf32fe",
+    "target/sdk279-audio-channels-20261011-01/audio/all_restored-cues-clients.txt": "e1047e03b020a61c9e099251cd5ab576747b541b20ee1843dd473860bf607ffe"
+  }
+}
