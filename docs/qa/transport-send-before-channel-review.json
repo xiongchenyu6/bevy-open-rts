@@ -1,0 +1,27 @@
+{
+  "scope": "Source-level guard for packets to peers without established data channels; actual fixed-Wasm TURN recovery still pending",
+  "actual_diagnostic_exit": 1,
+  "original_failure_preserved": "target/web20-real-turn-guest-reconnect-20261011-01",
+  "diagnostic_evidence": "target/web20-real-turn-guest-reconnect-20261011-02",
+  "first_panic_source": "matchbox_socket-0.14.0/src/webrtc_socket/mod.rs:279:30",
+  "cause": "Recovery Hello was queued before the replacement peer data channel existed. Matchbox try_send accepted the queue item, then its asynchronous message loop panicked at the missing peer channel expectation.",
+  "correction": "WebRtcTransport refuses reliable and snapshot sends until the destination appears in connected_peers. Normal established peer sends remain supported.",
+  "regression": {
+    "red_actual_exit": 101,
+    "red_failure": "Reliable send incorrectly returned success for a real new transport with zero connected peers",
+    "green_unit_tests": 8,
+    "green_actual_exit": 0,
+    "check_actual_exit": 0,
+    "real_local_two_peer_integration_passed": 1,
+    "deployed_integration_ignored": 1,
+    "integration_actual_exit": 0
+  },
+  "proof_logs": {
+    "check.log": "d14ed9925e5adfd502e8e6eb9e50829603a8d71469ff11798a0bd3488741afb6",
+    "red.log": "c99774d12b6073791634a9cf4df07163ffc0ddabd3bc149a40f443ed89cde98b",
+    "integration.log": "5e489bd3f685cdfa4dc5d848d093b889793b8820fea95fcec748e3cda796eaca",
+    "green.log": "be97867696e8bb50fc8f98c513734a7f6b98bb93cbd75dae97e43431cfed1520"
+  },
+  "real_TURN_recovery_verified_after_fix": false,
+  "all_release_gates_remain_open": true
+}

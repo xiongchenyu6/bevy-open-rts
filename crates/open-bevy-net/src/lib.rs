@@ -544,6 +544,12 @@ impl WebRtcTransport {
     }
 
     fn send(&mut self, channel: usize, peer: PeerId, payload: Vec<u8>) -> Result<(), ClientError> {
+        // Matchbox queues packets before validating the peer's data channel.
+        // A reconnect Hello sent during ICE gathering would otherwise panic
+        // asynchronously when its message loop consumes the queued packet.
+        if !self.socket.connected_peers().any(|connected| connected == peer) {
+            return Err(ClientError::TransportClosed);
+        }
         self.socket
             .channel_mut(channel)
             .try_send(Packet::from(payload), peer)
@@ -643,6 +649,30 @@ mod tests {
         assert_eq!(pairs["name"], "玩家 One");
         assert_eq!(pairs["ticket"], "secret&other=value");
         assert_eq!(pairs["build_id"], "0.1.0+abc");
+    }
+
+    #[test]
+    fn transport_rejects_packets_before_the_peer_channel_exists() {
+        let config = TransportConfig {
+            signaling_url: "ws://127.0.0.1:1/v1/signal/game/1/ABC123".to_string(),
+            player_name: PlayerName::new("Player").unwrap(),
+            role: PeerRole::Player,
+            build_id: BuildId::new("test-build").unwrap(),
+            ticket: None,
+            ice_servers: Vec::new(),
+            reconnect_attempts: Some(1),
+        };
+        let (mut transport, _message_loop) = WebRtcTransport::connect(config).unwrap();
+        let peer = PeerId("00000000-0000-0000-0000-000000000001".parse().unwrap());
+        assert_eq!(transport.connected_peers().count(), 0);
+        assert!(matches!(
+            transport.send_reliable(peer, vec![1]),
+            Err(ClientError::TransportClosed)
+        ));
+        assert!(matches!(
+            transport.send_snapshot(peer, vec![2]),
+            Err(ClientError::TransportClosed)
+        ));
     }
 
     #[test]
