@@ -1,0 +1,45 @@
+{
+  "scope": "Exact old244 timeout3276 recheck on sealed native279 optimized SDK audit; not final nav/host-pin core or player acceptance",
+  "actual_exit": 0,
+  "wall_seconds": 5.932241251983214,
+  "clock_seconds": 179.34268188476562,
+  "winner": [
+    1
+  ],
+  "config": {
+    "difficulties": [
+      "beginner",
+      "easy"
+    ],
+    "factions": [
+      "alliance",
+      "alliance"
+    ],
+    "map": "crossfire",
+    "max_seconds": 600,
+    "spawn_slots": [
+      3,
+      0
+    ]
+  },
+  "unchanged_limits": {
+    "simulation_seconds": 600,
+    "wall_seconds": 180,
+    "ore": 32,
+    "crystal": 16,
+    "startup_loadout": "GodotSkirmish"
+  },
+  "binary_sha256": "00d8da869811548b26c2ab87728f8235227a76826a7d272372e2f242c6edb3dc",
+  "inputs_unchanged": true,
+  "evidence": {
+    "target/native279-sdk-optimized-case3276-20261011/status.json": "b293ca5407624e948b565fd6bace179b0a5e8f7e7b9c0f2ed3bff8f530dd6fee",
+    "target/native279-sdk-optimized-case3276-20261011/result.json": "e4d14db0228b9ee2d91622824cdcb95799f678d09db1ffb4c4d5bf626ef20436",
+    "target/current244-all-starts-20261010/3276/status.json": "243d5f4710aef03c2eb9cd585459f1e83788ff7117f601dbd330920d61d1c482"
+  },
+  "original_failure": {
+    "classification": "wall_timeout",
+    "wall_seconds": 180.01694220298668,
+    "retained": true
+  },
+  "interpretation": "Optimized279 finishes unchanged case within original limit; no claim debug244 failure repaired or final current whole matrix accepted"
+}
