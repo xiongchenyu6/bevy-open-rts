@@ -1,0 +1,47 @@
+{
+  "scope": "Unarmed Patrol product correction; actual scheduled regressions/check only, new shipping/runtime acceptance pending",
+  "actual_old292_runtime": "target/sdk292-solo-drone-patrol-20261011-02/patrol-observation.json",
+  "old_runtime_stationary_seconds": 5.395628929138184,
+  "origin": [
+    -17,
+    1.5,
+    -20
+  ],
+  "destination": [
+    -11.000982,
+    0,
+    -16.995739
+  ],
+  "implementation": "Optional weapon in shared updater. Only armed units engage compatible visible enemies; unarmed units execute unchanged patrol movement and reversal logic.",
+  "RED": {
+    "actual_exit": 101,
+    "actual_root_compile": true,
+    "full_schedule_Running_frames": 180,
+    "stationary": true
+  },
+  "preserved_GREEN01_failure": "Initial fixture required endpointdistance<.5 despite existing2m PATROL_TURN_DISTANCE. ActualfixedDrone moved; correctedfixture observes realdirection flips at existing2m and >4m outbound trajectory with return, no productrange/timechange.",
+  "GREEN02": {
+    "actual_exit": 0,
+    "focus_passed": 1,
+    "endpoint_passed": 8,
+    "EMP_passed": 3,
+    "contextual_harvest_passed": 1,
+    "lib_main_capture_check": 0,
+    "wall_seconds": 75.63219881057739,
+    "Drone_bothlegs_no_teleport_height_preserved": true,
+    "armed_HMG_visible_ground_enemy_engagement": true
+  },
+  "evidence_sha256": {
+    "target/unarmed-patrol-red-20261011/red.log": "3281bd47123f366beadfc0db753593970351192258889642af166385ab2f80df",
+    "target/unarmed-patrol-red-20261011/result.json": "47435e0aad83261c0a28b03f2311f0f23b65b554daa8077d6fe5c36dbde1b0e5",
+    "target/unarmed-patrol-green02-20261011/focused.log": "5c1c5e8e309254b37a699fa6d670f526fc33f97a023d1d8f5ff554eda66222f0",
+    "target/unarmed-patrol-green02-20261011/movement.log": "8fba2ddc7025980594b8665bc3182b8c4d48097856198e56b1342d5e0a093d28",
+    "target/unarmed-patrol-green02-20261011/emp.log": "4c2e7bcc061bd68bda93c2fef159257ee4ff87b107d69256f87a91a6f841e6b2",
+    "target/unarmed-patrol-green02-20261011/result.json": "85c35d71b4a67ae59cb46e5fb981d946e4847f7b12bcb894b5911ec5910f2301"
+  },
+  "pending": [
+    "Full suite/new3bins pin",
+    "New officialSDK/Wasm artifacts",
+    "Actual normal Patrol on new package; old399/new292 preserved unchanged"
+  ]
+}

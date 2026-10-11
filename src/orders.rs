@@ -2704,7 +2704,7 @@ pub(crate) fn update_attack_move_and_patrol_orders(
         Entity,
         &Transform,
         &Team,
-        &Weapon,
+        Option<&Weapon>,
         &VisionRadius,
         Option<&Unit>,
         Option<&AttackMoveOrder>,
@@ -2762,15 +2762,17 @@ pub(crate) fn update_attack_move_and_patrol_orders(
             } else {
                 patrol_order.origin
             };
-            if let Some(enemy) = nearest_enemy_in_range(
-                *team,
-                transform.translation,
-                vision.0,
-                weapon.can_attack_air,
-                weapon.can_attack_ground,
-                &target_snapshots,
-                &relations,
-            ) {
+            if let Some(enemy) = weapon.and_then(|weapon| {
+                nearest_enemy_in_range(
+                    *team,
+                    transform.translation,
+                    vision.0,
+                    weapon.can_attack_air,
+                    weapon.can_attack_ground,
+                    &target_snapshots,
+                    &relations,
+                )
+            }) {
                 commands
                     .entity(entity)
                     .try_insert(AttackOrder {
@@ -2807,15 +2809,17 @@ pub(crate) fn update_attack_move_and_patrol_orders(
         }
 
         if let Some(attack_move_order) = attack_move {
-            if let Some(enemy) = nearest_enemy_in_range(
-                *team,
-                transform.translation,
-                vision.0,
-                weapon.can_attack_air,
-                weapon.can_attack_ground,
-                &target_snapshots,
-                &relations,
-            ) {
+            if let Some(enemy) = weapon.and_then(|weapon| {
+                nearest_enemy_in_range(
+                    *team,
+                    transform.translation,
+                    vision.0,
+                    weapon.can_attack_air,
+                    weapon.can_attack_ground,
+                    &target_snapshots,
+                    &relations,
+                )
+            }) {
                 commands
                     .entity(entity)
                     .try_insert(AttackOrder {

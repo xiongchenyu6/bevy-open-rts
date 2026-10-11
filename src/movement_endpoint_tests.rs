@@ -486,3 +486,95 @@ fn mixed_attack_move_moves_unarmed_drone_without_changing_armed_order() {
     assert!(app.world().get::<AttackMoveOrder>(drone).is_none());
     assert_eq!(end.y, start.y, "No airborne height change");
 }
+
+#[test]
+fn unarmed_drone_patrol_traverses_both_legs_in_real_schedule() {
+    let scene = r#"[[1,"CommandCenter","Player(0)",[20,0,20],2,30,null],[2,"CommandCenter","Player(1)",[-20,0,20],2,30,null],[3,"Drone","Player(0)",[-17,1.5,-20],0.6,6,null],[4,"Worker","Player(1)",[-14,0.05,-20],0.6,6,null]]"#;
+    let (mut app, keys) = measured_app(scene);
+    let drone = keys[&3];
+    let origin = Vec3::new(-17.0, 1.5, -20.0);
+    let destination = Vec3::new(-11.000982, 0.0, -16.995739);
+    let unit = app.world().get::<Unit>(drone).unwrap();
+    assert!(unit_supports_patrol(unit));
+    assert!(!unit_supports_attack_move(unit));
+    app.world_mut().entity_mut(drone).insert((
+        VisionRadius(10.0),
+        PatrolOrder {
+            origin,
+            destination,
+            moving_to_destination: true,
+        },
+    ));
+    let mut reached_destination = false;
+    let mut returned_to_origin = false;
+    let mut previous = origin;
+    for tick in 0..180 {
+        app.update();
+        assert_eq!(
+            app.world().resource::<MatchState>().phase,
+            MatchPhase::Running
+        );
+        let p = app.world().get::<Transform>(drone).unwrap().translation;
+        assert!(
+            xz_distance(p, previous) <= 4.0 / 30.0 + 0.01,
+            "No teleport at tick{tick}"
+        );
+        assert_eq!(p.y, origin.y);
+        assert!(
+            app.world().get::<AttackOrder>(drone).is_none(),
+            "Unarmed patrol must not attack nearby enemy"
+        );
+        let patrol = app.world().get::<PatrolOrder>(drone).unwrap();
+        if !reached_destination && !patrol.moving_to_destination {
+            assert!(xz_distance(p, destination) <= PATROL_TURN_DISTANCE + 4.0 / 30.0);
+            assert!(
+                xz_distance(p, origin) > 4.0,
+                "Actual outbound travel required"
+            );
+            reached_destination = true;
+        }
+        if reached_destination && patrol.moving_to_destination && !returned_to_origin {
+            assert!(xz_distance(p, origin) <= PATROL_TURN_DISTANCE + 4.0 / 30.0);
+            returned_to_origin = true;
+        }
+        previous = p;
+    }
+    assert!(
+        reached_destination && returned_to_origin,
+        "Actual unarmed patrol must traverse both legs, end{previous:?}"
+    );
+    assert!(app.world().get::<PatrolOrder>(drone).is_some());
+}
+
+#[test]
+fn armed_patrol_still_engages_compatible_visible_enemy() {
+    let scene = r#"[[1,"CommandCenter","Player(0)",[20,0,20],2,30,null],[2,"CommandCenter","Player(1)",[-20,0,20],2,30,null],[3,"HeavyMachinegunTrooper","Player(0)",[-17,0.05,-20],0.48,7,null],[4,"Worker","Player(1)",[-14,0.05,-20],0.6,6,null]]"#;
+    let (mut app, keys) = measured_app(scene);
+    let soldier = keys[&3];
+    app.world_mut().entity_mut(soldier).insert((
+        VisionRadius(7.5),
+        Weapon {
+            range: 4.5,
+            damage: 1.0,
+            cooldown: 1.0,
+            cooldown_left: 0.0,
+            splash_radius: 0.0,
+            splash_damage_multiplier: 0.0,
+            structure_damage_multiplier: 1.0,
+            can_attack_air: false,
+            can_attack_ground: true,
+        },
+        PatrolOrder {
+            origin: Vec3::new(-17.0, 0.05, -20.0),
+            destination: Vec3::new(-11.0, 0.0, -17.0),
+            moving_to_destination: true,
+        },
+    ));
+    app.update();
+    assert_eq!(
+        app.world().get::<AttackOrder>(soldier).unwrap().target,
+        keys[&4]
+    );
+    assert!(app.world().get::<MoveOrder>(soldier).is_none());
+    assert!(app.world().get::<PatrolOrder>(soldier).is_some());
+}
