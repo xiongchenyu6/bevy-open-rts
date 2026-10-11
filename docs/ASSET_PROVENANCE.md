@@ -63,8 +63,10 @@ metadata are recorded under `official_kenney_archives` and
 
 ## Generated content
 
-- Armor albedo: [ASSETS.md](../ASSETS.md) records built-in imagegen generation,
-  date and use for `textures/armor-painted-steel.png`.
+- Current armor albedo: `assets/textures/armor-matte-original-v2.png` has
+  built-in imagegen prompts and hashes in `art/armor-surface/candidates-v2/`.
+  [ASSETS.md](../ASSETS.md) records current use and bounded verification; the
+  replaced painted-steel texture is historical.
 - Current campaign art: all six `assets/campaign/mission_0N-v2.jpg` files
   derive from the original built-in imagegen PNGs recorded under
   `art/campaign/candidates/`. Encoding commands and source/runtime hashes are in

@@ -2,7 +2,7 @@
 
 Unsubmitted development draft, checked against the [Steamworks Content Survey
 documentation](https://partner.steamgames.com/doc/gettingstarted/contentsurvey)
-on 2026-10-10. Steam distinguishes content produced during development from
+on 2026-10-12. Steam distinguishes content produced during development from
 content generated while the product runs; disclosure does not replace the
 distribution rights and marketing review.
 
@@ -10,10 +10,10 @@ distribution rights and marketing review.
 
 Proposed description:
 
-> AI tools were used during development for campaign briefing illustrations,
-> prerecorded unit and announcer voices, and some UI artwork. Coding assistants
-> also helped implement the game and author vector UI graphics. These outputs
-> are reviewed and packaged as fixed game content.
+> AI tools were used during development to create campaign illustrations,
+> the menu background, an armor texture, prerecorded unit and announcer voices,
+> and UI artwork. These are packaged as fixed content; the game does not
+> generate images, voices or other generative AI content during play.
 
 The installed inventory includes six original campaign illustrations and 32
 fixed English/Chinese voice files. Native entity portraits are renders of the
@@ -27,6 +27,13 @@ in `art/campaign/`, `art/voice/`, `art/portraits/`, `art/menu-background/` and
 `art/cursors/`. Six unused legacy VFX textures were retired from runtime assets.
 These development checks do not establish final-package acceptance or complete
 provider-term and distribution-rights review.
+
+The current promotional illustration and capsule derivatives also use generated
+art, recorded in `art/steam/keyart-v1/` and `art/steam/capsules-v2/`. They remain
+unpublished and are illustrations, not gameplay captures. Valve focuses this
+survey section on content players consume, rather than developer efficiency
+tools. Keep coding-tool history in provenance records; reconcile any AI-assisted
+player-facing narrative and localization before submitting the final description.
 
 ## Live-generated AI content
 

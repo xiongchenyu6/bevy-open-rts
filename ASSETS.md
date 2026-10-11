@@ -1,15 +1,15 @@
 # Generated Art Assets
 
-## Battlefield material pass
+## Current battlefield material
 
-- `assets/textures/armor-painted-steel.png`: generated neutral matte armor albedo,
-  1254 × 1254 PNG. Fine scratches, dust and coating wear; no baked lighting
-  or panel borders. Generated with the built-in imagegen tool on 2026-10-06.
-- Used on neutral imported armor and procedural vehicle Paint materials.
-  Repeating linear sampler supports kit UVs beyond 0–1; startup loading retains
-  the handle before interactive matches begin.
-- Verified in real match captures across all three factions, rain and sandstorm.
-  Final proof media is recorded with the same shared scene and real unit orders.
+- `assets/textures/armor-matte-original-v2.png`: 1254 × 1254 PNG, generated
+  and smoothed with the built-in imagegen tool. Prompts and source/output hashes
+  are recorded in `art/armor-surface/candidates-v2/provenance.json`.
+- Used on imported armor and procedural vehicle Paint materials. The runtime
+  file matches the active asset ledger and verified SDK305 package.
+- A bounded headquarters/Worker/Barracks sample passed; broader vehicle,
+  faction/weather coverage and commercial-rights review remain open. See
+  `docs/ASSET_PROVENANCE.md` for current scope and historical render evidence.
 
 ## Authored audio lineage pass
 
