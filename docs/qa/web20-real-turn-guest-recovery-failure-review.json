@@ -1,0 +1,76 @@
+{
+  "scope": "Actual two-browser guest signaling loss over full published ICE and nominated real relay-relay route; private native authority, not public backend deployment",
+  "artifact": {
+    "wasm_sha256": "9c95ccc35b38e1a9b23ddc85ccfe8347e99975a6dd09fbb3b6968a8633b4dc10",
+    "backend_sha256": "c61c8a2c601bd6ad0256f068b38b984bf4aa3ae177cb8c2656f9363b26cd5e83",
+    "loss": "guest",
+    "ICE_scope": "FULLpublishedICEServers+forcedrelay;PRIVATElocalauthoritybackend; no publicbackenddeployment",
+    "deadline_seconds": 240,
+    "reconnect_grace_seconds": 30,
+    "no_deployment": true
+  },
+  "actual_exit": 1,
+  "failure": "Guest did not resume within unchanged 30-second recovery bound; RuntimeError wasm trap observed",
+  "driver": {
+    "actual_driver_exit": 1,
+    "error": "Error: Actual game resume missed unchanged30second grace",
+    "real_contexts": 2,
+    "roles": [
+      "host",
+      "p1"
+    ],
+    "events": 0,
+    "diagnostics": [
+      {
+        "role": "p1",
+        "name": "RuntimeError",
+        "code": "wasm_trap",
+        "source_file_only": "wasm-function[22332]"
+      }
+    ],
+    "normal_browser_close": true,
+    "closed_wall_ms": 1791710757505,
+    "browser_close_ms": 417,
+    "deadline_seconds": 240,
+    "physical_actions_completed": false,
+    "independent_verification_pending": true,
+    "reconnect_claim_pending_independent_verification": true,
+    "forced_relay_required": true
+  },
+  "resume": {
+    "resumed": false,
+    "elapsed_ms": 30104,
+    "within_original_30_seconds": false,
+    "host_peer_before": "43ef4500-92b7-4192-ba1d-e1c6a29d3d50",
+    "host_peer_after": "43ef4500-92b7-4192-ba1d-e1c6a29d3d50"
+  },
+  "credential_cleanup": {
+    "private_credentials_file_removed": true,
+    "credentials_in_argv": false,
+    "full_config_unmodified": true
+  },
+  "raw_evidence": "target/web20-real-turn-guest-reconnect-20261011-01",
+  "recovery_pass": false,
+  "cause_not_yet_proven": true,
+  "all_release_gates_remain_open": true,
+  "host_before_fault_routes": [
+    {
+      "state": "succeeded",
+      "nominated": true,
+      "bytesSent": 39847,
+      "bytesReceived": 6122,
+      "localType": "relay",
+      "remoteType": "relay"
+    }
+  ],
+  "p1_before_fault_routes": [
+    {
+      "state": "succeeded",
+      "nominated": true,
+      "bytesSent": 6172,
+      "bytesReceived": 39847,
+      "localType": "relay",
+      "remoteType": "relay"
+    }
+  ]
+}
