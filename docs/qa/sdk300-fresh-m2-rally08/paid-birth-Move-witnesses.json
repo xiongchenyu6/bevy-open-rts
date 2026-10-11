@@ -1,0 +1,1746 @@
+{
+  "original_natural_wait_seconds": 20,
+  "observed_wall": 19.760334438004065,
+  "paid_before": [
+    {
+      "producer": 77309409469,
+      "producer_id": "VehicleFactory",
+      "id": "AntiAirWalker",
+      "train": true,
+      "timer": 7.0,
+      "origin": [
+        -26.00655746459961,
+        0.0,
+        -25.007770538330078
+      ],
+      "cost": [
+        3,
+        2
+      ]
+    },
+    {
+      "producer": 77309409469,
+      "producer_id": "VehicleFactory",
+      "id": "AntiAirWalker",
+      "train": true,
+      "timer": 7.0,
+      "origin": [
+        -26.00655746459961,
+        0.0,
+        -25.007770538330078
+      ],
+      "cost": [
+        3,
+        2
+      ]
+    },
+    {
+      "producer": 77309409469,
+      "producer_id": "VehicleFactory",
+      "id": "Tank",
+      "train": true,
+      "timer": 6.0,
+      "origin": [
+        -26.00655746459961,
+        0.0,
+        -25.007770538330078
+      ],
+      "cost": [
+        3,
+        1
+      ]
+    },
+    {
+      "producer": 77309409469,
+      "producer_id": "VehicleFactory",
+      "id": "Tank",
+      "train": true,
+      "timer": 6.0,
+      "origin": [
+        -26.00655746459961,
+        0.0,
+        -25.007770538330078
+      ],
+      "cost": [
+        3,
+        1
+      ]
+    },
+    {
+      "producer": 77309409469,
+      "producer_id": "VehicleFactory",
+      "id": "Tank",
+      "train": true,
+      "timer": 6.0,
+      "origin": [
+        -26.00655746459961,
+        0.0,
+        -25.007770538330078
+      ],
+      "cost": [
+        3,
+        1
+      ]
+    },
+    {
+      "producer": 1095216658344,
+      "producer_id": "Barracks",
+      "id": "RocketInfantry",
+      "train": true,
+      "timer": 5.0,
+      "origin": [
+        -26.00221824645996,
+        0.0,
+        -22.000001907348633
+      ],
+      "cost": [
+        2,
+        1
+      ]
+    },
+    {
+      "producer": 1095216658344,
+      "producer_id": "Barracks",
+      "id": "RocketInfantry",
+      "train": true,
+      "timer": 5.0,
+      "origin": [
+        -26.00221824645996,
+        0.0,
+        -22.000001907348633
+      ],
+      "cost": [
+        2,
+        1
+      ]
+    },
+    {
+      "producer": 1095216658344,
+      "producer_id": "Barracks",
+      "id": "RocketInfantry",
+      "train": true,
+      "timer": 5.0,
+      "origin": [
+        -26.00221824645996,
+        0.0,
+        -22.000001907348633
+      ],
+      "cost": [
+        2,
+        1
+      ]
+    },
+    {
+      "producer": 1095216658344,
+      "producer_id": "Barracks",
+      "id": "HeavyMachinegunTrooper",
+      "train": true,
+      "timer": 4.5,
+      "origin": [
+        -26.00221824645996,
+        0.0,
+        -22.000001907348633
+      ],
+      "cost": [
+        2,
+        1
+      ]
+    },
+    {
+      "producer": 1095216658344,
+      "producer_id": "Barracks",
+      "id": "HeavyMachinegunTrooper",
+      "train": true,
+      "timer": 4.5,
+      "origin": [
+        -26.00221824645996,
+        0.0,
+        -22.000001907348633
+      ],
+      "cost": [
+        2,
+        1
+      ]
+    }
+  ],
+  "samples": [
+    {
+      "clock": 58.22281265258789,
+      "bank": [
+        61,
+        11
+      ],
+      "actual_newborns": [],
+      "jobs": [
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "AntiAirWalker",
+          "train": true,
+          "timer": 5.355971813201904,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            2
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "AntiAirWalker",
+          "train": true,
+          "timer": 7.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            2
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 3.355973958969116,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 5.0,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 5.0,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "clock": 60.335811614990234,
+      "bank": [
+        61,
+        11
+      ],
+      "actual_newborns": [],
+      "jobs": [
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "AntiAirWalker",
+          "train": true,
+          "timer": 3.242964506149292,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            2
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "AntiAirWalker",
+          "train": true,
+          "timer": 7.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            2
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 1.2429683208465576,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 5.0,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 5.0,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "clock": 62.50099563598633,
+      "bank": [
+        61,
+        11
+      ],
+      "actual_newborns": [
+        {
+          "key": 7692286425024,
+          "id": "RocketInfantry",
+          "position": [
+            -23.992979049682617,
+            0.05000000074505806,
+            -19.2379150390625
+          ],
+          "active": [
+            {
+              "kind": "Move",
+              "destination": [
+                -19.49799156188965,
+                0.0,
+                -19.999530792236328
+              ]
+            }
+          ],
+          "queued": [],
+          "cargo_ron": "None"
+        }
+      ],
+      "jobs": [
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "AntiAirWalker",
+          "train": true,
+          "timer": 1.0777873992919922,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            2
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "AntiAirWalker",
+          "train": true,
+          "timer": 7.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            2
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 4.077791690826416,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 5.0,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "clock": 64.71631622314453,
+      "bank": [
+        61,
+        11
+      ],
+      "actual_newborns": [
+        {
+          "key": 7692286425024,
+          "id": "RocketInfantry",
+          "position": [
+            -19.506141662597656,
+            0.05000000074505806,
+            -19.79723358154297
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 11566346926136,
+          "id": "AntiAirWalker",
+          "position": [
+            -29.18928337097168,
+            0.05000000074505806,
+            -21.635591506958008
+          ],
+          "active": [
+            {
+              "kind": "Move",
+              "destination": [
+                -19.49799156188965,
+                0.0,
+                -19.999530792236328
+              ]
+            }
+          ],
+          "queued": [],
+          "cargo_ron": "None"
+        }
+      ],
+      "jobs": [
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "AntiAirWalker",
+          "train": true,
+          "timer": 5.8624677658081055,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            2
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 1.8624728918075562,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 5.0,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "clock": 66.91212463378906,
+      "bank": [
+        61,
+        11
+      ],
+      "actual_newborns": [
+        {
+          "key": 7692286425024,
+          "id": "RocketInfantry",
+          "position": [
+            -19.506141662597656,
+            0.05000000074505806,
+            -19.79723358154297
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 7563437406481,
+          "id": "RocketInfantry",
+          "position": [
+            -24.478923797607422,
+            0.05000000074505806,
+            -19.43881607055664
+          ],
+          "active": [
+            {
+              "kind": "Move",
+              "destination": [
+                -19.49799156188965,
+                0.0,
+                -19.999530792236328
+              ]
+            }
+          ],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 11566346926136,
+          "id": "AntiAirWalker",
+          "position": [
+            -25.61876678466797,
+            0.05000000074505806,
+            -18.96570587158203
+          ],
+          "active": [
+            {
+              "kind": "Move",
+              "destination": [
+                -19.49799156188965,
+                0.0,
+                -19.999530792236328
+              ]
+            }
+          ],
+          "queued": [],
+          "cargo_ron": "None"
+        }
+      ],
+      "jobs": [
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "AntiAirWalker",
+          "train": true,
+          "timer": 3.6666667461395264,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            2
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 4.666669845581055,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "clock": 69.19165802001953,
+      "bank": [
+        67,
+        11
+      ],
+      "actual_newborns": [
+        {
+          "key": 7692286425024,
+          "id": "RocketInfantry",
+          "position": [
+            -18.979721069335938,
+            0.05000000074505806,
+            -20.56894302368164
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 7563437406481,
+          "id": "RocketInfantry",
+          "position": [
+            -19.548765182495117,
+            0.05000000074505806,
+            -19.808225631713867
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 11566346926136,
+          "id": "AntiAirWalker",
+          "position": [
+            -20.62114715576172,
+            0.05000000074505806,
+            -18.76453971862793
+          ],
+          "active": [
+            {
+              "kind": "Move",
+              "destination": [
+                -19.49799156188965,
+                0.0,
+                -19.999530792236328
+              ]
+            }
+          ],
+          "queued": [],
+          "cargo_ron": "None"
+        }
+      ],
+      "jobs": [
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "AntiAirWalker",
+          "train": true,
+          "timer": 1.3871214389801025,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            2
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 2.3871233463287354,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "clock": 71.5032730102539,
+      "bank": [
+        67,
+        11
+      ],
+      "actual_newborns": [
+        {
+          "key": 7692286425024,
+          "id": "RocketInfantry",
+          "position": [
+            -18.624773025512695,
+            0.05000000074505806,
+            -21.0174503326416
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 7563437406481,
+          "id": "RocketInfantry",
+          "position": [
+            -18.460025787353516,
+            0.05000000074505806,
+            -20.081802368164062
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 141733918401,
+          "id": "AntiAirWalker",
+          "position": [
+            -28.938154220581055,
+            0.05000000074505806,
+            -22.37264060974121
+          ],
+          "active": [
+            {
+              "kind": "Move",
+              "destination": [
+                -19.49799156188965,
+                0.0,
+                -19.999530792236328
+              ]
+            }
+          ],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 11566346926136,
+          "id": "AntiAirWalker",
+          "position": [
+            -19.6978759765625,
+            0.05000000074505806,
+            -19.907896041870117
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        }
+      ],
+      "jobs": [
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 5.075451374053955,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "RocketInfantry",
+          "train": true,
+          "timer": 0.0754525288939476,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "clock": 73.65377807617188,
+      "bank": [
+        67,
+        11
+      ],
+      "actual_newborns": [
+        {
+          "key": 7692286425024,
+          "id": "RocketInfantry",
+          "position": [
+            -18.52052879333496,
+            0.05000000074505806,
+            -21.059547424316406
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 7563437406481,
+          "id": "RocketInfantry",
+          "position": [
+            -18.31386947631836,
+            0.05000000074505806,
+            -20.088623046875
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 274877904628,
+          "id": "RocketInfantry",
+          "position": [
+            -19.740684509277344,
+            0.05000000074505806,
+            -19.19032859802246
+          ],
+          "active": [
+            {
+              "kind": "Move",
+              "destination": [
+                -19.49799156188965,
+                0.0,
+                -19.999530792236328
+              ]
+            }
+          ],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 141733918401,
+          "id": "AntiAirWalker",
+          "position": [
+            -26.06639862060547,
+            0.05000000074505806,
+            -19.38665008544922
+          ],
+          "active": [
+            {
+              "kind": "Move",
+              "destination": [
+                -19.49799156188965,
+                0.0,
+                -19.999530792236328
+              ]
+            }
+          ],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 11566346926136,
+          "id": "AntiAirWalker",
+          "position": [
+            -19.576433181762695,
+            0.05000000074505806,
+            -20.4241886138916
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        }
+      ],
+      "jobs": [
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 2.9249649047851562,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 2.42496657371521,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "clock": 75.81581115722656,
+      "bank": [
+        67,
+        11
+      ],
+      "actual_newborns": [
+        {
+          "key": 7692286425024,
+          "id": "RocketInfantry",
+          "position": [
+            -18.473125457763672,
+            0.05000000074505806,
+            -21.084562301635742
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 7563437406481,
+          "id": "RocketInfantry",
+          "position": [
+            -18.31386947631836,
+            0.05000000074505806,
+            -20.088623046875
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 274877904628,
+          "id": "RocketInfantry",
+          "position": [
+            -19.3560733795166,
+            0.05000000074505806,
+            -19.380264282226562
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 141733918401,
+          "id": "AntiAirWalker",
+          "position": [
+            -21.44272232055664,
+            0.05000000074505806,
+            -18.808536529541016
+          ],
+          "active": [
+            {
+              "kind": "Move",
+              "destination": [
+                -19.49799156188965,
+                0.0,
+                -19.999530792236328
+              ]
+            }
+          ],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 11566346926136,
+          "id": "AntiAirWalker",
+          "position": [
+            -19.63384246826172,
+            0.05000000074505806,
+            -20.599010467529297
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        }
+      ],
+      "jobs": [
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 0.7629415988922119,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 77309409469,
+          "producer_id": "VehicleFactory",
+          "id": "Tank",
+          "train": true,
+          "timer": 6.0,
+          "origin": [
+            -26.00655746459961,
+            0.0,
+            -25.007770538330078
+          ],
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 0.2629437744617462,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        },
+        {
+          "producer": 1095216658344,
+          "producer_id": "Barracks",
+          "id": "HeavyMachinegunTrooper",
+          "train": true,
+          "timer": 4.5,
+          "origin": [
+            -26.00221824645996,
+            0.0,
+            -22.000001907348633
+          ],
+          "cost": [
+            2,
+            1
+          ]
+        }
+      ]
+    }
+  ],
+  "witnesses": {
+    "Barracks": {
+      "key": 274877904628,
+      "id": "RocketInfantry",
+      "actual_Move": [
+        {
+          "kind": "Move",
+          "destination": [
+            -19.49799156188965,
+            0.0,
+            -19.999530792236328
+          ]
+        }
+      ],
+      "rally": {
+        "target": [
+          -19.49799156188965,
+          0.0,
+          -19.999530792236328
+        ],
+        "mode": 0,
+        "target_entity": null
+      },
+      "clock": 73.65377807617188,
+      "paid_queue_type_present_before_resume": true
+    },
+    "VehicleFactory": {
+      "key": 141733918401,
+      "id": "AntiAirWalker",
+      "actual_Move": [
+        {
+          "kind": "Move",
+          "destination": [
+            -19.49799156188965,
+            0.0,
+            -19.999530792236328
+          ]
+        }
+      ],
+      "rally": {
+        "target": [
+          -19.49799156188965,
+          0.0,
+          -19.999530792236328
+        ],
+        "mode": 0,
+        "target_entity": null
+      },
+      "clock": 75.81581115722656,
+      "paid_queue_type_present_before_resume": true
+    }
+  }
+}

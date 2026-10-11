@@ -1,0 +1,74 @@
+{
+  "scope": "SDK300 freshM2: BOTHnormalproducer groundRallies andpaidnewbornMove verified; firstAA30arrival fails, no defenderHold/fullpolicy/missionacceptance",
+  "raw_root": "target/sdk300-fresh-m2-rally-20261012-08",
+  "own_actor_trajectory": [
+    {
+      "snapshot": "issued-before",
+      "clock": 77.167435,
+      "position": [
+        -19.957565,
+        0.05,
+        -19.264338
+      ],
+      "health": 9.0,
+      "active": "[\n                    Move((-19.497992, 0.0, -19.99953)),\n                ]",
+      "hold": "false",
+      "effects": "(\n                    emp: None,\n                    shield: None,\n                    chrono: None,\n                    projector_remaining: None,\n                    income_remaining: None,\n                )"
+    },
+    {
+      "snapshot": "issued",
+      "clock": 77.167435,
+      "position": [
+        -19.957565,
+        0.05,
+        -19.264338
+      ],
+      "health": 9.0,
+      "active": "[\n                    Move((-20.504892, 0.0, -18.998405)),\n                ]",
+      "hold": "false",
+      "effects": "(\n                    emp: None,\n                    shield: None,\n                    chrono: None,\n                    projector_remaining: None,\n                    income_remaining: None,\n                )"
+    },
+    {
+      "snapshot": "arrival",
+      "clock": 106.67924,
+      "position": [
+        -18.718824,
+        0.05,
+        -16.643734
+      ],
+      "health": 9.0,
+      "active": "[]",
+      "hold": "false",
+      "effects": "(\n                    emp: None,\n                    shield: None,\n                    chrono: None,\n                    projector_remaining: None,\n                    income_remaining: None,\n                )"
+    }
+  ],
+  "requested_goal": [
+    -20.504892,
+    0,
+    -18.998405
+  ],
+  "final_requested_goal_distance": 2.955421191448863,
+  "final_HQ_distance": 6.28137734941406,
+  "AA_weapon_range": 7.5,
+  "HQ_range_passes": true,
+  "causality_unknown": "ArrivalRON overwritteneachpoll; nointermediateposes/path/firstMove-removalrecord. Couldbereachthenpush/chase orother scheduled behaviour; no proof of endpointnormalization orNavbug.",
+  "normal_exits": [
+    {
+      "pid": 3316764,
+      "supervisor_pid": 3316677,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "wall_seconds": 680.7951037779567,
+  "no_same_policy_rerun": true,
+  "evidence_sha256": {
+    "result.json": "90659934cc9da424f261406db1ac4470b7fd11738146159b93e0bb994218e24d",
+    "actual-rallies.json": "e208abe4e562fffecc724a7f3596493167608c063ff15929f3162b13038611db",
+    "paid-birth-Move-witnesses.json": "4a96795d6a2e3408410d1163f1331c6cfa802b5ce335bf40a890e9553d32cd64",
+    "actual-arrival-failure.png": "85003606e12e294ef9c864deda41ceaef31f10a3d6b7b1d63be1dbca3191a6a6"
+  }
+}
