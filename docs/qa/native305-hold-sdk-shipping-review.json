@@ -1,0 +1,32 @@
+{
+  "scope": "OfficialSDK305 build/package/extract integrity only; normal held-unit traffic runtime pending",
+  "actual_exit": 0,
+  "source_commit": "4f8e5884c1edb44afa56d772ca21dadf728df271",
+  "sources": 143,
+  "assets": 332,
+  "native_bins": 4,
+  "full_tests": {
+    "passed": 305,
+    "failed": 0,
+    "ignored": 1
+  },
+  "clean_four_local_packages_exit": 0,
+  "actual_compile_frozen_paths": true,
+  "build_wall_seconds": 418.4866933769663,
+  "installed_binary_sha256": "f563958431a6c812a2112aad9766b1b7316ea91bf4e1b3358b66222ed5bd8ab4",
+  "archive_sha256": "8f66709861a000a1e3f9a677847f7beed61bd622e734aa1aba113ff15cc1f5ee",
+  "package_files": 399,
+  "independent_current_source_assets_fourbins_and399_inventory_match": true,
+  "initial_preflight_failure": "SDK chain01 KeyError inputs_unchanged beforefreeze/Cargo; retained journal; exactcanonical actual_source_assets_unchanged guard retry02",
+  "evidence_sha256": {
+    "target/hold-separation-shared-20261012/pin.json": "db64dcd94b7a7497ba50809371c9140f66db78043deb828211b2a165fd75a214",
+    "target/linux-native305-hold-steamrt4-sdk-20261012/result.json": "1ce048f893ad6ecfb3876bae5a586b6d23b3a50dd6e645d87de8dd7d725bd075",
+    "target/linux-native305-hold-package-20261012/result.json": "9fb6f9d830d3169756faa3100dec343c87688c8abd604321b39eef36f1871d47",
+    "target/linux-native305-hold-extracted-20261012/ready.json": "340f2d4583ae8b8ab6f5153e56d5c8d9e627c7a169938522079bf51f56717106"
+  },
+  "boundaries": [
+    "Native GUI Hold traffic pending",
+    "SDK300/W26/current300 matrix stay historical frozen",
+    "No Wasm27/deployment"
+  ]
+}
