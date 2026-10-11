@@ -1,0 +1,41 @@
+{
+  "scope": "W20guest02 bounded data continuity only; original overallfailure and failed visible-scene review preserved",
+  "original_overall_exit": 1,
+  "normal_driver_exit": 0,
+  "resume_ms": 1687,
+  "original_grace_seconds": 30,
+  "same_tick_actual_ECS_samples": {
+    "pre": 121,
+    "post": 78
+  },
+  "component_and_resource_job_clock_mismatches": 0,
+  "same_HQ_entity_and_selection": true,
+  "new_normal_command_receipt": {
+    "before_tick": 176,
+    "receipt_tick": 188,
+    "before_ore": 28,
+    "after_ore": 26,
+    "cost": [
+      2,
+      0
+    ],
+    "producer": 5,
+    "independent_ECS_confirmed": true
+  },
+  "elapsed_clock_semantics": "SourceMatchState.start_time_sec is advanced by delta eachframe; elapsed time, notfixedstartidentity",
+  "elapsed_clock_before": 13.004100799560547,
+  "elapsed_clock_after": 22.91197967529297,
+  "visible_scene_accepted": false,
+  "direct_visual_result": "Finalimage almostallblackfog;selectedHQoffscreen. Fullworkflow acceptance remainsopen.",
+  "evidence": {
+    "target/web20-local-guest-reconnect-20261011-02/reconnect-proof-offline02.json": "a7e7fc3de35a40a21f8365200a550f56498ed2f9dd0b6cd49f0952d5f4d6cfba",
+    "target/web20-local-guest-reconnect-20261011-02/result.json": "ca873e2aee680416721846a93d44fcd7cd761ce106fef8008e0a36e749db468c",
+    "target/web20-local-guest-reconnect-20261011-02/final-result.json": "6476207570133dcd189f47a37ef10a9e029c033c94f2d723653071d14c37d64d",
+    "target/web20-local-guest-reconnect-20261011-02/p1-actual-recovered-paid-scene.png": "9ae2ffcdbc0b34a78ca509d15ff638b3ba455c8b4c3731751fd37b496cf30e38"
+  },
+  "limits": [
+    "Private loopbackSTUN,no deployedTURN/eight/fullmatch proof",
+    "Offlinecorrectedverifierdoesnotrewrite originalresult",
+    "Freshpropercamera guestcase andhostcase pending"
+  ]
+}
