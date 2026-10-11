@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "scope": "Native279 same-pin existing progress observer; wall timeout with concurrent official SDK compile, not simulation-timeout or per-system profiling",
+  "summary": {
+    "status": {
+      "actual_exit": 124,
+      "wall_seconds": 180.04945851798402,
+      "simulation_limit": 600,
+      "wall_limit": 180,
+      "command": [
+        "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/ai-ground-focus-shared-20261011/skirmish_audit",
+        "big_arena",
+        "chaos",
+        "easy",
+        "6",
+        "chaos",
+        "beginner",
+        "1",
+        "600",
+        "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/case2641-native279-progress-20261011/2641/result.json"
+      ],
+      "audit_sha256": "d44a5abf33c37718d3b4a794d80dfafa7fd3e5dfa803e62118ddb8cd78d6c75a",
+      "asset_count": 332,
+      "concurrent_load": "Root officialSDK buildPID576148 active; wall outcome alone is not a causal product claim"
+    },
+    "row_count": 175,
+    "last_complete": {
+      "clock_seconds": 254.25868225097656,
+      "wall_seconds": 178.400241814,
+      "update": 7628,
+      "last_update_wall_seconds": 0.113363036,
+      "max_update_wall_seconds": 0.91955096,
+      "order_counts": {
+        "attack": 3
+      },
+      "completed_structure_types": {
+        "0": {
+          "Barracks": 1,
+          "CommandCenter": 1,
+          "OrePurifier": 1,
+          "PowerReactor": 3,
+          "RadarUplink": 1,
+          "Refinery": 1,
+          "RoboticsBay": 1,
+          "TechLab": 1,
+          "VehicleFactory": 1
+        },
+        "1": {
+          "PowerReactor": 1,
+          "TechLab": 1
+        },
+        "neutral": {
+          "TechAirport": 2,
+          "TechBunker": 4,
+          "TechHospital": 2,
+          "TechOilDerrick": 4,
+          "TechRepairDepot": 2
+        }
+      },
+      "pending_foundations": [
+        {
+          "entity": 1816771165049,
+          "health": 1.0,
+          "position": [
+            -7.296714782714844,
+            0.0,
+            31.906827926635742
+          ],
+          "remaining": 1.0,
+          "structure": "AircraftFactory",
+          "team": 0,
+          "total": 1.0
+        }
+      ]
+    },
+    "same_factory_constructor_samples": 73,
+    "first_factory_sample": {
+      "clock": 140.00094604492188,
+      "wall": 23.304433914,
+      "constructor": {
+        "entity": 12884901113,
+        "move_target": null,
+        "path_goal": null,
+        "position": [
+          -19.18723487854004,
+          0.05000000074505806,
+          35.14212417602539
+        ],
+        "radius": 0.6000000238418579,
+        "remaining_waypoints": null,
+        "target": 1816771165049,
+        "target_structure": "AircraftFactory",
+        "target_under_construction": {
+          "remaining": 1.0,
+          "total": 1.0
+        }
+      }
+    },
+    "last_factory_sample": {
+      "clock": 254.25868225097656,
+      "wall": 178.400241814,
+      "constructor": {
+        "entity": 12884901113,
+        "move_target": null,
+        "path_goal": null,
+        "position": [
+          -19.18723487854004,
+          0.05000000074505806,
+          35.14212417602539
+        ],
+        "radius": 0.6000000238418579,
+        "remaining_waypoints": null,
+        "target": 1816771165049,
+        "target_structure": "AircraftFactory",
+        "target_under_construction": {
+          "remaining": 1.0,
+          "total": 1.0
+        }
+      }
+    },
+    "route_fail_samples": 73,
+    "scope": "Timed existing observer samples, not per-system profiler or exact total search count; concurrent SDK load prevents wall-only causality inference",
+    "progress_sha256": "e34bae879b41e0e7f034dc60630a29e88c6311dc2f046c4147cffa99792a5277"
+  },
+  "geometry_only_witness": {
+    "waypoint_count": 97,
+    "visited_cells": 6359,
+    "scope": "Recorded static/mobile-circle geometry only; no NavGrid or terrain simulation, not an exhaustive impossibility proof",
+    "source": [
+      -19.18723487854004,
+      35.14212417602539
+    ],
+    "target": [
+      -7.296714782714844,
+      31.906827926635742
+    ],
+    "bounds": {
+      "x": [
+        -26.375,
+        -9.413325817150895
+      ],
+      "z": [
+        24.625,
+        38.125
+      ]
+    },
+    "no_existing_overlap_exception_used": true,
+    "not_actual_nav_or_gameplay_acceptance": true
+  },
+  "source_findings": [
+    {
+      "source": "src/production.rs",
+      "finding": "Existing route-invalid construction path calls reachable_unit_contact_approach and retries on subsequent updates; failed approach leaves foundation/order intact."
+    },
+    {
+      "source": "src/orders/contact_planning.rs",
+      "finding": "Global coarse-grid routes are continuously checked against actual physical footprints; a rejected selected path falls through to bounded local refinement."
+    },
+    {
+      "source": "src/orders/contact_planning/local_contact.rs",
+      "finding": "Local refinement has existing49x49 quarter-metre cells centered between source and target. Geometry witness detours beyond this box. This does not prove global-route rejection or require a fix."
+    }
+  ],
+  "limitations": [
+    "Observer records timed samples, not every route attempt.",
+    "Whole-update cost rose; no per-system timer proves constructor alone causes slowdown.",
+    "Concurrent officialSDK compile and historical sweep prevent wall-only performance attribution.",
+    "No simulation600 outcome, victory or infinite-game claim.",
+    "No source changes, Cargo or GPU launched by this audit."
+  ],
+  "next_action": "Root optimized officialSDK audit on identical frozen279 core and original600sim/180wall before intrusive gameplay changes.",
+  "artifact_sha256": {
+    "target/case2641-native279-progress-20261011/2641/status.json": "d075801941e7b8cdf2c7b22b8e305912f17c8f31f130fa1f9c54e051d4d09822",
+    "target/case2641-native279-progress-20261011/2641/progress.jsonl": "e34bae879b41e0e7f034dc60630a29e88c6311dc2f046c4147cffa99792a5277",
+    "target/case2641-native279-progress-20261011/2641/summary.json": "8735a6a9ae4f75dae942bf70379c427267c171cb72b2db268dd3a953c2c8545e",
+    "target/case2641-native279-progress-20261011/2641/geometry-witness.json": "f46da51f2133f802405b387da0ac0d9297ec7ee089dfd7c47be504a0aeee6ea6"
+  }
+}
