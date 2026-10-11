@@ -1,0 +1,10 @@
+{
+  "actual_selected_worker": {
+    "local_entity": 8589933893,
+    "network_id": 4,
+    "type": "Worker"
+  },
+  "normal_focus": "AltI",
+  "normal_zoom": "mouse wheel deltaY -400",
+  "scope": "Current own selection/body/UI PNGs only; visual review required, no actor/camera pose or compact-layout numeric claim"
+}

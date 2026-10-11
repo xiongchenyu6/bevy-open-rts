@@ -1,0 +1,29 @@
+{
+  "visual_pass": true,
+  "scope": "Same own Worker compact selection/body/UI visible at default and normal closer zoom only; no whole-game acceptance",
+  "actual_browser_closed": true,
+  "browser_page_errors": [],
+  "actual_node_exit": 0,
+  "actual_driver_exit": 0,
+  "actual_supervisor_exit": 0,
+  "wall_seconds": 36.132,
+  "same_worker": {
+    "local_entity": 8589933893,
+    "network_id": 4,
+    "type": "Worker"
+  },
+  "visible_finding": "Short separated mint selection arcs near Worker feet in both current images; no huge full circle; compact bottom selection strip. Same recognizable Worker body after closer zoom.",
+  "actual_png_sha256": {
+    "02-worker-default.png": "1ab222a30baf4706771ea34b149ce4ade1e07f1605f2787c25f43cb8a96dc57e",
+    "01-setup.png": "5e8ebd62753cf55839e6f97aaca6cb4ee3a42f477bacd0f69d589750040b4789",
+    "03-worker-closezoom.png": "2459014c767a4e56ddc26cac9037a4c625888eddb663903e0a79ddf22ab59f49",
+    "00-menu.png": "c379efd88e17ff51904dda1bee8495f095b438546dd9d0c151bd6f4a9faf3889"
+  },
+  "managed_unit_terminal": "inactive/dead, Result success, ExecMainStatus0, empty ControlGroup; subsequently transient unit unloaded",
+  "matching_recipe_browser_or_driver_processes": [],
+  "recipe_GPU_released": true,
+  "original_bounds": [
+    240,
+    30
+  ]
+}

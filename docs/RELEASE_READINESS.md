@@ -59,6 +59,10 @@ A bounded regression or an older package cannot establish final release readines
   four frozen compile paths,642 non-web inputs, exact Wasm bytes and gzip
   equality. Protected originals remain unchanged; only a private QA alias is
   created ([shipping proof](qa/web27-hold-shipping-build-review.json)). Actual
+  Worker default/normal closer-zoom selection passes actual browser review:
+  same Worker, compact foot arcs, no huge ring, empty browser errors and
+  supervisor/node/driver exit0 in36.132s
+  ([actual selection proof](qa/web27-worker-selection-review.json)). Broader
   browser operation and public deployment remain unverified.
 - Wasm26 builds successfully from the native300 source pin. Its actual Wasm
   bytes, input manifest and641 non-web frozen inputs are independently rehashed
