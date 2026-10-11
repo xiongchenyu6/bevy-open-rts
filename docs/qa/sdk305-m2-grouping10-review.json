@@ -1,0 +1,22 @@
+{
+  "scope": "Normal SDK305 M2 paidbase/firstelevenarmy+Drone only; first cohort Stop helper assertion before group Move/Hold or victory",
+  "actual_runner_exit": 1,
+  "actual_game_exit": 0,
+  "wall_seconds": 489.1211422709748,
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "failure": "Helper searches action Stop; actual StopSelected disabled for idle AA cohort",
+  "seven_reviews_within45": true,
+  "evidence_sha256": {
+    "docs/qa/sdk305-m2-grouping10/result.json": "9d7fc999ffb2d4b7d7f1abff7fd946a630b8dac1bf35d093c39ce4b0d645ac39",
+    "docs/qa/sdk305-m2-grouping10/first-AA-cohort-before.ron": "78233b0cb71ba1be9f5851db166accaaff2bd0d7036670e9b9456c7eedfbcde8",
+    "docs/qa/sdk305-m2-grouping10/actual-M2-failure.png": "8a3681f80c76d6d3c4f4d6ef9315726392a0fc2f4a7a3e834d4f9248d2ab91d4",
+    "docs/qa/sdk305-m2-grouping10/sole-reviewer-terminal-summary.json": "b61d729fad23d585de83b95fc4d6f5d6aff529ea7f4a7b710de93102dfed6d7a"
+  },
+  "boundaries": [
+    "No group arrival/Hold/assault/M2win/sixsameApp acceptance",
+    "All original900/30/45 bounds retained",
+    "Next privatehelper must use correctStopSelected or verify exactidle cohort before skippingdisabledStop"
+  ]
+}

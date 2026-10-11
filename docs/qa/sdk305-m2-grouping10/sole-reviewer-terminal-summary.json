@@ -1,0 +1,66 @@
+{
+  "scope": "Actual normal-player SDK305 Mission2 attempt10 diagnostic; no six-chain acceptance",
+  "passed": false,
+  "failure": "Helper requested enabled action Stop for selected two AntiAirWalker; current public card action StopSelected was disabled with visible tooltip Status: Not supported by current selection.",
+  "wall_seconds": 489.1211422709748,
+  "actual_exits": [
+    {
+      "pid": 3587077,
+      "supervisor_pid": 3587026,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "earned_prefix_sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+  "failure_png_sha256": "8a3681f80c76d6d3c4f4d6ef9315726392a0fc2f4a7a3e834d4f9248d2ab91d4",
+  "persisted_reviews": [
+    {
+      "file": "target/sdk305-fresh-m2-grouping-20261012-10/normal-M2-main-menu-review.json",
+      "sha256": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+      "physical_request_mtime_ns": "1791755789345492433",
+      "review_age_seconds": 9.993901252746582
+    },
+    {
+      "file": "target/sdk305-fresh-m2-grouping-20261012-10/normal-M2-campaign-card-review.json",
+      "sha256": "f984f67a6974baf3be64d2f7cf94c0ed69cd2dc9047caa2945bcc9380a4706bf",
+      "physical_request_mtime_ns": "1791755802146403854",
+      "review_age_seconds": 7.069911241531372
+    },
+    {
+      "file": "target/sdk305-fresh-m2-grouping-20261012-10/02/assembly-ground-review.json",
+      "sha256": "edaab1b86944d936777d2a787505545324970ac08ec016d1e31498052df4a01d",
+      "physical_request_mtime_ns": "1791756124984476179",
+      "review_age_seconds": 6.059606075286865
+    },
+    {
+      "file": "target/sdk305-fresh-m2-grouping-20261012-10/02/economy-visible-ore-review.json",
+      "sha256": "5c48cf9a990a171facf2d7be0cf9def7c568dd4a11179c103a61730effb9ed65",
+      "physical_request_mtime_ns": "1791755823343529151",
+      "review_age_seconds": 5.546631574630737
+    },
+    {
+      "file": "target/sdk305-fresh-m2-grouping-20261012-10/02/member-defense-review.json",
+      "sha256": "b338c4ccfb3b802f9e5b4c5ad84092d18a5b8175390d5c7fbcaaace92a1fea4f",
+      "physical_request_mtime_ns": "1791756238300991162",
+      "review_age_seconds": 6.979447841644287
+    }
+  ],
+  "additional_consumed_reviews": [
+    {
+      "image": "rally-VehicleFactory-current-assembly.png",
+      "age_seconds": 7.38657
+    },
+    {
+      "image": "member-group09-drone-4294966721-body-angle-0.png",
+      "age_seconds": 5.449
+    }
+  ],
+  "current_request_45_exhausted": false,
+  "unit_state": "ActiveState=failed\nSubState=failed\nMainPID=0\nExecMainStatus=1\nControlGroup=\n",
+  "runtime_supervisor_runner_pids_remaining": [],
+  "GPU_released": true,
+  "recorded_at_utc_epoch": 1791756352.1917198
+}
