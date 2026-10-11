@@ -1,0 +1,66 @@
+{
+  "scope": "Exact current267 native audit repeat2641; not SDK gameplay acceptance",
+  "process_result": {
+    "scope": "Exact immutable case repeat; wall timeout alone is not gameplay failure evidence",
+    "config": {
+      "map": "big_arena",
+      "factions": [
+        "chaos",
+        "chaos"
+      ],
+      "difficulties": [
+        "easy",
+        "beginner"
+      ],
+      "spawn_slots": [
+        6,
+        1
+      ],
+      "max_seconds": 600
+    },
+    "command": [
+      "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/case1885-movement-shared-20261011/skirmish_audit",
+      "big_arena",
+      "chaos",
+      "easy",
+      "6",
+      "chaos",
+      "beginner",
+      "1",
+      "600",
+      "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/repeat267-case2641-20261011-01/result.json"
+    ],
+    "binary_sha256": "3f7994f460e16c4d4d8483e976cc6e71b03688e342030de5f0175717ecb1605f",
+    "asset_count": 332,
+    "asset_pin_sha256": "6fbe1b04909806021007d9122b4a1d82debcc703a5bdf238667e8e5bd3bc6aa2",
+    "simulation_limit": 600,
+    "wall_limit": 180,
+    "nice": 10,
+    "trace_enabled": false,
+    "child_pid": 399390,
+    "actual_exit": 124,
+    "classification": "wall_timeout",
+    "wall_seconds": 180.02200222498504,
+    "result_present": false,
+    "binary_unchanged": true,
+    "assets_unchanged": true
+  },
+  "actual_scheduling": {
+    "scope": "Independent live scheduling observation; overrides inherited metadata nice10",
+    "service_nice": 15,
+    "service_cpu_quota_percent": 100,
+    "observed_processes": " 398846  15 SNs\n 399390  15 RN\n",
+    "original_simulation_limit": 600,
+    "original_wall_limit": 180,
+    "no_gpu": true
+  },
+  "result_present": false,
+  "assessment": "Unresolved wall timeout under explicit one-core CPU quota concurrent with normal campaign and historical matrix. No proof of infinite match or causal gameplay defect. Retain failure and require unthrottled/final artifact recheck.",
+  "evidence_sha256": {
+    "target/repeat267-case2641-20261011-01/input.json": "44d1d9109be3944772784871b0cc1e2b18251832f0decb9b4dc5d357c4196633",
+    "target/repeat267-case2641-20261011-01/live.json": "fb397d7707ec806a0de1438b6f879866e8edaf13a14a5250ee4ff32beba4716c",
+    "target/repeat267-case2641-20261011-01/process-result.json": "a818b08ee738f07290a3897024e2d86a332227ca4b1f92d87481d5ca2fabced3",
+    "target/repeat267-case2641-20261011-01/runtime.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "target/repeat267-case2641-20261011-01/actual-scheduling-observation.json": "c4d739e7481a0b6bbf2ff2b6e4fdc5f27b91d0754da6b87f1b595c87ba2622c8"
+  }
+}
