@@ -1,0 +1,208 @@
+{
+  "scope": "ExactSDK267 normalphysicalMission1 completefirst-session battle and genuinefresh-process persistence; not sixsameApp campaign acceptance",
+  "archive_sha256": "812dd6bf79e28e9d6a520872278be6a674e55f82e4f94d9c26321b1d72f39d14",
+  "binary_sha256": "58e5d9b3a7f94461580e4d2f3359697abe15b12956f37c3bac6a0c741eddb9e1",
+  "evidence_directory": "target/sdk267-mission1-normal-defense-20261011-10",
+  "raw_result_sha256": "28723ac69ed13858d3290e8ba30ba2daf2eb20a03a8f922247e98c814718d5c7",
+  "raw_visual_pending_flag_preserved": true,
+  "offline_visual_adjudication": {
+    "agent_and_root_directly_reviewed": [
+      "90-natural-mission1-victory.png",
+      "92-fresh-process-first-unlock-prefix.png"
+    ],
+    "passed": true,
+    "public_result": "Heldtheline04:00;2enemyunitkills;ownloss0units0buildings;NextMissionenabled; ownHQ20 inlastnormalSave",
+    "fresh_menu": "Missions1and2accessible,3\u20136locked;Backvisible"
+  },
+  "wall_seconds": 424.9208631509973,
+  "original_wall_limit_seconds": 900,
+  "simulation_limit_seconds": 900,
+  "speed": 1,
+  "site_limit_seconds": 30,
+  "green_threshold": 1500,
+  "green_red_ratio": 2,
+  "actual_game_exits": [
+    {
+      "index": 1,
+      "pid": 393823,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "index": 2,
+      "pid": 412791,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "normal_paid_opening": {
+    "structure_cost": [
+      16,
+      6
+    ],
+    "three_hmg_cost": [
+      6,
+      3
+    ],
+    "six_tank_cost": [
+      18,
+      6
+    ],
+    "total_cost": [
+      40,
+      15
+    ],
+    "starting_bank": [
+      48,
+      24
+    ],
+    "bank_after_payment": [
+      8,
+      9
+    ],
+    "producer_capacity": 5,
+    "sixth_paid_after_first_natural_completion": true
+  },
+  "last_own_normal_save": {
+    "path": "20-defense-review-017-normal-save.ron",
+    "sha256": "6d7ff67e56c7381589e5787a8711bc1f0bc13411f590fc9fd669465be1bf2320",
+    "clock": 233.75755310058594,
+    "hq_health": 20,
+    "unit_counts": {
+      "Worker": 2,
+      "Drone": 1,
+      "Tank": 6,
+      "HeavyMachinegunTrooper": 3
+    },
+    "bank": [
+      38,
+      24
+    ]
+  },
+  "completion_prefix": [
+    "hold_the_line"
+  ],
+  "campaign_sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "00-normal-main-menu": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01-normal-campaign-map": "e9d8a913cb2efed8e93cbb7068d1817f849da3d0fe9e2d2213bb96722f482346",
+    "02-locked-second-card": "fa2244ee0d0ec2db8ef28e95532897543e7ffa3e5d58a57a00aed9d5404e4781",
+    "03-normal-back-main-menu": "e592bc0a562bc6a3f1e28861ba2be1edc252374698a4f229eb4dbac5ea6a430c",
+    "04-real-mission-briefing": "550a6aa365a1cb020a3728ceb5e752c4fab50605f284f03f86e3512376931efc",
+    "05-enter-dismissed-briefing": "33a43bae7794d622409921ea5b23b866e68a94732918214fef11d27fbec4a1bc",
+    "06-tactical-pause": "b207949de0699ce6392721b592a52fa3e195d2f56ec06eb27cd9937875371aa2",
+    "07-actual-mission-save": "8dd792aac1ca3c8fd7dcc550b9e6cfce792819c524f0266ef12f8acfe036230f",
+    "08-briefing-closed-paused": "5746cbf66cef33da73cca3e43ac5941dfd3a5495f19218af188fbd92c5d6b150",
+    "09-opening-worker-selected": "d52f26f772a161f4ba51f867e208b58f504a531f3f6898d628bfe0468b00b57e",
+    "10-opening-power-tooltip": "884a28bdc5fc8f6a37dcad3d7c2869c260b41569124931daea006b79e92b15e4",
+    "11-opening-before-ghost": "884a28bdc5fc8f6a37dcad3d7c2869c260b41569124931daea006b79e92b15e4",
+    "12-opening-power-green-ghost": "a7b9e5d379a95fa70c7ed67d760f03914f68c6f5279b1c6c64d17191486a43c1",
+    "13-opening-power-completed": "916c715c7dfae3dacbb37897c26952c646be6587e55cb901d0030459694e1637",
+    "auto-01-AntiGroundTurret-tab-tooltip": "7d386b4656fe91859d216c7e2830a4fc4d3adee0c6b7cfe21d2848946f4fc6ca",
+    "auto-01-AntiGroundTurret-before-ghost": "29ec029cff1b2dad00b3911a066e650f86b60b4a8e56b054f3bab3c200c9c3e8",
+    "auto-01-AntiGroundTurret-build-tooltip": "e922fe3014a27467a8206758f65f28d537f14e3896439a833e99f1ad8aec603a",
+    "auto-01-AntiGroundTurret-ghost-0": "fca1840f61e6be86b77aa2eaa68e9fd80315b8874cbd00d2816800f0e7ee6c0f",
+    "auto-01-AntiGroundTurret-completed": "e698ef112607bede374ad3a1b45e6b28616780172a4760cee7208f0d443471c4",
+    "auto-02-AntiGroundTurret-tab-tooltip": "400ca9fd51623285dc006dbc51f310bdb95cd07e96d131754118d2b724ec3813",
+    "auto-02-AntiGroundTurret-before-ghost": "400ca9fd51623285dc006dbc51f310bdb95cd07e96d131754118d2b724ec3813",
+    "auto-02-AntiGroundTurret-build-tooltip": "7a9670efbed798f92f2c76242e936f00c80d64df8f6bcb6a793819f33d708cdd",
+    "auto-02-AntiGroundTurret-ghost-0": "4af461082cc23401dedd5803bf3dc4dc5f5b5bfee2203df5ce9661f0eb773fe0",
+    "auto-02-AntiGroundTurret-completed": "7038dd2fc801d23aac9902d714c44d9df3de489c2644a3306d62c2715c68ffe6",
+    "auto-03-Barracks-tab-tooltip": "384efc14f11c650f3954517116908d49fccec9c41bdfbeecb67689f669c07861",
+    "auto-03-Barracks-before-ghost": "44d192aa804f33ecf0389531da6f6a849f63d45fa217a70d7dd68d4152955f5e",
+    "auto-03-Barracks-build-tooltip": "44d192aa804f33ecf0389531da6f6a849f63d45fa217a70d7dd68d4152955f5e",
+    "auto-03-Barracks-ghost-0": "4ebf672d33dfc8ebe73277d221d8c56cdbeca553ddfccbe7c93e74f08e5bf64c",
+    "auto-03-Barracks-completed": "4815a39e6aeb17c4f70e240259f070dba3c85fe13e5eb90920a23d2ae3ec5053",
+    "auto-early-hmg-0-tooltip": "8e4dc1a9559f403f8ea206130311680aba11bc13879e5769e86d674d9b2e1d51",
+    "auto-early-hmg-1-tooltip": "4f0366fa2fbc8f634dac7c23fdb5ea2f8980d54f17dbbd8ab11317204699cdcf",
+    "auto-early-hmg-2-tooltip": "d6115c941ef886a3ae18c7dbeb5474dacc434b5b0884caa23f0c54dd027bedee",
+    "actual-own-worker-candidate-before-click": "84bcf442bb1a690359f74d67317244655c5d5f2a7162a8c72466fc66369a6a77",
+    "auto-04-VehicleFactory-tab-tooltip": "f4ede323af043cdf14751d147e68beaa5c1c4e08aa5f123b6c382bc4289bcb14",
+    "auto-04-VehicleFactory-before-ghost": "f4ede323af043cdf14751d147e68beaa5c1c4e08aa5f123b6c382bc4289bcb14",
+    "auto-04-VehicleFactory-build-tooltip": "6c9024b8aa878a227288e4f66f385e2bd065581460f1af4f77a59972befe1c98",
+    "auto-04-VehicleFactory-ghost-0": "3d7d3e39bf73c82ff957ddc3a4aa5d2cb818577f4c05b3b46a71ab38a7ce6016",
+    "auto-04-VehicleFactory-completed": "31168fc91776a35b31c5a1cbe011c225501bfc14db9a80fdea5be74d3c43c077",
+    "auto-tank-queue-0-tooltip": "06d1702a06c59d3fbf3af6a04b789f2151d19c153a40273c5eab1c36b4cff896",
+    "auto-tank-queue-1-tooltip": "dfbba29b93c0492b6c094117ab7478ddbb295765c2633904e6687ece5df80776",
+    "auto-tank-queue-2-tooltip": "377bca11c3acb4a61c93970a7227f234fd47206634cb35134bdd4cdefc75ff16",
+    "auto-tank-queue-3-tooltip": "3065c720911e5818cde13b6d0740b8c6c3834038ab2753e3614c13a0db6ef211",
+    "auto-tank-queue-4-tooltip": "5767f85cee833b9e42595c1942c364627b1852956c1c2f80a12ebff608572550",
+    "auto-sixth-tank-capacity-refill-0-tooltip": "9fb15bbf386800abf5b612796c20a4fd5d3a2b817973a675672fdb831dd30976",
+    "14-early-paid-defenses-and-running-tank-queue": "b1441a623f548b33abaa5ed649d90b1c11e134d5380ba467bf1cd1d5f4862bc6",
+    "20-defense-review-000": "12860f8f0a8019da8e8ee09a6f09b80c7194dc9664649ae5822d262216a7dc22",
+    "20-defense-review-001": "9722471eb0198978b0b90fa87979f05c86840d25105dbc747334c03018aaae43",
+    "20-defense-review-002": "b5f9d63f494e4c07239a7a89226f608e897dbb56bad0157d36711e54bd285877",
+    "20-defense-review-003": "2b28e7fced6601cb2a8b962f46a07d688678f230221fef2126a3f9916798cc3c",
+    "20-defense-review-004": "dd246754c734672074426f127cddf8bdaa6f881b4fb419fd4d8435582d78a941",
+    "20-defense-review-005": "ee623c8a9d2c0c0080ecf97f96b4f59c47ab7c21453a77482058048f305575be",
+    "20-defense-review-006": "739420f6e5bc77c14b04ee14ddc379a7668277129fa5d8410056e05d3768f8ac",
+    "20-defense-review-007": "18fe65911368ddc3d69fd3a6cc35154095da91b6a34dec2c17cebc30be689647",
+    "20-defense-review-008": "c253550e13d4d57b4c6abfcd45f569b3da2761c925bba5c130ab2a727d5b9e3e",
+    "20-defense-review-009": "4e6c9e690367084acbf3cd97576af1fa34f664e1c6a4110834a723a34a1e9146",
+    "20-defense-review-010": "1c3478ae6519fafb6179e1d51ec7ef26604bb008733580d6e7081b13019b9b5b",
+    "20-defense-review-011": "7acf63287dcb25b394c42624271bfdd41ae238a12a299fefea3691efbdef3487",
+    "20-defense-review-012": "6cbab6d3044102204bbd5221b985102d78d822065c6f9cec4c35d4ef68ecb670",
+    "20-defense-review-013": "27bad2933a12bbeec75f0230a14f2a2a0724fd5dce5ee3983fa2e28cb3636f8a",
+    "20-defense-review-014": "b97c83a4cb98254c8fc141649f7f7c640495a01f1127202f63cbef6b0d23aa09",
+    "20-defense-review-015": "2783efd60fdff7e345378853859850bffe5a3d18e3a9c945be7ead78efd2a3d2",
+    "20-defense-review-016": "dc39a8a7a4f2d2f699f0ef9f985efd2535c19cbdf24a3567e3cae98974c9ed11",
+    "20-defense-review-017": "271c5d1597a90af3ace27a831eb6356631d95ee8d51222bed73b44eecc98641a",
+    "90-natural-mission1-victory": "98d254481434924ba53e33c8769426f5aaac56ccb9715ad1a7b09f9198ecb823",
+    "91-fresh-process-campaign-completed-menu": "dd7ce723d5cd4d1b6bcb50bf912d29a06ba7c2643cceb6d1d3cff6a967b3a4a9",
+    "92-fresh-process-first-unlock-prefix": "6b8be67b7f369aac334b120c6666515bea692a644c6cf3dafecbd548d1f7d1d4"
+  },
+  "raw_normal_save_hashes": {
+    "07-actual-mission-save.ron": "b823414970e2184de90fa632c57888c13a7ec17d32dd88608662fb86b79fd865",
+    "13-opening-paid-power.ron": "3d0b843465365b119f321eb28b47e3c81086b1628c59c196019228770b928d59",
+    "20-defense-review-000-normal-save.ron": "be15dbd5f95ed9664bf30f73c14a52d3aacc464d8449cee2325331fec5862223",
+    "20-defense-review-001-normal-save.ron": "96c63c6bb6e494ab67cab2b6a6db809cb70df27a82412530a21b466c83352cd1",
+    "20-defense-review-002-normal-save.ron": "e2b3e9c8f8d0643af1b011dc6a4ef5510237f2192c892fccf8afdca09342f849",
+    "20-defense-review-003-normal-save.ron": "66d674a05cd32cdc9f4e5c90f8855a4347677b0629a71ad6d61f150952edfaaf",
+    "20-defense-review-004-normal-save.ron": "0cc9daf16ba6cdccda46948ab7a13ed7303efc5abc0fb2945b0c337e74ab1307",
+    "20-defense-review-005-normal-save.ron": "f8e371b000d62eb13aa015a0ab0fe0f6452bfb3f4ac9c9e0898e193d0879ce46",
+    "20-defense-review-006-normal-save.ron": "bb98573e3ee79c450c3ce4b55ee67c51b499109443b592ed3827626a824cf2c3",
+    "20-defense-review-007-normal-save.ron": "c881bd50689e13c36a03b30d9a3d09d13824082e1691b1b6f2832139afcad7de",
+    "20-defense-review-008-normal-save.ron": "bb357b27405c382060be5ee5bc2b1829857390379ee0a1329ec500a419585a45",
+    "20-defense-review-009-normal-save.ron": "1340cd618eb2cc23373875954cfe0fa676300760056db68367f6fafff8c998d0",
+    "20-defense-review-010-normal-save.ron": "3d3d4582dd673f71cda4748143c75856b1d7d68bc2f1b30accbd3d973e5c7f7c",
+    "20-defense-review-011-normal-save.ron": "97f3147000834028db7cbbc373ef1c29f5c3f0d126104884ce4026675b9e440c",
+    "20-defense-review-012-normal-save.ron": "bb71602c8f8c3b80854dfb727a58a8e96434a8976426a9a8d87cabbb766edae9",
+    "20-defense-review-013-normal-save.ron": "538bda344d0dc1ced6dc30d4fbc0b66d20ba335a90ee3c33cd3c2ed5ac264efb",
+    "20-defense-review-014-normal-save.ron": "ab2df17b06bf0626212d3519b6d4e3e09f0198498ddd23ccd4c507bcd111adbc",
+    "20-defense-review-015-normal-save.ron": "890a229486e8e7a43d757d7ba0c980451af43534e438386aaf08ae323bdcf9dd",
+    "20-defense-review-016-normal-save.ron": "6d7ff67e56c7381589e5787a8711bc1f0bc13411f590fc9fd669465be1bf2320",
+    "20-defense-review-017-normal-save.ron": "6d7ff67e56c7381589e5787a8711bc1f0bc13411f590fc9fd669465be1bf2320",
+    "auto-01-AntiGroundTurret-before.ron": "40270c5499119394e9a506af03b409b492ffc9e1f74648463118d70c32281708",
+    "auto-01-AntiGroundTurret-paid.ron": "8fdf0817a0d6773b1ed597969a50613c196085c737d327587a4cbb9c7c45df97",
+    "auto-01-AntiGroundTurret-progress.ron": "14b141b98f541aabfc6340b64c53f67a86df2d6f150a7017f39d08d3a66e8562",
+    "auto-02-AntiGroundTurret-before.ron": "13f81d49ea867692b860f9be4f5530a62688e0ffc4635628c59bc5456b675199",
+    "auto-02-AntiGroundTurret-paid.ron": "444afa83806b11862f6ba297968965510b15aa4d7d3c04deb87aa1c3d30c246e",
+    "auto-02-AntiGroundTurret-progress.ron": "291758854f4ac9b064c69f6612678c4db51e2c0fe3e30fb80f1305aae2d0fc93",
+    "auto-03-Barracks-before.ron": "8d1ee268a5356037e08fdfe21595fa51f9a8ef6e911aa7c5808d0fde68cfacec",
+    "auto-03-Barracks-paid.ron": "dc7e19d9c83a8142e94ef36a00b8aad6f4ddc0514f20c128be8d7171295a48d9",
+    "auto-03-Barracks-progress.ron": "065db8782b92d2dee1697290fdc8e67f7a2af1459ba9790579dbbcc1b0b4504b",
+    "auto-04-VehicleFactory-before.ron": "37e2feb5c0ffce46ee36af3f8f4bbb01107d1f2407e671617306597fb41f72be",
+    "auto-04-VehicleFactory-paid.ron": "74b4733b81bc2b554cb2568e2c6982b71f633bb08f15bda5b34773c1aac80eb1",
+    "auto-04-VehicleFactory-progress.ron": "a89117ff9e7c72881fc817672b6b2193b46fafca18e472112bf9e46d8c4838b9",
+    "auto-current-own-worker-poses.ron": "10d33007f191503126d615d4efa72d483c5156786e78635713e633b021086d7f",
+    "auto-early-hmg-before.ron": "61145988a8560ec41ab1e5acd0d3875b6e42f485e593d5a63cfc99b0f707216c",
+    "auto-early-hmg-paid.ron": "10d33007f191503126d615d4efa72d483c5156786e78635713e633b021086d7f",
+    "auto-early-three-hmg.ron": "626854359ae2214b84b9a31dd5b11e7038f76c0053249538e6ed3d44c2cff725",
+    "auto-opening-finished.ron": "88ef38438f18c14d9d078f0bc6a2a394c5f38a4a8a39845848bddf76225b460b",
+    "auto-sixth-tank-capacity-refill-before.ron": "626854359ae2214b84b9a31dd5b11e7038f76c0053249538e6ed3d44c2cff725",
+    "auto-sixth-tank-capacity-refill-paid.ron": "5ae5651dcac11a280724570e9b4cfe2b2ce0ab11226eb5b40e86ac17c2abc5dd",
+    "auto-tank-queue-before.ron": "ab1b868c4c6ae060c8e192c54107552d87153a2e3fef4f74558951ab3245ef74",
+    "auto-tank-queue-paid.ron": "e7fbdca11ac04ed5d24383d3304311dba62d3d64714bba67ca16383725001eef"
+  },
+  "passed": true,
+  "limits": [
+    "Rawprogramvisual_pending remains true; this separateoffline record supplies actualimage adjudication without rewritingrawresult.",
+    "Old09forcedcleanup/final45timeout remainsfailed, all01\u201309 evidenceunchanged.",
+    "Natural120secondauthored30/15 supply explainsfinal38/24; no QAresourcegrant/harvestingincome claim.",
+    "Mission2\u20136 progression/defeatRetry/finale notaccepted.",
+    "PersistentTrainTanktooltip alongsideresults and stackedcenter notifications remain separatepresentationpolish gaps."
+  ]
+}
