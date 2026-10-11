@@ -17,7 +17,7 @@ A bounded regression or an older package cannot establish final release readines
   endpoints and medium routes travel1.975m after the first turn. Nine screenshot
   hashes and trajectories are independently checked; actual game exit is0,
   with no forced cleanup and unchanged installation/archive. Raw evidence is
-  `target/sdk300-short-medium-patrol-20261012-01/result.json`; browser verification
+  [portable Patrol proof](qa/sdk300-short-medium-patrol-review.json); browser verification
   remains pending. SDK296/W25 results retain their older artifact scope and all
   nine release gates remain open.
 - Native296 passes296 tests with0 failures and1 ignored; all three native checks
@@ -74,6 +74,13 @@ A bounded regression or an older package cannot establish final release readines
   completion observation is within154.701s of the original300s bound
   ([current official Runtime4 tutorial](qa/native291-official-runtime4-bootcamp-review.json)).
   Audio and Windows first-session acceptance remain required.
+- The frozen native291 official-SDK authored-start matrix completes
+  **3,726/3,726** unique terminal cases with no integrity errors or failures.
+  Driver and independent verifier exit0; recorded evidence hashes are rechecked
+  ([complete frozen matrix](qa/native291-complete-authored-start-matrix-review.json)).
+  Four current source files differ from that pin. This proves the frozen291
+  matrix only; current300 coverage, independent seeds, random maps, statistical
+  balance and human gameplay remain open.
 - The frozen native285 official-SDK matrix completes **3,726/3,726** cases
   within the original 600s simulation and 180s per-case wall limits. Independent
   verification accepts every terminal result, binary identity and all 332 assets.
