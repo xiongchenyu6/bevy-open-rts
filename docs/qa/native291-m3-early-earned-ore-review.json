@@ -36,9 +36,26 @@
     "snapshot_sha256": "103e6592ba26e15c59ba000984beb5998039ed95238a6608b32779e4881a158f"
   },
   "safety_of_attribution": "No losses/refund opportunity, own Command Center alive, unchanged crystal after paid cost accounting, exact consumed originally clicked node. No bank/resource/order setters.",
-  "workflow_still_running": true,
+  "workflow_still_running": false,
   "full_opening_pass": false,
   "mission_victory_pass": false,
   "same_application_six_mission_pass": false,
-  "all_release_gates_remain_open": true
+  "all_release_gates_remain_open": true,
+  "preserved_terminal_workflow": {
+    "passed": false,
+    "error": "No genuine returned Ore+depleted referenced node proof yet",
+    "wall_seconds": 285.25310114599415,
+    "actual_game_exits": [
+      {
+        "pid": 1808288,
+        "supervisor_pid": 1808213,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "forced_game_cleanup": false,
+    "installation_unchanged": true,
+    "archive_unchanged": true
+  },
+  "interpretation": "The early six Ore witness remains valid. Later normal auto-retarget income exceeded original-node depletion, so the single-node whole-opening attribution check failed. Original workflow remains failed; mission victory unverified."
 }
