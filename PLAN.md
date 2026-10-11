@@ -170,3 +170,6 @@ without error output; final capture verifies 4.24m movement and 113 siege damage
 - [x] Verify normalSDK267 Mission2 victory, two normal exits and fresh-process Mission3 unlock; separate fromsixsameApp.
 - [x] Verify Wasm16 twoHuman motion and activepaidHMG jobs through actualguestECS; 8peers/reconnect remain.
 - [ ] Fix actualnormalMission3 construction-contact stall using originalWorker/Drone/terrain and preserved30s failure.
+
+- [x] Exactnative279 privateUbuntu channel-volume/restart acceptance: five normal exits,10closedPCMchecks/all5Optionsdirectreview, no clipping/hostcapture, unchanged archive. Full officialRuntime4/audiohumanreview remain.
+- [ ] Verify both navigation fixes through full suite and a new optimizedpackage normalMission3; actualsaved-state REDs retained.
