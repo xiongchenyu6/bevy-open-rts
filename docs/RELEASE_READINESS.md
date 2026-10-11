@@ -7,6 +7,13 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Latest Verified Checkpoints
 
+- Current native300 passes300 tests with0 failures and1 ignored; all three
+  native checks and builds pass. Short and medium Patrol regressions reject the
+  former endpoint oscillation. The official-SDK package contains399 files/332
+  assets; its recorded evidence and complete installation inventory have been
+  independently rehashed ([shipping proof](qa/native300-route-patrol-shipping-review.json)).
+  Actual normal-input short/medium Patrol verification is pending. SDK296/W25
+  results retain their older artifact scope; all nine release gates remain open.
 - Native296 passes296 tests with0 failures and1 ignored; all three native checks
   and builds pass. Its official-SDK package contains399 files/332 assets
   ([current shipping proof](qa/native296-toast-shipping-review.json)).
@@ -117,7 +124,14 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Current Artifact Boundaries
 
-The current SDK296 notice-fix archive has399 files and332 assets. Its archive SHA256
+The current SDK300 route-aware Patrol archive has399 files and332 assets. Its archive
+SHA256 is `24afda2babe97e7d3c37f5f97c2c311fd4a7355d340abae70ea5827002348685`;
+the installed binary SHA256 is
+`ec5aa728f8e79e3fb3e34cfb39b790bf278362042a87a424ab2237d94f614608`.
+Normal player verification and a new browser build remain pending. It does not
+inherit earlier tutorial, save, campaign, audio or multiplayer acceptance.
+
+The previous SDK296 notice-fix archive has399 files and332 assets. Its archive SHA256
 is `19787ebddd97570e66d3b2576a1343a03cf66f6d875704ad84ab97ecd4a104cc`;
 the installed binary SHA256 is
 `165996cd616a91380a6a64785f134481ff466c8c744d34f6a35dc41f3821b1c0`.
