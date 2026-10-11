@@ -1,0 +1,27 @@
+{
+  "scope": "Local Wasm17 build on verified native285 inputs; fresh browser acceptance pending; no publication",
+  "actual_exit": 0,
+  "clean_actual_exit": 0,
+  "wall_seconds": 543.2215258399956,
+  "wasm_sha256": "1b17c9f57b6a4a06ecd344823c9dd69fefeff33729618e65099e35edac21b721",
+  "wasm_bytes": 27073094,
+  "frozen_manifest_sha256": "814069612463ffa18dbb67eb6e0b22560e2f27afa3bcc2044ab4b42e8fb8132f",
+  "native_sources": 120,
+  "assets": 332,
+  "frozen_files": 627,
+  "independently_verified": true,
+  "source_commit_at_freeze": "6808cd2e49f4844ba5af65380b3199bc01340d0a",
+  "compiled_inputs_authority": "Native source pin and frozen file hashes; commit alone does not describe then-uncommitted navigation code",
+  "native_pin_sha256": "e223768fdae3ab8fc34dce7606464503bb8949792b968e2d741270c72986624c",
+  "evidence": {
+    "target/web-current-build17-snapshot-20261011/result.json": "8dd99536c927ce4f6b68544be8ab8726a1b08cc0bf85459183a7677ce87a4c1e",
+    "target/web-current-build17-snapshot-20261011/input.json": "814069612463ffa18dbb67eb6e0b22560e2f27afa3bcc2044ab4b42e8fb8132f",
+    "target/web-current-build17-snapshot-20261011/build.log": "911565fbd1b654abb0fb23db8a30d250feb96ce3aab12056ddc4fc554f368197"
+  },
+  "limits": [
+    "Actual eightHuman run in progress",
+    "Normal six-mission SDK campaign pending",
+    "Full multiplayer match, host actions and signaling reconnect remain open",
+    "Public demo not updated"
+  ]
+}
