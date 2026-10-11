@@ -1,0 +1,17 @@
+{
+  "actual_exit": 0,
+  "source_and_assets_unchanged": true,
+  "wall_seconds": 612.7906845310063,
+  "wasm_sha256": "35a495542c3432156fd6b243118f9ae2e295be8922f135fce7e47277a894901d",
+  "wasm_bytes": 27035275,
+  "input_manifest_sha256": "10fc07882e02f8aeb84eeac41510a883d8996674ed03c00eeb3d5f92abd56f89",
+  "clean_actual_exit": 0,
+  "source_commit": "35dd9217ca0231c750b0401ff3d04adb69484d37",
+  "asset_count": 332,
+  "retained_home": "/home/freeman.xiong",
+  "scope": "Frozen native275 observer/lobby correction browser build; actual8footer and multiplayer runtime acceptance pending",
+  "recorded_inputs": 621,
+  "evidence": "target/web-current-build16-snapshot-20261011",
+  "runtime_acceptance": false,
+  "public_deployment": false
+}
