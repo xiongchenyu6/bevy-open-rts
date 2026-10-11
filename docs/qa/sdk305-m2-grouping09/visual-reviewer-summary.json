@@ -1,0 +1,13 @@
+{
+  "actual_pngs_inspected": 2,
+  "reviews_written": 1,
+  "review_ages_seconds": [
+    39.948593616485596
+  ],
+  "card_poll_age_seconds": 0.04833173751831055,
+  "failure": "Directwrite+nextpoll55 capturedcard at0.048s andviewed sameexec. Model/tool turnaround between actualPNGview and guardedwrite exceeded45s; deadline assertion rejected, no late gate. No M2gameplay entered.",
+  "late_approvals": 0,
+  "m2_gameplay_verified": false,
+  "cleanup_process_matches": [],
+  "gpu_released": true
+}

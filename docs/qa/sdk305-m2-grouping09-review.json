@@ -1,0 +1,15 @@
+{
+  "scope": "SDK305 normal fresh M2 attempt09 stopped at campaign-card review deadline before gameplay; no grouping defense or victory acceptance",
+  "actual_driver_exit": 1,
+  "actual_game_exit": 0,
+  "wall_seconds": 115.43528516101651,
+  "forced_cleanup": false,
+  "installation_archive_unchanged": true,
+  "next_action": "Fresh-context reviewer attempt10 with same40 helpers and original900/30/45; no gameplay or timing change",
+  "evidence_sha256": {
+    "docs/qa/sdk305-m2-grouping09/visual-reviewer-summary.json": "7b4994714802de91ce8524765c62cb86ef3e8d80f2520a50868306ae7a55d191",
+    "docs/qa/sdk305-m2-grouping09/result.json": "427fa8f77e90d66b86448f463a2330e3c11e2c4ebd4bb92e8aae215e4af99384",
+    "docs/qa/sdk305-m2-grouping09/normal-M2-campaign-card.png": "4cec9b10da989213e0b5fb6d9bb3a4658f33f3648e4193b8722da5f42ea085f3",
+    "docs/qa/sdk305-m2-grouping09/normal-M2-main-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c"
+  }
+}

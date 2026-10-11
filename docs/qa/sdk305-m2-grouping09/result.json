@@ -1,0 +1,29 @@
+{
+  "scope": "FreshMission2diagnostic withbyteexactgenuineearnedMission1progress; notsixsameApp acceptance",
+  "passed": false,
+  "original_wall": 900,
+  "original_simulation": 900,
+  "original_site": 30,
+  "original_review": 45,
+  "genuine_earned_profile_sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+  "error": "Original45 current Strike the Outpost review exhausted",
+  "error_type": "RuntimeError",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/run_fresh_m2_grouping09_refresh05.py\", line 38, in <module>\n    click_current_reviewed(s,'normal-M2-campaign-card','Strike the Outpost');s.wait_bounded(2)\n    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/coordinator399.py\", line 62, in click_current_reviewed\n    if time.monotonic()-began>=45:raise RuntimeError('Original45 current '+caption+' review exhausted')\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: Original45 current Strike the Outpost review exhausted\n",
+  "actual_exits": [
+    {
+      "pid": 3578124,
+      "supervisor_pid": 3578069,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "normal-M2-main-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "normal-M2-campaign-card.png": "4cec9b10da989213e0b5fb6d9bb3a4658f33f3648e4193b8722da5f42ea085f3",
+    "actual-M2-failure.png": "4cec9b10da989213e0b5fb6d9bb3a4658f33f3648e4193b8722da5f42ea085f3"
+  },
+  "wall_seconds": 115.43528516101651
+}
