@@ -161,3 +161,6 @@ without error output; final capture verifies 4.24m movement and 113 siege damage
 
 - [ ] Resolve current267 Big Arena cases2641/2668, preserving original600sim/180wall limits and retained failures.
 - [ ] Verify result-tooltip cleanup in full suite, fresh rendered victory/defeat and final package; focused real-App regression passes.
+
+- [ ] Verify persisted player preferences in a new optimized package through normal Options clicks and fresh restart; native disk regressions pass, startup initialization/consolidated checks pending.
+- [ ] Repeat isolated audio channel acceptance with per-phase recording boundaries; first semantic-stop run and actual fresh-process volume reset are retained.
