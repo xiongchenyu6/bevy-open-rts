@@ -1,0 +1,58 @@
+{
+  "scope": "Current native305 Hold-aware Wasm27 shipping build integrity only; no browser runtime, GUI/M2 acceptance, or public deployment",
+  "actual_exit": 0,
+  "wall_seconds": 655.4567737770267,
+  "native_product_source_commit": "4f8e5884c1edb44afa56d772ca21dadf728df271",
+  "source_commit": "1a00acdf63336d2eb7641d9d91a7e7ca1235af4d",
+  "sources": 143,
+  "assets": 332,
+  "fork_files": 15,
+  "frozen_files": 644,
+  "nonweb_frozen_verified": 642,
+  "clean4_actual_exit": 0,
+  "actual_four_frozen_compilepaths": {
+    "bevy-open-rts": [
+      "   Compiling bevy-open-rts v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build27-snapshot-20261012/source)"
+    ],
+    "open-bevy-protocol": [
+      "   Compiling open-bevy-protocol v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build27-snapshot-20261012/source/crates/open-bevy-protocol)"
+    ],
+    "open-bevy-net": [
+      "   Compiling open-bevy-net v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build27-snapshot-20261012/source/crates/open-bevy-net)"
+    ],
+    "matchbox_socket": [
+      "   Compiling matchbox_socket v0.14.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build27-snapshot-20261012/source/crates/matchbox-socket)"
+    ]
+  },
+  "wasm_bindgen": "0.2.128",
+  "wasm_sha256": "7d9181a4fcd70cc9da7d7916efa0bde65f69f3611d8781420c05a17b0c4aadce",
+  "wasm_bytes": 27082151,
+  "gzip_equal": true,
+  "protected_originals_unchanged": true,
+  "alias": "web/qa-wasm27",
+  "native_pin_sha256": "db64dcd94b7a7497ba50809371c9140f66db78043deb828211b2a165fd75a214",
+  "evidence_sha256": {
+    "target/web-current-build27-snapshot-20261012/input.json": "481119c9febf82419a0d742384dda50d5c347b620fecc31bceeca33e91a81713",
+    "target/web-current-build27-snapshot-20261012/result.json": "584ca2699ad0de6ee91175e88a0d5c9e0a588c203ff93fd4d04a16ba614fa68b",
+    "target/web-current-build27-snapshot-20261012/seal.json": "35b091955c46b2d1d275b1733f0aab1ce514bb3fb85d616a4292464b36248dbe",
+    "target/web-current-build27-snapshot-20261012/build.log": "c1433fab69d355d9ee6cbc6a89a7cef68a0ad734f3523685169f3a40a06a7a79",
+    "target/web-current-build27-snapshot-20261012/clean-project-wasm.log": "705317368ca1294647bded1ef1b29bbb82f44076542e816eb2e696f513ab3e09"
+  },
+  "build_id": "eef8c356bbad5e2e",
+  "managed_unit": "rts-web27-hold-build-20261012",
+  "invocation": "282bf29ba03f4014aa5956b1bc79d799",
+  "portable_evidence_sha256": {
+    "docs/qa/web27-hold-build-20261012/build.log": "c1433fab69d355d9ee6cbc6a89a7cef68a0ad734f3523685169f3a40a06a7a79",
+    "docs/qa/web27-hold-build-20261012/clean-project-wasm.log": "705317368ca1294647bded1ef1b29bbb82f44076542e816eb2e696f513ab3e09",
+    "docs/qa/web27-hold-build-20261012/independent-review.json": "b03d6613e4032f136e26b02271e9a9dda3967a3bc47d763d0a1a1992ec216fd8",
+    "docs/qa/web27-hold-build-20261012/input.json": "481119c9febf82419a0d742384dda50d5c347b620fecc31bceeca33e91a81713",
+    "docs/qa/web27-hold-build-20261012/result.json": "584ca2699ad0de6ee91175e88a0d5c9e0a588c203ff93fd4d04a16ba614fa68b",
+    "docs/qa/web27-hold-build-20261012/seal.json": "35b091955c46b2d1d275b1733f0aab1ce514bb3fb85d616a4292464b36248dbe"
+  },
+  "boundaries": [
+    "Initial cached native303 run remains invalid; verified native305 is the matching source pin.",
+    "Shipping Wasm build integrity only; no browser runtime adjudication.",
+    "No M2/grouping09 or six-mission acceptance claim.",
+    "Private local alias only; no public deployment."
+  ]
+}
