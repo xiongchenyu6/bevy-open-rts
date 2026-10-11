@@ -33,6 +33,12 @@ A bounded regression or an older package cannot establish final release readines
   normally with one game process and unchanged package/archive. Mission3 and
   later missions are not reached ([chain outcome](qa/sdk294-same-app-chain01-review.json)).
   Fresh Mission2 income/targeting diagnostics and the six-mission acceptance remain open.
+- Wasm26 builds successfully from the native300 source pin. Its actual Wasm
+  bytes, input manifest and641 non-web frozen inputs are independently rehashed
+  ([browser build proof](qa/web26-route-patrol-shipping-build-review.json)).
+  Browser attempts01/02 stop at screenshot-review deadlines before Patrol.
+  Attempt02 verifies menu approval within17.31s; this proves neither gameplay
+  nor browser Patrol. Both browsers close normally; runtime acceptance remains open.
 - All326 active asset-ledger records independently match both the current
   worktree and exact SDK300 installation; the packaged ledger and archive
   hashes also match ([current asset identity](qa/native300-active-asset-ledger-review.json)).
@@ -153,8 +159,10 @@ The current SDK300 route-aware Patrol archive has399 files and332 assets. Its ar
 SHA256 is `24afda2babe97e7d3c37f5f97c2c311fd4a7355d340abae70ea5827002348685`;
 the installed binary SHA256 is
 `ec5aa728f8e79e3fb3e34cfb39b790bf278362042a87a424ab2237d94f614608`.
-The bounded normal-input short/medium Patrol proof passes; a new browser build
-and broader final-package player verification remain pending. This archive does not
+The bounded normal-input short/medium Patrol proof passes. Wasm26 is built with
+SHA256 `f9df5efeb5a9323da51e80ff3e2bdeef22b2968773f53af2957039bc82994054`;
+browser runtime and broader final-package player verification remain pending.
+This archive does not
 inherit earlier tutorial, save, campaign, audio or multiplayer acceptance.
 
 The previous SDK296 notice-fix archive has399 files and332 assets. Its archive SHA256
