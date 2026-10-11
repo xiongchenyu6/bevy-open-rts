@@ -1,0 +1,88 @@
+{
+  "scope": "Exact current267 native headless case2668 simulation failure; not optimized SDK player flow",
+  "config": {
+    "difficulties": [
+      "easy",
+      "beginner"
+    ],
+    "factions": [
+      "chaos",
+      "chaos"
+    ],
+    "map": "big_arena",
+    "max_seconds": 600,
+    "spawn_slots": [
+      6,
+      2
+    ]
+  },
+  "actual_exit": 2,
+  "simulation_seconds": 600.0084228515625,
+  "wall_seconds": 108.67825926598744,
+  "original_limits": {
+    "simulation": 600,
+    "wall": 180
+  },
+  "starting_resources": {
+    "crystal": 16,
+    "ore": 32
+  },
+  "phase": "Running",
+  "remaining_anchors": 10,
+  "teams": [
+    {
+      "crystal": 243,
+      "ore": 938,
+      "pending_construction": 0,
+      "player": 0,
+      "structure_types": {
+        "AircraftFactory": 1,
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "OrePurifier": 1,
+        "PowerReactor": 3,
+        "RadarUplink": 1,
+        "Refinery": 1,
+        "RoboticsBay": 1,
+        "TechLab": 1,
+        "VehicleFactory": 1
+      },
+      "structures": 12,
+      "unit_types": {
+        "ScoutRover": 2,
+        "ShieldTrooper": 1,
+        "Worker": 3
+      },
+      "units": 6
+    },
+    {
+      "crystal": 14,
+      "ore": 755,
+      "pending_construction": 0,
+      "player": 1,
+      "structure_types": {
+        "CommandCenter": 1,
+        "OrePurifier": 1,
+        "PowerReactor": 2,
+        "RadarUplink": 1,
+        "Refinery": 1,
+        "RoboticsBay": 1,
+        "TechLab": 1
+      },
+      "structures": 8,
+      "unit_types": {
+        "Worker": 5
+      },
+      "units": 5
+    }
+  ],
+  "binary_sha256": "3f7994f460e16c4d4d8483e976cc6e71b03688e342030de5f0175717ecb1605f",
+  "assets_unchanged": true,
+  "diagnosis": "Unresolved; retained complete actual timeout units/footprints for causal inspection. No changed limits or current full-matrix claim.",
+  "evidence_sha256": {
+    "target/repeat267-case2668-20261011-01/result.json": "3aa44516799610c715dce7ac3f2c0a32aba036468fb48b3cf7e7142076fc47af",
+    "target/repeat267-case2668-20261011-01/process-result.json": "fa68563a53552f21a3305061a97bd687b34706e01e862e2776d80cf49f77fa34",
+    "target/repeat267-case2668-20261011-01/input.json": "a3e2c4086fd4c85c84739324ead8cd00f1b1f02856de6631db233ff2de4b8b7c",
+    "target/repeat267-case2668-20261011-01/runtime.log": "86c5ede07aa74f23b12812ea5d6f43c475c9fdaa2a7e1e970af769ad4ce7d7dc"
+  }
+}
