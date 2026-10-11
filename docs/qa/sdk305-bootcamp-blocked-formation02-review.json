@@ -1,0 +1,24 @@
+{
+  "scope": "Normal SDK305 tutorial failure after firstsixlessons; camera focus succeeds but formation endpoint enters paidPower, graduation/Replay not reached",
+  "actual_runner_exit": 1,
+  "actual_game_exit": 0,
+  "wall_seconds": 288.3173892130144,
+  "forced_cleanup": false,
+  "installation_archive_unchanged": true,
+  "actual_Move_orders": 5,
+  "arrived_within_original30": 4,
+  "remaining_rifle_key": 51539605902,
+  "original_goal_to_power_m": 1.0957861042298807,
+  "physical_radius_sum_m": 1.87,
+  "root_directly_viewed_scout_and_failure_png": true,
+  "evidence_sha256": {
+    "docs/qa/sdk305-bootcamp-blocked-formation02/13-public-scout-00.png": "6bde4a93c97840bda84ab3927dbbd81f351dfd00ef2709184fb185a5826b77ec",
+    "docs/qa/sdk305-bootcamp-blocked-formation02/natural-arrival-progress.ron": "85fad7728ef97ebafb77801eef80a7759fcbf048f0da7ac5f494da0ff6ed7110",
+    "docs/qa/sdk305-bootcamp-blocked-formation02/99-failure.png": "9e79601f003296e6d6404b6a4d335b2f3409622f63f03ca3eb85a81da1958e59",
+    "docs/qa/sdk305-bootcamp-blocked-formation02/auto-result.json": "29ae32823fe0222dc76785c82e9b918eccc981ce08f3f1b5317084eef610e363",
+    "docs/qa/sdk305-bootcamp-blocked-formation02/normal-cohort-focus.json": "5dbd920d8aeb498995fac2c0eae0a2bbcb0ecf5547558e99e4013e6acd87c20f",
+    "docs/qa/sdk305-bootcamp-blocked-formation02/actual-Move.ron": "601d004410322a3d6776219a60e118a4be7458b05b9b554f04eba953588a55b4",
+    "docs/qa/sdk305-bootcamp-blocked-formation02/reviewer-summary.json": "149f677093da0a5781af7e68ccb04da9567bede642fec57241e0f7313f4e9987"
+  },
+  "boundary": "New source isolatedGREEN andcanonical309tests do notyetprove repaired normalGUI orfullBootCamp"
+}

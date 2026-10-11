@@ -1,0 +1,45 @@
+{
+  "status": "FAIL original30 natural Move exhaustion; earned/freshReplay not reached",
+  "actual_error": "Original30 natural Move / original300 attack bound exhausted",
+  "verified_pngs": 29,
+  "camera_focus_receipt": "target/sdk305-runtime4-bootcamp-auto-20261012-02/01/scout-00-normal-cohort-focus.json",
+  "actual_Move_all_five": true,
+  "last_pending_own_military": [
+    {
+      "key": 51539605902,
+      "id": "LightRifleInfantry",
+      "position": [
+        -13.462347030639648,
+        0.05000000074505806,
+        -22.176061630249023
+      ],
+      "active": [
+        {
+          "kind": "Move",
+          "destination": [
+            -12.586511611938477,
+            0.0,
+            -21.93024444580078
+          ]
+        }
+      ],
+      "queued": [],
+      "cargo_ron": "None"
+    }
+  ],
+  "own_clock_elapsed": 29.166053771972656,
+  "profile_exists": false,
+  "normal_exits": [
+    {
+      "pid": 3689157,
+      "supervisor_pid": 3689065,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "wall_seconds": 288.3173892130144,
+  "unit_state": "ActiveState=failed\nMainPID=0\nExecMainStatus=1\nControlGroup=\n"
+}

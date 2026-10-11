@@ -1,0 +1,50 @@
+{
+  "scope": "Current normal physical BootCamp Skip/seven/earned/freshReplay; actual render adjudication required",
+  "passed": false,
+  "error_type": "AssertionError",
+  "error": "Original30 natural Move / original300 attack bound exhausted",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk305-bootcamp-preparation-20261012/auto02.py\", line 82, in <module>\n    s=PhysicalSession(ready['package'],ready['archive'],ready['binary_sha256'],ready['archive_sha256'],ROOT/'target/sdk305-runtime4-bootcamp-auto-20261012-02',900);s.begin_mission(0);r['receipts']=run(s);s.normal_close_and_require_exit_zero();r['flow_passed']=True\n                                                                                                                                                                                                     ~~~^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk305-bootcamp-preparation-20261012/auto02.py\", line 69, in run\n    else:natural_move(s,o,cohort,p,min(start+300,time.monotonic()+30),'scout-%02d'%attempt)\n         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk305-bootcamp-preparation-20261012/bootcamp02_controls.py\", line 56, in natural_move\n    s.check_wall();assert time.monotonic()<deadline,'Original30 natural Move / original300 attack bound exhausted'\n                          ^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Original30 natural Move / original300 attack bound exhausted\n",
+  "normal_exits": [
+    {
+      "pid": 3689157,
+      "supervisor_pid": 3689065,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "01/00-fresh-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01/01-Skip-training.png": "f1f4a59bde6382651ca207bcef315e3400f5d1f0420636e415452c6a9e137916",
+    "01/02-after-Skip.png": "37337524abdef7b31ee27476def34fcc94e43b3533f99e2d2da6ee543328f4be",
+    "01/03-full-training-menu.png": "df6189c7940616cf4dde39e17c1987d514e9a1c7dd7306887656b920d5aeab65",
+    "01/04-Worker.png": "7f53242e1cf98405cf5ebee701282841a79fc491386153d8d2b8af8629ab376b",
+    "01/05-Ore.png": "b31fe053bc17cdc7b1867478b70d43d71b6fde8db4896a5ea513ddeb0899f522",
+    "01/06-gathered.png": "874b12ca118a8f1782f33b1a5314ddc27b51d1ff551b553e490f2a7fa9d90396",
+    "01/auto-01-PowerReactor-tab-tooltip.png": "89f6fbe2b187ac6541b578e557999e290abe71fc7a3a01592635672c8430c4b1",
+    "01/auto-01-PowerReactor-candidate-0-before-ghost.png": "83feeaf13df500cfb13c428279cca23c362d2685a4363e19471116d6d8b236dc",
+    "01/auto-01-PowerReactor-candidate-0-build-tooltip.png": "8e87ad91205a58f73dbe26f456e572b9bb5cc247836111c2cb2251f196fd8201",
+    "01/auto-01-PowerReactor-ghost-0.png": "3cb5ed774c4f6c5bd210adc79b5fafff4d142a78f9749e036222aca554f59251",
+    "01/auto-01-PowerReactor-completed.png": "d24b8a35711463fb8b58cc518b2cbcff32a02964d25da77318ec36b8b3b947c4",
+    "01/auto-02-Barracks-tab-tooltip.png": "d2ef1a9398f8453a79b805d876c2902dbfd88bbe95b11db440bd91dd1c5dd7df",
+    "01/auto-02-Barracks-candidate-0-before-ghost.png": "478ac9e4f3a0df039ead770fbde4fc2b75a74b8c968d9fb2ba1630dd6d399d9f",
+    "01/auto-02-Barracks-candidate-0-build-tooltip.png": "8dc84d38fd7973a5fc4e61d787060d7a825e17820df00151921fae94e7be7430",
+    "01/auto-02-Barracks-ghost-0.png": "43215360ad7e3cf1c7a44e363ce9cacc61e79879e4885d4ecd77cc14037e8735",
+    "01/auto-02-Barracks-candidate-1-before-ghost.png": "6ddd94d6737708b9a878836b0f2e0acefa4375a7a28d4754755f6afffbe9b113",
+    "01/auto-02-Barracks-candidate-1-build-tooltip.png": "d53dcbfc97485f7507fce4e58e92bc2ab6750d5fb646f963d7027916357686f4",
+    "01/auto-02-Barracks-ghost-1.png": "523c65b0ebcc0a492163f35c829b3191203d5efbdae858b78885f96c2ec51ab0",
+    "01/auto-02-Barracks-completed.png": "d7f3af34a1001e9465e9b3f822e885cc07a02035b9f1e5a572b9eb76367a75a8",
+    "01/09-four-paid-Infantry-0-tooltip.png": "31a76ed34733d037023dc738b1f9eacfbea0794676fbe8c27b75c7a306876a65",
+    "01/09-four-paid-Infantry-1-tooltip.png": "d1e4bfc650ddb0ea79e1d7dcfc0772acdbf0b534e986f6214fed691fab7e045a",
+    "01/09-four-paid-Infantry-2-tooltip.png": "57d85de2f2ac9f43da407ab65e3d6803a389bad093f49ba15830575726910b51",
+    "01/09-four-paid-Infantry-3-tooltip.png": "e8cc52508f01a83f75e232c6d145e56084afdd94220f35cf8b9acae49ab1f395",
+    "01/10-four-ready.png": "bcb0abbf7f2a2ac21511ad2803f1b94815383e93c92facc41289df34e239e35e",
+    "01/11-public-move.png": "9fb0c005cd8b955a4a59755ff6c5f87ebe14529c9633120e04dacb4fae56fb84",
+    "01/12-Attack-lesson.png": "48524ccdcd2b857e3de90ee938f2b93057e33e02f71ea0dd13545907a3772f4c",
+    "01/13-public-scout-00.png": "6bde4a93c97840bda84ab3927dbbd81f351dfd00ef2709184fb185a5826b77ec",
+    "01/99-failure.png": "9e79601f003296e6d6404b6a4d335b2f3409622f63f03ca3eb85a81da1958e59"
+  },
+  "wall_seconds": 288.3173892130144
+}
