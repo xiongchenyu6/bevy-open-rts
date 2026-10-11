@@ -1,0 +1,85 @@
+{
+  "scope": "SDK292 genuine case07 retained-save normal CtrlL continuation; not freshM3, sixsameApp, or campaign victory",
+  "package": {
+    "ready": "target/linux-native292-unarmed-extracted-20261011/ready.json",
+    "binary_sha256": "9de865dea62439e84c7908b9d7721db01994aa6abc67888bff71437710259402",
+    "archive_sha256": "1913e6dcab45a5af3188fc1c37a30a885d2b7cca7edccfc8da7c7b63acc3e4e6",
+    "files": 399,
+    "assets": 332
+  },
+  "raw_output": "target/sdk292-retained-m3-07-continue-20261011-02",
+  "diagnostic_flow_passed": true,
+  "campaign_victory": false,
+  "fresh_M3_gate_passed": false,
+  "actual_natural_phase": "HumanDefeat",
+  "actual_simulation_clock": 712.7493286132812,
+  "actual_prefix": [
+    "hold_the_line",
+    "strike_the_outpost"
+  ],
+  "original_limits": {
+    "wall": 900,
+    "simulation_ceiling": 900
+  },
+  "actual_wall_seconds": 775.4608782299911,
+  "normal_game_exits": [
+    {
+      "pid": 2878369,
+      "supervisor_pid": 2878276,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "source_ron_unchanged": true,
+  "earned_original_unchanged": true,
+  "source_ron_sha256": "1fda9b3ce11e0345eb224e6cec42deec5f146f11d17e82bc9273e01e72af2a5e",
+  "earned_progress_sha256": "49a2d1643b35bdc53c65186dff35bb82e29e9c7d92f72d20472cda617e645fc2",
+  "load_receipt": "01/02-normal-loaded.ron",
+  "natural_result_png": "01/90-natural-HumanDefeat.png",
+  "direct_result_frame_review": {
+    "reason": "Your base was eliminated",
+    "clock_display": "11:52",
+    "enemy_kills_units": 227,
+    "enemy_kills_buildings": 1,
+    "own_losses_units": 3,
+    "own_losses_buildings": 5,
+    "selected_surviving_army": {
+      "Drone": 1,
+      "HeavyMachinegunTrooper": 8,
+      "Tank": 19
+    }
+  },
+  "all_fifty_seven_PNG_hashes_verified": true,
+  "actual_paid_refill_orders": 13,
+  "retrospective_own_chronology": {
+    "file": "retrospective-own-HQ-worker-chronology.json",
+    "last_worker_hp_534_66": 6,
+    "worker_hp_551_58": 4.8,
+    "worker_absent_567_97": true,
+    "loaded_HQ_last_saved_699_923": {
+      "owner": 0,
+      "health": 20
+    },
+    "final_HQ_capture_or_destruction_unproven": true,
+    "never_used_for_gameplay_targets": true
+  },
+  "retained_failures": {
+    "fresh_case07": "still failed on harness range condition; never reclassified",
+    "continuation01": "failed on zeroCrystal refill attempt; preserved"
+  },
+  "limitations": [
+    "Not identical to headless individual frontguard policy",
+    "No conclusion that difficulty is unwinnable or balance changes required",
+    "Final HQ fate not established from preterminal saved sample",
+    "Source snapshot uses unarmed AttackMove fix, not later Patrol fix; no Patrol issued"
+  ],
+  "raw_hashes": {
+    "result.json": "e99ad5e79cf1bd4187421f3567327645681d4e164e581efafaa1974a5b306b39",
+    "01/02-normal-loaded.ron": "f47922e0e497487ec8894eb192551f9afdbdd3dbac29ea52544fcf58e0c2db78",
+    "retrospective-own-HQ-worker-chronology.json": "0917f2959ef9d188943ecacc858b25075522040b93f409413742069ee05c6c70",
+    "01/90-natural-HumanDefeat.png": "a3a6f132b7d385ac99aa481716ce662bc20be9c60d80ef171360b7e8593b8bd0"
+  }
+}
