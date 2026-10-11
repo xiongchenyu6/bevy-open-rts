@@ -1,0 +1,35 @@
+{
+  "scope": "Direct native normal campaign cutscene render and Enter dismissal; debug checkpoint only, final SDK/browser/Windows presentation pending",
+  "binary_sha256": "816639e08b9198096e5059888aa813c470eda99715a870c4470d6887406f5c27",
+  "actual_game_exit": 0,
+  "normal_close": true,
+  "forced_cleanup": false,
+  "wall_seconds": 49.93676488799974,
+  "direct_visual_findings": [
+    "Initial and later illustrated briefing visibly show gradual art zoom",
+    "Title,briefing and Enter hint readable without clipping",
+    "Normal Enter reveals actual CanyonPass battlefield and03:58holdout HUD"
+  ],
+  "B0004_warnings": 0,
+  "readonly_clock_observations": {
+    "02-real-cutscene-initial": 0.016377761960029602,
+    "03-real-cutscene-later": 0.016377761960029602,
+    "04-real-cutscene-full-briefing": 0.016377761960029602,
+    "05-normal-Enter-dismissed": 0.016377761960029602
+  },
+  "clock_evidence_limit": "Observer values also unchanged after dismissal while rendered countdown advanced; not standalone proof of paused/resumed simulation. Real-App regression separately tests virtual pause and real-time animation.",
+  "evidence": {
+    "target/cutscene-normal-render-20261011-01/result.json": "e0495cbe986c7c8e046ab2341267f1af65b9e539f4b6d102457efae8a068d544",
+    "target/cutscene-normal-render-20261011-01/events.json": "3aa53675aa72ee99e6c872942259d413a40c26f92d82f501c45d95ea48544089",
+    "target/cutscene-normal-render-20261011-01/game.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "target/cutscene-normal-render-20261011-01/02-real-cutscene-initial.png": "8e1450247b6f756a3bc59e7f5644196fdf9ad066b2de229fa0754d14ea977b45",
+    "target/cutscene-normal-render-20261011-01/03-real-cutscene-later.png": "d72e9580127c17a9bd70935945d6db699df73830d8f15319a1874bc41532cd33",
+    "target/cutscene-normal-render-20261011-01/04-real-cutscene-full-briefing.png": "919cd4b24d6de43f6b1d59cf4bfab9e0eb4cb587894e248b2c2fcff195029a4b",
+    "target/cutscene-normal-render-20261011-01/05-normal-Enter-dismissed.png": "fe6faa5a6fbdab573a3012f5df3f76bcb2af3b7ba7eafe5f5e36646c4861e462"
+  },
+  "limits": [
+    "Only first mission briefing at1280x720 native debugcheckpoint",
+    "No replay,allmission,resolution,browserorWindows acceptance",
+    "New optimized officialSDKbuild still underway"
+  ]
+}
