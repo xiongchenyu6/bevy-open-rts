@@ -1,0 +1,15 @@
+{
+  "scope": "Current asset ledger byte identity and six campaign derivative/package correspondences; not commercial-rights or visual acceptance",
+  "active_asset_records": 326,
+  "active_hash_mismatches": [],
+  "ledger_sha256": "de71e605da8c803ed81e380b35744af7142e46f27b5af34a475f018cbe97e579",
+  "campaign_images": 6,
+  "source_runtime_ledger_code_and_SDK294_matches": true,
+  "retired_campaign_JPEGs_absent_in_tree_and_SDK294": true,
+  "package_archive_sha256": "76aaa6754e67d031a7ca8d41e9ad13539bc374ebef11af7ce166b47396312b6e",
+  "limitations": [
+    "326 ledger records and332 runtime files have different scopes",
+    "Generated terms and commercial rights remain open",
+    "Does not verify final all-mission rendering"
+  ]
+}
