@@ -1,0 +1,302 @@
+{
+  "scope": "Wasm15 observer/native273 normal two-human forcedrelay paidPower plus independently queried actual guest ECS comparison; preonline-lobby-footer UI fix",
+  "wasm_sha256": "1bd898b4881234fc2aa1d50b29e03e9086018cd8c516003efe613a5a9ef0c436",
+  "wasm_bytes": 27028537,
+  "assets": 332,
+  "actual_supervisor_exit": 0,
+  "node_driver_paid_verifier_world_verifier_exits": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "deadline_seconds": 240,
+  "wall_seconds_from_prelaunch_artifact_to_final_result": 123.05596208572388,
+  "normal_closure": "Normal awaitedbrowser.close completed; no supervisor timeout/forcedcleanup",
+  "independent_replicated_guest_ECS_samples": 33,
+  "actual_common_world_ticks": [
+    176,
+    177,
+    178,
+    179,
+    180,
+    183,
+    184,
+    185,
+    186,
+    187,
+    188,
+    189,
+    190,
+    191,
+    194,
+    195,
+    196,
+    197,
+    198,
+    199,
+    200,
+    201,
+    202,
+    203,
+    206,
+    207,
+    208,
+    209,
+    210,
+    211,
+    212,
+    213,
+    214
+  ],
+  "entity_component_mismatches": [],
+  "resource_job_support_clock_differences": [],
+  "render_pose_differences": [],
+  "sampled_actual_network_entity_count": 25,
+  "steady_state_limits": {
+    "Worker7_unique_render_poses": 1,
+    "active_interpolation_components_in_common_samples": 0,
+    "build_queue_jobs_in_common_samples": 0,
+    "runtime_moving_interpolation_accepted": false,
+    "busy_production_job_continuity_accepted": false
+  },
+  "normal_paid_Power": {
+    "initial_bank": [
+      32,
+      16
+    ],
+    "cost": [
+      3,
+      1
+    ],
+    "final_economy": {
+      "crystal": 15,
+      "ore": 29,
+      "power_capacity": 26,
+      "power_sabotage_remaining": 0.0,
+      "power_used": 0,
+      "production_veterancy_ranks": [
+        0,
+        0,
+        0
+      ]
+    },
+    "completed_entity": [
+      {
+        "cargo": null,
+        "construction": null,
+        "health": [
+          12.0,
+          12.0
+        ],
+        "id": 9,
+        "kind": {
+          "Structure": {
+            "id": "PowerReactor"
+          }
+        },
+        "rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "team": {
+          "Player": 1
+        },
+        "translation": [
+          10.831581115722656,
+          0.0,
+          -17.498512268066406
+        ],
+        "veterancy": null,
+        "visual_faction": "Demon"
+      }
+    ]
+  },
+  "actual_host_routes": [
+    {
+      "connectionState": "connected",
+      "iceConnectionState": "connected",
+      "signalingState": "stable",
+      "iceGatheringState": "complete",
+      "localDescriptionType": "offer",
+      "remoteDescriptionType": "answer",
+      "candidateCount": 10,
+      "candidateErrors": [
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        }
+      ],
+      "descriptionStages": [
+        {
+          "stage": "createOffer-called",
+          "time": 16323.300000011921,
+          "descriptionType": null
+        },
+        {
+          "stage": "createOffer-resolved",
+          "time": 16329.09999999404,
+          "descriptionType": null
+        },
+        {
+          "stage": "setLocalDescription-called",
+          "time": 16329.59999999404,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "setLocalDescription-resolved",
+          "time": 16331.40000000596,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "setRemoteDescription-called",
+          "time": 96256.09999999404,
+          "descriptionType": "answer"
+        },
+        {
+          "stage": "setRemoteDescription-resolved",
+          "time": 96261.80000001192,
+          "descriptionType": "answer"
+        }
+      ],
+      "routes": [
+        {
+          "nominated": true,
+          "bytesSent": 58504,
+          "bytesReceived": 8084,
+          "localType": "relay",
+          "remoteType": "relay"
+        }
+      ]
+    }
+  ],
+  "actual_guest_routes": [
+    {
+      "connectionState": "connected",
+      "iceConnectionState": "connected",
+      "signalingState": "stable",
+      "iceGatheringState": "complete",
+      "localDescriptionType": "answer",
+      "remoteDescriptionType": "offer",
+      "candidateCount": 10,
+      "candidateErrors": [
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        },
+        {
+          "code": 701
+        }
+      ],
+      "descriptionStages": [
+        {
+          "stage": "setRemoteDescription-called",
+          "time": 50948.59999999404,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "setRemoteDescription-resolved",
+          "time": 50949.80000001192,
+          "descriptionType": "offer"
+        },
+        {
+          "stage": "createAnswer-called",
+          "time": 50950,
+          "descriptionType": null
+        },
+        {
+          "stage": "createAnswer-resolved",
+          "time": 50950.59999999404,
+          "descriptionType": null
+        },
+        {
+          "stage": "setLocalDescription-called",
+          "time": 50950.59999999404,
+          "descriptionType": "answer"
+        },
+        {
+          "stage": "setLocalDescription-resolved",
+          "time": 50951.80000001192,
+          "descriptionType": "answer"
+        }
+      ],
+      "routes": [
+        {
+          "nominated": true,
+          "bytesSent": 8034,
+          "bytesReceived": 58310,
+          "localType": "relay",
+          "remoteType": "relay"
+        }
+      ]
+    }
+  ],
+  "image_review": {
+    "greenpreview_personally_viewed": true,
+    "completedPower_and29_15_26_personally_viewed": true,
+    "compactWorkerfootarcs": true
+  },
+  "comparison_provenance": "Actual typed ECS rows recordedinLast afterUpdate/deferred, joined byactualappliedtick with sent/received DTO; no receivedsnapshot fallback; independent agent comparator rerun exit0",
+  "remaining_gates": [
+    "Eight actualhuman peers",
+    "Disconnect/reconnect continuity",
+    "Moving interpolation/runtime control equivalence",
+    "NewWasm16 eight-slot footer visual acceptance"
+  ],
+  "capture_timings": [
+    {
+      "role": "p1",
+      "label": "08-candidate-Power-preview",
+      "started_wall_ms": 1791678810793,
+      "remaining_wall_ms": 126991,
+      "budget_ms": 25000,
+      "read_only_protocol": "Page.captureScreenshot",
+      "actual_png_bytes": 879020,
+      "completed": true,
+      "elapsed_wall_ms": 737
+    },
+    {
+      "role": "p1",
+      "label": "09-paid-state",
+      "started_wall_ms": 1791678819245,
+      "remaining_wall_ms": 118539,
+      "budget_ms": 8000,
+      "read_only_protocol": "Page.captureScreenshot",
+      "actual_png_bytes": 875408,
+      "completed": true,
+      "elapsed_wall_ms": 498
+    }
+  ],
+  "credentials_SDP_values_retained": false,
+  "evidence_sha256": {
+    "target/web15-actual-guest-world-20261011-01/final-supervisor-result.json": "0ff72c628502e70f3eff2116088f2281a0ac25c8217c7665853e972533271d8a",
+    "target/web15-actual-guest-world-20261011-01/actual-guest-world-comparison.json": "3ce4a79c85c7fba02c36f4cb7ba1f7540780fdad6a24abbdf56ebdb2e0a45afa",
+    "target/web15-actual-guest-world-20261011-01/agent-independent-world-comparison.json": "3ce4a79c85c7fba02c36f4cb7ba1f7540780fdad6a24abbdf56ebdb2e0a45afa",
+    "target/web15-actual-guest-world-20261011-01/host-09-authoritative-state-observation.json": "d053d0b7e889ba053ce8f6f1f2a08bd726ba6ff911861ad220054b56571075d4",
+    "target/web15-actual-guest-world-20261011-01/p1-09-paid-state-observation.json": "75c2f63fb92eb3744f09bc1ed570b65cca7ce815e23da2c7b8579ad8708cf917",
+    "target/web15-actual-guest-world-20261011-01/p1-08-candidate-Power-preview.png": "0cf60ffc6acf73e04e073217cda09c1be5e1ff7e47a34a3a4db0ab4e106a4157",
+    "target/web15-actual-guest-world-20261011-01/p1-09-paid-state.png": "98b305017010edbad90cf5595ae325f6e6aae74ad7e53d6d796dfc7dd2a6d7d4",
+    "target/web15-actual-guest-world-20261011-01/capture-stage-timings.json": "54e501d5c2db4f9d96736a69c41441215e1ad754aa6982e7c32039cd28515c52",
+    "target/web15-actual-guest-world-20261011-01/actual-browser-gpu.json": "6df1e1732fe024a642537d276f81d91b0ed1afb32bb05c05c65a6e09aa5c00ed"
+  }
+}
