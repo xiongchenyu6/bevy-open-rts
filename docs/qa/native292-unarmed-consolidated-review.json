@@ -1,0 +1,21 @@
+{
+  "scope": "Current unarmed-order correction consolidated native tests/check/build identity; officialSDK and player verification remain pending",
+  "tests": {
+    "passed": 292,
+    "failed": 0,
+    "ignored": 1
+  },
+  "actual_results": {
+    "full": 0,
+    "check": 0,
+    "build": 0
+  },
+  "root_independently_hashed_sources": 142,
+  "root_independently_hashed_assets": 332,
+  "root_independently_hashed_bins": {
+    "bevy-open-rts": "05226b942a9549c9e491ecbf02d70cef288a34a0d2feb1681a8d159ef31efada",
+    "capture": "cdb2c89428870091bde1b227ff751f9e02484962ab7d40abda01009b425c1c47",
+    "skirmish_audit": "e666dcc78cfb636dbfb280ab4cef8e3d8ecbd23f60d60ee5e06ebc713c4966d0"
+  },
+  "evidence_directory": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/unarmed-native292-shared-20261011"
+}
