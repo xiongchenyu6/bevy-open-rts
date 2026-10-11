@@ -1,0 +1,27 @@
+{
+  "scope": "Frozen browser build of validated peer-channel send guard; actual TURN recovery acceptance pending",
+  "build": {
+    "actual_exit": 0,
+    "source_and_assets_unchanged": true,
+    "wall_seconds": 564.9250586329727,
+    "scope": "Frozen current browserQA build; runtime/finalrelease acceptance pending",
+    "wasm_sha256": "87e32d392b14bc7e05f06c2613c5c4e220931bbc090770252799178c68a89c7f",
+    "wasm_bytes": 27080306,
+    "site_path": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build21-snapshot-20261011/source/web",
+    "input_manifest_sha256": "68e5fab3553fe44fec05cbb5713c4864fe7f2657b1d5d5008b7c8bf3ade3a844",
+    "native_pin_sha256": "67dff996b0c28766e868010ae0f011bba25c84be0ad8a6c14f3d3b30eb05e89b",
+    "native_source_count": 124,
+    "clean_actual_exit": 0,
+    "source_commit": "9cc058207634ce59ee8d032fcb7d88007d923888",
+    "asset_count": 332,
+    "retained_home": "/home/freeman.xiong"
+  },
+  "local_package_rebuilds": {
+    "open-bevy-protocol": true,
+    "open-bevy-net": true,
+    "bevy-open-rts": true
+  },
+  "independently_verified_wasm_sha256": "87e32d392b14bc7e05f06c2613c5c4e220931bbc090770252799178c68a89c7f",
+  "raw_evidence": "target/web-current-build21-snapshot-20261011",
+  "all_release_gates_remain_open": true
+}
