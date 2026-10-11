@@ -1,0 +1,28 @@
+{
+  "scope": "SDK289 recovery build/package identity only; final player acceptance pending",
+  "actual_build_exit": 0,
+  "clean_project_exit": 0,
+  "package_exit": 0,
+  "integrity_exit": 0,
+  "build_wall_seconds": 439.9752343640139,
+  "official_SDK_image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+  "raw_binary_sha256": "687d67f28fcd922476d0557bf034b05447f121fb006acf0291fa74a30f7977bd",
+  "installed_binary_sha256": "3d712f00a29da507e904c68949f43b5929c6c3ea48327aa779e451d28ba22cd5",
+  "archive_sha256": "b321c041edbae335093ff6e84b431deb7c8d8fc87d67ef32d2bc72099b814a08",
+  "frozen_files": 783,
+  "runtime_assets": 332,
+  "installed_files": 381,
+  "independently_verified": true,
+  "evidence": {
+    "target/linux-native289-recovery-steamrt4-sdk-20261011/result.json": "3e55991bbeb668940d9f69545987071eb7d9182940561144aa68ca7382409677",
+    "target/linux-native289-recovery-package-20261011/result.json": "52f91e75a89b37d92967b0d1c56f35af496759390093981c1d35380ae9c7e0f5",
+    "target/linux-native289-recovery-extracted-20261011/ready.json": "5211b94367b1bbac9b3a7f89f16903a430c6f799fa12f7a686cae9c135bbf1c3",
+    "target/linux-native289-recovery-sdk-snapshot-20261011/input.json": "f1a730bf0b3a010871b1701d0990ec5fdf17a50e82dc25a4aa4a8d1bb3dfc3b1"
+  },
+  "limits": [
+    "SDK286tutorial is earlier checkpoint, not acceptance of this exact package",
+    "M3freshdefense03 ended in natural defeat; no complete campaign proof",
+    "W19localreconnect fixtures remain under diagnosis; no deployedTURN or30s claim",
+    "FinalWindows/save/audio/performance/store rights/media remain open"
+  ]
+}
