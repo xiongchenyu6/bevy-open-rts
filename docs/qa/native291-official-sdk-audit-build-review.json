@@ -1,0 +1,11 @@
+{
+  "actual_build_exit": 0,
+  "audit_sha256": "24d29796b3f9e7da3075884ab92ec20b47178e4bde615230f823e8a7f6667eb4",
+  "inputs_unchanged": true,
+  "main_sealed_binary_unchanged": true,
+  "scope": "Current officialSDK optimized audit build identity only; fullmatrix still running",
+  "root_rehashed_frozen_files": 811,
+  "source_count": 142,
+  "asset_count": 332,
+  "root_frozen_input_differences": []
+}
