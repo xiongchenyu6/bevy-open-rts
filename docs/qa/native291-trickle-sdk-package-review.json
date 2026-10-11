@@ -1,0 +1,44 @@
+{
+  "scope": "Official SDK-built current native source package identity; final Runtime4/Windows/player acceptance still pending",
+  "source_fix_commit": "ff944c7",
+  "native_source_count": 142,
+  "runtime_asset_count": 332,
+  "sdk_build": {
+    "scope": "Exact frozen officialSDK optimized build; no gameplay acceptance",
+    "actual_exit": 0,
+    "clean_actual_exit": 0,
+    "wall_seconds": 429.90258638802334,
+    "snapshot": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-trickle-sdk-snapshot-20261011",
+    "input_manifest_sha256": "e6ce6bc223cef80e76d9621ff6fa381cd74e320febeae109d8b2aacd663843cc",
+    "frozen_inputs_unchanged": true,
+    "image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+    "project_artifacts_cleaned": true,
+    "reused_dependency_cache": true,
+    "no_nix_mount": true,
+    "binary_sha256": "cc0d03a213bcfc040fcd2722731c24c595d48503657a613220021ea7d2d03a8d",
+    "binary_bytes": 103305624,
+    "sealed_binary": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-trickle-steamrt4-sdk-20261011/bevy-open-rts-sealed"
+  },
+  "package": {
+    "scope": "SDK-built Linux archive packaging only; clean player-flow/runtime acceptance pending",
+    "actual_exit": 0,
+    "wall_seconds": 6.633434285002295,
+    "sdk_build": "cc0d03a213bcfc040fcd2722731c24c595d48503657a613220021ea7d2d03a8d",
+    "packaging_image": "sha256:b78a537676c4aacd878a7239072bc4a45dc758922355a1103e923a44e302ba0c",
+    "independent_integrity_exit": 0,
+    "archive_sha256": "2a6b917240812daa7c9d201db57cbe88ed49f08aded1ea99e695cc44c6e49f49"
+  },
+  "root_extracted_ready": {
+    "scope": "Official SDK current trickle-source archive identity only; final native runtime/player acceptance pending",
+    "actual_exit": 0,
+    "archive": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-trickle-package-20261011/archive/bevy-open-rts-linux-x86_64.tar.gz",
+    "archive_sha256": "2a6b917240812daa7c9d201db57cbe88ed49f08aded1ea99e695cc44c6e49f49",
+    "package": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-trickle-extracted-20261011/bevy-open-rts-linux-x86_64",
+    "binary_sha256": "f4fb85245a88307b651e22c6dabd54e53e0f38351c052c262e4f418d40b6acd7",
+    "files": 399
+  },
+  "fork_notice_files_bundled": 5,
+  "exact_asset_hashes_match_source_pin": true,
+  "packaged_binary_hash_matches_BUILD_INFO": true,
+  "all_release_gates_remain_open": true
+}
