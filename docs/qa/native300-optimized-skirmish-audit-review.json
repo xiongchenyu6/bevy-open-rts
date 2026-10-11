@@ -1,0 +1,329 @@
+{
+  "scope": "Current300 official Steam Runtime4 optimized headless audit build; matrix coverage remains partial",
+  "actual_exit": 0,
+  "wall_seconds": 436.31222071900265,
+  "binary_sha256": "c540968d4c1073c22b81e4f458a1bda9761cbc8b4939ed1341f63caec08968d5",
+  "binary_bytes": 103556624,
+  "source_count": 142,
+  "asset_count": 332,
+  "independent_binary_source_assets_match": true,
+  "clean_four_local_packages_exit": 0,
+  "actual_compile_packages": [
+    "bevy-open-rts",
+    "open-bevy-net",
+    "open-bevy-protocol",
+    "matchbox_socket"
+  ],
+  "matrix_initial_snapshot": {
+    "scope": "Partial read-only verification of the fixed source pin; not full-matrix or current247-library equivalence",
+    "planned": 3726,
+    "terminal_snapshot": 25,
+    "counts": {
+      "completed": 25
+    },
+    "complete_matrix": false,
+    "integrity_verified": true,
+    "errors": [],
+    "failures": [],
+    "matrix": "target/native300-patrol-sdk-all-starts-20261012",
+    "source_pin": "target/native300-patrol-steamrt4-optimized-audit-20261012/pin.json",
+    "audit_sha256": "c540968d4c1073c22b81e4f458a1bda9761cbc8b4939ed1341f63caec08968d5",
+    "manifest_sha256": "8f3ced0117a11449c281e2c181cda3f2524b546d497203b1826b925fe61f8dd0",
+    "private_asset_count": 332,
+    "private_asset_hashes_match": true,
+    "current_source_files_differing_from_pin": [],
+    "current_source_files_added_since_pin": [],
+    "observations": [
+      {
+        "index": 0,
+        "classification": "completed",
+        "clock": 89.99897003173828,
+        "wall": 2.4861208319780417,
+        "winning_teams": [
+          0
+        ],
+        "status_sha256": "05236a0abb15ec7710fff6388054a339d1078d346b8ab697d382f8b5660e84b5",
+        "result_sha256": "e75769fa284a40d2903476d2c9f816446f11bdf9650c5c1945fd2661989a5ead"
+      },
+      {
+        "index": 1,
+        "classification": "completed",
+        "clock": 71.06592559814453,
+        "wall": 1.4642579819774255,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "b23a0a2330b8a14ad22373c42aecb5f80c1ce55e784a29ad0e074cee1f9dc1f0",
+        "result_sha256": "bbc2088ecede79a9700038a310aba019c503a49993ca0b6ddd89bf9e0251e80e"
+      },
+      {
+        "index": 2,
+        "classification": "completed",
+        "clock": 101.09880065917969,
+        "wall": 2.6149019349832088,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "c4e0cec64b89e2d33cb78a1e795d83bccb70efeabf3c4e5bcf7143c98b2ce2db",
+        "result_sha256": "4775f00f4d0d1f12ac5d020aff0e1b83dcd5739e728f4ef6c8c58166f031ba3c"
+      },
+      {
+        "index": 3,
+        "classification": "completed",
+        "clock": 79.59912872314453,
+        "wall": 2.4153596939868294,
+        "winning_teams": [
+          0
+        ],
+        "status_sha256": "58fb00cb496c7909ff9f03f2aa4eed5be58242c8b495267a8422c8ab730a3604",
+        "result_sha256": "c05f22831129b39e530a587e0bcfbda5a57096f03c662b94ae1182c62d98f444"
+      },
+      {
+        "index": 4,
+        "classification": "completed",
+        "clock": 93.56558227539062,
+        "wall": 1.964236221043393,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "d3eb97eb48048bab792ef0ed6cbd4b3eb347274be6ea372a3d6c98679f3a3ff2",
+        "result_sha256": "6fe84c754cacedc85f040b205de855ef05a9c5d39734b3cabed2c72421f54cdc"
+      },
+      {
+        "index": 5,
+        "classification": "completed",
+        "clock": 89.89897155761719,
+        "wall": 1.664241622958798,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "2fe4b43e359a70acd42be6e263c4749354d097c78b815e74eae0b5c3fe5fa114",
+        "result_sha256": "cb8a824494b7296c8385f12dc8136a903f1e2e994b21a917773fc44bd1be90eb"
+      },
+      {
+        "index": 6,
+        "classification": "completed",
+        "clock": 93.79891204833984,
+        "wall": 2.4148129029781558,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "45f0225247467f65a25e7a8c783f791d18aad9deed87fcaf4c767e234e88535f",
+        "result_sha256": "fa2ed94571707a518ada53dc12159deabf15fd74aac5b4f4bbdd69c6fc9dda01"
+      },
+      {
+        "index": 7,
+        "classification": "completed",
+        "clock": 95.16555786132812,
+        "wall": 2.3635485260165296,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "450e948b6b80cd763633ee2b4b5752493050a071b425287663f4b426bd76dcfe",
+        "result_sha256": "ae856b3e7eaff87d9e11d723b6da83b8a8eac1fde84722dbbb4500078e563351"
+      },
+      {
+        "index": 8,
+        "classification": "completed",
+        "clock": 95.0322265625,
+        "wall": 1.7262448070105165,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "2e14a90ca8ca5d0c3a356840eab34575cc7cdfca0d8678174a6dd5d6a6d82bdd",
+        "result_sha256": "b95264eeb3194cb97aecb18ff3dab3fce546016e4b8c4e169ae824d73b69f652"
+      },
+      {
+        "index": 9,
+        "classification": "completed",
+        "clock": 167.40679931640625,
+        "wall": 3.7307680179947056,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "f876cd942c5fd1e317b47513fcc236ed832faf5addf2009d7c8719c1fbde502e",
+        "result_sha256": "f79b3346723baa6c7e81e5c1aa9a181dfa44c43fee229f20c0576e745737423a"
+      },
+      {
+        "index": 10,
+        "classification": "completed",
+        "clock": 167.40679931640625,
+        "wall": 3.5170374140143394,
+        "winning_teams": [
+          0
+        ],
+        "status_sha256": "f02280f3931bbd13cb82aa0e2b67b99d156aafd1966cca4810e78ba2593ecb43",
+        "result_sha256": "9d961b0ff61fb05164d378edff4576de81e3f9339755d0f768fae12fe1a40939"
+      },
+      {
+        "index": 11,
+        "classification": "completed",
+        "clock": 77.16583251953125,
+        "wall": 1.4622447220026515,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "a2a8018c9da14fc2c26686021a374d81705759d3a1057a653e6b55643426d918",
+        "result_sha256": "3b579f252ac10e4be2bfcc43b2fb63e064e73fd48d9b805481edc3383fe0bf72"
+      },
+      {
+        "index": 12,
+        "classification": "completed",
+        "clock": 103.36543273925781,
+        "wall": 1.8124515999807045,
+        "winning_teams": [
+          0
+        ],
+        "status_sha256": "eb7b176208d708f6e0b66fc6a157b75f61085aa0242f9c808765c1c59ca25fbb",
+        "result_sha256": "5199a0045e00ebe46a767957ef0275403a50b9c5945deb20c1249f478a2de87f"
+      },
+      {
+        "index": 13,
+        "classification": "completed",
+        "clock": 91.832275390625,
+        "wall": 3.529996212979313,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "3b80f002108611fbcd5aa54e6af5560ac4cc39251f0c007b4a51f0dfa3fb1606",
+        "result_sha256": "3211845ad3b73de6c84203a536aea57239ec4efa85f927233275eceb4aec871e"
+      },
+      {
+        "index": 14,
+        "classification": "completed",
+        "clock": 93.26558685302734,
+        "wall": 2.276612793037202,
+        "winning_teams": [
+          0
+        ],
+        "status_sha256": "adcc54cf23321e08cf7a029e96946762f3dd53b040b0073a31891ea22e23d3b6",
+        "result_sha256": "2830bfd8a859c3a8d1817cb46268a10a1513f822ae681a27ad0766487ed9500b"
+      },
+      {
+        "index": 15,
+        "classification": "completed",
+        "clock": 175.7085723876953,
+        "wall": 2.6992852280382067,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "b84135bf54a5ee95d08b169a9a73e9b61b00bbc7a72fc833032766f025c74cd7",
+        "result_sha256": "8795ce4aba4baf451d06673fd638f6d84ba0dfa32d5184b48937ee7f4f56957e"
+      },
+      {
+        "index": 16,
+        "classification": "completed",
+        "clock": 177.54229736328125,
+        "wall": 2.659813431033399,
+        "winning_teams": [
+          0
+        ],
+        "status_sha256": "769ccc756ba0b544739ed043f607d499897108f62d13ed20cb6135310bf115dc",
+        "result_sha256": "e87e88d17076b2193d5988ffa875041e344eec6247e8ef5497d278494e4832bf"
+      },
+      {
+        "index": 17,
+        "classification": "completed",
+        "clock": 78.19915008544922,
+        "wall": 1.5076506279874593,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "c4e324794a22a46e27fe0d8d8966bd42a324b92b6956844c5009bd0df021852a",
+        "result_sha256": "03ceaa73fbaa34cb57ab207b8dff0aa32d3bd06de9762222b309703e21074a32"
+      },
+      {
+        "index": 18,
+        "classification": "completed",
+        "clock": 71.79924774169922,
+        "wall": 1.3064529270050116,
+        "winning_teams": [
+          0
+        ],
+        "status_sha256": "bf65175d63c69752263c5947a260217a7e123379ac8f2ddc769a4a1e3713a11a",
+        "result_sha256": "e944bfce6b052fb605c3b7dd79214d44e847309496b14ff21de1621940855bcd"
+      },
+      {
+        "index": 19,
+        "classification": "completed",
+        "clock": 83.56573486328125,
+        "wall": 6.471113245002925,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "1a4ef78983c5ca0e6718237aaf2307466225ec2da44f1418cb226497edcc9ee3",
+        "result_sha256": "ef811608f220dca0ab95cf26d7248e2f32c4178f65809f3b30a7a5852399f2d9"
+      },
+      {
+        "index": 20,
+        "classification": "completed",
+        "clock": 87.76567077636719,
+        "wall": 2.1624872949905694,
+        "winning_teams": [
+          0
+        ],
+        "status_sha256": "42d9fa169a4a93e08390a1f2e0c1c2a492134c5d4ff5be7afffb5b7400c3e28b",
+        "result_sha256": "88325411deaaa523c3190358cf7018da4cc9e4a83e1504abe1791e10de82008f"
+      },
+      {
+        "index": 21,
+        "classification": "completed",
+        "clock": 218.3843536376953,
+        "wall": 3.784353238006588,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "9c043d2b79d024671d028bc7b41b0d5a285998e2b269b066d898d77e4d87b05b",
+        "result_sha256": "450baf69a2916196d1065b664f1ad6aa70e5fa2e3bab83e8ddb3a09e05b0088b"
+      },
+      {
+        "index": 22,
+        "classification": "completed",
+        "clock": 284.4187927246094,
+        "wall": 4.63334440800827,
+        "winning_teams": [
+          0
+        ],
+        "status_sha256": "0daf59804f979479a625f0709be95e89287e8e27621319847b352a0c713d4fac",
+        "result_sha256": "695b9442572ba58f476f4780c76829fc18c4122452ca1ca1bc2114ebdbb23d14"
+      },
+      {
+        "index": 23,
+        "classification": "completed",
+        "clock": 87.26567840576172,
+        "wall": 2.2641773889772594,
+        "winning_teams": [
+          1
+        ],
+        "status_sha256": "8d12d74eaf9cf1da3f819d42e8dfade5f369d5a28277d43870acbed62d4bd956",
+        "result_sha256": "1bc41eb37335be819161f90125d6851c16e7e909af96801fc69af2dd0e44df78"
+      },
+      {
+        "index": 24,
+        "classification": "completed",
+        "clock": 73.0658950805664,
+        "wall": 1.5115616300026886,
+        "winning_teams": [
+          0
+        ],
+        "status_sha256": "9f962fa76e0b3ab9079c28d4c417b896d2803ba8809cfa3566e3587c0b80218e",
+        "result_sha256": "f3501c35b31ae4becb6ea8f8c7ec655cb037704fef16ef24ed88e7d7d5d37a91"
+      }
+    ],
+    "inflight_directories": [
+      "0025"
+    ],
+    "interpretation": "Completion means current Annihilation policy: only Command Centers and Workers retain a team. Other surviving units/structures do not invalidate this policy. No independent seeds/repeats/random maps claimed."
+  },
+  "evidence_hashes": {
+    "target/native300-patrol-steamrt4-optimized-audit-20261012/result.json": "0d5aeaf04f484d6a0cb0a0e5ef39f6ac3c528464bc88204c2fbaa06b01011f59",
+    "target/native300-patrol-steamrt4-optimized-audit-20261012/pin.json": "cd3db5ef2aa7a51779166f9ac929cdece314c8108fdd6849205c29f71900338a",
+    "target/native300-patrol-steamrt4-optimized-audit-20261012/build.log": "3a96a66d649e5ec9abfaeb6a97f607599f6cbabb1381c47f1465fcc65ee2e59b",
+    "target/native300-patrol-steamrt4-optimized-audit-20261012/clean-local.log": "bb7ae6a964d7949b9398456c77b61fb0c0b14ab2a646603d0d66a166dc950f83"
+  },
+  "boundaries": [
+    "Not full3726 acceptance",
+    "Older291 results remain separate",
+    "No player/render/random-seed acceptance"
+  ]
+}
