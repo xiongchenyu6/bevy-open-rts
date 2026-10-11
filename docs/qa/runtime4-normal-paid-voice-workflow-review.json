@@ -1,0 +1,177 @@
+{
+  "scope": "Official Runtime4 exact399 package, fresh normal32/16 Skirmish, natural paid Worker and Power workflows with private voice-only output recording. Not individual named-cue/human listening acceptance.",
+  "package": {
+    "ready": "target/linux-native291-trickle-extracted-20261011/ready.json",
+    "binary_sha256": "f4fb85245a88307b651e22c6dabd54e53e0f38351c052c262e4f418d40b6acd7",
+    "archive_sha256": "2a6b917240812daa7c9d201db57cbe88ed49f08aded1ea99e695cc44c6e49f49",
+    "files": 399,
+    "assets": 332
+  },
+  "raw_output": "target/native291-runtime4-natural-paid-audio-20261011-03",
+  "actual_exit": 0,
+  "wall_seconds": 113.12370052601909,
+  "original_bounds": {
+    "whole": 600,
+    "natural_worker": 30,
+    "construction": 30
+  },
+  "normal_game_exits": [
+    {
+      "pid": 2660551,
+      "supervisor_pid": 2660481,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "host_audio_environment_unchanged": true,
+  "direct_visual_review": [
+    "01/voice-only-adjusted-options.png",
+    "01/Worker-paid-completed.png",
+    "01/auto-01-PowerReactor-candidate-0-build-tooltip.png",
+    "01/auto-01-PowerReactor-ghost-0.png",
+    "01/Power-paid-completed.png"
+  ],
+  "all_nine_png_hashes_verified": true,
+  "natural_paid_receipts": {
+    "Worker": {
+      "initial_bank": [
+        32,
+        16
+      ],
+      "paid_bank": [
+        30,
+        16
+      ],
+      "actual_job_cost": [
+        2,
+        0
+      ],
+      "actual_job_timer": 3.0,
+      "initial_workers": 2,
+      "completed_workers": 3,
+      "completed_jobs": 0
+    },
+    "PowerReactor": {
+      "before_bank": [
+        30,
+        16
+      ],
+      "paid_bank": [
+        27,
+        15
+      ],
+      "cost": [
+        3,
+        1
+      ],
+      "actual_green_ghost": true,
+      "paid_construction": [
+        1.0,
+        1.0
+      ],
+      "completed_construction": null,
+      "completed_cost": null,
+      "actual_capacity_after": 26
+    }
+  },
+  "audio_options_directly_reviewed": {
+    "master": 1,
+    "music": 0,
+    "sfx": 0,
+    "voice": 1
+  },
+  "recording_identity": [
+    {
+      "phase": "paid-worker-training-and-ready",
+      "game_host_pid": 2660551,
+      "game_namespace_pids": [
+        2660551
+      ],
+      "pulse_reported_pid": 2660551,
+      "single_game_playback_stream": true,
+      "monitor": "private rts_qa_game_only.monitor",
+      "recorder_exit": 0
+    },
+    {
+      "phase": "paid-power-construction-and-complete",
+      "game_host_pid": 2660551,
+      "game_namespace_pids": [
+        2660551
+      ],
+      "pulse_reported_pid": 2660551,
+      "single_game_playback_stream": true,
+      "monitor": "private rts_qa_game_only.monitor",
+      "recorder_exit": 0
+    }
+  ],
+  "pcm_sections": [
+    {
+      "file": "paid-power-construction-and-complete.wav",
+      "sha256": "916ea07976a7100987ee11b8927e9737b2b36d918820a62fb8252eb48c00663a",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 1445600,
+      "seconds": 30.116666666666667,
+      "peak": 17143,
+      "clipped": 0,
+      "nonzero": 245666,
+      "individual_cue_identified": false
+    },
+    {
+      "file": "paid-worker-training-and-ready.wav",
+      "sha256": "8c5fa5881fa20354582eb622722b91a20055042db02580d198ed8d0289cd22d7",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 598743,
+      "seconds": 12.4738125,
+      "peak": 11629,
+      "clipped": 0,
+      "nonzero": 180162,
+      "individual_cue_identified": false
+    }
+  ],
+  "private_endpoint_cleanup": {
+    "private_server_closed": true,
+    "host_audio_default_unchanged": true,
+    "microphone_or_desktop_capture": false
+  },
+  "limitations": {
+    "individual_training_unitready_constructioncomplete_waveforms_identified": false,
+    "human_listening_and_tone": false,
+    "phase_contains_other_normal_selection_command_voice": true,
+    "hardware_audio_device_acceptance": false,
+    "all_seventeen_natural_events": false
+  },
+  "retained_failures": [
+    {
+      "output": "target/native291-runtime4-natural-paid-audio-20261011-01",
+      "actual_exit": 1,
+      "reason": "QA output layout before Power planning; Worker actualpaidcompletion only"
+    },
+    {
+      "output": "target/native291-runtime4-natural-paid-audio-20261011-02",
+      "actual_exit": 1,
+      "reason": "QA exact actual mapURI lookup absent before Power planning; Worker actualpaidcompletion only"
+    }
+  ],
+  "screenshots": {
+    "01/voice-only-adjusted-options.png": "71a9b67f2155bb3bdfbfa451a5294a970dddbd4693851c7fa475d80cd59daaaf",
+    "01/Worker-train-0-tooltip.png": "b5f59e441dc9897b00b948153ed5a812639d317b8b8d7baed39fc4c60ac6b48e",
+    "01/Worker-paid-completed.png": "ff833647a9c2daa354bbb6c6423f8b80a2d0bacfae680c64175ccac2353c7949",
+    "01/auto-01-PowerReactor-tab-tooltip.png": "1d51c467a0c8775d4c1c432424b06b3da0f5c953ebca5eed8ead4600245e0c16",
+    "01/auto-01-PowerReactor-candidate-0-before-ghost.png": "b1533c6f53955b9d5fd4d5675f594d638d7454c2569c28c7698b134d8a0e00a3",
+    "01/auto-01-PowerReactor-candidate-0-build-tooltip.png": "4d303c6c119caf46e78c1f8384a6dc1740ad40f060cd8b11f2a012432a8e0530",
+    "01/auto-01-PowerReactor-ghost-0.png": "846fea6072c7e1972db84271dab0acc02aeffffe6cfbe43e22be162c8c4f1f56",
+    "01/auto-01-PowerReactor-completed.png": "43516f3802eba000f5c3330df876fee72e565a2596b9cbd98c1607948b6b310f",
+    "01/Power-paid-completed.png": "95f35a39ece3b1a11a1861668a8b00e7cc4ff01338a329a6207640b360bf404f"
+  },
+  "raw_hashes": {
+    "result.json": "5a2e075a4d38cc6b52276077cf425e2922aacfd8ccfc6696de98b460cd43f1a9",
+    "independent-raw-review.json": "f98ef404385dccc6821d0fb8465e4e1d039c5547cec9be2d28bdb1f97469222d",
+    "audio/phase-identity.json": "f628816b19718b2378ed3de1e319e8157b6fe6ccd5d0bec060fd5fb853c66cdf",
+    "audio/cleanup.json": "b7a34ea60c86b0c88aeff359ccb38e80d4edfae8e2bc807d591a9a964f6a87b2"
+  }
+}
