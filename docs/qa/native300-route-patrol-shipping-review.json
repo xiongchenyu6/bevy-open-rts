@@ -1,0 +1,51 @@
+{
+  "scope": "Continuous route-awarePatrol native300 regression/build and officialSDK shipping integrity; actual normal playerproof pending",
+  "source_commit": "206f365",
+  "native": {
+    "full_passed": 300,
+    "failed": 0,
+    "ignored": 1,
+    "full_seconds": 236.15,
+    "check3bins": 0,
+    "build3bins": 0,
+    "source_count": 142,
+    "assets": 332,
+    "bins": {
+      "bevy-open-rts": "d378a740eb11f0c06bae20439cbf9f37f2966e1adf1fee4332c982a9cbb3be49",
+      "capture": "40382a8bb4132a82cd08a623ff0b0f97c8fe5062fcbe4bdb8c155e46d9008005",
+      "skirmish_audit": "daf41e0dd5807db5d905826c0462a46a522f0361dcab4b2102e1c50ad9070950"
+    }
+  },
+  "SDK": {
+    "image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+    "clean4_localpackages": 0,
+    "actual4_workspace_compilepaths": true,
+    "actual_exit": 0,
+    "wall_seconds": 457.94510315702064,
+    "raw_ELF_sha256": "194e6616ace8e8a7c651faa99f36e1a31a1c6fc6cd046183f7d8b1fcda0f985d",
+    "frozen_inputs_unchanged": true
+  },
+  "package": {
+    "actual_exit": 0,
+    "independent_integrity": 0,
+    "files": 399,
+    "assets": 332,
+    "archive_sha256": "24afda2babe97e7d3c37f5f97c2c311fd4a7355d340abae70ea5827002348685",
+    "installed_ELF_sha256": "ec5aa728f8e79e3fb3e34cfb39b790bf278362042a87a424ab2237d94f614608",
+    "official_Runtime4_notice_files": 13,
+    "local_fork_notice_files": 5
+  },
+  "independent_current142source_332assets_3bins_and399inventory_hashes_match": true,
+  "evidence_sha256": {
+    "target/patrol-native300-shared-20261012/pin.json": "f9c25adc91d9a52b5b9cd673bc3d91ed02bec30e514c43982ad5f5caee661ea7",
+    "target/patrol-native300-shared-20261012/full.log": "a7075c27a453dbd7e49c825cb230e9c51f0f203141ceb87d0523e46f3ce08c76",
+    "target/linux-native300-patrol-steamrt4-sdk-20261012/result.json": "18b31e9161bb820502aac6a95d623831567ce2d986b2a7d0be02684b66683c4c",
+    "target/linux-native300-patrol-package-20261012/result.json": "59276fbc0d6677c241677d0f195f6b1518cb54574a45a91f74e8311c8361bb32",
+    "target/linux-native300-patrol-extracted-20261012/ready.json": "33e705e6023c87aaa6cfd23c3baa26a198fff78565de1ffd160bd8f3428b917a"
+  },
+  "boundaries": [
+    "SDK296/W25 immutable prior core; no relabel of its UI/smallmotion evidence",
+    "Actual newSDK300 short/medium normalinput proof pending",
+    "NoW26/browser/runtime/publicdeployment"
+  ]
+}
