@@ -1,0 +1,41 @@
+{
+  "scope": "Official SDK-built peer-channel send-guard Linux package identity; actual final Runtime4/player acceptance pending",
+  "build": {
+    "scope": "Exact frozen officialSDK optimized build; no gameplay acceptance",
+    "actual_exit": 0,
+    "clean_actual_exit": 0,
+    "wall_seconds": 425.6052717489947,
+    "snapshot": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-peer-channel-sdk-snapshot-20261011",
+    "input_manifest_sha256": "49d84a9fe21bf34a85da26b6048c742875ec3a7ce78e2c23e78bc2a3dbef5e9d",
+    "frozen_inputs_unchanged": true,
+    "image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+    "project_artifacts_cleaned": true,
+    "reused_dependency_cache": true,
+    "no_nix_mount": true,
+    "binary_sha256": "cca920cbd86d5f97231f0b3ec008664a9b74ac30e2969084fbef1aec398621b5",
+    "binary_bytes": 103305792,
+    "sealed_binary": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-peer-channel-steamrt4-sdk-20261011/bevy-open-rts-sealed"
+  },
+  "package": {
+    "scope": "SDK-built Linux archive packaging only; clean player-flow/runtime acceptance pending",
+    "actual_exit": 0,
+    "wall_seconds": 7.377006728987908,
+    "sdk_build": "cca920cbd86d5f97231f0b3ec008664a9b74ac30e2969084fbef1aec398621b5",
+    "packaging_image": "sha256:b78a537676c4aacd878a7239072bc4a45dc758922355a1103e923a44e302ba0c",
+    "independent_integrity_exit": 0,
+    "archive_sha256": "faa69cb5dfb508e62cb7f9874cf67c7c89c725ce7a87e7634e78e36c0ae92a1b"
+  },
+  "root_extracted_identity": {
+    "scope": "SDK291 peer-channel send guard package identity only; runtime/player/release acceptance pending",
+    "actual_exit": 0,
+    "archive": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-peer-channel-package-20261011/archive/bevy-open-rts-linux-x86_64.tar.gz",
+    "archive_sha256": "faa69cb5dfb508e62cb7f9874cf67c7c89c725ce7a87e7634e78e36c0ae92a1b",
+    "package": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native291-peer-channel-extracted-20261011/bevy-open-rts-linux-x86_64",
+    "binary_sha256": "fc204f497e1dd1e53875465aecbcaca935f1c0ae2bbfb0143f82e679a343841f",
+    "files": 394
+  },
+  "exact_runtime_asset_hashes_match_native_pin": 332,
+  "additional_official_runtime_license_texts": 13,
+  "runtime_gameplay_acceptance": false,
+  "all_release_gates_remain_open": true
+}
