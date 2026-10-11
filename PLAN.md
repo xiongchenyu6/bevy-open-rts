@@ -5,15 +5,23 @@
 The acceptance matrix is in `docs/RELEASE_READINESS.md`; the full Steam goal
 remains open. Current evidence must match the source/artifact being claimed.
 
-- [x] Boot Camp entry, skip, seven lessons, graduation and fresh replay;
-  native sandbox persistence/restart verified separately.
-- [x] Remaining missions3/5 now win through ordinary input and continue.
-- [x] Six missions complete in pinned separate-process sequence; exact growing
-  progress prefix and fresh-process all-unlocked menu verified.
-- [ ] Same-App campaign/retry audit and revalidation after current AI changes.
-- [x] Keyboard and mouse save/recovery in skirmish, including missing/corrupt files.
-- [ ] Campaign-runtime save continuity, full UI/browser and audio review.
+- [ ] Final-package Boot Camp, Skip and Replay acceptance. SDK291 has a verified
+  normal-input seven-lesson run and fresh replay; newer packages need revalidation.
+- [ ] Fresh current-package Mission3 victory and all six missions in one App.
+  Earlier separate-process wins are historical evidence. SDK292 retained Mission3
+  continuation ends in natural defeat at712.75s; this diagnostic is not a win.
+- [ ] Same-App retry and exact growing campaign prefixes, followed by a fresh
+  all-unlocked menu.
+- [ ] Final-package save continuity, including fog, queues, effects and support.
+  Earlier keyboard/mouse and missing/corrupt-file checks cover narrower scopes.
+- [ ] Current normal-input Drone Patrol verification. Native294 passes294 tests,
+  with0 failures and1 ignored; build/package evidence alone does not prove motion.
+- [ ] Full UI/browser, natural audio cues and human presentation review.
 - [ ] Release delivery, balance/performance, provenance and store-media gates.
+
+Current package and runtime proofs are recorded separately under `docs/qa/`.
+All nine release gates remain open. The frozen native291 authored-start matrix
+is historical relative to the current Patrol fix; its live run is not restarted.
 
 The b416 construction checkpoint passed168 library tests, fmt/check/bins build and a12-second
 native launch with no error output. Proof is `screenshots/result/15`:450frames,
