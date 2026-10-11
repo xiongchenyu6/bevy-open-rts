@@ -1,0 +1,96 @@
+{
+  "scope": "Eight actual normal-input W22 browsers over real TURN/private native authority; original overall workflow failed one movement check",
+  "actual_driver_exit": 0,
+  "actual_supervisor_exit": 0,
+  "actual_final_exit": 1,
+  "normal_browser_close": true,
+  "raw_evidence": "target/web22-eight-human-real-turn-20261011-01",
+  "players": {
+    "host": {
+      "assigned_slot": 0,
+      "completed_own_Worker_count": 3,
+      "actual_ECS_paid_job_ticks": 18,
+      "actual_ECS_exact": null,
+      "connected_actual_RTC": 7,
+      "each_RTC_has_positive_relay_pair": true,
+      "actual_worker_motion_over_half_metre": true,
+      "actual_render_motion_over_half_metre": true
+    },
+    "p1": {
+      "assigned_slot": 3,
+      "completed_own_Worker_count": 3,
+      "actual_ECS_paid_job_ticks": 14,
+      "actual_ECS_exact": true,
+      "connected_actual_RTC": 7,
+      "each_RTC_has_positive_relay_pair": true,
+      "actual_worker_motion_over_half_metre": false,
+      "actual_render_motion_over_half_metre": false
+    },
+    "p2": {
+      "assigned_slot": 4,
+      "completed_own_Worker_count": 3,
+      "actual_ECS_paid_job_ticks": 10,
+      "actual_ECS_exact": true,
+      "connected_actual_RTC": 7,
+      "each_RTC_has_positive_relay_pair": true,
+      "actual_worker_motion_over_half_metre": true,
+      "actual_render_motion_over_half_metre": true
+    },
+    "p3": {
+      "assigned_slot": 6,
+      "completed_own_Worker_count": 3,
+      "actual_ECS_paid_job_ticks": 16,
+      "actual_ECS_exact": true,
+      "connected_actual_RTC": 7,
+      "each_RTC_has_positive_relay_pair": true,
+      "actual_worker_motion_over_half_metre": true,
+      "actual_render_motion_over_half_metre": true
+    },
+    "p4": {
+      "assigned_slot": 1,
+      "completed_own_Worker_count": 3,
+      "actual_ECS_paid_job_ticks": 12,
+      "actual_ECS_exact": true,
+      "connected_actual_RTC": 7,
+      "each_RTC_has_positive_relay_pair": true,
+      "actual_worker_motion_over_half_metre": true,
+      "actual_render_motion_over_half_metre": true
+    },
+    "p5": {
+      "assigned_slot": 2,
+      "completed_own_Worker_count": 3,
+      "actual_ECS_paid_job_ticks": 16,
+      "actual_ECS_exact": true,
+      "connected_actual_RTC": 7,
+      "each_RTC_has_positive_relay_pair": true,
+      "actual_worker_motion_over_half_metre": true,
+      "actual_render_motion_over_half_metre": true
+    },
+    "p6": {
+      "assigned_slot": 5,
+      "completed_own_Worker_count": 3,
+      "actual_ECS_paid_job_ticks": 10,
+      "actual_ECS_exact": true,
+      "connected_actual_RTC": 7,
+      "each_RTC_has_positive_relay_pair": true,
+      "actual_worker_motion_over_half_metre": true,
+      "actual_render_motion_over_half_metre": true
+    },
+    "p7": {
+      "assigned_slot": 7,
+      "completed_own_Worker_count": 3,
+      "actual_ECS_paid_job_ticks": 13,
+      "actual_ECS_exact": true,
+      "connected_actual_RTC": 7,
+      "each_RTC_has_positive_relay_pair": true,
+      "actual_worker_motion_over_half_metre": true,
+      "actual_render_motion_over_half_metre": true
+    }
+  },
+  "preserved_failure": "p1 Worker remained stationary; actual contextual Follow, not desired ground Move, under investigation from raw input and order traces",
+  "original_wall_bound_seconds": 240,
+  "whole_workflow_pass": false,
+  "eight_player_reconnect_pass": false,
+  "full_match_pass": false,
+  "all_release_gates_remain_open": true
+}
