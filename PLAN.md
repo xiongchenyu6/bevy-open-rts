@@ -164,3 +164,9 @@ without error output; final capture verifies 4.24m movement and 113 siege damage
 
 - [ ] Verify persisted player preferences in a new optimized package through normal Options clicks and fresh restart; native disk regressions pass, startup initialization/consolidated checks pending.
 - [ ] Repeat isolated audio channel acceptance with per-phase recording boundaries; first semantic-stop run and actual fresh-process volume reset are retained.
+
+- [x] Build/check fullnative279 checkpoint and officialSDK optimized archive with immutable743-file snapshot and integrity0.
+- [x] Verify exact2668 afterAI focus and exact2641 on optimizedsame-core SDK under original600/180; retaineddebug failures remain.
+- [x] Verify normalSDK267 Mission2 victory, two normal exits and fresh-process Mission3 unlock; separate fromsixsameApp.
+- [x] Verify Wasm16 twoHuman motion and activepaidHMG jobs through actualguestECS; 8peers/reconnect remain.
+- [ ] Fix actualnormalMission3 construction-contact stall using originalWorker/Drone/terrain and preserved30s failure.
