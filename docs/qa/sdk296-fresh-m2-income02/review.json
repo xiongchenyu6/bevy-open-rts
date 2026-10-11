@@ -1,0 +1,37 @@
+{
+  "scope": "SDK296 freshM2 camera/Ore income verified; firstmember reviewexpired/operatorQA failure. No combat/roles/HQpriority/missionacceptance",
+  "raw_root": "target/sdk296-fresh-m2-income-20261012-02",
+  "body_review_deadline": 1791739111.1018665,
+  "late_review_seconds_after_deadline": 16.539005517959595,
+  "late_review_not_accepted": true,
+  "income_verified": {
+    "returned_ore": 36,
+    "node_consumed": 42,
+    "actual_bank": [
+      80,
+      23
+    ],
+    "authored_paid_buildings_cost": [
+      20,
+      9
+    ],
+    "initial_bank": [
+      64,
+      32
+    ],
+    "actual_clock": 55.8632698059082
+  },
+  "personally_viewed": [
+    "normal-M2-main-menu.png",
+    "normal-M2-campaign-card.png",
+    "02/economy-visible-ore-preview-home.png",
+    "02/member-whole-opening-5806795782609-body.png"
+  ],
+  "next_action": "Surfacependingrequest immediately, prioritizeimage/gate aboveprogressreads; preserve45second bound. No automaticretry ofsamefailure.",
+  "evidence_sha256": {
+    "actual-defender-review-expired.png": "0c38f7286ee66b75ac750f5e4256fc52541b0db6234d23e69a526086f218cc6e",
+    "result.json": "8f980f712e40b2108ec0c6ae5b35fef9579fca9faaec12a939f693bf8c202d92",
+    "actual-home-Ore-body.png": "5996e9bf01ce1dc9342d9f343110ab95ffc4db4569887ef868d9bf7dc910a159",
+    "income-receipt.json": "7479c4156d198bd05289a800eac6e81881a6844086d3ea7e5fc1b7822388146a"
+  }
+}
