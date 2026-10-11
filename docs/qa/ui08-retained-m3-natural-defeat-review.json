@@ -1,0 +1,43 @@
+{
+  "scope": "Actual normal CtrlL continuation of genuine failed-six05 M3 save, observed natural defeat; diagnostic execution success is not campaign success",
+  "actual_natural_phase": "HumanDefeat",
+  "natural_victory": false,
+  "simulation_clock": 92.42526245117188,
+  "wall_seconds": 50.93374740102445,
+  "game_exits": [
+    {
+      "pid": 1348664,
+      "supervisor_pid": 1348562,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "original_wall_limit": 900,
+  "source_save_sha256": "ed10de51a79a72dae78006310f560a68fca99f7b55212bf40005ba3d9ef9c28e",
+  "actual_fresh_save_write_proved": true,
+  "direct_visual_result": {
+    "title": "Defeat",
+    "time": "01:32",
+    "own_unit_losses": 10,
+    "own_building_losses": 6,
+    "enemy_unit_kills": 8,
+    "enemy_building_kills": 1,
+    "resources": [
+      17,
+      9
+    ]
+  },
+  "source_and_package_unchanged": true,
+  "evidence": {
+    "target/sdk285-ui08-retained-m3-normal-20261011-02/result.json": "7d3b93d1eb44da68288e0f061290a6c1da2c4668e1c7ae0f0e4271e86fba031f",
+    "target/sdk285-ui08-retained-m3-normal-20261011-02/01/02-actual-loaded-M3.ron": "e5de02fbcba3242c34c0ee534d2d25ec9be2f53f245252aecc8d9774d11fa4fd",
+    "target/sdk285-ui08-retained-m3-normal-20261011-02/01/90-natural-HumanDefeat.png": "cd685a51623b37899cad22004d6dddc53c93cac5515251f8172f908caad94df5"
+  },
+  "limits": [
+    "A genuine retained save continuation; not fresh-mission or six-process-chain acceptance",
+    "Originalsix05 erroneousHQabort remains preserved",
+    "Retained01 mistakenly returned toMainMenu; its seededRON didnotproveLoad",
+    "Improved defense-first ordinary-input tactic still requires fresh-M3verification"
+  ]
+}
