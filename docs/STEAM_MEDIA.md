@@ -18,6 +18,8 @@ Checked2026-10-10 against [Steam store graphical assets](https://partner.steamga
 | Small capsule | 462×174 |
 | Main capsule | 1232×706 |
 | Vertical capsule | 748×896 |
+| Shortcut icon | 256×256 PNG |
+| Application icon | 184×184 JPEG |
 | Gameplay screenshots | At least5; minimum1920×1080,16:9 |
 
 Capsules carry the title and key art. Screenshots must show actual gameplay;
@@ -30,6 +32,10 @@ recipes, then inspect the raw frames before selecting screenshots.
 require a600×900 capsule,920×430 header,3840×1240 hero and transparent logo1280px
 wide and/or720px tall. The hero contains no text and keeps important content in
 its central860×380 safe area. Client placement remains to review.
+
+Reviewed [client-icon candidates](../art/steam/icons-v1/README.md) reproduce
+exactly in two exports. Their actual256px/184px sizes were visually inspected;
+Steam-client placement and final approval remain open.
 
 ## Evidence still required
 

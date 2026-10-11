@@ -1,0 +1,30 @@
+{
+  "scope": "Steam client-icon candidates; actual client placement and final rights review pending",
+  "dimensions_source": "https://partner.steamgames.com/doc/store/assets?l=english",
+  "generator_sha256": "c4bc3caddabc8bd25bab86e4dd09bff5909c8942bd5da3a4ba3b18b4b3e89063",
+  "keyart_sha256": "dfb14c0c7f46a83034918f8a342212d09f3d19ba4548646c31fd58dfde7bf713",
+  "rasterizer": "0.48.1",
+  "jpeg_encoder": "ffmpeg version 9.0.1 Copyright (c) 2000-2026 the FFmpeg developers",
+  "records": [
+    {
+      "path": "shortcut-icon.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "9b25a08fce8fda29f365043c2d4b29358ec146e3752394c09742f497c43c13a0",
+      "svg_sha256": "ccae0ae163edf672f55f3f9d2f48a5d9887567558f559809b2493cbb81d04429"
+    },
+    {
+      "path": "app-icon.png",
+      "width": 184,
+      "height": 184,
+      "sha256": "6d8e274048b09f30ef631dea7ff4c3b13aeab3fa1c5e59f4ce9a2039cca7751b",
+      "svg_sha256": "5384c72784c9407a39f8d9d98ee0cdf36d706300d857d865361ebae0d652e2d1"
+    },
+    {
+      "path": "app-icon.jpg",
+      "width": 184,
+      "height": 184,
+      "sha256": "98bd5a682a623ff3350ab600f8bf2f7c5c60e983a8c04d9feda265162201e0be"
+    }
+  ]
+}
