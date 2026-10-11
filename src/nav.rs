@@ -59,6 +59,7 @@ pub(crate) fn separate_units(
             &Selectable,
             &mut Transform,
             &Health,
+            Option<&HoldPosition>,
         ),
         With<Unit>,
     >,
@@ -86,11 +87,11 @@ pub(crate) fn separate_units(
     let snapshot: Vec<SeparationSnapshot> = units
         .iter()
         .map(
-            |(team, unit, domain, selectable, transform, health)| SeparationSnapshot {
+            |(team, unit, domain, selectable, transform, health, hold)| SeparationSnapshot {
                 team: *team,
                 radius: selectable.radius,
                 position: transform.translation,
-                movable: unit.speed > 0.0,
+                movable: unit.speed > 0.0 && !hold.is_some_and(|hold| hold.enabled),
                 active: *domain == MovementDomain::Terrain && health.current > 0.0,
             },
         )
@@ -115,7 +116,7 @@ pub(crate) fn separate_units(
             ) else {
                 continue;
             };
-            // An immovable unit (deployed/zero-speed) passes its share to the other.
+            // An immovable unit (held/deployed/zero-speed) passes its share to the other.
             match (snapshot[i].movable, snapshot[j].movable) {
                 (true, true) => {
                     pushes[i] += push;
@@ -138,7 +139,7 @@ pub(crate) fn separate_units(
             },
         )
         .collect::<Vec<_>>();
-    for (index, (_, _, _, selectable, mut transform, _)) in units.iter_mut().enumerate() {
+    for (index, (_, _, _, selectable, mut transform, _, _)) in units.iter_mut().enumerate() {
         let push = pushes[index].clamp_length_max(max_step);
         if push == Vec3::ZERO {
             continue;
@@ -669,3 +670,6 @@ mod tests {
         assert!(grid.line_clear(Vec3::new(-4.0, 0.0, -4.0), Vec3::new(4.0, 0.0, 4.0)));
     }
 }
+
+#[cfg(test)]
+mod hold_tests;

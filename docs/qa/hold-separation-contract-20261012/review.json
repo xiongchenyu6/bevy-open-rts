@@ -1,0 +1,65 @@
+{
+  "scope": "Genuine Hold separation contract regression andminimalfix; independentCPUfixture, NOT exactM2arrivalcause/GUI/player/sweep acceptance",
+  "code_change": "Healthy held terrain units useexistingimmovable separation share logic; unheld/zero-speed/enemy/static/terrain rules unchanged",
+  "source_contract": "src/command_card.rs tooltip: Units hold position and only fire at enemies in range.",
+  "RED_original01": {
+    "held_max_drift": 0.84455406665802,
+    "original_incoming_progress_assertion": ".5m",
+    "occupied_goal_diagnostic_only": true
+  },
+  "RED_clear02": {
+    "held_max_drift": 0.8165092468261719,
+    "valid_goal": [
+      -16.581308364868164,
+      0,
+      -20.70163917541504
+    ],
+    "endpoint_healthy_terrain_static_checks": 67,
+    "incoming_progress_required": 3
+  },
+  "GREEN_both": {
+    "frames_each": 180,
+    "held_exact_drift": 0,
+    "Hold_true_NoMove_all_frames": true,
+    "clear02_final_goal_distance": 0.15355668034994366,
+    "original01_not_an_arrival_claim_inside_held_disk": true
+  },
+  "unheld_mechanism": {
+    "first_Move_removal_frame": 6,
+    "distance_when_removed_before_separation": 0.16851097345352173,
+    "later_goal_distance": 0.9448291659355164,
+    "not_proved_exact08_cause": true
+  },
+  "live_verification": {
+    "focused": 5,
+    "existing_nav": 5,
+    "Patrol": 6,
+    "movement_endpoints": 12,
+    "all_targets_check": 0,
+    "full_passed": 305,
+    "full_failed": 0,
+    "full_ignored": 1,
+    "native_bins": 4,
+    "all_actual_exit_zero": true,
+    "source_asset_hashes_unchanged": true
+  },
+  "invalid_prior_run": "target/hold-separation-live-20261012 initialstaleisolatedcache: focused0test/full303 NOTliveverification; ownpipeline semanticallystopped; scopedpackage-devclean; cleanretry02 actual5names verified",
+  "raw_scope_label_correction": "Isolated GREEN result inherited RED textualscope fromrunner; itsactualexit0/log+twozero traces proveGREEN. Rawfile preserved unchanged.",
+  "native_pin": "target/hold-separation-shared-20261012/pin.json",
+  "source_files": 143,
+  "runtime_assets": 332,
+  "shipping_claim": "None: Debugnativeonly; officialSDK305 buildnext",
+  "historical_matrix": "FrozenSDK300 matrix remainsrunninghistorical; no patchedsource equivalence",
+  "evidence_sha256": {
+    "isolated-original01-RED-result.json": "025ebb18d062d3ed7d3d885977b6d194a37de7592e8823722c597174bbc57c7e",
+    "isolated-GREEN-result.json": "753e160ce536103ae7b818e59dba4e64e7b016a76c2bb02c3f34b164d59272b1",
+    "isolated-clear02-RED-frames.json": "4febab55e3f4c97375b8cd97cfd19cfe3d1dca1ebd58d7c5f3d6c2ba45e29179",
+    "live-original01-GREEN-frames.json": "9d41abb9166ac715fe218d6550612fad70c27230d39aa3d49769e9a7ca050e32",
+    "isolated-original01-RED-frames.json": "6a94c5323d251dc87fa6ee8d4615c50546ac4da8499992760236c53e171347f3",
+    "live-full-build-result.json": "3fc05c0f9743d258cdb0db636b813626fb056c506e15bb4858458989e80413c7",
+    "live-focused-test-name-review.json": "22e966fcb03d6d6936217578a2aa67fb1e37f6c05f12285926c5e3463a0d96c7",
+    "live-unheld-short-Move-frames.json": "8635b4cb5ae13fd62abe6b0be7f580ecc4181f3c8699a076f43e30166a03ad88",
+    "live-clear02-GREEN-frames.json": "6783faf4f64eb22d28923f274221aeec1421fc1f288100ebbcd09c9ecf6d175a",
+    "isolated-clear02-RED-result.json": "55ec15d6d5bed853df037372f667dfdc0b9456de4844a51e761ef5658dc63f2c"
+  }
+}

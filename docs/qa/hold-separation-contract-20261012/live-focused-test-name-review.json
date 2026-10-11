@@ -1,0 +1,18 @@
+{
+  "expected_source_test_names": [
+    "genuinely_deployed_zero_speed_unit_stays_immovable_under_separation",
+    "held_clear_goal_aa_keeps_position_under_incoming_actual_move_in_full_schedule",
+    "held_registry_aa_keeps_position_under_incoming_actual_move_in_full_schedule",
+    "observed_short_move_records_first_removal_and_postarrival_traffic_in_full_schedule",
+    "scheduled_separation_keeps_unheld_mobility_and_ignores_enemy_pairs"
+  ],
+  "actual_passed_names": [
+    "genuinely_deployed_zero_speed_unit_stays_immovable_under_separation",
+    "held_clear_goal_aa_keeps_position_under_incoming_actual_move_in_full_schedule",
+    "held_registry_aa_keeps_position_under_incoming_actual_move_in_full_schedule",
+    "observed_short_move_records_first_removal_and_postarrival_traffic_in_full_schedule",
+    "scheduled_separation_keeps_unheld_mobility_and_ignores_enemy_pairs"
+  ],
+  "exact_match": true,
+  "zero_failures": true
+}

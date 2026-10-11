@@ -1,0 +1,14 @@
+{
+  "scope": "Live minimal Hold-aware separation plus regressions; GUI/M2/sweep acceptance stillpending",
+  "results": {
+    "focused": 0,
+    "nav": 0,
+    "patrol": 0,
+    "endpoint": 0,
+    "check": 0,
+    "full": 0,
+    "build": 0
+  },
+  "wall_seconds": 543.7519592100289,
+  "source_assets_unchanged": true
+}

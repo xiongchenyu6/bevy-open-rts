@@ -1,0 +1,18 @@
+{
+  "scope": "Isolated CPU full schedule Hold+incoming traffic RED; no GUI/player/exact08 proof",
+  "actual_exit": 0,
+  "wall_seconds": 112.38271357800113,
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "--jobs",
+    "1",
+    "--lib",
+    "m2_congestion_fixture::held_",
+    "--",
+    "--nocapture"
+  ],
+  "live_source_assets_unchanged": true
+}
