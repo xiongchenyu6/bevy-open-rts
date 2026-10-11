@@ -1,0 +1,61 @@
+{
+  "scope": "Actual normal-input passive notice fix rendered on current399 officialSteamRuntime4 SDK296; bounded one fresh Skirmish only",
+  "actual_visual_pass": true,
+  "raw_program_flow_passed": true,
+  "raw_result_kept_separate": "Rawdriverpassedfalse/visual_adjudication_pendingtrue remainsunchanged; thisfile recordsdirecthumanimageadjudication",
+  "wall_seconds": 54.554325332981534,
+  "original_outer_bound_seconds": 600,
+  "ordinary_inputs": [
+    "NormalSkirmish32/16 viaMainMenu/SetupEnter",
+    "F10pause/CtrlS/F10resume/CtrlS/F10pause/CtrlS",
+    "ActualPNG03 beforewait",
+    "Natural7.5wall whilepaused; PNG04 BEFOREnewCtrlS",
+    "NormalCtrlS afterPNG04 andnormalwindowclose"
+  ],
+  "direct_child_and_Root_views": {
+    "03-current-notices.png": "ExactlyoneSaved+onecurrentTacticalpause; no duplicateSaved/Pause oroldResumed.",
+    "04-notices-after-paused-wall-expiry.png": "Zero passive notices afterrealwait; HQ/Workers/Drone/normalHUD retained andHQclear."
+  },
+  "paused_game_clock": 11.201255798339844,
+  "bank_before_and_after": [
+    32,
+    16
+  ],
+  "full_Save_bytes_identical": true,
+  "full_Save_sha256_before_after": "17110fe36dbf8c99c1e34462f953d1e500cb21b8677b0d6a1e8e26dd636bb189",
+  "normal_exits": [
+    {
+      "pid": 3021455,
+      "supervisor_pid": 3021243,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_and_archive_unchanged": true,
+  "all_output_owned_GPU_children_closed": true,
+  "artifact": {
+    "source_commit": "c37a8bb",
+    "files": 399,
+    "assets": 332,
+    "ready": "target/linux-native296-toasts-extracted-20261012/ready.json",
+    "archive_sha256": "19787ebddd97570e66d3b2576a1343a03cf66f6d875704ad84ab97ecd4a104cc",
+    "installed_ELF_sha256": "165996cd616a91380a6a64785f134481ff466c8c744d34f6a35dc41f3821b1c0"
+  },
+  "screenshots_sha256": {
+    "docs/qa/sdk296-toast-notices/03-current-notices.png": "8f79a1d96a4f0f52f956005378b64b0457e3e2f4e6b876832e694e39bfe76bf1",
+    "docs/qa/sdk296-toast-notices/04-notices-after-paused-wall-expiry.png": "4a0959ca6b00883544512d4ff8ff78703496d1083b1399940ccd38d07336e9f5"
+  },
+  "raw_evidence_sha256": {
+    "target/sdk296-normal-toast-notices-20261012-01/result.json": "2b7475f921667d918d2b4e48b61ca12cadfc0004ff45e5f17fe4d0f018a7b0af",
+    "target/sdk296-normal-toast-notices-20261012-01/01/02-paused-after-alternating-notices.ron": "17110fe36dbf8c99c1e34462f953d1e500cb21b8677b0d6a1e8e26dd636bb189",
+    "target/sdk296-normal-toast-notices-20261012-01/01/05-paused-after-expiry.ron": "17110fe36dbf8c99c1e34462f953d1e500cb21b8677b0d6a1e8e26dd636bb189",
+    "target/sdk296-normal-toast-notices-20261012-01/independent-paused-clock-cleanup.json": "b4cdc6670700eafcaeb2ad2ec34c097039846a37f276ac866a19da4de3cff515"
+  },
+  "preserved_RED_visual": "docs/qa/sdk294-solo-drone-patrol/10-solo-Drone-after-natural-motion.png",
+  "boundaries": [
+    "No broaderHUD/allcampaign/fullSaveStateacceptance",
+    "NoWasm25/publicdeployment",
+    "No actor/resource/timer setters; pause isordinaryF10input"
+  ]
+}
