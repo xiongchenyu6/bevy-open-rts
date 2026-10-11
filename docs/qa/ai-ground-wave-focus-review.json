@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "scope": "AI ground wave focus against repeated manual-repair recovery; exact case2668 verified,2641 unresolved",
+  "source_changes": [
+    "src/ai.rs",
+    "src/ai/ground_focus_tests.rs",
+    "src/capture_api/repair_trace.rs"
+  ],
+  "behavior": "Existing actual ground-wave attackers converge on their majority valid living ground target at the existing profile refresh. Ties use health ratio then stable entity identity. No costs, stats, caps, timers, limits or configured human orders changed. Queued, selected, constructing, repairing, following, unrelated movement and air-target attacks excluded.",
+  "red": {
+    "actual_exit": 101,
+    "simulation_seconds": 200.01376,
+    "actual_ground_wave_members": 3,
+    "distinct_targets": 2,
+    "fixture": "Normal paid exactBigArena ChaosEasy6 vsChaosBeginner2; no unit/resource grants"
+  },
+  "green": {
+    "focused_exit": 0,
+    "focused_count": 1,
+    "protection_cases": [
+      "selected",
+      "queued",
+      "construct",
+      "repair",
+      "follow",
+      "unrelated_Move",
+      "configured_human"
+    ],
+    "preferences_exit": 0,
+    "preferences_count": 2,
+    "preferences_assertion": "Existing valid file overwritten through production atomic save_path and reloaded with changed volume/fullscreen",
+    "full": {
+      "exit": 0,
+      "passed": 279,
+      "failed": 0,
+      "ignored": 1,
+      "simulation_test_wall_seconds": 331.22
+    },
+    "check": 0,
+    "native_build": 0
+  },
+  "prefocus_attacked_power_trace": {
+    "status": {
+      "actual_exit": 2,
+      "wall_seconds": 85.41601130898925,
+      "simulation_limit": 600,
+      "wall_limit": 180,
+      "command": [
+        "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/case2668-prefocus-diagnostic-pin-20261011/skirmish_audit",
+        "big_arena",
+        "chaos",
+        "easy",
+        "6",
+        "chaos",
+        "beginner",
+        "2",
+        "600",
+        "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/case2668-prefocus-power-trace-20261011/result.json"
+      ]
+    },
+    "rows": 12003,
+    "first_clock": 200.01376342773438,
+    "last_clock": 600.0084228515625,
+    "targets": [
+      47244639426
+    ],
+    "hp_min": 3.4099984169006348,
+    "hp_max": 6.939998149871826,
+    "repair_starts": 156,
+    "manual_active_frames": 11080
+  },
+  "repair_trace_scope": "Actual ManualRepair component/HP observations. Residual bank delta is explicitly an estimate, not observed exact repair transactions. Prior default Power attempt actually watched TechLab and is not Power evidence.",
+  "native_pin": {
+    "path": "target/ai-ground-focus-shared-20261011/pin.json",
+    "bins": {
+      "bevy-open-rts": "bfcd6882fb4582c07455f13e824260188f49094577901d612e952730b8b42a57",
+      "capture": "0b75217033ef7009d6727eba5474b08ef1aff294091d4ede20e8811cca05e137",
+      "skirmish_audit": "d44a5abf33c37718d3b4a794d80dfafa7fd3e5dfa803e62118ddb8cd78d6c75a"
+    },
+    "source_and_assets_unchanged": true,
+    "asset_count": 332
+  },
+  "exact_case_rechecks": {
+    "2668": {
+      "status": {
+        "actual_exit": 0,
+        "wall_seconds": 24.471094767010072,
+        "simulation_limit": 600,
+        "wall_limit": 180,
+        "command": [
+          "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/ai-ground-focus-shared-20261011/skirmish_audit",
+          "big_arena",
+          "chaos",
+          "easy",
+          "6",
+          "chaos",
+          "beginner",
+          "2",
+          "600",
+          "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/ai-ground-focus-exact-rechecks-20261011/2668/result.json"
+        ],
+        "audit_sha256": "d44a5abf33c37718d3b4a794d80dfafa7fd3e5dfa803e62118ddb8cd78d6c75a",
+        "asset_count": 332
+      },
+      "result": {
+        "completed": true,
+        "timeout": false,
+        "clock_seconds": 250.02444458007812,
+        "config": {
+          "difficulties": [
+            "easy",
+            "beginner"
+          ],
+          "factions": [
+            "chaos",
+            "chaos"
+          ],
+          "map": "big_arena",
+          "max_seconds": 600,
+          "spawn_slots": [
+            6,
+            2
+          ]
+        },
+        "starting_resources": {
+          "crystal": 16,
+          "ore": 32
+        },
+        "startup_loadout": "GodotSkirmish",
+        "winning_teams": [
+          0
+        ],
+        "phase": "MatchFinished"
+      }
+    },
+    "2641": {
+      "status": {
+        "actual_exit": 124,
+        "wall_seconds": 180.0133817740134,
+        "simulation_limit": 600,
+        "wall_limit": 180,
+        "command": [
+          "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/ai-ground-focus-shared-20261011/skirmish_audit",
+          "big_arena",
+          "chaos",
+          "easy",
+          "6",
+          "chaos",
+          "beginner",
+          "1",
+          "600",
+          "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/ai-ground-focus-exact-rechecks-20261011/2641/result.json"
+        ],
+        "audit_sha256": "d44a5abf33c37718d3b4a794d80dfafa7fd3e5dfa803e62118ddb8cd78d6c75a",
+        "asset_count": 332
+      },
+      "result": null
+    }
+  },
+  "limitations": [
+    "Case2641 still wall-timeout with no simulation result; no infinite-game or completed-match inference.",
+    "No complete ordered-start sweep, independent seeds/random-map, balance or release acceptance claim.",
+    "No GPU/browser runtime used for this fix; old package/Web16 scope remains its original version."
+  ],
+  "artifact_sha256": {
+    "target/ai-ground-focus-red-20261011/red.log": "3cb8ed0d051269c676b8b9a61113c983674e2bcfd56d25d3782f09c31f73fa6b",
+    "target/ai-ground-focus-red-20261011/result.json": "53608b04809fc9d394e544a4091fce0ef16545adc213e690c2ebc3ddb60ccc0f",
+    "target/ai-ground-focus-green-20261011/result.json": "b368817c3143b334efcb46560a62f33f10f4d146b05dfa8d1e10b3ca6c3c25b0",
+    "target/case2668-prefocus-power-trace-20261011/summary.json": "bbe886e21be65a159433f947d3128d374414789a9118d748e22d647631b2f81d",
+    "target/case2668-prefocus-power-trace-20261011/status.json": "998ae4aaecb7bfa591e30b0ea68785a345725d1997aec2b7dcd3a6780266158d",
+    "target/case2668-prefocus-power-trace-20261011/repair.jsonl": "413dd8150074a70b45b352e79625ac28e4a7293bc1de97638053909a8a832839",
+    "target/ai-ground-focus-shared-20261011/full.log": "05cb44d8f308092bae95ea1a1a57eb019af9482f214b67a3cd12a335a66a986a",
+    "target/ai-ground-focus-shared-20261011/check.log": "17f01cdc8039529553eb4e03aafb4849c4f8909d3c92068911962520909239dc",
+    "target/ai-ground-focus-shared-20261011/build.log": "e64ad5179c37f51f3d8706a26dd94e249921ef833c9ab8993c19f5feabf8d000",
+    "target/ai-ground-focus-shared-20261011/pin.json": "98cc8ce4b1f6cf5726cbbc212f6084bfa128a8e93195fe13a27a3e913f5f6d99",
+    "target/ai-ground-focus-exact-rechecks-20261011/2668/result.json": "47e35e1fd29d35fcf7da3c27d0e52968521cf2e16ed0d293fa62505e43448a65",
+    "target/ai-ground-focus-exact-rechecks-20261011/2668/status.json": "e06ff69a517313f9425f29aff06b10712c7583fff1dfedce3e67708cdeecddcf",
+    "target/ai-ground-focus-exact-rechecks-20261011/2641/status.json": "b5fb9667396bd1ca0bcc15a736b8c576ddd0f664eb4f84ca7008da016d6ec93b"
+  }
+}

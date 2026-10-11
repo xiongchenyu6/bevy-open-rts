@@ -101,20 +101,32 @@ impl RepairTrace {
                 "cooldown_left":weapon.cooldown_left,"structure_multiplier":weapon.structure_damage_multiplier,
                 "can_attack_ground":weapon.can_attack_ground,"emp_seconds":emp.map(|e|e.remaining)
             }))).collect::<Vec<_>>();
-        let focus = if let Some(id) = &self.structure_id {
-            world
-                .query::<(Entity, &Structure, &Team, &Health)>()
-                .iter(world)
-                .find(|(_, structure, team, hp)| {
-                    **team == self.defender && structure.id == id && hp.current > 0.0
-                })
-                .map(|(entity, ..)| entity)
-        } else {
-            attacks.iter().map(|(target, _)| *target).find(|target| {
-                world.get::<Structure>(*target).is_some()
-                    && world.get::<Team>(*target) == Some(&self.defender)
+        // Prefer a real attacked target of the requested type. A base can have
+        // several reactors; selecting an arbitrary living one loses causality.
+        let focus = attacks
+            .iter()
+            .map(|(target, _)| *target)
+            .find(|target| {
+                world.get::<Structure>(*target).is_some_and(|structure| {
+                    self.structure_id
+                        .as_ref()
+                        .is_none_or(|id| structure.id == id)
+                }) && world.get::<Team>(*target) == Some(&self.defender)
+                    && world
+                        .get::<Health>(*target)
+                        .is_some_and(|health| health.current > 0.0)
             })
-        };
+            .or_else(|| {
+                self.structure_id.as_ref().and_then(|id| {
+                    world
+                        .query::<(Entity, &Structure, &Team, &Health)>()
+                        .iter(world)
+                        .find(|(_, structure, team, health)| {
+                            **team == self.defender && structure.id == id && health.current > 0.0
+                        })
+                        .map(|(entity, ..)| entity)
+                })
+            });
         let target = focus.map(|focus| {
             let structure = world.get::<Structure>(focus).unwrap();
             let health = world.get::<Health>(focus).unwrap();

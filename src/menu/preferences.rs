@@ -154,6 +154,13 @@ mod tests {
         };
         save_path(&path, saved).unwrap();
         assert_eq!(load_path(&path).unwrap().unwrap(), saved);
+        let changed = MenuOptionsState {
+            voice_volume: 0.25,
+            fullscreen: true,
+            ..saved
+        };
+        save_path(&path, changed).unwrap();
+        assert_eq!(load_path(&path).unwrap().unwrap(), changed);
         std::fs::remove_file(path).unwrap();
     }
     #[test]

@@ -735,6 +735,7 @@ pub(crate) fn ai_director(
     targets: Query<(Entity, &Team, &Transform), With<Health>>,
     wave_targets: Query<(Entity, &Team, &Transform, &Health, &MovementDomain)>,
     weapons: Query<&Weapon>,
+    wave_members: Query<&AiAttackWaveMember>,
     occupiers: Query<
         (Entity, &Transform, &Selectable, Option<&Health>),
         Or<(
@@ -950,6 +951,93 @@ pub(crate) fn ai_director(
         resources.director.attack_timer[idx] -= delta;
         if profile.active_offense_enabled && resources.director.attack_timer[idx] <= 0.0 {
             resources.director.attack_timer[idx] = profile.attack_interval;
+            // Existing ground-wave members must combine damage rather than
+            // letting several independently repaired targets absorb split fire.
+            let mut ground_members = Vec::new();
+            let mut target_counts = std::collections::HashMap::<Entity, usize>::new();
+            for (
+                entity,
+                unit,
+                unit_team,
+                _,
+                queue,
+                moving,
+                follow,
+                attack,
+                capture,
+                garrison,
+                harvest,
+                repair,
+                construct,
+                attack_move,
+                patrol,
+            ) in &units
+            {
+                if *unit_team != team
+                    || !ai_battle_unit_id(unit.id)
+                    || !wave_members.contains(entity)
+                    || queue.is_some_and(|queue| !queue.orders.is_empty())
+                    || has_active_orders_in_query(
+                        None,
+                        follow,
+                        None,
+                        capture,
+                        garrison,
+                        harvest,
+                        repair,
+                        construct,
+                        attack_move,
+                        patrol,
+                    )
+                {
+                    continue;
+                }
+                let Some(attack) = attack else {
+                    continue;
+                };
+                let Ok(weapon) = weapons.get(entity) else {
+                    continue;
+                };
+                let Ok((_, target_team, position, health, domain)) =
+                    wave_targets.get(attack.target)
+                else {
+                    continue;
+                };
+                if *domain == MovementDomain::Air
+                    || !attack_order_target_valid(
+                        &team,
+                        target_team,
+                        *domain,
+                        health,
+                        weapon,
+                        &resources.relations,
+                    )
+                    || moving.is_some_and(|order| {
+                        xz_distance(order.target, position.translation)
+                            > NAV_REPLAN_GOAL_TOLERANCE_M
+                    })
+                {
+                    continue;
+                }
+                ground_members.push((entity, attack.target));
+                *target_counts.entry(attack.target).or_default() += 1;
+            }
+            let ground_focus = target_counts
+                .into_iter()
+                .max_by(|(left, left_count), (right, right_count)| {
+                    left_count
+                        .cmp(right_count)
+                        .then_with(|| {
+                            wave_targets
+                                .get(*right)
+                                .unwrap()
+                                .3
+                                .ratio()
+                                .total_cmp(&wave_targets.get(*left).unwrap().3.ratio())
+                        })
+                        .then_with(|| right.to_bits().cmp(&left.to_bits()))
+                })
+                .map(|(target, _)| target);
             for (
                 entity,
                 unit,
@@ -968,6 +1056,25 @@ pub(crate) fn ai_director(
                 patrol_order,
             ) in &units
             {
+                if let Some((_, current_target)) =
+                    ground_members.iter().find(|(member, _)| *member == entity)
+                {
+                    if let Some(target) = ground_focus.filter(|target| target != current_target)
+                        && let Ok(weapon) = weapons.get(entity)
+                        && let Ok((_, target_team, _, health, domain)) = wave_targets.get(target)
+                        && attack_order_target_valid(
+                            &team,
+                            target_team,
+                            *domain,
+                            health,
+                            weapon,
+                            &resources.relations,
+                        )
+                    {
+                        commands.entity(entity).try_insert(AttackOrder { target });
+                    }
+                    continue;
+                }
                 if *unit_team != team
                     || !ai_battle_unit_id(unit.id)
                     || order_queue.is_some_and(|queue| !queue.orders.is_empty())
@@ -3100,3 +3207,6 @@ mod match_reset_tests;
 #[cfg(test)]
 #[path = "ai/placement_tests.rs"]
 mod placement_tests;
+
+#[cfg(test)]
+mod ground_focus_tests;
