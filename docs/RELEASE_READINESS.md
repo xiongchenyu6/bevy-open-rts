@@ -133,6 +133,11 @@ A bounded regression or an older package cannot establish final release readines
   completion observation is within154.701s of the original300s bound
   ([current official Runtime4 tutorial](qa/native291-official-runtime4-bootcamp-review.json)).
   Audio and Windows first-session acceptance remain required.
+- Frozen native300 matrix partial verification accepts2,668/3,726 unique
+  terminal cases with zero failures/integrity errors
+  ([partial snapshot](qa/native300-matrix-partial2668-review.json)). Its driver
+  remains live; native305 is queued behind it and has no matrix cases yet.
+  Neither partial300 coverage nor a queued305 job closes balance acceptance.
 - The frozen native291 official-SDK authored-start matrix completes
   **3,726/3,726** unique terminal cases with no integrity errors or failures.
   Driver and independent verifier exit0; recorded evidence hashes are rechecked

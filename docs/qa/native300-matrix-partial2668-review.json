@@ -1,0 +1,23 @@
+{
+  "scope": "Read-only partial matrix snapshot of immutable native300; current305 Hold changes not covered",
+  "completed": 2668,
+  "planned": 3726,
+  "complete_matrix": false,
+  "actual_verifier_exit": 0,
+  "evidence_sha256": {
+    "docs/qa/native300-matrix-partial2668.json": "275dd9521fcde9395991654a2eb7ee89bbea71b28d05733cb83c6d56ce0e28c6"
+  },
+  "latest305_coverage": 0,
+  "bounds": {
+    "simulation": 600,
+    "wall_per_case": 180,
+    "opening_bank": [
+      32,
+      16
+    ]
+  },
+  "boundaries": [
+    "No independent seeds, repeats, random maps, statisticalbalance or human gameplay acceptance",
+    "Old300 driver confirmed live; current305 queuedwaiting separately"
+  ]
+}
