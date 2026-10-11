@@ -1,0 +1,67 @@
+{
+  "scope": "Actual normal-input currentSDK300starterDrone short/mediumPatrol proof only; no broadercampaign orbrowserclaim",
+  "passed": true,
+  "wall_seconds": 63.97408274299232,
+  "original_bounds": [
+    900,
+    30
+  ],
+  "artifact": {
+    "source": "206f365",
+    "archive_sha256": "24afda2babe97e7d3c37f5f97c2c311fd4a7355d340abae70ea5827002348685",
+    "installed_ELF_sha256": "ec5aa728f8e79e3fb3e34cfb39b790bf278362042a87a424ab2237d94f614608",
+    "files": 399,
+    "assets": 332
+  },
+  "ordinary_inputs": [
+    "NormalSkirmish32/16",
+    "AltC/HQfocus andCtrlAltA SoloDrone",
+    "ActualenabledPatrolcard/DOWN+nonHUDRMB tocurrentOWN-relativepublicclearcardinaltarget",
+    "FastnormalCtrlS during5natural seconds; no pauseinside sampling",
+    "NormalF10pause afterstage andwindowclose"
+  ],
+  "short": {
+    "actual_leg": 2.414743436987895,
+    "natural_clock_delta": 5.002164840698242,
+    "samples": 25,
+    "destination_then_origin_within_0_35": true
+  },
+  "medium": {
+    "actual_leg": 4.097656254709438,
+    "natural_clock_delta": 5.18121337890625,
+    "samples": 26,
+    "actual_post_firstturn_span": 1.9751281764047157
+  },
+  "Root_independent_recalculation": "25short/26medium endpointvisits, postfirstturnspan, allclock/bank/height/endpoints/4msspeed and9PNGhashes independentlyPASS; RootdirectfinalPNGviews",
+  "child_direct_views": "All8stageimages checked: actualPatrolmode/OWNDroneHUD/clearHQ andchangedairborneDronefinalposes",
+  "actual_bank_height_identity_speed_and_bothflags_preserved": true,
+  "normal_exits": [
+    {
+      "pid": 3247942,
+      "supervisor_pid": 3247831,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_archive_unchanged": true,
+  "no_owned_GPU_children": true,
+  "evidence_sha256": {
+    "target/sdk300-short-medium-patrol-20261012-01/result.json": "178c52af8cbe811bb63d27a10fb3d167c826b1217ee64a1e18807cc3b0c49866",
+    "target/sdk300-short-medium-patrol-20261012-01/natural-patrol-progress.json": "7431a48f9a4ff0d0658eca06f051fea60c06b4428f6fcd326aef000f67fe411d"
+  },
+  "portable_files_sha256": {
+    "docs/qa/sdk300-short-medium-patrol/actual-own-trajectories.json": "546f75822f2c8483f377ef594ef4c254e364aa6abb4482e8a0c75fc616af53fe",
+    "docs/qa/sdk300-short-medium-patrol/short-after-five-natural-seconds.png": "22b46640f5d5c17faf8066d8abbc2c29a0305be7ce95690c540c4cfc3e809a2d",
+    "docs/qa/sdk300-short-medium-patrol/short-paused-issued.png": "43cf55062eb219c01c87d5e2a65a701bc7f466cc5a97f45570b7edbae2809063",
+    "docs/qa/sdk300-short-medium-patrol/medium-paused-issued.png": "84c789810945f06d020f6f5fa182e6f7daabc22ee9d5d1f3656f11d3933550b2",
+    "docs/qa/sdk300-short-medium-patrol/short-actual-Patrol-mode.png": "df7399746c047f4a6e83ed314a828c93482d267fb8cb00ae8f8380ee0d166a2a",
+    "docs/qa/sdk300-short-medium-patrol/medium-after-five-natural-seconds.png": "cda796108a1f36fde71f4d78ab7f14e0db8e5de9caf8a630fb38a1894a005ebf",
+    "docs/qa/sdk300-short-medium-patrol/medium-actual-Patrol-mode.png": "a2930611b28f522b7eafc3494533298255ee9fce09f59b14bc55dd312cba8078"
+  },
+  "boundaries": [
+    "No actor/camera/ECS/grant/timer setters",
+    "No fullSaveState orbroadercampaign acceptance",
+    "W25oldcode/smallmotion remainsseparate; currentbrowserPatrol notyetproven"
+  ]
+}
