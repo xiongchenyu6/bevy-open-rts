@@ -1,0 +1,267 @@
+{
+  "scope": "SDK296 normal starter Drone Patrol partial-save same/fresh-process continuity. Not exhaustive Save gate, campaign, mines, effects, support, or weather acceptance.",
+  "artifact": {
+    "ready": "target/linux-native296-toasts-extracted-20261012/ready.json",
+    "binary_sha256": "165996cd616a91380a6a64785f134481ff466c8c744d34f6a35dc41f3821b1c0",
+    "archive_sha256": "19787ebddd97570e66d3b2576a1343a03cf66f6d875704ad84ab97ecd4a104cc",
+    "files": 399,
+    "assets": 332
+  },
+  "output": "target/sdk296-normal-drone-patrol-save-20261012-03",
+  "passed": true,
+  "actual_wall_seconds": 95.32117678696522,
+  "original_limits": {
+    "whole": 900,
+    "natural_observation_stage": 30
+  },
+  "normal_game_exits": [
+    {
+      "pid": 3027807,
+      "supervisor_pid": 3027761,
+      "actual_exit": 0,
+      "normal_window_close": true
+    },
+    {
+      "pid": 3029612,
+      "supervisor_pid": 3029541,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "actual_partial_saved_order": {
+    "origin": [
+      -17.0,
+      1.5,
+      -20.0
+    ],
+    "destination": [
+      -11.000982284545898,
+      0.0,
+      -16.995738983154297
+    ],
+    "Move": [
+      -17.0,
+      1.5,
+      -20.0
+    ],
+    "forward": false,
+    "worldY": 1.5,
+    "bank": [
+      32,
+      16
+    ],
+    "fog_cells_compared": 36864,
+    "schema": 4
+  },
+  "same_process_load": {
+    "semantic_fields_exact": true,
+    "height_exact": true,
+    "fog_exact": true,
+    "actual_expected_key": 8589933885,
+    "actual_restored_key": 17179868558,
+    "numeric_key_inequality_required": false,
+    "before_save_sha256": "9db9df00871f1ee538d4792f548c2465be80aba003dd545530506e8dfe99eb3e",
+    "load_source_bytes_unchanged": true,
+    "actual_resave": "01/12-same-process-loaded-resaved.ron",
+    "image": "01/12-same-process-loaded.png"
+  },
+  "fresh_process_load": {
+    "semantic_fields_exact": true,
+    "height_exact": true,
+    "fog_exact": true,
+    "actual_expected_key": 17179868558,
+    "actual_restored_key": 12884900579,
+    "numeric_key_inequality_required": false,
+    "before_save_sha256": "ed3a42d3822bbff1d8a6c8450b4ecb6a6003d6c71ba7f9f0b6f53b9f50c2f98f",
+    "load_source_bytes_unchanged": true,
+    "actual_resave": "01/14-fresh-process-loaded-resaved.ron",
+    "image": "01/14-fresh-process-loaded.png"
+  },
+  "actual_natural_resume": {
+    "clock_delta": 5.35112190246582,
+    "sample_count": 13,
+    "both_legs_observed": true,
+    "sampled_XZ_travel_lower_bound": 13.071499671584501,
+    "height_and_bank_exact": true,
+    "samples": [
+      {
+        "clock": 16.45759391784668,
+        "position": [
+          -15.123540878295898,
+          1.5,
+          -19.060285568237305
+        ],
+        "forward": false
+      },
+      {
+        "clock": 17.29292869567871,
+        "position": [
+          -13.188258171081543,
+          1.5,
+          -18.091106414794922
+        ],
+        "forward": false
+      },
+      {
+        "clock": 17.755279541015625,
+        "position": [
+          -14.841902732849121,
+          1.5,
+          -18.91924285888672
+        ],
+        "forward": false
+      },
+      {
+        "clock": 18.18265724182129,
+        "position": [
+          -14.072076797485352,
+          1.5,
+          -18.533721923828125
+        ],
+        "forward": true
+      },
+      {
+        "clock": 18.60795021057129,
+        "position": [
+          -13.021688461303711,
+          1.5,
+          -18.007692337036133
+        ],
+        "forward": false
+      },
+      {
+        "clock": 19.002485275268555,
+        "position": [
+          -14.432779312133789,
+          1.5,
+          -18.71435546875
+        ],
+        "forward": false
+      },
+      {
+        "clock": 19.460586547851562,
+        "position": [
+          -14.420955657958984,
+          1.5,
+          -18.708436965942383
+        ],
+        "forward": true
+      },
+      {
+        "clock": 19.876985549926758,
+        "position": [
+          -12.93166446685791,
+          1.5,
+          -17.962608337402344
+        ],
+        "forward": true
+      },
+      {
+        "clock": 20.340938568115234,
+        "position": [
+          -13.041508674621582,
+          1.5,
+          -18.01761817932129
+        ],
+        "forward": false
+      },
+      {
+        "clock": 20.727136611938477,
+        "position": [
+          -14.422762870788574,
+          1.5,
+          -18.709341049194336
+        ],
+        "forward": false
+      },
+      {
+        "clock": 21.091842651367188,
+        "position": [
+          -14.784390449523926,
+          1.5,
+          -18.89044189453125
+        ],
+        "forward": true
+      },
+      {
+        "clock": 21.45219612121582,
+        "position": [
+          -13.495549201965332,
+          1.5,
+          -18.2450008392334
+        ],
+        "forward": true
+      },
+      {
+        "clock": 21.8087158203125,
+        "position": [
+          -13.270669937133789,
+          1.5,
+          -18.132383346557617
+        ],
+        "forward": false
+      }
+    ]
+  },
+  "direct_public_frame_review": [
+    "01/11-real-partial-Patrol-baseline.png",
+    "01/12-same-process-loaded.png",
+    "01/14-fresh-process-loaded.png",
+    "01/16-fresh-resumed-Patrol.png"
+  ],
+  "all_ten_PNG_hashes_verified": true,
+  "screenshots": {
+    "01/00-normal-main-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01/05-current-mixed-before-ground.png": "c781a5fc0dbaea5f9f7328f67700005bea62faa84cc0b9ee935c1303ad3491f7",
+    "01/06-actual-Patrol-mode.png": "57cfe8bfce61ace7711a74e940338fdc0e014c52b7b7eab199bef3a6f37f08e7",
+    "01/08-solo-Drone-paused-issued.png": "0d2b75985e83aa8f0f3a888e870f8d7c73de31a86a57de9ae9daabe5e2839699",
+    "01/10-solo-Drone-after-natural-motion.png": "9a47b0c06a2e08ad607e6ffe101f26cd72fce0427f56d750f384c1e7b14e65ff",
+    "01/11-real-partial-Patrol-baseline.png": "d87c9ca0f8be3dc8b8f391af5846d38805c50325e7cccad472b42ddcfafcac61",
+    "01/12-same-process-loaded.png": "a4af6d71b656b758f1827c89a69989227405b3cf0e9e899e5fcacf3473005a38",
+    "01/13-fresh-process-main-menu.png": "9810c443b78491843f164da968ac2f0f92a9057678e28520b5da46817fd82ee4",
+    "01/14-fresh-process-loaded.png": "5cec380f949cc76e75361fee62e5207712bdf010263e815be2a3c8ad66522a59",
+    "01/16-fresh-resumed-Patrol.png": "ab95b2c22c8b7e21684eb0b33ddac9bb0438ef3e97476b463f12bbe2711b3c3c"
+  },
+  "retained_failures": [
+    {
+      "output": "target/sdk294-normal-drone-patrol-save-20261012-01",
+      "overall_pass": false,
+      "partial_load_comparisons": true,
+      "reason": "Coarse normal CtrlS samples did not observe both legs; strict turn assertion failed"
+    },
+    {
+      "output": "target/sdk294-normal-drone-patrol-save-20261012-02",
+      "overall_pass": false,
+      "game_started": false,
+      "reason": "Private compositor bootstrap core dump; original program result absent, separate journal/bootstrap metadata retained"
+    }
+  ],
+  "method": "Normal menus/Patrol card/RMB/F10/CtrlS/CtrlL; read-only RON analysis. Faster natural-stage CtrlS keys held.08s, fresh atomic save marks required; no Actor/camera/resource/time setters.",
+  "raw_sha256": {
+    "01/01-initial.ron": "128faed8d9b115beb181638540a8975fc79f9a88e7f61be64ee60b1460b96bc1",
+    "01/04-mixed-before.ron": "964f2e8f436ed476b452be89541344dcf4f22e3d0429775d30e950b6b39da6a4",
+    "01/07-mixed-issued.ron": "7208b44c4cffea6b44412904f3f2696c80f450ab59aae9661c2302a8ea756c7d",
+    "01/09-after-natural-five-seconds.ron": "9db9df00871f1ee538d4792f548c2465be80aba003dd545530506e8dfe99eb3e",
+    "01/11-real-partial-Patrol-baseline.ron": "9db9df00871f1ee538d4792f548c2465be80aba003dd545530506e8dfe99eb3e",
+    "01/12-same-process-loaded-resaved.ron": "ed3a42d3822bbff1d8a6c8450b4ecb6a6003d6c71ba7f9f0b6f53b9f50c2f98f",
+    "01/14-fresh-process-loaded-resaved.ron": "482e3076e6998113b3af610f2efe3e56c51be8603c6f6d3db3b8ae52e6be5132",
+    "01/15-resumed-sample-1.ron": "1194cd5e049ace7cf56df85d1330ab066ef1df0a6671bdf43f2bb2179d717626",
+    "01/15-resumed-sample-10.ron": "427dbac3fefbd11b117e14f209769fd3628b5d09c34a8c9a901dca59bb3aa8b9",
+    "01/15-resumed-sample-11.ron": "f531e6da1e4aee9bf036ac89ab246dda50612702b9ee9dd118c22a2b1e0085cb",
+    "01/15-resumed-sample-12.ron": "d549ffacbcb8d05bc862367e3ad75ae02d9c03bc6fd290dd4f01b90138bc0939",
+    "01/15-resumed-sample-2.ron": "6c6ec2b507d0ba87842249ceef255a66bc8e2f901fa35cf144e9ec9959ad3992",
+    "01/15-resumed-sample-3.ron": "1c0a0ea4a163210d66b42b296ed027c9cabb962ceb9676b0e966324607d60e63",
+    "01/15-resumed-sample-4.ron": "141e055ec023fc8ed5889ba6e3ee33e69ca3e23e1d0593ec95e39ecd01fb3572",
+    "01/15-resumed-sample-5.ron": "cfb134061892e5e5c3df87069899f7ac956e1f7bd8c19ae49d15f96706e0f21d",
+    "01/15-resumed-sample-6.ron": "355146411d1957cbb3681c72abd57f26d6ddddf34a2c9fd7c021df7a8932ff66",
+    "01/15-resumed-sample-7.ron": "a3132851f46576e053f3adcd0e3d67ee7c3c5e55136e480394738b11554e8c33",
+    "01/15-resumed-sample-8.ron": "121d0cdd7785d9dd540b6b6eef3d892a2fafe5646819755ac043a24ced955df0",
+    "01/15-resumed-sample-9.ron": "9f7cb6ebac38a00faa617907bf955113f9ab31788f43c4bfc485919b8d97f49c",
+    "01/current-own-producer-CommandCenter.ron": "128faed8d9b115beb181638540a8975fc79f9a88e7f61be64ee60b1460b96bc1",
+    "user-data/bevy-open-rts/quicksave.ron": "d549ffacbcb8d05bc862367e3ad75ae02d9c03bc6fd290dd4f01b90138bc0939"
+  },
+  "result_sha256": "0cc979dd2c065bd279d6e9facaf4990f8ffed1e257f2020e74ad53f2b7e5d89d"
+}
