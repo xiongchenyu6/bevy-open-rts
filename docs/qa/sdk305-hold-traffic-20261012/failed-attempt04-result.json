@@ -1,0 +1,24 @@
+{
+  "scope": "Actual normal-input paid AA Hold under friendly HMG traffic only; no camera/ECS/entity setters",
+  "passed": false,
+  "original_wall": 900,
+  "original_stages": 30,
+  "error": "Fresh normal HUD acknowledgement failed: Input cursor does not match compositor-derived mapping",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/run_sdk305_hold_traffic.py\", line 133, in <module>\n    s=PhysicalSession(ready['package'],ready['archive'],ready['binary_sha256'],ready['archive_sha256'],a.out,900);s.begin_mission(0);r['receipts']=run(s);s.normal_close_and_require_exit_zero();r['program_flow_passed']=True\n                                                                                                                                                   ~~~^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/run_sdk305_hold_traffic.py\", line 64, in run\n    o.select_free_worker();o.build(ident,cost,o.own_base_sites(ident),tab)\n    ~~~~~~~~~~~~~~~~~~~~^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/group_opening.py\", line 31, in select_free_worker\n    focused = self.refresh()\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/refresh04.py\", line 55, in refresh\n    raise AssertionError('Fresh normal HUD acknowledgement failed: '+str(last_error))\nAssertionError: Fresh normal HUD acknowledgement failed: Input cursor does not match compositor-derived mapping\n",
+  "normal_exits": [
+    {
+      "pid": 3550394,
+      "supervisor_pid": 3550332,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "01/00-main-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01/99-failure.png": "ee3247616536ad56863e1b0a4ae984abd2045582bff67f28f7b60c7a5bb9a81d"
+  },
+  "wall_seconds": 49.07561216200702
+}

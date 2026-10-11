@@ -1,0 +1,298 @@
+{
+  "scope": "Actual normal-input paid AA Hold under friendly HMG traffic only; no camera/ECS/entity setters",
+  "passed": true,
+  "original_wall": 900,
+  "original_stages": 30,
+  "receipts": {
+    "minimum_actual_swept_distance_to_held": 0.11137971456421215,
+    "near_contact_limit": 1.58,
+    "planned_segment": [
+      [
+        -12.908225059509277,
+        0.05000000074505806,
+        -13.825431823730469
+      ],
+      [
+        -12.231320701311391,
+        0,
+        -18.30595620410801
+      ]
+    ],
+    "fresh_baseline_clock": 70.17430114746094,
+    "paid_HMG_and_AA": true,
+    "normal_H_once": true,
+    "public_clear_target": [
+      -12.231320701311391,
+      0,
+      -18.30595620410801
+    ],
+    "samples": [
+      {
+        "clock": 70.73351287841797,
+        "held_key": 5592047417623,
+        "held_position": [
+          -12.604775428771973,
+          0.05000000074505806,
+          -15.834007263183594
+        ],
+        "hold": true,
+        "mover_key": 803158882476,
+        "mover_position": [
+          -12.752092361450195,
+          0.05000000074505806,
+          -14.846982955932617
+        ],
+        "mover_active": [
+          {
+            "kind": "Move",
+            "destination": [
+              -12.22718620300293,
+              0.0,
+              -18.308181762695312
+            ]
+          }
+        ],
+        "bank": [
+          11,
+          8
+        ]
+      },
+      {
+        "clock": 71.27558135986328,
+        "held_key": 5592047417623,
+        "held_position": [
+          -12.604775428771973,
+          0.05000000074505806,
+          -15.834007263183594
+        ],
+        "hold": true,
+        "mover_key": 803158882476,
+        "mover_position": [
+          -12.664848327636719,
+          0.05000000074505806,
+          -15.382043838500977
+        ],
+        "mover_active": [
+          {
+            "kind": "Move",
+            "destination": [
+              -12.22718620300293,
+              0.0,
+              -18.308181762695312
+            ]
+          }
+        ],
+        "bank": [
+          11,
+          8
+        ]
+      },
+      {
+        "clock": 71.8518295288086,
+        "held_key": 5592047417623,
+        "held_position": [
+          -12.604775428771973,
+          0.05000000074505806,
+          -15.834007263183594
+        ],
+        "hold": true,
+        "mover_key": 803158882476,
+        "mover_position": [
+          -12.18598461151123,
+          0.05000000074505806,
+          -16.584714889526367
+        ],
+        "mover_active": [
+          {
+            "kind": "Move",
+            "destination": [
+              -12.22718620300293,
+              0.0,
+              -18.308181762695312
+            ]
+          }
+        ],
+        "bank": [
+          11,
+          8
+        ]
+      },
+      {
+        "clock": 72.4121322631836,
+        "held_key": 5592047417623,
+        "held_position": [
+          -12.604775428771973,
+          0.05000000074505806,
+          -15.834007263183594
+        ],
+        "hold": true,
+        "mover_key": 803158882476,
+        "mover_position": [
+          -12.21263599395752,
+          0.05000000074505806,
+          -18.124937057495117
+        ],
+        "mover_active": [],
+        "bank": [
+          11,
+          8
+        ]
+      },
+      {
+        "clock": 73.04058074951172,
+        "held_key": 5592047417623,
+        "held_position": [
+          -12.604775428771973,
+          0.05000000074505806,
+          -15.834007263183594
+        ],
+        "hold": true,
+        "mover_key": 803158882476,
+        "mover_position": [
+          -12.21263599395752,
+          0.05000000074505806,
+          -18.124937057495117
+        ],
+        "mover_active": [],
+        "bank": [
+          11,
+          8
+        ]
+      },
+      {
+        "clock": 73.69866943359375,
+        "held_key": 5592047417623,
+        "held_position": [
+          -12.604775428771973,
+          0.05000000074505806,
+          -15.834007263183594
+        ],
+        "hold": true,
+        "mover_key": 803158882476,
+        "mover_position": [
+          -12.21263599395752,
+          0.05000000074505806,
+          -18.124937057495117
+        ],
+        "mover_active": [],
+        "bank": [
+          11,
+          8
+        ]
+      },
+      {
+        "clock": 74.26573944091797,
+        "held_key": 5592047417623,
+        "held_position": [
+          -12.604775428771973,
+          0.05000000074505806,
+          -15.834007263183594
+        ],
+        "hold": true,
+        "mover_key": 803158882476,
+        "mover_position": [
+          -12.21263599395752,
+          0.05000000074505806,
+          -18.124937057495117
+        ],
+        "mover_active": [],
+        "bank": [
+          11,
+          8
+        ]
+      },
+      {
+        "clock": 74.8097152709961,
+        "held_key": 5592047417623,
+        "held_position": [
+          -12.604775428771973,
+          0.05000000074505806,
+          -15.834007263183594
+        ],
+        "hold": true,
+        "mover_key": 803158882476,
+        "mover_position": [
+          -12.21263599395752,
+          0.05000000074505806,
+          -18.124937057495117
+        ],
+        "mover_active": [],
+        "bank": [
+          11,
+          8
+        ]
+      },
+      {
+        "clock": 75.36976623535156,
+        "held_key": 5592047417623,
+        "held_position": [
+          -12.604775428771973,
+          0.05000000074505806,
+          -15.834007263183594
+        ],
+        "hold": true,
+        "mover_key": 803158882476,
+        "mover_position": [
+          -12.21263599395752,
+          0.05000000074505806,
+          -18.124937057495117
+        ],
+        "mover_active": [],
+        "bank": [
+          11,
+          8
+        ]
+      }
+    ],
+    "actual_sim_seconds": 4.636253356933594
+  },
+  "program_flow_passed": true,
+  "normal_exits": [
+    {
+      "pid": 3556557,
+      "supervisor_pid": 3556493,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "01/00-main-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01/auto-01-PowerReactor-tab-tooltip.png": "43480a04c411d003f80c6765a269e5ce5d707a4fcaebf5aa8c322cafb65df44e",
+    "01/auto-01-PowerReactor-candidate-0-before-ghost.png": "bfe401fe1a54fcee671dc965495f1549ac5b84db6e96c6e6c60897419167b4ea",
+    "01/auto-01-PowerReactor-candidate-0-build-tooltip.png": "fea165458c36058101d0809faff3dc7522afbe5a7a59494012dc9fb4a3b53c5b",
+    "01/auto-01-PowerReactor-ghost-0.png": "1b067528fd839e02201cab3041f412d9daab63aec98f0ce890990919531fdf94",
+    "01/auto-01-PowerReactor-completed.png": "82117fa448aeff470892758222d35eafcf2ded4ceaf1c44c1c7636a5177b5be7",
+    "01/auto-02-Barracks-tab-tooltip.png": "4accf40970e4d374584d81c9acdbe484cc46b8f0ea9bd0d11532abeee3b92b1c",
+    "01/auto-02-Barracks-candidate-0-before-ghost.png": "c1722b407a118ce0fa2c4928668ef290652a86dbeec6336ef54d2f30b070a8e7",
+    "01/auto-02-Barracks-candidate-0-build-tooltip.png": "2a9b3bfcd80b9813fec76957261f6f72806403b39022594c89d3ec99d0f5a2ac",
+    "01/auto-02-Barracks-ghost-0.png": "7014e6adfaf242723751dcd1a6b24baa9caaf561019a2ca8b5fbe3d934ce0380",
+    "01/auto-02-Barracks-candidate-1-before-ghost.png": "2e8d9fc05d904f96887b458d4f21d637087075b50aaddb9cb7b3a514493e7af7",
+    "01/auto-02-Barracks-candidate-1-build-tooltip.png": "15a03ee234b717417b92b6f0543ebd6913355593034a9ae15c0b3406da6cb64f",
+    "01/auto-02-Barracks-ghost-1.png": "dee2432e6723a2b868b5d870f514fd4fb6af663caec860a3655b00acd8c84a66",
+    "01/auto-02-Barracks-completed.png": "51f8d66446a4d93e20263e97b271698d0a6566d41ed747d90ae1d845d7027f09",
+    "01/auto-03-VehicleFactory-tab-tooltip.png": "3d73e217c5a4622092afced4933c1fe2c3cdd255f23089282ffcc5a16abfdc45",
+    "01/auto-03-VehicleFactory-candidate-0-before-ghost.png": "08c39d3305216d310af585c4c85fe8b23798226e93107a96d9425f02781d0994",
+    "01/auto-03-VehicleFactory-candidate-0-build-tooltip.png": "f92e941502bf1f32dfe989a3e703d157aa313014ef8cc25f69f136fbe8227bdd",
+    "01/auto-03-VehicleFactory-ghost-0.png": "3cc6917c96dbbc1b340a23bd313bd9064d759fcf9249a96677abc396f4c71f6a",
+    "01/auto-03-VehicleFactory-completed.png": "a429e18818b4047abfcd0643b56faa7b080daf72b4a96e65d4c4d549d5f16cbd",
+    "01/auto-04-RadarUplink-tab-tooltip.png": "7c94dee59b611c5c81339530a4100f348dbeb711f1eb33856ec77dba3aab8ed0",
+    "01/auto-04-RadarUplink-candidate-0-before-ghost.png": "4c83902aa767796a4eaf308a7cc1bc364ab1b755747b26b7b0a591a3493da7dd",
+    "01/auto-04-RadarUplink-candidate-0-build-tooltip.png": "d0d0db7b73aab9a98e746ccae7d592500742fb6b454df5d35371a4c80937e47b",
+    "01/auto-04-RadarUplink-ghost-0.png": "8ab412a5f3e8540f7db1ea01af60337251c8d46ffe2313a0dbac1d412933a0fb",
+    "01/auto-04-RadarUplink-completed.png": "00bd51eaab041f4c17e132175540bf4871200238066f1ed3dd995fda385b774a",
+    "01/rally-Barracks-current-assembly.png": "6365a97856983a0615e0c1801f0fcfbeba63d7f534089d3e31a090ea9a0084ce",
+    "01/rally-Barracks-actual-mode.png": "55f3e4adb1ab45b7add39660ee3c0f1e2b77e6c2bcaf278c1ef4a970387a9810",
+    "01/paid-HeavyMachinegunTrooper-0-tooltip.png": "1578a43a21d2a4925678a7aa0c346480860f27d5109c81e4af7169ce90f2b082",
+    "01/rally-VehicleFactory-current-assembly.png": "5a3c47f8d414e36ccca0773fcabd597f6b738d89c4aca07d80e0bf65c8f8155b",
+    "01/rally-VehicleFactory-actual-mode.png": "c6c8045813ebcd89ee1a9f4f89d919ee7669d66938bc5990bba52b4c279f65d3",
+    "01/paid-AntiAirWalker-0-tooltip.png": "3d53dd5f86f125dd590a858c20d7b445902e6a22eeded3defbde86048a00c16d",
+    "01/body-AntiAirWalker.png": "cd3f7ee9cd0fce300be699b0e53c15d48c97e8bf8ba95163920ee50a5461638b",
+    "01/body-HeavyMachinegunTrooper.png": "d7b4cd53d38cb734dfb1110a109aade7bae8e49589eb445de4ea26589af78c1d",
+    "01/05-current-traffic-ground.png": "02ec4cabc67afab6ef7c09bdb1f712cd1fbc669e226aa5915de632759661ef3c",
+    "01/07-after-natural-traffic.png": "1308e6a34c0ad2b1eae7be4623bcfbc3fc8f301fd47816948a19da5d420a39c3"
+  },
+  "wall_seconds": 436.6105988220079
+}

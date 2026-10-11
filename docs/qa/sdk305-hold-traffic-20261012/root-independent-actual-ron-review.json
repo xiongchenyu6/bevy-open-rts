@@ -1,0 +1,15 @@
+{
+  "scope": "Normal physical SDK305 paid AA Hold under HMG nearby movement only",
+  "actual_ron_samples": 9,
+  "baseline_sim_seconds": 5.195465087890625,
+  "first_last_sim_seconds": 4.636253356933594,
+  "held_max_drift": 0,
+  "mover_max_progress_from_baseline": 4.355409211920824,
+  "minimum_sampled_segment_distance": 0.11137971456421215,
+  "own_bank": [
+    11,
+    8
+  ],
+  "normal_exit": 0,
+  "broader_release_gates_open": true
+}

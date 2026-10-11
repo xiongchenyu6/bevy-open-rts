@@ -1,0 +1,20 @@
+{
+  "bounded_hold_traffic_pass": true,
+  "actual_driver_pass": true,
+  "visual_finding": "Actualcurrentbody/terrain gates andfinalPNG inspected; HMG northofunchangedAA relativefixedHQ. RootindependentactualRONreview attached.",
+  "baseline_to_last_sim_seconds": 5.195465087890625,
+  "first_to_last_sample_sim_seconds": 4.636253356933594,
+  "review_ages_seconds": [
+    27.2736599445343,
+    33.48014760017395,
+    35.45102834701538,
+    41.204912424087524,
+    43.32489466667175
+  ],
+  "cleanup_process_matches": [],
+  "gpu_released": true,
+  "scope_excludes": [
+    "full campaign",
+    "Steam release gate"
+  ]
+}

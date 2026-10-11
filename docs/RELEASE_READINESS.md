@@ -20,7 +20,8 @@ A bounded regression or an older package cannot establish final release readines
   held translation exactly unchanged while the paid HMG moves nearby. The
   fresh baseline-to-final interval is5.195s; first-to-last samples cover4.636s.
   Actual game exit0, no forced cleanup and unchanged installation/archive are
-  verified. Attempts01–04 remain failures. No Mission2 victory is claimed.
+  verified ([actual Hold proof](qa/sdk305-hold-traffic-review.json)). Attempts01–04
+  remain failures. No Mission2 victory is claimed.
 - Previous native300 passes300 tests with0 failures and1 ignored; all three
   native checks and builds pass. Short and medium Patrol regressions reject the
   former endpoint oscillation. The official-SDK package contains399 files/332

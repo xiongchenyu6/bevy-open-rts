@@ -1,0 +1,46 @@
+{
+  "scope": "Normal physical SDK305 paid AA Hold under HMG nearby movement only",
+  "actual_ron_samples": 9,
+  "baseline_sim_seconds": 5.195465087890625,
+  "first_last_sim_seconds": 4.636253356933594,
+  "held_max_drift": 0,
+  "mover_max_progress_from_baseline": 4.355409211920824,
+  "minimum_sampled_segment_distance": 0.11137971456421215,
+  "own_bank": [
+    11,
+    8
+  ],
+  "normal_exit": 0,
+  "broader_release_gates_open": true,
+  "actual_exit": 0,
+  "source_commit": "4f8e5884c1edb44afa56d772ca21dadf728df271",
+  "installed_binary_sha256": "f563958431a6c812a2112aad9766b1b7316ea91bf4e1b3358b66222ed5bd8ab4",
+  "archive_sha256": "8f66709861a000a1e3f9a677847f7beed61bd622e734aa1aba113ff15cc1f5ee",
+  "evidence_sha256": {
+    "docs/qa/sdk305-hold-traffic-20261012/07-after-natural-traffic.png": "1308e6a34c0ad2b1eae7be4623bcfbc3fc8f301fd47816948a19da5d420a39c3",
+    "docs/qa/sdk305-hold-traffic-20261012/actual-hold-traffic-samples.json": "cdff2f44a4ee533b201bf98113ddf1ddb406703c2641f1082a5562ec3fb7373f",
+    "docs/qa/sdk305-hold-traffic-20261012/failed-attempt01-result.json": "7f190a9736d67776d3408ad46a6c2c6c907675193332f7d86a824ec03cae6a73",
+    "docs/qa/sdk305-hold-traffic-20261012/failed-attempt02-result.json": "4798b746381aa15ca9df21e8228ce9316cf1421dd87915773c78ba7800bfba7f",
+    "docs/qa/sdk305-hold-traffic-20261012/failed-attempt03-result.json": "00b00522e05895365f4a242965ae439abf256a541902b8afb9929dc929df6570",
+    "docs/qa/sdk305-hold-traffic-20261012/failed-attempt04-result.json": "76d1bf92dbc29cbd34577b3f74fdcd6cc7f6b7c0b8858c4ea431876d84c8750a",
+    "docs/qa/sdk305-hold-traffic-20261012/result.json": "9175134b841fa66101bb1594b8c913926e2583e406571404d974c834bd8525ce",
+    "docs/qa/sdk305-hold-traffic-20261012/root-independent-actual-ron-review.json": "61178ce07ac8dd47465897afc85034c293c4ad9226e1a5b46e5109cbef5b6776",
+    "docs/qa/sdk305-hold-traffic-20261012/traffic-fresh-paused-baseline.ron": "555f78ad41307fc303faa66359dc2a96a49c4f0a019bd171793ecacfffa83564",
+    "docs/qa/sdk305-hold-traffic-20261012/traffic-sample-000.ron": "9d60aaa3b1e2b4e07946acf8c6a6e9bbf19fa22e78077d2045ba27ea88dffd5b",
+    "docs/qa/sdk305-hold-traffic-20261012/traffic-sample-001.ron": "dd9fd9b3836243782d920921cc5c52797c18e7334ad3441d58a3b9a1b870d601",
+    "docs/qa/sdk305-hold-traffic-20261012/traffic-sample-002.ron": "e105c3e2c2b53b5c4dc3618d7d9a8c87359bb3feb8d45cdd86f53fdd174aeacb",
+    "docs/qa/sdk305-hold-traffic-20261012/traffic-sample-003.ron": "cab4c6d7937eb947e37e243d7ef7908985d73e1ec218bd19652fa904700c8f5c",
+    "docs/qa/sdk305-hold-traffic-20261012/traffic-sample-004.ron": "46d1edbb3478ec109ba0ef47cacccb4378401507464833c2ad4a8d2ff08c622d",
+    "docs/qa/sdk305-hold-traffic-20261012/traffic-sample-005.ron": "abc19dd507fb976635463591deaa147932bd0592b68b64dc52ecf440248a524a",
+    "docs/qa/sdk305-hold-traffic-20261012/traffic-sample-006.ron": "c90d783abbd8d0f2264a42af265235c206ece4519f36eaeb57e8ce228f3d8a66",
+    "docs/qa/sdk305-hold-traffic-20261012/traffic-sample-007.ron": "8ce852131af3e66fbff3c39be9db6bb75a82347c86f75957c7d6ec82c3a3a05c",
+    "docs/qa/sdk305-hold-traffic-20261012/traffic-sample-008.ron": "fef52936c0f3a3c8a1163975b17e3c632406d885fbb807dbb575e58dcec5216c",
+    "docs/qa/sdk305-hold-traffic-20261012/visual-reviewer-summary.json": "5150d57596240896b78fd216ed036d6377b38a41e8f0238f8c70eb5c12343839"
+  },
+  "boundaries": [
+    "Paid normal AA/HMG nearby movement only; no M2 victory, dense combat, browser Hold or final Steam acceptance",
+    "Failed attempts01-04 retained; attempt02 forcedcleanuptrue, others normalexit0",
+    "Raw attempt05 receipt actual_sim_seconds is first-to-last4.636; original>=5 requirement measured from freshbaseline5.195",
+    "Complete raw five-attempt archive retained under target; portable subset includes allnine actual RONs and finalPNG"
+  ]
+}

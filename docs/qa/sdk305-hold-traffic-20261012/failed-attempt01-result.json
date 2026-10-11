@@ -1,0 +1,48 @@
+{
+  "scope": "Actual normal-input paid AA Hold under friendly HMG traffic only; no camera/ECS/entity setters",
+  "passed": false,
+  "original_wall": 900,
+  "original_stages": 30,
+  "error": "Original45 current Rally ground review exhausted",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/run_sdk305_hold_traffic.py\", line 121, in <module>\n    s=PhysicalSession(ready['package'],ready['archive'],ready['binary_sha256'],ready['archive_sha256'],a.out,900);s.begin_mission(0);r['receipts']=run(s);s.normal_close_and_require_exit_zero();r['program_flow_passed']=True\n                                                                                                                                                   ~~~^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/run_sdk305_hold_traffic.py\", line 67, in run\n    rally_receipt=ensure_rally(s,o,producer);o.train(producer,ident,1,cost,'paid-'+ident)\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/producer_rally305.py\", line 84, in ensure_rally\n    while not gate.exists():s.check_wall();assert time.monotonic()-began<45,'Original45 current Rally ground review exhausted';time.sleep(.2)\n                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Original45 current Rally ground review exhausted\n",
+  "normal_exits": [
+    {
+      "pid": 3501738,
+      "supervisor_pid": 3501623,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "01/00-main-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01/auto-01-PowerReactor-tab-tooltip.png": "63a04b893f793a41eeb8ad1f6dce24c6dc9458c2d1eb67631fab17b900b00c76",
+    "01/auto-01-PowerReactor-candidate-0-before-ghost.png": "c5c4016140e74a1168e5fbf209be5a6748942c24afe18805325c1311655bdf91",
+    "01/auto-01-PowerReactor-candidate-0-build-tooltip.png": "c2583b4d89b265d012b243ada8379bdd0b2ca267542ac82b8658c7747bd9ffb7",
+    "01/auto-01-PowerReactor-ghost-0.png": "b89be2acc1a626f0060dc61e941af96e1ae0afb4a650eee513679dd815629ca2",
+    "01/auto-01-PowerReactor-completed.png": "4a20a08d3d0196f7b03631f8a8bb77e719621bb6bd40e9fd25f9414c5fd49b27",
+    "01/auto-02-Barracks-tab-tooltip.png": "9e4d06b709951e9529ca5c814bc3f2fd380d48cc065890171ed10812ff1d1650",
+    "01/auto-02-Barracks-candidate-0-before-ghost.png": "b1b36bf5f6a6cdea7ce15fb6f1147807c4b329e27a1de5930198310b8ee25496",
+    "01/auto-02-Barracks-candidate-0-build-tooltip.png": "bf6063277a99f0da496b77c8c615c9a3c28c15afcec1378fd793860684769944",
+    "01/auto-02-Barracks-ghost-0.png": "abba2451bfb1c4d4c7e22e0155ed96d165a55b193e900ad50875b2dd1b7be692",
+    "01/auto-02-Barracks-candidate-1-before-ghost.png": "5736c9040936bbd8685e6e6c25b99abdaa7a48523b08d32091e152ce3b6e8636",
+    "01/auto-02-Barracks-candidate-1-build-tooltip.png": "f01840a29a2dbe70c2d6aeace2603f2ade046df035adc0a21707b4c96da60f86",
+    "01/auto-02-Barracks-ghost-1.png": "6fce3e7326fa4fe2ca0a5805e3a68c69a12868b807875f4b9b07b8562a5e6f1d",
+    "01/auto-02-Barracks-completed.png": "9c93346aa112f1d25b9ab1b7bc5c9f40128e9a7f5e2416933e2b4936db942ac4",
+    "01/auto-03-VehicleFactory-tab-tooltip.png": "f18c349c4c989999040e0a5ac780f078acb9e003e607e4abc661ef537ef20fd8",
+    "01/auto-03-VehicleFactory-candidate-0-before-ghost.png": "636bab7888d59b45026bb8bb8a387debc46808eb3ec980e01b7c79b08f4035d7",
+    "01/auto-03-VehicleFactory-candidate-0-build-tooltip.png": "311fd2904de3ecf1bf4e9c48defe049149f51228cf67a6a462cab39f8b421d47",
+    "01/auto-03-VehicleFactory-ghost-0.png": "88cbfe4cd73eed32f8a86013064dd29c7652be1578874dd98f3f390d4076513c",
+    "01/auto-03-VehicleFactory-completed.png": "5afcece32b5f83d194bd8fd970a013badee1cf9c83f4b26c92266e1e4b710166",
+    "01/auto-04-RadarUplink-tab-tooltip.png": "d36394e9e592ec40d980034975795754e99b2cf6dc319e3e26eb098df4d36b25",
+    "01/auto-04-RadarUplink-candidate-0-before-ghost.png": "d3218c59470bba0768128758ff7ec7de59ad5b73e08fd89c067ee03fcc720e20",
+    "01/auto-04-RadarUplink-candidate-0-build-tooltip.png": "58bfa2c997d0ed4fd26c29266e336069a31ee1bdbde6ce2caa4d11e513d1ac30",
+    "01/auto-04-RadarUplink-ghost-0.png": "a521461afa95e9868559bb0d3f9eb481cc667e4b968b28a57102f6873ee8ee55",
+    "01/auto-04-RadarUplink-completed.png": "e7d96920a7bc6b0ac40a3fe95bdf9a396c73b5c35c8c676ab6fa7c3b24233013",
+    "01/rally-Barracks-current-assembly.png": "4b5c1bd95d2793b5f90f53d5f6a308146fecc11805fa392d7519571d6d500635",
+    "01/99-failure.png": "a3eb5c8b5bfc4532f6933600ed6f1a28f60e1e6cc275cfd8720ef5afd30a4b20"
+  },
+  "wall_seconds": 214.99115796998376
+}
