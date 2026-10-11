@@ -22,6 +22,11 @@ A bounded regression or an older package cannot establish final release readines
   Actual game exit0, no forced cleanup and unchanged installation/archive are
   verified ([actual Hold proof](qa/sdk305-hold-traffic-review.json)). Attempts01–04
   remain failures. No Mission2 victory is claimed.
+- The current native305 optimized official-SDK audit builds with exit0 in
+  424.205s. Its binary,143 sources,332 assets and unchanged installed399-file
+  package/archive are independently checked
+  ([audit build proof](qa/native305-optimized-skirmish-audit-review.json)).
+  No current305 matrix coverage or gameplay victory is established by this build.
 - Previous native300 passes300 tests with0 failures and1 ignored; all three
   native checks and builds pass. Short and medium Patrol regressions reject the
   former endpoint oscillation. The official-SDK package contains399 files/332
