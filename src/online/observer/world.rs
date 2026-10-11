@@ -104,7 +104,7 @@ pub(in crate::online) fn record(
         "transform_semantics":"render_transform is actual interpolated Transform; replicated_transform reads actual NetworkInterpolation target when present, otherwise Transform"});
     observer.applied_worlds.insert(tick, row);
     observer.dirty = true;
-    while observer.applied_worlds.len() > 40 {
+    while observer.applied_worlds.len() > 8 {
         observer.applied_worlds.pop_first();
     }
 }
@@ -276,8 +276,8 @@ mod tests {
             app.world_mut().run_system_once(record).unwrap();
         }
         let rows = &app.world().resource::<OnlineObserver>().applied_worlds;
-        assert_eq!(rows.len(), 40);
-        assert_eq!(rows.first_key_value().unwrap().0, &11);
+        assert_eq!(rows.len(), 8);
+        assert_eq!(rows.first_key_value().unwrap().0, &43);
         let old = rows.clone();
         app.world_mut().run_system_once(record).unwrap();
         assert_eq!(app.world().resource::<OnlineObserver>().applied_worlds, old);

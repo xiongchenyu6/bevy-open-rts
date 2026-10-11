@@ -52,7 +52,7 @@ impl OnlineObserver {
         }
         self.snapshots.insert(snapshot.tick, snapshot.clone());
         self.dirty = true;
-        while self.snapshots.len() > 40 {
+        while self.snapshots.len() > 8 {
             self.snapshots.pop_first();
         }
     }
@@ -326,8 +326,8 @@ mod tests {
             snapshot.tick = tick;
             observer.record(&snapshot);
         }
-        assert_eq!(observer.snapshots.len(), 40);
-        assert_eq!(observer.snapshots.first_key_value().unwrap().0, &11);
+        assert_eq!(observer.snapshots.len(), 8);
+        assert_eq!(observer.snapshots.first_key_value().unwrap().0, &43);
         assert_eq!(observer.snapshots.get(&50), Some(&snapshot));
     }
 }

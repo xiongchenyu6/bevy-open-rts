@@ -1,0 +1,50 @@
+{
+  "scope": "QA-only bounded observation payload; no gameplay/protocol or runtime throughput acceptance",
+  "changes": {
+    "validated_received_DTO_history": 8,
+    "actual_typed_guest_ECS_history": 8,
+    "physical_UI_input_history": 40
+  },
+  "retention_checks": "After fifty ticks, exactly newest ticks43..50 retained; actual-world disabled/no-writes, repeated-tick suppression, divergence, deferred Last registration and match reset checks preserved.",
+  "verification": {
+    "focused": {
+      "passed": 13,
+      "failed": 0,
+      "seconds": 3.6
+    },
+    "full": {
+      "passed": 285,
+      "failed": 0,
+      "ignored": 1,
+      "seconds": 305.44
+    },
+    "stage_exits": {
+      "focused": 0,
+      "full": 0,
+      "check": 0,
+      "build": 0
+    },
+    "native_build_seconds": 122,
+    "source_inputs": 120,
+    "assets": 332,
+    "inputs_unchanged": true
+  },
+  "binary_sha256": {
+    "bevy-open-rts": "158f2eccf6ef822d67144dfa90186d30852ceedaba9c6b31e5a1b2c64e4d3406",
+    "capture": "0db19f6ef46ff7d39f2f1d213cf388e3ab1633d1d44817f24d84e8b57ff6bca4",
+    "skirmish_audit": "c6e481ea36d6b4a5d351c4afcf98c3cc620a773473b3bfbc16cd8c3ca79cfb8a"
+  },
+  "owned_source_sha256": {
+    "src/online/observer.rs": "29216c8e4117aa6883acbfe58029a35da3c0a5719e8060e57abb16fc67f94fc2",
+    "src/online/observer/world.rs": "9790899f0d08f10f87bd0ef35aa012aebc4f50ad4d0368466a1dd321bdabccdf"
+  },
+  "evidence_directory": "target/observer-eight-history-shared-20261011",
+  "remaining": [
+    "Eight-human runtime rerun on rebuilt Wasm",
+    "At least16 cumulative exact ticks still required from persisted samples",
+    "Actual payload sizes/stage timings must be measured",
+    "Reconnect and full multiplayer gate remain open"
+  ],
+  "older_artifacts_immutable": true,
+  "gpu_launched": false
+}
