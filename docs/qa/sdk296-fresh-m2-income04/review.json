@@ -1,0 +1,39 @@
+{
+  "scope": "SDK296 freshM2: income/purchases positive; dedicatedreviewer rejectedunidentifiableoccludedfirstmemberbody; no memberrole/assault/combat/missionacceptance",
+  "raw_root": "target/sdk296-fresh-m2-income-20261012-04",
+  "request": {
+    "image": "member-whole-opening-7258494728197-body.png",
+    "image_sha256": "b5a2ed218b893a946c4693cb8705aff7ada83313017bf2eee25cd2c289f80858",
+    "review_file": "member-defense-review.json",
+    "kind": "visible OWN body selection",
+    "actor_key": 7258494728197,
+    "actor_type": "RocketInfantry",
+    "point": [
+      87,
+      469
+    ],
+    "original_review_seconds": 45,
+    "deadline_utc_epoch": 1791740190.6011658
+  },
+  "review_file_never_written": true,
+  "dedicated_reviewer": "/root/visual_reviewer",
+  "actual_rejection": "RequestedRocketInfantry point87,469 coveredbybuilding; actualOWNbody notvisuallyidentifiable; approvalrefused",
+  "qa_failure_kind": "camera/bodyvisibility preparation; notlate-review operatorfailure02",
+  "normal_exits": [
+    {
+      "pid": 3080400,
+      "supervisor_pid": 3080332,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "next_unverified_action": "Ordinarycameraorbit/zoom beforefreshbodyreview; preserve45deadline/strictactualkey and rolequotas",
+  "evidence_sha256": {
+    "actual-occluded-defender.png": "b5a2ed218b893a946c4693cb8705aff7ada83313017bf2eee25cd2c289f80858",
+    "result.json": "65df68ca4fd3e2e2c62bb91272bda35883d4d431c4b9d7e15e9c784c12e440e9",
+    "income-receipt.json": "a67055acdc31958c6841b73433c73b2445b3763a155e9aafe5291c3fb7a39418"
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "initial_bank": [
+    64,
+    32
+  ],
+  "harvester_key": 4294966719,
+  "node": {
+    "key": 4294966689,
+    "kind": 0,
+    "position": [
+      -16.0,
+      0.0,
+      -24.0
+    ],
+    "amount": 240
+  },
+  "actual_public_body": {
+    "image": "economy-visible-ore-preview-home.png",
+    "image_sha256": "a72fe028575bdf0ffe9b61e021ea9fe12da36b9a2b5f7ff16d288326828e1a48",
+    "resource_entity": 4294966689,
+    "kind": "Ore",
+    "projected_body_point": [
+      1118,
+      230
+    ],
+    "visible": true,
+    "loaded_mesh_count": 3,
+    "actual_glb_bounds": {
+      "center_screen": [
+        1116.477294921875,
+        201.57717895507812
+      ],
+      "ground_screen": [
+        1110.736572265625,
+        209.4248504638672
+      ],
+      "height_above_global_anchor": 0.3275500237941742,
+      "max": [
+        -15.770689964294434,
+        0.3275500237941742,
+        -23.7471981048584
+      ],
+      "min": [
+        -16.22930908203125,
+        0.029999999329447746,
+        -24.2528018951416
+      ],
+      "size": [
+        0.4586191177368164,
+        0.2975500226020813,
+        0.5056037902832031
+      ],
+      "top_screen": [
+        1122.359375,
+        193.53656005859375
+      ]
+    },
+    "actual_worker_key": 4294966719,
+    "camera_attempt": "home"
+  },
+  "normal_controls_only": true,
+  "income_proven": true,
+  "witness_snapshot": "economy-returned-ore-proof-6.ron",
+  "witness_sha256": "e9239773a9388371214dc3e03122ccc3c2285ea5edc170dfc3e19ccdedc699f7",
+  "witness_cost_rows": [
+    {
+      "id": "PowerReactor",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        865,
+        181
+      ],
+      "completed_count": 1,
+      "construction_wall": 8.143972774036229
+    },
+    {
+      "id": "VehicleFactory",
+      "cost": [
+        6,
+        0
+      ],
+      "point": [
+        340,
+        181
+      ],
+      "completed_count": 1,
+      "construction_wall": 12.12724896898726
+    },
+    {
+      "id": "RadarUplink",
+      "cost": [
+        4,
+        3
+      ],
+      "point": [
+        640,
+        129
+      ],
+      "completed_count": 1,
+      "construction_wall": 12.236374847008847
+    },
+    {
+      "id": "AntiAirTurret",
+      "cost": [
+        2,
+        2
+      ],
+      "point": [
+        998,
+        129
+      ],
+      "completed_count": 1,
+      "construction_wall": 10.651693077001255
+    },
+    {
+      "id": "AntiGroundTurret",
+      "cost": [
+        2,
+        2
+      ],
+      "point": [
+        902,
+        373
+      ],
+      "completed_count": 1,
+      "construction_wall": 12.924073761038017
+    },
+    {
+      "id": "Barracks",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        291,
+        373
+      ],
+      "completed_count": 1,
+      "construction_wall": 11.174158055975568
+    }
+  ],
+  "actual_returned_ore": 36,
+  "referenced_node_consumed": 36,
+  "paid_costs_at_probe": [
+    20,
+    9
+  ],
+  "actual_bank": [
+    80,
+    23
+  ],
+  "actual_clock": 54.303260803222656
+}
