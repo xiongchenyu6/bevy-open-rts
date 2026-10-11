@@ -1,6 +1,27 @@
 # Linux runtime source materials
 
-The current thin-LTO Linux candidate bundles libraries from glibc2.44-25,
+## Current official-SDK305 providers
+
+The sealed SDK305 package contains Debian runtime providers: glibc2.41-12+deb13u3,
+ALSA1.2.14-1, libffi3.4.8-2, GCC14.2.0-19, Wayland1.23.1-3 and
+libxkbcommon1.7.0-2. Its recorded provider versions and ten library ELF Build IDs
+were checked against the packaging image, BUILD_ID4.0.20260805.254769.
+
+All19 exact source inputs match the independently retrieved
+[official Steamrt source index](https://repo.steampowered.com/steamrt4/images/4.0.20260805.254769/sources/Sources.gz)
+and DSC member checksums. The local archive is under
+`target/steamrt4-library-source-companion-20261010/`; recovery includes706 regular
+Debian patch/build files. Original and recovery hashes were independently
+rechecked ([materials evidence](qa/native305-source-notices-review.json)).
+
+These are local source materials. Signature trust, complete rebuild instructions,
+reproducible library rebuild and a distribution/source-delivery mechanism remain
+unverified. Rust dependencies, assets and generated-content rights are separate.
+The Nix companion below covers its historical providers; it does not cover SDK305.
+
+## Historical Nix companion
+
+The historical Nix thin-LTO Linux candidate bundles libraries from glibc2.44-25,
 Wayland1.26.0, libxkbcommon1.13.2, libffi3.8.0, GCC16.2.0 and ALSA1.2.16.1.
 `BUILD_INFO.json` records the exact installed providers. The packager verifies
 that these providers match `third-party/linux-runtime/manifest.json` and that

@@ -1,0 +1,24 @@
+{
+  "scope": "Read-only materials and identity audit; sealed399 archive unchanged, no rights or final distribution acceptance",
+  "independent_root_original_and_recovery_hashes_verified": 1986,
+  "original_manifest_count": 1238,
+  "recovery_manifest_count": 748,
+  "exact_runtime_source_inputs": 19,
+  "source_providers": 6,
+  "debian_build_patch_regular_files": 706,
+  "missing_original_rust_notices": [
+    "constgebra0.1.4",
+    "hexf-parse0.2.1",
+    "simd_helpers0.1.0"
+  ],
+  "evidence_sha256": {
+    "docs/qa/native305-source-notices/packaged-library-buildids.json": "3b5eabd8b12a2c1766ca1c8901322beb70530a725719a08e9fd7bd1224fe6e08",
+    "docs/qa/native305-source-notices/runtime-source-review.json": "f02d0d0979a289ca859b1e405311151d5e0d757806823474c4a27a2735f1e968",
+    "docs/qa/native305-source-notices/RECOVERY.md": "7b3578d199901c5611f933e52a0634b25b976ca9bc59d86ca70673d566b7481d",
+    "docs/qa/native305-source-notices/validation.json": "caab4433e92eaad1967ab1ff538623c957dd6ce9b905a433ecab1b1b029e163b"
+  },
+  "boundaries": [
+    "Original license-text declarations not replaced by invented notices",
+    "Sources locally recovered; signature trust, reproducible rebuild, publication and rights review not completed"
+  ]
+}

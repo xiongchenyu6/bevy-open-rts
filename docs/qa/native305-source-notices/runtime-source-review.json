@@ -1,0 +1,71 @@
+{
+  "verified_components": [
+    {
+      "component": "alsa-lib",
+      "version": "1.2.14-1",
+      "sealed_manifest_matches": true,
+      "files": 4,
+      "dsc_Source": [
+        "Source: alsa-lib",
+        "Version: 1.2.14-1",
+        "Build-Depends: dpkg-dev (>= 1.22.5), debhelper-compat (= 13), python3-dev:native, libpython3-dev"
+      ]
+    },
+    {
+      "component": "gcc-14",
+      "version": "14.2.0-19",
+      "sealed_manifest_matches": true,
+      "files": 3,
+      "dsc_Source": [
+        "Source: gcc-14",
+        "Version: 14.2.0-19",
+        "Build-Depends: debhelper (>= 11), dpkg-dev (>= 1.17.14), g++-multilib [amd64 i386 mips mips64 mips64el mips64r6 mips64r6el mipsel mipsn32 mipsn32el mipsn32r6 mipsn32r6el mipsr6 mipsr6el powerpc ppc64 s390 s390x sparc sparc64 x32] <!cross>, libc6.1-dev (>= 2.23-1~) [alpha ia64] | libc0.3-dev (>= 2.23-1~) [hurd-amd64 hurd-i386] | libc6-dev (>= 2.23-1~), libc6-dev-amd64 [i386 x32], libc6-dev-sparc64 [sparc], libc6-dev-sparc [sparc64], libc6-dev-s390 [s390x], libc6-dev-s390x [s390], libc6-dev-i386 [amd64 x32], libc6-dev-powerpc [ppc64], libc6-dev-ppc64 [powerpc], lib32gcc-s1 [amd64 ppc64 mipsn32 mipsn32el mips64 mips64el mipsn32r6 mipsn32r6el mips64r6 mips64r6el s390x sparc64 x32], libn32gcc-s1 [mips mipsel mips64 mips64el mipsr6 mipsr6el mips64r6 mips64r6el], lib64gcc-s1 [i386 mips mipsel mipsn32 mipsn32el mipsr6 mipsr6el mipsn32r6 mipsn32r6el powerpc sparc s390 x32], libc6-dev-mips64 [mips mipsel mipsn32 mipsn32el mipsr6 mipsr6el mipsn32r6 mipsn32r6el], libc6-dev-mipsn32 [mips mipsel mips64 mips64el mipsr6 mipsr6el mips64r6 mips64r6el], libc6-dev-mips32 [mipsn32 mipsn32el mips64 mips64el mipsn32r6 mipsn32r6el mips64r6 mips64r6el], libc6-dev-x32 [amd64 i386], libx32gcc-s1 [amd64 i386], libc6.1-dbg [alpha ia64] | libc0.3-dbg [hurd-amd64 hurd-i386] | libc6-dbg, linux-libc-dev [m68k], m4, libtool, autoconf2.69, dwz, libunwind8-dev [ia64], libatomic-ops-dev [ia64], gawk, lzma, xz-utils, patchutils, libzstd-dev, zlib1g-dev, systemtap-sdt-dev [linux-any], binutils:native (>= 2.39), binutils-hppa64-linux-gnu:native (>= 2.39) [hppa amd64 i386 x32], gperf, bison, flex, gettext, nvptx-tools [amd64 arm64 ppc64el], amdgcn-tools-19 [amd64], texinfo, locales-all, sharutils, procps, gnat-14:native [!arc !ia64 !sh3 !sh3eb !sh4eb !m68k], g++-14:native [!m68k], gnat-13:native [m68k], g++-13:native [m68k], netbase, gdc-14:native [!alpha !arc !ia64 !m68k !sh4 !s390 !sparc64 !hurd-amd64 !hurd-i386], python3:any, cargo [!alpha !hppa !ia64 !m68k !sh4 !x32], libisl-dev (>= 0.20), libmpc-dev (>= 1.0), libmpfr-dev (>= 3.0.0-9~), libgmp-dev (>= 2:5.0.1~), lib32z1-dev [amd64], lib64z1-dev [i386], unzip <!nocheck>, dejagnu <!nocheck>, git <!nocheck>, coreutils, chrpath, lsb-release, quilt, time, pkgconf, libgc-dev, g++-14-for-host <cross>, gobjc-14-for-host [!avr] <cross>, gfortran-14-for-host <cross>, gdc-14-for-host [!alpha !arc !ia64 !m68k !sh4 !s390 !sparc64 !hurd-amd64 !hurd-i386] <cross>, gccgo-14-for-host [!arc !avr !hppa !loong64 !m68k !sh4] <cross>, gnat-14-for-host [!arc !ia64 !sh3 !sh3eb !sh4eb] <cross>, gm2-14-for-host [!powerpc !ppc64 !sh4] <cross>"
+      ]
+    },
+    {
+      "component": "glibc",
+      "version": "2.41-12+deb13u3",
+      "sealed_manifest_matches": true,
+      "files": 3,
+      "dsc_Source": [
+        "Source: glibc",
+        "Version: 2.41-12+deb13u3",
+        "Build-Depends: gettext, dpkg (>= 1.18.7), dpkg-dev (>= 1.17.14), xz-utils, file, quilt, autoconf, gawk, debhelper-compat (= 13), rdfind, symlinks, netbase, gperf, bison, linux-libc-dev (>= 3.9) [linux-any], libaudit-dev [linux-any], libcap-dev [linux-any] <!stage2>, libselinux1-dev [linux-any] <!stage2>, mig-for-host (>= 1.8+git20200618-7~) [hurd-any], gnumach-dev (>= 2:1.8+git20200710-2~) [hurd-any], hurd-dev (>= 1:0.9.git20201127-4~) [hurd-any] | hurd-headers-dev [hurd-any], binutils-for-host (>= 2.38), g++-14-for-host, g++-14-multilib [amd64 i386 mips mipsel mipsn32 mipsn32el mips64 mips64el mipsr6 mipsr6el mipsn32r6 mipsn32r6el mips64r6 mips64r6el powerpc ppc64 s390x sparc sparc64 x32] <!nobiarch>, g++-14-for-host (>= 14.1.0-4) [arm64], python3:native, libidn2-0 (>= 2.0.5~) <!nocheck>, libc-bin (>= 2.41) <cross>, libgd-dev <!stage1 !stage2>"
+      ]
+    },
+    {
+      "component": "libffi",
+      "version": "3.4.8-2",
+      "sealed_manifest_matches": true,
+      "files": 3,
+      "dsc_Source": [
+        "Source: libffi",
+        "Version: 3.4.8-2",
+        "Build-Depends: debhelper (>= 11), libltdl-dev, dejagnu, texinfo"
+      ]
+    },
+    {
+      "component": "libxkbcommon",
+      "version": "1.7.0-2",
+      "sealed_manifest_matches": true,
+      "files": 3,
+      "dsc_Source": [
+        "Source: libxkbcommon",
+        "Version: 1.7.0-2",
+        "Build-Depends: debhelper-compat (= 13), bison, dh-exec, doxygen, flex, graphviz, meson, pkgconf, quilt, libwayland-dev [linux-any], libxcb-xkb-dev, libxml2-dev, wayland-protocols [linux-any], x11-xkb-utils <!nocheck>, x11proto-dev, xkb-data <!nocheck>, xvfb <!nocheck>"
+      ]
+    },
+    {
+      "component": "wayland",
+      "version": "1.23.1-3",
+      "sealed_manifest_matches": true,
+      "files": 3,
+      "dsc_Source": [
+        "Source: wayland",
+        "Version: 1.23.1-3",
+        "Build-Depends: debhelper-compat (= 13), quilt, pkgconf, libexpat1-dev, libffi-dev, libxml2-dev, libwayland-bin <cross>, meson"
+      ]
+    }
+  ],
+  "scope": "Exact sealed305 version mapping, official Steamrt source index and DSC hashes verified. Signature trust, reproducible rebuild and publication/source mechanism not established here."
+}

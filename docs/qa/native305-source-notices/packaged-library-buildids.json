@@ -1,0 +1,82 @@
+[
+  {
+    "library": "ld-linux-x86-64.so.2",
+    "sha256": "438c546d8e8cc48496bf3a95f753051afd9db66a629a74e31a9ded71586b56e0",
+    "build_ids": [
+      "Build ID: c591a5df63f461bfdafb01908ca16845b375fa37"
+    ],
+    "readelf_exit": 0
+  },
+  {
+    "library": "libasound.so.2",
+    "sha256": "d64e7875c78a1676ded6aa38bfe102682f6fffe7fda6d64f725c8745064fb8e0",
+    "build_ids": [
+      "Build ID: 7d9fb25225ad788d6d9bbdc2dda84a71b61462b1"
+    ],
+    "readelf_exit": 0
+  },
+  {
+    "library": "libc.so.6",
+    "sha256": "d531eec57632da91383b3a94e5da7517eb5ee175492761c1690bd9be806d95bc",
+    "build_ids": [
+      "Build ID: c495b62edadd6c356265942ec1282d98058a7b41"
+    ],
+    "readelf_exit": 0
+  },
+  {
+    "library": "libffi.so.8",
+    "sha256": "57a198528b4c369eaf8dfbdb2f29e17072a3d31807cf7e490ee0b16e3eab88d8",
+    "build_ids": [
+      "Build ID: fe140638f4a9b1dc519b2343ea30d7f0a4f130fe"
+    ],
+    "readelf_exit": 0
+  },
+  {
+    "library": "libgcc_s.so.1",
+    "sha256": "2e27829e48fe2d9fff3e694c659bac860e0cc3780633778ee74c65a4d4f5d31e",
+    "build_ids": [
+      "Build ID: 12eddb764a9c4e3c9ad99b3e645cbd206521af07"
+    ],
+    "readelf_exit": 0
+  },
+  {
+    "library": "libm.so.6",
+    "sha256": "c2e2f71341198f8e35862bc2fb4993fab1512b424aad77f47289ab22c8bf6eff",
+    "build_ids": [
+      "Build ID: befc0308f899f79b901d4e738992787368cf70f7"
+    ],
+    "readelf_exit": 0
+  },
+  {
+    "library": "libwayland-client.so.0",
+    "sha256": "84046e4d7193021101c0be3c019bf54c6342e5817bd349cb21770e894e29c427",
+    "build_ids": [
+      "Build ID: 8ea5016742ee065f4475e275de9c984be621513c"
+    ],
+    "readelf_exit": 0
+  },
+  {
+    "library": "libwayland-cursor.so.0",
+    "sha256": "762e87eb8367e0d0f6398026114579e5eb093ab7d4f4998cf9595d00db41cf2e",
+    "build_ids": [
+      "Build ID: cb05ce6c79c93062235515c57fda9133bda3271e"
+    ],
+    "readelf_exit": 0
+  },
+  {
+    "library": "libwayland-egl.so.1",
+    "sha256": "d0c623a0202ffbf25e79c07042772bce1a72aafdf25c8bc499bbe0de675696c1",
+    "build_ids": [
+      "Build ID: a9aafdc462c395f2e12690a8e4f5b5f6fd139d3a"
+    ],
+    "readelf_exit": 0
+  },
+  {
+    "library": "libxkbcommon.so.0",
+    "sha256": "ec48dfdc40b7f4067e34f8874469e0b48914b77fdc416af66bb6ad0fbe3a8419",
+    "build_ids": [
+      "Build ID: cba8f6cde436556730ca34874d72a76024052643"
+    ],
+    "readelf_exit": 0
+  }
+]

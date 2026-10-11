@@ -1,0 +1,16 @@
+{
+  "copy_files": 1233,
+  "bundle_hash_errors": [],
+  "sealed399_inventory_errors": [],
+  "sealed_package_files": 399,
+  "historical_external_packages": 635,
+  "all_historical_names_versions_in_current_lock": true,
+  "current_lock_matches_sealed_build_context": true,
+  "missing_originals": [
+    "constgebra-0.1.4",
+    "hexf-parse-0.2.1",
+    "simd_helpers-0.1.0"
+  ],
+  "runtime_assets_in_BUILD_INFO": 332,
+  "scope": "CPU copy/hash validation only; no Cargo/build/GPU/linker or legal acceptance"
+}
