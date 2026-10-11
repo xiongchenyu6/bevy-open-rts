@@ -1,0 +1,64 @@
+{
+  "scope": "Unarmed Patrol source/native regressions and officialSDK/Web shipping integrity, normal newartifact playerverification pending",
+  "source_commit": "a0ffdf2",
+  "native": {
+    "full_passed": 294,
+    "failed": 0,
+    "ignored": 1,
+    "full_seconds": 256.61,
+    "check3bins": 0,
+    "build3bins": 0,
+    "sources": 142,
+    "assets": 332,
+    "bins": {
+      "bevy-open-rts": "54b214e991121378807b5ae7b528e67143eb622207215752571e7abd02760745",
+      "capture": "88acaa33874c5ff26e278d4c75bb6b0422b1c0a8a87487717875989136ae014e",
+      "skirmish_audit": "d424c1ac97007c5bcae1cbcfcd24967de9ecbd605475fd5c24058616b8f1dd4d"
+    }
+  },
+  "SDK": {
+    "actual_exit": 0,
+    "clean4packages": 0,
+    "actual4compilepaths": true,
+    "image": "registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk@sha256:2ff6220464894964266c7dbda1b91ca24e433a58ad3edff26571a2a9e5163e00",
+    "seconds": 554.8145243799663,
+    "raw_binary_sha256": "d3819d9052ce9fa3aadc6fd48ed9d9ae26f2e6abdc8c75707a78c565d1e646a8"
+  },
+  "package": {
+    "actual_exit": 0,
+    "integrity": 0,
+    "files": 399,
+    "assets": 332,
+    "archive_sha256": "76aaa6754e67d031a7ca8d41e9ad13539bc374ebef11af7ce166b47396312b6e",
+    "installed_ELF_sha256": "85b1871dabf4fb7d235d499dad6d7f0fb42207491b1dff25fe0656cc9d30b8e8",
+    "official_Runtime4_notice_files": 13,
+    "fork_notice_files": 5
+  },
+  "Wasm24": {
+    "actual_exit": 0,
+    "clean4packages": 0,
+    "actual4snapshotcompilepaths": true,
+    "seconds": 638.2629529929836,
+    "wasm_sha256": "bd5c48551312ecc4f77dc2a7ba8aa7db13a3f4c395acbe4eefab666a03a0f9f4",
+    "bytes": 27079196,
+    "bindgen_version": "0.2.128",
+    "build_id": "41967b6d22e85b0f",
+    "private_alias": "web/qa-wasm24",
+    "protected_user_originals_unchanged": true
+  },
+  "independent_all_source_assets_binary_package_Wasm_hash_checks": true,
+  "evidence_sha256": {
+    "target/patrol-native294-shared-20261011/pin.json": "fcdc44cc8b14506216bdda944568aa058901d25c9626f25cafe4c433a5834195",
+    "target/patrol-native294-shared-20261011/full.log": "2298e48801d7510cef78cbe61b4c7af3b7f2579eb11c5def6f7f4ad938d755db",
+    "target/linux-native294-patrol-steamrt4-sdk-20261011/result.json": "2e74cd4ec7efc33f61a18dde5198759fa0ff2372e7c2f21502603672de89ebfb",
+    "target/linux-native294-patrol-package-20261011/result.json": "e001fc3c2fb2e6ad36b04a3f2e018183901ba706ab0a470ed77b0b7065f49edc",
+    "target/linux-native294-patrol-extracted-20261011/ready.json": "1c6312310dc7ad81ac0c4de67b5ac3e62d589cebb062a87c84dd7a76f66bfad9",
+    "target/web-current-build24-snapshot-20261011/result.json": "f9a0be321cd9a1be9e40062825a5edbb9b7ad4403f82d13ec0683194d61161e6",
+    "target/web-current-build24-snapshot-20261011/seal.json": "5acd06c0dd44fbb78e651573c4087c0c21487577a0dc3eed328a2ec8ff95e81a"
+  },
+  "limitations": [
+    "No normal Patrol on newlybuilt officialSDK/Wasm runtime acceptance yet",
+    "Prior292/SDK399/M307 evidence preserved, not relabeled",
+    "No publicdeployment; all playerflow timers unchanged"
+  ]
+}
