@@ -390,5 +390,25 @@
     "target/web16-motion-production-20261011-01/wrapper-result.json": "eb14a4c3b7592ddf20834eaeaab7aa802d284a7874d460d40571d8ccb7ba1a54",
     "target/web16-motion-production-20261011-01/p1-11-actual-HMG-card.png": "cdc4313073016f2fa74340614c121ed41b9f6903a96846ec8e3721e1a3f318cb",
     "target/web16-motion-production-20261011-01/p1-12-paid-production-state.png": "e4ce0a445ce17841d9526cca3792118e02dd1a332c6e04d829b145bf03e99974"
+  },
+  "independently_verified_nominated_routes": {
+    "host": [
+      {
+        "nominated": true,
+        "bytesSent": 122034,
+        "bytesReceived": 14036,
+        "localType": "relay",
+        "remoteType": "relay"
+      }
+    ],
+    "guest": [
+      {
+        "nominated": true,
+        "bytesSent": 14036,
+        "bytesReceived": 122034,
+        "localType": "relay",
+        "remoteType": "relay"
+      }
+    ]
   }
 }
