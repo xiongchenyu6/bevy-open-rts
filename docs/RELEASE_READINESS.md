@@ -7,6 +7,24 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Latest Verified Checkpoints
 
+- Native296 passes296 tests with0 failures and1 ignored; all three native checks
+  and builds pass. Its official-SDK package contains399 files/332 assets
+  ([current shipping proof](qa/native296-toast-shipping-review.json)).
+  A fresh normal-input SDK296 run verifies one Saved notice and only the latest
+  Pause state; after7.5 wall seconds while paused, notices disappear and the
+  entire saved game remains byte-identical. Normal exit is0, with installation
+  and archive unchanged ([actual notice proof](qa/sdk296-toast-notices-review.json)).
+  This establishes the specific UI fix, not full campaign or platform acceptance.
+- SDK294 same-App campaign attempt01 naturally completes Mission1 and persists
+  exactly one completed mission, then naturally loses Mission2 at04:11. It closes
+  normally with one game process and unchanged package/archive. Mission3 and
+  later missions are not reached ([chain outcome](qa/sdk294-same-app-chain01-review.json)).
+  Fresh Mission2 income/targeting diagnostics and the six-mission acceptance remain open.
+- Original capsule/library and client-icon candidates export reproducibly, with
+  directly inspected crops and small title samples
+  ([capsules](../art/steam/capsules-v2/README.md), [icons](../art/steam/icons-v1/README.md)).
+  Final client placement, commercial rights and actual final-build gameplay media
+  remain open; promotional illustration does not count as a gameplay screenshot.
 - Native294 includes the unarmed Drone Patrol fix:294 tests pass,0 fail and1
   is ignored; check and all three native builds pass. Its official-SDK package
   contains399 files/332 assets, and Wasm24 is sealed
@@ -99,7 +117,13 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Current Artifact Boundaries
 
-The current SDK294 Patrol archive has399 files and332 assets. Its archive SHA256
+The current SDK296 notice-fix archive has399 files and332 assets. Its archive SHA256
+is `19787ebddd97570e66d3b2576a1343a03cf66f6d875704ad84ab97ecd4a104cc`;
+the installed binary SHA256 is
+`165996cd616a91380a6a64785f134481ff466c8c744d34f6a35dc41f3821b1c0`.
+Its normal notice proof is recorded above. Wider final-package flows remain open.
+
+The previous SDK294 Patrol archive has399 files and332 assets. Its archive SHA256
 is `76aaa6754e67d031a7ca8d41e9ad13539bc374ebef11af7ce166b47396312b6e`;
 the installed binary SHA256 is
 `85b1871dabf4fb7d235d499dad6d7f0fb42207491b1dff25fe0656cc9d30b8e8`.
