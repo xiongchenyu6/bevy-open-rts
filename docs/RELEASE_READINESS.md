@@ -38,7 +38,12 @@ A bounded regression or an older package cannot establish final release readines
   ([browser build proof](qa/web26-route-patrol-shipping-build-review.json)).
   Browser attempts01/02 stop at screenshot-review deadlines before Patrol.
   Attempt02 verifies menu approval within17.31s; this proves neither gameplay
-  nor browser Patrol. Both browsers close normally; runtime acceptance remains open.
+  nor browser Patrol. Both browsers close normally. Attempt03 then passes five
+  timely current-image reviews, real Drone/Patrol input and17 visibly recurring
+  motion frames; notices expire with paused clock unchanged, and Chrome closes
+  normally in129.779s ([bounded visual proof](qa/web26-notices-patrol-review.json)).
+  Browser exact-distance/ECS checks, broader player flows and release acceptance
+  remain open.
 - All326 active asset-ledger records independently match both the current
   worktree and exact SDK300 installation; the packaged ledger and archive
   hashes also match ([current asset identity](qa/native300-active-asset-ledger-review.json)).

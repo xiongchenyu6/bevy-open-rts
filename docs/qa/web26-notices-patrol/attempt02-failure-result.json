@@ -1,0 +1,10 @@
+{
+  "actual_driver_exit": 1,
+  "failure": "Error: Current image review absent 02-match",
+  "errors": [],
+  "wall_seconds": 54.046,
+  "original_wall_seconds": 240,
+  "normal_browser_closed": true,
+  "visual_adjudication_pending": true,
+  "scope": "Physical offline inputs/ownselection/card/dirtyclock; no offline ECS/Patrolflag/position proof"
+}

@@ -1,0 +1,70 @@
+{
+  "scope": "Current W26 normal browser input, notice expiry and visible sustained recurring Drone travel/return only; no full release acceptance",
+  "wasm_sha256": "f9df5efeb5a9323da51e80ff3e2bdeef22b2968773f53af2957039bc82994054",
+  "driver_exit": 0,
+  "wall_seconds": 129.779,
+  "original_whole_seconds": 240,
+  "original_review_seconds": 30,
+  "reviews": {
+    "02-match": 16.58600664138794,
+    "00-menu": 15.325413227081299,
+    "06-selected-Drone": 16.65178155899048,
+    "05-before-Drone-selection": 27.489718914031982,
+    "07-Patrol-mode": 17.984336853027344
+  },
+  "late_approvals": 0,
+  "motion_frames": 17,
+  "motion_frames_directly_reviewed_by_reviewer": 17,
+  "root_direct_motion_views": [
+    0,
+    4,
+    8,
+    12,
+    16
+  ],
+  "root_visual_finding": "HQ and other scene anchors remain fixed while selected Drone visibly translates out and back with changed heading; sustained movement is larger than tiny endpoint flutter.",
+  "normal_browser_closed": true,
+  "owned_children_absent": true,
+  "gpu_released": true,
+  "raw_source": "target/web26-long-patrol-20261012-03",
+  "raw_adjudication_sha256": "7660744077cee7efbc1e0d0a607705b825fb6b56e8dab582ebdc64bf4ddec215",
+  "portable_files_sha256": {
+    "docs/qa/web26-notices-patrol/03-current-notices.png": "ecb97e396c14d986561b38ff04e10ec3e19414002f03bed8fd3979a7943a0941",
+    "docs/qa/web26-notices-patrol/04-expired-notices.png": "e0398fc3548b2499f4f71e4fb954d7d4dd638a361137ee23fb4df39bd265d9c9",
+    "docs/qa/web26-notices-patrol/08-motion-00.png": "f7dc15e69e9e1629994514c387eab39d91649a057a9bf2e2226c33b56334b906",
+    "docs/qa/web26-notices-patrol/08-motion-01.png": "a05791ec5840c88903f9be5ba8ea888c42a9dece723369ce4bded245f29a2bc4",
+    "docs/qa/web26-notices-patrol/08-motion-02.png": "b83bdd1d7efe0bbff2da09f4f8f0c3157ec5cd3e7d386790b1072b5e5dc00299",
+    "docs/qa/web26-notices-patrol/08-motion-03.png": "8bab5cb7db7b81c157a00c3269bb95c0d20cd54b08d5607bec76593a16bb6865",
+    "docs/qa/web26-notices-patrol/08-motion-04.png": "b9a8c794194992e6b0c102b8c07ddf0841028c406409d9ec6f3a3da1356c6412",
+    "docs/qa/web26-notices-patrol/08-motion-05.png": "5d0910ed1daa68d3192286f7e9ac43cb1718139aa6ec6bc2edabe1f7d08f3ff2",
+    "docs/qa/web26-notices-patrol/08-motion-06.png": "bf84483359c9f46344b429c2b0286d6c53ff37314df069202fd5745fa7eb5790",
+    "docs/qa/web26-notices-patrol/08-motion-07.png": "d74dbda79e63a8a5650b2e71f6fbed606d1618a4162744be16fdea52d6dfebd3",
+    "docs/qa/web26-notices-patrol/08-motion-08.png": "663eee5d7cdf1caf1986e437c913fa28f5895c0ba8e2173def57bfa86f4eccab",
+    "docs/qa/web26-notices-patrol/08-motion-09.png": "68d8cd892a397193efa74bb25c06df7d3e413589d615595c495a6c679f02f48c",
+    "docs/qa/web26-notices-patrol/08-motion-10.png": "004d8a49733bb2f7febdfaa925e310e5205ccde8d9831c24eb7b686a0a4610a9",
+    "docs/qa/web26-notices-patrol/08-motion-11.png": "c9e949f02ac23a8e3f290b54d8c16237d97c2e2e14294d737eb13c6566163984",
+    "docs/qa/web26-notices-patrol/08-motion-12.png": "ad9332eff542376ae27a7ab07b5c01d9bed8d9b6568f23f492a7d7f3d05e684d",
+    "docs/qa/web26-notices-patrol/08-motion-13.png": "3b324e9f3f845e8b7f4cf713c2aa468cea215f19394eba09cc173dc8c69e4795",
+    "docs/qa/web26-notices-patrol/08-motion-14.png": "b575e0793feeffa4b17ce941b555f1f1d7edce9b8a1adf4d1167426fccacc785",
+    "docs/qa/web26-notices-patrol/08-motion-15.png": "615a675ac33bc6ac7dc6bf180a58cebcb4eafbaa62270bb502502141a8fcd40d",
+    "docs/qa/web26-notices-patrol/08-motion-16.png": "320218f2111e879089dee577c474c0b30472c03540a7e9e546ef958d86024dc2",
+    "docs/qa/web26-notices-patrol/attempt01-failure-result.json": "b7988c49ed9a1614cc99d3a5c7e3870d970cfb7e978d94c00e2b54b431c707b1",
+    "docs/qa/web26-notices-patrol/attempt02-failure-result.json": "cec137a1ba8f216fc85635893e3df279896b30b69c543851446abe76a68ba7b7",
+    "docs/qa/web26-notices-patrol/paused-clock.json": "2437f5e4fa9917cb16aa2b0f4692b2bc3c53c626290a770f36432305f7179022",
+    "docs/qa/web26-notices-patrol/result.json": "256703aee431efac21c5e2cf8c524113823f3846bf71d16c634e30a1bb4cf8ac",
+    "docs/qa/web26-notices-patrol/supervisor-result.json": "ca113496fd40531f88b9491aa4f145f8fff3c06dba8f17f2c2e51ba0474ebd1f",
+    "docs/qa/web26-notices-patrol/visual-adjudication.json": "7660744077cee7efbc1e0d0a607705b825fb6b56e8dab582ebdc64bf4ddec215"
+  },
+  "boundaries": [
+    "No exact metres or offline ECS/Patrol component claims",
+    "Long visual route does not establish browser short/medium numerical behaviour",
+    "Attempts01/02 preserve review scheduling failures before Patrol",
+    "Supervisor pending-acceptance template remains unchanged; explicit terminal visual adjudication establishes this bounded scope",
+    "No public deployment, full campaign, broader HUD, audio or Windows acceptance"
+  ],
+  "root_direct_notice_views": [
+    "03-current-notices.png",
+    "04-expired-notices.png"
+  ],
+  "paused_clock_before_and_after": 19.780925750732422
+}
