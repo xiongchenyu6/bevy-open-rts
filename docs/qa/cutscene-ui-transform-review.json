@@ -1,0 +1,48 @@
+{
+  "scope": "Cutscene UI-transform fix, realspawn RED/GREEN plus consolidated native verification; rendered normalCampaign check pending",
+  "root_product_change": "ImageNode cutscene art uses UiTransform; animation mutatesVec2UIscale rather than ignored3DTransform. No gameplaytimers changed.",
+  "red": {
+    "actual_exit": 101,
+    "passed": 0,
+    "failed": 1,
+    "assertion": "Real cutscene art must not have3DTransform",
+    "compiled": true,
+    "source_sha256": "987804c09faea3b4697c40740265c36cc2de99ae236f72fb91853fdd30635c73"
+  },
+  "green": {
+    "focused_exit": 0,
+    "passed": 1,
+    "failed": 0,
+    "covers": [
+      "real spawn withUiGlobalTransform/no3D",
+      "actualUiTransformzoom advances withTimeReal",
+      "ChineseUnicode typewriter advances",
+      "TimeVirtual remainspaused"
+    ]
+  },
+  "full": {
+    "passed": 286,
+    "failed": 0,
+    "ignored": 1,
+    "seconds": 325.13
+  },
+  "check_exit": 0,
+  "build_exit": 0,
+  "native_build_seconds": 256,
+  "inputs_unchanged": true,
+  "source_count": 120,
+  "asset_count": 332,
+  "owned_source_sha256": "775e2b7a4c22ad16d8f66a0d15903c4bf85ffd34df9923578ee32b7e9d7907cf",
+  "bins": {
+    "bevy-open-rts": "816639e08b9198096e5059888aa813c470eda99715a870c4470d6887406f5c27",
+    "capture": "8bc311ff0ebff5b8ea9e220c3f168f893049b625b67403f4d01aa1b965bc6625",
+    "skirmish_audit": "0cf51e9605193f027307a3cf3061a03ba2b3aea25a1c2bdfa67337f5ff54d6e1"
+  },
+  "evidence_directory": "target/cutscene-ui-transform-shared-20261011",
+  "scope_limits": [
+    "No fresh renderedcutscene acceptance yet",
+    "OlderSDK/W18artifacts retain pre-fixsource",
+    "No newGPU workflow run"
+  ],
+  "no_gameplay_stat_timer_changes": true
+}

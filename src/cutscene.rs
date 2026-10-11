@@ -82,7 +82,7 @@ pub(crate) fn spawn_mission_cutscene(
                     height: Val::Percent(100.0),
                     ..default()
                 },
-                Transform::from_scale(Vec3::splat(1.0)),
+                UiTransform::default(),
                 CutsceneArt { age: 0.0 },
             ));
             // Bottom letterbox band holding title + briefing.
@@ -148,14 +148,14 @@ pub(crate) fn spawn_mission_cutscene(
 /// at zero while the cutscene is up.
 pub(crate) fn animate_mission_cutscene(
     time: Res<Time<Real>>,
-    mut art: Query<(&mut CutsceneArt, &mut Transform)>,
+    mut art: Query<(&mut CutsceneArt, &mut UiTransform)>,
     mut writers: Query<(&mut CutsceneTypewriter, &mut Text)>,
 ) {
     let dt = time.delta_secs();
     for (mut state, mut transform) in &mut art {
         state.age += dt;
         let zoom = 1.0 + (state.age / 14.0).min(1.0) * 0.07;
-        transform.scale = Vec3::splat(zoom);
+        transform.scale = Vec2::splat(zoom);
     }
     for (mut writer, mut text) in &mut writers {
         if writer.shown >= writer.full.chars().count() {
@@ -196,5 +196,60 @@ pub(crate) fn dismiss_mission_cutscene(
     }
     if !pause.0 {
         virtual_time.set_relative_speed(match_speed.preset.scale());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use bevy::ecs::system::RunSystemOnce;
+    use std::time::Duration;
+
+    #[test]
+    fn real_cutscene_uses_ui_zoom_while_simulation_is_paused() {
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, bevy::asset::AssetPlugin::default()))
+            .init_asset::<Image>()
+            .init_asset::<Font>()
+            .insert_resource(ActiveMission(Some(0)))
+            .insert_resource(Locale(Language::Zh));
+        app.world_mut()
+            .run_system_once(spawn_mission_cutscene)
+            .unwrap();
+        let art = app
+            .world_mut()
+            .query_filtered::<Entity, With<CutsceneArt>>()
+            .single(app.world())
+            .unwrap();
+        assert!(app.world().get::<Transform>(art).is_none());
+        assert!(app.world().get::<UiGlobalTransform>(art).is_some());
+        assert_eq!(
+            app.world().resource::<Time<Virtual>>().relative_speed(),
+            0.0
+        );
+        app.world_mut()
+            .resource_mut::<Time<Real>>()
+            .advance_by(Duration::from_secs(7));
+        app.world_mut()
+            .run_system_once(animate_mission_cutscene)
+            .unwrap();
+        assert!(app.world().get::<UiTransform>(art).unwrap().scale.x > 1.0);
+        assert_eq!(
+            app.world().resource::<Time<Virtual>>().relative_speed(),
+            0.0
+        );
+        let (writer, text) = app
+            .world_mut()
+            .query::<(&CutsceneTypewriter, &Text)>()
+            .single(app.world())
+            .unwrap();
+        assert!(!text.0.is_empty() && writer.full.starts_with(&text.0));
+        app.world_mut()
+            .resource_mut::<Time<Real>>()
+            .advance_by(Duration::from_secs(30));
+        app.world_mut()
+            .run_system_once(animate_mission_cutscene)
+            .unwrap();
+        assert!(app.world().get::<UiTransform>(art).unwrap().scale.x <= 1.071);
     }
 }
