@@ -1,0 +1,28 @@
+{
+  "status": "FAIL bounded physical recipe; no full BootCamp/Steam gate PASS",
+  "error": "Original300 attack budget exhausted",
+  "evidence_verified": 35,
+  "observed": [
+    "Skip did not earn completion",
+    "deposited Ore 70",
+    "paid Power 3/1 and Barracks 3/1 completed",
+    "four paid Infantry born",
+    "natural Move advanced actual 7/7 Attack",
+    "seven current screenshot scouting reviews; no visible enemy HQ",
+    "earned completion and fresh Replay not reached"
+  ],
+  "profile_file_exists": false,
+  "normal_exit": [
+    {
+      "pid": 3652532,
+      "supervisor_pid": 3652455,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "wall_seconds": 546.2197528370307,
+  "unit_state": "ActiveState=failed\nMainPID=0\nExecMainStatus=1\nControlGroup=\n"
+}

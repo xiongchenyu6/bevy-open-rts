@@ -1,0 +1,20 @@
+{
+  "scope": "ExactSDK305 normal BootCamp Skip/firstsixlessons/reachedAttack7of7; incomplete graduation/freshReplay",
+  "actual_runner_exit": 1,
+  "actual_game_exit": 0,
+  "wall_seconds": 546.2197528370307,
+  "error": "Original300 attack budget exhausted",
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "controller_deficiency": "Repeated current public ground scouting without normal camera advancement; no hidden HQ target used",
+  "next_recipe": "Private02 adds normal Ctrl1/double1 own-cohort focus and actual Move completion, same900/300/30/45",
+  "evidence_sha256": {
+    "docs/qa/sdk305-bootcamp-partial01/99-failure.png": "4b354c40ee1966ff130cf0c492a2618b2a897d528e2effe1a27fe04f550ddebd",
+    "docs/qa/sdk305-bootcamp-partial01/auto-result.json": "6c084fde2574fa561b3fc226a253fc99529db04d4da8fe13b8feef673d7248ff",
+    "docs/qa/sdk305-bootcamp-partial01/10-four-ready.png": "5b67859d2a4aef9420a6734c8a7cd61ff38d0d0d3e95c574223ff160bdbe29e9",
+    "docs/qa/sdk305-bootcamp-partial01/06-gathered.png": "73088392a1ac239e2038d2e5489491d37ca280ca3b573a91bd199dac5aceb823",
+    "docs/qa/sdk305-bootcamp-partial01/reviewer-summary.json": "1876da2fdc987d231550002428d494cea583593c0df93f9d18591b753a3cac1c",
+    "docs/qa/sdk305-bootcamp-partial01/12-Attack-lesson.png": "84433702128dca632c3049893607e354516c396d3a504bd4e32fd84827610170"
+  }
+}
