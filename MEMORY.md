@@ -505,3 +505,5 @@ Latest construction checkpoint:
   finale-single-map-button. Pin2e472b5f, isolated6-onlyprofile; fullcoherent3
   separate. Systemd capture requires devLD_LIBRARY_PATH for Vulkanloader;
   firstfailedGPUstartup preserved, retryservice success. Windowsbuildactive.
+
+- 2026-10-11: Wasm16 host-only1280×720 eight-slot footer acceptance is recorded in `docs/qa/web16-eight-slot-lobby-footer-review.json` (actual0/original90s). Root rehashed nine raw/image evidence files and viewed reverse-scroll frame; no eight-human or other-DPI claim. SDK267 Mission1 natural victory plus separate genuine-profile menu persistence is bounded evidence; original09 workflow remains failed due late final review/forced cleanup.

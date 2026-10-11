@@ -150,3 +150,11 @@ without error output; final capture verifies 4.24m movement and 113 siege damage
 - [x] Remove the duplicate aircraft ground ring and reduce small-unit health-bar width.
 - [x] Verify selected worker, movement/harvest input and battle footage (`screenshots/selection-compact`, `screenshots/result/8`).
 - [x] Formatting, type/build checks and 2 existing selection tests pass.
+
+## Current Steam acceptance continuation (2026-10-11)
+
+- [x] Verify Wasm16 host-only eight-slot lobby footer at1280×720 with normal wheel input; raw evidence hashes and reverse-scroll frame independently reviewed.
+- [ ] Complete exact SDK267 normal Mission1 victory → normal exit → fresh campaign-menu persistence in one successful workflow; prior workflow failure stays recorded.
+- [ ] Complete six missions through normal menu/input in one final-package application, including Retry/Next/finale and fresh-process final menu.
+- [ ] Verify actual moving guest ECS and active paid jobs, eight real peers, and reconnect.
+- [ ] Close all nine gates in `docs/RELEASE_READINESS.md`; bounded checks above do not close those gates.
