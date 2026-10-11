@@ -1,0 +1,77 @@
+{
+  "scope": "FreshSDK296 Mission2 withgenuineearnedMission1 prefix; failedcamera/Orepreparation beforepaidrecipe/Harvest/HQpriority. NotnaturalDefeat/sixchain/corebugproof",
+  "raw_root": "target/sdk296-fresh-m2-income-20261012-01",
+  "exact_initial_bank": [
+    64,
+    32
+  ],
+  "earned_prefix": [
+    "hold_the_line"
+  ],
+  "earned_profile_sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+  "normal_exits": [
+    {
+      "pid": 3033000,
+      "supervisor_pid": 3032921,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "original_bounds": {
+    "wall": 900,
+    "simulation": 900,
+    "site": 30,
+    "review": 45
+  },
+  "observed": {
+    "error": "No actual visible loaded Ore body after bounded normal pan",
+    "visible_resource_metadata": [
+      {
+        "entity": 4294966685,
+        "kind": "Crystal",
+        "visible": true,
+        "loaded_mesh_count": 3,
+        "actual_screen_center": [
+          672.0774536132812,
+          -308.1546325683594
+        ]
+      },
+      {
+        "entity": 4294966687,
+        "kind": "Ore",
+        "visible": true,
+        "loaded_mesh_count": 3,
+        "actual_screen_center": [
+          954.51904296875,
+          -395.30096435546875
+        ]
+      },
+      {
+        "entity": 4294966689,
+        "kind": "Ore",
+        "visible": true,
+        "loaded_mesh_count": 3,
+        "actual_screen_center": [
+          899.87255859375,
+          -411.104248046875
+        ]
+      }
+    ],
+    "image_personally_viewed": true,
+    "cause": "M3specificboundeddown-pan producednoeligibleon-screenOreprojectioninM2; metadata/imagealignment notestablished",
+    "not_tested": [
+      "OreHarvest",
+      "income/refills",
+      "roleassignment",
+      "HQpriority",
+      "missionresult"
+    ]
+  },
+  "hashes": {
+    "result.json": "6a78193694e5aa967b7032a8f157a592c729ef5ef08fa28815a4722bc22b534a",
+    "actual-ore-pan-failure.png": "2bbe23f42c0b486a96dd25b3d121e5ed52ecf4666cdeaad18dbd708cb7c57189"
+  }
+}

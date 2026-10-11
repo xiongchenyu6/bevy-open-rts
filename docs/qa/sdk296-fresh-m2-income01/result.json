@@ -1,0 +1,34 @@
+{
+  "scope": "FreshMission2diagnostic withbyteexactgenuineearnedMission1progress; notsixsameApp acceptance",
+  "passed": false,
+  "original_wall": 900,
+  "original_simulation": 900,
+  "original_site": 30,
+  "original_review": 45,
+  "genuine_earned_profile_sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+  "error": "No actual visible loaded Ore body after bounded normal pan",
+  "error_type": "AssertionError",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/run_fresh_m2_income_priority.py\", line 26, in <module>\n    result['actual_outcome']=play(s,recipe);s.normal_close_and_require_exit_zero();result['program_flow_passed']=True\n                             ~~~~^^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/m2_income_priority.py\", line 25, in play\n    payments=opening(s,recipe);o=opening_for(s);frame=0;observations=[]\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/m2_income_priority.py\", line 9, in opening\n    o=opening_for(s);s.key('F10');ledger=begin_ore_harvester(s,o)\n                                         ~~~~~~~~~~~~~~~~~~~^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/same-app-campaign-preparation/economy_opening05.py\", line 57, in begin_ore_harvester\n    assert proposal is not None,'No actual visible loaded Ore body after bounded normal pan'\n           ^^^^^^^^^^^^^^^^^^^^\nAssertionError: No actual visible loaded Ore body after bounded normal pan\n",
+  "actual_exits": [
+    {
+      "pid": 3033000,
+      "supervisor_pid": 3032921,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "normal-M2-main-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "normal-M2-campaign-card.png": "6b8be67b7f369aac334b120c6666515bea692a644c6cf3dafecbd548d1f7d1d4",
+    "02/normal-initial-strike_the_outpost.png": "bbc87389ff52a7da0a3e1c38b105a844029b115e97a65ad0bd060516d6007209",
+    "02/briefing-close-normal.png": "0e43bcf031ec5b6f33c80bbc551ad53aa630fed486920f214c26bd0375633780",
+    "02/economy-visible-ore-preview-0.png": "8d95c9691c184d5e10d78e9936a10356a04862d639ba094d39dc36d475a14ea7",
+    "02/economy-visible-ore-preview-1.png": "ff5f9b13849e4a088af27221818afcbb3dd7f7811dfff2323575bae389fbecaa",
+    "02/economy-visible-ore-preview-2.png": "2bbe23f42c0b486a96dd25b3d121e5ed52ecf4666cdeaad18dbd708cb7c57189",
+    "02/actual-M2-failure.png": "74e8eff43b25f88bf3826660b935ae9e75c30c5924de9a675c26df743dcd68a9"
+  },
+  "wall_seconds": 88.96320749999722
+}
