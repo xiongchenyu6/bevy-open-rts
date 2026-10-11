@@ -1,0 +1,38 @@
+{
+  "scope": "Actual normal formation move/arrival/hold only; original workflow subsequently failed, no victory",
+  "cohort_count": 5,
+  "eligible_count": 4,
+  "actual_arrivals": [
+    {
+      "key": 12884899674,
+      "type": "HeavyMachinegunTrooper",
+      "distance_to_original_hq": 3.0585746909382494,
+      "weapon_range": 4.5
+    },
+    {
+      "key": 296352740947,
+      "type": "Tank",
+      "distance_to_original_hq": 1.9442218835876206,
+      "weapon_range": 5.0
+    },
+    {
+      "key": 597000452057,
+      "type": "HeavyMachinegunTrooper",
+      "distance_to_original_hq": 4.022080866717874,
+      "weapon_range": 4.5
+    },
+    {
+      "key": 631360190290,
+      "type": "HeavyMachinegunTrooper",
+      "distance_to_original_hq": 4.032632570639928,
+      "weapon_range": 4.5
+    }
+  ],
+  "raw_hashes": {
+    "formation-immediate-move.ron": "fac5dc132438b99f41cfe0b5007c1a4932117bf86150cea541d421c897d255ac",
+    "formation-natural-arrival.ron": "2b1ae93c1af86a0a0a2b016f7c5e5f757843776a7ce858f33a7fca5e59886b8b",
+    "formation-held-after.ron": "36482f7b59a52df0e0fc50a3ed6638363afed61b9926c27310bd85e278c923f8"
+  },
+  "workflow_failure": "Exactlyone realcompletedownedproducer required CommandCenter",
+  "all_release_gates_remain_open": true
+}

@@ -1,0 +1,183 @@
+{
+  "scope": "Two actual normal-input W22 browsers, real provider TURN and private native authority; guest and host signaling loss recovery only",
+  "source_fix_commit": "ff944c7",
+  "wasm_sha256": "b617a80728b4586f03409b4bb68927dc736534463857f45a5fc75daebfb7449a",
+  "ICE_configuration_scope": "Full published API config2servers/8URLs preserved; normal product adapter selects the authenticated TURN entry with all6URLs unchanged; only relay policy forced",
+  "cases": [
+    {
+      "raw_evidence": "target/web22-real-turn-guest-reconnect-20261011-01",
+      "fault_role": "guest",
+      "actual_exit": 0,
+      "resume_ms": 1613,
+      "original_grace_seconds": 30,
+      "actual_ECS": {
+        "pre": {
+          "exact_ticks": 128,
+          "entity_component_differences": 0,
+          "economy_job_support_clock_differences": 0,
+          "render_pose_differences": 8,
+          "full_render_world_equivalence_claim": false
+        },
+        "post": {
+          "exact_ticks": 120,
+          "entity_component_differences": 0,
+          "economy_job_support_clock_differences": 0,
+          "render_pose_differences": 0,
+          "full_render_world_equivalence_claim": false
+        }
+      },
+      "guest_new_paid_command": {
+        "before_tick": 186,
+        "receipt_tick": 195,
+        "before_ore": 28,
+        "after_ore": 26,
+        "cost": [
+          2,
+          0
+        ],
+        "producer": 5,
+        "independent_ECS_confirmed": true
+      },
+      "host_new_paid_command": {
+        "before_tick": 215,
+        "receipt_tick": 223,
+        "before_ore": 32,
+        "after_ore": 30,
+        "cost": [
+          2,
+          0
+        ]
+      },
+      "host_authenticated_UUID_changed": false,
+      "owned_entity_binding_preserved": true,
+      "current_live_relay_routes": {
+        "host": [
+          {
+            "state": "succeeded",
+            "nominated": true,
+            "bytesSent": 36520,
+            "bytesReceived": 5520,
+            "localType": "relay",
+            "remoteType": "relay"
+          }
+        ],
+        "p1": [
+          {
+            "state": "succeeded",
+            "nominated": true,
+            "bytesSent": 5520,
+            "bytesReceived": 36520,
+            "localType": "relay",
+            "remoteType": "relay"
+          }
+        ]
+      },
+      "normal_browser_close": true,
+      "page_error_diagnostics": [],
+      "credential_cleanup": {
+        "private_credentials_file_removed": true,
+        "credentials_in_argv": false,
+        "full_config_unmodified": true
+      },
+      "final_frames_directly_viewed": true,
+      "final_frame_sha256": {
+        "host": "e3b7c146aba27dda6d99d5274fe08dfd1d4d02ab42e1f46ed6e8b67633f6f720",
+        "p1": "beefbb4709165ac57dd8a54bea259ff7efda03c4a0dd1012a736e30f3ed3b65d"
+      }
+    },
+    {
+      "raw_evidence": "target/web22-real-turn-host-reconnect-20261011-01",
+      "fault_role": "host",
+      "actual_exit": 0,
+      "resume_ms": 4484,
+      "original_grace_seconds": 30,
+      "actual_ECS": {
+        "pre": {
+          "exact_ticks": 133,
+          "entity_component_differences": 0,
+          "economy_job_support_clock_differences": 0,
+          "render_pose_differences": 8,
+          "full_render_world_equivalence_claim": false
+        },
+        "post": {
+          "exact_ticks": 148,
+          "entity_component_differences": 0,
+          "economy_job_support_clock_differences": 0,
+          "render_pose_differences": 0,
+          "full_render_world_equivalence_claim": false
+        }
+      },
+      "guest_new_paid_command": {
+        "before_tick": 219,
+        "receipt_tick": 229,
+        "before_ore": 28,
+        "after_ore": 26,
+        "cost": [
+          2,
+          0
+        ],
+        "producer": 5,
+        "independent_ECS_confirmed": true
+      },
+      "host_new_paid_command": {
+        "before_tick": 251,
+        "receipt_tick": 262,
+        "before_ore": 32,
+        "after_ore": 30,
+        "cost": [
+          2,
+          0
+        ]
+      },
+      "host_authenticated_UUID_changed": true,
+      "owned_entity_binding_preserved": true,
+      "current_live_relay_routes": {
+        "host": [
+          {
+            "state": "succeeded",
+            "nominated": true,
+            "bytesSent": 42914,
+            "bytesReceived": 6103,
+            "localType": "relay",
+            "remoteType": "relay"
+          }
+        ],
+        "p1": [
+          {
+            "state": "succeeded",
+            "nominated": true,
+            "bytesSent": 6153,
+            "bytesReceived": 42914,
+            "localType": "relay",
+            "remoteType": "relay"
+          }
+        ]
+      },
+      "normal_browser_close": true,
+      "page_error_diagnostics": [],
+      "credential_cleanup": {
+        "private_credentials_file_removed": true,
+        "credentials_in_argv": false,
+        "full_config_unmodified": true
+      },
+      "final_frames_directly_viewed": true,
+      "final_frame_sha256": {
+        "host": "8f6519aaee836e7e241ef83a09bbe3005bc08c73d582b91b509029018dac74fe",
+        "p1": "7faee04539511bcf79c5bb5349554bc3fd8733222cb4464b4ead7bf4106345b1"
+      }
+    }
+  ],
+  "preserved_original_failures": [
+    "target/web20-real-turn-guest-reconnect-20261011-01",
+    "target/web20-real-turn-guest-reconnect-20261011-02",
+    "target/web21-real-turn-guest-reconnect-20261011-01"
+  ],
+  "not_established": [
+    "public deployed backend recovery",
+    "eight-player recovery",
+    "complete combat match",
+    "browser reload recovery",
+    "full render-world equivalence"
+  ],
+  "all_release_gates_remain_open": true
+}
