@@ -1,0 +1,94 @@
+{
+  "scope": "Third actualeight-context original240 deadline failure before Ready/control acceptance",
+  "supervisor": {
+    "node_actual_exit": 124,
+    "driver_actual_exit": 1,
+    "actual_exit": 124,
+    "deadline_seconds": 240
+  },
+  "raw_driver_result": {
+    "actual_driver_exit": 1,
+    "error": "Error: page.waitForTimeout: Target page, context or browser has been closed",
+    "real_contexts": 8,
+    "roles": [
+      "host",
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6",
+      "p7"
+    ],
+    "events": 0,
+    "diagnostics": [
+      {
+        "sampling_error": "Error: page.evaluate: Target page, context or browser has been closed"
+      }
+    ],
+    "normal_browser_close": true,
+    "closed_wall_ms": 1791690699039,
+    "browser_close_ms": 162,
+    "deadline_seconds": 240,
+    "eight_gate_verified_by_separate_verifier": false,
+    "reconnect_pass": false,
+    "forced_relay_required": true
+  },
+  "public_views": {
+    "host": {
+      "player_id": 1,
+      "revision": 17,
+      "human_occupants": 8
+    },
+    "p1": {
+      "player_id": 3,
+      "revision": 12,
+      "human_occupants": 3
+    },
+    "p2": {
+      "player_id": 2,
+      "revision": 11,
+      "human_occupants": 2
+    },
+    "p3": {
+      "player_id": 5,
+      "revision": 14,
+      "human_occupants": 5
+    },
+    "p4": {
+      "player_id": 6,
+      "revision": 15,
+      "human_occupants": 6
+    },
+    "p5": {
+      "player_id": 8,
+      "revision": 17,
+      "human_occupants": 8
+    },
+    "p6": {
+      "player_id": 4,
+      "revision": 13,
+      "human_occupants": 4
+    },
+    "p7": {
+      "player_id": 7,
+      "revision": 16,
+      "human_occupants": 7
+    }
+  },
+  "forced_deadline_cleanup": true,
+  "normal_close_flag_not_success_evidence": true,
+  "root_source_inference": "Guest PeerConnected handler currently overwrites host_peer for later mesh peers even after Welcome; LobbySnapshot guard accepts only host_peer. This explains join-order snapshot stagnation but runtime host_peer itself was not exported. Protocol regression and actual fixed-build rerun required.",
+  "source_locations": [
+    "src/online.rs:3454",
+    "src/online.rs:5925"
+  ],
+  "source_changed": false,
+  "eight_control_pass": false,
+  "evidence_sha256": {
+    "target/web16-eight-human-20261011-03/eight-sample-437.json": "cf8dcdae15e83dd84bfc7eda1d9f907914e535cf7b2a0c26a6a00d1febc3421a",
+    "target/web16-eight-human-20261011-03/result.json": "076ec1d06fcf719def3c82e179a30625531fe00c2aa28f1b7959cc2bfd7c86d7",
+    "target/web16-eight-human-20261011-03/final-supervisor-result.json": "4f60b28e3f34c92357dec83e5efff1de43367eb36654e6efe98239b4fa20aa7d",
+    "target/web16-eight-human-20261011-03/deadline-failure.json": "386805de4718f3bccacfae1d3cb3d013f55b6a803290e459d8b767100d381fcd"
+  }
+}
