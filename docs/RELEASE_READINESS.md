@@ -13,8 +13,11 @@ A bounded regression or an older package cannot establish final release readines
   Current-source tests pass305/0/1ignored, all-target checks and four native
   builds pass;143 sources,332 assets and four binary hashes are independently
   rechecked ([contract proof](qa/hold-separation-contract-20261012/review.json)).
-  The earlier cached303 run is invalid and retained. Official SDK305 packaging
-  and actual player verification remain pending; no Mission2 victory is claimed.
+  The earlier cached303 run is invalid and retained. Official SDK305 build and
+  packaging now pass:399 installed files and the archive are independently
+  rehashed ([shipping proof](qa/native305-hold-sdk-shipping-review.json)).
+  Actual held-unit traffic verification remains pending; attempt01 stops at
+  the first Rally review deadline before Hold input. No Mission2 victory is claimed.
 - Previous native300 passes300 tests with0 failures and1 ignored; all three
   native checks and builds pass. Short and medium Patrol regressions reject the
   former endpoint oscillation. The official-SDK package contains399 files/332
