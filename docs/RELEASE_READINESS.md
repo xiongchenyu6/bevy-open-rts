@@ -33,6 +33,11 @@ A bounded regression or an older package cannot establish final release readines
   normally with one game process and unchanged package/archive. Mission3 and
   later missions are not reached ([chain outcome](qa/sdk294-same-app-chain01-review.json)).
   Fresh Mission2 income/targeting diagnostics and the six-mission acceptance remain open.
+- All326 active asset-ledger records independently match both the current
+  worktree and exact SDK300 installation; the packaged ledger and archive
+  hashes also match ([current asset identity](qa/native300-active-asset-ledger-review.json)).
+  This verifies payload identity only. Generated terms, commercial rights and
+  library obligations remain open.
 - Original capsule/library and client-icon candidates export reproducibly, with
   directly inspected crops and small title samples
   ([capsules](../art/steam/capsules-v2/README.md), [icons](../art/steam/icons-v1/README.md)).

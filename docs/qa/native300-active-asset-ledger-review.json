@@ -1,0 +1,15 @@
+{
+  "scope": "Active payload ledger byte identity in current worktree and exact SDK300 installation; not commercial rights or final visual acceptance",
+  "active_records": 326,
+  "worktree_and_package_matches": 326,
+  "mismatches": [],
+  "ledger_sha256": "de71e605da8c803ed81e380b35744af7142e46f27b5af34a475f018cbe97e579",
+  "ready_sha256": "33e705e6023c87aaa6cfd23c3baa26a198fff78565de1ffd160bd8f3428b917a",
+  "archive_sha256": "24afda2babe97e7d3c37f5f97c2c311fd4a7355d340abae70ea5827002348685",
+  "installed_ELF_sha256": "ec5aa728f8e79e3fb3e34cfb39b790bf278362042a87a424ab2237d94f614608",
+  "limitations": [
+    "326 active payload records and332 runtime files have different scopes",
+    "Generated-asset terms, commercial rights and library obligations remain open",
+    "Does not verify all-mission rendering or final Steam media"
+  ]
+}
