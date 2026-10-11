@@ -1,0 +1,15 @@
+{
+  "tool": "Built-in image_gen",
+  "date": "2026-10-12",
+  "scope": "Original promotional key-art candidate; not gameplay capture, not final store approval",
+  "prompt": "Use case: ads-marketing. Asset type: original text-free key art for Open RTS Steam capsule and library layouts. Create a polished wide landscape illustration, 16:9. Scene: a stylized low-polygon science-fiction RTS battle on warm orange desert terrain, gray and olive green modular industrial base, compact tracked tanks and small angular utility robots defending against dark red opposing armor. Match a readable low-poly game aesthetic: chunky beveled geometric silhouettes, matte painted metal, restrained detailing, no photorealistic human soldiers. One foreground green tracked tank with a clear turret silhouette, several smaller allied robots and tanks, modular power plant and command-center structures further back, a small hovering angular aircraft; brief muzzle flashes and dust suggest a tactical battle. Isometric three-quarter elevated view, coherent unit scale, believable tracks and shadows. Strong warm desert / cool gray-green contrast, clear depth, striking but faithful to a small industrial robot RTS rather than a giant-mech game. Keep the main unit and base action within the central portion so both landscape and portrait crops remain possible, with quieter darker terrain across the upper quarter for a separately composed title. Make the focal shapes readable at thumbnail size. Text: none. No lettering, logos, UI, game HUD, cursors, watermarks, awards, promotional badges, real-world insignia, copyrighted characters or gore. This is promotional illustration, not a fabricated gameplay screenshot.",
+  "file_sha256": "dfb14c0c7f46a83034918f8a342212d09f3d19ba4548646c31fd58dfde7bf713",
+  "width": 1672,
+  "height": 941,
+  "review": {
+    "personally_inspected": true,
+    "text_free": true,
+    "low_poly_industrial_RTS_theme": true,
+    "capsule_crops_and_thumbnail_review_pending": true
+  }
+}
