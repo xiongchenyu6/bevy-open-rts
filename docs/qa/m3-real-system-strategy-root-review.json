@@ -1,0 +1,115 @@
+{
+  "scope": "Actual full-schedule M3 headless paid-command policy comparison; no normal-input player acceptance or independently seeded win-rate claim",
+  "actual_result": {
+    "stages": {
+      "clean": 0,
+      "comparison": 0
+    },
+    "wall_seconds": 1916.8271806240082,
+    "scope": "Target-only real-system headless strategy comparison; no normal-player acceptance"
+  },
+  "root_independent_results": [
+    {
+      "strategy": "rear_hmg",
+      "same_configuration_repeats": 2,
+      "phase": "HumanDefeat",
+      "clock": 97.72306060791016,
+      "bounded_outcome": "HumanDefeat",
+      "repeat_results_identical": true,
+      "paid_structure_sequence": [
+        "PowerReactor",
+        "AntiAirTurret",
+        "AntiGroundTurret",
+        "Barracks",
+        "PowerReactor",
+        "VehicleFactory",
+        "RadarUplink"
+      ],
+      "paid_training_orders": {
+        "HeavyMachinegunTrooper": 3,
+        "Tank": 14
+      },
+      "original_HQ_ownership_changes": [
+        {
+          "clock": 87.57089233398438,
+          "original_HQ_owner": "None"
+        }
+      ],
+      "hashes": {
+        "0": "8e63c488bdbe4704c2c2c6dbbe0802cdc1fb6aecc836d6d071235cacfc3e685b",
+        "1": "774e64737b9c0207aacffff9f59cdb1d07afcf2597b74349df756f9183c7a936"
+      }
+    },
+    {
+      "strategy": "front_military",
+      "same_configuration_repeats": 2,
+      "phase": "Running",
+      "clock": 899.90771484375,
+      "bounded_outcome": "SIMULATION_LIMIT",
+      "repeat_results_identical": true,
+      "paid_structure_sequence": [
+        "PowerReactor",
+        "Barracks",
+        "VehicleFactory",
+        "AntiGroundTurret",
+        "PowerReactor",
+        "AntiGroundTurret",
+        "RadarUplink"
+      ],
+      "paid_training_orders": {
+        "HeavyMachinegunTrooper": 5,
+        "Tank": 17
+      },
+      "original_HQ_ownership_changes": [
+        {
+          "clock": 62.91587829589844,
+          "original_HQ_owner": "Some(Player(1))"
+        },
+        {
+          "clock": 64.18256378173828,
+          "original_HQ_owner": "None"
+        }
+      ],
+      "hashes": {
+        "0": "d460e68c1a1ef7c3e7725836281279f75df7970b384d839ec8cd2a4ba395bda5",
+        "1": "71e3cec78c14f3bd24843b45254dc736334754b6b25f9d25db63a4ccb6226131"
+      }
+    },
+    {
+      "strategy": "early_double_aa",
+      "same_configuration_repeats": 2,
+      "phase": "HumanVictory",
+      "clock": 213.0254364013672,
+      "bounded_outcome": "HumanVictory",
+      "repeat_results_identical": true,
+      "paid_structure_sequence": [
+        "PowerReactor",
+        "AntiAirTurret",
+        "AntiAirTurret",
+        "Barracks",
+        "VehicleFactory",
+        "PowerReactor",
+        "AntiGroundTurret",
+        "AntiGroundTurret"
+      ],
+      "paid_training_orders": {
+        "HeavyMachinegunTrooper": 5,
+        "Tank": 16
+      },
+      "original_HQ_ownership_changes": [],
+      "hashes": {
+        "0": "33aa69131f2ff8158399b78dc2694b9e77f579dce43b1933cff2b31e7d893244",
+        "1": "7ae09ce9d345c91eb05376ab7e9ea8568ca55e117b1c5938536556b0ccbfaf87"
+      }
+    }
+  ],
+  "root_fixture_source_review": "Reviewed actual paid placement/prerequisites/collision/enqueue costs, visible-only scouting/enemy targeting, realAIRdomain filter, fixed1/60 max54000. Fixture configures authoredmission and normalEnter; no resource grants/actorfabrication/HPnerfs.",
+  "limitations": [
+    "Policies change both construction order and army control; not an isolated causal estimate of dual-AA benefit",
+    "Static AA cooldowns excluded from unit-only firing metric",
+    "No original08 HQ capture cause proved by these separate runs",
+    "Normal physical current399 M3 and full six-mission same-App chain remain required"
+  ],
+  "source_sha256": "c189a8f406a16df722e435df86db804223c12223a335b2d05fa588e996d1f749",
+  "evidence_directory": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/m3-real-system-strategy-20261011"
+}
