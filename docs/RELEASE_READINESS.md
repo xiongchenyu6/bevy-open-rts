@@ -378,3 +378,15 @@ full music/SFX/combat mix, human listening, Windows and browser audio remain ope
 [Scoped actual01 report](qa/native309-normal-audio-review.json) pins the86-file
 portable evidence archive under local `target/`; this is local evidence retention,
 not a public source offer or published release artifact.
+
+SDK309 audio successor02 repeats the same three ordinary voice-only workflows,
+adds a genuine CommandCenter-to-Worker selection transition and preserves2.1s of
+recording after actual paid Worker birth (shipped UnitReady duration1.6s). The
+original30s completion and600s overall bounds remain. Actual controller and normal
+game exit0 in143.97s; package399/archive unchanged, all three recordings unclipped.
+Independent96-reference comparisons establish five waveform candidates including
+UnitReady(.932865); Hello(.743153) remains below threshold and unaccepted. Multiple
+normal selection voices can overlap; no production defect or logical cue identity
+is inferred. Prior actual01 results remain unchanged. [Successor02 report](qa/native309-normal-audio-successor02-review.json)
+pins a local portable archive including independent review. All17 natural event,
+human listening/full mix and Windows/browser acceptance remain open.

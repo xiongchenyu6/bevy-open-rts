@@ -1,0 +1,288 @@
+{
+  "scope": "SDK309 normal-input successor02 three voice-only workflows; five waveform candidates, no logical identity/all17 or humanmix acceptance",
+  "actual_controller": {
+    "actual_exit": 0,
+    "original_wall_seconds": 600,
+    "normal_exits": [
+      {
+        "pid": 4171601,
+        "supervisor_pid": 4171514,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "forced_cleanup": false,
+    "installation_archive_unchanged": true,
+    "phases": [
+      {
+        "event_candidates": [
+          "Hello",
+          "Ack1",
+          "Ack2"
+        ],
+        "individual_cue_waveform_identified": false
+      },
+      {
+        "event_candidates": [
+          "Training",
+          "UnitReady"
+        ],
+        "actual_new_Worker": true,
+        "paid_cost": [
+          2,
+          0
+        ],
+        "individual_cue_waveform_identified": false
+      },
+      {
+        "event_candidates": [
+          "ConstructionComplete"
+        ],
+        "actual_green_paid_completed_Power": true,
+        "paid_cost": [
+          3,
+          1
+        ],
+        "individual_cue_waveform_identified": false
+      }
+    ],
+    "wall_seconds": 143.97489755501738,
+    "screenshots": {
+      "01/voice-only-adjusted-options.png": "71a9b67f2155bb3bdfbfa451a5294a970dddbd4693851c7fa475d80cd59daaaf",
+      "01/Worker-train-0-tooltip.png": "4058385a2f644c1bd247397c635ee4173b8703287ccf3ec96fa990301b65ccf1",
+      "01/Worker-paid-completed.png": "0940069541511d5875468447ba0979809d7619b46f438e80a2f3152a2c977b21",
+      "01/auto-01-PowerReactor-tab-tooltip.png": "a329a953de8fa948a863bd2b62f47c47397a1b84efa4fa2e2fb3fae750b81869",
+      "01/auto-01-PowerReactor-candidate-0-before-ghost.png": "2110e11f68f2e2cf869061a57feebacc1309d64f1cb05444e3db63a0a1910065",
+      "01/auto-01-PowerReactor-candidate-0-build-tooltip.png": "fe96e737adf6c61901edbbd6f8e8838abda86d577b6386c224b56f69d9aac761",
+      "01/auto-01-PowerReactor-ghost-0.png": "206636d741ab5de904ce558b5d0d3efe5c9b106d2ab0427b4a1fda2ef316a3e5",
+      "01/auto-01-PowerReactor-completed.png": "80e7ddbf53cf4288cb700431375b55936fd5929a71ccf5128283cd455c78d692",
+      "01/Power-paid-completed.png": "79fde1f097c5bb10af3b48b5cdabbcd2749501a53b815da717ec2c943d355269"
+    },
+    "installation_unchanged": true,
+    "archive_unchanged": true,
+    "host_audio_environment_unchanged": true
+  },
+  "private_game_identity": [
+    {
+      "phase": "normal-selection-and-two-moves",
+      "game_host_pid": 4171601,
+      "game_namespace_pids": [
+        4171601
+      ],
+      "pulse_reported_pid": 4171601,
+      "single_game_playback_stream": true,
+      "monitor": "private rts_qa_game_only.monitor",
+      "recorder_exit": 0
+    },
+    {
+      "phase": "paid-worker-training-and-ready",
+      "game_host_pid": 4171601,
+      "game_namespace_pids": [
+        4171601
+      ],
+      "pulse_reported_pid": 4171601,
+      "single_game_playback_stream": true,
+      "monitor": "private rts_qa_game_only.monitor",
+      "recorder_exit": 0
+    },
+    {
+      "phase": "paid-power-construction-and-complete",
+      "game_host_pid": 4171601,
+      "game_namespace_pids": [
+        4171601
+      ],
+      "pulse_reported_pid": 4171601,
+      "single_game_playback_stream": true,
+      "monitor": "private rts_qa_game_only.monitor",
+      "recorder_exit": 0
+    }
+  ],
+  "pcm_metrics": {
+    "normal-selection-and-two-moves.wav": {
+      "duration": 23.585708333333333,
+      "peak_pcm16": 19564,
+      "clipped_samples": 0,
+      "rms": 919.9591422340329,
+      "sha256": "a3b7b45809951a9d6114f7d979950174d8b6b5035388c613a417dd977ca3e5a0"
+    },
+    "paid-power-construction-and-complete.wav": {
+      "duration": 32.4690625,
+      "peak_pcm16": 17143,
+      "clipped_samples": 0,
+      "rms": 604.9901234749626,
+      "sha256": "6d46379840c22105199d19b859c5de0b1104f8a3d4367e4810e7bc81429cb7a4"
+    },
+    "paid-worker-training-and-ready.wav": {
+      "duration": 15.042854166666666,
+      "peak_pcm16": 11649,
+      "clipped_samples": 0,
+      "rms": 632.6252275967631,
+      "sha256": "6018af1b2fb5b58bd5d4a6e418a4980d13bc75df8632579ca58197c040f840de"
+    }
+  },
+  "comparisons": 96,
+  "threshold": 0.85,
+  "matched_waveform_candidates": [
+    {
+      "recording": "normal-selection-and-two-moves.wav",
+      "reference": "assets/voice/english/unit/ack1.ogg",
+      "recording_sha256": "a3b7b45809951a9d6114f7d979950174d8b6b5035388c613a417dd977ca3e5a0",
+      "reference_sha256": "3e9db0c29c7fc417d24e4823bab16bc0234bfcc8f30d390e0896e1ecf1db243a",
+      "best_offset_seconds": 12.659375,
+      "normalized_correlation": 0.8624426423446495,
+      "candidate_threshold": 0.85,
+      "candidate_match": true,
+      "logical_event_identity_proven": false,
+      "all17_accepted": false
+    },
+    {
+      "recording": "normal-selection-and-two-moves.wav",
+      "reference": "assets/voice/english/unit/ack2.ogg",
+      "recording_sha256": "a3b7b45809951a9d6114f7d979950174d8b6b5035388c613a417dd977ca3e5a0",
+      "reference_sha256": "4c380c0df4b6cb52b2566611b2452d18c14aa3df97ee0628228ee6ce4f5682a4",
+      "best_offset_seconds": 18.63325,
+      "normalized_correlation": 0.9357806997899177,
+      "candidate_threshold": 0.85,
+      "candidate_match": true,
+      "logical_event_identity_proven": false,
+      "all17_accepted": false
+    },
+    {
+      "recording": "paid-power-construction-and-complete.wav",
+      "reference": "assets/voice/english/announcer/construction_complete.ogg",
+      "recording_sha256": "6d46379840c22105199d19b859c5de0b1104f8a3d4367e4810e7bc81429cb7a4",
+      "reference_sha256": "b46bb60b5d9d4660dab9433937b2c8aded77d7456440faa71b6047bfb242ac53",
+      "best_offset_seconds": 27.90925,
+      "normalized_correlation": 0.8950792243325384,
+      "candidate_threshold": 0.85,
+      "candidate_match": true,
+      "logical_event_identity_proven": false,
+      "all17_accepted": false
+    },
+    {
+      "recording": "paid-worker-training-and-ready.wav",
+      "reference": "assets/voice/english/announcer/training.ogg",
+      "recording_sha256": "6018af1b2fb5b58bd5d4a6e418a4980d13bc75df8632579ca58197c040f840de",
+      "reference_sha256": "1590dfc39e19c3de412340cc869b5c610f50c19c3867cbdc682f5ce5169dd881",
+      "best_offset_seconds": 6.90225,
+      "normalized_correlation": 0.9058305064160931,
+      "candidate_threshold": 0.85,
+      "candidate_match": true,
+      "logical_event_identity_proven": false,
+      "all17_accepted": false
+    },
+    {
+      "recording": "paid-worker-training-and-ready.wav",
+      "reference": "assets/voice/english/announcer/unit_ready.ogg",
+      "recording_sha256": "6018af1b2fb5b58bd5d4a6e418a4980d13bc75df8632579ca58197c040f840de",
+      "reference_sha256": "44de57e2233928c4dfd590e33c2b2f11b3a2bdc34d11c4f7a2a536f0c570af07",
+      "best_offset_seconds": 11.69975,
+      "normalized_correlation": 0.9328650636682772,
+      "candidate_threshold": 0.85,
+      "candidate_match": true,
+      "logical_event_identity_proven": false,
+      "all17_accepted": false
+    }
+  ],
+  "Hello_unmatched_coefficient": 0.7431532426974112,
+  "UnitReady_tail_seconds": 2.1,
+  "UnitReady_shipped_reference_seconds": 1.6,
+  "actual_selection_transition": {
+    "normal_controls": [
+      "Alt+I",
+      "Ctrl+9",
+      "Alt+C",
+      "single 9"
+    ],
+    "strict_actual_worker_key": 8589933888,
+    "idle_selection": {
+      "pending_placement": null,
+      "selected_owned": [
+        {
+          "local_entity": 8589933888,
+          "network_id": 3,
+          "type": "Worker"
+        }
+      ]
+    },
+    "assigned_selection": {
+      "pending_placement": null,
+      "selected_owned": [
+        {
+          "local_entity": 8589933888,
+          "network_id": 3,
+          "type": "Worker"
+        }
+      ]
+    },
+    "hq_selection": {
+      "pending_placement": null,
+      "selected_owned": [
+        {
+          "local_entity": 8589933873,
+          "network_id": 1,
+          "type": "CommandCenter"
+        }
+      ]
+    },
+    "recalled_selection": {
+      "pending_placement": null,
+      "selected_owned": [
+        {
+          "local_entity": 8589933888,
+          "network_id": 3,
+          "type": "Worker"
+        }
+      ]
+    },
+    "hq_focused_camera": [
+      1.0,
+      0.0,
+      -0.0,
+      0.0,
+      -0.0,
+      0.5226873159408569,
+      -0.85252445936203,
+      0.0,
+      0.0,
+      0.85252445936203,
+      0.5226873159408569,
+      0.0,
+      -15.0,
+      8.14285659790039,
+      -13.007572174072266,
+      1.0
+    ],
+    "recalled_camera": [
+      1.0,
+      0.0,
+      -0.0,
+      0.0,
+      -0.0,
+      0.5226873159408569,
+      -0.85252445936203,
+      0.0,
+      0.0,
+      0.85252445936203,
+      0.5226873159408569,
+      0.0,
+      -15.0,
+      8.14285659790039,
+      -13.007572174072266,
+      1.0
+    ],
+    "scope": "Normal control-group restoration; mouse body-picking ambiguity remains open"
+  },
+  "logical_event_identity_proven": false,
+  "all17_accepted": false,
+  "human_mix_accepted": false,
+  "Windows_browser_accepted": false,
+  "prior_actual01_unmatched_Hello_UnitReady_preserved": true,
+  "limitation": "Repeated normal selection cues may overlap; Hello belowthreshold remains unaccepted; no production bug inferred",
+  "root_independent_review_sha256": "57fca437424ae862969f7d61b2cad525a02ea31099e5d49ecec7d489c260cfae",
+  "portable_archive": {
+    "path": "target/sdk309-normal-audio-20261012-02-evidence.tar.gz",
+    "sha256": "8630ef179fa12e871994a434931e8a158ceeb10df01375295ebb398f2b337043",
+    "files": 84
+  }
+}
