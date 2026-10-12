@@ -1,0 +1,24 @@
+{
+  "scope": "ActualSDK309 fresh M2 diagnostic12 partial failure only; later assault/naturalM2win/sixsameApp acceptance unproven",
+  "passed": false,
+  "wall_seconds": 593.106509654026,
+  "normal_exit": 0,
+  "forced_cleanup": false,
+  "all77_png_sha256_independently_rechecked": true,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "verified": "Normal paid six-base opening20/9; paid2AA3Tank3HMG3Rocket; outerFactoryRally; 2AA typedMove/HQrange/Hold.",
+  "failure": "No eligible publicly clear group defense ground",
+  "failed_cohort": "HeavyMachinegunTrooper",
+  "all20_points_own_actor_blocked": true,
+  "scope_limit": "Candidate macroclearance rejection does not establish navigation impossibility. All nine release gates remain open.",
+  "files": {
+    "docs/qa/sdk309-m2-grouping12/result.json": "4152b73627a951cf2d2c23f8068d934605d327ec3cf8b0453f48a23c9c846e33",
+    "docs/qa/sdk309-m2-grouping12/group11-AntiAirWalker-held.ron": "4631ead9255ce537313f0ad4ee5a56e140f5fded1995fe9ad31b10d9cd7fefc9",
+    "docs/qa/sdk309-m2-grouping12/all-png-sha256.json": "26e06bc17a3a1beb211c5a4550872e9c765dcd667cbbf59de75fa00b9142244d",
+    "docs/qa/sdk309-m2-grouping12/group11-defense-receipts.json": "f047c4bfa692407035a717d9a1f585ab101f9becf498b9da856e62ebfe7933f5",
+    "docs/qa/sdk309-m2-grouping12/actual-M2-failure.png": "389c127d1351c6bb4b0967b62142822c5f18bb64555cb50a1ce1dd224996b4ea",
+    "docs/qa/sdk309-m2-grouping12/group11-HeavyMachinegunTrooper-ground-candidates.json": "13c8930384d3e0614625f29b86b449ef5cab849ed358d747cf7d0d25ac852520",
+    "docs/qa/sdk309-m2-grouping12/terminal-own-summary.json": "7ed5a583690fc98a2932d4e2daf0b5d5a957dacbfd15dcaa210fcfca487bfb1f"
+  }
+}

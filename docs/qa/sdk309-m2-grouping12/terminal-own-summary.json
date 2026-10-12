@@ -1,0 +1,115 @@
+{
+  "scope": "Mission2 diagnostic only; natural victory unproven",
+  "exact_failure": "No eligible publicly clear group defense ground",
+  "failed_cohort": "HeavyMachinegunTrooper",
+  "own_counts": {
+    "AntiAirWalker": 2,
+    "Worker": 2,
+    "Drone": 1,
+    "RocketInfantry": 3,
+    "HeavyMachinegunTrooper": 3,
+    "Tank": 3
+  },
+  "aa_held": [
+    {
+      "key": 438086661916,
+      "id": "AntiAirWalker",
+      "hold": "true",
+      "active": "[]"
+    },
+    {
+      "key": 6575594928105,
+      "id": "AntiAirWalker",
+      "hold": "true",
+      "active": "[]"
+    }
+  ],
+  "paid_base": [
+    {
+      "id": "PowerReactor",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        865,
+        181
+      ],
+      "completed_count": 1,
+      "construction_wall": 8.258670530980453
+    },
+    {
+      "id": "VehicleFactory",
+      "cost": [
+        6,
+        0
+      ],
+      "point": [
+        340,
+        181
+      ],
+      "completed_count": 1,
+      "construction_wall": 12.06206431495957
+    },
+    {
+      "id": "RadarUplink",
+      "cost": [
+        4,
+        3
+      ],
+      "point": [
+        640,
+        129
+      ],
+      "completed_count": 1,
+      "construction_wall": 12.564801482018083
+    },
+    {
+      "id": "AntiAirTurret",
+      "cost": [
+        2,
+        2
+      ],
+      "point": [
+        998,
+        129
+      ],
+      "completed_count": 1,
+      "construction_wall": 10.85844060499221
+    },
+    {
+      "id": "AntiGroundTurret",
+      "cost": [
+        2,
+        2
+      ],
+      "point": [
+        902,
+        373
+      ],
+      "completed_count": 1,
+      "construction_wall": 13.353548278973904
+    },
+    {
+      "id": "Barracks",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        291,
+        373
+      ],
+      "completed_count": 1,
+      "construction_wall": 10.517375717987306
+    }
+  ],
+  "candidate_count": 20,
+  "projection_eligible": 18,
+  "own_actor_blocked": 20,
+  "resource_blocked": 0,
+  "png_count": 77,
+  "normal_exit": 0,
+  "forced_cleanup": false,
+  "gpu_runtime_pid_absent": true
+}

@@ -66,6 +66,13 @@ A bounded regression or an older package cannot establish final release readines
   entire saved game remains byte-identical. Normal exit is0, with installation
   and archive unchanged ([actual notice proof](qa/sdk296-toast-notices-review.json)).
   This establishes the specific UI fix, not full campaign or platform acceptance.
+- SDK309 fresh Mission2 attempt12 verifies paid opening20/9, exact11
+  initial defenders, outer Factory Rally, and both AA units’ normal
+  Move-to-HQ-range then Hold. HMG formation fails because all20 macro
+  candidates are blocked by OWN actors. Game exit0,77 PNG hashes and
+  unchanged installation/archive are verified
+  ([actual partial failure](qa/sdk309-m2-grouping12-review.json)). Later
+  assault, Mission2 victory and six-mission completion remain unproven.
 - SDK294 same-App campaign attempt01 naturally completes Mission1 and persists
   exactly one completed mission, then naturally loses Mission2 at04:11. It closes
   normally with one game process and unchanged package/archive. Mission3 and
