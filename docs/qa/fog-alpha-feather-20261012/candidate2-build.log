@@ -1,0 +1,245 @@
+warning: Git tree '/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts' is dirty
+warning: use of deprecated method `futures_channel::mpsc::UnboundedReceiver::<T>::try_next`: please use `try_recv` instead
+   --> crates/matchbox-socket/src/webrtc_socket/socket.rs:332:41
+    |
+332 |         while let Ok(Some(x)) = self.rx.try_next() {
+    |                                         ^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `futures_channel::mpsc::UnboundedReceiver::<T>::try_next`: please use `try_recv` instead
+   --> crates/matchbox-socket/src/webrtc_socket/socket.rs:565:48
+    |
+565 |         while let Ok(res) = self.peer_state_rx.try_next() {
+    |                                                ^^^^^^^^
+
+warning: `matchbox_socket` (lib) generated 2 warnings
+   Compiling bevy-open-rts v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts)
+warning: unused import: `bevy::prelude::*`
+ --> src/capture_api/voice_audio.rs:5:5
+  |
+5 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `bevy::prelude::*`
+ --> src/ai.rs:6:5
+  |
+6 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/campaign.rs:9:5
+  |
+9 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+  --> src/terrain.rs:11:5
+   |
+11 | use bevy::prelude::*;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/maps.rs:4:5
+  |
+4 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/support_powers.rs:4:5
+  |
+4 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/spawn.rs:5:5
+  |
+5 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/tank_models.rs:9:5
+  |
+9 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/selection.rs:5:5
+  |
+5 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/command_card.rs:5:5
+  |
+5 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/fog.rs:4:5
+  |
+4 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/match_screens.rs:4:5
+  |
+4 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/placement_ghost.rs:6:5
+  |
+6 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/limb_animation.rs:9:5
+  |
+9 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/structure_ambience.rs:7:5
+  |
+7 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/weather.rs:8:5
+  |
+8 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/cutscene.rs:6:5
+  |
+6 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/combat_vfx.rs:4:5
+  |
+4 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+  --> src/factions.rs:15:5
+   |
+15 | use bevy::prelude::*;
+   |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/save.rs:7:5
+  |
+7 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/combat.rs:6:5
+  |
+6 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/orders.rs:6:5
+  |
+6 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/orders/contact_planning.rs:3:5
+  |
+3 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/production.rs:6:5
+  |
+6 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/economy.rs:6:5
+  |
+6 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/economy/harvest_contact.rs:3:5
+  |
+3 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `prelude::*`
+  --> src/online.rs:10:5
+   |
+10 |     prelude::*,
+   |     ^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/menu.rs:6:5
+  |
+6 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/camera.rs:6:5
+  |
+6 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/nav.rs:5:5
+  |
+5 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude`
+ --> src/capture_api.rs:8:5
+  |
+8 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude`
+ --> src/audio.rs:6:5
+  |
+6 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude`
+ --> src/hud.rs:7:5
+  |
+7 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^
+
+warning: function `allied_skirmish_ally` is never used
+    --> src/lib.rs:1957:15
+     |
+1957 | pub(crate) fn allied_skirmish_ally(player_team: Team, active_team_count: usize) -> Option<Team> {
+     |               ^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `allied_skirmish_enemy` is never used
+    --> src/lib.rs:1961:15
+     |
+1961 | pub(crate) fn allied_skirmish_enemy(player_team: Team, active_team_count: usize) -> Option<Team> {
+     |               ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `default_skirmish_opponent` is never used
+    --> src/lib.rs:1988:15
+     |
+1988 | pub(crate) fn default_skirmish_opponent(
+     |               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `free_position` is never used
+    --> src/lib.rs:7376:15
+     |
+7376 | pub(crate) fn free_position(origin: Vec3, seed: u32, radius: f32) -> Vec3 {
+     |               ^^^^^^^^^^^^^
+
+warning: `bevy-open-rts` (lib) generated 37 warnings (run `cargo fix --lib -p bevy-open-rts` to apply 30 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 58.31s

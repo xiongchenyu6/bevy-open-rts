@@ -1,0 +1,12 @@
+[
+  {
+    "stage": "build",
+    "exit": 0,
+    "elapsed": 60.51422318897676
+  },
+  {
+    "stage": "capture",
+    "exit": 0,
+    "elapsed": 9.052083477028646
+  }
+]

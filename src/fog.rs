@@ -193,6 +193,41 @@ pub(crate) fn update_fog_overlay(
             255
         };
     }
+    feather_fog_alpha(data, res);
+}
+
+/// Feather only the displayed alpha. The original boolean visibility and
+/// explored memory remain exact; this never changes entity sight or selection.
+fn feather_fog_alpha(data: &mut [u8], res: usize) {
+    const WEIGHTS: [u32; 5] = [1, 4, 6, 4, 1];
+    let original: Vec<u8> = data.chunks_exact(4).map(|pixel| pixel[3]).collect();
+    let mut horizontal = vec![0u32; res * res];
+    for y in 0..res {
+        for x in 0..res {
+            horizontal[y * res + x] = WEIGHTS
+                .iter()
+                .enumerate()
+                .map(|(tap, weight)| {
+                    let px = (x as isize + tap as isize - 2).clamp(0, res as isize - 1) as usize;
+                    original[y * res + px] as u32 * weight
+                })
+                .sum();
+        }
+    }
+    for y in 0..res {
+        for x in 0..res {
+            let sum: u32 = WEIGHTS
+                .iter()
+                .enumerate()
+                .map(|(tap, weight)| {
+                    let py = (y as isize + tap as isize - 2).clamp(0, res as isize - 1) as usize;
+                    horizontal[py * res + x] * weight
+                })
+                .sum();
+            let i = y * res + x;
+            data[i * 4 + 3] = ((sum + 128) / 256) as u8;
+        }
+    }
 }
 
 pub(crate) fn update_visibility(
@@ -342,4 +377,60 @@ pub(crate) fn spawn_fog_memory_structure_remnant(
             ));
         }
     });
+}
+
+#[cfg(test)]
+mod fog_feather_tests {
+    use super::*;
+
+    fn pixels(alpha: &[u8]) -> Vec<u8> {
+        alpha.iter().flat_map(|&a| [0, 0, 0, a]).collect()
+    }
+
+    #[test]
+    fn fog_feather_preserves_uniform_visibility_states_and_rgb() {
+        for alpha in [0, FOG_OVERLAY_EXPLORED_ALPHA, 255] {
+            let mut data = pixels(&[alpha; 49]);
+            let before = data.clone();
+            feather_fog_alpha(&mut data, 7);
+            assert_eq!(data, before);
+        }
+    }
+
+    #[test]
+    fn fog_feather_forms_a_monotonic_display_gradient_across_the_boundary() {
+        let original: Vec<u8> = (0..81).map(|i| if i % 9 < 5 { 0 } else { 255 }).collect();
+        let mut data = pixels(&original);
+        feather_fog_alpha(&mut data, 9);
+        let edge: Vec<u8> = (0..9).map(|x| data[(4 * 9 + x) * 4 + 3]).collect();
+        assert_eq!(edge[0], 0);
+        assert!(edge[3] > 0 && edge[3] < edge[4] && edge[4] < 255);
+        assert!(edge.windows(2).all(|pair| pair[0] <= pair[1]));
+        assert!(edge[5] > edge[4] && edge[5] < edge[6] && edge[6] < 255);
+        assert_eq!(edge[8], 255);
+    }
+
+    #[test]
+    fn fog_feather_blends_all_display_states_without_changing_rgb() {
+        let original: Vec<u8> = (0..81)
+            .map(|i| match i % 9 {
+                0..=2 => 0,
+                3..=5 => FOG_OVERLAY_EXPLORED_ALPHA,
+                _ => 255,
+            })
+            .collect();
+        let mut data = pixels(&original);
+        feather_fog_alpha(&mut data, 9);
+        let row: Vec<u8> = (0..9).map(|x| data[(4 * 9 + x) * 4 + 3]).collect();
+        assert!(row.windows(2).all(|pair| pair[0] <= pair[1]));
+        assert!(
+            row.iter()
+                .any(|&alpha| alpha > 0 && alpha < FOG_OVERLAY_EXPLORED_ALPHA)
+        );
+        assert!(
+            row.iter()
+                .any(|&alpha| alpha > FOG_OVERLAY_EXPLORED_ALPHA && alpha < 255)
+        );
+        assert!(data.chunks_exact(4).all(|pixel| pixel[..3] == [0, 0, 0]));
+    }
 }

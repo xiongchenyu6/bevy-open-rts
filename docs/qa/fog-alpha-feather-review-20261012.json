@@ -1,0 +1,151 @@
+{
+  "scope": "Bounded display-only fog feather + diagnostic capture; not earned media, package acceptance or Steam readiness",
+  "production_change": "Separable5tap [1,4,6,4,1] alpha blend on original192texture; unchangedboolean visible/explored update andentity visibility/reveal radiuses",
+  "toolchain": "Rust/Cargo1.98.1 focused diagnostic; exactcanonical1.95 rebuild pending",
+  "candidate2_focused_tests": "3passed0failed",
+  "candidate2_all_targets_check": true,
+  "candidate2_capture_build": true,
+  "candidate2_current_render_exit": 0,
+  "visual_review": "Root accepts removal of coarse hardstepblocks; smooth broadgradient. Finecrosshatch remains; noallcamera/perfect/performance claim",
+  "same_diagnostic_camera": true,
+  "same_explored_count": 5399,
+  "capture_metadata": {
+    "clock": 6.266662120819092,
+    "distance": 7.0,
+    "focus": [
+      -3.0,
+      0.0,
+      -18.0
+    ],
+    "fog": {
+      "cells": 36864,
+      "explored": 5399,
+      "opaque_cells": 31095
+    },
+    "map_half_extent": [
+      25.0,
+      25.0
+    ],
+    "outskirts": [
+      {
+        "name": "Battlefield outskirts",
+        "position": [
+          0.0,
+          -0.03999999910593033,
+          0.0
+        ]
+      },
+      {
+        "name": "Battlefield boundary rim",
+        "position": [
+          0.0,
+          -0.014999999664723873,
+          0.0
+        ]
+      }
+    ],
+    "phase": "Running",
+    "radar": "Radar offline\nBuild a Radar Uplink",
+    "radar_online": false,
+    "rendered": {
+      "flat_ground_viewport_corners": [
+        {
+          "flat_ground": [
+            -12.427742004394531,
+            0.0,
+            -24.22047233581543
+          ],
+          "inside_map": true,
+          "screen": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "flat_ground": [
+            6.427742004394531,
+            0.0,
+            -24.22047233581543
+          ],
+          "inside_map": true,
+          "screen": [
+            1920.0,
+            0.0
+          ]
+        },
+        {
+          "flat_ground": [
+            2.6090502738952637,
+            0.0,
+            -14.299121856689453
+          ],
+          "inside_map": true,
+          "screen": [
+            1920.0,
+            1080.0
+          ]
+        },
+        {
+          "flat_ground": [
+            -8.609050750732422,
+            0.0,
+            -14.299121856689453
+          ],
+          "inside_map": true,
+          "screen": [
+            0.0,
+            1080.0
+          ]
+        }
+      ],
+      "position": [
+        -3.0,
+        8.14285659790039,
+        -13.007572174072266
+      ],
+      "rotation": [
+        -0.4885246753692627,
+        0.0,
+        0.0,
+        0.8725501298904419
+      ]
+    },
+    "selected": [],
+    "settings": {
+      "edge_pan": true,
+      "pan_speed": 18.0,
+      "tilt": 0.550000011920929
+    }
+  },
+  "candidate1": "Inwardalpha clamp rejected: hardstairs remained. Its312fullsuitepassed appliesonlycandidate1.",
+  "invalid_baselines": [
+    "Weatherframe showsnoclearfogedge",
+    "Mapoverview explicitly enablesallplayersvisible; not fogproof",
+    "Initialdirectbinarycapture startup30s failed becauseBEVY_ASSET_ROOT omitted; deadline notextended"
+  ],
+  "source_files": {
+    "src/fog.rs": "8cc2946f8a3be7d1033668e26cca745e81f5b326204d2b8ecfb0df05b76891f3",
+    "src/capture_api.rs": "7d45d47ca5bb826009c91b7e646c08fd387e2a48e4a225fe6ca8023746e56d44",
+    "src/bin/capture.rs": "f89980b04bad806220fd20c027e46ef55912a7846d053bd9bb16288f120f8920"
+  },
+  "capture_binary_sha256": "a2208fac3b7d162fe5506891369be2ad37adb437553022710ffa56bcbfff2ba7",
+  "all332_assets_unchanged_root_verified": true,
+  "existing_frozen_sdk309_untouched": true,
+  "all9_release_gates_open": true,
+  "files": {
+    "docs/qa/fog-alpha-feather-20261012/candidate2-tests.log": "4a95168873851f27e25fb899e6231e243d3d54dc8c397d1ceba547933de5be5b",
+    "docs/qa/fog-alpha-feather-20261012/candidate1-frame.png": "6db344ef426024af9290a730990b5aec5444cf1eea003bcfbae7d6a7582a13e2",
+    "docs/qa/fog-alpha-feather-20261012/candidate2-check.log": "b8402a3e8eef29baa5e69187c9a08fe78a2492f45b450e93fc683a8bfc0b6a77",
+    "docs/qa/fog-alpha-feather-20261012/startup-assets-missing-failure.log": "d7e797e916be671c4dea986928cc4701cb3aeca0ae1d9d3519f1196492f2b610",
+    "docs/qa/fog-alpha-feather-20261012/candidate2-capture.log": "814f38019399aef9696d3531039e83288690d5b528677eb9dc9ae80cc3ba5711",
+    "docs/qa/fog-alpha-feather-20261012/invalid-weather-baseline.png": "333bc3cb616b91e6c05a7e76fda7ffbb4cc50599452bfebac998a5acd03bc0e3",
+    "docs/qa/fog-alpha-feather-20261012/candidate2-frame.png": "c0e16aee7bdf5654ba6881780d3589f28d8a23e7ac2b86480d4be0e7933da12d",
+    "docs/qa/fog-alpha-feather-20261012/candidate1-observation.json": "66f9b238eec91cc4709142de388b7d2881505fc437bbd657bacc5e0eb0f9c03a",
+    "docs/qa/fog-alpha-feather-20261012/candidate2-stages.json": "bb06f98a8a1616f1bababb36d0f5c1178a8648602520a629272dbe6b8626638a",
+    "docs/qa/fog-alpha-feather-20261012/candidate2-observation.json": "038fd3d8843f59e69f1a219dcb6486dd38b0586bb2536d86f74c2c3c2c2ef12d",
+    "docs/qa/fog-alpha-feather-20261012/candidate2-build.log": "f8d416a8ec611835cf42e45456085c008bb822b69b973454cd38edac9366f090",
+    "docs/qa/fog-alpha-feather-20261012/invalid-spectator-map-baseline.png": "c4dff0ef8aea3ccde4eba5c70f458784fb58072d6cb07a2f4426e38b3d1f57c0",
+    "docs/qa/fog-alpha-feather-20261012/candidate1.rs": "1209de21bd92e11020d7248378d016aae5cd478d0df59fabae4a34d511a941ff",
+    "docs/qa/fog-alpha-feather-20261012/root-review.json": "499feb68f4ab8b44c36a89dd85375740e390c9a7faea2121604d989f1813fef8"
+  }
+}

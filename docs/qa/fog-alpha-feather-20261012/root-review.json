@@ -1,0 +1,21 @@
+{
+  "scope": "Root direct diagnostic fog-edge review at1920x1080; not final package/player/performance acceptance",
+  "visual_improvement_accepted": true,
+  "finding": "Hard block steps seen in max-clamped candidate1 replaced by continuous soft gradient in candidate2",
+  "limitation": "Fine crosshatch pattern visible in transition; all camera views/moving gameplay/performance unverified",
+  "image_sha256": "c0e16aee7bdf5654ba6881780d3589f28d8a23e7ac2b86480d4be0e7933da12d",
+  "fog_source_sha256": "8cc2946f8a3be7d1033668e26cca745e81f5b326204d2b8ecfb0df05b76891f3",
+  "stages": [
+    {
+      "stage": "build",
+      "exit": 0,
+      "elapsed": 60.51422318897676
+    },
+    {
+      "stage": "capture",
+      "exit": 0,
+      "elapsed": 9.052083477028646
+    }
+  ],
+  "camera": "Diagnostic ownHQ+12mX focus, player0visibility; not normal-input media"
+}

@@ -1772,7 +1772,9 @@ pub fn capture_player_completed_structure_position_near(
 
 /// Read-only targeting/placement state for normal capture input cancellation.
 pub fn capture_has_pending_command_mode(app: &mut App) -> bool {
-    app.world().resource::<CommandMode>().has_pending_interaction()
+    app.world()
+        .resource::<CommandMode>()
+        .has_pending_interaction()
 }
 
 /// Whether the player currently has a pending structure placement (build mode).
@@ -2341,6 +2343,17 @@ pub fn capture_select_map(app: &mut App, map_id: &str) -> Result<(), String> {
     app.world_mut()
         .resource_mut::<SelectedSkirmishMap>()
         .godot_path = map.godot_path;
+    Ok(())
+}
+
+/// Diagnostic-only camera framing of a genuine per-player fog boundary.
+/// Does not create actors, grant sight, or change explored memory.
+pub fn capture_frame_fog_edge(app: &mut App) -> Result<(), String> {
+    app.world_mut()
+        .insert_resource(VisiblePlayer::per_player(Team::Player(0)));
+    let (_, own_hq, _) =
+        capture_player_command_center(app).ok_or("fog diagnostic requires an existing owned HQ")?;
+    capture_focus_camera_on(app, own_hq + Vec3::new(12.0, 0.0, 0.0));
     Ok(())
 }
 

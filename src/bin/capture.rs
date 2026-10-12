@@ -74,8 +74,8 @@ use bevy_open_rts::{
     capture_enemy_structure_position, capture_entity_is_selected,
     capture_first_enabled_attack_move_hotkey, capture_first_enabled_build_hotkey,
     capture_first_enabled_rally_hotkey, capture_first_enabled_train_hotkey,
-    capture_focus_camera_on, capture_frame_whole_map, capture_key, capture_match_phase_label,
-    capture_mission_briefing_complete, capture_model_harness_manifest,
+    capture_focus_camera_on, capture_frame_fog_edge, capture_frame_whole_map, capture_key,
+    capture_match_phase_label, capture_mission_briefing_complete, capture_model_harness_manifest,
     capture_model_harness_page_count, capture_mouse_button, capture_nearest_enemy_anchor_position,
     capture_nearest_visible_resource_click_position_to, capture_nearest_visible_resource_position,
     capture_onscreen_resource_model_center, capture_placement_is_valid,
@@ -494,6 +494,13 @@ fn main() {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("screenshots/deploy"));
             render_deployed_siege(&dir)
+        }
+        Some("fog-edge") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/fog-edge"));
+            render_fog_edge(&dir)
         }
         Some("weather") => {
             let kind = args.next().unwrap_or_else(|| "sandstorm".into());
@@ -2323,6 +2330,37 @@ fn render_placement_ghost(path: &Path) -> Result<(), String> {
         app.update();
     }
     println!("[capture] wrote {}", path.display());
+    Ok(())
+}
+
+fn render_fog_edge(dir: &Path) -> Result<(), String> {
+    if dir.exists() {
+        return Err("refusing to replace existing fog-edge evidence".into());
+    }
+    std::fs::create_dir_all(dir).map_err(|error| error.to_string())?;
+    let mut app = start_match_app()?;
+    capture_dismiss_match_briefing(&mut app);
+    capture_set_weather(&mut app, "clear");
+    capture_frame_fog_edge(&mut app)?;
+    capture_set_cursor(&mut app, Vec2::new(WIDTH as f32 * 0.5, HEIGHT as f32 * 0.5));
+    for _ in 0..120 {
+        app.update();
+    }
+    let observation = bevy_open_rts::capture_camera_edge_observation(&mut app);
+    if observation["fog"]["opaque_cells"].as_u64().unwrap_or(0) == 0 {
+        return Err("fog edge diagnostic has no opaque shroud".into());
+    }
+    std::fs::write(
+        dir.join("observation.json"),
+        serde_json::to_vec_pretty(&observation).unwrap(),
+    )
+    .map_err(|error| error.to_string())?;
+    let handle = capture_handle(&app);
+    shoot(&mut app, &handle, dir.join("frame.png"));
+    println!(
+        "[capture] diagnostic-only per-player fog edge wrote {}",
+        dir.display()
+    );
     Ok(())
 }
 
