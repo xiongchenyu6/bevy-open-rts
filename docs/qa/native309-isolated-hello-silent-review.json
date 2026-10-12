@@ -1,0 +1,412 @@
+{
+  "scope": "SDK309 prescribed single9 isolated control-group recall; actual silent output, Hello remains unaccepted",
+  "actual_controller": {
+    "actual_exit": 0,
+    "original_wall_seconds": 600,
+    "natural_recipe": {
+      "earned_group9_worker_key": 8589933892,
+      "hq_before_recording": {
+        "pending_placement": null,
+        "selected_owned": [
+          {
+            "local_entity": 8589933873,
+            "network_id": 1,
+            "type": "CommandCenter"
+          }
+        ]
+      },
+      "recalled_during_recording": {
+        "pending_placement": null,
+        "selected_owned": [
+          {
+            "local_entity": 8589933892,
+            "network_id": 4,
+            "type": "Worker"
+          }
+        ]
+      },
+      "only_single9_selection_inside_recording": true,
+      "shipped_hello_duration": 1.575,
+      "tail_seconds": 2.075,
+      "accepted": false,
+      "waveform_review_pending": true,
+      "logical_audio_receipt_available": false
+    },
+    "normal_exits": [
+      {
+        "pid": 37307,
+        "supervisor_pid": 37238,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "forced_cleanup": false,
+    "installation_archive_unchanged": true,
+    "phases": [],
+    "wall_seconds": 88.72261027403874,
+    "screenshots": {
+      "01/voice-only-adjusted-options.png": "71a9b67f2155bb3bdfbfa451a5294a970dddbd4693851c7fa475d80cd59daaaf",
+      "01/isolated-hello-actual-worker-selected.png": "c3352e100f310e5c9a15d4c774da0693a3e5725ee20e4cf3f9ae69ded47e2fc8"
+    },
+    "installation_unchanged": true,
+    "archive_unchanged": true,
+    "host_audio_environment_unchanged": true
+  },
+  "actual_selection_receipts": {
+    "earned_group9_worker_key": 8589933892,
+    "hq_before_recording": {
+      "pending_placement": null,
+      "selected_owned": [
+        {
+          "local_entity": 8589933873,
+          "network_id": 1,
+          "type": "CommandCenter"
+        }
+      ]
+    },
+    "recalled_during_recording": {
+      "pending_placement": null,
+      "selected_owned": [
+        {
+          "local_entity": 8589933892,
+          "network_id": 4,
+          "type": "Worker"
+        }
+      ]
+    },
+    "only_single9_selection_inside_recording": true,
+    "shipped_hello_duration": 1.575,
+    "tail_seconds": 2.075,
+    "accepted": false,
+    "waveform_review_pending": true,
+    "logical_audio_receipt_available": false
+  },
+  "private_game_identity": [
+    {
+      "phase": "isolated-worker-single9-hello",
+      "game_host_pid": 37307,
+      "game_namespace_pids": [
+        37307
+      ],
+      "pulse_reported_pid": 37307,
+      "single_game_playback_stream": true,
+      "monitor": "private rts_qa_game_only.monitor",
+      "recorder_exit": 0
+    }
+  ],
+  "pcm_and_32_reference_rejections": {
+    "actual_exit": 0,
+    "comparisons": 32,
+    "references": [
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/base_under_attack.ogg",
+        "reference_sha256": "f73ae0fe757a040296e2975bff1ef5d9380393eb087029a402db9f0171c1dd1e",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/construction_complete.ogg",
+        "reference_sha256": "bff568e942a796bd77f25b158f806c683e0b312b83a2b743f9deb7d3fdac2e96",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/defeat.ogg",
+        "reference_sha256": "fd87d8ddba6c36ff990b85eb6d856516ca89b710d7719e85084547b87a9a78dd",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/enemy_superweapon_launched.ogg",
+        "reference_sha256": "36dfe0f5f5046f18880fe4fb6b0459b15e99fe52d7b4f3e38c762176efcb9f72",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/enemy_superweapon_ready.ogg",
+        "reference_sha256": "809f9ac6a1beb24d7e2a05aefe7616d59cf562dd0fcc54dfcf0d47c226d0da91",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/enemy_support_power_fired.ogg",
+        "reference_sha256": "793d95b5fb4277b444987d7e7b8c28af8aab6d70a51560b1c0f00406ee8a7d56",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/not_enough_resources.ogg",
+        "reference_sha256": "e0495e0856eabc131e260cf1c6ce812c930b11b687d622cef733e79b381a7b23",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/support_power_ready.ogg",
+        "reference_sha256": "cddab3aabb9e3a5d0655714ac9c5e34dbb4c77cf1038a991357ca4a35990f844",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/training.ogg",
+        "reference_sha256": "80e4edc9197a3c0aaf4828c71f60e9f9886ddfb7c9843680596e7b77bb1ab964",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/unit_lost.ogg",
+        "reference_sha256": "47d0385e765b8cf79b9061a2d0365e756473efa2eb45f79be9d39f5fc195c7fa",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/unit_ready.ogg",
+        "reference_sha256": "198608871e4435d18c98806dbb84cd61f7f60198d98dce0417ce527859292f94",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/unit_under_attack.ogg",
+        "reference_sha256": "564c18dc8dc4790d427ebd9e754263fc00feb121835e0e52cecad39c70476b09",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/announcer/victory.ogg",
+        "reference_sha256": "c1fc682af7f76a920ac4e4ba0634e82a9c61f0598b33946434c73bedebe178af",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/unit/ack1.ogg",
+        "reference_sha256": "294660b658718e1158e17cea6998eeaa2dab6f3e39713413ebdba7bd0e7d47e1",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/unit/ack2.ogg",
+        "reference_sha256": "1cb20ea9e6ad8090d2ed960088e01d29c46322193b174d576c13447b9b127159",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/chinese/unit/hello.ogg",
+        "reference_sha256": "7b07ce6b990f9c0e1739d746e0758c64873a75624ef4e40855255a98a6912c40",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/base_under_attack.ogg",
+        "reference_sha256": "9ac1327983d387158b90a8c3cb036354864937c1524c6a3b4e66dfe9d186778f",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/construction_complete.ogg",
+        "reference_sha256": "b46bb60b5d9d4660dab9433937b2c8aded77d7456440faa71b6047bfb242ac53",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/defeat.ogg",
+        "reference_sha256": "975ac6056e3f5339023d71e44348a3d91af6857f9ea83e476f60b5436c0b23fe",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/enemy_superweapon_launched.ogg",
+        "reference_sha256": "0ec6b24d3fd60eebbf3e73b5311141b7eceacb2343e52211d13b70d30c5248a7",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/enemy_superweapon_ready.ogg",
+        "reference_sha256": "f9d45b87fc124b8af93bc69e9af4bb1b0f9c5d925ce59ecf87d3c1f654fa26f7",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/enemy_support_power_fired.ogg",
+        "reference_sha256": "0933a1b4683929db35a4345414205962f656bd09b304262d1f22653f98cdca62",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/not_enough_resources.ogg",
+        "reference_sha256": "672f1f0b1b613c3771c8f60a8f2fb9a6f230b40e0c10437ee637d6ba079ded72",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/support_power_ready.ogg",
+        "reference_sha256": "4c062f0fbbc92c2ce2bce5b26ec7740d772a865c1c8e39fe2f03be9a67b84d56",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/training.ogg",
+        "reference_sha256": "1590dfc39e19c3de412340cc869b5c610f50c19c3867cbdc682f5ce5169dd881",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/unit_lost.ogg",
+        "reference_sha256": "ed9483539db797ee148a3f135ec1b6c8e96449c42a88c466024b80e8498b4c18",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/unit_ready.ogg",
+        "reference_sha256": "44de57e2233928c4dfd590e33c2b2f11b3a2bdc34d11c4f7a2a536f0c570af07",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/unit_under_attack.ogg",
+        "reference_sha256": "2bd6722ab634d5d9bd5aad3ee677b0f0cf8dc8476eb3454e13f5d21d1864e304",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/announcer/victory.ogg",
+        "reference_sha256": "6b4a0aadac66ace9a658e9dad27f04ce77b0778544bca7e5fbe0cc8e4f4d5db5",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/unit/ack1.ogg",
+        "reference_sha256": "3e9db0c29c7fc417d24e4823bab16bc0234bfcc8f30d390e0896e1ecf1db243a",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/unit/ack2.ogg",
+        "reference_sha256": "4c380c0df4b6cb52b2566611b2452d18c14aa3df97ee0628228ee6ce4f5682a4",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      },
+      {
+        "recording": "isolated-worker-single9-hello.wav",
+        "reference": "assets/voice/english/unit/hello.ogg",
+        "reference_sha256": "1c9acb77e1e1034832f7685655cbd9c00c4404b3fa569c4309d1d932fd02afaa",
+        "recording_sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef",
+        "normalized_correlation": null,
+        "candidate_match": false,
+        "reason": "Exact zero PCM: normalized correlation undefined; rejected before matching"
+      }
+    ],
+    "pcm_metrics": {
+      "duration": 4.209520833333333,
+      "peak_pcm16": 0,
+      "nonzero_samples": 0,
+      "clipped_samples": 0,
+      "sha256": "97edf672a6e7da89537c9957b7da13fb84eb78442691d80376aa66bf33fb6eef"
+    },
+    "Hello_accepted": false,
+    "prior_numeric_runner_exit": 1,
+    "prior_failure": "No nonsilent recording window",
+    "runtime_logical_identity_proven": false
+  },
+  "source_explanation": "selection.rs control-group recall applies selection without voice feedback; AltI idle-worker selection separately queues Hello",
+  "no_production_bug_claim": true,
+  "Hello_accepted": false,
+  "all17_accepted": false,
+  "human_mix_accepted": false,
+  "portable_archive": {
+    "path": "target/sdk309-isolated-hello-20261012-01-evidence.tar.gz",
+    "sha256": "3c7a9e5f6d9e959fd6128483733b6aad50072abdb66bd91e73d0fa71a17138a4",
+    "files": 38
+  }
+}

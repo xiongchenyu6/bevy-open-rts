@@ -414,3 +414,24 @@ ordinary trigger with correlated output; exact logical audio receipts, remaining
 rare natural events, Hello, human mix and Windows/browser audio remain open.
 
 Frozen native305 deterministic headless matrix completed all3,726 unique cases under the original600-second simulation/180-second wall limits and32/16 starting resources. Driver and two independent verifier runs exited0; root rehashed143 frozen sources,332 assets and the exact audit binary. This historical result does not prove currentHUD equivalence, human play, rendering or hardware performance. The frozen309 formation matrix started only after305 terminal verification; its coverage is still pending. See [full305 evidence](qa/native305-complete-matrix-review.json). All release gates remain open.
+
+SDK309 isolated single9 Worker-group recall completes normally in88.72s with a
+fresh actual HQ-to-healthy-Worker selection receipt, but its4.2095s private output
+is exactly silent. All32 references are rejected as silence with undefined
+correlation; Hello remains unaccepted. Source control-group recall applies
+selection without voice feedback, while ordinary Alt+I idle-worker selection queues
+Hello. [Preserved silent recipe](qa/native309-isolated-hello-silent-review.json)
+records this scope and numeric verifier rejection; no production defect is inferred.
+
+SDK309 support actual01 earns paid Power3/1 and Radar4/3, activates RadarSweep with
+normal F1 and reviewed visible ground, then records ten fresh unique player0
+cooldown receipts decreasing17.019634→0. Root directly reviews the target,
+“Support used: RadarSweep,” “Support ready: RadarSweep” and F1 ring transitions.
+Normal game/controller exit0 in176.20s; package399/archive unchanged, closed24.3905s
+private recording has no clipping. Identical FFmpeg mono8k comparison ofall32
+references yields only shared Ack2(.944929); SupportPowerFired intentionally reuses
+these bytes, so the waveform alone does not identify the logical event.
+SupportPowerReady(.804575) remains below the unchanged.85 threshold and unaccepted.
+[Scoped support report](qa/native309-normal-support-audio-review.json) pins portable
+local evidence including independent runtime review. All17, human mix and
+Windows/browser acceptance remain open.

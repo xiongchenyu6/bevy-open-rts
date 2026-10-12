@@ -1,0 +1,242 @@
+{
+  "scope": "SDK309 normal paidPower/Radar +ordinaryF1 activation and naturallyearned18srecharge; one sharedAck2 waveform candidate, Ready remainsunaccepted",
+  "actual_controller": {
+    "actual_exit": 0,
+    "original_wall_seconds": 900,
+    "natural_recipe": {
+      "paid_builds": [
+        {
+          "id": "PowerReactor",
+          "cost": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "RadarUplink",
+          "cost": [
+            4,
+            3
+          ]
+        }
+      ],
+      "normal_F1_and_reviewed_ground": {
+        "image_sha256": "8eb24f35ed108ab714c378447f0d5cdafc61cdf380cc4c60ebc54b912e013279",
+        "visible_clear_ground_only": true,
+        "point": [
+          650,
+          570
+        ],
+        "direct_current_image_review": "Clear beige ground below ownedHQ, right of loose mineral debris, left ofactualcommandHUD; powered5/26 HUD, readyF1 icon",
+        "no_hidden_enemy_coordinates": true
+      },
+      "actual_before_cooldown": 0.0,
+      "positive_then_natural_zero": [
+        {
+          "cooldown": 17.019634,
+          "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-after-actual-F1-ground-002.ron"
+        },
+        {
+          "cooldown": 14.716024,
+          "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-003.ron"
+        },
+        {
+          "cooldown": 12.646306,
+          "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-004.ron"
+        },
+        {
+          "cooldown": 10.666129,
+          "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-005.ron"
+        },
+        {
+          "cooldown": 8.622799,
+          "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-006.ron"
+        },
+        {
+          "cooldown": 6.605306,
+          "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-007.ron"
+        },
+        {
+          "cooldown": 4.5977626,
+          "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-008.ron"
+        },
+        {
+          "cooldown": 2.5847993,
+          "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-009.ron"
+        },
+        {
+          "cooldown": 0.5945293,
+          "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-010.ron"
+        },
+        {
+          "cooldown": 0.0,
+          "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-011.ron"
+        }
+      ],
+      "SupportPowerFired_same_pcm_as_Ack2": true,
+      "logical_audio_receipt_available": false,
+      "accepted": false,
+      "actual_activation_and_ready_png_review_pending": true,
+      "waveform_correlation_pending": true
+    },
+    "normal_exits": [
+      {
+        "pid": 41924,
+        "supervisor_pid": 41875,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "forced_cleanup": false,
+    "installation_archive_unchanged": true,
+    "phases": [],
+    "wall_seconds": 176.19836277299328,
+    "screenshots": {
+      "01/voice-only-adjusted-options.png": "71a9b67f2155bb3bdfbfa451a5294a970dddbd4693851c7fa475d80cd59daaaf",
+      "01/auto-01-PowerReactor-tab-tooltip.png": "12e9eba860d23652207473019c5fb5e526ada9443f9785b7df5bc68ec3825a58",
+      "01/auto-01-PowerReactor-candidate-0-before-ghost.png": "c5c1f2465ae06ff1840ec63a4cbd7aa7f8350f0607ec9f4dcfc05ffc0e536891",
+      "01/auto-01-PowerReactor-candidate-0-build-tooltip.png": "0c2d1572ed1a21c6f02ef1a0db72c73c212b2486c97b6f2b919c4cf93c43d09f",
+      "01/auto-01-PowerReactor-ghost-0.png": "94b7333dc5e821054cdf361fd3811583071723093ae65c7e5da68e8b2c2f1bc5",
+      "01/auto-01-PowerReactor-completed.png": "75a67cd336905d02f446b417d166a986f94465d1723072f07e9890d59577bf96",
+      "01/auto-02-RadarUplink-tab-tooltip.png": "eee309b4e55c7cefbcb17ecd15841fead9544a9e0c143adf51c678b2c2413b19",
+      "01/auto-02-RadarUplink-candidate-0-before-ghost.png": "66312faa355d18de07bcb0ca4386958dd9975ea015f9bef095b80a06b067f71a",
+      "01/auto-02-RadarUplink-candidate-0-build-tooltip.png": "437e7c75bef7d04ed7837f746a851adcd672f7a62b79d352fd1d10411b23734a",
+      "01/auto-02-RadarUplink-ghost-0.png": "e8d46121bceb21aff80974108461c3bb20a218d760777c828e48a0b5fb8cd196",
+      "01/auto-02-RadarUplink-candidate-1-before-ghost.png": "1db51713c16f7d76f7efbeaafa9195a37fb49055d7fc905e96d27b3f68dbce7c",
+      "01/auto-02-RadarUplink-candidate-1-build-tooltip.png": "320ebf09dac5f761201767c4bd4eb9d2773fe5080e6a874edff18a7f0b451dd1",
+      "01/auto-02-RadarUplink-ghost-1.png": "597771e282f114c1b4c92367c24268cd577da1c2665ee6d29ff27d8627b46b08",
+      "01/auto-02-RadarUplink-completed.png": "bdcefdca684b185e23c5971883b9ef4b2fa8e72aff9998f3ff8949e988e438df",
+      "01/support-current-visible-target.png": "8eb24f35ed108ab714c378447f0d5cdafc61cdf380cc4c60ebc54b912e013279",
+      "01/support-actual-cooldown-positive.png": "5adca147beef188a1adab3c66b56ea87026ccced2dc322ead6faccd4eccf5b39",
+      "01/support-actual-natural-ready.png": "81f090a28b5afb17534db31317c338d1fb19fc8b40b6aeb6690cec6c37392af6"
+    },
+    "installation_unchanged": true,
+    "archive_unchanged": true,
+    "host_audio_environment_unchanged": true
+  },
+  "actual_support_receipts": {
+    "paid_builds": [
+      {
+        "id": "PowerReactor",
+        "cost": [
+          3,
+          1
+        ]
+      },
+      {
+        "id": "RadarUplink",
+        "cost": [
+          4,
+          3
+        ]
+      }
+    ],
+    "normal_F1_and_reviewed_ground": {
+      "image_sha256": "8eb24f35ed108ab714c378447f0d5cdafc61cdf380cc4c60ebc54b912e013279",
+      "visible_clear_ground_only": true,
+      "point": [
+        650,
+        570
+      ],
+      "direct_current_image_review": "Clear beige ground below ownedHQ, right of loose mineral debris, left ofactualcommandHUD; powered5/26 HUD, readyF1 icon",
+      "no_hidden_enemy_coordinates": true
+    },
+    "actual_before_cooldown": 0.0,
+    "positive_then_natural_zero": [
+      {
+        "cooldown": 17.019634,
+        "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-after-actual-F1-ground-002.ron"
+      },
+      {
+        "cooldown": 14.716024,
+        "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-003.ron"
+      },
+      {
+        "cooldown": 12.646306,
+        "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-004.ron"
+      },
+      {
+        "cooldown": 10.666129,
+        "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-005.ron"
+      },
+      {
+        "cooldown": 8.622799,
+        "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-006.ron"
+      },
+      {
+        "cooldown": 6.605306,
+        "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-007.ron"
+      },
+      {
+        "cooldown": 4.5977626,
+        "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-008.ron"
+      },
+      {
+        "cooldown": 2.5847993,
+        "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-009.ron"
+      },
+      {
+        "cooldown": 0.5945293,
+        "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-010.ron"
+      },
+      {
+        "cooldown": 0.0,
+        "save": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-normal-support-audio-20261012-01/01/support-natural-progress-011.ron"
+      }
+    ],
+    "SupportPowerFired_same_pcm_as_Ack2": true,
+    "logical_audio_receipt_available": false,
+    "accepted": false,
+    "actual_activation_and_ready_png_review_pending": true,
+    "waveform_correlation_pending": true
+  },
+  "private_game_identity": [
+    {
+      "phase": "normal-radar-fired-and-natural-ready",
+      "game_host_pid": 41924,
+      "game_namespace_pids": [
+        41924
+      ],
+      "pulse_reported_pid": 41924,
+      "single_game_playback_stream": true,
+      "monitor": "private rts_qa_game_only.monitor",
+      "recorder_exit": 0
+    }
+  ],
+  "pcm_metrics": {
+    "duration": 24.390479166666665,
+    "peak_pcm16": 19453,
+    "nonzero_samples": 216804,
+    "clipped_samples": 0,
+    "rms": 642.6701685811541,
+    "sha256": "19cceb2611615f7e565f0fa4a96d0247af2849be14d23b4fba83863cac8dd2b9"
+  },
+  "comparisons": 32,
+  "threshold": 0.85,
+  "matched_waveform_candidates": [
+    {
+      "recording": "normal-radar-fired-and-natural-ready.wav",
+      "reference": "assets/voice/english/unit/ack2.ogg",
+      "recording_sha256": "19cceb2611615f7e565f0fa4a96d0247af2849be14d23b4fba83863cac8dd2b9",
+      "reference_sha256": "4c380c0df4b6cb52b2566611b2452d18c14aa3df97ee0628228ee6ce4f5682a4",
+      "normalized_correlation": 0.944929459638546,
+      "offset_seconds": 0.959375,
+      "reason": null,
+      "candidate_match": true
+    }
+  ],
+  "SupportReady_unmatched_coefficient": 0.8045746989895609,
+  "SupportFired_samePCM_as_Ack2": true,
+  "logical_audio_identity_proven": false,
+  "all17_accepted": false,
+  "human_mix_accepted": false,
+  "Windows_browser_accepted": false,
+  "gpu_released": true,
+  "actual_current_power_target_cooldown_PNG_root_review_pending": false,
+  "root_runtime_review_sha256": "d27cd0f1b6ccf644817075d05d477a0c0c8f316e50005f56bfb80bb07356cd14",
+  "portable_archive": {
+    "path": "target/sdk309-normal-support-audio-20261012-01-evidence.tar.gz",
+    "sha256": "3012b3b261d1d719dd25e6a8082b410a45e2e0dfaad44b1490aa82d0029144c8",
+    "files": 85
+  }
+}
