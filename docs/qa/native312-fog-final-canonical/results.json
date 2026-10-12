@@ -1,0 +1,60 @@
+[
+  {
+    "phase": "check",
+    "actual_exit": 0,
+    "wall_seconds": 30.826016722014174,
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "cargo",
+      "check",
+      "--locked",
+      "--offline",
+      "--jobs",
+      "1",
+      "--all-targets"
+    ],
+    "test_results": []
+  },
+  {
+    "phase": "full",
+    "actual_exit": 0,
+    "wall_seconds": 578.3805634589517,
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--jobs",
+      "1",
+      "--lib",
+      "--",
+      "--test-threads=2"
+    ],
+    "test_results": [
+      "test result: ok. 312 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 267.64s"
+    ]
+  },
+  {
+    "phase": "native-bins",
+    "actual_exit": 0,
+    "wall_seconds": 151.61242429201957,
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "cargo",
+      "build",
+      "--locked",
+      "--offline",
+      "--jobs",
+      "1",
+      "--bins"
+    ],
+    "test_results": []
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "scope": "Finalfogshadow0cf280e canonicalRust1.95; officialSDK/player acceptance pending",
+  "full_tests": {
+    "passed": 312,
+    "failed": 0,
+    "ignored": 1
+  },
+  "all_targets_exit": 0,
+  "four_bins_exit": 0,
+  "sources": 144,
+  "assets": 332,
+  "root_all_hashes_match": true,
+  "SDK_phase": "Actuallybuilding frozen1462file snapshot; no package acceptance",
+  "files": {
+    "docs/qa/native312-fog-final-canonical/root-independent-review.json": "6e52eb1f4c169ecf3a194603c664495c032989a52522a643b21701eb7b5681cc",
+    "docs/qa/native312-fog-final-canonical/results.json": "3ffe33cd54ce3a24422e3d658f788ec363254edcf3a8fb5e8b46ab62f67fafc4",
+    "docs/qa/native312-fog-final-canonical/canonical-pin.json": "8ca4a352504661627e13936525ed0d06833d3657a66ac4346fac56fe6c565c96"
+  }
+}
