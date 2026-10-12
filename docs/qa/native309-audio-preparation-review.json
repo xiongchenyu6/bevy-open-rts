@@ -1,0 +1,21 @@
+{
+  "scope": "CPU preparation only; no audio runtime/listening/cue acceptance",
+  "actual_CPU_check_exit": 0,
+  "sources": 144,
+  "assets": 332,
+  "package_files": 399,
+  "frozen_dependencies": 57,
+  "implemented_recording_workflows": [
+    "Normal selection and two moves",
+    "Paid Worker training and completion",
+    "Paid PowerReactor construction and completion"
+  ],
+  "candidate_cues": 6,
+  "channel_persistence_workflow_implemented": false,
+  "private_audio": "GamePID/privateDockerPulse/nullsink only; no host microphone/default sink",
+  "limits": "Remaining natural triggers/logical cue identity/mixing/human listening/Windows/browser unverified; identical Ack2/SupportPowerFired PCM cannot establish semantic identity.",
+  "files": {
+    "docs/qa/native309-audio-preparation/ACCEPTANCE.md": "3ebe0d9586f5977a53d5b62d5edb9ee2899db9ee2749881d574cf7abd1b09c43",
+    "docs/qa/native309-audio-preparation/cpu-check.json": "ef5e3b024695938058c6fa22cb1629ddd91d5e64e4c93abcaedde5b91453f064"
+  }
+}

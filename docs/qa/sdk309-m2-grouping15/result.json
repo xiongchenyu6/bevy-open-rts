@@ -1,0 +1,43 @@
+{
+  "scope": "FreshMission2diagnostic withbyteexactgenuineearnedMission1progress; notsixsameApp acceptance",
+  "passed": false,
+  "original_wall": 900,
+  "original_simulation": 900,
+  "original_site": 30,
+  "original_review": 45,
+  "genuine_earned_profile_sha256": "79036c9c79b620a950cdaefee639a18a57a11085296c831e9d4be9ff8406574d",
+  "error": "Camera changed between current baseline and Build frame; no stale-image green adjudication",
+  "error_type": "AssertionError",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-m2-grouping15-preparation-20261012/run.py\", line 40, in <module>\n    result['actual_outcome']=play(s,recipe);s.normal_close_and_require_exit_zero();result['program_flow_passed']=True\n                             ~~~~^^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-m2-grouping15-preparation-20261012/m2_grouping11.py\", line 66, in play\n    payments=opening(s,recipe);o=opening_for(s);frame=0;observations=[]\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-m2-grouping15-preparation-20261012/m2_grouping11.py\", line 33, in opening\n    for ident,cost,tab in [('PowerReactor',[3,1],'Production'),('VehicleFactory',[6,0],'Production'),('RadarUplink',[4,3],'Production'),('AntiAirTurret',[2,2],'Defense'),('AntiGroundTurret',[2,2],'Defense'),('Barracks',[3,1],'Production')]:build(s,o,ident,cost,tab)\n                                                                                                                                                                                                                                                ~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-m2-grouping15-preparation-20261012/strategies07.py\", line 23, in build\n    return o.build(ident,cost,o.own_base_sites(ident),tab)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-m2-grouping15-preparation-20261012/fresh_placement.py\", line 86, in build\n    assert event['native_resource_geometry']['camera_world_from_local'] == fresh['native_resource_geometry']['camera_world_from_local'], 'Camera changed between current baseline and Build frame; no stale-image green adjudication'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Camera changed between current baseline and Build frame; no stale-image green adjudication\n",
+  "actual_exits": [
+    {
+      "pid": 4105730,
+      "supervisor_pid": 4105684,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "normal-M2-main-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "normal-M2-campaign-card.png": "4cec9b10da989213e0b5fb6d9bb3a4658f33f3648e4193b8722da5f42ea085f3",
+    "02/normal-initial-strike_the_outpost.png": "ec7e64a500277513eb55d70295809ed8e0ea95f4779c31613b1e6d8b792417e9",
+    "02/briefing-close-normal.png": "8a21d95632958052fe798026f95a18a2d30c82fa5679b49ec3798bed5dadd429",
+    "02/economy-visible-ore-preview-initial.png": "e03e4f296c48b8bc6c552e60a5b9322c3300387029243dddf688400b424bab84",
+    "02/economy-visible-ore-preview-home.png": "5000108403a31f0c5af9381af413288fd9a49af278fdd86800447474ad493737",
+    "02/normal-zoom-PowerReactor-current.png": "b005bfc742fae2d715b78e8ff0ed61c72664bfa0ebad63769b7f8f399695e787",
+    "02/auto-01-PowerReactor-tab-tooltip.png": "b762b046915eb32f86b8fc3860b02212133a96852b755f142438f3a5c8be21f6",
+    "02/auto-01-PowerReactor-candidate-0-before-ghost.png": "93f4257062fe2d1841f57440a10c728c01709015e2a289dfc189462f1f931db0",
+    "02/auto-01-PowerReactor-candidate-0-build-tooltip.png": "fac83909b0dc176f775860060e72945c8a9fcaf3490cf7872fd74d6f6f45ee71",
+    "02/auto-01-PowerReactor-ghost-0.png": "b1cfc6324c6ec679a37ad14358528636bacbd76ce39b314b29ac6b097a3a3715",
+    "02/auto-01-PowerReactor-completed.png": "a20bc0e705b82c126ffbdfda9a70797632468b7db21119015f82ad686bdd8dff",
+    "02/normal-zoom-VehicleFactory-current.png": "09b34a5b5a88a2dd0e673a54539167957e8d384a8aec3264f624105fa8fef232",
+    "02/auto-02-VehicleFactory-tab-tooltip.png": "b1c4950e7135d6a4a3887db811b5b150ee148346f3220d1aba73f21eea636ab6",
+    "02/auto-02-VehicleFactory-candidate-0-before-ghost.png": "61ddc8ad7ec091ef96cc0b41c1e36720b7dfc803280011435871b79265121b1d",
+    "02/auto-02-VehicleFactory-candidate-0-build-tooltip.png": "dd60897a357f74db1a5b4f0330db779d52d8687edb0441b3bfdc77e96a93e548",
+    "02/actual-M2-failure.png": "149e88aa5463bb15e0a6ae62ca8356fedef2a44218948f8a2ff47e6ea55360fa"
+  },
+  "wall_seconds": 165.7175049560028
+}

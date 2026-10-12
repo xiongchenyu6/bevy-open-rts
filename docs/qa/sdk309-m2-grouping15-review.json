@@ -1,0 +1,26 @@
+{
+  "scope": "Actual latestHUD M2 diagnostic15 partial failure only; firstPowerpaid/completed,Factory/army/victory unverified",
+  "passed": false,
+  "normal_exit": 0,
+  "forced_cleanup": false,
+  "all17_png_hashes_independently_verified": true,
+  "firstPower_cost": [
+    3,
+    1
+  ],
+  "firstPower_completion_seconds": 11.83,
+  "firstPower_remaining_bank": [
+    61,
+    31
+  ],
+  "failure": "Camera changed between current baseline and Build frame; no stale-image green adjudication",
+  "camera_translation_delta_m": 1.9073486328125e-06,
+  "old_exact_matrix_guard_failure_preserved": true,
+  "next_contract": "Existing same-rounded-pixel/max0.25px view verifier; actual15 projected anchors must be measured before successor use",
+  "files": {
+    "docs/qa/sdk309-m2-grouping15/result.json": "1dd4be6f782ea2271df016d5f3c3d4b08aab4fa6007ce805dcec2fd4ecdb9560",
+    "docs/qa/sdk309-m2-grouping15/all-png-sha256.json": "9e9709e5fe143e469bedbdd3e1655969288a68d743cd3c87a73d01c36fa4b030",
+    "docs/qa/sdk309-m2-grouping15/actual-M2-failure.png": "149e88aa5463bb15e0a6ae62ca8356fedef2a44218948f8a2ff47e6ea55360fa",
+    "docs/qa/sdk309-m2-grouping15/terminal-own-summary.json": "055204ad685decc18436730efe789ee566c5bf5967927108553e8df63e74afc7"
+  }
+}

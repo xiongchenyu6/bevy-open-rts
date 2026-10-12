@@ -1,0 +1,19 @@
+{
+  "normal-M2-main-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+  "normal-M2-campaign-card.png": "4cec9b10da989213e0b5fb6d9bb3a4658f33f3648e4193b8722da5f42ea085f3",
+  "02/normal-initial-strike_the_outpost.png": "ec7e64a500277513eb55d70295809ed8e0ea95f4779c31613b1e6d8b792417e9",
+  "02/briefing-close-normal.png": "8a21d95632958052fe798026f95a18a2d30c82fa5679b49ec3798bed5dadd429",
+  "02/economy-visible-ore-preview-initial.png": "e03e4f296c48b8bc6c552e60a5b9322c3300387029243dddf688400b424bab84",
+  "02/economy-visible-ore-preview-home.png": "5000108403a31f0c5af9381af413288fd9a49af278fdd86800447474ad493737",
+  "02/normal-zoom-PowerReactor-current.png": "b005bfc742fae2d715b78e8ff0ed61c72664bfa0ebad63769b7f8f399695e787",
+  "02/auto-01-PowerReactor-tab-tooltip.png": "b762b046915eb32f86b8fc3860b02212133a96852b755f142438f3a5c8be21f6",
+  "02/auto-01-PowerReactor-candidate-0-before-ghost.png": "93f4257062fe2d1841f57440a10c728c01709015e2a289dfc189462f1f931db0",
+  "02/auto-01-PowerReactor-candidate-0-build-tooltip.png": "fac83909b0dc176f775860060e72945c8a9fcaf3490cf7872fd74d6f6f45ee71",
+  "02/auto-01-PowerReactor-ghost-0.png": "b1cfc6324c6ec679a37ad14358528636bacbd76ce39b314b29ac6b097a3a3715",
+  "02/auto-01-PowerReactor-completed.png": "a20bc0e705b82c126ffbdfda9a70797632468b7db21119015f82ad686bdd8dff",
+  "02/normal-zoom-VehicleFactory-current.png": "09b34a5b5a88a2dd0e673a54539167957e8d384a8aec3264f624105fa8fef232",
+  "02/auto-02-VehicleFactory-tab-tooltip.png": "b1c4950e7135d6a4a3887db811b5b150ee148346f3220d1aba73f21eea636ab6",
+  "02/auto-02-VehicleFactory-candidate-0-before-ghost.png": "61ddc8ad7ec091ef96cc0b41c1e36720b7dfc803280011435871b79265121b1d",
+  "02/auto-02-VehicleFactory-candidate-0-build-tooltip.png": "dd60897a357f74db1a5b4f0330db779d52d8687edb0441b3bfdc77e96a93e548",
+  "02/actual-M2-failure.png": "149e88aa5463bb15e0a6ae62ca8356fedef2a44218948f8a2ff47e6ea55360fa"
+}

@@ -1,0 +1,124 @@
+{
+  "error": "Camera changed between current baseline and Build frame; no stale-image green adjudication",
+  "first_Power_paid_and_completed": [
+    {
+      "id": "PowerReactor",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        641,
+        391
+      ],
+      "completed_count": 1,
+      "construction_wall": 11.825673955027014
+    }
+  ],
+  "own_structure_counts": {
+    "CommandCenter": 1,
+    "PowerReactor": 1
+  },
+  "own_bank": [
+    61,
+    31
+  ],
+  "PNG_count": 17,
+  "last_actual_camera_changes": [
+    {
+      "pending_before": null,
+      "pending_after": null,
+      "translation_before": [
+        -16.667354583740234,
+        11.0,
+        -19.390274047851562
+      ],
+      "translation_after": [
+        -16.667354583740234,
+        11.0,
+        -19.39027214050293
+      ],
+      "maximum_component_delta": 1.9073486328125e-06
+    },
+    {
+      "pending_before": null,
+      "pending_after": null,
+      "translation_before": [
+        -16.667354583740234,
+        11.0,
+        -19.39027214050293
+      ],
+      "translation_after": [
+        -16.6673526763916,
+        11.0,
+        -19.390274047851562
+      ],
+      "maximum_component_delta": 1.9073486328125e-06
+    },
+    {
+      "pending_before": null,
+      "pending_after": null,
+      "translation_before": [
+        -16.6673526763916,
+        11.0,
+        -19.390274047851562
+      ],
+      "translation_after": [
+        -16.6673526763916,
+        11.0,
+        -19.390275955200195
+      ],
+      "maximum_component_delta": 1.9073486328125e-06
+    },
+    {
+      "pending_before": null,
+      "pending_after": null,
+      "translation_before": [
+        -16.6673526763916,
+        11.0,
+        -19.390275955200195
+      ],
+      "translation_after": [
+        -16.6673526763916,
+        11.0,
+        -19.390274047851562
+      ],
+      "maximum_component_delta": 1.9073486328125e-06
+    },
+    {
+      "pending_before": null,
+      "pending_after": null,
+      "translation_before": [
+        -16.6673526763916,
+        11.0,
+        -19.390274047851562
+      ],
+      "translation_after": [
+        -16.6673526763916,
+        11.0,
+        -19.390275955200195
+      ],
+      "maximum_component_delta": 1.9073486328125e-06
+    },
+    {
+      "pending_before": null,
+      "pending_after": "VehicleFactory",
+      "translation_before": [
+        -16.6673526763916,
+        11.0,
+        -19.390275955200195
+      ],
+      "translation_after": [
+        -16.6673526763916,
+        11.0,
+        -19.390274047851562
+      ],
+      "maximum_component_delta": 1.9073486328125e-06
+    }
+  ],
+  "normal_exit": 0,
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "runtime_pending_natural_M2_victory": true
+}
