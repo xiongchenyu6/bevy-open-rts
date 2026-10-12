@@ -1,0 +1,25 @@
+{
+  "scope": "Frozen formation309 partial evidence and live exact resume; no full matrix/currentHUD acceptance",
+  "original_exit": 137,
+  "cause": "Unknown; targeted kernel interval has no OOM entries; no claim about signal sender",
+  "completed_before_resume": 786,
+  "planned": 3726,
+  "resume_unit": "rts-native309-formation-matrix-resume02-20261012.service",
+  "observed_unit_state": "ActiveState=active\nInvocationID=89517a9c3a144053a1da0280f893aacf\nMainPID=456012\n",
+  "resume_log": "target/native309-formation-sdk-matrix-resume-20261012/runtime.log",
+  "preserved_interrupted_case": "0786",
+  "resume_limits": {
+    "simulation_seconds": 600,
+    "wall_seconds": 180,
+    "starting_resources": [
+      32,
+      16
+    ]
+  },
+  "files": {
+    "docs/qa/native309-matrix-interruption/root-terminal-partial-review.json": "4c475479bc59fbe118b085d99478c43fa7363aa1a2664280ace1f4e01aca5280",
+    "docs/qa/native309-matrix-interruption/result.json": "88a826c19f03c671f21e5f1cdada4765ad3358eeb3a274c6d3277d624359e765",
+    "docs/qa/native309-matrix-interruption/verification-result.json": "42876a87375023facfe1a38b517ad334f47b8c7b3fddefdf38b4fdfd0be7cf94"
+  },
+  "prelaunch_syntax_failure": "First resume wrapper failed parsing before any container or evidence modification; corrected wrapper py_compile passed before second unit launch"
+}

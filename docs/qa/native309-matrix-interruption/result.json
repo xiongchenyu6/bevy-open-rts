@@ -1,0 +1,7 @@
+{
+  "actual_exit": 137,
+  "wall_seconds": 5559.754926347989,
+  "binary_unchanged": true,
+  "inputs_unchanged": true,
+  "scope": "Full driver terminal; independently verify every raw result before claiming accepted"
+}
