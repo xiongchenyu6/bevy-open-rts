@@ -1,0 +1,11 @@
+{
+  "actual_exit": 0,
+  "node_exit": 0,
+  "driver_exit": 0,
+  "original240bound": true,
+  "original_current_review_seconds": 30,
+  "wasm_sha256": "a1d901da2c3387807d07fd556e9907317203df6f6ccb4c92663c837acb717c40",
+  "build_id": "d763378308391d69",
+  "browser_visual_acceptance_pending": true,
+  "separate_worker_recipe": false
+}

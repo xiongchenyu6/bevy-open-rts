@@ -10,8 +10,13 @@ A bounded regression or an older package cannot establish final release readines
 - Current HUD source moves the objective tracker to the upper-right HUD
   column after W28 Patrol frames show Drone-body overlap. Owned-file format
   and all-target checks pass; fresh309 tests and four native builds pass.
-  The new layout has no rendered acceptance yet. W28 proofs below retain
-  their pre-change source03c979d scope.
+  W29 clean/build and exact private HTTP integrity pass. Actual1280x720
+  Patrol review verifies all17 motion frames keep the Drone body clear of
+  the readable upper-right objective/progress panel; root rechecks25 PNG
+  hashes, directly views motion/notice frames, and verifies normal exits0
+  ([rendered fix](qa/web29-objective-runtime-review.json)). Populated support
+  powers, other viewport/DPI/OS cases and public deployment remain open.
+  W28 proofs below retain their pre-change source03c979d scope.
 - Current worktree resolves physically blocked terrain formation endpoints. The
   genuine save-restored diagnostic changes4/5 arrivals to5/5 within the same
   30s; canonical tests now pass309/0/1ignored. All-target checking and four
