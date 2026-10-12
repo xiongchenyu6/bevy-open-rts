@@ -1,0 +1,26 @@
+{
+  "scope": "Actual14 normal M2 only; no natural victory",
+  "terminal_error": "Original45second unknownsite review exhausted",
+  "material_cause": "Exact Power HQ-relative(-5,-5) projected [298,81] into upper-left HUD/placement banner; no visible green ghost. No unrelated fallback authorized or approved.",
+  "own_unit_counts": {
+    "Drone": 1,
+    "Worker": 2
+  },
+  "own_structure_counts": {
+    "CommandCenter": 1
+  },
+  "own_bank": [
+    64,
+    32
+  ],
+  "power_foundation_paid": false,
+  "current_green_pixels": 70,
+  "green_threshold": 1500,
+  "PNG_count": 11,
+  "normal_close_exit": 0,
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "runtime_and_watcher_absent": true,
+  "runtime_GPU_released": true
+}

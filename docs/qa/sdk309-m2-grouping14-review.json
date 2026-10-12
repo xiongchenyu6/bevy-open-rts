@@ -1,0 +1,17 @@
+{
+  "scope": "Actual latestHUD Mission2 diagnostic14 fails before firstpaidfoundation; no victory/army acceptance",
+  "passed": false,
+  "normal_exit": 0,
+  "forced_cleanup": false,
+  "wall_seconds": 159.91963912599022,
+  "all11_png_hashes_independently_verified": true,
+  "failure": "Original45second unknownsite review exhausted",
+  "substantive_failure": "Planned Power world offset projected under upperleftHUD; visible green preview missing. No alternate site fabricated.",
+  "next_verification": "Sameworldplan throughnormalcamera framing beforecandidatebaseline; allgreen/HUD/bounds/cost guards retained.",
+  "files": {
+    "docs/qa/sdk309-m2-grouping14/result.json": "4ee10bf3d887ffa8542873b6df3c0563b86d48bc88c908c13cc9633c7a4faeca",
+    "docs/qa/sdk309-m2-grouping14/all-png-sha256.json": "83f9f3b13d4d3a77dafc302bd03e2ee17eb45c378cfa9fd6d0d8a67bd637754a",
+    "docs/qa/sdk309-m2-grouping14/actual-M2-failure.png": "70d06cc0c489bf32e6890973b649fdd7f00c863e795c3edea441fc813997bd2f",
+    "docs/qa/sdk309-m2-grouping14/terminal-own-summary.json": "a428eeda1306a520c14494d6ce93a32385d87615dfc5310edee65010852674e6"
+  }
+}
