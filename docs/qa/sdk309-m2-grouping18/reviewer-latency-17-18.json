@@ -1,0 +1,42 @@
+{
+  "scope": "CPU-only actual tool transcript timestamps and request/gate mtimes; no runtime retry",
+  "observations": [
+    {
+      "attempt": 18,
+      "request_created_utc": "2026-10-12T03:36:01.874959+00:00",
+      "actual_poll_view_exec_start_utc": "2026-10-12T03:36:28.536Z",
+      "actual_poll_and_view_result_utc": "2026-10-12T03:36:29.711Z",
+      "combined_poll_view_tool_duration_seconds": 1.1749999523162842,
+      "request_age_at_combined_result_seconds": 27.83604121208191,
+      "gate_file_write_utc": "2026-10-12T03:37:09.593205+00:00",
+      "gate_age_seconds": 67.71824598312378,
+      "combined_result_to_gate_file_gap_seconds": 39.88220477104187,
+      "nested_view_image_exact_start_end": "Not separately recorded; bounded by enclosing functions.exec start/result. Do not infer exact nested timestamps.",
+      "original_review_limit_seconds": 45,
+      "gate_not_consumed": true
+    },
+    {
+      "attempt": 17,
+      "request_created_utc": "2026-10-12T03:17:46.932152+00:00",
+      "actual_poll_view_exec_start_utc": "2026-10-12T03:18:04.714Z",
+      "actual_poll_and_view_result_utc": "2026-10-12T03:18:05.017Z",
+      "combined_poll_view_tool_duration_seconds": 0.30299997329711914,
+      "request_age_at_combined_result_seconds": 18.084847927093506,
+      "gate_file_write_utc": "2026-10-12T03:19:12.088092+00:00",
+      "gate_age_seconds": 85.15593957901001,
+      "combined_result_to_gate_file_gap_seconds": 67.0710916519165,
+      "nested_view_image_exact_start_end": "Not separately recorded; bounded by enclosing functions.exec start/result. Do not infer exact nested timestamps.",
+      "original_review_limit_seconds": 45,
+      "gate_not_consumed": true
+    }
+  ],
+  "diagnosis": "Main delay is inter-tool model/tool-scheduling gaps, not large stdout or image loading.18poll+actualview1.175s vs39.88s response-to-gate gap. Empty40second polling task expired before new request and was restarted after a gap, allowing27s request age. write_stdin empty polls actually waited5s despite yield_time_ms1000.",
+  "prospective_loop": [
+    "One live watcher: exec prints minimal path/hash/deadline via notify immediately, then view actual PNG in same exec; yield_time_ms1000 directive and no shell write_stdin waiting fallback.",
+    "After actual PNG result, write reviewed gate first; no additional metadata reads, rationale or progress messages before gate.",
+    "Gate writer must assert currentSHA and now<original requestdeadline BEFORE write; late file never accepted.",
+    "Remain in watcher between requests; notify request readiness without a 40s subprocess expiry/restart gap.",
+    "Record poll_ready/view_start/view_end/gatewrite clocks explicitly into reviewer-only audit file, no hidden game fields."
+  ],
+  "limits": "CPU loop proposal does not prove human/model response below45. Original45 remains unchanged; latency failure never counts gameplay acceptance. No19launch/gamechanges."
+}
