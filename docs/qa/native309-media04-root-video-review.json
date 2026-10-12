@@ -1,0 +1,26 @@
+{
+  "scope": "Root independent hash/decoded-prefix/PTS check and three direct native frame reviews; economy only",
+  "raw_frames": 477,
+  "cut_frames": 450,
+  "decoded_prefix_exact": true,
+  "decoded_pts_every_frame": true,
+  "native_dimensions": [
+    1920,
+    1080
+  ],
+  "directly_viewed_indices": [
+    0,
+    238,
+    476
+  ],
+  "visible_economy": "HUD ore32\u219238\u219244; Worker position and cargo3\u21921\u21921 change naturally",
+  "product_findings": [
+    "Coarse stair-stepped fog boundary requires render polish",
+    "Pointer over bottomright build card leaves tooltip overlay throughout samples",
+    "Opening contains save/resume/group/idle notices"
+  ],
+  "combat_or_completed_objective": false,
+  "final_store_media_accepted": false,
+  "raw_sha256": "1146668297dc8d5ab40efb3d7ba0511b3e880485a70b7ba87301f00399a0dc48",
+  "cut_sha256": "af8e6c93684bc410a81d6cab5cbf2b8c5d5f2cf87495c8af0dcf5156e7a18b3f"
+}
