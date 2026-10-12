@@ -1,0 +1,5 @@
+{
+  "actual_exit": 0,
+  "removed": [],
+  "scope": "Only audit binary/dep-info/fingerprint; sealed main and shared library untouched"
+}

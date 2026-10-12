@@ -1,0 +1,18 @@
+{
+  "scope": "OfficialSDK309 optimized audit build/integrity only; current309 matrix coverage zero; runtime/player acceptance unproven",
+  "actual_build_exit": 0,
+  "wall_seconds": 352.4442313059699,
+  "binary_sha256": "b824900ea0fbc1bfb173054eec19ffead9ae42642c6413ca7b0817bfa73ce6aa",
+  "binary_bytes": 103584912,
+  "sources": 144,
+  "assets": 332,
+  "all_frozen_snapshot_inputs_independently_verified": 1063,
+  "installed399_files_and_archive_rehashed_unchanged": true,
+  "current309_completed_matrix_cases": 0,
+  "files": {
+    "docs/qa/native309-optimized-audit/build.log": "7d0c80a295ba39414e57fff9739aed9288efa004c3efe343bee7901f94f6db54",
+    "docs/qa/native309-optimized-audit/result.json": "d3cdc50337dd92bc6b874da55363681bf90fe4690f523b9f01527fd3a0818bb3",
+    "docs/qa/native309-optimized-audit/pin.json": "9f45095aaa7245755cb321e52a2d1c155dec4e3d0fdc3c9ffdec2140251a6a84",
+    "docs/qa/native309-optimized-audit/clean-audit-only.json": "98a5629a36e33bcac40cdd2327affa6ae21d583636f8a6df70006480c0a8139f"
+  }
+}

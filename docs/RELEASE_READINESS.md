@@ -39,6 +39,12 @@ A bounded regression or an older package cannot establish final release readines
   Actual game exit0, no forced cleanup and unchanged installation/archive are
   verified ([actual Hold proof](qa/sdk305-hold-traffic-review.json)). Attempts01–04
   remain failures. No Mission2 victory is claimed.
+- Native309 optimized official-SDK audit builds with exit0 in352.444s.
+  Root independently verifies its binary,144 sources,332 assets,1063 frozen
+  snapshot inputs and unchanged399-file installation/archive
+  ([audit build proof](qa/native309-optimized-skirmish-audit-review.json)).
+  Current309 matrix coverage remains zero. A managed queue waits for the
+  frozen305 matrix to finish and verify before starting current309 cases.
 - The frozen native305 optimized official-SDK audit builds with exit0 in
   424.205s. Its binary,143 sources,332 assets and unchanged installed399-file
   package/archive are independently checked
