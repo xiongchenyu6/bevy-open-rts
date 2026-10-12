@@ -262,12 +262,12 @@ pub(crate) struct BattleLogEntryButton(pub(crate) usize);
 #[derive(Component)]
 pub(crate) struct ObjectiveTrackerText;
 
-/// Container of the top-center objective text + progress bar; hidden once
+/// Container of the upper-right objective text + progress bar; hidden once
 /// the match resolves so it doesn't overlap the summary panel.
 #[derive(Component)]
 pub(crate) struct ObjectiveTrackerRoot;
 
-/// The fill node of the top-center objective progress bar (godot MissionProgressBar).
+/// The fill node of the objective progress bar.
 #[derive(Component)]
 pub(crate) struct ObjectiveProgressFill;
 
@@ -1168,16 +1168,17 @@ pub(crate) fn setup_ui(
         MatchScopedEntity,
     ));
 
-    // godot: objective tracker (+ progress bar) centered near the top.
+    // Keep the objective beside the HUD, clear of the central battlefield.
     commands
         .spawn((
             Node {
                 position_type: PositionType::Absolute,
                 top: px(OBJECTIVE_TRACKER_TOP_PX),
-                left: px(0),
-                right: px(0),
+                right: px(14),
+                width: px(320),
+                max_width: percent(40),
                 flex_direction: FlexDirection::Column,
-                align_items: AlignItems::Center,
+                align_items: AlignItems::FlexEnd,
                 row_gap: px(4),
                 ..default()
             },
