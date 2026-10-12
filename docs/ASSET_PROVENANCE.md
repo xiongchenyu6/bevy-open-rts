@@ -1,6 +1,10 @@
 # Asset Provenance
 
 Current inventory update: 2026-10-10. The runtime tree contains 332 files after unused VFX retirement.
+The current332-file runtime manifest includes326 asset-provenance rows plus six
+font/logo notice documents. All326 asset hashes match the ledger; no content
+asset is missing from it ([membership check](qa/current-runtime-provenance-parity.json)).
+This proves inventory consistency, not distribution rights.
 Historical import audits are distinguished below from current original assets;
 unidentified remaining families are not licensed by their presence in the tree.
 

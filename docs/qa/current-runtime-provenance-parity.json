@@ -1,0 +1,17 @@
+{
+  "scope": "Current runtime332 versus provenance326 membership and byte comparison; no rights clearance",
+  "runtime_count": 332,
+  "provenance_asset_count": 326,
+  "all326_current_asset_hashes_match": true,
+  "runtime_only_notice_documents": {
+    "assets/fonts/WQY-LICENSE-AUTHORS.txt": "e980452a04c9e9dd7d6f0d8f72dd4c960f312207d64b849b73347beb02b9c3fa",
+    "assets/fonts/WQY-LICENSE-Apache2.txt": "1c19d8eb506a0e9d501d882fc9fe94eca99bc7b2f69f5e64fa79b7ec48cee54d",
+    "assets/fonts/WQY-LICENSE-GPLv3.txt": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+    "assets/fonts/WQY-LICENSE-PROVENANCE.md": "c7dc58d9aa9f1cfb2ca24307ba74174531af9e5ed5904de903ee1ccd525336a8",
+    "assets/fonts/WQY-LICENSE-README.txt": "9b1f9a3d90f88041387700498296fc89d6d600d0ebc9b6258c119dd192eaf6b9",
+    "assets/logos/LOGO_LICENSES.md": "a9de50c637a0e9d7d532db08ac9cf581fe90698e90a17ac667a49d7908425180"
+  },
+  "missing_content_asset_records": [],
+  "retired_ledger_rows_still_present": [],
+  "rights_and_final_package_acceptance": false
+}
