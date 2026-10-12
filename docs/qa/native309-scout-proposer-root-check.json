@@ -1,0 +1,58 @@
+{
+  "scope": "Root reran actual04 CPU scout fixture screening; no actual05 run, no liveground approval",
+  "exit": 0,
+  "negative_cases": [
+    {
+      "case": "nonfinite",
+      "rejection": "nonfinite"
+    },
+    {
+      "case": "outmap",
+      "rejection": "publicmap-outside50"
+    },
+    {
+      "case": "edge",
+      "rejection": "viewport-or-edge"
+    },
+    {
+      "case": "HUD",
+      "rejection": "actual-HUD"
+    },
+    {
+      "case": "OWNbbox",
+      "rejection": "OWN-model-bounds-or-visible-resource"
+    },
+    {
+      "case": "blackfog",
+      "rejection": "actualPNGpatch-not-clear-tan-terrain"
+    },
+    {
+      "case": "oldviewport",
+      "rejection": "actualnative1920required"
+    }
+  ],
+  "OWN_team_filtered_before_export": true,
+  "proposal_only": true,
+  "direct_current_PNG_review_required": true,
+  "review_seconds": 45,
+  "whole_seconds": 900,
+  "battle_seconds": 30,
+  "historical_fixture_point": [
+    1416,
+    990
+  ],
+  "fixture_point_must_not_be_reused_for_new_runtime": true,
+  "remaining_risks": [
+    "Minimum forward-distance ranking may not reach visible combat across four scouts",
+    "First scout recording can contain only movement; combat requires actual frame review",
+    "Conservative model bounds are exclusions, not exact collision proof"
+  ],
+  "files": {
+    "target/native309-scout-ground-proposal-cpu-20261012/propose.py": "6571929b2de261b1e53a14c798e03d856f1b832c872842bde5d069703dba3ac5",
+    "target/native309-scout-ground-proposal-cpu-20261012/inputs.py": "62c10d7494bbcecb0053a6defb815649a27305c18cb63b131332fad824db80f4",
+    "target/native309-scout-ground-proposal-cpu-20261012/model_bounds.py": "4a603ceeb6dd2bda8f9237ccd7a3ce4d8b7b03374ab3eaccb703631028bf7316",
+    "target/native309-scout-ground-proposal-cpu-20261012/check.py": "e22998e857583ce928ce4c5cebe1c782e0c0367d475c916ee7d82c577edf5f7b",
+    "target/native309-scout-ground-proposal-cpu-20261012/check-result.json": "15644777d61716e7134cefab8ca421161f1a7f88de8ef11593d45a154e02ef46",
+    "target/native309-scout-ground-proposal-cpu-20261012/diagnostic-proposal.json": "be003c7a0927e57436496ffcf778802b992f45244dd46a642dc76e6885473357"
+  }
+}
