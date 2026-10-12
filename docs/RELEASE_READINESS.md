@@ -47,6 +47,14 @@ A bounded regression or an older package cannot establish final release readines
   This is CPU diagnosis, not GUI proof, and the stronger final-settling
   assertion is rejected as an original RED
   ([diagnostic](qa/sdk309-arrival-sampling-diagnostic-review.json)).
+- HistoricalSDK309 BootCamp09 naturally earns completion: actual result
+  shows Boot Camp Complete,one enemy building destroyed andzero own
+  losses; original campaign profile persists training_complete:true.
+  Four scout hops have all5 GUI arrival witnesses; hop04 records combat
+  contact and is not counted as arrival. The harness fails when it tries
+  another focus after victory; normal exit0 and all33 PNG hashes are verified
+  ([actual partial victory](qa/sdk309-bootcamp-partial09-review.json)).
+  Explicit visible-HQ attack input and whole-flow freshReplay remain unproven.
 - Previous source `4f8e588` prevents allied separation from displacing held units.
   Two genuine scheduled REDs show0.844m/0.817m drift; unchanged GREEN scenarios
   keep held translation exactly zero while friendly movement still works.
