@@ -71,6 +71,12 @@ A bounded regression or an older package cannot establish final release readines
   normally with one game process and unchanged package/archive. Mission3 and
   later missions are not reached ([chain outcome](qa/sdk294-same-app-chain01-review.json)).
   Fresh Mission2 income/targeting diagnostics and the six-mission acceptance remain open.
+- Wasm28 builds from current native309 formation source: clean/build exit0
+  in629.357s,144 sources/332 assets, exact Wasm/gzip and645 frozen inputs
+  independently verified. Private HTTP serves the same27,092,940 bytes
+  ([build proof](qa/web28-formation-shipping-build-review.json)). Browser
+  runtime and public deployment remain pending; Wasm27 visual proofs below
+  retain their older305 scope.
 - Wasm27 builds from the previous native305 Hold source: actual clean and
   build exit0 in655.457s. Independent checks verify143 sources,332 assets,
   four frozen compile paths,642 non-web inputs, exact Wasm bytes and gzip

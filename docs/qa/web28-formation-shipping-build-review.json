@@ -1,0 +1,28 @@
+{
+  "scope": "Exact native309 W28 build/inventory/private-serving only; current browser runtime and public deployment not verified",
+  "actual_build_exit": 0,
+  "clean_exit": 0,
+  "build_wall_seconds": 629.3568150170031,
+  "sources": 144,
+  "assets": 332,
+  "frozen_nonweb_files": 643,
+  "wasm_sha256": "a20ccae14fd812f4e2a9316bdfc1942778e61380d5749c53b66d3dbc6c1dd7bd",
+  "wasm_bytes": 27092940,
+  "build_id": "ccd67582387998c9",
+  "gzip_equal": true,
+  "root_direct_private_HTTP_wasm_sha256_verified": true,
+  "protected_originals_unchanged": true,
+  "browser_CPU_preflight_exit": 0,
+  "runtime_verified": false,
+  "public_deployment": false,
+  "queue_failure": "W28 terminal clears InvocationID; initial dependency queue incorrectly rejected blank ID. Old failure retained; actual build success verified, CPU followups executed directly.",
+  "files": {
+    "docs/qa/web28-formation-build/seal.json": "929581e6aa081d75ad43a6b4c05adb1f4be16dfbced2a92db2e65ea0a201d225",
+    "docs/qa/web28-formation-build/build.log": "a50c11682d4993c12327667df72959a01367c1e8815b5b87f49f96b129f35684",
+    "docs/qa/web28-formation-build/result.json": "881675f90dc333e1535cfbda7d9818f297d7cb84112bdb75eb7f1501b7b3e9dd",
+    "docs/qa/web28-formation-build/independent-review.json": "4ce55b5e82049273309240c9e3bc0e894fcecd7f53c674f0f689d332d1247d99",
+    "docs/qa/web28-formation-build/input.json": "7ea288a0e1c882844db18e839bed32168aafd6d366d38597a4fc39a045858a2d",
+    "docs/qa/web28-formation-build/clean-project-wasm.log": "705317368ca1294647bded1ef1b29bbb82f44076542e816eb2e696f513ab3e09",
+    "docs/qa/web28-formation-build/preflight.json": "9516c1eceebbfd40f9d096a1c953b11b76a31c8e1dd15fe3ab6b6f0f216e03e8"
+  }
+}
