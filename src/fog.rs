@@ -110,6 +110,7 @@ pub(crate) fn spawn_fog_overlay(
         })),
         Transform::from_xyz(0.0, surface_y, 0.0),
         FogOverlayPlane,
+        bevy::light::NotShadowCaster,
         MatchScopedEntity,
     ));
 

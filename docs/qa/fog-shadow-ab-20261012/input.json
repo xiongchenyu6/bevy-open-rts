@@ -1,0 +1,4 @@
+{
+  "baseline_pin_sha256": "6c86b580d3a7aa82138d8c7f94ccb5ba55a8ea16a9135f14d469066f7905eeee",
+  "scope": "Readonly canonicalbefore samefogedge/defaultclear fixtures; noactor grants"
+}

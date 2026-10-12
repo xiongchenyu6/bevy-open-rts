@@ -1,0 +1,50 @@
+{
+  "scope": "ActualcanonicalRust1.95 diagnostic singleflagAB; not genuineearnedmedia/performance/allviewport/Steam acceptance",
+  "source_change": "ONLYbevy::light::NotShadowCaster onFogOverlayPlane spawnedtuple",
+  "reason": "Bevy0.19.1 Blend shadowprepass treatsalpha>=.05asdepthcaster; unlit does not exclude casts. Displayfog must not shadow terrain.",
+  "root_direct_before_after_verdict": "Crosshatchgone; smoothgradientretained",
+  "entire_edge_observation_dict_equal": true,
+  "fog_counts": {
+    "cells": 36864,
+    "explored": 5399,
+    "opaque_cells": 31095
+  },
+  "normal_objects_images_byte_exact": true,
+  "normal_objects_image_sha256": "0d47d85e27ae85bdcc19bf066f1f7d236e63a2568cc1995f44e661a316dbbb31",
+  "normal_HQ_Drone_Worker_shadows_retained": true,
+  "source_delta_from_validatedbaseline": [
+    "src/fog.rs"
+  ],
+  "source_fog_sha256": "b883b79af0a6ed0485981e9a225420ecd6bb06a9cb2611fe718932dfa388dd7a",
+  "after_capture_binary_sha256": "b02995c5354f4d2ff29d27f4e1953e1429cb8bd6cd1d4d7278bb3c15acea18a2",
+  "baseline_all312tests0fail1ignored": "ValidatedBEFOREflag; finalflag312suite/fourbins pending ROOT job",
+  "flag_after_check_alltargets_exit": 0,
+  "flag_after_capture_build_exit": 0,
+  "actual_before_after_fourcapture_exits": 0,
+  "compiler": "Rust1.95.0 override existingcanonicalcompilerenv",
+  "AB_context_CWD": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts",
+  "AB_context_CARGO_TARGET_DIR": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target",
+  "baseline_context_physical_target_dir": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target",
+  "cache_equivalence_claim": false,
+  "all332_assets_unchanged": true,
+  "frozen_old_SDK309_notmodified": true,
+  "all9releasegates_open": true,
+  "files": {
+    "docs/qa/fog-shadow-ab-20261012/check.log": "27825130ab9555e69a29d197fbbc4fd895e86378280c7e1a8e45d42a7b0d629e",
+    "docs/qa/fog-shadow-ab-20261012/build.log": "6515d9a317bfe8ffdf7e13b1dd0f9722c7e88223c2a70a6c9e311866dd950855",
+    "docs/qa/fog-shadow-ab-20261012/baseline-pin.json": "6c86b580d3a7aa82138d8c7f94ccb5ba55a8ea16a9135f14d469066f7905eeee",
+    "docs/qa/fog-shadow-ab-20261012/after-edge.png": "8dfcfc53f776aef825ee032958aa69949a9cacc93407d6b2604ecfb3fa015486",
+    "docs/qa/fog-shadow-ab-20261012/root-visual-review.json": "21da579d88ff5775085d0bff9549dde41d1882c04559ac5263b468dc477baafb",
+    "docs/qa/fog-shadow-ab-20261012/before-objects.log": "3fae82b3046e4c27fdf607f2d24c87313fd579c7cdb1a45ad4e471c20911ca04",
+    "docs/qa/fog-shadow-ab-20261012/input.json": "709eb1db14a3bad630c6c5ec31126d3d2e257c6b4c6a185c9e9a124e888a06e9",
+    "docs/qa/fog-shadow-ab-20261012/results.json": "1c43787a333b74ba01a8d52dec0cf378d04c15a28c3d9a3835bb653dde48d0f3",
+    "docs/qa/fog-shadow-ab-20261012/before-edge.png": "c0e16aee7bdf5654ba6881780d3589f28d8a23e7ac2b86480d4be0e7933da12d",
+    "docs/qa/fog-shadow-ab-20261012/before-objects.png": "0d47d85e27ae85bdcc19bf066f1f7d236e63a2568cc1995f44e661a316dbbb31",
+    "docs/qa/fog-shadow-ab-20261012/before-edge.log": "7a09c47767147e837b00b3b10e64e98c49cbf25e1b082aa4c4bc0b97cc00dff1",
+    "docs/qa/fog-shadow-ab-20261012/after-objects.png": "0d47d85e27ae85bdcc19bf066f1f7d236e63a2568cc1995f44e661a316dbbb31",
+    "docs/qa/fog-shadow-ab-20261012/after-edge-observation.json": "038fd3d8843f59e69f1a219dcb6486dd38b0586bb2536d86f74c2c3c2c2ef12d",
+    "docs/qa/fog-shadow-ab-20261012/before-edge-observation.json": "038fd3d8843f59e69f1a219dcb6486dd38b0586bb2536d86f74c2c3c2c2ef12d",
+    "docs/qa/fog-shadow-ab-20261012/after-objects.log": "c8f8d1d3bf6061796323c715c8c814c905a21d86e373910da75bd4f9b1168e19",
+    "docs/qa/fog-shadow-ab-20261012/after-edge.log": "058896c4b18a6ed264bd57588eec6375bb18d4a884665195a4c3e794dc834579"
+  }
+}

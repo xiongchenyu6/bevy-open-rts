@@ -1,0 +1,185 @@
+   Compiling wayland-sys v0.31.11
+    Checking wayland-backend v0.3.17
+    Checking wayland-client v0.31.15
+    Checking wayland-protocols v0.32.13
+    Checking wayland-csd-frame v0.3.0
+    Checking wayland-cursor v0.31.14
+   Compiling alsa-sys v0.4.0
+    Checking calloop-wayland-source v0.3.0
+    Checking wayland-protocols-wlr v0.3.12
+    Checking smithay-client-toolkit v0.19.2
+    Checking sctk-adwaita v0.10.1
+    Checking alsa v0.11.0
+    Checking wayland-protocols-plasma v0.3.12
+    Checking winit v0.30.13
+    Checking cpal v0.17.3
+    Checking rodio v0.22.2
+    Checking accesskit_winit v0.32.2
+    Checking bevy_winit v0.19.1
+    Checking bevy_audio v0.19.1
+    Checking bevy_internal v0.19.1
+    Checking bevy v0.19.1
+warning: use of deprecated method `futures_channel::mpsc::UnboundedReceiver::<T>::try_next`: please use `try_recv` instead
+   --> crates/matchbox-socket/src/webrtc_socket/socket.rs:332:41
+    |
+332 |         while let Ok(Some(x)) = self.rx.try_next() {
+    |                                         ^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `futures_channel::mpsc::UnboundedReceiver::<T>::try_next`: please use `try_recv` instead
+   --> crates/matchbox-socket/src/webrtc_socket/socket.rs:565:48
+    |
+565 |         while let Ok(res) = self.peer_state_rx.try_next() {
+    |                                                ^^^^^^^^
+
+warning: `matchbox_socket` (lib) generated 2 warnings
+    Checking bevy_fluent v0.15.0
+    Checking bevy_rts_camera v0.14.0
+    Checking bevy-open-rts v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts)
+warning: unused import: `bevy::prelude::*`
+ --> src/capture_api/voice_audio.rs:5:5
+  |
+5 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `bevy::prelude::*`
+ --> src/orders/contact_planning.rs:3:5
+  |
+3 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/economy/harvest_contact.rs:3:5
+  |
+3 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: function `allied_skirmish_ally` is never used
+    --> src/lib.rs:1957:15
+     |
+1957 | pub(crate) fn allied_skirmish_ally(player_team: Team, active_team_count: usize) -> Option<Team> {
+     |               ^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `allied_skirmish_enemy` is never used
+    --> src/lib.rs:1961:15
+     |
+1961 | pub(crate) fn allied_skirmish_enemy(player_team: Team, active_team_count: usize) -> Option<Team> {
+     |               ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `default_skirmish_opponent` is never used
+    --> src/lib.rs:1988:15
+     |
+1988 | pub(crate) fn default_skirmish_opponent(
+     |               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `free_position` is never used
+    --> src/lib.rs:7376:15
+     |
+7376 | pub(crate) fn free_position(origin: Vec3, seed: u32, radius: f32) -> Vec3 {
+     |               ^^^^^^^^^^^^^
+
+warning: `bevy-open-rts` (lib) generated 7 warnings (run `cargo fix --lib -p bevy-open-rts` to apply 3 suggestions)
+warning: unused variable: `resource`
+   --> src/ai/tests.rs:240:18
+    |
+240 |             for (resource, node, node_radius) in resources
+    |                  ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_resource`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `unit`
+   --> src/ai/tests.rs:558:18
+    |
+558 |         for (id, unit, position, radius) in
+    |                  ^^^^ help: if this is intentional, prefix it with an underscore: `_unit`
+
+warning: methods `with_map`, `with_starting_resources`, `with_visible_player`, `with_ai_difficulties`, and `with_startup_loadout` are never used
+   --> src/lib.rs:961:19
+    |
+959 | impl MatchSetupSettings {
+    | ----------------------- methods in this implementation
+960 |     #[cfg(test)]
+961 |     pub(crate) fn with_map(mut self, map_path: &'static str) -> Self {
+    |                   ^^^^^^^^
+...
+967 |     pub(crate) fn with_starting_resources(mut self, starting_resources: StartingResources) -> Self {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+973 |     pub(crate) fn with_visible_player(mut self, visible_player: VisiblePlayer) -> Self {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+979 |     pub(crate) fn with_ai_difficulties(mut self, ai_difficulties: AiDifficultySettings) -> Self {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+985 |     pub(crate) fn with_startup_loadout(mut self, startup_loadout: StartupLoadoutMode) -> Self {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `team_startup` is never used
+    --> src/lib.rs:4756:15
+     |
+4756 | pub(crate) fn team_startup(team: Team) -> &'static TeamStartup {
+     |               ^^^^^^^^^^^^
+
+warning: function `team_build_queue_len` is never used
+    --> src/lib.rs:6081:15
+     |
+6081 | pub(crate) fn team_build_queue_len(build_queue: &BuildQueue, team: Team) -> usize {
+     |               ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `skirmish_maps` is never used
+    --> src/maps.rs:1114:15
+     |
+1114 | pub(crate) fn skirmish_maps() -> &'static [SkirmishMapDef] {
+     |               ^^^^^^^^^^^^^
+
+warning: method `part_count` is never used
+   --> src/spawn.rs:402:19
+    |
+392 | impl ProceduralEntityModel {
+    | -------------------------- method in this implementation
+...
+402 |     pub(crate) fn part_count(self) -> usize {
+    |                   ^^^^^^^^^^
+
+warning: method `part_count` is never used
+   --> src/spawn.rs:433:19
+    |
+417 | impl FactionIdentityMarker {
+    | -------------------------- method in this implementation
+...
+433 |     pub(crate) fn part_count(self) -> usize {
+    |                   ^^^^^^^^^^
+
+warning: function `apply_rally_point_command` is never used
+   --> src/orders.rs:961:15
+    |
+961 | pub(crate) fn apply_rally_point_command(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `minimap_local_position` is never used
+    --> src/hud.rs:3667:15
+     |
+3667 | pub(crate) fn minimap_local_position(world: Vec3) -> Vec2 {
+     |               ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `minimap_world_position` is never used
+    --> src/hud.rs:3676:15
+     |
+3676 | pub(crate) fn minimap_world_position(local: Vec2) -> Vec3 {
+     |               ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `minimap_world_position_in_bounds` is never used
+    --> src/hud.rs:3688:15
+     |
+3688 | pub(crate) fn minimap_world_position_in_bounds(local: Vec2, bounds: MapBounds) -> Vec3 {
+     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `bevy-open-rts` (lib test) generated 16 warnings (4 duplicates) (run `cargo fix --lib -p bevy-open-rts --tests` to apply 2 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 34.93s

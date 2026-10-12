@@ -1,0 +1,17 @@
+{
+  "scope": "Root direct fourframe canonical1.95 diagnosticAB; nofinalpackage/runtime/performance claim",
+  "change": "FogOverlayPlane NotShadowCaster only",
+  "edge_visual_accepted": true,
+  "finding": "Diagonal crosshatch gone; smooth gradient retained",
+  "normal_object_shadows_directly_visible_after": true,
+  "default_objects_png_byte_identical": true,
+  "all_edge_observation_fields_identical": true,
+  "explored_cells": 5399,
+  "opaque_cells": 31095,
+  "files": {
+    "before-edge/frame.png": "c0e16aee7bdf5654ba6881780d3589f28d8a23e7ac2b86480d4be0e7933da12d",
+    "after-edge03/frame.png": "8dfcfc53f776aef825ee032958aa69949a9cacc93407d6b2604ecfb3fa015486",
+    "before-objects.png": "0d47d85e27ae85bdcc19bf066f1f7d236e63a2568cc1995f44e661a316dbbb31",
+    "after-objects.png": "0d47d85e27ae85bdcc19bf066f1f7d236e63a2568cc1995f44e661a316dbbb31"
+  }
+}

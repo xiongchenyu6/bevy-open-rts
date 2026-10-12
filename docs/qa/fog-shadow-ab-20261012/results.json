@@ -1,0 +1,22 @@
+[
+  {
+    "phase": "check",
+    "actual_exit": 0,
+    "elapsed": 35.01489896397106
+  },
+  {
+    "phase": "build",
+    "actual_exit": 0,
+    "elapsed": 325.11539569997694
+  },
+  {
+    "phase": "after-edge",
+    "actual_exit": 0,
+    "elapsed": 11.160355885978788
+  },
+  {
+    "phase": "after-objects",
+    "actual_exit": 0,
+    "elapsed": 8.794183300982695
+  }
+]
