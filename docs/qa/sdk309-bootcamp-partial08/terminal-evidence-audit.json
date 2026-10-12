@@ -1,0 +1,429 @@
+{
+  "scope": "Actual08 fails reviewer original45 deadline; three genuine bounded GUI arrivals independently verified; no earned/replay acceptance",
+  "passed": false,
+  "error": "Original45 current review exhausted",
+  "whole_wall_seconds": 397.17710598598933,
+  "normal_exits": [
+    {
+      "pid": 3999727,
+      "supervisor_pid": 3999632,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "original_png_count": 32,
+  "all_original_png_hashes_verified": true,
+  "unique_dense_originals": 43,
+  "all_dense_original_hashes_and_fresh_ACKs_verified": true,
+  "actual_arrivals": [
+    {
+      "stage": "scout-00",
+      "all_five_natural_arrival": true,
+      "actual_samples": 6,
+      "actual_ack_intervals": [
+        0.28847488295286894,
+        0.3037886000238359,
+        0.2967596540111117,
+        0.2917128870030865,
+        0.28989253198960796
+      ],
+      "median_ack_interval": 0.2917128870030865,
+      "witnesses": [
+        {
+          "own_key": "8589933279",
+          "own_clock": 119.57589721679688,
+          "position": [
+            -9.422993659973145,
+            1.5,
+            -24.24858856201172
+          ],
+          "original_actual_Move_goal": [
+            -9.268791198730469,
+            0.0,
+            -24.286640167236328
+          ],
+          "distance_xz": 0.15882796892697598,
+          "source_own_snapshot": "scout-00-natural-arrival-progress-0003-38cd835a164646b28653b4719979d2fc.ron",
+          "source_sha256": "500849a43bf53faa87a3b3dff3118239cd80cc08856f26188e567f44d7dcb69b",
+          "ack_receipt": "scout-00-natural-arrival-progress-0003-save-ack.json"
+        },
+        {
+          "own_key": "395136989639",
+          "own_clock": 119.57589721679688,
+          "position": [
+            -10.224225997924805,
+            0.05000000074505806,
+            -23.287050247192383
+          ],
+          "original_actual_Move_goal": [
+            -10.036158561706543,
+            0.0,
+            -23.271108627319336
+          ],
+          "distance_xz": 0.18874187614275392,
+          "source_own_snapshot": "scout-00-natural-arrival-progress-0003-38cd835a164646b28653b4719979d2fc.ron",
+          "source_sha256": "500849a43bf53faa87a3b3dff3118239cd80cc08856f26188e567f44d7dcb69b",
+          "ack_receipt": "scout-00-natural-arrival-progress-0003-save-ack.json"
+        },
+        {
+          "own_key": "1129576398169",
+          "own_clock": 119.57589721679688,
+          "position": [
+            -8.722121238708496,
+            0.05000000074505806,
+            -24.008625030517578
+          ],
+          "original_actual_Move_goal": [
+            -8.524430274963379,
+            0.0,
+            -24.009855270385742
+          ],
+          "distance_xz": 0.19769479162741355,
+          "source_own_snapshot": "scout-00-natural-arrival-progress-0003-38cd835a164646b28653b4719979d2fc.ron",
+          "source_sha256": "500849a43bf53faa87a3b3dff3118239cd80cc08856f26188e567f44d7dcb69b",
+          "ack_receipt": "scout-00-natural-arrival-progress-0003-save-ack.json"
+        },
+        {
+          "own_key": "987842476541",
+          "own_clock": 119.85572814941406,
+          "position": [
+            -10.586359024047852,
+            0.05000000074505806,
+            -24.566078186035156
+          ],
+          "original_actual_Move_goal": [
+            -10.415079116821289,
+            0.0,
+            -24.579999923706055
+          ],
+          "distance_xz": 0.17184475959224702,
+          "source_own_snapshot": "scout-00-natural-arrival-progress-0004-2bac8cdfaf2549489efa85a3e195a686.ron",
+          "source_sha256": "15042e3b62db226703c3ce74456e796f96dbe7034b1c232252e1d25531f8988f",
+          "ack_receipt": "scout-00-natural-arrival-progress-0004-save-ack.json"
+        },
+        {
+          "own_key": "983547509328",
+          "own_clock": 120.15129089355469,
+          "position": [
+            -9.544072151184082,
+            0.05000000074505806,
+            -21.924888610839844
+          ],
+          "original_actual_Move_goal": [
+            -9.427947998046875,
+            0.0,
+            -21.78966522216797
+          ],
+          "distance_xz": 0.17824192488227478,
+          "source_own_snapshot": "scout-00-natural-arrival-progress-0005-a464be0e6cce47aaa633da1fd93bc016.ron",
+          "source_sha256": "ff2975b7de988a69fa86fd89fb558da306da482d87456d1be907b161cf27766a",
+          "ack_receipt": "scout-00-natural-arrival-progress-0005-save-ack.json"
+        }
+      ]
+    },
+    {
+      "stage": "scout-01",
+      "all_five_natural_arrival": true,
+      "actual_samples": 4,
+      "actual_ack_intervals": [
+        0.33620405301917344,
+        0.3839278459781781,
+        0.33512087701819837
+      ],
+      "median_ack_interval": 0.33620405301917344,
+      "witnesses": [
+        {
+          "own_key": "8589933279",
+          "own_clock": 145.11647033691406,
+          "position": [
+            -4.133398056030273,
+            1.5,
+            -23.226329803466797
+          ],
+          "original_actual_Move_goal": [
+            -3.9757118225097656,
+            0.0,
+            -23.19585609436035
+          ],
+          "distance_xz": 0.16060384549751094,
+          "source_own_snapshot": "scout-01-natural-arrival-progress-0002-37127fcb57374f4d89512f010365545e.ron",
+          "source_sha256": "be6199f6c749d7eb1743603af63fdb0d2ddb616d254d0fd4b169fea57aa15b09",
+          "ack_receipt": "scout-01-natural-arrival-progress-0002-save-ack.json"
+        },
+        {
+          "own_key": "395136989639",
+          "own_clock": 145.5044708251953,
+          "position": [
+            -4.673210144042969,
+            0.05000000074505806,
+            -23.285734176635742
+          ],
+          "original_actual_Move_goal": [
+            -4.494077682495117,
+            0.0,
+            -23.28416633605957
+          ],
+          "distance_xz": 0.17913932260747445,
+          "source_own_snapshot": "scout-01-natural-arrival-progress-0003-fe20f8e825834409b9bc621c63b6e34d.ron",
+          "source_sha256": "544e025da20a16ad1a82a4df7c312199975d42b71f59dc151fc3b992ac31296c",
+          "ack_receipt": "scout-01-natural-arrival-progress-0003-save-ack.json"
+        },
+        {
+          "own_key": "983547509328",
+          "own_clock": 145.5044708251953,
+          "position": [
+            -4.044677734375,
+            0.05000000074505806,
+            -21.876829147338867
+          ],
+          "original_actual_Move_goal": [
+            -3.865544319152832,
+            0.0,
+            -21.875261306762695
+          ],
+          "distance_xz": 0.1791402762452652,
+          "source_own_snapshot": "scout-01-natural-arrival-progress-0003-fe20f8e825834409b9bc621c63b6e34d.ron",
+          "source_sha256": "544e025da20a16ad1a82a4df7c312199975d42b71f59dc151fc3b992ac31296c",
+          "ack_receipt": "scout-01-natural-arrival-progress-0003-save-ack.json"
+        },
+        {
+          "own_key": "987842476541",
+          "own_clock": 145.5044708251953,
+          "position": [
+            -5.086963176727295,
+            0.05000000074505806,
+            -24.51801872253418
+          ],
+          "original_actual_Move_goal": [
+            -4.907831192016602,
+            0.0,
+            -24.516450881958008
+          ],
+          "distance_xz": 0.17913884578857922,
+          "source_own_snapshot": "scout-01-natural-arrival-progress-0003-fe20f8e825834409b9bc621c63b6e34d.ron",
+          "source_sha256": "544e025da20a16ad1a82a4df7c312199975d42b71f59dc151fc3b992ac31296c",
+          "ack_receipt": "scout-01-natural-arrival-progress-0003-save-ack.json"
+        },
+        {
+          "own_key": "1129576398169",
+          "own_clock": 145.5044708251953,
+          "position": [
+            -3.2227261066436768,
+            0.05000000074505806,
+            -23.9605655670166
+          ],
+          "original_actual_Move_goal": [
+            -3.043593406677246,
+            0.0,
+            -23.95899772644043
+          ],
+          "distance_xz": 0.1791395610169221,
+          "source_own_snapshot": "scout-01-natural-arrival-progress-0003-fe20f8e825834409b9bc621c63b6e34d.ron",
+          "source_sha256": "544e025da20a16ad1a82a4df7c312199975d42b71f59dc151fc3b992ac31296c",
+          "ack_receipt": "scout-01-natural-arrival-progress-0003-save-ack.json"
+        }
+      ]
+    },
+    {
+      "stage": "scout-02",
+      "all_five_natural_arrival": true,
+      "actual_samples": 4,
+      "actual_ack_intervals": [
+        0.3143826189916581,
+        0.3371721999719739,
+        0.33245152403833345
+      ],
+      "median_ack_interval": 0.33245152403833345,
+      "witnesses": [
+        {
+          "own_key": "8589933279",
+          "own_clock": 177.18814086914062,
+          "position": [
+            1.3001289367675781,
+            1.5,
+            -22.90194320678711
+          ],
+          "original_actual_Move_goal": [
+            1.5170698165893555,
+            0.0,
+            -22.888992309570312
+          ],
+          "distance_xz": 0.2173271061707832,
+          "source_own_snapshot": "scout-02-natural-arrival-progress-0002-c6915e64cb1c4331aa6271ef83cde005.ron",
+          "source_sha256": "cafdd1375ee3ce3d8f0a17fe9197d150cbfc54cbcdd3c9bd9afcdadf82c225c6",
+          "ack_receipt": "scout-02-natural-arrival-progress-0002-save-ack.json"
+        },
+        {
+          "own_key": "395136989639",
+          "own_clock": 177.4994354248047,
+          "position": [
+            0.7826183438301086,
+            0.05000000074505806,
+            -22.989051818847656
+          ],
+          "original_actual_Move_goal": [
+            0.9987044334411621,
+            0.0,
+            -22.97730255126953
+          ],
+          "distance_xz": 0.2164052758414605,
+          "source_own_snapshot": "scout-02-natural-arrival-progress-0003-0c172fba6d834949a3d0c91fe3a42ba7.ron",
+          "source_sha256": "0df4150397ef8971dd90e54ef6eca34a6c61a219561035b9afac5c504f425edd",
+          "ack_receipt": "scout-02-natural-arrival-progress-0003-save-ack.json"
+        },
+        {
+          "own_key": "983547509328",
+          "own_clock": 177.4994354248047,
+          "position": [
+            1.4111515283584595,
+            0.05000000074505806,
+            -21.58014678955078
+          ],
+          "original_actual_Move_goal": [
+            1.6272368431091309,
+            0.0,
+            -21.568397521972656
+          ],
+          "distance_xz": 0.2164045021239602,
+          "source_own_snapshot": "scout-02-natural-arrival-progress-0003-0c172fba6d834949a3d0c91fe3a42ba7.ron",
+          "source_sha256": "0df4150397ef8971dd90e54ef6eca34a6c61a219561035b9afac5c504f425edd",
+          "ack_receipt": "scout-02-natural-arrival-progress-0003-save-ack.json"
+        },
+        {
+          "own_key": "987842476541",
+          "own_clock": 177.4994354248047,
+          "position": [
+            0.3688659071922302,
+            0.05000000074505806,
+            -24.221336364746094
+          ],
+          "original_actual_Move_goal": [
+            0.5849514007568359,
+            0.0,
+            -24.20958709716797
+          ],
+          "distance_xz": 0.21640468067415186,
+          "source_own_snapshot": "scout-02-natural-arrival-progress-0003-0c172fba6d834949a3d0c91fe3a42ba7.ron",
+          "source_sha256": "0df4150397ef8971dd90e54ef6eca34a6c61a219561035b9afac5c504f425edd",
+          "ack_receipt": "scout-02-natural-arrival-progress-0003-save-ack.json"
+        },
+        {
+          "own_key": "1129576398169",
+          "own_clock": 177.4994354248047,
+          "position": [
+            2.2331035137176514,
+            0.05000000074505806,
+            -23.663883209228516
+          ],
+          "original_actual_Move_goal": [
+            2.449188470840454,
+            0.0,
+            -23.65213394165039
+          ],
+          "distance_xz": 0.21640414502357821,
+          "source_own_snapshot": "scout-02-natural-arrival-progress-0003-0c172fba6d834949a3d0c91fe3a42ba7.ron",
+          "source_sha256": "0df4150397ef8971dd90e54ef6eca34a6c61a219561035b9afac5c504f425edd",
+          "ack_receipt": "scout-02-natural-arrival-progress-0003-save-ack.json"
+        }
+      ]
+    }
+  ],
+  "published_public_point_gates": [
+    {
+      "gate": "13-public-scout-00-review.json",
+      "reviewed_image_sha256": "0c13254cc2a8ef4eacfb54a1fe9895eb79b9f39d27ccd85564b1e115fc307e76",
+      "visible_information_only": true,
+      "observation": "No enemy HQ visible; clear right-side terrain above own Power Reactor chosen for lateral scouting.",
+      "point": [
+        1130,
+        285
+      ],
+      "visible_enemy_hq": false,
+      "public_point_validation": {
+        "point": [
+          1130,
+          285
+        ],
+        "public_ground_intersection": [
+          -9.268792823198746,
+          0.0,
+          -24.286639957235018
+        ],
+        "roundtrip_pixel": [
+          1130.0,
+          285.0
+        ],
+        "public_half_extent": 25.0,
+        "viewport_HUD_edge_and_map_passed": true
+      }
+    },
+    {
+      "gate": "13-public-scout-01-review.json",
+      "reviewed_image_sha256": "937075b229e74f871c3109051771ab7764925eff877bd4c75c184a6fcab0dbc3",
+      "visible_information_only": true,
+      "observation": "No enemy HQ visible; clear right-hand ground beyond selected military cohort.",
+      "point": [
+        1150,
+        405
+      ],
+      "visible_enemy_hq": false,
+      "public_point_validation": {
+        "point": [
+          1150,
+          405
+        ],
+        "public_ground_intersection": [
+          -3.975712451064245,
+          0.0,
+          -23.195855588728815
+        ],
+        "roundtrip_pixel": [
+          1150.0,
+          404.99999999999994
+        ],
+        "public_half_extent": 25.0,
+        "viewport_HUD_edge_and_map_passed": true
+      }
+    },
+    {
+      "gate": "13-public-scout-02-review.json",
+      "reviewed_image_sha256": "3ac367289a541c4363baffd5ed7a83b15c2b4ae65479a8d5356c350a841bf1f9",
+      "visible_information_only": true,
+      "observation": "Only own military visible; open right-side frontier ground contains no visible enemy HQ.",
+      "point": [
+        1155,
+        410
+      ],
+      "visible_enemy_hq": false,
+      "public_point_validation": {
+        "point": [
+          1155,
+          410
+        ],
+        "public_ground_intersection": [
+          1.517068593793149,
+          0.0,
+          -22.888991436952203
+        ],
+        "roundtrip_pixel": [
+          1155.0,
+          409.9999999999999
+        ],
+        "public_half_extent": 25.0,
+        "viewport_HUD_edge_and_map_passed": true
+      }
+    }
+  ],
+  "scout03_no_gate_or_command_published": true,
+  "scout03_original_deadline": 1791769474.2659628,
+  "no_recipe_or_output_bound_children": true,
+  "recipe_GPU_released": true,
+  "all_frozen08_hashes_unchanged": true,
+  "historical03_04_05_07_failures_preserved": true,
+  "earned_graduation_verified": false,
+  "fresh_Replay_verified": false,
+  "no_rerun": true
+}

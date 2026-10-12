@@ -1,0 +1,432 @@
+[
+  {
+    "receipt": "09-four-paid-Infantry-before-save-ack.json",
+    "before_mtime_ns": "1791769272655491485",
+    "ack_mtime_ns": "1791769274709480234",
+    "sup_monotonic": 310303.837819784,
+    "ack_monotonic": 310304.050142688,
+    "sha256": "2c769b5dfaf6e24b4b1bde803716a6af82c4d73522dfa166d2eeffa8e4b57e86",
+    "own_clock": 65.47612762451172,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/09-four-paid-Infantry-before-0468f993b84e43d5b9c85e81f8e70dad.ron"
+  },
+  {
+    "receipt": "09-four-paid-Infantry-paid-save-ack.json",
+    "before_mtime_ns": "1791769274709480234",
+    "ack_mtime_ns": "1791769285714419951",
+    "sup_monotonic": 310314.846341755,
+    "ack_monotonic": 310315.002216722,
+    "sha256": "e7ee48e9641f4dd698df0e7577e90187753c00adc228377b03319b700e09bc01",
+    "own_clock": 65.47612762451172,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/09-four-paid-Infantry-paid-95cccd6a80c84c998cfe42f147a0b0d6.ron"
+  },
+  {
+    "receipt": "actual-idle-worker-before-group-save-ack.json",
+    "before_mtime_ns": "1791769241353662953",
+    "ack_mtime_ns": "1791769243144653142",
+    "sup_monotonic": 310272.274165545,
+    "ack_monotonic": 310272.484843397,
+    "sha256": "13f483c31249e170626d9f8d09be1ba67c38c12e2d623466207b2c013e7f24f8",
+    "own_clock": 57.43992614746094,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/actual-idle-worker-before-group-edddb84b01b142ada5b021589bffd942.ron"
+  },
+  {
+    "receipt": "actual-worker-group-assigned-save-ack.json",
+    "before_mtime_ns": "1791769243144653142",
+    "ack_mtime_ns": "1791769244375646399",
+    "sup_monotonic": 310273.492834104,
+    "ack_monotonic": 310273.650728196,
+    "sha256": "13f483c31249e170626d9f8d09be1ba67c38c12e2d623466207b2c013e7f24f8",
+    "own_clock": 57.43992614746094,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/actual-worker-group-assigned-88f428e873f64bf389b96cd7cb4545c4.ron"
+  },
+  {
+    "receipt": "actual-worker-group-recalled-save-ack.json",
+    "before_mtime_ns": "1791769244604645145",
+    "ack_mtime_ns": "1791769248001626536",
+    "sup_monotonic": 310277.127798756,
+    "ack_monotonic": 310277.276172647,
+    "sha256": "13f483c31249e170626d9f8d09be1ba67c38c12e2d623466207b2c013e7f24f8",
+    "own_clock": 57.43992614746094,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/actual-worker-group-recalled-a86c972092884379b401cbdfe2d5bae8.ron"
+  },
+  {
+    "receipt": "auto-01-PowerReactor-before-save-ack.json",
+    "before_mtime_ns": "1791769225883747697",
+    "ack_mtime_ns": "1791769226146746257",
+    "sup_monotonic": 310255.266579428,
+    "ack_monotonic": 310255.419522227,
+    "sha256": "ed1fe17b59b807d42b0ed8fc337c33613bab732e4067fd6957b531f1ef0f8a2b",
+    "own_clock": 51.98269271850586,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/auto-01-PowerReactor-before-984601aafa2c4c4fbfffbb85e19bbe5f.ron"
+  },
+  {
+    "receipt": "auto-01-PowerReactor-paid-save-ack.json",
+    "before_mtime_ns": "1791769226146746257",
+    "ack_mtime_ns": "1791769234976697886",
+    "sup_monotonic": 310264.094384959,
+    "ack_monotonic": 310264.246068232,
+    "sha256": "ee507019fe6d39027f21d7457c2b1f68bb9d3e7995891e9dfb26da2f95e2e8e1",
+    "own_clock": 51.98269271850586,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/auto-01-PowerReactor-paid-9c6fc8387a5644ec9ae613392a4452fd.ron"
+  },
+  {
+    "receipt": "auto-01-PowerReactor-progress-save-ack.json",
+    "before_mtime_ns": "1791769239219674643",
+    "ack_mtime_ns": "1791769240434667988",
+    "sup_monotonic": 310269.560731953,
+    "ack_monotonic": 310269.707929149,
+    "sha256": "c22cdb84da4710693932770a1ef098324eccbf84754828a6fd0238d89a6f9f54",
+    "own_clock": 57.21039962768555,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/auto-01-PowerReactor-progress-f1466de42ba04273ac7753141a532d8c.ron"
+  },
+  {
+    "receipt": "auto-02-Barracks-before-save-ack.json",
+    "before_mtime_ns": "1791769248230625282",
+    "ack_mtime_ns": "1791769248510623748",
+    "sup_monotonic": 310277.639539981,
+    "ack_monotonic": 310277.791115838,
+    "sha256": "13f483c31249e170626d9f8d09be1ba67c38c12e2d623466207b2c013e7f24f8",
+    "own_clock": 57.43992614746094,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/auto-02-Barracks-before-34bd7b1f80da4fc28723de21c0b9cfd9.ron"
+  },
+  {
+    "receipt": "auto-02-Barracks-paid-save-ack.json",
+    "before_mtime_ns": "1791769248510623748",
+    "ack_mtime_ns": "1791769262799545475",
+    "sup_monotonic": 310291.924839714,
+    "ack_monotonic": 310292.070570163,
+    "sha256": "d32d10973d5f795b2ec00d0d722048c76e42648c30e728e62a653d7da1721e18",
+    "own_clock": 57.43992614746094,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/auto-02-Barracks-paid-e804613307ef41b98e045eb2766d7c2a.ron"
+  },
+  {
+    "receipt": "auto-02-Barracks-progress-save-ack.json",
+    "before_mtime_ns": "1791769269518508669",
+    "ack_mtime_ns": "1791769270820921286",
+    "sup_monotonic": 310299.953661776,
+    "ack_monotonic": 310300.108368709,
+    "sha256": "cc5e6491bca80e0e1ca8b3bd46c9753eeab1f19cdc343b20c6152a0a1db9e28a",
+    "own_clock": 65.21354675292969,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/auto-02-Barracks-progress-d3a85a74d9674e17a01e9c20b1d9fe8a.ron"
+  },
+  {
+    "receipt": "current-own-base-Barracks-save-ack.json",
+    "before_mtime_ns": "1791769248001626536",
+    "ack_mtime_ns": "1791769248230625282",
+    "sup_monotonic": 310277.356564719,
+    "ack_monotonic": 310277.507464856,
+    "sha256": "13f483c31249e170626d9f8d09be1ba67c38c12e2d623466207b2c013e7f24f8",
+    "own_clock": 57.43992614746094,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/current-own-base-Barracks-0463adf949b641a79f13a8e52883d3ae.ron"
+  },
+  {
+    "receipt": "current-own-base-PowerReactor-save-ack.json",
+    "before_mtime_ns": "1791769225686748777",
+    "ack_mtime_ns": "1791769225883747697",
+    "sup_monotonic": 310255.004262734,
+    "ack_monotonic": 310255.155250802,
+    "sha256": "ed1fe17b59b807d42b0ed8fc337c33613bab732e4067fd6957b531f1ef0f8a2b",
+    "own_clock": 51.98269271850586,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/current-own-base-PowerReactor-4a31645212fb4beda1f78621990a1ac8.ron"
+  },
+  {
+    "receipt": "current-own-producer-Barracks-save-ack.json",
+    "before_mtime_ns": "1791769271754496421",
+    "ack_mtime_ns": "1791769272655491485",
+    "sup_monotonic": 310301.786635112,
+    "ack_monotonic": 310301.938642312,
+    "sha256": "16d23cde52d43f289239f9a4fde3c2d1d1a6ed0faabe51563e0e18176ee5eb7a",
+    "own_clock": 65.47612762451172,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/current-own-producer-Barracks-34b7f5dc4d4044a5871c25a2dcfd5169.ron"
+  },
+  {
+    "receipt": "current-own-producer-CommandCenter-save-ack.json",
+    "before_mtime_ns": "1791769244375646399",
+    "ack_mtime_ns": "1791769244604645145",
+    "sup_monotonic": 310273.723657186,
+    "ack_monotonic": 310273.874248762,
+    "sha256": "13f483c31249e170626d9f8d09be1ba67c38c12e2d623466207b2c013e7f24f8",
+    "own_clock": 57.43992614746094,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/current-own-producer-CommandCenter-558aba3fc69948ab945aa822bd20df79.ron"
+  },
+  {
+    "receipt": "scout-00-actual-Move-save-ack.json",
+    "before_mtime_ns": "1791769364227989879",
+    "ack_mtime_ns": "1791769365210984494",
+    "sup_monotonic": 310394.341932705,
+    "ack_monotonic": 310394.508839529,
+    "sha256": "b0a40a094be96485f4482ba487275b8fd19918377bc5a318672b9cf376c91c6b",
+    "own_clock": 118.39368438720703,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-00-actual-Move-e21958fec6034e74aedcbcf2edd0065c.ron"
+  },
+  {
+    "receipt": "scout-00-focused-own-save-ack.json",
+    "before_mtime_ns": "1791769340115121959",
+    "ack_mtime_ns": "1791769342907106666",
+    "sup_monotonic": 310372.042632306,
+    "ack_monotonic": 310372.213301995,
+    "sha256": "088ac92ae265195c913866d57b800398151435aa934dc757823eb9e38eb16675",
+    "own_clock": 96.08976745605469,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-00-focused-own-84d303535afb4ce99c0e035a8d4fa092.ron"
+  },
+  {
+    "receipt": "scout-00-natural-arrival-progress-0000-save-ack.json",
+    "before_mtime_ns": "1791769365210984494",
+    "ack_mtime_ns": "1791769365506982873",
+    "sup_monotonic": 310394.640282167,
+    "ack_monotonic": 310394.798429855,
+    "sha256": "ac6fbf42543ea042517b808649a879020336eeb80cd041fb39efb51b17363415",
+    "own_clock": 118.68917846679688,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-00-natural-arrival-progress-0000-ea0f8e0a5d9b4d87b56e6c6ae635b703.ron"
+  },
+  {
+    "receipt": "scout-00-natural-arrival-progress-0001-save-ack.json",
+    "before_mtime_ns": "1791769365506982873",
+    "ack_mtime_ns": "1791769365785981345",
+    "sup_monotonic": 310394.92917624,
+    "ack_monotonic": 310395.086904738,
+    "sha256": "08a9d9477d43b776ea2842fef732437c0e0856eaa0d33b283902875fcd455fba",
+    "own_clock": 118.96835327148438,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-00-natural-arrival-progress-0001-f8881a0cf8a742eba2f670d75ba9bdab.ron"
+  },
+  {
+    "receipt": "scout-00-natural-arrival-progress-0002-save-ack.json",
+    "before_mtime_ns": "1791769365785981345",
+    "ack_mtime_ns": "1791769366081979724",
+    "sup_monotonic": 310395.227147021,
+    "ack_monotonic": 310395.390693338,
+    "sha256": "7a18883140a89890959f2e6a532446056f6e8a8b8efd0f740cdaed6c78e19e0c",
+    "own_clock": 119.26392364501953,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-00-natural-arrival-progress-0002-07b4c71af5534f1e9533aa2dab8321d4.ron"
+  },
+  {
+    "receipt": "scout-00-natural-arrival-progress-0003-save-ack.json",
+    "before_mtime_ns": "1791769366081979724",
+    "ack_mtime_ns": "1791769366393978015",
+    "sup_monotonic": 310395.52988974,
+    "ack_monotonic": 310395.687452992,
+    "sha256": "500849a43bf53faa87a3b3dff3118239cd80cc08856f26188e567f44d7dcb69b",
+    "own_clock": 119.57589721679688,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-00-natural-arrival-progress-0003-38cd835a164646b28653b4719979d2fc.ron"
+  },
+  {
+    "receipt": "scout-00-natural-arrival-progress-0004-save-ack.json",
+    "before_mtime_ns": "1791769366393978015",
+    "ack_mtime_ns": "1791769366672976486",
+    "sup_monotonic": 310395.818205174,
+    "ack_monotonic": 310395.979165879,
+    "sha256": "15042e3b62db226703c3ce74456e796f96dbe7034b1c232252e1d25531f8988f",
+    "own_clock": 119.85572814941406,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-00-natural-arrival-progress-0004-2bac8cdfaf2549489efa85a3e195a686.ron"
+  },
+  {
+    "receipt": "scout-00-natural-arrival-progress-0005-save-ack.json",
+    "before_mtime_ns": "1791769366672976486",
+    "ack_mtime_ns": "1791769366968974865",
+    "sup_monotonic": 310396.113044878,
+    "ack_monotonic": 310396.269058411,
+    "sha256": "ff2975b7de988a69fa86fd89fb558da306da482d87456d1be907b161cf27766a",
+    "own_clock": 120.15129089355469,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-00-natural-arrival-progress-0005-a464be0e6cce47aaa633da1fd93bc016.ron"
+  },
+  {
+    "receipt": "scout-00-pre-command-save-ack.json",
+    "before_mtime_ns": "1791769342907106666",
+    "ack_mtime_ns": "1791769364227989879",
+    "sup_monotonic": 310393.374123297,
+    "ack_monotonic": 310393.530550363,
+    "sha256": "e0306e1ee9bde6a306090de8095ac9700eb0473a0acf9efaa5033c56a01cfcf4",
+    "own_clock": 117.40950775146484,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-00-pre-command-6cc8e6a6484948b3ae009ca3cb7cf1f4.ron"
+  },
+  {
+    "receipt": "scout-00-selected-own-save-ack.json",
+    "before_mtime_ns": "1791769326278197753",
+    "ack_mtime_ns": "1791769340115121959",
+    "sup_monotonic": 310369.247058361,
+    "ack_monotonic": 310369.410585192,
+    "sha256": "ab45e75e1de939531d246c4b945b56b26b1fad9a138b7d603c96639c093760ec",
+    "own_clock": 93.29736328125,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-00-selected-own-b087faf774c14e87970561a302cede03.ron"
+  },
+  {
+    "receipt": "scout-01-actual-Move-save-ack.json",
+    "before_mtime_ns": "1791769389961848921",
+    "ack_mtime_ns": "1791769390931843608",
+    "sup_monotonic": 310420.087780227,
+    "ack_monotonic": 310420.254245861,
+    "sha256": "9c04de1693c2cf3898a6b4c21837935886e9fefa105661c34d399d0d4670eba8",
+    "own_clock": 144.11441040039062,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-01-actual-Move-dfc1682856b6435bbe8837a4ad8ff3c6.ron"
+  },
+  {
+    "receipt": "scout-01-focused-own-save-ack.json",
+    "before_mtime_ns": "1791769368348967306",
+    "ack_mtime_ns": "1791769371223951558",
+    "sup_monotonic": 310400.366362689,
+    "ack_monotonic": 310400.52324666,
+    "sha256": "5fd1b44b998f738749628594bd217d83304e5757a9a5c0784592bd389db6804a",
+    "own_clock": 124.40605163574219,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-01-focused-own-6142c6879754496ea9441583fa50ad2c.ron"
+  },
+  {
+    "receipt": "scout-01-natural-arrival-progress-0000-save-ack.json",
+    "before_mtime_ns": "1791769390931843608",
+    "ack_mtime_ns": "1791769391261841801",
+    "sup_monotonic": 310420.407572651,
+    "ack_monotonic": 310420.589954666,
+    "sha256": "3da0d8bb0bb4ebe0edead6a80a9a7ec2d59fff4deec7618214d8bdb6ef27e3d1",
+    "own_clock": 144.44314575195312,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-01-natural-arrival-progress-0000-d7c6daddc5ca4d9588f656bf3c06d488.ron"
+  },
+  {
+    "receipt": "scout-01-natural-arrival-progress-0001-save-ack.json",
+    "before_mtime_ns": "1791769391261841801",
+    "ack_mtime_ns": "1791769391588840009",
+    "sup_monotonic": 310420.739517613,
+    "ack_monotonic": 310420.926158719,
+    "sha256": "44e993a33ef8651ec44fce47881923a9dc61d60f38ec8c18117ec359d72664c3",
+    "own_clock": 144.7709197998047,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-01-natural-arrival-progress-0001-ff5997e0a96b4057aa2a16c8699921b9.ron"
+  },
+  {
+    "receipt": "scout-01-natural-arrival-progress-0002-save-ack.json",
+    "before_mtime_ns": "1791769391588840009",
+    "ack_mtime_ns": "1791769391934838114",
+    "sup_monotonic": 310421.080548571,
+    "ack_monotonic": 310421.310086565,
+    "sha256": "be6199f6c749d7eb1743603af63fdb0d2ddb616d254d0fd4b169fea57aa15b09",
+    "own_clock": 145.11647033691406,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-01-natural-arrival-progress-0002-37127fcb57374f4d89512f010365545e.ron"
+  },
+  {
+    "receipt": "scout-01-natural-arrival-progress-0003-save-ack.json",
+    "before_mtime_ns": "1791769391934838114",
+    "ack_mtime_ns": "1791769392322835989",
+    "sup_monotonic": 310421.463837853,
+    "ack_monotonic": 310421.645207442,
+    "sha256": "544e025da20a16ad1a82a4df7c312199975d42b71f59dc151fc3b992ac31296c",
+    "own_clock": 145.5044708251953,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-01-natural-arrival-progress-0003-fe20f8e825834409b9bc621c63b6e34d.ron"
+  },
+  {
+    "receipt": "scout-01-pre-command-save-ack.json",
+    "before_mtime_ns": "1791769371223951558",
+    "ack_mtime_ns": "1791769389961848921",
+    "sup_monotonic": 310419.10561156,
+    "ack_monotonic": 310419.258567211,
+    "sha256": "bf1b2b479d8f03acee3f4e78fc073586b32563c0e99d403fd1a7400d4de6280b",
+    "own_clock": 143.14459228515625,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-01-pre-command-206fae8574484342a2aeb9c92cfae3c8.ron"
+  },
+  {
+    "receipt": "scout-01-selected-own-save-ack.json",
+    "before_mtime_ns": "1791769366968974865",
+    "ack_mtime_ns": "1791769368348967306",
+    "sup_monotonic": 310397.481078661,
+    "ack_monotonic": 310397.668152647,
+    "sha256": "870f17a3891bd87e65cac78a2b347ef7b46e5d1466ec175d64875596178fddfe",
+    "own_clock": 121.53089904785156,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-01-selected-own-d72432f306004d92a5fce15472354e41.ron"
+  },
+  {
+    "receipt": "scout-02-actual-Move-save-ack.json",
+    "before_mtime_ns": "1791769422054673135",
+    "ack_mtime_ns": "1791769423053667663",
+    "sup_monotonic": 310452.198942237,
+    "ack_monotonic": 310452.362204927,
+    "sha256": "095a02741f3a79a990dc9d54b029da65bb3f88e06294574f269db43c13d18df4",
+    "own_clock": 176.23617553710938,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-02-actual-Move-73b5b0a4cb4f4dad945caebc675a0eb3.ron"
+  },
+  {
+    "receipt": "scout-02-focused-own-save-ack.json",
+    "before_mtime_ns": "1791769393753828151",
+    "ack_mtime_ns": "1791769396746811757",
+    "sup_monotonic": 310425.895866656,
+    "ack_monotonic": 310426.062599784,
+    "sha256": "7c00bf2571f1bb7bbb270d01bdb79a92c6dbf7791a5a792a66c922f080f4ed15",
+    "own_clock": 149.92977905273438,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-02-focused-own-9a5b3bd7a2ad45de8af82b5e3287ba21.ron"
+  },
+  {
+    "receipt": "scout-02-natural-arrival-progress-0000-save-ack.json",
+    "before_mtime_ns": "1791769423053667663",
+    "ack_mtime_ns": "1791769423381665866",
+    "sup_monotonic": 310452.519027996,
+    "ack_monotonic": 310452.669641503,
+    "sha256": "b22eb11e01682ebbfd7da74aea530aa88f123680fc3e64d63318b9889e25c236",
+    "own_clock": 176.56419372558594,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-02-natural-arrival-progress-0000-f7f5ea95503e46329825517bb9160a2c.ron"
+  },
+  {
+    "receipt": "scout-02-natural-arrival-progress-0001-save-ack.json",
+    "before_mtime_ns": "1791769423381665866",
+    "ack_mtime_ns": "1791769423676664251",
+    "sup_monotonic": 310452.824059151,
+    "ack_monotonic": 310452.984024122,
+    "sha256": "bddd5e5cc78bcf2e60f61f7cd36ca300b98b25eb8547de75c1a71c50428df822",
+    "own_clock": 176.85943603515625,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-02-natural-arrival-progress-0001-d000997f4a6a4e6e9cfb2ead46db5d36.ron"
+  },
+  {
+    "receipt": "scout-02-natural-arrival-progress-0002-save-ack.json",
+    "before_mtime_ns": "1791769423676664251",
+    "ack_mtime_ns": "1791769424004662454",
+    "sup_monotonic": 310453.146879495,
+    "ack_monotonic": 310453.321196322,
+    "sha256": "cafdd1375ee3ce3d8f0a17fe9197d150cbfc54cbcdd3c9bd9afcdadf82c225c6",
+    "own_clock": 177.18814086914062,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-02-natural-arrival-progress-0002-c6915e64cb1c4331aa6271ef83cde005.ron"
+  },
+  {
+    "receipt": "scout-02-natural-arrival-progress-0003-save-ack.json",
+    "before_mtime_ns": "1791769424004662454",
+    "ack_mtime_ns": "1791769424317660740",
+    "sup_monotonic": 310453.469232527,
+    "ack_monotonic": 310453.653647846,
+    "sha256": "0df4150397ef8971dd90e54ef6eca34a6c61a219561035b9afac5c504f425edd",
+    "own_clock": 177.4994354248047,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-02-natural-arrival-progress-0003-0c172fba6d834949a3d0c91fe3a42ba7.ron"
+  },
+  {
+    "receipt": "scout-02-pre-command-save-ack.json",
+    "before_mtime_ns": "1791769396746811757",
+    "ack_mtime_ns": "1791769422054673135",
+    "sup_monotonic": 310451.198345259,
+    "ack_monotonic": 310451.366901606,
+    "sha256": "aa2e28b3a7d0bec8a85d431545db929dd436f8cbedc6433fbcb59a94f30b85e0",
+    "own_clock": 175.23516845703125,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-02-pre-command-6642af5f658c48cd9e24dc742f8916d8.ron"
+  },
+  {
+    "receipt": "scout-02-selected-own-save-ack.json",
+    "before_mtime_ns": "1791769392322835989",
+    "ack_mtime_ns": "1791769393753828151",
+    "sup_monotonic": 310422.916786313,
+    "ack_monotonic": 310423.121451207,
+    "sha256": "451f1569dd65862d2a928bcfcd4120aed9b57e43bc48082ed0d4910c417aa5fc",
+    "own_clock": 146.9345245361328,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-02-selected-own-7e02ed8da7ea48f08c00d0d3b4dfb887.ron"
+  },
+  {
+    "receipt": "scout-03-focused-own-save-ack.json",
+    "before_mtime_ns": "1791769425795652644",
+    "ack_mtime_ns": "1791769428732636557",
+    "sup_monotonic": 310457.873205053,
+    "ack_monotonic": 310458.041650072,
+    "sha256": "c3ce4f9b959a045580b97efe9bd1c503809b20035b68d40ed502ee0e7069ef93",
+    "own_clock": 181.91534423828125,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-03-focused-own-51b7984a1981432ab50b6ab61d0e7330.ron"
+  },
+  {
+    "receipt": "scout-03-selected-own-save-ack.json",
+    "before_mtime_ns": "1791769424317660740",
+    "ack_mtime_ns": "1791769425795652644",
+    "sup_monotonic": 310454.94747244,
+    "ack_monotonic": 310455.11419132,
+    "sha256": "68498ef4b4cae457a311365345bef6d1439de97ce6a3f2c46017e61c300f7940",
+    "own_clock": 178.97801208496094,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-08/01/scout-03-selected-own-f196ff6c44e94cddacb6465d9fdb0efc.ron"
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "scope": "Exacthistorical309 normal-input partial flow; fullharness failed and freshReplay unverified",
+  "full_flow_passed": false,
+  "normal_game_exit": 0,
+  "forced_cleanup": false,
+  "all_original_PNG_hashes_independently_verified": 33,
+  "wall_seconds": 425.1317633379949,
+  "installation_archive_unchanged": true,
+  "failure": "Fresh normal HUD acknowledgement failed: Fresh HUD refresh requires actual running match context",
+  "actual_earned_profile": true,
+  "root_direct_completion_screenshot": true,
+  "enemy_buildings_destroyed_visible": 1,
+  "own_losses_visible": 0,
+  "freshReplay_verified": false,
+  "explicit_visible_HQ_attack_gate": false,
+  "files": {
+    "docs/qa/sdk309-bootcamp-partial09/99-failure.png": "2000ac441193ab50c72cb04b6e100c02a714ec6da242457412849cf8bab30ad7",
+    "docs/qa/sdk309-bootcamp-partial09/auto-result.json": "1238c523a23a1a44a66906f2c88054f700294652fb04c596d91cfd33f6652bf8",
+    "docs/qa/sdk309-bootcamp-partial09/actual-review-audit.json": "656828b4cbbb3d463f5487a12cb62e6eed6dbd441614a7169886425a8eee091d",
+    "docs/qa/sdk309-bootcamp-partial09/original-earned-campaign.ron": "2264aab2d7e7dae2d74a86b515a3d4d8dd630f89048565b8f47148db0d085e93"
+  }
+}

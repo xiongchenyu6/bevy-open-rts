@@ -1,0 +1,57 @@
+{
+  "scope": "Actual08 original request deadlines from tool-returned requests and filesystem gate/PNG mtimes; no inferred CLI delay",
+  "original_review_seconds": 45,
+  "review_gate_timing": [
+    {
+      "stage": "13-public-scout-00",
+      "original_request_deadline_epoch_from_actual_request": 1791769388.4381156,
+      "original_review_started_epoch": 1791769343.4381156,
+      "image_filesystem_mtime_epoch": 1791769343.4341037,
+      "gate_published": true,
+      "gate_filesystem_mtime_epoch": 1791769364.1014824,
+      "actual_gate_age_seconds": 20.66336679458618,
+      "remaining_seconds_when_gate_written": 24.33663320541382
+    },
+    {
+      "stage": "13-public-scout-01",
+      "original_request_deadline_epoch_from_actual_request": 1791769416.6879814,
+      "original_review_started_epoch": 1791769371.6879814,
+      "image_filesystem_mtime_epoch": 1791769371.684949,
+      "gate_published": true,
+      "gate_filesystem_mtime_epoch": 1791769389.8087046,
+      "actual_gate_age_seconds": 18.120723247528076,
+      "remaining_seconds_when_gate_written": 26.879276752471924
+    },
+    {
+      "stage": "13-public-scout-02",
+      "original_request_deadline_epoch_from_actual_request": 1791769442.2533855,
+      "original_review_started_epoch": 1791769397.2533855,
+      "image_filesystem_mtime_epoch": 1791769397.249809,
+      "gate_published": true,
+      "gate_filesystem_mtime_epoch": 1791769421.9029384,
+      "actual_gate_age_seconds": 24.649552822113037,
+      "remaining_seconds_when_gate_written": 20.350447177886963
+    },
+    {
+      "stage": "13-public-scout-03",
+      "original_request_deadline_epoch_from_actual_request": 1791769474.2659628,
+      "original_review_started_epoch": 1791769429.2659628,
+      "image_filesystem_mtime_epoch": 1791769429.2626336,
+      "gate_published": false,
+      "gate_filesystem_mtime_epoch": null,
+      "actual_gate_age_seconds": null,
+      "remaining_seconds_when_gate_written": null
+    }
+  ],
+  "failure_png_mtime_epoch": 1791769474.6873848,
+  "failure_png_age_from_scout03_review_start_seconds": 45.42142200469971,
+  "failure_png_after_originaldeadline_seconds": 0.42142200469970703,
+  "no_late_scout03_gate": true,
+  "current_scout03_image_sha256": "c737045359f53534c97aa70c58b111c4f58dd217dafa504d420604094f86cd3b",
+  "CLI_tool_returned_exec_wall_seconds": {
+    "scout03_validate_only": 0.009200187,
+    "scout03_expired_final_write": 1.8368e-05
+  },
+  "CLI_tooltime_scope": "Tool-returned exec duration only, excludes model planning/orchestration; actual capture grim duration was not separately recorded and is not claimed",
+  "new_readonly_candidate_helper_CPU_seconds": 0.002094202965963632
+}

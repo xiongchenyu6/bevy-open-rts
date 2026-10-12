@@ -1,0 +1,17 @@
+{
+  "scope": "Exacthistorical309 normal-input partial flow; fullharness failed and freshReplay unverified",
+  "full_flow_passed": false,
+  "normal_game_exit": 0,
+  "forced_cleanup": false,
+  "all_original_PNG_hashes_independently_verified": 32,
+  "wall_seconds": 397.17710598598933,
+  "installation_archive_unchanged": true,
+  "failure": "Original45 current review exhausted",
+  "files": {
+    "docs/qa/sdk309-bootcamp-partial08/99-failure.png": "4105538c6b58f52ccbf5280d37ef9cc1067fbed4b1a958e5f58794a00d0820ee",
+    "docs/qa/sdk309-bootcamp-partial08/auto-result.json": "a7b2cb7dd1ea9f7c7ba921bd287995d5bb1002c9a11b98e1739067aad06bd6e2",
+    "docs/qa/sdk309-bootcamp-partial08/terminal-evidence-audit.json": "e32a0da9c011623e4ed09683f15f1061d8204389827542b8d84f997284eca0ef",
+    "docs/qa/sdk309-bootcamp-partial08/dense-original-ack-inventory.json": "448d544b9fd2251d12974e978d702cd5c09c51ea7a343d1067af6489bd2b79e7",
+    "docs/qa/sdk309-bootcamp-partial08/review-deadline-timing.json": "8a53d5433eef8e2e2ad0fea513fb17f56f131639b861f50981e72497cb509964"
+  }
+}

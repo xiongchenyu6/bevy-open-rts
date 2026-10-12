@@ -1,0 +1,35 @@
+{
+  "scope": "Exact historical SDK309 actual current PNG review09; partial flow, harness terminal failure preserved",
+  "full_flow_passed": false,
+  "earned_profile_original": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-09/user-data/bevy-open-rts/campaign.ron",
+  "earned_profile_text": "(version:1,training_complete:true,completed:[])",
+  "earned_visual": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-09/01/99-failure.png",
+  "direct_visual_observation": "Boot Camp Complete; enemy buildings killed 1, own losses 0; selected own five HP100%; no stale tutorial panel",
+  "fresh_replay_verified": false,
+  "explicit_visible_HQ_attack_gate": false,
+  "png_count": 33,
+  "all_png_hashes_verified": true,
+  "save_ack_count": 63,
+  "unique_original_count": 63,
+  "all_ack_hashes_verified": true,
+  "natural_arrival_hops": [
+    "00",
+    "01",
+    "02",
+    "03"
+  ],
+  "scout04_combat_contact_not_arrival": true,
+  "terminal_error": "Fresh normal HUD acknowledgement failed: Fresh HUD refresh requires actual running match context",
+  "normal_exits": [
+    {
+      "pid": 4051113,
+      "supervisor_pid": 4051067,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "wall_seconds": 425.1317633379949
+}
