@@ -1,0 +1,18 @@
+{
+  "stage": "BuildBarracks",
+  "original_source": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson4-paid-Power-progress-203f1e4e360a4c758002ccaecb4def01.ron",
+  "ack": {
+    "before_mtime_ns": "1791791330594152602",
+    "ack_mtime_ns": "1791791331931144724",
+    "sup_monotonic": 332361.059303994,
+    "ack_monotonic": 332361.230429121,
+    "sha256": "ac00317b709e831af202718c694e59c16e1305a20c5991a7d0fb458f7e660b48",
+    "own_clock": 17.281543731689453,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson4-paid-Power-progress-203f1e4e360a4c758002ccaecb4def01.ron"
+  },
+  "bank": [
+    67,
+    31
+  ],
+  "natural_bounded_transition": true
+}

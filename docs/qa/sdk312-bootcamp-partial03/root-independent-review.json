@@ -1,0 +1,62 @@
+{
+  "scope": "Root partialactual03; fullBootCamp/Move/Attack/Victory/Replay NOTaccepted",
+  "controller_exit": 1,
+  "wall_seconds": 313.5616532689892,
+  "normal_exits": [
+    {
+      "pid": 668332,
+      "supervisor_pid": 668287,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_archive_unchanged": true,
+  "allPNG_hashes_match": true,
+  "actual_natural_stages": [
+    {
+      "stage": "BuildBarracks",
+      "bank": [
+        67,
+        31
+      ]
+    },
+    {
+      "stage": "BuildPower",
+      "bank": [
+        70,
+        32
+      ]
+    },
+    {
+      "stage": "Train",
+      "bank": [
+        70,
+        30
+      ]
+    },
+    {
+      "stage": "SelectWorker",
+      "bank": [
+        64,
+        32
+      ]
+    },
+    {
+      "stage": "Move",
+      "bank": [
+        78,
+        30
+      ]
+    },
+    {
+      "stage": "Gather",
+      "bank": [
+        64,
+        32
+      ]
+    }
+  ],
+  "unconsumed_original45_gate": "04-public-Move",
+  "error": "Original45current review exhausted"
+}

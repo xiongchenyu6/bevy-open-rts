@@ -1,0 +1,139 @@
+{
+  "scope": "Actual03 normalBootCamp partial paid/birthproof; noMove/Attack/victory/SAME-AppReplay acceptance",
+  "controller_exit": 1,
+  "original_error": "Original45current review exhausted",
+  "wall_seconds": 313.5616532689892,
+  "root_review_copied": true,
+  "all23PNG_independently_rehashed": true,
+  "direct_terminal_PNG": "6/7Move healthyselected4Rifle+Drone bank78/30",
+  "actual_natural_stages": [
+    {
+      "stage": "SelectWorker",
+      "bank": [
+        64,
+        32
+      ],
+      "originalUUIDRON": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson1-initial-b5baf7f2689243afb209d95cbe2b26f4.ron",
+      "sha256": "9e1086e807fe1fe4f3d59161220f597f71096dcc992167ac40869c79a9adb761"
+    },
+    {
+      "stage": "Gather",
+      "bank": [
+        64,
+        32
+      ],
+      "originalUUIDRON": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson2-Gather-progress-2442b59b04334f9da3aa8aae2626e573.ron",
+      "sha256": "9e2020d12099a3549b2790a9aed67f9c7aced52140ed3f55c6d0423969ebabe3"
+    },
+    {
+      "stage": "BuildPower",
+      "bank": [
+        70,
+        32
+      ],
+      "originalUUIDRON": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson3-gathered-progress-649f7dda0da44a9fad6bbce48b3c8731.ron",
+      "sha256": "21769889144c7d8e67fbdf62e2f2e8adf54317e44e33e981329e563b77b270de"
+    },
+    {
+      "stage": "BuildBarracks",
+      "bank": [
+        67,
+        31
+      ],
+      "originalUUIDRON": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson4-paid-Power-progress-203f1e4e360a4c758002ccaecb4def01.ron",
+      "sha256": "ac00317b709e831af202718c694e59c16e1305a20c5991a7d0fb458f7e660b48"
+    },
+    {
+      "stage": "Train",
+      "bank": [
+        70,
+        30
+      ],
+      "originalUUIDRON": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson5-paid-Barracks-progress-c3a8d390a3cb49caa32ac0fb1cc79b37.ron",
+      "sha256": "da46158ffd9b4bb6c9e9b7bd840af9a02e207fab9643004a83304357321dd7c7"
+    },
+    {
+      "stage": "Move",
+      "bank": [
+        78,
+        30
+      ],
+      "originalUUIDRON": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson6-Move-progress-2f9050c1843e4c1b932d4990a30d2451.ron",
+      "sha256": "4c50e48fccff3ab910131a23c6d1679fa3f659110b389e43f1e1f486e4bb86a7"
+    }
+  ],
+  "paid_Power_and_Barracks": {
+    "each_cost": [
+      3,
+      1
+    ],
+    "natural_completion_seconds": [
+      7.248686717997771,
+      10.117850380018353
+    ]
+  },
+  "four_Rifle_paid_unit_cost": [
+    1,
+    0
+  ],
+  "last_natural_birth_counts": {
+    "Worker": 2,
+    "Drone": 1,
+    "LightRifleInfantry": 4
+  },
+  "unconsumed_original45_review": "04-public-Move",
+  "failure_class": "Reviewerpoll/modeldeadline; no game movement defect demonstrated",
+  "normal_exits": [
+    {
+      "pid": 668332,
+      "supervisor_pid": 668287,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_archive_unchanged": true,
+  "binary_sha256": "11137f0411f4b27e1fae8f1c6f9a9c1dc9710d8263cf5cb0583060883b44c8ee",
+  "archive_sha256": "5d06d5094551a71d667fbae7a81a3edbecce9e8a3353d20f5b99af95d9c83274",
+  "all9releasegates_open": true,
+  "files": {
+    "docs/qa/sdk312-bootcamp-partial03/lesson4-paid-Power-lesson.json": "551b9e2c04daa593a99f9d38de0c059248c618feef2737a0496e2c56ac919435",
+    "docs/qa/sdk312-bootcamp-partial03/result.json": "08004359b1dff25c810677526d50e8261d7d884d559e44c2ea64e17a2d82d035",
+    "docs/qa/sdk312-bootcamp-partial03/OWN-stage-bank-births.json": "0abac4f32087a8007f906c1c91f92e4dfdff934aa7f801507b68fcbc50eacd27",
+    "docs/qa/sdk312-bootcamp-partial03/lesson3-gathered-lesson.json": "e21fdfed60d173bde1ffcfae992ef542d6d8e823bff7b9241ff8fa757ba1139e",
+    "docs/qa/sdk312-bootcamp-partial03/PNG-sha256.json": "76bc466d50fa13a80f3987a98899e1a4623aa72cc8b1f59031c7d65ec5fd9cc3",
+    "docs/qa/sdk312-bootcamp-partial03/root-independent-review.json": "62076b868e27c48953bd2401d2ba18504ba817d473f50e9e6622fe9b8e0dc7fb",
+    "docs/qa/sdk312-bootcamp-partial03/lesson5-paid-Barracks-lesson.json": "40fb9b90d2fb2ae68b0c544d9697391a387a10476e2b312eb83408f4504e1247",
+    "docs/qa/sdk312-bootcamp-partial03/lesson1-initial-lesson.json": "82d9fb4eb739352c38dc39d177323cb6afa194ca773acf837cf825043121ffb5",
+    "docs/qa/sdk312-bootcamp-partial03/lesson6-Move-lesson.json": "d5cbdbb49260f69f0dcc823ade0d93afbb5ff66a2520439af702e7c91d928488",
+    "docs/qa/sdk312-bootcamp-partial03/lesson2-Gather-lesson.json": "12b25830c6aab2340a13ea3f0c43a6bb0de73dede50d117deb3d2058b670a29b",
+    "docs/qa/sdk312-bootcamp-partial03/01/four-paid-Infantry-before-save-ack.json": "fa20ec4be26586626f584ffc0de36370c334552ddc92862945cb72084b492d08",
+    "docs/qa/sdk312-bootcamp-partial03/01/four-paid-Infantry-3-tooltip.png": "34f75505d559430efd5529deb3b619972a18a7f5b611882dbb213b66201ebbf9",
+    "docs/qa/sdk312-bootcamp-partial03/01/02-select-Worker.png": "0c7d19be18fbddaface2b4377ce8e84d23c393d750e4c176c874773e359a8670",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-02-Barracks-ghost-0.png": "103d1bbf61687afa27d31f5a6545e1b8af3f2c7ea2cdc8e6de62ded7eb6b60e4",
+    "docs/qa/sdk312-bootcamp-partial03/01/bootcamp-review-request.json": "53c7bca248535ae90e927849473eaadbf6c3ee40d971c043b10f804016681ac6",
+    "docs/qa/sdk312-bootcamp-partial03/01/four-paid-Infantry-0-tooltip.png": "7d1c6271525c2c3102fe01beac395544e8871d49631a82e646158585e26e33e7",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-02-Barracks-tab-tooltip.png": "dd2203d6e04890ba9fb6e2acc89edb23706b44353f62c9ed8a95888d73463d74",
+    "docs/qa/sdk312-bootcamp-partial03/01/four-natural-births-save-ack.json": "316005a725a9dd3a3d3f62c2bde8a34c48f0aa989a4ff3614c17355508fd9ded",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-02-Barracks-candidate-0-before-ghost.png": "06aa01d60bff77c69c0815e71309be28052191114b3ceb4b01dc83e7b0830428",
+    "docs/qa/sdk312-bootcamp-partial03/01/00-native-fullscreen.png": "15c43563aabe324162f3f517b633ea3aeb506e91b57a823fd6ca2982f4523130",
+    "docs/qa/sdk312-bootcamp-partial03/01/99-terminal-failure.png": "72a5eb9e12562a2d082bc949cd97352fe19596056a6ee55769f920bcd01f62d0",
+    "docs/qa/sdk312-bootcamp-partial03/01/four-paid-Infantry-1-tooltip.png": "d92812c01bc5195c9f270cd10f8313ce53d1382c1ab88506ea217884d6fd9fab",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-01-PowerReactor-candidate-0-build-tooltip.png": "13ea581e4b7616dea30af0b3728b50b3f9a2b695fae48a38d0800aa9b6e394f6",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-02-Barracks-completed.png": "9d4dc3d493202b006411fb5df015bc1f245682342ecc3be273d4cc44a80de04e",
+    "docs/qa/sdk312-bootcamp-partial03/01/four-paid-Infantry-paid-save-ack.json": "261c1c66d6fd7bfd15744b8ebc66cc905e49bcb421dc646fd2b6c0fbfddfe780",
+    "docs/qa/sdk312-bootcamp-partial03/01/four-paid-Infantry-2-tooltip.png": "375bf89f41dc02af2667da54281791f62301c5c9b88aa0f5a6c3a42dc30104c2",
+    "docs/qa/sdk312-bootcamp-partial03/01/01-fresh-BootCamp.png": "2432aeb199d62ce68350ef2d9e090be58a6dc30dd94e5d850c2619aa17b79d15",
+    "docs/qa/sdk312-bootcamp-partial03/01/03-visible-Ore.png": "1ce76491ebb40d6425f470f1477a885ae8d823b66266fad9d26ffd077598f6e7",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-01-PowerReactor-tab-tooltip.png": "82230520488e794df5cd2d96868d4541890258eebeff7501d2b37223865afac8",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-01-PowerReactor-candidate-0-before-ghost.png": "de39eb341ba5c2cd88def430ac9981c41c2b08a962f07ffeebdda6750d3749f5",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-02-Barracks-candidate-0-build-tooltip.png": "e404254b99410a50535708f4bb6edf9ae47eab11bbc7e0e6f0c7ff4e55de60bf",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-01-PowerReactor-ghost-0.png": "0d8a5f6e592b95c3afb469df8c8619e5e6f30ab818896142e53df93a92d7f727",
+    "docs/qa/sdk312-bootcamp-partial03/01/04-public-Move.png": "2c27243db3937096e780b972ffa764150c6cfaf20e408fc8782b70e903d12f1b",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-02-Barracks-candidate-1-build-tooltip.png": "ff530bc9870aa4836ed8f76ddab6d61b51c46bcd9808d9e6d5c522647b2f97f9",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-01-PowerReactor-completed.png": "8ee0a04770d4ea2e6d81921d10e87bbb4e8b891e108985749f6d549f704055f0",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-02-Barracks-candidate-1-before-ghost.png": "99a16502da8834cb035a0b28bdd99221062e095e9007d59695d526b807daf1b0",
+    "docs/qa/sdk312-bootcamp-partial03/01/automatic-opening.json": "1ba13ba3d2affbce4a0779dcfefa6765587cb3db803fd8a8223945461ebc27da",
+    "docs/qa/sdk312-bootcamp-partial03/01/auto-02-Barracks-ghost-1.png": "f8bcf6a3d1c5240d4ef4bc2bf60582e11b4f7aa3773a8e4a150006b4018b81bd"
+  }
+}

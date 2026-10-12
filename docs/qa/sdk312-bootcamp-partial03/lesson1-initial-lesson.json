@@ -1,0 +1,17 @@
+{
+  "stage": "SelectWorker",
+  "original_source": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson1-initial-b5baf7f2689243afb209d95cbe2b26f4.ron",
+  "ack": {
+    "before_mtime_ns": "-1",
+    "ack_mtime_ns": "1791791218210815400",
+    "sup_monotonic": 332247.333243177,
+    "ack_monotonic": 332247.483032557,
+    "sha256": "9e1086e807fe1fe4f3d59161220f597f71096dcc992167ac40869c79a9adb761",
+    "own_clock": 1.8958364725112915,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson1-initial-b5baf7f2689243afb209d95cbe2b26f4.ron"
+  },
+  "bank": [
+    64,
+    32
+  ]
+}

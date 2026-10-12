@@ -1,0 +1,9 @@
+{
+  "before_mtime_ns": "1791791391416794364",
+  "ack_mtime_ns": "1791791391705792662",
+  "sup_monotonic": 332420.834734929,
+  "ack_monotonic": 332420.996309407,
+  "sha256": "bc51d8c01b128185ad4afd783c7bbdf32ae91c33caf64c0d86ae6b9e171b111d",
+  "own_clock": 37.675716400146484,
+  "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/four-natural-births-6f68dc32c18a4bdaafeabc41227d1a2e.ron"
+}

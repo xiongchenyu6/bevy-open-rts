@@ -1,0 +1,18 @@
+{
+  "stage": "Gather",
+  "original_source": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson2-Gather-progress-2442b59b04334f9da3aa8aae2626e573.ron",
+  "ack": {
+    "before_mtime_ns": "1791791261667558961",
+    "ack_mtime_ns": "1791791262072556572",
+    "sup_monotonic": 332291.184354575,
+    "ack_monotonic": 332291.342165839,
+    "sha256": "9e2020d12099a3549b2790a9aed67f9c7aced52140ed3f55c6d0423969ebabe3",
+    "own_clock": 2.1566359996795654,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson2-Gather-progress-2442b59b04334f9da3aa8aae2626e573.ron"
+  },
+  "bank": [
+    64,
+    32
+  ],
+  "natural_bounded_transition": true
+}

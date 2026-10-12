@@ -1,0 +1,18 @@
+{
+  "stage": "Train",
+  "original_source": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson5-paid-Barracks-progress-c3a8d390a3cb49caa32ac0fb1cc79b37.ron",
+  "ack": {
+    "before_mtime_ns": "1791791363615958070",
+    "ack_mtime_ns": "1791791365075949471",
+    "sup_monotonic": 332394.210563027,
+    "ack_monotonic": 332394.362505141,
+    "sha256": "da46158ffd9b4bb6c9e9b7bd840af9a02e207fab9643004a83304357321dd7c7",
+    "own_clock": 25.589900970458984,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson5-paid-Barracks-progress-c3a8d390a3cb49caa32ac0fb1cc79b37.ron"
+  },
+  "bank": [
+    70,
+    30
+  ],
+  "natural_bounded_transition": true
+}

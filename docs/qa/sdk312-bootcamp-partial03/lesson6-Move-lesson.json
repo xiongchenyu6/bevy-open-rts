@@ -1,0 +1,18 @@
+{
+  "stage": "Move",
+  "original_source": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson6-Move-progress-2f9050c1843e4c1b932d4990a30d2451.ron",
+  "ack": {
+    "before_mtime_ns": "1791791391705792662",
+    "ack_mtime_ns": "1791791392469788164",
+    "sup_monotonic": 332421.607015059,
+    "ack_monotonic": 332421.768108537,
+    "sha256": "4c50e48fccff3ab910131a23c6d1679fa3f659110b389e43f1e1f486e4bb86a7",
+    "own_clock": 37.96516418457031,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/lesson6-Move-progress-2f9050c1843e4c1b932d4990a30d2451.ron"
+  },
+  "bank": [
+    78,
+    30
+  ],
+  "natural_bounded_transition": true
+}

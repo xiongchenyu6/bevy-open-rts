@@ -1,0 +1,37 @@
+[
+  {
+    "id": "PowerReactor",
+    "cost": [
+      3,
+      1
+    ],
+    "point": [
+      1312,
+      240
+    ],
+    "completed_count": 1,
+    "construction_wall": 7.248686717997771
+  },
+  {
+    "id": "Barracks",
+    "cost": [
+      3,
+      1
+    ],
+    "point": [
+      491,
+      240
+    ],
+    "completed_count": 1,
+    "construction_wall": 10.117850380018353
+  },
+  {
+    "producer": "Barracks",
+    "unit": "LightRifleInfantry",
+    "queued_paid_count": 4,
+    "bank": [
+      66,
+      30
+    ]
+  }
+]

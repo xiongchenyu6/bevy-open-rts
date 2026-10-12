@@ -1,0 +1,9 @@
+{
+  "before_mtime_ns": "1791791367491935242",
+  "ack_mtime_ns": "1791791379349865413",
+  "sup_monotonic": 332408.477343657,
+  "ack_monotonic": 332408.632796576,
+  "sha256": "483f9fbddda762f0b64b80073a3ec199085d1d0275b6b28d58b2f2593c3912db",
+  "own_clock": 25.589900970458984,
+  "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/four-paid-Infantry-paid-83670b9ccd0c4ca799b83ccf76b13e8b.ron"
+}

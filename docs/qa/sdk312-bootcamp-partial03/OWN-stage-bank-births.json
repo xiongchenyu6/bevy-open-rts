@@ -1,0 +1,1868 @@
+{
+  "scope": "Team0-only originalUUIDstage/bank/healthycounts; noenemycoords/fullRON copied",
+  "rows": [
+    {
+      "original_ron": "lesson1-initial-b5baf7f2689243afb209d95cbe2b26f4.ron",
+      "sha256": "9e1086e807fe1fe4f3d59161220f597f71096dcc992167ac40869c79a9adb761",
+      "own_clock": 1.8958365,
+      "tutorial_stage": "SelectWorker",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson2-Gather-progress-44fdf5f7461b4cb3949166ae8151a057.ron",
+      "sha256": "947e495f2f707b4aa8301a56ab5c2a6a9784f811628dab2259e9fba9ec039bf1",
+      "own_clock": 2.156636,
+      "tutorial_stage": "SelectWorker",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson2-Gather-progress-2442b59b04334f9da3aa8aae2626e573.ron",
+      "sha256": "9e2020d12099a3549b2790a9aed67f9c7aced52140ed3f55c6d0423969ebabe3",
+      "own_clock": 2.156636,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-4f6bf586aaf047459c76f8623b07c2d1.ron",
+      "sha256": "a8a46554e483538977b7a8e7230ab20d8dbdc0a66d8f676bb7024311183e790e",
+      "own_clock": 2.5574234,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-1a6f2df452e948499eb68acaa4c330e9.ron",
+      "sha256": "99542d5c64327b210a568634df841b762af008b2054d9477464a5369d8e67e45",
+      "own_clock": 2.9811308,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-4f7e87c2c8b040c280f055995b44cbd9.ron",
+      "sha256": "f28c2c97c8b7b78ae72d1113dc591070adc619dc4df58bcb47affb2f3e9a116d",
+      "own_clock": 3.3752148,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-36d098adef974f6392718aee53736e09.ron",
+      "sha256": "4db50a6ac5112455f882077f07ecbebb84e25d132f5371f9290b6a1cd79930ba",
+      "own_clock": 3.732931,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-0575b80d6a694a0fabd13956b619ba15.ron",
+      "sha256": "8bb82ebded83b6b896a5a468ffee519d743185256500a43985e529c735228763",
+      "own_clock": 4.1726313,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-7b212017c2fa4144a9bfae74bcc39740.ron",
+      "sha256": "78e9a1fd999b964463d787d0cacab548658d1f361906f6b82c918710a1524a8a",
+      "own_clock": 4.5347466,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-540702f0de9f4cf8b2bd9240749418dc.ron",
+      "sha256": "886a4bdcf3e2c359aef7f80794e8abaa46a13e12a8d0daf3c76e67a0f285eb04",
+      "own_clock": 4.971956,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-d00a62e9c0cd4c80a632b3b9adc2ad44.ron",
+      "sha256": "6eae5069cc366fd9f32b11c6c174eec60b6b1bef123ca0fd90f0c18dfc1213be",
+      "own_clock": 5.3453183,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-215027e8a0904464aa21ef4fed226c02.ron",
+      "sha256": "d8a7e24e3e0a19d808642305f40bc05a54f92f607ebde981ad017daec1afae78",
+      "own_clock": 5.6853046,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-a505fb45319f4c629cd790e14b127b23.ron",
+      "sha256": "4eea63c0d30bcad82808b06e03e84656e4804c0ad83684f45c0cea2c05262c5c",
+      "own_clock": 6.0422473,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-8f27915dcf6842b0b4e6162b61a21c04.ron",
+      "sha256": "174d946a1a77fb160501eb969ec0a17542461799250cc6637b83ba8df5d32717",
+      "own_clock": 6.4001436,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-f43a94fa83884a2bbc544045e7ffafd7.ron",
+      "sha256": "1c41dcd4f724454931208878eb05dce89d4e97628345f796e415af0a16639324",
+      "own_clock": 6.744504,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-19f2f7d89fc1412ea3d5360a3057d9f4.ron",
+      "sha256": "2af22764dbf7a383babd8d9932a4c22a3177e4f8029529ee2781f484b4dc612f",
+      "own_clock": 7.138135,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-6c01e42cc6a54c86846d108c538e31da.ron",
+      "sha256": "2ad0563a8e690d977dcbe50a82d6f77b58e367564cbd61aeaea66e8960fce65e",
+      "own_clock": 7.482026,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-94b58477545f4d398a1cbb9d1afe667d.ron",
+      "sha256": "cb72909527a25b406dfed3c609c2843cdb03f94cbdbb6611ac4cfa841b140a70",
+      "own_clock": 7.8432393,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-837208f87b6443faa26d1f23894b2dde.ron",
+      "sha256": "1df385f9a92a403a215e8e34f382320fbfa4154fe49b9270cad037c89cb086c5",
+      "own_clock": 8.219434,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-ada23cac843841f880e7a83fa362cb04.ron",
+      "sha256": "9b28ef96cac49bc7f88e2109466fa5b939db7ce50d0815ccc9d9dcf4bcc44e10",
+      "own_clock": 8.581616,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-7f2f7b125e2a42ef81cbb513274e9209.ron",
+      "sha256": "bed3af6d432d27f5a1671685a4b11218df94b6f958c81f3cc05304bd6fe311fb",
+      "own_clock": 8.970614,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-809f1d6baf6d4e2ab01f770806a13849.ron",
+      "sha256": "3239eb282a73ebe38d76191638f7db43066b5e97ca4b1298a6fa9d88b765784c",
+      "own_clock": 9.40552,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-3b359ea150904f02b035679be83dab98.ron",
+      "sha256": "63cfcafb62cb4786e259429300175998eeeeb8e47f6439c0bd096f8cff4a0e15",
+      "own_clock": 9.795942,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-98ecbc85686d4ca4b683b973ec526ffe.ron",
+      "sha256": "3fbe764f6199991e13bfc4ff2c334282e543de7dcf6d68037bc96966e2da547c",
+      "own_clock": 10.133356,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-26c59d55f04c4904bc2c1dc891e7e990.ron",
+      "sha256": "cc8b5e70c2d7aaa4b3100de18eef77bbcd3ebffb3251a6ef0a859956d1044781",
+      "own_clock": 10.490996,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-111dd35ec23449d5987050cb457117fe.ron",
+      "sha256": "cabff54199172df96dfa87bd1b261ba9fa36d1f3346d893b8e26f356a273ddd2",
+      "own_clock": 10.833593,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-4c57e495588248cea9d42f41f59f1da0.ron",
+      "sha256": "d19aa111e3284f9e75e34d5bdf33590e70a008ffff33095c6704d352421be026",
+      "own_clock": 11.177441,
+      "tutorial_stage": "Gather",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-649f7dda0da44a9fad6bbce48b3c8731.ron",
+      "sha256": "21769889144c7d8e67fbdf62e2f2e8adf54317e44e33e981329e563b77b270de",
+      "own_clock": 11.537031,
+      "tutorial_stage": "BuildPower",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "actual-idle-worker-before-group-d51ac2b51c544f8b923494d254c5657e.ron",
+      "sha256": "eb83b8fd8fa03c90f753cda1cec9581a2df01c3ec5f698f8fb3cd97a28ad282b",
+      "own_clock": 11.799333,
+      "tutorial_stage": "BuildPower",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "actual-worker-group-assigned-ec8dd2f3752e4b0a9ba78d1508a66f8f.ron",
+      "sha256": "eb83b8fd8fa03c90f753cda1cec9581a2df01c3ec5f698f8fb3cd97a28ad282b",
+      "own_clock": 11.799333,
+      "tutorial_stage": "BuildPower",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "current-own-producer-CommandCenter-07a5a81652a347feb91672be64409b85.ron",
+      "sha256": "eb83b8fd8fa03c90f753cda1cec9581a2df01c3ec5f698f8fb3cd97a28ad282b",
+      "own_clock": 11.799333,
+      "tutorial_stage": "BuildPower",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "actual-worker-group-recalled-0e483f8148a1482497ec657299765c93.ron",
+      "sha256": "d9b20f3b18cef85ec2de90b74bf105dc1f4db341c7445689735d3122c8f1795a",
+      "own_clock": 11.799333,
+      "tutorial_stage": "BuildPower",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "current-own-base-PowerReactor-6aeeb2714179434ebd63a8a0e7482918.ron",
+      "sha256": "d9b20f3b18cef85ec2de90b74bf105dc1f4db341c7445689735d3122c8f1795a",
+      "own_clock": 11.799333,
+      "tutorial_stage": "BuildPower",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "auto-01-PowerReactor-before-68fa7d2293844b4189cff654347a417f.ron",
+      "sha256": "d9b20f3b18cef85ec2de90b74bf105dc1f4db341c7445689735d3122c8f1795a",
+      "own_clock": 11.799333,
+      "tutorial_stage": "BuildPower",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "auto-01-PowerReactor-paid-25e744e7f707433d9cc7c96ef1a17d78.ron",
+      "sha256": "823297e167c59d7c3109fd0689bba11c3a9f4f5959f1a5e0cf71346357858bba",
+      "own_clock": 11.799333,
+      "tutorial_stage": "BuildPower",
+      "player0_bank": [
+        67,
+        31
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "auto-01-PowerReactor-progress-331e1f3ace43431b91559818e765fb43.ron",
+      "sha256": "00c131024e98b35a7a2021e19b52e48aa194d81c3dbe7f86f800aa18cd356ca7",
+      "own_clock": 13.227521,
+      "tutorial_stage": "BuildPower",
+      "player0_bank": [
+        67,
+        31
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "auto-01-PowerReactor-progress-2a7608042a1f451aa3d1e35dd6c0f202.ron",
+      "sha256": "1900cfd2f051a3b6c8de62fa0d178877470a1cd78d990ed0025520c23d199bd9",
+      "own_clock": 14.534284,
+      "tutorial_stage": "BuildPower",
+      "player0_bank": [
+        67,
+        31
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "auto-01-PowerReactor-progress-d7f350a971504cbbaf23d1d466757f17.ron",
+      "sha256": "9c51301016813f42630fac69f6c2abe3a4d7c1474a60127d1b4539ba2abf7d31",
+      "own_clock": 15.766549,
+      "tutorial_stage": "BuildPower",
+      "player0_bank": [
+        67,
+        31
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "auto-01-PowerReactor-progress-fc8e5fbc2a7d4c2bb880e23ef36479f1.ron",
+      "sha256": "d43a28e9e2b7bd38424556ba4601fb11fa4a8495495642fc92e19a3cff59c5b0",
+      "own_clock": 17.053642,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        67,
+        31
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "lesson4-paid-Power-progress-203f1e4e360a4c758002ccaecb4def01.ron",
+      "sha256": "ac00317b709e831af202718c694e59c16e1305a20c5991a7d0fb458f7e660b48",
+      "own_clock": 17.281544,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        67,
+        31
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "actual-idle-worker-before-group-8c8fc6bc7a0f4ac7b939e3c271d31c43.ron",
+      "sha256": "ac00317b709e831af202718c694e59c16e1305a20c5991a7d0fb458f7e660b48",
+      "own_clock": 17.281544,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        67,
+        31
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "actual-worker-group-assigned-a3faeebfb0584c7ba5a9a09c7898196d.ron",
+      "sha256": "ac00317b709e831af202718c694e59c16e1305a20c5991a7d0fb458f7e660b48",
+      "own_clock": 17.281544,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        67,
+        31
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "current-own-producer-CommandCenter-68110bd498154249a47b81d1bd3d5980.ron",
+      "sha256": "ac00317b709e831af202718c694e59c16e1305a20c5991a7d0fb458f7e660b48",
+      "own_clock": 17.281544,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        67,
+        31
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "actual-worker-group-recalled-821d321fb7604824a76ce4e71ea88d60.ron",
+      "sha256": "ac00317b709e831af202718c694e59c16e1305a20c5991a7d0fb458f7e660b48",
+      "own_clock": 17.281544,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        67,
+        31
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "current-own-base-Barracks-c9f2d27d21c7432fa2ff5955ef250154.ron",
+      "sha256": "ac00317b709e831af202718c694e59c16e1305a20c5991a7d0fb458f7e660b48",
+      "own_clock": 17.281544,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        67,
+        31
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "auto-02-Barracks-before-d0fae7ac1a7f4b1f97e9e64df8deabc2.ron",
+      "sha256": "ac00317b709e831af202718c694e59c16e1305a20c5991a7d0fb458f7e660b48",
+      "own_clock": 17.281544,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        67,
+        31
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "auto-02-Barracks-paid-eee65e80e6414deb8d085eab36dcfe7b.ron",
+      "sha256": "e9a5a036de17fb09b54d6d93cbb6e809ded70472b66013628d375e8003449384",
+      "own_clock": 17.281544,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        64,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "auto-02-Barracks-progress-ae0f3ac752f24bb796c7b4a895b258c3.ron",
+      "sha256": "0559e44ee9a6d17b4e15e7d79400fc615d224a399c90d99477ec1af1d4fca4e1",
+      "own_clock": 18.734085,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        64,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "auto-02-Barracks-progress-f6682d616f614346996754f32bfc22d9.ron",
+      "sha256": "c4b87cda149685c44bbc72b15c22fa9dd940373d71dd0919503a0f0d6c3cc38a",
+      "own_clock": 20.057076,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        64,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "auto-02-Barracks-progress-d9ddd29dceff4d4fa8c4e831f7fd2054.ron",
+      "sha256": "e0864e3d55b1173298aa2a86de67387846626e14f6ff5b487a6ef36621800c6b",
+      "own_clock": 21.310745,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        70,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "auto-02-Barracks-progress-3b180e03189c433884f27fea4b085669.ron",
+      "sha256": "a1fe4ab5862c9c780183ed216facdd5df83d959cd3a2262b19c8930a0ea8933a",
+      "own_clock": 22.613731,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        70,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "auto-02-Barracks-progress-cd4713ae6780426fa2a80f24881a0f86.ron",
+      "sha256": "9d5ff50aea8414c42b90c0af936211c845898973d367bc5861ba6b7403f47307",
+      "own_clock": 23.913748,
+      "tutorial_stage": "BuildBarracks",
+      "player0_bank": [
+        70,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "auto-02-Barracks-progress-dcf003f2c80e497e921afe76217b3aa2.ron",
+      "sha256": "e4aef35d8f65a166673739b339af62ebfee9339509d7b43fa9889d040fc7e91f",
+      "own_clock": 25.250061,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        70,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "Barracks": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "lesson5-paid-Barracks-progress-c3a8d390a3cb49caa32ac0fb1cc79b37.ron",
+      "sha256": "da46158ffd9b4bb6c9e9b7bd840af9a02e207fab9643004a83304357321dd7c7",
+      "own_clock": 25.589901,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        70,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "Barracks": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "current-own-producer-Barracks-091b97b386474fcf9f1a0b44dd7642b2.ron",
+      "sha256": "da46158ffd9b4bb6c9e9b7bd840af9a02e207fab9643004a83304357321dd7c7",
+      "own_clock": 25.589901,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        70,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "Barracks": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-paid-Infantry-before-f2097918ad26484badb58c3d5e2aa8b0.ron",
+      "sha256": "0334b61efe882e731f460f074b062575545d48f2356a107355f96357fe3bcc99",
+      "own_clock": 25.589901,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        70,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-paid-Infantry-paid-83670b9ccd0c4ca799b83ccf76b13e8b.ron",
+      "sha256": "483f9fbddda762f0b64b80073a3ec199085d1d0275b6b28d58b2f2593c3912db",
+      "own_clock": 25.589901,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        66,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-2840c1cd275d4d46954275c280feab3b.ron",
+      "sha256": "ebd7093a4ede7073437cd8ec3f8022232876f29f0e3d976794a4f4103a403818",
+      "own_clock": 26.011347,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        66,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-cf5bc460c44a4b09bf47d084d9d2734c.ron",
+      "sha256": "f4958f13ccde27dfae8128029d993c189d5c2bc8fc0cf24ba3a870aca4504ef2",
+      "own_clock": 26.279312,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        66,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-b9a185426ac7414896a9d1a8e882b610.ron",
+      "sha256": "c791f367b9d8695961e6be2786ab8f9f236a746b919a64ad2aa99fce796d5d39",
+      "own_clock": 26.553709,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        66,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-58c59ce1afca4a5cae3f80fdf6efa42c.ron",
+      "sha256": "8cf623ce31815eed3db187e5e1599eea2f6ba56183f418ed8012999367d96d6a",
+      "own_clock": 26.824385,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        66,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-47b9a30d090f4bdf8685092a1e25bc54.ron",
+      "sha256": "2f35a18b5ee619de77a511a54b89d0088d107dc12e8cb4404ac94a5eb8a905ae",
+      "own_clock": 27.153566,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        66,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-8bfccb73d3394b33b2d0d083c6e52ff7.ron",
+      "sha256": "e920acfe47780d298b5088bbf2567cd81e068d681f27076e39f873b941e2b4f6",
+      "own_clock": 27.4409,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        66,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-460b487053c14184a45c585e141cb623.ron",
+      "sha256": "4486ca686587da984405c81e9a068d0e2e80fcc302954081decf83bb632e5fa7",
+      "own_clock": 27.74773,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        66,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-b5ddefcfcf8f48ebaae6921c2590c202.ron",
+      "sha256": "d08b370afddb2fc51173a9b493aaca0ecb02604c354dca5aafdded0d752477f8",
+      "own_clock": 28.024216,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        66,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-f7c6e3d0173b454a94777ed733449c10.ron",
+      "sha256": "e0e2836b7ea589dbf86cbf461c117f7501050d482977addcedfb413dace8e80d",
+      "own_clock": 28.312645,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        66,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-64ba9023b85247d4b9df22954e2abe59.ron",
+      "sha256": "068351ff44fd3f86bb18200381df957904ed17b2155c328f6f7a5dab52b8b76c",
+      "own_clock": 28.587831,
+      "tutorial_stage": "Train",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-b85563b186a24901b52948c946bb7c49.ron",
+      "sha256": "05cfae1e676b81737bc0f2449fad7f5ef4db0572f68ee363b789f11276554e3a",
+      "own_clock": 28.961067,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-797b5d0448394cf09c4e17ae58369895.ron",
+      "sha256": "fe1fafd6ccc7794562cd02d94a6f6b49a9b7a7318244de1c88e54253d998d8a8",
+      "own_clock": 29.255068,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-13f994a37a034e30a8c180f3fcd25fa3.ron",
+      "sha256": "3f0596d5c13bec842b76e95c46f83b86d79fc9bb7ba4eee8d00d198fa90bd678",
+      "own_clock": 29.592197,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-81bf68b45a3f415ea54b110faaa697ca.ron",
+      "sha256": "1c614f042c7571b885a8eaeed3a0adfc771c1a822d13a263eae2b00e0501c22c",
+      "own_clock": 29.894735,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-88ce307cfb7846a197bc34da7b8dd4a0.ron",
+      "sha256": "7446f6d955c91defbdd2a473179492bfa8d0e5e7f353c46118ae2753bf55d512",
+      "own_clock": 30.16671,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-5b7370e48db040819e905c7947e3604a.ron",
+      "sha256": "6c472e689ac9497426aee6730a7de22c3f118f3db32cfea8384503cc8f905b5a",
+      "own_clock": 30.454304,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-a2a54cc72efb46d2ad074d495e7b661f.ron",
+      "sha256": "cafabc5c154faa39c7c1c7cbaff2310cc31c5f7fd16a65d3907279160c9758a8",
+      "own_clock": 30.754059,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-787e69b933e548f5a3f13e80cb35f599.ron",
+      "sha256": "10f3b9cd32cf8e908271bf0defbd3eb4d5a29bbcb3865611ad1d03b5fa5951aa",
+      "own_clock": 31.043877,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-00a821cfd1c143ae890734e3705400e9.ron",
+      "sha256": "64272337de6056c24115848a26e9aac87091215031743b3deb444f78c158d7fe",
+      "own_clock": 31.327957,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 1
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-12a8a1d0a342432680d3241149dbaa14.ron",
+      "sha256": "89d26fc37cf44414bc93c4a8a114f086dffca1c34991edec75acb4c2dff9ee92",
+      "own_clock": 31.61074,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 2
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-3c333e4253b74708b07d9679b4644fd8.ron",
+      "sha256": "5214b4ccf76adfba4c7d8d6a3eee16d1c0cd0041a67625c2ef7978ee170f20da",
+      "own_clock": 31.883846,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 2
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-2d397f9c04344a8ebeeedf465c98f090.ron",
+      "sha256": "ad91cc0993fc8252dbd739a4c2e339f31dd75030751de0f29ea710c54b844f73",
+      "own_clock": 32.163494,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 2
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-226ebc8863bd4577be2cc7904520ca70.ron",
+      "sha256": "f939a48c4f1adfcfe3ac452c4becd797f0bea0a70de9a6e83b0f498359b2dae7",
+      "own_clock": 32.437935,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 2
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-52e5c2ff0ffa4d04a9f2aab85211062b.ron",
+      "sha256": "f207aca67ef90f7e4b2ba0dfd8b1ed7896f08ee81389e41e2fbf074f6d774e0b",
+      "own_clock": 32.71241,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 2
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-f28dccf066054a319be9d0a764172b42.ron",
+      "sha256": "0583f41c491889f65fbb0d58a179daf6a4d0c33fd909d98b279757bea6904b00",
+      "own_clock": 32.99031,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 2
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-0836afac038d4cc18a621e39461123d2.ron",
+      "sha256": "a14185b9c0fccd936c4a1ab1f6845f335b697e66724b0b2ab87086536ae28dc4",
+      "own_clock": 33.254143,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 2
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-d1a9fc274728469e817b5809c26b97d6.ron",
+      "sha256": "dc0e9b636f468521e4c7ead9468b12b34d531b2b035aa7dfa92882b1b823db57",
+      "own_clock": 33.535225,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 2
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-0c54862ab4824b46aec4f4b530d3e714.ron",
+      "sha256": "3726961edf14fd5667e06e96b2694990231f54a5315a845588f4d9cb87faeece",
+      "own_clock": 33.84316,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 2
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-25470e8df7344aa29d6ce31646939234.ron",
+      "sha256": "5919ddeaac04a2cf7c97e3ed332be88f6bd07ad3ea1095e75cab7ab10c99174f",
+      "own_clock": 34.1185,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 2
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-2cb342f15be94355b481b9295f55cce5.ron",
+      "sha256": "49d418dd3036057630fa393ccd198c70dcc4e556ff9e93637d4dc897b0fa1451",
+      "own_clock": 34.40212,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 2
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-239c86ca46a344d6811b22f90ebc4356.ron",
+      "sha256": "e890e5861cbf3c9e611a64ec8d4d82353bf69476ed3c968650624fb940f17566",
+      "own_clock": 34.665104,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 3
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-5924133857354e1598ac32add4a24f32.ron",
+      "sha256": "a184f9ee0e798f21f911416e04beaec10218f4f5ca6325fc92a6ce9c17ce785a",
+      "own_clock": 34.929695,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 3
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-48534c7cffc0425b81f2a1f953ef2fec.ron",
+      "sha256": "0b23916ba4fa500552177b8a4473432f27d1e389cd02f035b2a9b3a3acd65c79",
+      "own_clock": 35.233913,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 3
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-9a5c978035a849829bc3682b6c28fc95.ron",
+      "sha256": "96fe8789f0e67139c8c91fee7aaf8b4237712778bd449aa37b81d482b8c607ff",
+      "own_clock": 35.5851,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 3
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-464739fd0b6a46309f61e69a5dca26c7.ron",
+      "sha256": "a2ad6553b64ef6bde99d8854ebc75009991cb0f223715c7d034aece4a084f5c2",
+      "own_clock": 35.911503,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 3
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-d40f7afe0c644dde9bcf0dcc69e8e80a.ron",
+      "sha256": "0338016331f1e4d6493746cec68888cac36ec027f616c2dda0270b2dcf1b5729",
+      "own_clock": 36.27105,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        72,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 3
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-3b567f5696334701be6d39a1e53405c3.ron",
+      "sha256": "93343e9cd4653ee437bb5d5bfa55a8db8c8b28ffd305c756e3f16b0e4057c163",
+      "own_clock": 36.562008,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        78,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 3
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-182c3933dd764f44a1fa8ad6654d9b90.ron",
+      "sha256": "2f2e5dac0bd5bf50b200f0a55058ca6be8001060a721fafba3f3d26ef194ed6f",
+      "own_clock": 36.82391,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        78,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 3
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-900fb0f8907a42709b4d6024fff93fb3.ron",
+      "sha256": "96ccd12ad216b6fec788843a6e35581502a18f60677303939846c5214874e07a",
+      "own_clock": 37.10491,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        78,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 3
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-e35efc6e48bb4eb5a47e2aecd0fbfb84.ron",
+      "sha256": "6fd7fccc763c3a05653b2a00739e33712a5208a1be0ffaf4867912c7c7162b77",
+      "own_clock": 37.387287,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        78,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 3
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "four-natural-births-6f68dc32c18a4bdaafeabc41227d1a2e.ron",
+      "sha256": "bc51d8c01b128185ad4afd783c7bbdf32ae91c33caf64c0d86ae6b9e171b111d",
+      "own_clock": 37.675716,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        78,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 4
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "lesson6-Move-progress-2f9050c1843e4c1b932d4990a30d2451.ron",
+      "sha256": "4c50e48fccff3ab910131a23c6d1679fa3f659110b389e43f1e1f486e4bb86a7",
+      "own_clock": 37.965164,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        78,
+        30
+      ],
+      "OWN_healthy_units": {
+        "Worker": 2,
+        "Drone": 1,
+        "LightRifleInfantry": 4
+      },
+      "OWN_completed_structures": {
+        "Barracks": 1,
+        "CommandCenter": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "scout-move-selected-own-ff82aced8a654c2997ea7ef62106856a.ron",
+      "sha256": "27f5ad1f63d8712253b53f722f7f4e79323dd7fb68dd70edc627f0d270bac244",
+      "own_clock": 37.965164,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        78,
+        30
+      ],
+      "OWN_healthy_units": {
+        "LightRifleInfantry": 4,
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "Barracks": 1,
+        "PowerReactor": 1
+      }
+    },
+    {
+      "original_ron": "scout-move-focused-own-99a94943038d46bbb150be4f6addd8b2.ron",
+      "sha256": "27f5ad1f63d8712253b53f722f7f4e79323dd7fb68dd70edc627f0d270bac244",
+      "own_clock": 37.965164,
+      "tutorial_stage": "Move",
+      "player0_bank": [
+        78,
+        30
+      ],
+      "OWN_healthy_units": {
+        "LightRifleInfantry": 4,
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_completed_structures": {
+        "CommandCenter": 1,
+        "Barracks": 1,
+        "PowerReactor": 1
+      }
+    }
+  ]
+}

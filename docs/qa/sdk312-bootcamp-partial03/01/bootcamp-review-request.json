@@ -1,0 +1,123 @@
+{
+  "stage": "04-public-Move",
+  "image": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/04-public-Move.png",
+  "image_sha256": "2c27243db3937096e780b972ffa764150c6cfaf20e408fc8782b70e903d12f1b",
+  "kind": "CURRENTclearOWNbaseground modestmovement>2m, awayfromenemy; .3m naturalarrival remainsrequired",
+  "gesture": "observe",
+  "original_review_seconds": 45,
+  "deadline_utc_epoch": 1791791442.5829036,
+  "caller_absolute_deadline": null,
+  "public_point_context": {
+    "current_focus_receipt": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/scout-move-normal-cohort-focus.json",
+    "current_focus_receipt_sha256": "fe01f49fdc2e6cfc38f4745cc0e8da82dde38adfc1e0829cc872871e5de73b84",
+    "geometry": {
+      "camera_available": true,
+      "camera_world_from_local": [
+        1.0,
+        0.0,
+        -0.0,
+        0.0,
+        -0.0,
+        0.5226873159408569,
+        -0.85252445936203,
+        0.0,
+        0.0,
+        0.85252445936203,
+        0.5226873159408569,
+        0.0,
+        -19.454715728759766,
+        8.14285659790039,
+        -15.946098327636719,
+        1.0
+      ],
+      "camera_clip_from_view": [
+        1.3579950332641602,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.4142134189605713,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        0.10000000149011612,
+        0.0
+      ]
+    },
+    "window": {
+      "browser_dpr": null,
+      "cursor_logical": [
+        1860.0,
+        1044.0
+      ],
+      "cursor_physical": [
+        1860.0,
+        1044.0
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "physical_size": [
+        1920,
+        1080
+      ],
+      "scale_factor": 1.0
+    },
+    "physical_window_offset": [
+      0,
+      0
+    ],
+    "hud_rects": [
+      [
+        [
+          0.0,
+          908.0
+        ],
+        [
+          172.0,
+          1080.0
+        ]
+      ],
+      [
+        [
+          1554.0,
+          930.0
+        ],
+        [
+          1910.0,
+          1070.0
+        ]
+      ],
+      [
+        [
+          196.0,
+          992.0
+        ],
+        [
+          652.0,
+          1080.0
+        ]
+      ],
+      [
+        [
+          12.0,
+          68.0
+        ],
+        [
+          312.0,
+          258.0
+        ]
+      ]
+    ],
+    "map_uri": "res://source/match/maps/PlainAndSimple.tscn",
+    "public_map_size": 50,
+    "map_source_original": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-03/01/scout-move-focused-own-99a94943038d46bbb150be4f6addd8b2.ron",
+    "map_source_ack_sha256": "27f5ad1f63d8712253b53f722f7f4e79323dd7fb68dd70edc627f0d270bac244"
+  }
+}

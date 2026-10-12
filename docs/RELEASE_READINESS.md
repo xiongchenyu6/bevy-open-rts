@@ -7,6 +7,16 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Latest Verified Checkpoints
 
+- SDK312 normal BootCamp actual03 naturally reaches6/7 Move after returned
+  ore, paid Power and Barracks (3/1 each), and four naturally born paid Rifle
+  Infantry (1/0 each). Original UUID saves prove SelectWorker64/32 → Gather64/32
+  → BuildPower70/32 → BuildBarracks67/31 → Train70/30 → Move78/30. It fails an
+  unconsumed original45-second current Move image review; no Move, Attack,
+  victory or same-app Replay acceptance follows. Root review and all23 PNG
+  hashes are preserved; normal game close exits0, no forced cleanup occurs and
+  package/archive stay unchanged
+  ([partial paid/birth proof](qa/sdk312-bootcamp-partial03-review.json)). This is
+  a reviewer deadline failure, not a demonstrated movement defect.
 - SDK312 normal BootCamp attempts01/02 remain failed helper diagnostics.
   Attempt01 stops on an immediate Gather assertion while its saved stage is
   still SelectWorker; the terminal image already shows2/7 Gather. Attempt02
