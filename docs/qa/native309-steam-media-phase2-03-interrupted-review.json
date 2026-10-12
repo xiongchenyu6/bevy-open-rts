@@ -1,0 +1,185 @@
+{
+  "scope": "Preservedfailedactual03: timelyrootapprovals, actualOreHarvest andpartialnativevideo; interruptedbyunidentifiedSIGTERM beforepostrecordingproof; nofive-scene or450frameacceptance",
+  "actual_controller": {
+    "actual_exit": 1,
+    "scope": "Actualnative1920 initialgameplay draft only, not five scenes or Steamrelease",
+    "original_wall": 900,
+    "original_current_image_review": 45,
+    "actual_native_framebuffer_1920": true,
+    "initial_gameplay_image_sha256": "c1a58b9327c9367ea3f74d0d6b1895f7995461cfdf01fc9440d897df726afc2d",
+    "error": "Original900wall interrupted",
+    "error_type": "RuntimeError",
+    "traceback": "Traceback (most recent call last):\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/native309-steam-media-phase2-prepared-20261012/run.py\", line 71, in <module>\n    result['phase2_workflows']=play(s);assert result['phase2_workflows']['actual_victory'],'Original900 boundedworkflow didnot earncompleteobjective; partialscenes retained'\n                               ~~~~^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/native309-steam-media-phase2-prepared-20261012/scenario.py\", line 81, in play\n    ledger=begin_ore_harvester(s,o);s.press('F10');recording=record(s,o,'native1920-ordinary-ore-gameplay')\n                                                             ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/native309-steam-media-phase2-prepared-20261012/scenario.py\", line 54, in record\n    try:s.wait_bounded(16)\n        ~~~~~~~~~~~~~~^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/native309-steam-media1920-prepared-20261012/media_session.py\", line 67, in wait_bounded\n    self.check_wall();time.sleep(seconds);self.check_wall()\n                      ~~~~~~~~~~^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/native309-steam-media-phase2-prepared-20261012/run.py\", line 49, in interrupted\n    def interrupted(n,f):raise RuntimeError('Original900wall interrupted')\n                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: Original900wall interrupted\n",
+    "normal_exits": [
+      {
+        "pid": 310544,
+        "supervisor_pid": 310469,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "forced_cleanup": false,
+    "installation_unchanged": true,
+    "archive_unchanged": true,
+    "wall_seconds": 254.0869462460396,
+    "screenshots": {
+      "01/media-current-00.png": "15c43563aabe324162f3f517b633ea3aeb506e91b57a823fd6ca2982f4523130",
+      "01/media-current-01.png": "32e0f5c9206fc52f128ec5ac970f0afd4e9dedf3c827f22b0a6f7ae5aae7a0e3",
+      "01/media-current-02.png": "7fbb54bfcfc4885c98e31866c64a99f577f2054e19e450cdb29c1a6d2a94a869",
+      "01/media-current-03.png": "373c261b63f43aa79c32caf7789a7747e285b7cee91801f7d5ed83ae43554ddc",
+      "01/media-current-04.png": "c1a58b9327c9367ea3f74d0d6b1895f7995461cfdf01fc9440d897df726afc2d",
+      "01/economy-visible-ore-preview-initial.png": "cd6b8dd8147fedc22f93131e01153ea597fb65c7d460cc93c738d73b9ee046e9",
+      "01/economy-visible-ore-preview-home.png": "a14e6bfb98bb41e740508eb9ccf65b9575e7cc3248344e2fe78a216a3c69df04",
+      "01/economy-visible-ore-preview-pan0.png": "017fa608232d2d0f4baadb9e8601e673038072e1816756bd0d719ca703cfff38",
+      "01/native1920-ordinary-ore-gameplay-actual-frame.png": "96699fc9880892e8ecf84eb35d879924f4a8155cbef4415b5f3f24aa9f12d094"
+    }
+  },
+  "actual_harvest_start": {
+    "initial_bank": [
+      32,
+      16
+    ],
+    "harvester_key": 8589933895,
+    "node": {
+      "key": 8589934036,
+      "kind": 0,
+      "position": [
+        -15.92648983001709,
+        0.0,
+        -7.863399505615234
+      ],
+      "amount": 240
+    },
+    "actual_public_body": {
+      "image": "economy-visible-ore-preview-pan0.png",
+      "image_sha256": "017fa608232d2d0f4baadb9e8601e673038072e1816756bd0d719ca703cfff38",
+      "resource_entity": 8589934036,
+      "kind": "Ore",
+      "projected_body_point": [
+        869,
+        455
+      ],
+      "visible": true,
+      "loaded_mesh_count": 3,
+      "actual_glb_bounds": {
+        "center_screen": [
+          868.6678466796875,
+          454.534423828125
+        ],
+        "ground_screen": [
+          869.5354614257812,
+          462.93927001953125
+        ],
+        "height_above_global_anchor": 0.3275500237941742,
+        "max": [
+          -15.697178840637207,
+          0.3275500237941742,
+          -7.610597133636475
+        ],
+        "min": [
+          -16.155797958374023,
+          0.029999999329447746,
+          -8.116202354431152
+        ],
+        "size": [
+          0.4586191177368164,
+          0.2975500226020813,
+          0.5056052207946777
+        ],
+        "top_screen": [
+          867.783447265625,
+          445.96685791015625
+        ]
+      },
+      "actual_worker_key": 8589933895,
+      "camera_attempt": "pan0"
+    },
+    "normal_controls_only": true,
+    "income_proven": false
+  },
+  "partial_video_and_control_audit": {
+    "scope": "Actual03partialvideo softwaredecode and scoped priorcontrol audit; no450/fullfive-scene approval",
+    "raw_video_sha256": "0bb564c15301d3f367efa02c8a84fbfc51ef4b710a18ed8e43eb2d0398408648",
+    "video": {
+      "width": 1920,
+      "height": 1080,
+      "r_frame_rate": "30/1",
+      "avg_frame_rate": "1895/63",
+      "duration": "12.600000",
+      "nb_frames": "379",
+      "nb_read_frames": "378"
+    },
+    "encoder_log_reported_frames": 379,
+    "decoded_frames": 378,
+    "container_nb_frames": 379,
+    "discrepancy_preserved": true,
+    "decoded_samples": [
+      {
+        "decoded_frame_index": 0,
+        "path": "partial-video-inspection/frame-01.png",
+        "sha256": "2c868ae8ac5d68d4098d579e203e58359f8e467e0bc4765fb4bae59925abb799",
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      {
+        "decoded_frame_index": 189,
+        "path": "partial-video-inspection/frame-02.png",
+        "sha256": "aacfda0634dd0390cf65a6987cc82450a733853c0bffa9a81f23ac5438e6128f",
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      {
+        "decoded_frame_index": 377,
+        "path": "partial-video-inspection/frame-03.png",
+        "sha256": "e68a131e75922e04ae14066a1f4ae4345aa0b1780c1c25887608bf2206dbbd7f",
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      }
+    ],
+    "direct_frame_observations": [
+      "Frame0: HUD32ore, WorkerCargo3/6 atvisibledeposit",
+      "Frame189: HUD38ore, WorkerCargo0/6 movingbackafterreturn",
+      "Frame377: HUD38ore, WorkerCargo6/6 movingwithcargo"
+    ],
+    "actual_post_recording_own_save_proof_absent": true,
+    "failed_reason": "ReceivedSIGTERM duringplanned16srecording at254.09s; notoriginal900wall expiry",
+    "exact_launch_command": "python3 target/native309-steam-media-phase2-prepared-20261012/run.py --out target/sdk309-steam-media-phase2-20261012-03",
+    "launch_tool": "tools.exec_command viafunctions.exec, yield1000ms, normalplainpipes",
+    "tool_session_id": 98237,
+    "controller_pid": 310092,
+    "controller_parent_pid": 2618399,
+    "controller_parent_comm": "codex",
+    "game_pid": 310544,
+    "runtime4_supervisor_pid": 310469,
+    "uv_or_venv_used": false,
+    "no_agent_signal_sent": true,
+    "signal_sender_proven": false,
+    "before_terminal_known_target_tool_signal_calls_found": false,
+    "no_upscale_synthetic_motion_or_host_audio": true,
+    "450frame_accepted": false,
+    "five_earned_scenes_accepted": false
+  },
+  "recent_control_audit": {
+    "scope": "Alltodaytool-control metadata duringactual03window; commandbodies/environment excluded to avoid unrelatedsecret exposure",
+    "start_UTC": "2026-10-12T04:41:14.501000+00:00",
+    "terminal_file_UTC": "2026-10-12T04:45:30.348623+00:00",
+    "candidates": [],
+    "no_known_target_signal_found": true,
+    "sender_unknown": true
+  },
+  "five_earned_scenes_accepted": false,
+  "450frame30fps_accepted": false,
+  "managed_background_fix_prepared_not_launched": true,
+  "portable_archive": {
+    "path": "target/sdk309-steam-media-phase2-20261012-03-failure-evidence.tar.gz",
+    "sha256": "fafac94cb023479e47de8c38e45b9f056a9a608343696d256c86a5de29b569f2",
+    "files": 69,
+    "public_publish_or_source_offer": false
+  }
+}

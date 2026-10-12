@@ -481,3 +481,17 @@ host audio capture. [Native viewport proof](qa/native309-steam-native1920-firsts
 retains earlier client-identity/pointer-calibration failures. This establishes only
 normal initial gameplay at native resolution: earned economy, developed base,
 mixed army, combat, completed objective and450 genuine30fps video frames remain open.
+
+Steam media phase2 actual03 receives timely current menu/Ore approvals and issues
+an exact normal paused Harvest request to the reviewed visible Ore body. A SIGTERM
+interrupts its planned16s recording at254.09s, before the original900s deadline;
+its sender remains unproven. Controller fails, game closes normally with exit0,
+no forced cleanup, package399/archive unchanged. The partial native1920 recording
+has378 independently decoded frames/12.6s, while encoder/container metadata says379;
+both counts are preserved. Extracted first/middle/last native frames show actual
+Worker motion/cargo and HUD ore32→38, but the post-recording own-save income proof
+was not completed. [Interrupted phase2 evidence](qa/native309-steam-media-phase2-03-interrupted-review.json)
+retains raw video, receipts, current reviews, control audit and local portable
+archive. This establishes neither allfive earned media scenes nor450-frame/full
+opening-interaction-combat-ending video acceptance. A managed background systemd
+wrapper is prepared; no further actual run is inferred from that preparation.
