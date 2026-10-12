@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "checks": [
+    "first_partial_genuine_arrivals",
+    "asynchronous_arrival_then_drift",
+    "deadline_expiry",
+    "stale_cohort",
+    "dead_member",
+    "Follow",
+    "work",
+    "queued",
+    "Attack_contact_never_arrival",
+    "idle_above_point3_rejected",
+    "actual04_terminal_still_fails_two_unwitnessed"
+  ],
+  "actual04_terminal_qualified_members": 3,
+  "runtime_verified": false
+}

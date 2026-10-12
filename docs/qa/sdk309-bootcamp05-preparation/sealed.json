@@ -1,0 +1,36 @@
+{
+  "scope": "Exact SDK309 artifact and complete helper closure sealed; runtime unverified",
+  "files": {
+    "target/mission2_physical_controls04.py": "02fdc0fddc6ed96f8f97d351fd2d3df8d77035fbacd60394675ae52ef660faeb",
+    "target/same-app-campaign-preparation/artifact.py": "5a700738fcf11a5fc10f2de5d66365b4fa2efc2fabc8fd3b672282e6d90c97fb",
+    "target/same-app-campaign-preparation/camera_opening.py": "79fdf98bd20a7fb087d9a768f004a825e39b2a658badfc4ff41831756f0afc84",
+    "target/same-app-campaign-preparation/group_opening.py": "89f6615b91c28e6fdb1e61a57467ee8e117b84b978e2f26682ac73ea6b2c6185",
+    "target/same-app-campaign-preparation/process_identity.py": "41e251ae8ffb1411109183ef02f7b7f871793e09d6e025f255e70d5a3142f512",
+    "target/same-app-campaign-preparation/recovery_placement06.py": "b1416747c5c7e7c3c97c73ea114ab9be952e115c28831fdb036ee7ab7d4b5970",
+    "target/same-app-campaign-preparation/recovery_view_guard.py": "ceaee7e1c4c31146d1fc5167aec181ec20b86785ba880f77695c99a7ebd283e2",
+    "target/same-app-campaign-preparation/refresh05.py": "331c7170b15f3fc26921b9524bb34b51e0a6436f4fad72dfde3014ee73c2ca48",
+    "target/same-app-campaign-preparation/session.py": "0135080fbc11a9cc0fbbcef5e6ee7b66538bd85e30751e20874d26afe6d9aacd",
+    "target/save_position_ron.py": "a46f0fd9daf546d0cda6bc8345d91544994aa4dbab69bf5651f6c15dfc68d819",
+    "target/save_queue4_ron.py": "1cde9539cb9bb679d469103bf207d8b53f6f3a5173bf409b8d83f30e912bd12c",
+    "target/save_work4_ron.py": "ff28a0c44a87cabc91590183c3bbc0ce018bb518666fbafc1722b4dd4cf175d2",
+    "target/validate_actual_green_ghost09.py": "21d23821af992c7097f0dd2c7724a9e0387643bb4333da80cc3aff00f9abc388",
+    "target/sdk309-bootcamp05-preparation-20261012/auto03.py": "27a1421867af021cc75abdb93845a036a42133d6918c66ad63c2950cf8658c0d",
+    "target/sdk309-bootcamp05-preparation-20261012/bootcamp02_controls.py": "3b250d12db56cddaf1a55a17098a2b8c5a4c0eb9bfcbe0e2f4186a4b427f518a",
+    "target/sdk309-bootcamp05-preparation-20261012/check_arrival_latch.py": "12c2a86b607264e2711f84b8af9b453705153fc2b25e53f47e445c0c65903fc0",
+    "target/sdk309-bootcamp05-preparation-20261012/cpu-check.json": "83888047158d1dbc5f8c637303d53fc7596d0ae3aba44c2e34fa133927fe264a",
+    "target/sdk309-bootcamp05-preparation-20261012/launch.py": "69e638675676f7c7922fcc6fd3e7d71b92e5df51cc40539db9bc33944237e75b",
+    "target/sdk309-bootcamp05-preparation-20261012/seal.py": "049cc1899097062df5068ca563f60a0d35dc0109c80f76e0ef3e9b3e13e33b5f"
+  },
+  "ready": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native309-formation-extracted-20261012/ready.json",
+  "ready_sha256": "c6a94a0fac9f9f0b19adbe95225a9a3f1be6fa4b7977e3d35901dbf3fa565fa0",
+  "native_pin": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/formation-endpoint-20261012/canonical-pin.json",
+  "native_pin_sha256": "c4366307c82790c5dad785aedb3bb165a059b1341ec933d81ed7aa16e598258a",
+  "binary_sha256": "6caae6b818fd76d8b13395a085dbf0ec8ca632a260af1a486ac56c6b643f44f3",
+  "archive_sha256": "c83ca72ed3e9f709120c154fb95fa57e03ab9c776ba3c28df2114209922fb02e",
+  "bounds": {
+    "whole": 900,
+    "attack": 300,
+    "stage": 30,
+    "review": 45
+  }
+}

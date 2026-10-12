@@ -1,0 +1,18 @@
+{
+  "scope": "CPU prepared first qualifying per-unit arrival witnesses only; actual GUI tutorial05 not run",
+  "CPU_check_exit": 0,
+  "runtime_verified": false,
+  "original_arrival_tolerance_m": 0.3,
+  "bounds": {
+    "whole": 900,
+    "attack": 300,
+    "stage": 30,
+    "review": 45
+  },
+  "unique_actual_poll_save_files": true,
+  "actual04_remains_failed": true,
+  "files": {
+    "docs/qa/sdk309-bootcamp05-preparation/sealed.json": "b56b273db7cb556ceafa65dff2b3d3b5aefa39c43be5c0414f9368aa40e1d1c1",
+    "docs/qa/sdk309-bootcamp05-preparation/cpu-check.json": "83888047158d1dbc5f8c637303d53fc7596d0ae3aba44c2e34fa133927fe264a"
+  }
+}
