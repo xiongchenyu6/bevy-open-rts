@@ -362,3 +362,19 @@ content survey, rights and library distribution obligations remain required.
 Steam submission needs the owner's account and explicit publication scope; the
 quality goal does not authorize submission. Preserve user changes to
 `flake.lock`, `web/index.html`, existing `AGENTS.md` and the ignored full font.
+
+SDK309 ordinary-input audio actual01 completed three voice-only recording workflows
+in138.10s: owned Worker selection/two moves, paid Worker training/completion2ore,
+and paid PowerReactor construction/completion3ore/1crystal. Actual game and three
+private game-only monitor recorders exited0; all399 installation files and archive
+remained unchanged. Independent comparison of32 shipped references against each
+closed stereo48k recording yields four waveform candidates: Ack1, Ack2, Training
+and ConstructionComplete. Hello and UnitReady remain below the candidate threshold;
+ordinary workflow completion establishes neither their audible identity nor all17
+coverage. All recordings have zero PCM16 clipping. The original silent-window
+correlation result was rejected; the corrected verifier excludes low-energy windows
+and passes independent-reference/silence numerical guards. Logical event identity,
+full music/SFX/combat mix, human listening, Windows and browser audio remain open.
+[Scoped actual01 report](qa/native309-normal-audio-review.json) pins the86-file
+portable evidence archive under local `target/`; this is local evidence retention,
+not a public source offer or published release artifact.

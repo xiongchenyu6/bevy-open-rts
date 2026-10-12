@@ -1,0 +1,215 @@
+{
+  "scope": "SDK309 normal physical English voice-only three workflows; four waveform candidates, not six identities or all17 acceptance",
+  "actual_controller": {
+    "actual_exit": 0,
+    "original_wall_seconds": 600,
+    "normal_exits": [
+      {
+        "pid": 4151839,
+        "supervisor_pid": 4151775,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "forced_cleanup": false,
+    "installation_archive_unchanged": true,
+    "phases": [
+      {
+        "event_candidates": [
+          "Hello",
+          "Ack1",
+          "Ack2"
+        ],
+        "individual_cue_waveform_identified": false
+      },
+      {
+        "event_candidates": [
+          "Training",
+          "UnitReady"
+        ],
+        "actual_new_Worker": true,
+        "paid_cost": [
+          2,
+          0
+        ],
+        "individual_cue_waveform_identified": false
+      },
+      {
+        "event_candidates": [
+          "ConstructionComplete"
+        ],
+        "actual_green_paid_completed_Power": true,
+        "paid_cost": [
+          3,
+          1
+        ],
+        "individual_cue_waveform_identified": false
+      }
+    ],
+    "wall_seconds": 138.10456205700757,
+    "screenshots": {
+      "01/voice-only-adjusted-options.png": "71a9b67f2155bb3bdfbfa451a5294a970dddbd4693851c7fa475d80cd59daaaf",
+      "01/Worker-train-0-tooltip.png": "62655841c3dd0979054fb67af654098083a3861ab35d3f32e596cf930a89ed44",
+      "01/Worker-paid-completed.png": "34619f6dff5c6ada8bbe9b621ffaef8dc00d7c3a0538a5034dbf75977ef32e2b",
+      "01/auto-01-PowerReactor-tab-tooltip.png": "b11603b32b3488fd3b4cb6939e779a152eee4a261d49605a0257d53c438e5946",
+      "01/auto-01-PowerReactor-candidate-0-before-ghost.png": "2ff15cc2af6900569bfe6fd5b1ac4d84906c1cb97a8aa890833defb3183d508e",
+      "01/auto-01-PowerReactor-candidate-0-build-tooltip.png": "87982171cdc9ea8654c253fa6377cfd78b3dfe9e7b9f87742aadfc88095c9eb9",
+      "01/auto-01-PowerReactor-ghost-0.png": "3266780d42ecac098af4be6cd40d50c72dae9c1fa18fccc77e48a35d97b81e50",
+      "01/auto-01-PowerReactor-completed.png": "1e5a1cfe76968a940856e0449448ac85c5bcbb8ec75332322cf6bb886df14975",
+      "01/Power-paid-completed.png": "e9897e2c9ebb6adc1bc447a109fe5aa669268a9b33ef0c96178d6c2457dbddf6"
+    },
+    "installation_unchanged": true,
+    "archive_unchanged": true,
+    "host_audio_environment_unchanged": true
+  },
+  "private_game_identity": [
+    {
+      "phase": "normal-selection-and-two-moves",
+      "game_host_pid": 4151839,
+      "game_namespace_pids": [
+        4151839
+      ],
+      "pulse_reported_pid": 4151839,
+      "single_game_playback_stream": true,
+      "monitor": "private rts_qa_game_only.monitor",
+      "recorder_exit": 0
+    },
+    {
+      "phase": "paid-worker-training-and-ready",
+      "game_host_pid": 4151839,
+      "game_namespace_pids": [
+        4151839
+      ],
+      "pulse_reported_pid": 4151839,
+      "single_game_playback_stream": true,
+      "monitor": "private rts_qa_game_only.monitor",
+      "recorder_exit": 0
+    },
+    {
+      "phase": "paid-power-construction-and-complete",
+      "game_host_pid": 4151839,
+      "game_namespace_pids": [
+        4151839
+      ],
+      "pulse_reported_pid": 4151839,
+      "single_game_playback_stream": true,
+      "monitor": "private rts_qa_game_only.monitor",
+      "recorder_exit": 0
+    }
+  ],
+  "pcm_metrics": {
+    "normal-selection-and-two-moves.wav": {
+      "duration": 23.338104166666668,
+      "peak_pcm16": 19564,
+      "clipped_samples": 0,
+      "rms": 924.8267957931619,
+      "sha256": "2ab691d9a65be5588ec946655c7fe97ecd6d42dd728876565a858277512f6e59"
+    },
+    "paid-power-construction-and-complete.wav": {
+      "duration": 31.819041666666667,
+      "peak_pcm16": 17093,
+      "clipped_samples": 0,
+      "rms": 611.1389341635414,
+      "sha256": "5bd0745f27f321252417d8bed12b5722bd23156d646d5035c7b90ee2a70f6615"
+    },
+    "paid-worker-training-and-ready.wav": {
+      "duration": 12.628583333333333,
+      "peak_pcm16": 11629,
+      "clipped_samples": 0,
+      "rms": 690.4531902811046,
+      "sha256": "139889c4a8b2c8ef14e8c09d09ac1b02a73a5162938ccf6b0bbb9a15d36b4416"
+    }
+  },
+  "comparisons": 96,
+  "threshold": 0.85,
+  "matched_waveform_candidates": [
+    {
+      "recording": "normal-selection-and-two-moves.wav",
+      "reference": "assets/voice/english/unit/ack1.ogg",
+      "recording_sha256": "2ab691d9a65be5588ec946655c7fe97ecd6d42dd728876565a858277512f6e59",
+      "reference_sha256": "3e9db0c29c7fc417d24e4823bab16bc0234bfcc8f30d390e0896e1ecf1db243a",
+      "best_offset_seconds": 12.659375,
+      "normalized_correlation": 0.8613401489925288,
+      "candidate_threshold": 0.85,
+      "candidate_match": true,
+      "logical_event_identity_proven": false,
+      "all17_accepted": false
+    },
+    {
+      "recording": "normal-selection-and-two-moves.wav",
+      "reference": "assets/voice/english/unit/ack2.ogg",
+      "recording_sha256": "2ab691d9a65be5588ec946655c7fe97ecd6d42dd728876565a858277512f6e59",
+      "reference_sha256": "4c380c0df4b6cb52b2566611b2452d18c14aa3df97ee0628228ee6ce4f5682a4",
+      "best_offset_seconds": 18.509375,
+      "normalized_correlation": 0.9459490506530329,
+      "candidate_threshold": 0.85,
+      "candidate_match": true,
+      "logical_event_identity_proven": false,
+      "all17_accepted": false
+    },
+    {
+      "recording": "paid-power-construction-and-complete.wav",
+      "reference": "assets/voice/english/announcer/construction_complete.ogg",
+      "recording_sha256": "5bd0745f27f321252417d8bed12b5722bd23156d646d5035c7b90ee2a70f6615",
+      "reference_sha256": "b46bb60b5d9d4660dab9433937b2c8aded77d7456440faa71b6047bfb242ac53",
+      "best_offset_seconds": 27.361625,
+      "normalized_correlation": 0.8907380835838257,
+      "candidate_threshold": 0.85,
+      "candidate_match": true,
+      "logical_event_identity_proven": false,
+      "all17_accepted": false
+    },
+    {
+      "recording": "paid-worker-training-and-ready.wav",
+      "reference": "assets/voice/english/announcer/training.ogg",
+      "recording_sha256": "139889c4a8b2c8ef14e8c09d09ac1b02a73a5162938ccf6b0bbb9a15d36b4416",
+      "reference_sha256": "1590dfc39e19c3de412340cc869b5c610f50c19c3867cbdc682f5ce5169dd881",
+      "best_offset_seconds": 6.654625,
+      "normalized_correlation": 0.9226808598492107,
+      "candidate_threshold": 0.85,
+      "candidate_match": true,
+      "logical_event_identity_proven": false,
+      "all17_accepted": false
+    }
+  ],
+  "unmatched_expected_candidates": [
+    {
+      "candidate": "hello",
+      "coefficient": 0.733284121580912,
+      "threshold": 0.85,
+      "matched": false
+    },
+    {
+      "candidate": "unit_ready",
+      "coefficient": 0.24451407225664445,
+      "threshold": 0.85,
+      "matched": false
+    }
+  ],
+  "logical_event_identity_proven": false,
+  "voice_observer_receipt_available": false,
+  "support_fired_shares_ack2_PCM": true,
+  "all17_accepted": false,
+  "human_mix_accepted": false,
+  "Windows_browser_accepted": false,
+  "gpu_released": true,
+  "limitations": [
+    "Hello and UnitReady below candidate threshold despite normal selection and completed paid Worker; no playback identity claim",
+    "Voice-only sliders mean no full music/SFX/combat mixing acceptance",
+    "Corrected silence-mask correlation verifier used; frozen original produces invalid silent-window coefficients and was rejected"
+  ],
+  "numerical_sanity": {
+    "actual_exit": 0,
+    "silence_rejected": true,
+    "independent_nonself_reference_coefficient": 0.04414950653546793,
+    "independent_negative_below_threshold": true,
+    "runtime_evidence": false
+  },
+  "original_invalid_output_preserved": "original-invalid-correlation-REJECTED.json",
+  "root_independent_review_sha256": "03d14c422ef1c5cd02b704b1204bfea9e094b2c495ad182d7ce2dc70e1a2c8b3",
+  "portable_archive": {
+    "path": "target/sdk309-normal-audio-20261012-01-evidence.tar.gz",
+    "sha256": "a4a6f72b0888390bb25644c6e6df83b27cdebc0adeb7ca38091526d3805b0959",
+    "files": 86
+  }
+}
