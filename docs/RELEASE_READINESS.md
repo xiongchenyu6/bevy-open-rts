@@ -390,3 +390,16 @@ normal selection voices can overlap; no production defect or logical cue identit
 is inferred. Prior actual01 results remain unchanged. [Successor02 report](qa/native309-normal-audio-successor02-review.json)
 pins a local portable archive including independent review. All17 natural event,
 human listening/full mix and Windows/browser acceptance remain open.
+
+SDK309 ordinary insufficient-resources audio actual01 completes sixteen paid
+Worker jobs through enabled normal training cards, naturally spending32ore to0.
+With actual empty queue, a further enabled Worker request leaves bank0ore/16crystal
+and jobs unchanged. Root directly reviews “Not enough resources,” the2ore/0crystal
+Worker tooltip and Queue0/5 in the actual screenshot. Controller and normal game
+exit0 in244.95s; package399/archive unchanged, private game-only output removed.
+All32 shipped references were compared against the closed7.583s stereo48k recording;
+only English NotEnoughResources matches the waveform candidate threshold(.875402),
+with no PCM16 clipping. [Scoped rejection report](qa/native309-insufficient-audio-review.json)
+pins portable local evidence and visible rejection review. This adds one genuine
+ordinary trigger with correlated output; exact logical audio receipts, remaining
+rare natural events, Hello, human mix and Windows/browser audio remain open.

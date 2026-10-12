@@ -1,0 +1,376 @@
+{
+  "scope": "SDK309 ordinary enabled Worker training rejection after sixteen naturally completed paid Worker jobs; one waveform candidate, no all17/humanmix acceptance",
+  "actual_controller": {
+    "actual_exit": 0,
+    "original_wall_seconds": 600,
+    "insufficient_recipe": {
+      "normal_paid_workers": [
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        },
+        {
+          "worker_cost": [
+            2,
+            0
+          ],
+          "natural_new_worker": true
+        }
+      ],
+      "actual_bank_before": [
+        0,
+        16
+      ],
+      "actual_bank_after": [
+        0,
+        16
+      ],
+      "empty_queue_before_after": true,
+      "enabled_fresh_normal_train_click": true,
+      "explicit_insufficient_funds_log_review_pending": true,
+      "waveform_correlation_pending": true,
+      "logical_event_identity_proven": false,
+      "accepted": false
+    },
+    "normal_exits": [
+      {
+        "pid": 4181211,
+        "supervisor_pid": 4181072,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "forced_cleanup": false,
+    "installation_archive_unchanged": true,
+    "phases": [],
+    "wall_seconds": 244.95185122900875,
+    "screenshots": {
+      "01/voice-only-adjusted-options.png": "71a9b67f2155bb3bdfbfa451a5294a970dddbd4693851c7fa475d80cd59daaaf",
+      "01/insufficient-spend-0-0-tooltip.png": "f054785b7d4d317c0f144b5e841c566a4201ddf998ba4d304ee0108f9cea0e87",
+      "01/insufficient-spend-1-0-tooltip.png": "502c4d263db7c76b82e520aca63659ecc1062b2d89ccd22d86ebf386981b6740",
+      "01/insufficient-spend-2-0-tooltip.png": "0130f417996c829e3c5ae070d5fed723280188ceb8c6886294044a289b2e88f8",
+      "01/insufficient-spend-3-0-tooltip.png": "71fd6d196efbf4c65e86e948e6dd29c724a410439ecd8c55a0629be5c0a01cc4",
+      "01/insufficient-spend-4-0-tooltip.png": "9cce33407951c5e7d4fb3013a8cdfa4ed1f1f587e8e016bf44dfed80ad1ed54d",
+      "01/insufficient-spend-5-0-tooltip.png": "0cb8f0e96ccc039af5e391d46dd2626594d77fe4d13bfabd16cf6b8eead0f3e2",
+      "01/insufficient-spend-6-0-tooltip.png": "dca9132c6d485ae94f68a4b43450e8e1ebdf644b52acefd1426861420b9c7a38",
+      "01/insufficient-spend-7-0-tooltip.png": "dd066b7dd9ccc6438befb97c1d80cbc20e7b1343c9f306d5abf0409f1c6803b0",
+      "01/insufficient-spend-8-0-tooltip.png": "74cd25750cfb6ff7f3409ac86e0490be711f8914665462c6f9a54a88ea22aebf",
+      "01/insufficient-spend-9-0-tooltip.png": "29289a1692a1e33db8e24df47848a692497b15181b2dcd64ce68597a1884ee47",
+      "01/insufficient-spend-10-0-tooltip.png": "7b851f44c60cfc5881b081f511b6d5c3fbce6af1076f409fbdfaf469e2434857",
+      "01/insufficient-spend-11-0-tooltip.png": "424217fd50fe0208e701af2cee3875a973e19c9db44da8e0953925afc621cee4",
+      "01/insufficient-spend-12-0-tooltip.png": "1570991b8d4b5950cb61d34b9fa30679d7595b7bf630720e593a00237b6425dc",
+      "01/insufficient-spend-13-0-tooltip.png": "bcd1c86c36615d4c3c1e8d390676034d4061608b2c0756d017279b0baca63e0f",
+      "01/insufficient-spend-14-0-tooltip.png": "6c7e2a90d0b1d946ea20aa937f0bcc70b5f237aaa56e0fc6f4ef5427af0db68d",
+      "01/insufficient-spend-15-0-tooltip.png": "f2ff907422b53bebda9a9c1e40aa47d25aef24c4bc8f29bbd7435f17f525658d",
+      "01/insufficient-enabled-request-tooltip.png": "f986eab5449ed061efe485442580890b6e01899226e1ccf103dad5101edfd6ad",
+      "01/insufficient-actual-visible-battle-log.png": "d99283231c8d2a8d57a02468ba4cf7b1a44f714431c2926a1a937de643549b18"
+    },
+    "installation_unchanged": true,
+    "archive_unchanged": true,
+    "host_audio_environment_unchanged": true
+  },
+  "actual_rejection_receipts": {
+    "normal_paid_workers": [
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      },
+      {
+        "worker_cost": [
+          2,
+          0
+        ],
+        "natural_new_worker": true
+      }
+    ],
+    "actual_bank_before": [
+      0,
+      16
+    ],
+    "actual_bank_after": [
+      0,
+      16
+    ],
+    "empty_queue_before_after": true,
+    "enabled_fresh_normal_train_click": true,
+    "explicit_insufficient_funds_log_review_pending": true,
+    "waveform_correlation_pending": true,
+    "logical_event_identity_proven": false,
+    "accepted": false
+  },
+  "root_visible_rejection_review": {
+    "scope": "Root direct visible insufficient-resources rejection and independent19PNGhash review; waveform/logical playback acceptance pending",
+    "visible_log_exact_text": "Not enough resources",
+    "actual_PNG_directly_viewed": true,
+    "actual_train_tooltip_cost": [
+      2,
+      0
+    ],
+    "visible_queue": "0/5",
+    "bank_before_after": [
+      0,
+      16
+    ],
+    "paid_workers": 16,
+    "normal_exit": 0,
+    "forced_cleanup": false,
+    "all19_PNG_hashes_rechecked": true,
+    "audio_accepted": false,
+    "files": {
+      "result.json": "1e79caa79480707fb22b19332111108ad8a77c105099f9ea160fd474007dfbfe",
+      "01/insufficient-actual-visible-battle-log.png": "d99283231c8d2a8d57a02468ba4cf7b1a44f714431c2926a1a937de643549b18"
+    }
+  },
+  "private_game_identity": [
+    {
+      "phase": "normal-insufficient-worker-request",
+      "game_host_pid": 4181211,
+      "game_namespace_pids": [
+        4181211
+      ],
+      "pulse_reported_pid": 4181211,
+      "single_game_playback_stream": true,
+      "monitor": "private rts_qa_game_only.monitor",
+      "recorder_exit": 0
+    }
+  ],
+  "pcm_metrics": {
+    "normal-insufficient-worker-request.wav": {
+      "duration": 7.583333333333333,
+      "peak_pcm16": 9206,
+      "clipped_samples": 0,
+      "rms": 707.9558034084263,
+      "sha256": "8d210fec2ae440db4349c532670339bddde9ad35239e067546362645a4ea079a"
+    }
+  },
+  "comparisons": 32,
+  "threshold": 0.85,
+  "matched_waveform_candidates": [
+    {
+      "recording": "normal-insufficient-worker-request.wav",
+      "reference": "assets/voice/english/announcer/not_enough_resources.ogg",
+      "recording_sha256": "8d210fec2ae440db4349c532670339bddde9ad35239e067546362645a4ea079a",
+      "reference_sha256": "672f1f0b1b613c3771c8f60a8f2fb9a6f230b40e0c10437ee637d6ba079ded72",
+      "best_offset_seconds": 2.32125,
+      "normalized_correlation": 0.8754023688099082,
+      "candidate_threshold": 0.85,
+      "candidate_match": true,
+      "logical_event_identity_proven": false,
+      "all17_accepted": false
+    }
+  ],
+  "ordinary_insufficient_funds_trigger_observed": true,
+  "logical_audio_event_receipt_available": false,
+  "logical_audio_identity_proven": false,
+  "all17_accepted": false,
+  "human_mix_accepted": false,
+  "Windows_browser_accepted": false,
+  "gpu_released_to_M2": true,
+  "portable_archive": {
+    "path": "target/sdk309-insufficient-audio-20261012-01-evidence.tar.gz",
+    "sha256": "8c2f9cb16d924e41de3ef554cbcae65e278d8407cc3e1d7a6802e27062908721",
+    "files": 103
+  }
+}
