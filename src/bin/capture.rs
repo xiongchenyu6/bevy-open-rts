@@ -1610,53 +1610,155 @@ fn recover_abandoned_campaign_foundation(
     let entities = snapshot["entities"]
         .as_array()
         .ok_or("missing construction entities")?;
+    let contacts = snapshot["contacts"]
+        .as_array()
+        .ok_or("missing contact observations")?;
     let Some(site) = entities.iter().find(|entity| {
-        entity["team"].as_str() == Some("Player(0)")
-            && entity["structure"].as_str() == Some(structure_id)
+        entity["team"] == "Player(0)"
+            && entity["structure"] == structure_id
             && entity["construction_remaining"].as_f64().is_some()
             && entity["health"].as_f64().is_some_and(|hp| hp > 0.0)
-            && entity["position"].as_array().is_some_and(|position| {
-                let x = position[0].as_f64().unwrap_or(f64::MAX) as f32;
-                let z = position[2].as_f64().unwrap_or(f64::MAX) as f32;
-                Vec3::new(x, 0.0, z).distance(placed_at.with_y(0.0)) < 0.25
+            && entity["position"].as_array().is_some_and(|p| {
+                Vec3::new(
+                    p[0].as_f64().unwrap_or(f64::MAX) as f32,
+                    0.0,
+                    p[2].as_f64().unwrap_or(f64::MAX) as f32,
+                )
+                .distance(placed_at.with_y(0.0))
+                    < 0.25
             })
     }) else {
         return Ok(false);
     };
     let target = site["entity"].as_u64().ok_or("foundation entity missing")?;
-    if entities.iter().any(|entity| {
-        entity["team"].as_str() == Some("Player(0)")
-            && entity["unit"].as_str() == Some("Worker")
+    let healthy_worker = |entity: &&serde_json::Value| {
+        entity["team"] == "Player(0)"
+            && entity["unit"] == "Worker"
             && entity["health"].as_f64().is_some_and(|hp| hp > 0.0)
-            && (entity["construct_target"].as_u64() == Some(target)
-                || entity["queued_construct_targets"]
-                    .as_array()
-                    .is_some_and(|targets| {
-                        targets.iter().any(|queued| queued.as_u64() == Some(target))
-                    }))
-    }) {
-        return Ok(false);
+    };
+    for worker in entities.iter().filter(healthy_worker) {
+        if worker["queued_construct_targets"]
+            .as_array()
+            .is_some_and(|q| q.iter().any(|key| key.as_u64() == Some(target)))
+        {
+            return Ok(false);
+        }
+        if worker["construct_target"].as_u64() != Some(target) {
+            continue;
+        }
+        let contact = contacts
+            .iter()
+            .find(|c| c["worker"] == worker["entity"] && c["target"].as_u64() == Some(target))
+            .ok_or("assigned builder contact row missing")?;
+        let range = contact["entry_range"]
+            .as_f64()
+            .ok_or("actual construction entry range missing")?;
+        let p = worker["position"]
+            .as_array()
+            .ok_or("builder position missing")?;
+        let distance = (p[0].as_f64().unwrap() - placed_at.x as f64)
+            .hypot(p[2].as_f64().unwrap() - placed_at.z as f64);
+        if !worker["move_target"].is_null()
+            || !worker["path_goal"].is_null()
+            || distance <= range
+            || contact["reachable"] != false
+            || worker["emp_remaining"]
+                .as_f64()
+                .is_some_and(|remaining| remaining > 0.0)
+        {
+            return Ok(false);
+        }
     }
-    if !bevy_open_rts::capture_campaign_units(app)
+    let candidate = entities
         .iter()
-        .any(|unit| unit.id == "Worker" && !unit.constructing)
-    {
+        .filter(healthy_worker)
+        .filter(|worker| {
+            worker["construct_target"].is_null()
+                && worker["queued_construct_targets"]
+                    .as_array()
+                    .is_some_and(|q| q.is_empty())
+                && !worker["emp_remaining"]
+                    .as_f64()
+                    .is_some_and(|remaining| remaining > 0.0)
+                && contacts.iter().any(|c| {
+                    c["worker"] == worker["entity"]
+                        && c["target"].as_u64() == Some(target)
+                        && c["reachable"] == true
+                })
+        })
+        .min_by(|a, b| {
+            let distance = |worker: &serde_json::Value| {
+                let p = worker["position"].as_array().unwrap();
+                (p[0].as_f64().unwrap() - placed_at.x as f64)
+                    .hypot(p[2].as_f64().unwrap() - placed_at.z as f64)
+            };
+            distance(a).total_cmp(&distance(b))
+        });
+    let Some(candidate) = candidate else {
         return Ok(false);
+    };
+    let builder = candidate["entity"]
+        .as_u64()
+        .ok_or("reachable free builder entity missing")?;
+    println!("[capture] reachable-foundation-recovery target={target} builder={builder}");
+    trace_campaign_construction(app, structure_id, "before-reachable-builder-selection")?;
+    capture_key(app, KeyCode::ShiftLeft, false);
+    let mut selected = None;
+    for attempt in 0..3 {
+        let Some(before) = bevy_open_rts::capture_campaign_units(app)
+            .into_iter()
+            .find(|u| {
+                u.entity.to_bits() == builder
+                    && u.id == "Worker"
+                    && u.health > 0.0
+                    && !u.constructing
+            })
+        else {
+            return Ok(false);
+        };
+        capture_set_cursor(app, Vec2::new(WIDTH as f32 * 0.5, HEIGHT as f32 * 0.5));
+        capture_focus_camera_on(app, before.position);
+        for _ in 0..12 {
+            observed_capture_step(app, observer);
+        }
+        let Some(current) = bevy_open_rts::capture_campaign_units(app)
+            .into_iter()
+            .find(|u| u.entity == before.entity && u.health > 0.0 && !u.constructing)
+        else {
+            return Ok(false);
+        };
+        let point = capture_world_to_screen(
+            app,
+            if attempt == 0 {
+                current.position
+            } else {
+                current.click_position
+            },
+        )
+        .ok_or("reachable builder offscreen")?;
+        bevy_open_rts::capture_world_click_safety(
+            app,
+            point,
+            Vec2::new(WIDTH as f32, HEIGHT as f32),
+        )?;
+        capture_click_screen(app, point, MouseButton::Left);
+        if capture_entity_is_selected(app, current.entity) {
+            selected = Some(current.entity);
+            break;
+        }
     }
-    campaign_bot::select_builder(app)?;
-    let builder = bevy_open_rts::capture_campaign_units(app)
-        .into_iter()
-        .find(|unit| unit.id == "Worker" && unit.selected)
-        .ok_or("recovery builder selection vanished")?
-        .entity
-        .to_bits();
-    println!("[capture] abandoned-foundation-recovery target={target} builder={builder}");
-    trace_campaign_construction(app, structure_id, "before-recovery-right-click")?;
+    if selected.is_none() {
+        return Err("normal click did not select exact reachable free builder".into());
+    }
+    trace_campaign_construction(app, structure_id, "after-reachable-builder-selection")?;
+    capture_set_cursor(app, Vec2::new(WIDTH as f32 * 0.5, HEIGHT as f32 * 0.5));
     capture_focus_camera_on(app, placed_at);
     for _ in 0..8 {
         observed_capture_step(app, observer);
     }
     let screen = capture_world_to_screen(app, placed_at).ok_or("recovery foundation offscreen")?;
+    bevy_open_rts::capture_world_click_safety(app, screen, Vec2::new(WIDTH as f32, HEIGHT as f32))?;
+    trace_campaign_construction(app, structure_id, "before-recovery-right-click")?;
     capture_set_cursor(app, screen);
     capture_mouse_button(app, MouseButton::Right, true);
     observed_capture_step(app, observer);
@@ -1665,21 +1767,25 @@ fn recover_abandoned_campaign_foundation(
         observed_capture_step(app, observer);
     }
     let after = bevy_open_rts::capture_construction_contact_debug(app);
-    let current = after["entities"].as_array().and_then(|entities| {
-        entities
-            .iter()
-            .find(|entity| entity["entity"].as_u64() == Some(builder))
+    let assigned = after["entities"].as_array().is_some_and(|entities| {
+        entities.iter().any(|entity| {
+            entity["entity"].as_u64() == Some(builder)
+                && entity["health"].as_f64().is_some_and(|hp| hp > 0.0)
+                && entity["construct_target"].as_u64() == Some(target)
+        })
     });
-    let assigned =
-        current.is_some_and(|entity| entity["construct_target"].as_u64() == Some(target));
-    println!(
-        "[capture] abandoned-foundation-recovery result target={target} builder={builder} alive={} assigned={assigned}",
-        current.is_some()
-    );
     trace_campaign_construction(app, structure_id, "after-recovery-right-click")?;
+    println!(
+        "[capture] reachable-foundation-recovery result target={target} builder={builder} assigned={assigned}"
+    );
+    if !assigned {
+        return Err(
+            "normal right-click did not assign reachable free builder to existing foundation"
+                .into(),
+        );
+    }
     Ok(true)
 }
-
 fn build_structure_with_input_mode(
     app: &mut App,
     structure_id: &'static str,

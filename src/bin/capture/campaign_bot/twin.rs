@@ -58,7 +58,100 @@ fn refill(app: &mut App, hold: bool) -> Result<(), String> {
     Ok(())
 }
 
-pub(super) fn opening(app: &mut App, watch: &mut SetupWatch) -> Result<(), String> {
+/// Leave ground squads on their current response while existing rockets focus a visible capturer.
+pub(super) fn defend_visible_engineer(
+    app: &mut App,
+    watch: &mut SetupWatch,
+) -> Result<bool, String> {
+    let state = capture_campaign_state(app);
+    let Some(base) = state.headquarters.map(|hq| hq.position) else {
+        return Ok(false);
+    };
+    let Some(engineer) = visible_enemy_contacts(app)?
+        .into_iter()
+        .filter(|contact| contact.id == "EngineerDrone" && contact.position.distance(base) <= 16.0)
+        .min_by(|a, b| {
+            a.position
+                .distance_squared(base)
+                .total_cmp(&b.position.distance_squared(base))
+        })
+    else {
+        return Ok(false);
+    };
+    let rockets: Vec<_> = capture_campaign_units(app)
+        .iter()
+        .filter(|unit| unit.id == "RocketInfantry" && unit.health > 0.0)
+        .map(|unit| unit.entity)
+        .collect();
+    if rockets.is_empty() {
+        return Ok(false);
+    }
+    select_units(app, &rockets)?;
+    // The existing helper re-reads visibility after the normal selection/camera input.
+    let focused = focus_target::attack(app, &watch.dir, engineer.key)?;
+    if focused {
+        println!(
+            "[capture] M5 visible Engineer normal Rocket priority target={}",
+            engineer.key
+        );
+        log_state(app, &mut watch.trace, "visible-engineer-rocket-defense")?;
+    }
+    Ok(focused)
+}
+
+/// Recover only the first lost infantry producer through ordinary paid placement.
+pub(super) fn recover_first_barracks(
+    app: &mut App,
+    watch: &mut SetupWatch,
+    attempted: &mut bool,
+) -> Result<(), String> {
+    if defend_visible_engineer(app, watch)? {
+        return Ok(());
+    }
+    if *attempted {
+        return queue_to_quota(app, "Barracks", "HeavyMachinegunTrooper", 3);
+    }
+    let state = capture_campaign_state(app);
+    if state
+        .structures
+        .iter()
+        .any(|structure| structure.id == "Barracks")
+    {
+        return Ok(());
+    }
+    // Current authored Alliance Barracks cost; the actual placement UI charges it.
+    let bank = capture_player_resources(app);
+    if bank.0 < 3 || bank.1 < 1 {
+        return Ok(());
+    }
+    *attempted = true;
+    watch.checkpoint(app, "before-first-paid-rear-Barracks-recovery")?;
+    let result = place_campaign_structure_with_offsets(
+        app,
+        "Barracks",
+        [
+            Vec3::new(-3.0, 0.0, -7.0),
+            Vec3::new(-8.0, 0.0, -5.0),
+            Vec3::new(-8.0, 0.0, 0.0),
+            Vec3::new(-5.0, 0.0, -8.0),
+            Vec3::new(0.0, 0.0, -8.0),
+        ],
+        &mut |app| watch.observe(app),
+    );
+    if let Err(error) = result {
+        watch.checkpoint(app, "first-paid-rear-Barracks-recovery-failed")?;
+        return Err(error);
+    }
+    println!("[capture] M5 first lost Barracks normal paid rear recovery; original 3HMG quota");
+    watch.checkpoint(app, "first-paid-rear-Barracks-recovery-placed")?;
+    queue_to_quota(app, "Barracks", "HeavyMachinegunTrooper", 3)
+}
+
+pub(super) fn opening(
+    app: &mut App,
+    watch: &mut SetupWatch,
+    recovery_attempted: &mut bool,
+) -> Result<(), String> {
     build(app, watch, "PowerReactor")?;
     build(app, watch, "VehicleFactory")?;
     rally_to_safe_staging(app, "VehicleFactory", 4)?;
@@ -131,6 +224,11 @@ pub(super) fn opening(app: &mut App, watch: &mut SetupWatch) -> Result<(), Strin
     watch.checkpoint(app, "opening-whole-army-held")?;
     for _ in 0..180 {
         running(app)?;
+        if defend_visible_engineer(app, watch)? {
+            watch.advance(app, 15);
+            continue;
+        }
+        recover_first_barracks(app, watch, recovery_attempted)?;
         refill(app, false)?;
         let state = capture_campaign_state(app);
         let contacts = visible_enemy_contacts(app)?;

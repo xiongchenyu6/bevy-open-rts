@@ -16,6 +16,51 @@ pub(super) fn run(
         Vec3::new(x, 0.0, -z),
         Vec3::ZERO,
     ];
+    // A Worker is an economic survival anchor under the normal annihilation
+    // rules. Keep one alive with a real retreat order instead of leaving every
+    // collector beside the captured HQ while the army chases enemies.
+    let corners = [
+        Vec3::new(-state.half_width + 4.0, 0.0, -state.half_depth + 4.0),
+        Vec3::new(-state.half_width + 4.0, 0.0, state.half_depth - 4.0),
+        Vec3::new(state.half_width - 4.0, 0.0, -state.half_depth + 4.0),
+        Vec3::new(state.half_width - 4.0, 0.0, state.half_depth - 4.0),
+    ];
+    let units = capture_campaign_units(app);
+    if let Some(worker) = units
+        .iter()
+        .filter(|unit| unit.id == "Worker")
+        .max_by(|a, b| {
+            a.health.total_cmp(&b.health).then_with(|| {
+                let distance = |unit: &CaptureCampaignUnit| {
+                    corners
+                        .iter()
+                        .map(|point| unit.position.distance_squared(*point))
+                        .fold(f32::INFINITY, f32::min)
+                };
+                distance(b).total_cmp(&distance(a))
+            })
+        })
+    {
+        let target = *corners
+            .iter()
+            .min_by(|a, b| {
+                worker
+                    .position
+                    .distance_squared(**a)
+                    .total_cmp(&worker.position.distance_squared(**b))
+            })
+            .unwrap();
+        if bevy_open_rts::capture_has_pending_command_mode(app) {
+            tap_key(app, KeyCode::Escape);
+        }
+        select_units(app, &[worker.entity])?;
+        ground_order(app, target, false)?;
+        println!(
+            "[capture] surviving economic Worker {} normal retreat to {target:?}",
+            worker.entity
+        );
+        log_state(app, &mut watch.trace, "survivor-worker-retreat")?;
+    }
     let mut leg = 0;
     println!(
         "[capture] HQ lost while match remains Running; continuing existing army, remaining rounds={remaining_rounds}"

@@ -54,6 +54,13 @@ configuration, initial HQ position, resource, typed count, outcome and asset has
 checks passed for all eight. Raw reports, commands, process exits and verification
 are retained in `target/movement-clearance-failed-rechecks-20261010`.
 
-This is bounded regression evidence. The older3726-case sweep continues on its
-immutable5ac594 executable; it is not a pass for the corrected source. No general
-balance, complete map coverage or release readiness claim follows from these runs.
+This is bounded regression evidence. The older5ac594 sweep was semantically
+superseded after441 observations:435 completed and6 simulation timeouts; inflight
+0441 and all raw evidence were retained. Its owned process group was confirmed
+terminal. It is not a completed sweep or a pass for the corrected source.
+A fresh3726-case sweep runs on immutable0295f5 in
+`target/skirmish-movement-clearance-all-starts-20261010`, with an isolated
+pre-portrait338-file asset snapshot and unchanged configuration/time budgets.
+That headless run does not validate the subsequently replaced71 portrait images.
+No general balance, complete map coverage or release readiness claim follows
+from the bounded rechecks.

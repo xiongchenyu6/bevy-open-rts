@@ -9,14 +9,16 @@ use bevy_open_rts::{
 use std::collections::{BTreeMap, HashSet};
 use std::io::Write;
 
+#[path = "campaign_bot/battle_support.rs"]
+mod battle_support;
 #[path = "campaign_bot/finale.rs"]
 mod finale;
-#[path = "campaign_bot/twin.rs"]
-mod twin;
-#[path = "campaign_bot/survivors.rs"]
-mod survivors;
 #[path = "campaign_bot/focus_target.rs"]
 mod focus_target;
+#[path = "campaign_bot/survivors.rs"]
+mod survivors;
+#[path = "campaign_bot/twin.rs"]
+mod twin;
 
 pub(super) fn run_finale(app: &mut App, handle: &Handle<Image>, dir: &Path) -> Result<(), String> {
     finale::run(app, handle, dir)
@@ -255,6 +257,71 @@ fn clear_selection_with_empty_ground_input(app: &mut App) -> Result<(), String> 
     Err("could not clear dead-target selection through verified empty-ground clicks".into())
 }
 
+/// Optional per-click evidence; records observations without advancing the app.
+fn record_selection_click(
+    app: &mut App,
+    requested: Entity,
+    point: Vec2,
+    attempt: usize,
+    probe: &str,
+    phase: &str,
+) -> Result<(), String> {
+    let Some(path) = std::env::var_os("OPEN_RTS_CAPTURE_SELECTION_TRACE") else {
+        return Ok(());
+    };
+    let actors = capture_campaign_units(app);
+    let game_phase = capture_match_phase_label(app);
+    let live = if game_phase == "Running" {
+        bevy_open_rts::capture_live_mine_state(app)?
+    } else {
+        // The persistence getter only accepts running games; terminal diagnostics
+        // still use actual campaign/contact state and mark unavailable save data.
+        serde_json::json!({"clock":null,"units":[],"structures":[]})
+    };
+    let debug = capture_construction_contact_debug(app);
+    let visibility: BTreeMap<_, _> = live["units"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|actor| {
+            actor["key"]
+                .as_u64()
+                .map(|key| (key, actor["visible"].clone()))
+        })
+        .collect();
+    let requested_position = actors
+        .iter()
+        .find(|actor| actor.entity == requested)
+        .map(|actor| actor.position);
+    let mut candidates = Vec::new();
+    for actor in actors {
+        let foot_screen = capture_world_to_screen(app, actor.position);
+        let visual_screen = capture_world_to_screen(app, actor.click_position);
+        let near = actor.entity == requested
+            || requested_position.is_some_and(|position| position.distance(actor.position) <= 3.0)
+            || foot_screen.is_some_and(|screen| screen.distance(point) <= 80.0);
+        if near {
+            candidates.push(serde_json::json!({"entity":actor.entity.to_bits(),"id":actor.id,
+                "position":actor.position.to_array(), "visual_position":actor.click_position.to_array(),
+                "foot_screen":foot_screen.map(|screen| screen.to_array()),
+                "visual_screen":visual_screen.map(|screen| screen.to_array()),
+                "visible":visibility.get(&actor.entity.to_bits()), "hp":actor.health,
+                "selected":actor.selected,"moving":actor.moving,"holding":actor.holding,
+            }));
+        }
+    }
+    let value = serde_json::json!({"clock":debug["clock"], "phase":phase,"game_phase":game_phase,
+        "live_snapshot_available":game_phase == "Running", "attempt":attempt,
+        "probe":probe,"requested":requested.to_bits(),"cursor":point.to_array(),
+        "camera":debug["camera"],"owned_candidates":candidates});
+    let mut file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path)
+        .map_err(|error| error.to_string())?;
+    writeln!(file, "{value}").map_err(|error| error.to_string())
+}
+
 fn select_units(app: &mut App, ids: &[Entity]) -> Result<Vec<Entity>, String> {
     running(app)?;
     let initial = capture_campaign_units(app);
@@ -290,6 +357,17 @@ fn select_units(app: &mut App, ids: &[Entity]) -> Result<Vec<Entity>, String> {
                 );
                 capture_focus_camera_on(app, before.position);
                 advance(app, 12);
+                if capture_match_phase_label(app) != "Running" {
+                    record_selection_click(
+                        app,
+                        id,
+                        Vec2::new(WIDTH as f32 * 0.5, HEIGHT as f32 * 0.5),
+                        attempt,
+                        "not-clicked",
+                        "phase-transition",
+                    )?;
+                    running(app)?;
+                }
                 let Some(unit) = capture_campaign_units(app)
                     .into_iter()
                     .find(|unit| unit.entity == id)
@@ -299,7 +377,12 @@ fn select_units(app: &mut App, ids: &[Entity]) -> Result<Vec<Entity>, String> {
                     );
                     break;
                 };
-                let point = capture_world_to_screen(app, unit.position)
+                let (probe, world_point) = if attempt == 0 {
+                    ("foot", unit.position)
+                } else {
+                    ("visual-centre", unit.click_position)
+                };
+                let point = capture_world_to_screen(app, world_point)
                     .ok_or("campaign unit could not be brought into view")?;
                 if point.x < 24.0
                     || point.x > WIDTH as f32 - 24.0
@@ -310,8 +393,11 @@ fn select_units(app: &mut App, ids: &[Entity]) -> Result<Vec<Entity>, String> {
                         "campaign unit is still outside click-safe field after centering: {id:?} at {point:?}"
                     ));
                 }
+                record_selection_click(app, id, point, attempt, probe, "before")?;
                 capture_key(app, KeyCode::ShiftLeft, !clicked.is_empty());
                 capture_click_screen(app, point, MouseButton::Left);
+                record_selection_click(app, id, point, attempt, probe, "after")?;
+                running(app)?;
                 // Per-unit camera settling already exceeds double-click timing.
                 if !capture_entity_is_selected(app, id) {
                     let current = capture_campaign_units(app);
@@ -571,12 +657,16 @@ pub(super) fn ensure_harvesting(app: &mut App) -> Result<(), String> {
         if worker.constructing {
             continue;
         }
-        let kind = if worker_count > 1 && index == worker_count - 1 {
-            "crystal"
+        let crystal_worker = if capture_active_mission(app) == Some(1) {
+            worker_count > 1 && index >= worker_count / 2
         } else {
-            "ore"
+            worker_count > 1 && index == worker_count - 1
         };
-        if worker.harvesting && worker.harvest_kind.is_none_or(|current| current == kind) {
+        let kind = if crystal_worker { "crystal" } else { "ore" };
+        if worker.harvesting
+            && (worker.harvest_kind == Some(kind)
+                || (worker.harvest_kind.is_none() && worker.moving))
+        {
             continue;
         }
         let resources = capture_campaign_resources(app);
@@ -718,7 +808,9 @@ fn maintain_home_defense(app: &mut App, perimeter: f32, staging_offset: f32) -> 
                 .total_cmp(&b.position.distance_squared(base))
         })
     {
-        if recall(app, DEFENSE)? {
+        if (capture_active_mission(app) == Some(1) && battle_support::recall_army(app)?)
+            || (capture_active_mission(app) != Some(1) && recall(app, DEFENSE)?)
+        {
             ground_order(app, threat.position, true)?;
         }
         return Ok(());
@@ -750,6 +842,41 @@ fn maintain_home_defense(app: &mut App, perimeter: f32, staging_offset: f32) -> 
     Ok(())
 }
 
+fn intercept_visible_m1_artillery(app: &mut App) -> Result<bool, String> {
+    let contacts = visible_enemy_contacts(app)?;
+    let units = capture_campaign_units(app);
+    let Some(threat) = contacts
+        .iter()
+        .filter(|threat| {
+            matches!(
+                threat.id.as_str(),
+                "LongbowMissileCrawler" | "RailArtilleryWalker" | "RailgunTank"
+            )
+        })
+        .min_by(|a, b| {
+            let distance = |c: &VisibleEnemyContact| {
+                units
+                    .iter()
+                    .filter(|u| u.combat)
+                    .map(|u| u.position.distance_squared(c.position))
+                    .fold(f32::INFINITY, f32::min)
+            };
+            distance(a).total_cmp(&distance(b))
+        })
+    else {
+        return Ok(false);
+    };
+    if !battle_support::recall_army(app)? {
+        return Ok(false);
+    }
+    println!(
+        "[capture] M1 actual visible frontline artillery group intercept {} at {:?}",
+        threat.id, threat.position
+    );
+    ground_order(app, threat.position, true)?;
+    Ok(true)
+}
+
 fn maintain_m1_visible_air_defense(app: &mut App) -> Result<(), String> {
     let state = capture_campaign_state(app);
     let contacts = visible_enemy_contacts(app)?;
@@ -770,14 +897,7 @@ fn maintain_m1_visible_air_defense(app: &mut App) -> Result<(), String> {
     else {
         return Ok(());
     };
-    let guards: Vec<_> = capture_campaign_units(app)
-        .iter()
-        .filter(|unit| {
-            unit.groups.contains(&DEFENSE) && matches!(unit.id, "RocketInfantry" | "AntiAirWalker")
-        })
-        .map(|unit| unit.entity)
-        .collect();
-    if select_units(app, &guards)?.is_empty() {
+    if !battle_support::recall_army(app)? {
         return Ok(());
     }
     println!(
@@ -1014,7 +1134,14 @@ pub(super) fn log_state(
         *types.entry(unit.id).or_insert(0usize) += 1;
     }
     // Join read-only snapshots without advancing the application between reads.
-    let live = bevy_open_rts::capture_live_mine_state(app)?;
+    let game_phase = capture_match_phase_label(app);
+    let live = if game_phase == "Running" {
+        bevy_open_rts::capture_live_mine_state(app)?
+    } else {
+        // The persistence getter only accepts running games; terminal diagnostics
+        // still use actual campaign/contact state and mark unavailable save data.
+        serde_json::json!({"clock":null,"units":[],"structures":[]})
+    };
     let contact = capture_construction_contact_debug(app);
     let live_units: BTreeMap<_, _> = live["units"]
         .as_array()
@@ -1068,7 +1195,8 @@ pub(super) fn log_state(
         })
         .collect();
     let value = serde_json::json!({
-        "stage": stage, "clock": state.clock, "phase": capture_match_phase_label(app),
+        "stage": stage, "clock": state.clock, "phase": game_phase,
+        "live_snapshot_available": game_phase == "Running",
         "resources": capture_player_resources(app), "low_power": state.low_power,
         "headquarters": state.headquarters.as_ref().map(|hq| serde_json::json!({"hp":hq.health,"max":hq.max_health,"position":hq.position.to_array()})),
         "types": types, "queued": state.queued,
@@ -1117,10 +1245,11 @@ pub(super) fn run(
         error: None,
     };
     let mut remaining_rounds = 240;
+    let mut twin_barracks_recovery_attempted = false;
     let result = (|| {
         log_state(app, &mut watch.trace, "opening")?;
         if index == 4 {
-            twin::opening(app, &mut watch)?;
+            twin::opening(app, &mut watch, &mut twin_barracks_recovery_attempted)?;
         } else {
             build(app, &mut watch, "PowerReactor")?;
             // Factory-first gets real armor onto the battlefield before the Hard
@@ -1170,7 +1299,12 @@ pub(super) fn run(
             if index == 1 {
                 queue_to_quota(app, "VehicleFactory", "AntiAirWalker", 2)?;
             }
-            queue_to_quota(app, "VehicleFactory", "Tank", 9)?;
+            queue_to_quota(
+                app,
+                "VehicleFactory",
+                "Tank",
+                if index == 1 { 6 } else { 9 },
+            )?;
             if index != 1 {
                 build(app, &mut watch, "RadarUplink")?;
             }
@@ -1183,7 +1317,27 @@ pub(super) fn run(
             }
             build(app, &mut watch, "AntiGroundTurret")?;
             if index == 1 {
-                queue_to_quota(app, "VehicleFactory", "Tank", 9)?;
+                watch.checkpoint(app, "before-build-spaced-RoboticsBay")?;
+                let mut observer = |app: &mut App| watch.observe(app);
+                build_campaign_structure_with_offsets(
+                    app,
+                    "RoboticsBay",
+                    [
+                        Vec3::new(8.0, 0.0, -6.0),
+                        Vec3::new(6.0, 0.0, -7.0),
+                        Vec3::new(8.0, 0.0, -4.0),
+                        Vec3::new(7.0, 0.0, -5.0),
+                        Vec3::new(9.0, 0.0, -6.0),
+                    ],
+                    &mut observer,
+                )?;
+                ensure_harvesting(app)?;
+                watch.checkpoint(app, "after-build-spaced-RoboticsBay")?;
+                println!(
+                    "[capture] M1 paid RoboticsBay and two Longbow counters; normal income only"
+                );
+                queue_to_quota(app, "VehicleFactory", "LongbowMissileCrawler", 2)?;
+                queue_to_quota(app, "VehicleFactory", "Tank", 6)?;
             } else {
                 train_to_count(app, &mut watch, "VehicleFactory", "Tank", 6)?;
             }
@@ -1207,6 +1361,13 @@ pub(super) fn run(
             if capture_match_phase_label(app) != "Running" {
                 break;
             }
+            if index == 4 {
+                twin::recover_first_barracks(
+                    app,
+                    &mut watch,
+                    &mut twin_barracks_recovery_attempted,
+                )?;
+            }
             ensure_harvesting(app)?;
             refresh_groups(app)?;
             hold_arrived_defenders(app)?;
@@ -1214,14 +1375,46 @@ pub(super) fn run(
                 maintain_home_defense(app, 12.0, 8.0)?;
             }
             if index == 1 {
+                let state = capture_campaign_state(app);
+                let bank = capture_player_resources(app);
+                if !state.structures.iter().any(|s| s.id == "TechLab") && bank.0 >= 7 && bank.1 >= 7
+                {
+                    watch.checkpoint(app, "before-build-normal-support-TechLab")?;
+                    let mut observer = |app: &mut App| watch.observe(app);
+                    build_campaign_structure_with_offsets(
+                        app,
+                        "TechLab",
+                        [
+                            Vec3::new(-7.0, 0.0, 0.0),
+                            Vec3::new(-8.0, 0.0, -2.0),
+                            Vec3::new(-6.0, 0.0, -1.0),
+                            Vec3::new(-7.0, 0.0, 2.0),
+                            Vec3::new(-5.0, 0.0, -2.0),
+                        ],
+                        &mut observer,
+                    )?;
+                    watch.checkpoint(app, "after-build-normal-support-TechLab")?;
+                }
+                battle_support::maintain(app, dir)?;
+            }
+            if index == 1 {
                 queue_to_quota(app, "VehicleFactory", "AntiAirWalker", 2)?;
                 queue_to_quota(app, "Barracks", "RocketInfantry", 5)?;
                 maintain_m1_visible_air_defense(app)?;
             }
+            if index == 1 {
+                queue_to_quota(app, "VehicleFactory", "LongbowMissileCrawler", 2)?;
+            }
+            let artillery_intercept = index == 1 && intercept_visible_m1_artillery(app)?;
             queue_to_quota(app, "CommandCenter", "Worker", 4)?;
             queue_to_quota(app, "Barracks", "HeavyMachinegunTrooper", 3)?;
             queue_to_quota(app, "Barracks", "RocketInfantry", 5)?;
-            queue_to_quota(app, "VehicleFactory", "Tank", 9)?;
+            queue_to_quota(
+                app,
+                "VehicleFactory",
+                "Tank",
+                if index == 1 { 6 } else { 9 },
+            )?;
             let state = capture_campaign_state(app);
             let units = capture_campaign_units(app);
             let Some(hq) = state.headquarters.as_ref() else {
@@ -1254,14 +1447,16 @@ pub(super) fn run(
                     .count()
                     >= *quota
             });
-            if pressure && hq.health < hq.max_health * 0.75 {
+            if artillery_intercept {
+                launched = false;
+            } else if pressure && hq.health < hq.max_health * 0.75 {
                 if recall(app, ASSAULT)? {
                     ground_order(app, hq.position + Vec3::new(4.5, 0.0, 4.5), true)?;
                 }
                 launched = false;
             } else if !pressure
                 && defenders_ready
-                && tanks >= 6
+                && tanks >= if index == 1 { 3 } else { 6 }
                 && (!launched || state.clock - last_attack_clock >= 15.0)
             {
                 attack(app, &mut scout_cursor, index == 1)?;
@@ -1298,6 +1493,7 @@ pub(super) fn run(
     })();
     let result = if result.as_ref().err().is_some_and(|error| {
         error == "headquarters lost"
+            || error == "headquarters lost while clearing selection"
             || error == "campaign headquarters eliminated"
             || error.starts_with("could not place ")
     }) && matches!(index, 2 | 4)
@@ -1310,9 +1506,24 @@ pub(super) fn run(
                 "original_error": result.as_ref().err(),
                 "snapshot": capture_construction_contact_debug(app),
                 "scope": "Original macro failure retained; only existing army may continue"
-            })).map_err(|error| error.to_string())?,
-        ).map_err(|error| error.to_string())?;
+            }))
+            .map_err(|error| error.to_string())?,
+        )
+        .map_err(|error| error.to_string())?;
         survivors::run(app, &mut watch, remaining_rounds)
+    } else {
+        result
+    };
+    // A natural victory can arrive while ordinary input is settling. Accept only
+    // this exact phase-stop result; selection mismatches retain their errors.
+    let result = if result
+        .as_ref()
+        .err()
+        .is_some_and(|error| error == "campaign bot stopped during HumanVictory")
+        && capture_match_phase_label(app) == "HumanVictory"
+    {
+        log_state(app, &mut watch.trace, "result")?;
+        Ok(())
     } else {
         result
     };

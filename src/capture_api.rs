@@ -18,7 +18,6 @@ pub use camera_edges::{
     capture_camera_minimap_point, capture_camera_mouse_wheel,
 };
 
-
 #[cfg(not(target_arch = "wasm32"))]
 mod portrait_export;
 #[cfg(not(target_arch = "wasm32"))]
@@ -56,7 +55,9 @@ pub use save_lifecycle::{
 #[cfg(not(target_arch = "wasm32"))]
 mod save_orders;
 #[cfg(not(target_arch = "wasm32"))]
-pub use save_orders::{capture_disk_order_state, capture_live_order_state, capture_world_click_safety};
+pub use save_orders::{
+    capture_disk_order_state, capture_live_order_state, capture_world_click_safety,
+};
 
 #[cfg(not(target_arch = "wasm32"))]
 mod save_effects;
@@ -1427,6 +1428,33 @@ pub fn capture_construction_contact_debug(app: &mut App) -> serde_json::Value {
             }).collect::<Vec<_>>()).unwrap_or_default(),
         })
     }).collect();
+    let camera_state = world.get_resource::<RtsCamera>().map(|camera| {
+        serde_json::json!({
+            "focus": camera.focus.to_array(), "distance": camera.distance,
+            "yaw": camera.yaw, "pitch": camera.pitch, "pending_jump": camera.pending_jump,
+        })
+    });
+    let rendered_camera = {
+        let mut cameras =
+            world.query_filtered::<(Entity, &Camera, &GlobalTransform), With<MainCamera>>();
+        cameras.iter(world).next().map(|(entity, camera, transform)| {
+            let (_, rotation, translation) = transform.to_scale_rotation_translation();
+            let bounds = world.resource::<MapBounds>();
+            let ground_corners = camera.logical_viewport_size().map(|size| {
+                [Vec2::ZERO, Vec2::new(size.x, 0.0), size, Vec2::new(0.0, size.y)]
+                    .map(|screen| {
+                        let point = camera.viewport_to_world(transform, screen).ok()
+                            .and_then(|ray| ray.plane_intersection_point(Vec3::ZERO, InfinitePlane3d::new(Vec3::Y)));
+                        serde_json::json!({"screen":screen.to_array(),
+                            "flat_ground":point.map(|point| point.to_array()),
+                            "inside_map":point.map(|point| point.x.abs() <= bounds.half_width && point.z.abs() <= bounds.half_depth)})
+                    })
+            });
+            serde_json::json!({"entity":entity.to_bits(), "position":translation.to_array(), "rotation":rotation.to_array(),
+                "flat_ground_viewport_corners":ground_corners,
+                "map_half_extent":[bounds.half_width,bounds.half_depth]})
+        })
+    };
     let grid = world.resource::<NavGrid>();
     let static_obstacles: Vec<_> = query
         .iter(world)
@@ -1490,12 +1518,14 @@ pub fn capture_construction_contact_debug(app: &mut App) -> serde_json::Value {
                 &occupied,
             );
             contacts.push(serde_json::json!({"worker":worker.to_bits(),"target":target.to_bits(),
+                "entry_range":contact_action_entry_range(radius,target_radius,CONSTRUCTION_ENTRY_MARGIN_M),
                 "reachable":approach.is_some(),"contact_target":approach.as_ref().map(|a| a.target.to_array()),
                 "waypoint_count":approach.as_ref().map(|a| a.waypoints.len())}));
         }
     }
     serde_json::json!({ "entities":entities, "contacts":contacts,
         "clock":world.resource::<MatchState>().start_time_sec,
+        "camera": {"state":camera_state,"rendered":rendered_camera},
         "movement_gating": {"delta_secs": world.resource::<Time>().delta_secs(),
             "app_screen": format!("{:?}", world.resource::<State<AppScreen>>().get()),
             "menu_visible": world.resource::<MatchMenuState>().visible,
