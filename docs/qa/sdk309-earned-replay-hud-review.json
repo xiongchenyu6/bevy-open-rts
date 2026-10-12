@@ -1,0 +1,28 @@
+{
+  "scope": "Actual latestHUD5fcf401 normal fresh-process Replay of original genuineearned09 profile only; old09 whole-flow failure/explicitEattack unproven",
+  "passed": true,
+  "root_direct_menu_and_fresh_lesson_images": true,
+  "actual_own_bank": [
+    64,
+    32
+  ],
+  "actual_own_roster": [
+    "Worker",
+    "Worker",
+    "Drone"
+  ],
+  "zero_paid_Infantry": true,
+  "actual_lesson": "SelectWorker",
+  "original_campaign_hash_unchanged": "2264aab2d7e7dae2d74a86b515a3d4d8dd630f89048565b8f47148db0d085e93",
+  "normal_game_exit": 0,
+  "forced_cleanup": false,
+  "package_archive_unchanged": true,
+  "all_two_PNG_hashes_independently_checked": true,
+  "children_exited": true,
+  "files": {
+    "docs/qa/sdk309-earned-replay-hud/00-earned-menu.png": "23592db5feb875e79df10280089fae28ea03ab1ef61ac6e79e71563c2f279a69",
+    "docs/qa/sdk309-earned-replay-hud/replay-result.json": "ac67dc68ad82dabc9e8f80b08f56a36e4d1e215e61bd930aa207485f9f378bfb",
+    "docs/qa/sdk309-earned-replay-hud/01-fresh-replay.png": "81dee20ada7df5f70a763574c4bc8ef29d17b6ca2f1431426c16e640f77516ac",
+    "docs/qa/sdk309-earned-replay-hud/profile-identity.json": "2805702057cc0f0160c0abffe1e1b1f7615ed30ce2cc8aefd0db9995220f3f48"
+  }
+}

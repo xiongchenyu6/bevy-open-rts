@@ -54,7 +54,13 @@ A bounded regression or an older package cannot establish final release readines
   contact and is not counted as arrival. The harness fails when it tries
   another focus after victory; normal exit0 and all33 PNG hashes are verified
   ([actual partial victory](qa/sdk309-bootcamp-partial09-review.json)).
-  Explicit visible-HQ attack input and whole-flow freshReplay remain unproven.
+  Explicit visible-HQ attack input and a single uninterrupted whole-flow
+  harness remain unproven. A separate fresh-process Replay on the latest
+  objective-HUD SDK selects the genuine original09 user-data directory:
+  current Replay Boot Camp opens lesson1/7 at64/32 with two Workers+Drone
+  andzero Infantry. Root views both images, verifies unchanged campaign
+  hash andnormal exit0/no forced cleanup/package unchanged
+  ([actual replay proof](qa/sdk309-earned-replay-hud-review.json)).
 - Previous source `4f8e588` prevents allied separation from displacing held units.
   Two genuine scheduled REDs show0.844m/0.817m drift; unchanged GREEN scenarios
   keep held translation exactly zero while friendly movement still works.

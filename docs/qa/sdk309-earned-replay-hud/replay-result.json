@@ -1,0 +1,40 @@
+{
+  "scope": "Standalone fresh-process normal Replay of genuine earned09 profile in latest HUD SDK309; does not replace failed09 flow",
+  "passed": true,
+  "profile": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-09/user-data",
+  "campaign_before_sha256": "2264aab2d7e7dae2d74a86b515a3d4d8dd630f89048565b8f47148db0d085e93",
+  "ready": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native309-objective-hud-extracted-20261012/ready.json",
+  "fresh_own": {
+    "bank": [
+      64,
+      32
+    ],
+    "own_unit_ids": [
+      "Worker",
+      "Worker",
+      "Drone"
+    ],
+    "zero_paid_Infantry": true,
+    "lesson": "SelectWorker"
+  },
+  "flow_passed": true,
+  "normal_exits": [
+    {
+      "pid": 4076026,
+      "supervisor_pid": 4075961,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "campaign_after_sha256": "2264aab2d7e7dae2d74a86b515a3d4d8dd630f89048565b8f47148db0d085e93",
+  "campaign_unchanged": true,
+  "screenshots": {
+    "00-earned-menu.png": "23592db5feb875e79df10280089fae28ea03ab1ef61ac6e79e71563c2f279a69",
+    "01-fresh-replay.png": "81dee20ada7df5f70a763574c4bc8ef29d17b6ca2f1431426c16e640f77516ac"
+  },
+  "wall_seconds": 60.57371621200582,
+  "all_session_children_exited": true
+}
