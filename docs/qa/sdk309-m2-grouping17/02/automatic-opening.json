@@ -1,0 +1,41 @@
+[
+  {
+    "id": "PowerReactor",
+    "cost": [
+      3,
+      1
+    ],
+    "point": [
+      662,
+      391
+    ],
+    "completed_count": 1,
+    "construction_wall": 12.293745631002821
+  },
+  {
+    "id": "VehicleFactory",
+    "cost": [
+      6,
+      0
+    ],
+    "point": [
+      629,
+      382
+    ],
+    "completed_count": 1,
+    "construction_wall": 10.427629534038715
+  },
+  {
+    "id": "RadarUplink",
+    "cost": [
+      4,
+      3
+    ],
+    "point": [
+      661,
+      348
+    ],
+    "completed_count": 1,
+    "construction_wall": 11.739758765965234
+  }
+]

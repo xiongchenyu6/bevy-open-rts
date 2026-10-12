@@ -7,6 +7,15 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Latest Verified Checkpoints
 
+- Normal native M2 diagnostic17 completes Power, Factory and Radar, then
+  stops before AA placement: the toast-overlapped current ghost has1274
+  changed green pixels against the unchanged1500 threshold. The original
+  45-second review expires; the review gate arrives85.16 seconds after the
+  request and is never consumed. The adaptive Tank policy is not exercised.
+  Raw `passed` remains false. Root rehashes all30 PNGs; normal close exits0,
+  package/archive stay unchanged, no children remain and the GPU is released
+  ([bounded failure](qa/sdk309-m2-grouping17-review.json)). Natural M2 victory
+  and all nine release gates remain open.
 - Current HUD source moves the objective tracker to the upper-right HUD
   column after W28 Patrol frames show Drone-body overlap. Owned-file format
   and all-target checks pass; fresh309 tests and four native builds pass.

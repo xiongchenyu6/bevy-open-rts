@@ -1,0 +1,57 @@
+{
+  "scope": "Actual17 firstthreepaidbuildings only; adaptiveTanknotexercised",
+  "passed": false,
+  "error": "Original45second unknownsite review exhausted",
+  "paid_buildings": [
+    {
+      "id": "PowerReactor",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        662,
+        391
+      ],
+      "completed_count": 1,
+      "construction_wall": 12.293745631002821
+    },
+    {
+      "id": "VehicleFactory",
+      "cost": [
+        6,
+        0
+      ],
+      "point": [
+        629,
+        382
+      ],
+      "completed_count": 1,
+      "construction_wall": 10.427629534038715
+    },
+    {
+      "id": "RadarUplink",
+      "cost": [
+        4,
+        3
+      ],
+      "point": [
+        661,
+        348
+      ],
+      "completed_count": 1,
+      "construction_wall": 11.739758765965234
+    }
+  ],
+  "AA_green_pixels": 1274,
+  "unchanged_green_required": 1500,
+  "AA_red_changed_pixels": 568,
+  "visible_current_ghost_toast_overlap": true,
+  "review_gate_age_seconds": 85.15593957901001,
+  "gate_not_consumed": true,
+  "PNG_count": 30,
+  "normal_exit": 0,
+  "forced_cleanup": false,
+  "installation_archive_unchanged": true,
+  "all9releasegates_open": true
+}

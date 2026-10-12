@@ -1,0 +1,65 @@
+{
+  "image_before_sha256": "369c1fd984e25a6aaa138244c97ac6d5512c3da5c5924b6496a7836c09c0b115",
+  "image_after_sha256": "e3f3b8246998794956a57f63119f710b5452c8f84107d800db35e11a1c51fd93",
+  "point": [
+    554,
+    297
+  ],
+  "green_changed_pixels": 1274,
+  "red_changed_pixels": 568,
+  "changed_pixels": 13703,
+  "passed": false,
+  "physical_viewport": [
+    2,
+    28,
+    1276,
+    690
+  ],
+  "masked_hud_rects": [
+    [
+      [
+        2.0,
+        546.0
+      ],
+      [
+        174.0,
+        718.0
+      ]
+    ],
+    [
+      [
+        1192.0,
+        36.0
+      ],
+      [
+        1266.0,
+        110.0
+      ]
+    ],
+    [
+      [
+        912.0,
+        424.0
+      ],
+      [
+        1268.0,
+        708.0
+      ]
+    ],
+    [
+      [
+        198.0,
+        630.0
+      ],
+      [
+        654.0,
+        718.0
+      ]
+    ]
+  ],
+  "masked_pixels": 0,
+  "green_threshold": 1500,
+  "absolute_red_pixels": 6487,
+  "non_new_red_excluded_pixels": 5919,
+  "red_tint_rule": "PositiveR-G/R-Bchroma gains>25 withGdecrease versusBEFORE; green1500/ratio2 unchanged"
+}
