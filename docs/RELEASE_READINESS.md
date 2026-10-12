@@ -20,7 +20,20 @@ A bounded regression or an older package cannot establish final release readines
   OfficialSDK objective-HUD Linux packaging also passes: root independently
   rehashes144 sources,332 assets,four canonical binaries,all399 installed
   files and archive ([shipping proof](qa/native309-objective-hud-sdk-shipping-review.json)).
-  New native GUI acceptance remains pending.
+  Normal native M2 diagnostic16 on source `5fcf40196e3a4d12e16ee57c4a8a7b41720c9a87`
+  proves six paid buildings, both outer producer Rally points and the exact
+  initial eleven defenders. AA/HMG/Rocket cohorts complete Move, HQ-range
+  arrival and Hold while all eight held anchors remain unchanged. The last
+  three Tanks individually end Move, but never simultaneously satisfy
+  idle/HQ-range across seventeen samples; one unheld Tank subsequently drifts
+  beyond its 5 m range. The original 30-second cohort guard fails and raw
+  `passed` remains false. The production cause is unverified; no movement fix
+  follows from this diagnostic. Root independently rehashes all65 PNGs and
+  directly reviews the failure image; normal close exits0, package/archive
+  remain unchanged and the GPU is released
+  ([bounded failure proof](qa/sdk309-m2-grouping16-review.json)). Later assault,
+  natural M2 victory and six missions in one app remain unverified. All nine
+  release gates remain open.
 - Current worktree resolves physically blocked terrain formation endpoints. The
   genuine save-restored diagnostic changes4/5 arrivals to5/5 within the same
   30s; canonical tests now pass309/0/1ignored. All-target checking and four

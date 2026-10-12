@@ -1,0 +1,172 @@
+{
+  "exact_failure": "Original30 actual formation Move completion/HQ-range failed",
+  "failed_cohort": "Tank",
+  "last_OWN_arrival": "group11-Tank-arrival-16.ron",
+  "own_clock": 136.68181,
+  "tank_final_OWN": [
+    {
+      "key": 13086765349206,
+      "position": [
+        -19.687456,
+        0.05,
+        -17.000082
+      ],
+      "active": "[]",
+      "hold": "false",
+      "distance_ownHQ": 5.508814732649847
+    },
+    {
+      "key": 558345745966,
+      "position": [
+        -20.638468,
+        0.05,
+        -19.383602
+      ],
+      "active": "[]",
+      "hold": "false",
+      "distance_ownHQ": 2.9494589133310543
+    },
+    {
+      "key": 188978558643,
+      "position": [
+        -21.574453,
+        0.05,
+        -17.245281
+      ],
+      "active": "[]",
+      "hold": "false",
+      "distance_ownHQ": 4.7737242293800355
+    }
+  ],
+  "typed_Move_arrival_Hold_passed": [
+    {
+      "type": "AntiAirWalker",
+      "count": 2
+    },
+    {
+      "type": "HeavyMachinegunTrooper",
+      "count": 3
+    },
+    {
+      "type": "RocketInfantry",
+      "count": 3
+    }
+  ],
+  "paid_base": [
+    {
+      "id": "PowerReactor",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        641,
+        378
+      ],
+      "completed_count": 1,
+      "construction_wall": 12.095722014957573
+    },
+    {
+      "id": "VehicleFactory",
+      "cost": [
+        6,
+        0
+      ],
+      "point": [
+        620,
+        381
+      ],
+      "completed_count": 1,
+      "construction_wall": 10.291751140030101
+    },
+    {
+      "id": "RadarUplink",
+      "cost": [
+        4,
+        3
+      ],
+      "point": [
+        665,
+        358
+      ],
+      "completed_count": 1,
+      "construction_wall": 10.79632283304818
+    },
+    {
+      "id": "AntiAirTurret",
+      "cost": [
+        2,
+        2
+      ],
+      "point": [
+        560,
+        338
+      ],
+      "completed_count": 1,
+      "construction_wall": 10.789147832023446
+    },
+    {
+      "id": "AntiGroundTurret",
+      "cost": [
+        2,
+        2
+      ],
+      "point": [
+        598,
+        342
+      ],
+      "completed_count": 1,
+      "construction_wall": 8.969419293978717
+    },
+    {
+      "id": "Barracks",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        700,
+        417
+      ],
+      "completed_count": 1,
+      "construction_wall": 12.855091172968969
+    }
+  ],
+  "physical_rendered_pixel_receipts": [
+    {
+      "file": "auto-01-PowerReactor-candidate-0-rendered-view-receipt.json",
+      "points": 586,
+      "maxdelta": 0.00020040213280481112
+    },
+    {
+      "file": "auto-05-AntiGroundTurret-candidate-0-rendered-view-receipt.json",
+      "points": 902,
+      "maxdelta": 0.00014005808924366647
+    },
+    {
+      "file": "auto-03-RadarUplink-candidate-0-rendered-view-receipt.json",
+      "points": 772,
+      "maxdelta": 0.0002712144116685522
+    },
+    {
+      "file": "auto-04-AntiAirTurret-candidate-0-rendered-view-receipt.json",
+      "points": 821,
+      "maxdelta": 0.0
+    },
+    {
+      "file": "auto-02-VehicleFactory-candidate-0-rendered-view-receipt.json",
+      "points": 659,
+      "maxdelta": 0.00018848848475272462
+    },
+    {
+      "file": "auto-06-Barracks-candidate-0-rendered-view-receipt.json",
+      "points": 1079,
+      "maxdelta": 0.0
+    }
+  ],
+  "png_count": 65,
+  "scope": "Normal freshM2; assault and naturalvictory unproven",
+  "normal_exit0": true,
+  "forced_cleanup": false,
+  "installation_archive_unchanged": true
+}

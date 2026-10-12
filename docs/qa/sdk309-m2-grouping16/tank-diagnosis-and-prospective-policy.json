@@ -1,0 +1,53 @@
+{
+  "scope": "CPU-only diagnosis of actual16 OWN observations; no successor17 implementation or runtime",
+  "issued_and_first_idle": [
+    {
+      "key": 558345745966,
+      "issued_goal_HQdistance": 3.181980515339464,
+      "first_idle_clock": 113.41031,
+      "first_idle_HQdistance": 3.2229190357072257,
+      "first_idle_goal_distance": 0.06523887433118325,
+      "first_idle_in_range": true
+    },
+    {
+      "key": 188978558643,
+      "issued_goal_HQdistance": 4.351835669578529,
+      "first_idle_clock": 115.27301,
+      "first_idle_HQdistance": 4.7737242293800355,
+      "first_idle_goal_distance": 0.6418659642277362,
+      "first_idle_in_range": true
+    },
+    {
+      "key": 13086765349206,
+      "issued_goal_HQdistance": 4.676675855920849,
+      "first_idle_clock": 111.581566,
+      "first_idle_HQdistance": 4.766572067629419,
+      "first_idle_goal_distance": 0.17321434587238976,
+      "first_idle_in_range": true
+    }
+  ],
+  "simultaneous_ready_samples": [],
+  "sample_count": 17,
+  "production_cause_unverified": true,
+  "source_corroboration": {
+    "nav": "src/nav.rs movable requires speed>0 and Hold disabled",
+    "orders": "src/orders.rs ordinary selected Hold clears orders when enabled"
+  },
+  "prospective_policy": [
+    "Retain exact11 paid defenders, six layout sites, costs and all clearances.",
+    "Use explicit healthy singleTank current-image selection; never mixed or already-held cohort toggles.",
+    "Approve each public HQ-relative destination before normal Move; natural actual idle within range must precede Hold.",
+    "Share one original30 natural-arrival cohort deadline across all three; do not restart for each Tank.",
+    "Pause normal F10 at each observed qualifying arrival, select only that Tank, issue ordinary Hold, and verify every previously held anchor remains unchanged.",
+    "Resume remaining actors under same cohort budget; reject missing actor/wrong selection/out-of-range/movement order/anchor shift."
+  ],
+  "feasibility_limits": [
+    "Actual16 individually firstidle/range evidence supports prospective perTank Hold, but does not prove future same-point arrival.",
+    "Three fresh body reviews each bounded45 and multiple normal save/input steps may exhaust shared30 whole-wall arrival budget; deadline accounting must be explicit before run.",
+    "Prepare/review stable OWN selection geometry while paused before shared cohort timer starts when possible; arrivals may change body projection, requiring fresh current frame.",
+    "No budget pause subtraction, perTank30 reset, cached body approval or anchor movement is authorized.",
+    "Prospective separate normal perTank Move targets may change traffic; currentPNG + allactor/resource/HUD guards remain necessary."
+  ],
+  "GPU_or_Cargo_or_source_changes": false,
+  "successor17_launched": false
+}

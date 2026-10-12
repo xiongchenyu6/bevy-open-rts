@@ -1,0 +1,42 @@
+[
+  {
+    "producer": "VehicleFactory",
+    "producer_key": 644245092656,
+    "rally": {
+      "target": [
+        -22.0,
+        0.0,
+        -27.512861251831055
+      ],
+      "mode": 0,
+      "target_entity": null
+    },
+    "point": [
+      640,
+      125
+    ],
+    "before_any_Train": true,
+    "paused_bank_clock_units_unchanged": true,
+    "actual_current_image_sha256": "90693824adcdf7c49ec77b9d5af762e5cd8f763f22d57c38b0ff863b6364f554"
+  },
+  {
+    "producer": "Barracks",
+    "producer_key": 5171140622338,
+    "rally": {
+      "target": [
+        -19.50328254699707,
+        0.0,
+        -27.00487518310547
+      ],
+      "mode": 0,
+      "target_entity": null
+    },
+    "point": [
+      774,
+      144
+    ],
+    "before_any_Train": true,
+    "paused_bank_clock_units_unchanged": true,
+    "actual_current_image_sha256": "975383d21015c0d7cd58427eb75219ce86925dd9a18f37a16d1acd05d1099823"
+  }
+]

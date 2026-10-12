@@ -1,0 +1,179 @@
+[
+  {
+    "id": "PowerReactor",
+    "cost": [
+      3,
+      1
+    ],
+    "point": [
+      641,
+      378
+    ],
+    "completed_count": 1,
+    "construction_wall": 12.095722014957573
+  },
+  {
+    "id": "VehicleFactory",
+    "cost": [
+      6,
+      0
+    ],
+    "point": [
+      620,
+      381
+    ],
+    "completed_count": 1,
+    "construction_wall": 10.291751140030101
+  },
+  {
+    "id": "RadarUplink",
+    "cost": [
+      4,
+      3
+    ],
+    "point": [
+      665,
+      358
+    ],
+    "completed_count": 1,
+    "construction_wall": 10.79632283304818
+  },
+  {
+    "id": "AntiAirTurret",
+    "cost": [
+      2,
+      2
+    ],
+    "point": [
+      560,
+      338
+    ],
+    "completed_count": 1,
+    "construction_wall": 10.789147832023446
+  },
+  {
+    "id": "AntiGroundTurret",
+    "cost": [
+      2,
+      2
+    ],
+    "point": [
+      598,
+      342
+    ],
+    "completed_count": 1,
+    "construction_wall": 8.969419293978717
+  },
+  {
+    "id": "Barracks",
+    "cost": [
+      3,
+      1
+    ],
+    "point": [
+      700,
+      417
+    ],
+    "completed_count": 1,
+    "construction_wall": 12.855091172968969
+  },
+  {
+    "producer": "VehicleFactory",
+    "unit": "AntiAirWalker",
+    "queued_paid_count": 1,
+    "bank": [
+      77,
+      21
+    ]
+  },
+  {
+    "producer": "VehicleFactory",
+    "unit": "AntiAirWalker",
+    "queued_paid_count": 1,
+    "bank": [
+      74,
+      19
+    ]
+  },
+  {
+    "producer": "VehicleFactory",
+    "unit": "Tank",
+    "queued_paid_count": 1,
+    "bank": [
+      71,
+      18
+    ]
+  },
+  {
+    "producer": "VehicleFactory",
+    "unit": "Tank",
+    "queued_paid_count": 1,
+    "bank": [
+      68,
+      17
+    ]
+  },
+  {
+    "producer": "VehicleFactory",
+    "unit": "Tank",
+    "queued_paid_count": 1,
+    "bank": [
+      65,
+      16
+    ]
+  },
+  {
+    "producer": "Barracks",
+    "unit": "RocketInfantry",
+    "queued_paid_count": 1,
+    "bank": [
+      63,
+      15
+    ]
+  },
+  {
+    "producer": "Barracks",
+    "unit": "RocketInfantry",
+    "queued_paid_count": 1,
+    "bank": [
+      61,
+      14
+    ]
+  },
+  {
+    "producer": "Barracks",
+    "unit": "RocketInfantry",
+    "queued_paid_count": 1,
+    "bank": [
+      59,
+      13
+    ]
+  },
+  {
+    "producer": "Barracks",
+    "unit": "HeavyMachinegunTrooper",
+    "queued_paid_count": 1,
+    "bank": [
+      57,
+      12
+    ]
+  },
+  {
+    "producer": "Barracks",
+    "unit": "HeavyMachinegunTrooper",
+    "queued_paid_count": 1,
+    "bank": [
+      55,
+      11
+    ]
+  },
+  {
+    "producer": "Barracks",
+    "unit": "HeavyMachinegunTrooper",
+    "queued_paid_count": 1,
+    "bank": [
+      59,
+      10
+    ]
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "branch": "skip-disabled-proven-idle",
+  "action": "StopSelected",
+  "exact_cohort": {
+    "558345745966": "Tank",
+    "188978558643": "Tank",
+    "13086765349206": "Tank"
+  },
+  "enabled": false,
+  "active_and_queued_empty_after": true,
+  "paused_bank_clock_pose_unchanged": true,
+  "before": "group11-Tank-stop-before.ron",
+  "after": "group11-Tank-stop-after.ron"
+}

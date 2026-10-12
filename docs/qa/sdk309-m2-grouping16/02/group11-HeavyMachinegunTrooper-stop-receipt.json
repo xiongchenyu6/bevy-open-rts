@@ -1,0 +1,14 @@
+{
+  "branch": "skip-disabled-proven-idle",
+  "action": "StopSelected",
+  "exact_cohort": {
+    "760209209000": "HeavyMachinegunTrooper",
+    "171798689408": "HeavyMachinegunTrooper",
+    "5669356828523": "HeavyMachinegunTrooper"
+  },
+  "enabled": false,
+  "active_and_queued_empty_after": true,
+  "paused_bank_clock_pose_unchanged": true,
+  "before": "group11-HeavyMachinegunTrooper-stop-before.ron",
+  "after": "group11-HeavyMachinegunTrooper-stop-after.ron"
+}

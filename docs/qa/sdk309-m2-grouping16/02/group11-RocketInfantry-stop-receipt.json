@@ -1,0 +1,14 @@
+{
+  "branch": "skip-disabled-proven-idle",
+  "action": "StopSelected",
+  "exact_cohort": {
+    "9307194128406": "RocketInfantry",
+    "9878424778845": "RocketInfantry",
+    "193273526000": "RocketInfantry"
+  },
+  "enabled": false,
+  "active_and_queued_empty_after": true,
+  "paused_bank_clock_pose_unchanged": true,
+  "before": "group11-RocketInfantry-stop-before.ron",
+  "after": "group11-RocketInfantry-stop-after.ron"
+}

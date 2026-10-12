@@ -1,0 +1,33 @@
+{
+  "scope": "Independent actual16 failed Tank defense observation; no inferred movement bug, victory or campaign completion",
+  "raw_passed": false,
+  "all65_PNG_hashes_rechecked": true,
+  "failure_PNG_directly_viewed": true,
+  "tanks": {
+    "558345745966": {
+      "first_sampled_idle_clock": 113.41031,
+      "first_sampled_idle_HQ_distance": 3.2229190357072257,
+      "first_sampled_idle_goal_distance": 0.06523887433118325,
+      "final_HQ_distance": 2.9494589133310543
+    },
+    "188978558643": {
+      "first_sampled_idle_clock": 115.27301,
+      "first_sampled_idle_HQ_distance": 4.7737242293800355,
+      "first_sampled_idle_goal_distance": 0.6418659642277362,
+      "final_HQ_distance": 4.7737242293800355
+    },
+    "13086765349206": {
+      "first_sampled_idle_clock": 111.581566,
+      "first_sampled_idle_HQ_distance": 4.766572067629419,
+      "first_sampled_idle_goal_distance": 0.17321434587238976,
+      "final_HQ_distance": 5.508814732649847
+    }
+  },
+  "all3_simultaneously_idle_and_within_range_in_saved_samples": false,
+  "interpretation": "All three became idle individually. One sampled idle Tank was initially within range then moved outside range while unheld. Production cause unverified; subsequent normal Hold handling requires investigation.",
+  "files": {
+    "result.json": "1f171919b33eea0ddffd2edb6b284b218fc2b79e9d03176486d32c4e155d33c2",
+    "tank-failure-trajectory-own.json": "a736ce7c08ed6f3bf206dbd89b052014fd42e69c262403beee43f90b25778aff",
+    "02/actual-M2-failure.png": "a9e2ec11a79eb7aea32f0f99434041c81d11cf25c65221b1e4471246f5a2923b"
+  }
+}

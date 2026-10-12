@@ -1,0 +1,1057 @@
+{
+  "scope": "Actual16 OWN-only original30 failedTank trajectory; no retry/no hidden enemy data",
+  "issued_goals": {
+    "558345745966": [
+      -19.75,
+      0.0,
+      -19.75
+    ],
+    "188978558643": [
+      -22.07115,
+      0.0,
+      -17.648746
+    ],
+    "13086765349206": [
+      -19.934053,
+      0.0,
+      -17.804388
+    ]
+  },
+  "original_arrival_limit": 30,
+  "normal_F10_resume_to_pause_wall": 30.997400348016527,
+  "frame_count": 17,
+  "trajectory": [
+    {
+      "file": "group11-Tank-arrival-0.ron",
+      "clock": 108.08601,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -24.475748,
+            0.05,
+            -23.923344
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 6.719759787612055,
+          "distance_ownHQ": 3.1350566664479924,
+          "active": "[\n                    Move((-22.07115, 0.0, -17.648746)),\n                ]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.063202,
+            0.05,
+            -25.196009
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 5.455236889529638,
+          "distance_ownHQ": 3.7370656966241573,
+          "active": "[\n                    Move((-19.75, 0.0, -19.75)),\n                ]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.465677,
+            0.05,
+            -23.48282
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 5.6979352449812914,
+          "distance_ownHQ": 2.9362473023791784,
+          "active": "[\n                    Move((-19.934053, 0.0, -17.804388)),\n                ]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-1.ron",
+      "clock": 109.796265,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -20.467524,
+            0.05,
+            -25.119736
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 7.641322393929993,
+          "distance_ownHQ": 3.4758071580960865,
+          "active": "[\n                    Move((-22.07115, 0.0, -17.648746)),\n                ]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -19.457703,
+            0.05,
+            -23.594442
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 3.85586200836765,
+          "distance_ownHQ": 3.0009197469397626,
+          "active": "[\n                    Move((-19.75, 0.0, -19.75)),\n                ]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -18.699345,
+            0.05,
+            -19.74895
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 2.303980298767331,
+          "distance_ownHQ": 3.9951908003905134,
+          "active": "[\n                    Move((-19.934053, 0.0, -17.804388)),\n                ]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-2.ron",
+      "clock": 111.581566,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -18.753635,
+            0.05,
+            -23.56684
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 6.784706505668539,
+          "distance_ownHQ": 3.6047015547511005,
+          "active": "[\n                    Move((-22.07115, 0.0, -17.648746)),\n                ]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -18.943233,
+            0.05,
+            -19.923086
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.8266388302547865,
+          "distance_ownHQ": 3.6955914622269868,
+          "active": "[\n                    Move((-19.75, 0.0, -19.75)),\n                ]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.769049,
+            0.05,
+            -17.787748
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.17321434587238976,
+          "distance_ownHQ": 4.766572067629419,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-3.ron",
+      "clock": 113.41031,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -19.038282,
+            0.05,
+            -19.890247
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 3.7716196836935985,
+          "distance_ownHQ": 3.636321112406468,
+          "active": "[\n                    Move((-22.07115, 0.0, -17.648746)),\n                ]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -19.71469,
+            0.05,
+            -19.727432
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.06523887433118325,
+          "distance_ownHQ": 3.2229190357072257,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.769049,
+            0.05,
+            -17.787748
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.17321434587238976,
+          "distance_ownHQ": 4.766572067629419,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-4.ron",
+      "clock": 115.27301,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-5.ron",
+      "clock": 116.99533,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-6.ron",
+      "clock": 118.82052,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-7.ron",
+      "clock": 120.58782,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-8.ron",
+      "clock": 122.413055,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-9.ron",
+      "clock": 124.19762,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-10.ron",
+      "clock": 126.03139,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-11.ron",
+      "clock": 127.778625,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-12.ron",
+      "clock": 129.57689,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-13.ron",
+      "clock": 131.3767,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-14.ron",
+      "clock": 133.14447,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-15.ron",
+      "clock": 134.90019,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    },
+    {
+      "file": "group11-Tank-arrival-16.ron",
+      "clock": 136.68181,
+      "OWN_tanks": [
+        {
+          "key": 188978558643,
+          "position": [
+            -21.574453,
+            0.05,
+            -17.245281
+          ],
+          "goal": [
+            -22.07115,
+            0.0,
+            -17.648746
+          ],
+          "distance_goal": 0.6418659642277362,
+          "distance_ownHQ": 4.7737242293800355,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 558345745966,
+          "position": [
+            -20.638468,
+            0.05,
+            -19.383602
+          ],
+          "goal": [
+            -19.75,
+            0.0,
+            -19.75
+          ],
+          "distance_goal": 0.962352784288589,
+          "distance_ownHQ": 2.9494589133310543,
+          "active": "[]",
+          "hold": "false"
+        },
+        {
+          "key": 13086765349206,
+          "position": [
+            -19.687456,
+            0.05,
+            -17.000082
+          ],
+          "goal": [
+            -19.934053,
+            0.0,
+            -17.804388
+          ],
+          "distance_goal": 0.8427444583294509,
+          "distance_ownHQ": 5.508814732649847,
+          "active": "[]",
+          "hold": "false"
+        }
+      ]
+    }
+  ],
+  "eight_prior_defender_anchors": [
+    {
+      "key": 4922032519046,
+      "id": "AntiAirWalker",
+      "same_position": true,
+      "held_final": true,
+      "active_final": "[]"
+    },
+    {
+      "key": 7666516621283,
+      "id": "AntiAirWalker",
+      "same_position": true,
+      "held_final": true,
+      "active_final": "[]"
+    },
+    {
+      "key": 760209209000,
+      "id": "HeavyMachinegunTrooper",
+      "same_position": true,
+      "held_final": true,
+      "active_final": "[]"
+    },
+    {
+      "key": 171798689408,
+      "id": "HeavyMachinegunTrooper",
+      "same_position": true,
+      "held_final": true,
+      "active_final": "[]"
+    },
+    {
+      "key": 5669356828523,
+      "id": "HeavyMachinegunTrooper",
+      "same_position": true,
+      "held_final": true,
+      "active_final": "[]"
+    },
+    {
+      "key": 193273526000,
+      "id": "RocketInfantry",
+      "same_position": true,
+      "held_final": true,
+      "active_final": "[]"
+    },
+    {
+      "key": 9307194128406,
+      "id": "RocketInfantry",
+      "same_position": true,
+      "held_final": true,
+      "active_final": "[]"
+    },
+    {
+      "key": 9878424778845,
+      "id": "RocketInfantry",
+      "same_position": true,
+      "held_final": true,
+      "active_final": "[]"
+    }
+  ],
+  "Tank_weapon_range": 5.0,
+  "final_out_of_range_keys": [
+    13086765349206
+  ],
+  "Tank_Hold_not_issued": true
+}
