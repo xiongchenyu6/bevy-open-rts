@@ -1,0 +1,189 @@
+{
+  "failure_preserved": true,
+  "selected_own_only": true,
+  "rows": [
+    {
+      "key": 12884900699,
+      "id": "Drone",
+      "initial_position": [
+        -17.059762954711914,
+        1.5,
+        -19.925487518310547
+      ],
+      "original_actual_Move_goal": [
+        -16.81770896911621,
+        0.0,
+        -16.115964889526367
+      ],
+      "end_position": [
+        -16.830081939697266,
+        1.5,
+        -16.310707092285156
+      ],
+      "initial_active_kinds": [
+        "Move"
+      ],
+      "end_active_kinds": [],
+      "remaining_distance_xz": 0.1951348660192354,
+      "own_structure_center_distances_at_goal": {
+        "CommandCenter": 2.6179484704445413,
+        "Barracks": 5.35918093012802,
+        "PowerReactor": 6.869315419929947
+      }
+    },
+    {
+      "key": 111669148056,
+      "id": "LightRifleInfantry",
+      "initial_position": [
+        -18.80268096923828,
+        0.05000000074505806,
+        -18.834386825561523
+      ],
+      "original_actual_Move_goal": [
+        -17.091960906982422,
+        0.0,
+        -16.577205657958984
+      ],
+      "end_position": [
+        -16.460166931152344,
+        0.05000000074505806,
+        -16.051271438598633
+      ],
+      "initial_active_kinds": [
+        "Move"
+      ],
+      "end_active_kinds": [],
+      "remaining_distance_xz": 0.8220525719133538,
+      "own_structure_center_distances_at_goal": {
+        "CommandCenter": 2.529949441409184,
+        "Barracks": 4.8265500243566635,
+        "PowerReactor": 6.753375508232349
+      }
+    },
+    {
+      "key": 1181116004861,
+      "id": "LightRifleInfantry",
+      "initial_position": [
+        -19.660390853881836,
+        0.05000000074505806,
+        -19.130390167236328
+      ],
+      "original_actual_Move_goal": [
+        -17.949670791625977,
+        0.0,
+        -16.87320899963379
+      ],
+      "end_position": [
+        -18.536619186401367,
+        0.05000000074505806,
+        -16.531705856323242
+      ],
+      "initial_active_kinds": [
+        "Move"
+      ],
+      "end_active_kinds": [],
+      "remaining_distance_xz": 0.679067607105796,
+      "own_structure_center_distances_at_goal": {
+        "CommandCenter": 3.1575648429569427,
+        "Barracks": 4.267506128498927,
+        "PowerReactor": 7.249257063112012
+      }
+    },
+    {
+      "key": 1224065678340,
+      "id": "LightRifleInfantry",
+      "initial_position": [
+        -17.396467208862305,
+        0.05000000074505806,
+        -19.542295455932617
+      ],
+      "original_actual_Move_goal": [
+        -15.75,
+        0.0,
+        -15.25
+      ],
+      "end_position": [
+        -15.952397346496582,
+        0.05000000074505806,
+        -15.239670753479004
+      ],
+      "initial_active_kinds": [
+        "Move"
+      ],
+      "end_active_kinds": [],
+      "remaining_distance_xz": 0.2026607490427019,
+      "own_structure_center_distances_at_goal": {
+        "CommandCenter": 2.850438562747845,
+        "Barracks": 6.614914065375398,
+        "PowerReactor": 6.873960393988825
+      }
+    },
+    {
+      "key": 1254130449627,
+      "id": "LightRifleInfantry",
+      "initial_position": [
+        -18.68940544128418,
+        0.05000000074505806,
+        -17.203996658325195
+      ],
+      "original_actual_Move_goal": [
+        -16.97868537902832,
+        0.0,
+        -14.946815490722656
+      ],
+      "end_position": [
+        -17.174785614013672,
+        0.05000000074505806,
+        -14.877510070800781
+      ],
+      "initial_active_kinds": [
+        "Move"
+      ],
+      "end_active_kinds": [],
+      "remaining_distance_xz": 0.20798688273989185,
+      "own_structure_center_distances_at_goal": {
+        "CommandCenter": 3.638286887653526,
+        "Barracks": 6.391200300769578,
+        "PowerReactor": 7.846749627065271
+      }
+    }
+  ],
+  "own_structures": [
+    {
+      "key": 12884901296,
+      "id": "CommandCenter",
+      "position": [
+        -15.0,
+        0.0,
+        -18.0
+      ],
+      "construction": null,
+      "cost": null
+    },
+    {
+      "key": 38654704060,
+      "id": "Barracks",
+      "position": [
+        -19.00655746459961,
+        0.0,
+        -21.007770538330078
+      ],
+      "construction": null,
+      "cost": null
+    },
+    {
+      "key": 360777251631,
+      "id": "PowerReactor",
+      "position": [
+        -11.995081901550293,
+        0.0,
+        -21.007770538330078
+      ],
+      "construction": null,
+      "cost": null
+    }
+  ],
+  "attack_acquisition_observed": false,
+  "natural_arrival_recorded": false,
+  "scope_limit": "No claim of collision radius clearance or intermediate goal changes; only initial/end owned snapshots."
+}

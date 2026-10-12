@@ -19,6 +19,11 @@ A bounded regression or an older package cannot establish final release readines
   move; normal exit0 and unchanged package/archive are verified
   ([partial failure](qa/sdk309-bootcamp-partial03-review.json)). Graduation,
   fresh Replay and exact original blocked-endpoint GUI repair remain unverified.
+  Attempt04 reaches7/7 but fails its first30s scout-arrival gate: all five
+  units end idle, with two Infantry beyond the original0.3m tolerance.
+  Normal exit0 and unchanged package/archive are verified
+  ([preserved failure](qa/sdk309-bootcamp-partial04-review.json)); the cause
+  requires trajectory evidence, so no path or arrival repair is claimed.
 - Previous source `4f8e588` prevents allied separation from displacing held units.
   Two genuine scheduled REDs show0.844m/0.817m drift; unchanged GREEN scenarios
   keep held translation exactly zero while friendly movement still works.

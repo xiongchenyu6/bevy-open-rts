@@ -1,0 +1,19 @@
+{
+  "scope": "ActualSDK309 normal-input partial tutorial04 failure; no natural arrival/graduation/freshReplay or original blocked-goal repair proof",
+  "passed": false,
+  "normal_exit": 0,
+  "forced_cleanup": false,
+  "all_png_hashes_rechecked": 29,
+  "error": "Original30 natural Move / original300 attack bound exhausted",
+  "wall_seconds": 304.1355863499921,
+  "owned_terminal_finding": "Five selected actors idle; two Infantry .822/.679m from initial goals. Path failure versus arrival sampling/separation unresolved.",
+  "next_verification": "Per-unit first qualifying arrival with unique original progress saves, same .3m/30s bounds; no acceptance of unobserved arrival",
+  "files": {
+    "docs/qa/sdk309-bootcamp-partial04/13-public-scout-00.png": "fba3e9801be663bd4be6d4c08afb5f1fdaf1cd55290408e0834f131b426c818f",
+    "docs/qa/sdk309-bootcamp-partial04/99-failure.png": "d792505c5b067f8a8f5a34f120602e82936cb41dcad62c233cba0e0cf159cc6f",
+    "docs/qa/sdk309-bootcamp-partial04/auto-result.json": "d0a406a79f53f68d31c7bac4f52e1b0e410cc1adec74e70e9196c96d3deeac19",
+    "docs/qa/sdk309-bootcamp-partial04/png-sha256.json": "7e877100b5e7168dd74ecaf6e6d72412d991f6c3596df4fee14f6c7fbd1ed5b1",
+    "docs/qa/sdk309-bootcamp-partial04/owned-move-terminal-analysis.json": "5a88e2e74198b350a3ef061fd37f7e2da64956deb8904aebca2cb96e3187485c",
+    "docs/qa/sdk309-bootcamp-partial04/reviewer-summary.json": "2a255b94dd9e4e81cbb34ce79057e53cd2a163833ea769e02ca9d0535beea3f4"
+  }
+}
