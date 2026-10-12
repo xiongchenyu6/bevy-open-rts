@@ -1,0 +1,20 @@
+{
+  "scope": "Canonical Rust1.95 fog-alpha baseline28a350d; not later shadowflag or SDK/player acceptance",
+  "full_tests": {
+    "passed": 312,
+    "failed": 0,
+    "ignored": 1
+  },
+  "all_targets_exit": 0,
+  "four_bins_exit": 0,
+  "sources": 144,
+  "assets": 332,
+  "independent_all_hashes_match": true,
+  "files": {
+    "docs/qa/native312-fog-canonical-baseline/root-independent-review.json": "004ef86fedc54fe15e4fa6efecc6928ad26211777b3c152872297ef1ebb08b28",
+    "docs/qa/native312-fog-canonical-baseline/results.json": "8baf48c443a224d55a3d66af719f3fd88c4c6ab566c02a36c97abdddcffd19b0",
+    "docs/qa/native312-fog-canonical-baseline/canonical-pin.json": "6c86b580d3a7aa82138d8c7f94ccb5ba55a8ea16a9135f14d469066f7905eeee"
+  },
+  "SDK_started": false,
+  "remaining": "FogshadowAB, finalsourcevalidation/package, normalplayeracceptance and fullreleasegates"
+}

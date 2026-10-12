@@ -1,0 +1,75 @@
+[
+  {
+    "phase": "clean",
+    "actual_exit": 0,
+    "wall_seconds": 1.6283798179938458,
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "cargo",
+      "clean",
+      "--package",
+      "bevy-open-rts"
+    ],
+    "test_results": []
+  },
+  {
+    "phase": "check",
+    "actual_exit": 0,
+    "wall_seconds": 46.386108314967714,
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "cargo",
+      "check",
+      "--locked",
+      "--offline",
+      "--jobs",
+      "1",
+      "--all-targets"
+    ],
+    "test_results": []
+  },
+  {
+    "phase": "full",
+    "actual_exit": 0,
+    "wall_seconds": 693.1397556139855,
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--jobs",
+      "1",
+      "--lib",
+      "--",
+      "--test-threads=1"
+    ],
+    "test_results": [
+      "test result: ok. 312 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 535.07s"
+    ]
+  },
+  {
+    "phase": "native-bins",
+    "actual_exit": 0,
+    "wall_seconds": 288.62552005803445,
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "cargo",
+      "build",
+      "--locked",
+      "--offline",
+      "--jobs",
+      "1",
+      "--bins"
+    ],
+    "test_results": []
+  }
+]
