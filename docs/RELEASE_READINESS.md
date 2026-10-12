@@ -10,12 +10,15 @@ A bounded regression or an older package cannot establish final release readines
 - Current worktree resolves physically blocked terrain formation endpoints. The
   genuine save-restored diagnostic changes4/5 arrivals to5/5 within the same
   30s; canonical tests now pass309/0/1ignored. All-target checking and four
-  native builds are still running. Current official-SDK packaging and actual
-  normal-input repair verification remain pending.
+  native builds pass;144 source files,332 assets and four binaries match the
+  canonical pin ([bounded regression proof](qa/ground-formation-endpoint-regression-20261012.json)).
+  Official-SDK309 packaging is running in managed unit
+  `rts-native309-formation-sdk-20261012`; actual normal-input repair and complete
+  tutorial verification remain pending.
 - Previous source `4f8e588` prevents allied separation from displacing held units.
   Two genuine scheduled REDs show0.844m/0.817m drift; unchanged GREEN scenarios
   keep held translation exactly zero while friendly movement still works.
-  Current-source tests pass305/0/1ignored, all-target checks and four native
+  That source’s tests pass305/0/1ignored, all-target checks and four native
   builds pass;143 sources,332 assets and four binary hashes are independently
   rechecked ([contract proof](qa/hold-separation-contract-20261012/review.json)).
   The earlier cached303 run is invalid and retained. Official SDK305 build and
@@ -27,7 +30,7 @@ A bounded regression or an older package cannot establish final release readines
   Actual game exit0, no forced cleanup and unchanged installation/archive are
   verified ([actual Hold proof](qa/sdk305-hold-traffic-review.json)). Attempts01–04
   remain failures. No Mission2 victory is claimed.
-- The current native305 optimized official-SDK audit builds with exit0 in
+- The frozen native305 optimized official-SDK audit builds with exit0 in
   424.205s. Its binary,143 sources,332 assets and unchanged installed399-file
   package/archive are independently checked
   ([audit build proof](qa/native305-optimized-skirmish-audit-review.json)).
@@ -59,7 +62,7 @@ A bounded regression or an older package cannot establish final release readines
   normally with one game process and unchanged package/archive. Mission3 and
   later missions are not reached ([chain outcome](qa/sdk294-same-app-chain01-review.json)).
   Fresh Mission2 income/targeting diagnostics and the six-mission acceptance remain open.
-- Wasm27 now builds from the current native305 Hold source: actual clean and
+- Wasm27 builds from the previous native305 Hold source: actual clean and
   build exit0 in655.457s. Independent checks verify143 sources,332 assets,
   four frozen compile paths,642 non-web inputs, exact Wasm bytes and gzip
   equality. Protected originals remain unchanged; only a private QA alias is
