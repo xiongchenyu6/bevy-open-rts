@@ -1,0 +1,20 @@
+{
+  "scope": "OfficialSDK objectiveHUD5fcf401 build/package/extract only; newnativeGUI/Windows/fullplayer acceptance unverified",
+  "actual_exit": 0,
+  "sources": 144,
+  "assets": 332,
+  "installed_files": 399,
+  "root_all_sources_assets_four_canonical_binaries_and_installed399_and_archive_rehashed": true,
+  "source_commit": "5fcf40196e3a4d12e16ee57c4a8a7b41720c9a87",
+  "build_seconds": 410.5906334379688,
+  "package_seconds": 6.723486770002637,
+  "installed_binary_sha256": "d7b5531d727c713b2bf582dd742913464990a5fc66a6417ea3f35494e2af7ed7",
+  "archive_sha256": "55d5e7385fd529c78c235ae7d6803fb9120ab5085a095ad5fd0eda104d27a37c",
+  "files": {
+    "docs/qa/native309-objective-hud-sdk/linux-native309-objective-hud-package-20261012-result.json": "05db7975fa459b2373ab0d9083e0c05f9a854a8fe0bb7cc3259698858f8bfdc4",
+    "docs/qa/native309-objective-hud-sdk/objective-hud-20261012-root-independent-native-review.json": "7e56a1e1ffc1f8c9e04cd84245151075549a03dadf93f770ea4aca0ce88ca13d",
+    "docs/qa/native309-objective-hud-sdk/linux-native309-objective-hud-steamrt4-sdk-20261012-result.json": "8060befed413d7675e0588069006d2c6da943e389aed25a5f53823b3b0d64644",
+    "docs/qa/native309-objective-hud-sdk/linux-native309-objective-hud-extracted-20261012-independent-seal.json": "8e5ff278a743e5250dcea7cacafe052213e1eaee794085b20a753073871729b1",
+    "docs/qa/native309-objective-hud-sdk/linux-native309-objective-hud-extracted-20261012-ready.json": "e2e08b02038a586a98d838d36891f30ecf5549561d70fd29a90aa7ed59b4ec98"
+  }
+}

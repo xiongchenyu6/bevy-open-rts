@@ -17,6 +17,10 @@ A bounded regression or an older package cannot establish final release readines
   ([rendered fix](qa/web29-objective-runtime-review.json)). Populated support
   powers, other viewport/DPI/OS cases and public deployment remain open.
   W28 proofs below retain their pre-change source03c979d scope.
+  OfficialSDK objective-HUD Linux packaging also passes: root independently
+  rehashes144 sources,332 assets,four canonical binaries,all399 installed
+  files and archive ([shipping proof](qa/native309-objective-hud-sdk-shipping-review.json)).
+  New native GUI acceptance remains pending.
 - Current worktree resolves physically blocked terrain formation endpoints. The
   genuine save-restored diagnostic changes4/5 arrivals to5/5 within the same
   30s; canonical tests now pass309/0/1ignored. All-target checking and four

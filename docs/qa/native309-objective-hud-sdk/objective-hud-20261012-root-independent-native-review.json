@@ -1,0 +1,12 @@
+{
+  "scope": "Fresh HUD-only Debug309 checks/input/binary integrity, not rendered UI/SDK delivery acceptance",
+  "actual_exit": 0,
+  "source_commit": "5fcf40196e3a4d12e16ee57c4a8a7b41720c9a87",
+  "all144_sources332_assets4_binaries_verified": true,
+  "pin_sha256": "929f57b1eee6f6f04f17789ebb9ed69aad63c7b945358a2af05bde0e71101957",
+  "full_tests": {
+    "passed": 309,
+    "failed": 0,
+    "ignored": 1
+  }
+}
