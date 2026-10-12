@@ -446,3 +446,14 @@ CPU-only native48k comparison also remains below threshold(.743923), so resampli
 rate alone does not explain the mismatch. [Alt+I report](qa/native309-isolated-alti-hello-review.json)
 preserves raw evidence and independent runtime review. Hello remains unaccepted;
 no production audio defect, logical identity or human quality approval is claimed.
+
+Offline CPU blind ASR screening completes four separate unprompted decodes in37.66s
+of an original180s budget. Closed Alt+I output and shipped Hello both decode as
+“Ready for orders”; the closed RadarSweep record contains “Support Power Ready,”
+matching its separately decoded shipped reference. Expected manifest strings were
+opened only after all four decodes. [CPU ASR report](qa/native309-audio-blind-asr-review.json)
+preserves raw transcripts, token log probabilities, model revision/hashes and
+portable closed inputs. Recognized words do not establish waveform identity,
+logical audio identity, human listening or tone approval. Hello and Ready remain
+below the unchanged waveform threshold; no production audio defect is proven.
+Independent listening to these preserved clips is the safest next quality check.
