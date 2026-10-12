@@ -1,0 +1,62 @@
+{
+  "scope": "ExactSDK309 normal physical partial tutorial only; no graduation/freshReplay or complete GUI movement repair claim",
+  "passed": false,
+  "all_screenshot_hashes_verified": 37,
+  "normal_exit": 0,
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "naturally_completed_scout_moves": 8,
+  "failure": "Unexpected order cannot count as natural Move arrival",
+  "selected_owned_last_orders": [
+    {
+      "key": "8589933227",
+      "id": "\"Drone\"",
+      "health": "6.0",
+      "active": "[]"
+    },
+    {
+      "key": "876173326824",
+      "id": "\"LightRifleInfantry\"",
+      "health": "4.0",
+      "active": "[\n                    Move((12.215191, 0.05, -0.16939333)),\n                    Attack(8589934020),\n                ]"
+    },
+    {
+      "key": "38654703958",
+      "id": "\"LightRifleInfantry\"",
+      "health": "4.0",
+      "active": "[\n                    Move((15.406463, 0.05, -11.930218)),\n                    Attack(8589933161),\n                ]"
+    },
+    {
+      "key": "768799144415",
+      "id": "\"LightRifleInfantry\"",
+      "health": "4.0",
+      "active": "[\n                    Attack(8589933161),\n                ]"
+    },
+    {
+      "key": "794568948391",
+      "id": "\"LightRifleInfantry\"",
+      "health": "4.0",
+      "active": "[]"
+    }
+  ],
+  "seven_lesson_reached": true,
+  "training_completion_verified": false,
+  "files": {
+    "docs/qa/sdk309-bootcamp-partial03/scout-04-natural-arrival.json": "a9f1d0d89bddf6d8708c1bf5029050c889aa8204b1326a5905fe312ecd892c37",
+    "docs/qa/sdk309-bootcamp-partial03/99-failure.png": "d114ad9da20aae45ea338a37bbf6983393e42a92f1d2673abc8d41767bef4f71",
+    "docs/qa/sdk309-bootcamp-partial03/05-Ore.png": "86aa12570de1704cc81c714ade6580ae753b96843931fe18a1d2a05208db4171",
+    "docs/qa/sdk309-bootcamp-partial03/auto-result.json": "6eed68c07005639225c9fd47f8ba106aa5787d24b78b737216b644ab43d7e939",
+    "docs/qa/sdk309-bootcamp-partial03/scout-03-natural-arrival.json": "f06676bc81754dcaeb587ee57a6b9e21eb9c1aada86d6073189669e8e7a2e35b",
+    "docs/qa/sdk309-bootcamp-partial03/scout-08-natural-arrival-progress.ron": "9564f24ad2542ffd9f8bed2e60b9ed96cb597f467b3928d929df0fb86487332d",
+    "docs/qa/sdk309-bootcamp-partial03/scout-01-natural-arrival.json": "78f533e48f7322a4bdbbd08cf77495829b53947623f44fb4d01f959abb550015",
+    "docs/qa/sdk309-bootcamp-partial03/scout-08-normal-cohort-focus.json": "a7ee1680bb38b16f575746bf5b02b0fd72336dca437e22ae2417a99fd225d2b5",
+    "docs/qa/sdk309-bootcamp-partial03/10-four-ready.png": "96fadf1637069a2023d7a2bcfa43100b7e90d155b3253ce5c4905797bf4ae580",
+    "docs/qa/sdk309-bootcamp-partial03/scout-07-natural-arrival.json": "8d4b390397e1e6e3e72b373bb9d5b6efbf9347c0533bdfe2eca075947a05c8cc",
+    "docs/qa/sdk309-bootcamp-partial03/scout-00-natural-arrival.json": "c46c76bd65f61e1b2df80618306ac83ddf7168a58a92e8d1a1ebc1178d9c8d05",
+    "docs/qa/sdk309-bootcamp-partial03/13-public-scout-08.png": "a3ae661d66260ff0e2a260f5591063e96cf9e005534ca013881889ba557ffee8",
+    "docs/qa/sdk309-bootcamp-partial03/scout-05-natural-arrival.json": "a95c8e3ec70f73d1604e2a9bab2056da01dda7cdfa52b2ed1444ef462d6841e8",
+    "docs/qa/sdk309-bootcamp-partial03/scout-02-natural-arrival.json": "e6bddb1a7d94d6b31b3235977b3f4c80ced87336470149078a29e86efd0204d6",
+    "docs/qa/sdk309-bootcamp-partial03/scout-06-natural-arrival.json": "e15d6ab7f0e11f6f22667b68d07a20b3c7b5abd3ad204434607062bb166b12c9"
+  }
+}

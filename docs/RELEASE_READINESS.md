@@ -12,9 +12,13 @@ A bounded regression or an older package cannot establish final release readines
   30s; canonical tests now pass309/0/1ignored. All-target checking and four
   native builds pass;144 source files,332 assets and four binaries match the
   canonical pin ([bounded regression proof](qa/ground-formation-endpoint-regression-20261012.json)).
-  Official-SDK309 packaging is running in managed unit
-  `rts-native309-formation-sdk-20261012`; actual normal-input repair and complete
-  tutorial verification remain pending.
+  Official-SDK309 build and packaging pass; all399 installed files are
+  independently rehashed ([shipping proof](qa/native309-formation-sdk-shipping-review.json)).
+  Normal-input tutorial attempt03 reaches7/7 and completes eight scout Moves,
+  then stops when selected infantry acquire Attack orders during the ninth
+  move; normal exit0 and unchanged package/archive are verified
+  ([partial failure](qa/sdk309-bootcamp-partial03-review.json)). Graduation,
+  fresh Replay and exact original blocked-endpoint GUI repair remain unverified.
 - Previous source `4f8e588` prevents allied separation from displacing held units.
   Two genuine scheduled REDs show0.844m/0.817m drift; unchanged GREEN scenarios
   keep held translation exactly zero while friendly movement still works.

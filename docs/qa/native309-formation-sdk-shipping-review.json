@@ -1,0 +1,18 @@
+{
+  "scope": "OfficialSDK309 optimized build/package/inventory only; normal tutorial attempt03 partial failure, all nine release gates open",
+  "actual_build_exit": 0,
+  "actual_package_exit": 0,
+  "independent_integrity_exit": 0,
+  "build_wall_seconds": 423.5886886459775,
+  "package_files": 399,
+  "runtime_assets": 332,
+  "binary_sha256": "6caae6b818fd76d8b13395a085dbf0ec8ca632a260af1a486ac56c6b643f44f3",
+  "archive_sha256": "c83ca72ed3e9f709120c154fb95fa57e03ab9c776ba3c28df2114209922fb02e",
+  "all399_installed_files_independently_rehashed": true,
+  "files": {
+    "docs/qa/native309-formation-sdk/linux-native309-formation-package-20261012-result.json": "6d3e3666618fe8758f102e5b185ff85697115fed20a6d68b78e7c304b598150c",
+    "docs/qa/native309-formation-sdk/linux-native309-formation-extracted-20261012-ready.json": "c6a94a0fac9f9f0b19adbe95225a9a3f1be6fa4b7977e3d35901dbf3fa565fa0",
+    "docs/qa/native309-formation-sdk/linux-native309-formation-steamrt4-sdk-20261012-result.json": "0bfc26c322243c182a182f2414ee9fa7012fa18d66de9c9ca44c59efcf7491ac",
+    "docs/qa/native309-formation-sdk/target-native309-formation-sdk-preflight-20261012.json": "04f5c066a580504a0bc83c56867c199f6f00fdefddc45bb07dbead1c8323a689"
+  }
+}

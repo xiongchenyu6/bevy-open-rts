@@ -1,0 +1,41 @@
+{
+  "scope": "Completed SDK309 chain preflight only; NO Cargo/build/runtime yet",
+  "preflight_exit": 0,
+  "canonical_pin": "target/formation-endpoint-20261012/canonical-pin.json",
+  "canonical_pin_sha256": "c4366307c82790c5dad785aedb3bb165a059b1341ec933d81ed7aa16e598258a",
+  "schema": "canonical_full_exit/check_all_targets_exit/native_bins_exit=0; full_tests309/0/1; explicit native_binary_directory; no unit/results aliases",
+  "source_count": 144,
+  "assets": 332,
+  "native_bins": 4,
+  "helpers_sha256": {
+    "target/prepare-native309-formation-sdk-20261012.py": "bfef608ba30359f5646c3bce25b2ac7ad8ee3ce84635a79d2d7a6bd17a2ad7ed",
+    "target/build-native309-formation-steamrt4-sdk-20261012.py": "87657949d5ed2523d83b85b58f20f611a029537cdcce173ac07175a3831b1a8b",
+    "target/package-native309-formation-steamrt4-20261012.py": "cb106fa3a091bd92c6f92a8d62819f69a480a1ed9ab0029a298bb3179800de3f",
+    "target/run-native309-formation-sdk-chain-20261012.py": "aca0ec7bc59ec359f9e0fe851b26eafa0f531a6632df47b45be776ddbd940beb"
+  },
+  "protected_files_sha256": {
+    "AGENTS.md": "a7603f66039e5cb0b82e6e59dee91fb70736f42988336f10e0f3dfaac5023929",
+    "flake.lock": "ea71f18d55487d08f92937bf9cb744f5c4226ffb13fb66284aaef79cac1a8b8d",
+    "web/index.html": "68fc49fe658ba75917ee36e39d528501596f4349a35aa5e5b520a27a349eb744",
+    "web/styles.css": "d318279300610835340082b52c100621737237082e1f9b15f216e4e960e01e5e"
+  },
+  "command": [
+    "python3",
+    "target/run-native309-formation-sdk-chain-20261012.py",
+    "--pin",
+    "target/formation-endpoint-20261012/canonical-pin.json"
+  ],
+  "clean_packages": [
+    "bevy-open-rts",
+    "open-bevy-protocol",
+    "open-bevy-net",
+    "matchbox_socket"
+  ],
+  "fresh_snapshot": "target/linux-native309-formation-sdk-snapshot-20261012",
+  "scope_limits": [
+    "No compiler launch before root lease",
+    "No GUI repair claimed",
+    "No license-compliance claim",
+    "Root current source docs copied from one current HEAD at freeze; old305 immutable"
+  ]
+}
