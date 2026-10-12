@@ -1,0 +1,41 @@
+{
+  "scope": "Current native309 objective-HUD Wasm29 shipping build integrity only; no browser runtime, GUI/M2 acceptance, or public deployment",
+  "actual_exit": 0,
+  "wall_seconds": 612.1405214359984,
+  "native_product_source_commit": "5fcf40196e3a4d12e16ee57c4a8a7b41720c9a87",
+  "source_commit": "5fcf40196e3a4d12e16ee57c4a8a7b41720c9a87",
+  "sources": 144,
+  "assets": 332,
+  "fork_files": 15,
+  "frozen_files": 645,
+  "nonweb_frozen_verified": 643,
+  "clean4_actual_exit": 0,
+  "actual_four_frozen_compilepaths": {
+    "bevy-open-rts": [
+      "   Compiling bevy-open-rts v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build29-snapshot-20261012/source)"
+    ],
+    "open-bevy-protocol": [
+      "   Compiling open-bevy-protocol v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build29-snapshot-20261012/source/crates/open-bevy-protocol)"
+    ],
+    "open-bevy-net": [
+      "   Compiling open-bevy-net v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build29-snapshot-20261012/source/crates/open-bevy-net)"
+    ],
+    "matchbox_socket": [
+      "   Compiling matchbox_socket v0.14.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build29-snapshot-20261012/source/crates/matchbox-socket)"
+    ]
+  },
+  "wasm_bindgen": "0.2.128",
+  "wasm_sha256": "a1d901da2c3387807d07fd556e9907317203df6f6ccb4c92663c837acb717c40",
+  "wasm_bytes": 27093013,
+  "gzip_equal": true,
+  "protected_originals_unchanged": true,
+  "alias": "web/qa-wasm29",
+  "native_pin_sha256": "929f57b1eee6f6f04f17789ebb9ed69aad63c7b945358a2af05bde0e71101957",
+  "evidence_sha256": {
+    "target/web-current-build29-snapshot-20261012/input.json": "bf77c00942365a8580572987ec462614e6cf102f7fa2c489a667272bca7cda36",
+    "target/web-current-build29-snapshot-20261012/result.json": "a1f4cea519fa042181ca31888fe4d6d0b04e4a0b8ac9f54b731adbe9e2c221b5",
+    "target/web-current-build29-snapshot-20261012/seal.json": "48662c6d2c4c91083c0b8e0afae1beadecf825579b2fd072bd3e89048cf8aca2",
+    "target/web-current-build29-snapshot-20261012/build.log": "1a82758affcf94fccffcf3e9a4edb3e68264318dfc6ac284ddeceae698171a11",
+    "target/web-current-build29-snapshot-20261012/clean-project-wasm.log": "71342188626ef930ab88042c861ffff64fb3d3f8b61eb71d7515ff28423f58ed"
+  }
+}

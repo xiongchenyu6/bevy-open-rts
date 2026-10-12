@@ -1,0 +1,143 @@
+{
+  "own_cohort": {
+    "8589933358": "Drone",
+    "38654703971": "LightRifleInfantry",
+    "274877905325": "LightRifleInfantry",
+    "820338751970": "LightRifleInfantry",
+    "1043677051465": "LightRifleInfantry"
+  },
+  "actual_Move_goals": {
+    "8589933358": [
+      -10.278936386108398,
+      0.0,
+      -24.399999618530273
+    ],
+    "38654703971": [
+      -10.997151374816895,
+      0.0,
+      -23.330394744873047
+    ],
+    "274877905325": [
+      -10.25,
+      0.0,
+      -22.25
+    ],
+    "820338751970": [
+      -9.52592945098877,
+      0.0,
+      -24.11341094970703
+    ],
+    "1043677051465": [
+      -11.419960975646973,
+      0.0,
+      -24.579999923706055
+    ]
+  },
+  "actual_Move_snapshot": "scout-00-actual-Move-7425c2c5f40f419f90c9b4e82776239f.ron",
+  "actual_Move_save_ack": {
+    "before_mtime_ns": "1791768475061862584",
+    "ack_mtime_ns": "1791768476030857269",
+    "sup_monotonic": 309505.173954036,
+    "ack_monotonic": 309505.33427045,
+    "sha256": "079a4a5363f9d78308b9f4832039bd464ccaa3328206c4352c2b34f1e9916ab4",
+    "own_clock": 113.98876190185547,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-07/01/scout-00-actual-Move-7425c2c5f40f419f90c9b4e82776239f.ron"
+  },
+  "arrival_witnesses": {
+    "8589933358": {
+      "own_clock": 114.87400817871094,
+      "position": [
+        -10.444177627563477,
+        1.5,
+        -24.383617401123047
+      ],
+      "original_actual_Move_goal": [
+        -10.278936386108398,
+        0.0,
+        -24.399999618530273
+      ],
+      "distance_xz": 0.16605133219818824,
+      "source_own_snapshot": "scout-00-natural-arrival-progress-0002-40cfcbe3b4934611a055049af5635427.ron"
+    },
+    "38654703971": {
+      "own_clock": 115.16441345214844,
+      "position": [
+        -11.021994590759277,
+        0.05000000074505806,
+        -23.518173217773438
+      ],
+      "original_actual_Move_goal": [
+        -10.997151374816895,
+        0.0,
+        -23.330394744873047
+      ],
+      "distance_xz": 0.18941473085048743,
+      "source_own_snapshot": "scout-00-natural-arrival-progress-0003-2c209c750c5d41dc903d6b95b37b16c2.ron"
+    },
+    "820338751970": {
+      "own_clock": 115.16441345214844,
+      "position": [
+        -9.724603652954102,
+        0.05000000074505806,
+        -24.12721824645996
+      ],
+      "original_actual_Move_goal": [
+        -9.52592945098877,
+        0.0,
+        -24.11341094970703
+      ],
+      "distance_xz": 0.19915340813098079,
+      "source_own_snapshot": "scout-00-natural-arrival-progress-0003-2c209c750c5d41dc903d6b95b37b16c2.ron"
+    },
+    "1043677051465": {
+      "own_clock": 115.16441345214844,
+      "position": [
+        -11.572956085205078,
+        0.05000000074505806,
+        -24.579627990722656
+      ],
+      "original_actual_Move_goal": [
+        -11.419960975646973,
+        0.0,
+        -24.579999923706055
+      ],
+      "distance_xz": 0.15299556164425435,
+      "source_own_snapshot": "scout-00-natural-arrival-progress-0003-2c209c750c5d41dc903d6b95b37b16c2.ron"
+    },
+    "274877905325": {
+      "own_clock": 115.75424194335938,
+      "position": [
+        -10.355003356933594,
+        0.05000000074505806,
+        -22.417049407958984
+      ],
+      "original_actual_Move_goal": [
+        -10.25,
+        0.0,
+        -22.25
+      ],
+      "distance_xz": 0.19730993301598093,
+      "source_own_snapshot": "scout-00-natural-arrival-progress-0005-f910b47d0bda41d59bafceaa3d298976.ron"
+    }
+  },
+  "natural_arrival": true,
+  "combat_contact": false,
+  "owned_orders": {
+    "8589933358": [],
+    "38654703971": [],
+    "274877905325": [],
+    "820338751970": [],
+    "1043677051465": []
+  },
+  "own_clock": 115.75424194335938,
+  "last_own_snapshot": "scout-00-natural-arrival-progress-0005-f910b47d0bda41d59bafceaa3d298976.ron",
+  "fresh_original_save_ack": {
+    "before_mtime_ns": "1791768477497849223",
+    "ack_mtime_ns": "1791768477797847578",
+    "sup_monotonic": 309506.941897825,
+    "ack_monotonic": 309507.114325222,
+    "sha256": "b7cf24279ebdf2a52f1c14c1fa529b63d0f27987ea5b6d0d6e7b9489b55680f1",
+    "own_clock": 115.75424194335938,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-runtime4-bootcamp-auto-20261012-07/01/scout-00-natural-arrival-progress-0005-f910b47d0bda41d59bafceaa3d298976.ron"
+  }
+}

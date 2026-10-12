@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "scope": "CPU preparation/dependency validation only; no Cargo/compiler/GPU launched",
+  "source_count": 144,
+  "asset_count": 332,
+  "fork_files": 15,
+  "frozen_files": 645,
+  "dependencies": {
+    "cargo": "/nix/store/gmgfpzc0w2pgby0lmq9r88m39albiyfw-cargo-1.98.1/bin/cargo",
+    "bash": "/nix/store/10dxp0qxqxxsyiljrh2kp0xqhz6arhcx-bash-5.3p15/bin/bash",
+    "python3": "/nix/store/lb41b0anx1f98y9y5s9mdv97gjgsq740-python3-3.14.7/bin/python3",
+    "wasm-bindgen": "/nix/store/k50xgbdbcnd7wfqxg3spzrky338lhmn7-wasm-bindgen-cli-0.2.128/bin/wasm-bindgen",
+    "wasm-opt": "/nix/store/vkw6p1xnh7xxyp0byk9888ln68rzqnkq-binaryen-132/bin/wasm-opt",
+    "gzip": "/nix/store/yr6ar7lsk3yfas4d464z1ysaxwcq2gc5-gzip-1.14/bin/gzip",
+    "file": "/nix/store/i22iaxmpraqg3czwcraqpb844fwbh9zy-file-5.48/bin/file"
+  },
+  "rustc": "/nix/store/yhmi70ln28n1j6wn82h61b8r8q4g562i-rustc-1.95.0/bin/rustc",
+  "rustc_target": "wasm32-unknown-unknown",
+  "wasm_bindgen": "0.2.128",
+  "input_sha256": "bf77c00942365a8580572987ec462614e6cf102f7fa2c489a667272bca7cda36",
+  "helper_manifest": {
+    "target/prepare-build-web29-objective-hud-20261012.py": "53f7ebbef651eb9539d935dec365798dd66bb231294f816983fc0e640bafcd41"
+  },
+  "protected_originals_unchanged": true
+}

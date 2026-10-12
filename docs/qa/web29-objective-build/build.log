@@ -1,0 +1,81 @@
+>> wasm-bindgen crate version: 0.2.128
+>> wasm-opt: wasm-opt version 130 (version_130)
+   Compiling matchbox_socket v0.14.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build29-snapshot-20261012/source/crates/matchbox-socket)
+warning: unused import: `RtcIceGatheringState`
+  --> crates/matchbox-socket/src/webrtc_socket/wasm.rs:24:26
+   |
+24 |     RtcIceCandidateInit, RtcIceGatheringState, RtcPeerConnection, RtcPeerConnectionIceEvent,
+   |                          ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: use of deprecated method `futures_channel::mpsc::UnboundedReceiver::<T>::try_next`: please use `try_recv` instead
+   --> crates/matchbox-socket/src/webrtc_socket/socket.rs:332:41
+    |
+332 |         while let Ok(Some(x)) = self.rx.try_next() {
+    |                                         ^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `futures_channel::mpsc::UnboundedReceiver::<T>::try_next`: please use `try_recv` instead
+   --> crates/matchbox-socket/src/webrtc_socket/socket.rs:565:48
+    |
+565 |         while let Ok(res) = self.peer_state_rx.try_next() {
+    |                                                ^^^^^^^^
+
+warning: `matchbox_socket` (lib) generated 3 warnings (run `cargo fix --lib -p matchbox_socket` to apply 1 suggestion)
+   Compiling open-bevy-protocol v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build29-snapshot-20261012/source/crates/open-bevy-protocol)
+   Compiling open-bevy-net v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build29-snapshot-20261012/source/crates/open-bevy-net)
+   Compiling bevy-open-rts v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build29-snapshot-20261012/source)
+warning: unused import: `bevy::prelude::*`
+ --> src/orders/contact_planning.rs:3:5
+  |
+3 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `bevy::prelude::*`
+ --> src/economy/harvest_contact.rs:3:5
+  |
+3 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: function `allied_skirmish_ally` is never used
+    --> src/lib.rs:1957:15
+     |
+1957 | pub(crate) fn allied_skirmish_ally(player_team: Team, active_team_count: usize) -> Option<Team> {
+     |               ^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `allied_skirmish_enemy` is never used
+    --> src/lib.rs:1961:15
+     |
+1961 | pub(crate) fn allied_skirmish_enemy(player_team: Team, active_team_count: usize) -> Option<Team> {
+     |               ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `default_skirmish_opponent` is never used
+    --> src/lib.rs:1988:15
+     |
+1988 | pub(crate) fn default_skirmish_opponent(
+     |               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `free_position` is never used
+    --> src/lib.rs:7376:15
+     |
+7376 | pub(crate) fn free_position(origin: Vec3, seed: u32, radius: f32) -> Vec3 {
+     |               ^^^^^^^^^^^^^
+
+warning: field `path` is never read
+  --> src/campaign_progress.rs:23:5
+   |
+21 | pub(crate) struct CampaignProgress {
+   |                   ---------------- field in this struct
+22 |     data: CampaignProfileData,
+23 |     path: Option<std::path::PathBuf>,
+   |     ^^^^
+
+warning: `bevy-open-rts` (lib) generated 7 warnings (run `cargo fix --lib -p bevy-open-rts` to apply 2 suggestions)
+    Finished `release` profile [optimized] target(s) in 9m 42s
+Stamped web build id: d763378308391d69

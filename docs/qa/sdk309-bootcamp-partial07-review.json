@@ -1,0 +1,20 @@
+{
+  "scope": "HistoricalSDK309 actual normal-input first5 arrival witnesses only; fulltutorial07 failure preserved, no graduation/freshReplay",
+  "passed": false,
+  "actual_first_scout_all5_witnessed": true,
+  "sample_interval_median_seconds": 0.2969,
+  "second_scout_failure": "Reviewer selected public point outside authored map \u00b125; no Move generated, correctly rejected",
+  "normal_exit": 0,
+  "forced_cleanup": false,
+  "installation_archive_unchanged": true,
+  "all30_png_hashes_independently_checked": true,
+  "files": {
+    "docs/qa/sdk309-bootcamp-partial07/99-failure.png": "79919f3c2d0a996c37f1421b3feaaf2b8726a8cf0eb2fd2dfdca4da02f2f95ba",
+    "docs/qa/sdk309-bootcamp-partial07/auto-result.json": "6f4e74b8d810e35dee89072a0fb85a42b61eab98b51ea1bfacfc75da12420d89",
+    "docs/qa/sdk309-bootcamp-partial07/scout01-public-boundary-diagnosis.json": "4c525f3fa4413accf44c6068fc04d60694bc85f654bc16c3b1a403db71e85c5a",
+    "docs/qa/sdk309-bootcamp-partial07/13-public-scout-01.png": "ce63f382d144e27169a4b688ba4e6d6ba815a77b854eb2500ad13bf347c686b1",
+    "docs/qa/sdk309-bootcamp-partial07/terminal-evidence-audit.json": "72a08d370a27fc463a3e2c3cb1fdebc0d56381f88e032dedd1ab6c122cb15789",
+    "docs/qa/sdk309-bootcamp-partial07/dense-original-ack-inventory.json": "03e9c37eda084571e0f1dcc544263e8de9481f66c2a5167487c31ee8eecbb401",
+    "docs/qa/sdk309-bootcamp-partial07/scout-00-natural-arrival.json": "70e37cc3f2198a73bed4ecf5d3f8effc94243a4346bc069a72b835b9b939f741"
+  }
+}

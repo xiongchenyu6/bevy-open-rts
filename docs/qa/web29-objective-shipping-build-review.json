@@ -1,0 +1,24 @@
+{
+  "scope": "ExactHUD5fcf401 W29 build/integrity/privateHTTP only; new objective placement rendering unverified",
+  "actual_build_exit": 0,
+  "build_wall_seconds": 612.1405214359984,
+  "sources": 144,
+  "assets": 332,
+  "frozen_files": 645,
+  "wasm_sha256": "a1d901da2c3387807d07fd556e9907317203df6f6ccb4c92663c837acb717c40",
+  "wasm_bytes": 27093013,
+  "build_id": "d763378308391d69",
+  "private_HTTP_same_bytes": true,
+  "browser_CPU_preflight_exit": 0,
+  "actual_layout_runtime_verified": false,
+  "public_deployment": false,
+  "files": {
+    "docs/qa/web29-objective-build/seal.json": "48662c6d2c4c91083c0b8e0afae1beadecf825579b2fd072bd3e89048cf8aca2",
+    "docs/qa/web29-objective-build/build.log": "1a82758affcf94fccffcf3e9a4edb3e68264318dfc6ac284ddeceae698171a11",
+    "docs/qa/web29-objective-build/result.json": "a1f4cea519fa042181ca31888fe4d6d0b04e4a0b8ac9f54b731adbe9e2c221b5",
+    "docs/qa/web29-objective-build/independent-review.json": "6a406aed3f8304e8d638d917128f2275de17d5164ac6694cb7263a3849c598ec",
+    "docs/qa/web29-objective-build/input.json": "bf77c00942365a8580572987ec462614e6cf102f7fa2c489a667272bca7cda36",
+    "docs/qa/web29-objective-build/clean-project-wasm.log": "71342188626ef930ab88042c861ffff64fb3d3f8b61eb71d7515ff28423f58ed",
+    "docs/qa/web29-objective-build/preflight.json": "99023ef8d2bec2b20fe6a764da869bc289367a5b9c55b20f90dfaa71a6de5bba"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "scope": "Read-only public map and actual current camera diagnosis; no hidden actor positions",
+  "reviewed_current_point": [
+    1060,
+    135
+  ],
+  "visible_enemy_hq": false,
+  "public_authored_map_size": 50,
+  "public_half_extent": 25,
+  "ray_ground_intersection": [
+    -4.741867445455504,
+    0.0,
+    -27.681442149321356
+  ],
+  "reprojection_pixel": [
+    1060.000006696489,
+    135.0
+  ],
+  "outside_public_map_extent": true,
+  "own_actual_orders_after_click": "all five active=[] queued=[]",
+  "conclusion": "Reviewed frontier point intersects ground beyond public map extent; genuine Move receipt absent, correctly rejected. No production movement bug claim."
+}

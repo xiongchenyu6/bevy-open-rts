@@ -1,0 +1,51 @@
+{
+  "scope": "Current normal physical BootCamp Skip/seven/earned/freshReplay; actual render adjudication required",
+  "passed": false,
+  "error_type": "AssertionError",
+  "error": "Actual normal Move required; Follow/Patrol never count",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-bootcamp07-preparation-20261012/auto03.py\", line 83, in <module>\n    s=PhysicalSession(ready['package'],ready['archive'],ready['binary_sha256'],ready['archive_sha256'],ROOT/'target/sdk309-runtime4-bootcamp-auto-20261012-07',900);s.begin_mission(0);r['receipts']=run(s);s.normal_close_and_require_exit_zero();r['flow_passed']=True\n                                                                                                                                                                                                     ~~~^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-bootcamp07-preparation-20261012/auto03.py\", line 70, in run\n    else:natural_move(s,o,cohort,p,min(start+300,time.monotonic()+30),'scout-%02d'%attempt)\n         ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-bootcamp07-preparation-20261012/bootcamp02_controls.py\", line 60, in natural_move\n    s.right(*point);own=o.state(label+'-actual-Move',deadline=deadline);goals=move_receipt(own,cohort);actual_source=o._dense_last_original.name;actual_ack=o._dense_last_receipt;witnesses={};poll=0\n                                                                              ~~~~~~~~~~~~^^^^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-bootcamp07-preparation-20261012/bootcamp02_controls.py\", line 41, in move_receipt\n    assert len(u['active'])==1 and u['active'][0]['kind']=='Move' and not u['queued'], 'Actual normal Move required; Follow/Patrol never count'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Actual normal Move required; Follow/Patrol never count\n",
+  "normal_exits": [
+    {
+      "pid": 3973757,
+      "supervisor_pid": 3973710,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "screenshots": {
+    "01/00-fresh-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+    "01/01-Skip-training.png": "4287d0495886e2f52e797c8e06f031b1b1bbd70c68025af1e82326fb77e3a77c",
+    "01/02-after-Skip.png": "11e6b9f45a92210d0040f6c28e24d67adbd9cea5c7872b72aa18758049521074",
+    "01/03-full-training-menu.png": "c6826c756637732d70f00fdc62a6d8ccf1eccfdb19e6e2107aef5ab5a5f34117",
+    "01/04-Worker.png": "f831a9808e6e108c8b63e47532e57d048cf35d73e50133a1bf724d9775081513",
+    "01/05-Ore.png": "6c6b32f9dba8697855e08a030686be38d3e4a6af67dad21412d35a6d51671744",
+    "01/06-gathered.png": "5a2ebf95fba7b5f43551d4560076253cb1aa7ac07877a93d74796b8943d1736f",
+    "01/auto-01-PowerReactor-tab-tooltip.png": "f79657bebfdeb2a87f2fbb1e1a2e3c27e27ab19d87dc89d967022d8b8133fa10",
+    "01/auto-01-PowerReactor-candidate-0-before-ghost.png": "0f5d9178ab8878cf0d7324aacc9687f19f78c77f25ca6e124a6cf3e4b9309bd8",
+    "01/auto-01-PowerReactor-candidate-0-build-tooltip.png": "6c6a9b34e866dce549cc9ca94bc896c68315e0e8653759dea98340b344d55867",
+    "01/auto-01-PowerReactor-ghost-0.png": "1b82e8f97f935edd4d0529c44ca6a00c53a82ecbf2b367698613485bd54df600",
+    "01/auto-01-PowerReactor-completed.png": "5f615c90958cddc38b4601bd3925a4bec8afcef8c90c88753a17c09a0de65074",
+    "01/auto-02-Barracks-tab-tooltip.png": "4592b03d32c0ae4ece3bc5c55090e61dfcab235e5bccba51499c0b8c9a92d4f6",
+    "01/auto-02-Barracks-candidate-0-before-ghost.png": "39ac5d88594b83c56d67f1d0393ec17be70c6dc068853c661c05c8679a89aed7",
+    "01/auto-02-Barracks-candidate-0-build-tooltip.png": "ba55fab9727a54578077e10e3e6e68b3b3c715e702db26c982633a2ba0bea049",
+    "01/auto-02-Barracks-ghost-0.png": "9846e2a417afa0313924233ba30f20ae6e8f15100b6cf1c1357967efd591ab3e",
+    "01/auto-02-Barracks-candidate-1-before-ghost.png": "0ea2a9ab5bde045a5d2e119cd684a6d9654297731e25bec10cb7e948ca21b1fb",
+    "01/auto-02-Barracks-candidate-1-build-tooltip.png": "c5af179b918732f58676f3d367f21b5b12d81252d0d4794df59d569bca083214",
+    "01/auto-02-Barracks-ghost-1.png": "3c65859ff89877d69967f9dd3e68dc3252b56d9a15d09d321c8273d82e10357d",
+    "01/auto-02-Barracks-completed.png": "414a98769fbc17a7f670150a90074021c14f1f9852937161c25fae4e894613f9",
+    "01/09-four-paid-Infantry-0-tooltip.png": "a8e44f2601ba8c4e63e5693740b18e8efc61494a35c6037bf07d63365208f565",
+    "01/09-four-paid-Infantry-1-tooltip.png": "95524e6eb39d32682fdf12515bddbb83e621c21dbde8ecd9a3b84870247f8fa7",
+    "01/09-four-paid-Infantry-2-tooltip.png": "252e592a61317c142b01aada65cfeefa2697b8536e2b4b9aaa7b2f1a7dae0c04",
+    "01/09-four-paid-Infantry-3-tooltip.png": "9f098287885bbc7048aa68435692f751950ddf0df74fb04fef659bc3405c3961",
+    "01/10-four-ready.png": "eace1109e77d4c0d213bc6b194b1bfcde8a6fd6f7244ef757be9aa38429e380a",
+    "01/11-public-move.png": "ea90728731099ff2675f615d745c86d1d8d919207c0859aa54f235e2b4797ec3",
+    "01/12-Attack-lesson.png": "1109a9ecdfa6a6355b4b9238aa3d458f5395569e97fad78c1dc7bf1ae549f1e1",
+    "01/13-public-scout-00.png": "1b46c59a0f01fabd4e0125bdf12e138ae4df45b67cff05607c18547a423f4463",
+    "01/13-public-scout-01.png": "ce63f382d144e27169a4b688ba4e6d6ba815a77b854eb2500ad13bf347c686b1",
+    "01/99-failure.png": "79919f3c2d0a996c37f1421b3feaaf2b8726a8cf0eb2fd2dfdca4da02f2f95ba"
+  },
+  "wall_seconds": 292.8517880279687
+}

@@ -1,0 +1,199 @@
+{
+  "scope": "Actual07 terminal failure retained; actual first scouting arrival independently verified, no earned/replay acceptance",
+  "passed": false,
+  "error": "Actual normal Move required; Follow/Patrol never count",
+  "whole_wall_seconds": 292.8517880279687,
+  "normal_exits": [
+    {
+      "pid": 3973757,
+      "supervisor_pid": 3973710,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "all_original_png_hashes_verified": true,
+  "actual_png_count": 30,
+  "unique_dense_originals": 29,
+  "all_dense_ack_mtimes_strictly_fresh": true,
+  "all_dense_original_hashes_verified": true,
+  "all_dense_sources_unique": true,
+  "all_frozen07_hashes_unchanged": true,
+  "actual_scout00_poll_samples": 6,
+  "actual_scout00_ack_interval_seconds": [
+    0.28591504000360146,
+    0.294867079006508,
+    0.296885157993529,
+    0.30129489704268053,
+    0.30985777894966304
+  ],
+  "actual_scout00_interval_summary": {
+    "min": 0.28591504000360146,
+    "median": 0.296885157993529,
+    "max": 0.30985777894966304
+  },
+  "actual_all_save_sup_to_ack_seconds": {
+    "min": 0.1518523590057157,
+    "median": 0.16204346099402755,
+    "max": 0.21339448599610478
+  },
+  "actual_scout00_all_five_natural_arrival": true,
+  "actual_scout00_arrival_witnesses": [
+    {
+      "own_key": "8589933358",
+      "own_clock": 114.87400817871094,
+      "position": [
+        -10.444177627563477,
+        1.5,
+        -24.383617401123047
+      ],
+      "original_actual_Move_goal": [
+        -10.278936386108398,
+        0.0,
+        -24.399999618530273
+      ],
+      "distance_xz": 0.16605133219818824,
+      "source_own_snapshot": "scout-00-natural-arrival-progress-0002-40cfcbe3b4934611a055049af5635427.ron",
+      "source_sha256": "7fccf826142d64c91d657a54e3fde4a6fbe0990684698d98b51f93f4b7b9b9a6",
+      "ack_receipt": "scout-00-natural-arrival-progress-0002-save-ack.json"
+    },
+    {
+      "own_key": "38654703971",
+      "own_clock": 115.16441345214844,
+      "position": [
+        -11.021994590759277,
+        0.05000000074505806,
+        -23.518173217773438
+      ],
+      "original_actual_Move_goal": [
+        -10.997151374816895,
+        0.0,
+        -23.330394744873047
+      ],
+      "distance_xz": 0.18941473085048743,
+      "source_own_snapshot": "scout-00-natural-arrival-progress-0003-2c209c750c5d41dc903d6b95b37b16c2.ron",
+      "source_sha256": "46ec64c5f47079c4616af5c3d317181e29b296c5a5241598454ea2dcded6ad0d",
+      "ack_receipt": "scout-00-natural-arrival-progress-0003-save-ack.json"
+    },
+    {
+      "own_key": "820338751970",
+      "own_clock": 115.16441345214844,
+      "position": [
+        -9.724603652954102,
+        0.05000000074505806,
+        -24.12721824645996
+      ],
+      "original_actual_Move_goal": [
+        -9.52592945098877,
+        0.0,
+        -24.11341094970703
+      ],
+      "distance_xz": 0.19915340813098079,
+      "source_own_snapshot": "scout-00-natural-arrival-progress-0003-2c209c750c5d41dc903d6b95b37b16c2.ron",
+      "source_sha256": "46ec64c5f47079c4616af5c3d317181e29b296c5a5241598454ea2dcded6ad0d",
+      "ack_receipt": "scout-00-natural-arrival-progress-0003-save-ack.json"
+    },
+    {
+      "own_key": "1043677051465",
+      "own_clock": 115.16441345214844,
+      "position": [
+        -11.572956085205078,
+        0.05000000074505806,
+        -24.579627990722656
+      ],
+      "original_actual_Move_goal": [
+        -11.419960975646973,
+        0.0,
+        -24.579999923706055
+      ],
+      "distance_xz": 0.15299556164425435,
+      "source_own_snapshot": "scout-00-natural-arrival-progress-0003-2c209c750c5d41dc903d6b95b37b16c2.ron",
+      "source_sha256": "46ec64c5f47079c4616af5c3d317181e29b296c5a5241598454ea2dcded6ad0d",
+      "ack_receipt": "scout-00-natural-arrival-progress-0003-save-ack.json"
+    },
+    {
+      "own_key": "274877905325",
+      "own_clock": 115.75424194335938,
+      "position": [
+        -10.355003356933594,
+        0.05000000074505806,
+        -22.417049407958984
+      ],
+      "original_actual_Move_goal": [
+        -10.25,
+        0.0,
+        -22.25
+      ],
+      "distance_xz": 0.19730993301598093,
+      "source_own_snapshot": "scout-00-natural-arrival-progress-0005-f910b47d0bda41d59bafceaa3d298976.ron",
+      "source_sha256": "b7cf24279ebdf2a52f1c14c1fa529b63d0f27987ea5b6d0d6e7b9489b55680f1",
+      "ack_receipt": "scout-00-natural-arrival-progress-0005-save-ack.json"
+    }
+  ],
+  "scout01_initial_Move_guard_rejected": true,
+  "scout01_all_five_own_active_and_queued_empty": true,
+  "no_recipe_processes_remaining": true,
+  "normal_runtime_pids_absent": true,
+  "earned_graduation_verified": false,
+  "fresh_Replay_verified": false,
+  "historical04_05_failures_unchanged": true,
+  "no_rerun": true,
+  "no_output_bound_children_remaining": true,
+  "GPU_recipe_released": true,
+  "current_gpu_holders": [
+    {
+      "pid": 2550796,
+      "device": "/dev/dri/card1"
+    },
+    {
+      "pid": 2550959,
+      "device": "/dev/dri/renderD128"
+    },
+    {
+      "pid": 2550965,
+      "device": "/dev/dri/renderD128"
+    },
+    {
+      "pid": 2551041,
+      "device": "/dev/dri/renderD128"
+    },
+    {
+      "pid": 2571653,
+      "device": "/dev/dri/renderD129"
+    },
+    {
+      "pid": 2590562,
+      "device": "/dev/dri/renderD129"
+    },
+    {
+      "pid": 2598524,
+      "device": "/dev/dri/renderD129"
+    },
+    {
+      "pid": 2618758,
+      "device": "/dev/dri/renderD129"
+    },
+    {
+      "pid": 2626514,
+      "device": "/dev/dri/renderD128"
+    },
+    {
+      "pid": 2626807,
+      "device": "/dev/dri/renderD128"
+    },
+    {
+      "pid": 2710110,
+      "device": "/dev/dri/renderD129"
+    },
+    {
+      "pid": 2734699,
+      "device": "/dev/dri/renderD129"
+    },
+    {
+      "pid": 2948932,
+      "device": "/dev/dri/renderD128"
+    }
+  ]
+}

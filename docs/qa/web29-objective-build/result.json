@@ -1,0 +1,16 @@
+{
+  "actual_exit": 0,
+  "clean_actual_exit": 0,
+  "source_and_assets_unchanged": true,
+  "protected_originals_unchanged": true,
+  "wall_seconds": 612.1405214359984,
+  "scope": "W29 frozen objective-HUD native309 integrity only; browser runtime and public deployment not claimed",
+  "native_pin_sha256": "929f57b1eee6f6f04f17789ebb9ed69aad63c7b945358a2af05bde0e71101957",
+  "native_source_count": 144,
+  "asset_count": 332,
+  "input_manifest_sha256": "bf77c00942365a8580572987ec462614e6cf102f7fa2c489a667272bca7cda36",
+  "wasm_sha256": "a1d901da2c3387807d07fd556e9907317203df6f6ccb4c92663c837acb717c40",
+  "wasm_bytes": 27093013,
+  "site_path": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-current-build29-snapshot-20261012/source/web",
+  "all_four_frozen_compiles": true
+}
