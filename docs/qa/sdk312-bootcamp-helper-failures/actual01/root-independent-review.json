@@ -1,0 +1,11 @@
+{
+  "scope": "Root actual01 failure verification; not fullBootCamp/player acceptance",
+  "controller_exit": 1,
+  "wall_seconds": 134.05212553503225,
+  "game_normal_exit": 0,
+  "all4PNG_hashes_match": true,
+  "direct_view": "TerminalPNG shows2/7 Gather andselectedWorker while earlierfreshsave reportedSelectWorker",
+  "cause": "Postinputstage/snapshot timing requiresdiagnosis; no game defect proven",
+  "installation_archive_unchanged": true,
+  "forced_cleanup": false
+}

@@ -1,0 +1,31 @@
+{
+  "actual_exit": 1,
+  "scope": "Freshnormal7lessons+explicitAttack+earnedVictory+SAME-AppReplay; actualacceptancepending",
+  "original_whole": 900,
+  "original_attack": 300,
+  "original_stage": 30,
+  "original_review": 45,
+  "original_arrival_distance": 0.3,
+  "error": "Actualnatural lesson mismatch Gather",
+  "error_type": "AssertionError",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/freeman.xiong/Documents/github/games/active/bevy-open-rts/target/fog-sdk-bootcamp-full-fresh-prepared-20261012/run.py\", line 21, in <module>\n    s=PhysicalSession(package,archive,ready['binary_sha256'],ready['archive_sha256'],a.out,wall=900);s.begin_mission(0);audio=PrivateAudio(s);result['actual_flow']=run(s);assert s.launch_count==1;s.normal_close_and_require_exit_zero();s.assert_installation_archive_unchanged();result['actual_exit']=0\n                                                                                                                                                                    ~~~^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/fog-sdk-bootcamp-full-fresh-prepared-20261012/recipe.py\", line 66, in run\n    s.press('F10');review(s,'02-select-Worker','CURRENTvisibleownedWorker lesson1','click');lesson(s,o,'Gather','lesson2-Gather');review(s,'03-visible-Ore','CURRENTvisibleOre normalRMB','right');s.press('F10');gathered=wait_lesson(s,o,'BuildPower','lesson3-gathered');assert gathered['ore']>64;s.press('F10')\n                                                                                            ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/fog-sdk-bootcamp-full-fresh-prepared-20261012/recipe.py\", line 29, in lesson\n    own=o.state(label);raw=fields(o._dense_last_original.read_text());assert raw['tutorial'].startswith('Some(');t=fields(raw['tutorial'][5:-1]);assert t['active']=='true'and t['stage']==expected,'Actualnatural lesson mismatch '+expected\n                                                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Actualnatural lesson mismatch Gather\n",
+  "normal_exits": [
+    {
+      "pid": 626166,
+      "supervisor_pid": 626053,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "launch_count": 1,
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "wall_seconds": 134.05212553503225,
+  "screenshots": {
+    "01/00-native-fullscreen.png": "15c43563aabe324162f3f517b633ea3aeb506e91b57a823fd6ca2982f4523130",
+    "01/01-fresh-BootCamp.png": "2432aeb199d62ce68350ef2d9e090be58a6dc30dd94e5d850c2619aa17b79d15",
+    "01/02-select-Worker.png": "ad4e007b3d21a88ef65896eadacf0bcd1141a60c37b4cec934658114ae5191a9",
+    "01/99-terminal-failure.png": "d351cc0f0cddec99330c40f75ef5abf512e9a391ea8026fd4e9ad23658d127c6"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "stage": "BuildPower",
+  "original_source": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-02/01/lesson3-gathered-progress-5247880d6fdc43ac960145b046968693.ron",
+  "ack": {
+    "before_mtime_ns": "1791790814876208017",
+    "ack_mtime_ns": "1791790815297205504",
+    "sup_monotonic": 331844.408253336,
+    "ack_monotonic": 331844.566510947,
+    "sha256": "6332e5e1223b01cddd668b479b281cef45594ae05eaa96070540e35e8f6c9ed5",
+    "own_clock": 11.473523139953613,
+    "original_ron": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-02/01/lesson3-gathered-progress-5247880d6fdc43ac960145b046968693.ron"
+  },
+  "bank": [
+    70,
+    32
+  ],
+  "natural_bounded_transition": true
+}

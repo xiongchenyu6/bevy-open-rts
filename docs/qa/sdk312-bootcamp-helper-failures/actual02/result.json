@@ -1,0 +1,32 @@
+{
+  "actual_exit": 1,
+  "scope": "Freshnormal7lessons+explicitAttack+earnedVictory+SAME-AppReplay; actualacceptancepending",
+  "original_whole": 900,
+  "original_attack": 300,
+  "original_stage": 30,
+  "original_review": 45,
+  "original_arrival_distance": 0.3,
+  "error": "[Errno 2] No such file or directory: '/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-02/01/current-own-base-PowerReactor.ron'",
+  "error_type": "FileNotFoundError",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/freeman.xiong/Documents/github/games/active/bevy-open-rts/target/fog-sdk-bootcamp-full-fresh02-prepared-20261012/run.py\", line 21, in <module>\n    s=PhysicalSession(package,archive,ready['binary_sha256'],ready['archive_sha256'],a.out,wall=900);s.begin_mission(0);audio=PrivateAudio(s);result['actual_flow']=run(s);assert s.launch_count==1;s.normal_close_and_require_exit_zero();s.assert_installation_archive_unchanged();result['actual_exit']=0\n                                                                                                                                                                    ~~~^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/fog-sdk-bootcamp-full-fresh02-prepared-20261012/recipe.py\", line 68, in run\n    o.select_free_worker();o.build('PowerReactor',[3,1],o.own_base_sites('PowerReactor'),'Production');wait_lesson(s,o,'BuildBarracks','lesson4-paid-Power');o.select_free_worker();o.build('Barracks',[3,1],o.own_base_sites('Barracks'),'Production');wait_lesson(s,o,'Train','lesson5-paid-Barracks');o.select_structure('Barracks');o.train('Barracks','LightRifleInfantry',4,[1,0],'four-paid-Infantry');s.press('F10');deadline=min(s.deadline,time.monotonic()+30)\n                                                        ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/fog-sdk-bootcamp-full-fresh02-prepared-20261012/opening1920.py\", line 44, in own_base_sites\n    raw = fields((self.out / ('current-own-base-' + ident + '.ron')).read_text())\n                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/nix/store/lb41b0anx1f98y9y5s9mdv97gjgsq740-python3-3.14.7/lib/python3.14/pathlib/__init__.py\", line 787, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/nix/store/lb41b0anx1f98y9y5s9mdv97gjgsq740-python3-3.14.7/lib/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-02/01/current-own-base-PowerReactor.ron'\n",
+  "normal_exits": [
+    {
+      "pid": 653468,
+      "supervisor_pid": 653421,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "launch_count": 1,
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "wall_seconds": 189.35145663801813,
+  "screenshots": {
+    "01/00-native-fullscreen.png": "15c43563aabe324162f3f517b633ea3aeb506e91b57a823fd6ca2982f4523130",
+    "01/01-fresh-BootCamp.png": "2432aeb199d62ce68350ef2d9e090be58a6dc30dd94e5d850c2619aa17b79d15",
+    "01/02-select-Worker.png": "e2039ef5bc5beb3accfe47761634d8b33ea952588be70995895df5035e5bb454",
+    "01/03-visible-Ore.png": "6e21b57a400ddb149a32cd107c6a54e9ad0750d5d89c643fe428ca2e949b15cb",
+    "01/99-terminal-failure.png": "d5ad69087ce09a8113323d5e9b40e95add089ade8cf16ec813e32a07c50dfca6"
+  }
+}

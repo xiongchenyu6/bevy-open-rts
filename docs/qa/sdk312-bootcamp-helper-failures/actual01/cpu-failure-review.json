@@ -1,0 +1,19 @@
+{
+  "scope": "Failed actual01; no completed BootCamp acceptance",
+  "actual_exit": 1,
+  "wall_seconds": 134.05212553503225,
+  "normal_exits": [
+    {
+      "pid": 626166,
+      "supervisor_pid": 626053,
+      "actual_exit": 0,
+      "normal_window_close": true
+    }
+  ],
+  "forced_cleanup": false,
+  "installation_unchanged": true,
+  "archive_unchanged": true,
+  "error": "Actualnatural lesson mismatch Gather",
+  "root_direct_PNG_review": "Terminal PNG visibly2/7 Gather with selected healthy Worker; immediate saved lesson remained SelectWorker",
+  "diagnosis": "Fresh save acknowledgment does not prove post-selection tutorial transition settled. Source Update UiAndManagement update_tutorial and input/save observation can differ by frame. No production tutorial defect established."
+}

@@ -7,6 +7,18 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Latest Verified Checkpoints
 
+- SDK312 normal BootCamp attempts01/02 remain failed helper diagnostics.
+  Attempt01 stops on an immediate Gather assertion while its saved stage is
+  still SelectWorker; the terminal image already shows2/7 Gather. Attempt02
+  naturally gathers and returns ore, reaching3/7 BuildPower with bank70/32,
+  then stops because an inherited helper requests a fixed save basename
+  although the actual save retains its original UUID. No paid Power or full
+  BootCamp, Attack, victory or same-app Replay pass follows. All4/5 respective
+  PNG hashes are independently verified, both games close normally with exit0,
+  no forced cleanup occurs and the399-file package/archive stay unchanged
+  ([preserved helper failures](qa/sdk312-bootcamp-helper-failures-review.json)).
+  These are helper failures, not demonstrated game defects; SDK shipping
+  verification and later runtime attempts have separate scopes.
 - Normal native M2 diagnostic18 verifies the first paid Power foundation and
   completion, then fails the original45-second Factory camera review because
   the gate arrives67.72 seconds after the request and is not consumed. Its

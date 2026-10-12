@@ -1,0 +1,583 @@
+{
+  "scope": "Team0-only originalUUIDsave stages/bank/counts; no hidden enemy coordinates or fullRONprinted/copied",
+  "actual_failed": true,
+  "PNG_hashes_verified": 5,
+  "rows": [
+    {
+      "original_ron": "lesson1-initial-880cde3770aa40a197897769d5449f9a.ron",
+      "sha256": "96d90ed5f322daff98d6867e7d53e2df4503e42c0a6d3e1b67b71aa5dd8b5f5d",
+      "own_clock": 1.8739666,
+      "tutorial_stage": "SelectWorker",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson2-Gather-progress-513cf3ba3a264832a4d7e055fda279a2.ron",
+      "sha256": "0f225a3233c85c91e1f661161b4c8abafc6b5c76013a6793bf408afdbff85fbf",
+      "own_clock": 2.2140574,
+      "tutorial_stage": "SelectWorker",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson2-Gather-progress-e991528760dd41f098661e9048d038db.ron",
+      "sha256": "e68d3df2b8cf04c35d6e4d0bdfd4354641466f5c8c589043e2d8bcd6769b1437",
+      "own_clock": 2.2140574,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-e32e18154ac74e2cb5da607bc90b6acd.ron",
+      "sha256": "c082673da1ab010f1f15e3823ba3d5fa9b69bd8dc0a148f8c5bef6423a5be94f",
+      "own_clock": 2.6025906,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-62f8d079d0474325b062a344baa78c65.ron",
+      "sha256": "d952273a9e0d381be7d7eac2098da72b988caf7957dc958ee17cb2b6edf60cc1",
+      "own_clock": 2.9674258,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-d5f0f99b8a8a4a0a9fa9afc68554a403.ron",
+      "sha256": "9095f3c03e324f8dfd1d403f9df229d935635c54ca33bf8f5eaf0dc02515e9b7",
+      "own_clock": 3.3655176,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-cfdde1c5d31a49bdbc74299ce03d3504.ron",
+      "sha256": "3bd073b07658260645d586d50404e053a5c703555cb67ed3f5a09d0cd46d75ee",
+      "own_clock": 3.7594798,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-d83d653661534803a265d3c1a88c1948.ron",
+      "sha256": "ad36e86b39587293dda7ee24d8311951b9d0cbc298d60582f698d5e4811f4bb4",
+      "own_clock": 4.120827,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-0f8546e7117e45f6a965466903379b45.ron",
+      "sha256": "f00f4af1e7b051a4fb726b1bb09011ad2aecd4e0a5c8f72bfef81df6e595575b",
+      "own_clock": 4.482914,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-96fb30d8ad294775a97dfc26ed2d3ff8.ron",
+      "sha256": "cf0c64d7c006af3ec004396d760c9bfcd7ce2ce9c6766c75d740716f87c68ee4",
+      "own_clock": 4.862014,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-ea5b72e1badc4376ac2bd64441c4805b.ron",
+      "sha256": "0c3d77e00b4e008f538dc1860f1edd80218d28714a483eac7f4f6578672093ab",
+      "own_clock": 5.2539063,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-451a14e369014608a6d27cfd0075b09b.ron",
+      "sha256": "f4525445e3d4a75e3117508d40b2d5cd0bd06c73aaf4358483ffdd50e7ff8a33",
+      "own_clock": 5.654542,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-fa884a05bfcc4976abf00338dfebbbda.ron",
+      "sha256": "1efb56dfcbb15874eea08d633ecb6eea8092001790d922ebfb0c130b0f3be925",
+      "own_clock": 6.0286417,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-a6b6d6d5921d476991afe1fb390c60b0.ron",
+      "sha256": "d766ec4a22776ac6976b5410e6c11b028692ea71335e60405413140d81dd28cd",
+      "own_clock": 6.4509964,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-da928905bd9d4eda932f79846cb5f642.ron",
+      "sha256": "aeab5a1be307e4a1289b80fae832939355f36676a77f18c4e96cb0da123208d6",
+      "own_clock": 6.877968,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-87266f2be66449b596ffb351dba5c00b.ron",
+      "sha256": "4c3159383e0bb1a384c3bc84dc519740a2cb525c7f0e467a910bbf391a33e33b",
+      "own_clock": 7.286517,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-e561e3b064c34e2692d8b56aa4215906.ron",
+      "sha256": "d8f11c1ea4116ea5cba7a422af4fb3b828e205865bc30229d7b94ddea07b4174",
+      "own_clock": 7.703527,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-996a52c075af4c4fb39ba9b862a4bde2.ron",
+      "sha256": "edd7ccea05b7adafd8806cfeadb531f53b1a470d4d168656b4b66487226f99e6",
+      "own_clock": 8.078296,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-a9f331089f714063939b47d896317692.ron",
+      "sha256": "280ba1ca548a58265019796b8281391acded0a8ef58438c49b469dddccf93dfe",
+      "own_clock": 8.470396,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-41014ab95b7d4ebb80915bc8a8fce778.ron",
+      "sha256": "91dfd6ef0a270cc805a10cf986c301e1a7a9e8688e63a96522db18d23cbdf08b",
+      "own_clock": 8.846702,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-c5258cd3b4624bfc8a3f4ad683224452.ron",
+      "sha256": "b3f200060d63797d04e4a04ba775f126ba4a9c551b747e552b0f2c6e93045d18",
+      "own_clock": 9.210401,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-fe4997727bf44c549626e0c8b9056f78.ron",
+      "sha256": "e4169a465c5bb1f7dede3e66ad4c0c53ccf4dcea980c85470c0a9fdcc10b52d3",
+      "own_clock": 9.591607,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-57f943b2b79f49938de005f42ff3e82f.ron",
+      "sha256": "6988dea20e2813e3d8f856b4ba12b0bc7a09a720408d1188bc6036eb4698ecfc",
+      "own_clock": 9.965087,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-622660beb50d465698011ef977de6b51.ron",
+      "sha256": "90a9e2eefeb061d9eb710f79b14fe8805ed92aa82ee9c80b154c11f2170b9f08",
+      "own_clock": 10.326971,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-8a25a2b2af784973925ee8bc52103777.ron",
+      "sha256": "4e5f2450604aebc2ae1b783beb6a3109034317a2c16107ba99de02e00bcfdf91",
+      "own_clock": 10.694939,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-9e904272a7aa45cf809aaaa27e712476.ron",
+      "sha256": "928058466aa6f6e54288ed20fd0224623da244c294536e190097ab672d78500b",
+      "own_clock": 11.051486,
+      "tutorial_stage": "Gather",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson3-gathered-progress-5247880d6fdc43ac960145b046968693.ron",
+      "sha256": "6332e5e1223b01cddd668b479b281cef45594ae05eaa96070540e35e8f6c9ed5",
+      "own_clock": 11.473523,
+      "tutorial_stage": "BuildPower",
+      "tutorial_active": "true",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "actual-idle-worker-before-group-e289bf82b5ee4171914629379a44e0f8.ron",
+      "sha256": "9211f96e131ee7825570638a304338a31360e59e7562bcaf64dd39cf9326543c",
+      "own_clock": 11.743627,
+      "tutorial_stage": "BuildPower",
+      "tutorial_active": "true",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "actual-worker-group-assigned-4b17a1b5ef074ebf9332c5e53bb2cf4d.ron",
+      "sha256": "9211f96e131ee7825570638a304338a31360e59e7562bcaf64dd39cf9326543c",
+      "own_clock": 11.743627,
+      "tutorial_stage": "BuildPower",
+      "tutorial_active": "true",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "current-own-producer-CommandCenter-4005a74c4f3d450186e7b091f9d62c28.ron",
+      "sha256": "9211f96e131ee7825570638a304338a31360e59e7562bcaf64dd39cf9326543c",
+      "own_clock": 11.743627,
+      "tutorial_stage": "BuildPower",
+      "tutorial_active": "true",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "actual-worker-group-recalled-abcfc3ec7b244effb06c40e01740197c.ron",
+      "sha256": "3a4c2bf5ea7f8b8e304c259f66e3fbcc86d845363139dba6bee7522958ca0fe4",
+      "own_clock": 11.743627,
+      "tutorial_stage": "BuildPower",
+      "tutorial_active": "true",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "current-own-base-PowerReactor-75f96e5bc9874ffe902bbe44aed20d05.ron",
+      "sha256": "3a4c2bf5ea7f8b8e304c259f66e3fbcc86d845363139dba6bee7522958ca0fe4",
+      "own_clock": 11.743627,
+      "tutorial_stage": "BuildPower",
+      "tutorial_active": "true",
+      "player0_bank": [
+        70,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Drone": 1,
+        "Worker": 2
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    }
+  ]
+}

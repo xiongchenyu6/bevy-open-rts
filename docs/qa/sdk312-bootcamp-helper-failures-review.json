@@ -1,0 +1,108 @@
+{
+  "scope": "Historical actual01/02 rawfailures immutable; helper03/rootfuture runtime separate; SDK312 shipping acceptance separately reviewed",
+  "attempts": [
+    {
+      "attempt": "01",
+      "scope": "Actual SDK312 fresh normal BootCamp partial HELPER failure; no fullBootCamp/Attack/victory/SAME-AppReplay pass",
+      "controller_exit": 1,
+      "error": "Actualnatural lesson mismatch Gather",
+      "wall_seconds": 134.05212553503225,
+      "binary_sha256": "11137f0411f4b27e1fae8f1c6f9a9c1dc9710d8263cf5cb0583060883b44c8ee",
+      "archive_sha256": "5d06d5094551a71d667fbae7a81a3edbecce9e8a3353d20f5b99af95d9c83274",
+      "normal_game_exits": [
+        {
+          "pid": 626166,
+          "supervisor_pid": 626053,
+          "actual_exit": 0,
+          "normal_window_close": true
+        }
+      ],
+      "forced_cleanup": false,
+      "installation_archive_unchanged": true,
+      "all_PNG_rehashed": 4,
+      "direct_terminal_PNG_review": true,
+      "own_first_stage_bank": [
+        "SelectWorker",
+        [
+          64,
+          32
+        ]
+      ],
+      "own_last_stage_bank": [
+        "SelectWorker",
+        [
+          64,
+          32
+        ]
+      ],
+      "root_review_file_copied": true,
+      "diagnosis": "Immediate postselection Gather assertion observed older SelectWorker save; terminalPNG alreadyGather2/7. No game tutorial bug established.",
+      "root_handoff_verification": "Copied root-independent-review.json",
+      "all9releasegates_open": true
+    },
+    {
+      "attempt": "02",
+      "scope": "Actual SDK312 fresh normal BootCamp partial HELPER failure; no fullBootCamp/Attack/victory/SAME-AppReplay pass",
+      "controller_exit": 1,
+      "error": "[Errno 2] No such file or directory: '/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk312-fog-bootcamp-full-20261012-02/01/current-own-base-PowerReactor.ron'",
+      "wall_seconds": 189.35145663801813,
+      "binary_sha256": "11137f0411f4b27e1fae8f1c6f9a9c1dc9710d8263cf5cb0583060883b44c8ee",
+      "archive_sha256": "5d06d5094551a71d667fbae7a81a3edbecce9e8a3353d20f5b99af95d9c83274",
+      "normal_game_exits": [
+        {
+          "pid": 653468,
+          "supervisor_pid": 653421,
+          "actual_exit": 0,
+          "normal_window_close": true
+        }
+      ],
+      "forced_cleanup": false,
+      "installation_archive_unchanged": true,
+      "all_PNG_rehashed": 5,
+      "direct_terminal_PNG_review": true,
+      "own_first_stage_bank": [
+        "SelectWorker",
+        [
+          64,
+          32
+        ]
+      ],
+      "own_last_stage_bank": [
+        "BuildPower",
+        [
+          70,
+          32
+        ]
+      ],
+      "root_review_file_copied": false,
+      "diagnosis": "Dense saved actual UUID current-own-base-PowerReactor file; inherited helper assumes missing fixed basename. Actual natural Gather and returnedOre reached BuildPower70/32 before any paidPower. No game build defect established.",
+      "root_handoff_verification": "Root reports exact controller/gameexits/normalteardown andunchanged399package; actual02 formalrootreviewfile pending at copytime",
+      "all9releasegates_open": true
+    }
+  ],
+  "files": {
+    "docs/qa/sdk312-bootcamp-helper-failures/actual02/own-stage-bank-review.json": "ed6f4894f0d95969b3d487aa70fe3c861472da13bc5ca1b05a67910464c2bb4d",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual02/result.json": "e40ad6f57e927d33e3608ae730564723928edf5cc88410a56661faf8cfc24785",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual02/lesson3-gathered-lesson.json": "e331e6f5162ab4b94fc70585ea25d7d1285772d39d01c113b731f0c732149c88",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual02/PNG-sha256.json": "2ecd9ee45a70f47420f1e821be15ba0afd678a73444cb4d647ea7850460a8ee5",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual02/lesson1-initial-lesson.json": "127192f487ad2389eefe2691162257de12374372fab31e81c24f823d8040384c",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual02/review.json": "7438f2727648212c1cebcb9b8be6575043bac4687170ace6b090c80905d29f49",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual02/lesson2-Gather-lesson.json": "04800f886541c241b35dbb41d4dbfbea6503e9148d35bbe8f0941e27a9936e25",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual01/own-stage-bank-review.json": "1366b4ef40ccd361beae8914c8568f18df59a34c5599b860e50ae4f7cc2aafa5",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual01/result.json": "44ca9512eecea15a15dcbdf0be6726b00c72acdaf7e4cad9fb7905733f9f92a4",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual01/cpu-failure-review.json": "23d580cdc40f7cd56b831df798875715b1fad1994dee4147859bf064ff788249",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual01/PNG-sha256.json": "2764520052b4ed49371ee4d7ea5050405a64279a5258d0737f4e5ab0d55b6038",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual01/root-independent-review.json": "39d53a586f52b78dbfb3ade6277e61eef64a38db62c04dea8cea2c2266506ff2",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual01/lesson1-initial-lesson.json": "a1a2bd9b1b577e85066ab938a323c799e8146e5d736ba732afc1fcdb07364c7a",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual01/review.json": "ea1e5c35c340bd64607e3e1de019e98a58ebe3d731c204eb8a6ca059f360c9f0",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual01/01/02-select-Worker.png": "ad4e007b3d21a88ef65896eadacf0bcd1141a60c37b4cec934658114ae5191a9",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual01/01/00-native-fullscreen.png": "15c43563aabe324162f3f517b633ea3aeb506e91b57a823fd6ca2982f4523130",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual01/01/99-terminal-failure.png": "d351cc0f0cddec99330c40f75ef5abf512e9a391ea8026fd4e9ad23658d127c6",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual01/01/01-fresh-BootCamp.png": "2432aeb199d62ce68350ef2d9e090be58a6dc30dd94e5d850c2619aa17b79d15",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual02/01/02-select-Worker.png": "e2039ef5bc5beb3accfe47761634d8b33ea952588be70995895df5035e5bb454",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual02/01/00-native-fullscreen.png": "15c43563aabe324162f3f517b633ea3aeb506e91b57a823fd6ca2982f4523130",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual02/01/99-terminal-failure.png": "d5ad69087ce09a8113323d5e9b40e95add089ade8cf16ec813e32a07c50dfca6",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual02/01/01-fresh-BootCamp.png": "2432aeb199d62ce68350ef2d9e090be58a6dc30dd94e5d850c2619aa17b79d15",
+    "docs/qa/sdk312-bootcamp-helper-failures/actual02/01/03-visible-Ore.png": "6e21b57a400ddb149a32cd107c6a54e9ad0750d5d89c643fe428ca2e949b15cb"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "scope": "Team0-only originalUUIDsave stages/bank/counts; no hidden enemy coordinates or fullRONprinted/copied",
+  "actual_failed": true,
+  "PNG_hashes_verified": 4,
+  "rows": [
+    {
+      "original_ron": "lesson1-initial-fd75e0b256ab4aa7ab1b80ed282b6ed8.ron",
+      "sha256": "e5b7c5de2a4555e19c7e231c96811326fed58668b142a1a2cc11f11ceb6513e5",
+      "own_clock": 1.850773,
+      "tutorial_stage": "SelectWorker",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    },
+    {
+      "original_ron": "lesson2-Gather-bdd38ae22bc54c42a156f506db3f077d.ron",
+      "sha256": "04ac28c5c8657b3593477dce95406f2d645e820ab824793eb67dd2098bee141b",
+      "own_clock": 2.1316738,
+      "tutorial_stage": "SelectWorker",
+      "tutorial_active": "true",
+      "player0_bank": [
+        64,
+        32
+      ],
+      "OWN_unit_counts": {
+        "Worker": 2,
+        "Drone": 1
+      },
+      "OWN_structure_counts": {
+        "CommandCenter": 1
+      }
+    }
+  ]
+}
