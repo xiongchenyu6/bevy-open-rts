@@ -81,9 +81,10 @@
   "logical_audio_identity_proven": false,
   "all17_accepted": false,
   "no_production_bug_proven": true,
+  "root_independent_review_sha256": "7b9a837ec2a63a86e1f0c5c39dfcb9366d2f3e81b0b303796cf064e88b58f24d",
   "portable_archive": {
     "path": "target/native309-audio-blind-asr-cpu-evidence.tar.gz",
-    "sha256": "36ed4d42bf1a6b9ce53c657cd81ead5e3d9c773fd1e33b30910efc56619f0a3f",
-    "files": 16
+    "sha256": "612cbaed4ad0d00667b55da2e9d9e6138b924dbf88d0351be81a3d1fa8823ebf",
+    "files": 17
   }
 }
