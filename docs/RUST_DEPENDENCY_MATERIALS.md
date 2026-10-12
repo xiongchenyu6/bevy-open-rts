@@ -59,3 +59,14 @@ source, Markdown and Cargo manifests for embedded copyright/license statements.
 Only manifest license declarations are found; no full original notice is recovered.
 Member hashes and matching lines are recorded in `rust-missing-notice-audit.json`.
 The missing-material and final distribution review requirements remain open.
+
+## Current Linux dependency reachability
+
+A fresh `cargo metadata --locked --offline --filter-platform
+x86_64-unknown-linux-gnu` check still reaches all three missing-notice packages
+through normal/build edges: `bevy_mesh → hexasphere → constgebra`,
+`bevy_render → naga → hexf-parse`, and
+`bevy_cursor_kit → image → ravif → rav1e → simd_helpers`.
+The last declares a procedural-macro target. This graph does not establish exact
+binary linkage or settle attribution for generated code or source distribution.
+Keep all three gaps open; see the [pinned current graph](qa/current-rust-missing-notice-graph.json).

@@ -1,0 +1,221 @@
+{
+  "scope": "Current locked offline Linux Cargo graph; no compilation, linker proof or legal clearance",
+  "metadata_exit": 0,
+  "metadata_sha256": "c4b4128a6ef3e78d674a7606fd68fce367217b1556b1307cf28a2dc625c3ec19",
+  "Cargo_lock_sha256": "7a1e47ec9fcdf9ab460414ed66b2bae7adbf8124b6b2b043293e4a4e7d749403",
+  "development_edges_excluded": true,
+  "missing_notice_packages": [
+    {
+      "name": "constgebra",
+      "version": "0.1.4",
+      "declared_license": "MIT OR Apache-2.0",
+      "targets": [
+        {
+          "name": "constgebra",
+          "kind": [
+            "lib"
+          ]
+        }
+      ],
+      "normal_build_graph_path": [
+        {
+          "from": "bevy-open-rts@0.1.0",
+          "to": "bevy@0.19.1",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "from": "bevy@0.19.1",
+          "to": "bevy_internal@0.19.1",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "from": "bevy_internal@0.19.1",
+          "to": "bevy_mesh@0.19.1",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "from": "bevy_mesh@0.19.1",
+          "to": "hexasphere@18.0.0",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "from": "hexasphere@18.0.0",
+          "to": "constgebra@0.1.4",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ],
+      "binary_linkage_verified": false,
+      "distribution_clearance": false
+    },
+    {
+      "name": "hexf-parse",
+      "version": "0.2.1",
+      "declared_license": "CC0-1.0",
+      "targets": [
+        {
+          "name": "hexf_parse",
+          "kind": [
+            "lib"
+          ]
+        }
+      ],
+      "normal_build_graph_path": [
+        {
+          "from": "bevy-open-rts@0.1.0",
+          "to": "bevy@0.19.1",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "from": "bevy@0.19.1",
+          "to": "bevy_internal@0.19.1",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "from": "bevy_internal@0.19.1",
+          "to": "bevy_render@0.19.1",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "from": "bevy_render@0.19.1",
+          "to": "naga@29.0.4",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "from": "naga@29.0.4",
+          "to": "hexf-parse@0.2.1",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ],
+      "binary_linkage_verified": false,
+      "distribution_clearance": false
+    },
+    {
+      "name": "simd_helpers",
+      "version": "0.1.0",
+      "declared_license": "MIT",
+      "targets": [
+        {
+          "name": "simd_helpers",
+          "kind": [
+            "proc-macro"
+          ]
+        },
+        {
+          "name": "cold_for",
+          "kind": [
+            "test"
+          ]
+        }
+      ],
+      "normal_build_graph_path": [
+        {
+          "from": "bevy-open-rts@0.1.0",
+          "to": "bevy_cursor_kit@0.9.0",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "from": "bevy_cursor_kit@0.9.0",
+          "to": "image@0.25.10",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "from": "image@0.25.10",
+          "to": "ravif@0.13.0",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "from": "ravif@0.13.0",
+          "to": "rav1e@0.8.1",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            },
+            {
+              "kind": null,
+              "target": "cfg(target = \"wasm32-unknown-unknown\")"
+            }
+          ]
+        },
+        {
+          "from": "rav1e@0.8.1",
+          "to": "simd_helpers@0.1.0",
+          "dependency_kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ],
+      "binary_linkage_verified": false,
+      "distribution_clearance": false
+    }
+  ],
+  "finding": "All three remain reachable. simd_helpers declares a proc-macro target; this alone does not resolve notice applicability for generated code or source distribution."
+}
