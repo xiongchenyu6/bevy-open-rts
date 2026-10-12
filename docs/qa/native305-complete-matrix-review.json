@@ -1,0 +1,27 @@
+{
+  "scope": "Completed frozen native305 deterministic headless matrix; currentHUD/source309 equivalence, human play, rendering and performance unproven",
+  "planned": 3726,
+  "completed_unique": 3726,
+  "driver_exit": 0,
+  "independent_verifier_exit": 0,
+  "root_repeated_verifier_exit": 0,
+  "wall_seconds": 14010.813282007002,
+  "original_sim_limit": 600,
+  "original_wall_limit": 180,
+  "starting_resources": [
+    32,
+    16
+  ],
+  "frozen_source_files_independently_hashed": 143,
+  "frozen_assets_independently_hashed": 332,
+  "binary_sha256": "5846ee1bf69363f3f5823319ed0797dcfd563b49a9e8ba9c2925421d4adb6228",
+  "live305_unit_terminal_MainPID": 0,
+  "queued309_started_after305_terminal": true,
+  "next309_actual_runner_PID": 16214,
+  "next309_scope": "Frozen03 formation source; latest5fc objectiveHUD not covered",
+  "files": {
+    "docs/qa/native305-complete-matrix/result.json": "163f62207392dd6d9455dbc54a853db515d507493e6aa33d8a2f088318d295be",
+    "docs/qa/native305-complete-matrix/verification-result.json": "f7f5141a362874422f42619645388b3a02a78829103b9c1c65ea8a423ed1757b",
+    "docs/qa/native305-complete-matrix/root-independent-final.json": "d6fcb135b86cab3ffd3f2d47f803a76fecc65aaa9f77a60eb57102ac84afef52"
+  }
+}

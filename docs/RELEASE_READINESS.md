@@ -403,3 +403,5 @@ with no PCM16 clipping. [Scoped rejection report](qa/native309-insufficient-audi
 pins portable local evidence and visible rejection review. This adds one genuine
 ordinary trigger with correlated output; exact logical audio receipts, remaining
 rare natural events, Hello, human mix and Windows/browser audio remain open.
+
+Frozen native305 deterministic headless matrix completed all3,726 unique cases under the original600-second simulation/180-second wall limits and32/16 starting resources. Driver and two independent verifier runs exited0; root rehashed143 frozen sources,332 assets and the exact audit binary. This historical result does not prove currentHUD equivalence, human play, rendering or hardware performance. The frozen309 formation matrix started only after305 terminal verification; its coverage is still pending. See [full305 evidence](qa/native305-complete-matrix-review.json). All release gates remain open.
