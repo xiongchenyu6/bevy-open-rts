@@ -1,0 +1,39 @@
+{
+  "scope": "CPU preparation only; actual M2 runtime/victory and six-mission acceptance unverified",
+  "sdk309_binary_sha256": "6caae6b818fd76d8b13395a085dbf0ec8ca632a260af1a486ac56c6b643f44f3",
+  "archive_sha256": "c83ca72ed3e9f709120c154fb95fa57e03ab9c776ba3c28df2114209922fb02e",
+  "frozen_helper_count": 76,
+  "actual_import_count": 28,
+  "initial_defenders": {
+    "Tank": 3,
+    "HeavyMachinegunTrooper": 3,
+    "AntiAirWalker": 2,
+    "RocketInfantry": 3
+  },
+  "later_assault": {
+    "Tank": 3,
+    "Drone": 1
+  },
+  "paid_unit_cost": {
+    "ore": 36,
+    "crystal": 16
+  },
+  "paid_base_cost": {
+    "ore": 20,
+    "crystal": 9
+  },
+  "bounds": {
+    "whole_wall": 900,
+    "simulation": 900,
+    "natural_arrival_each_typed_stage": 30,
+    "current_image_review": 45
+  },
+  "outer_rally": "Only initial Factory offsets5.5..6m; candidate trace clearance1.08 plus actual actor radii and visible resource/projection guards unchanged",
+  "actual_launch_check_exit": 0,
+  "runtime_verified": false,
+  "files": {
+    "docs/qa/sdk309-m2-grouping12-preparation/actual-import-check.json": "84a7a924e063618c5f6bda8b5e23b4f61b4a167b4a87445f764f8baffe46d1f0",
+    "docs/qa/sdk309-m2-grouping12-preparation/outer-rally-guards.json": "3c222fa27d9289c30f72c977957a26d4a8ff83b475808b0c575d8dbd68b6eb56",
+    "docs/qa/sdk309-m2-grouping12-preparation/group-guards.json": "f9d467c3ba4361340779643a8bfc411b50b7e149cf76d37c64b84204758f12a2"
+  }
+}

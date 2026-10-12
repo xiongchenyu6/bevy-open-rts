@@ -1,0 +1,94 @@
+{
+  "scope": "synthetic CPU parser/guard tests only; no runtime acceptance",
+  "passed": true,
+  "checks": [
+    {
+      "name": "exact eleven defenders plus Drone",
+      "passed": true
+    },
+    {
+      "name": "authored extra Tank rejected",
+      "passed": true
+    },
+    {
+      "name": "unexpected army type rejected",
+      "passed": true
+    },
+    {
+      "name": "missing AA rejected",
+      "passed": true
+    },
+    {
+      "name": "strict exact selection",
+      "passed": true
+    },
+    {
+      "name": "selected building rejected",
+      "passed": true
+    },
+    {
+      "name": "wrong same-type key rejected",
+      "passed": true
+    },
+    {
+      "name": "four alphabetical Tab types",
+      "passed": true
+    },
+    {
+      "name": "actual Move absent within HQ weapon range",
+      "passed": true
+    },
+    {
+      "name": "assigned normal formation goal read",
+      "passed": true
+    },
+    {
+      "name": "active Move cannot count as arrived",
+      "passed": true
+    },
+    {
+      "name": "outside HQ range cannot pass",
+      "passed": true
+    },
+    {
+      "name": "held Follow rejected",
+      "passed": true
+    },
+    {
+      "name": "Hold false rejected",
+      "passed": true
+    },
+    {
+      "name": "unchanged held anchors",
+      "passed": true
+    },
+    {
+      "name": "held physical drift rejected",
+      "passed": true
+    },
+    {
+      "name": "current SHA geometry deadline accepted",
+      "passed": true
+    },
+    {
+      "name": "expired45 review rejected",
+      "passed": true
+    },
+    {
+      "name": "stale image rejected",
+      "passed": true
+    },
+    {
+      "name": "wrong typed cohort rejected",
+      "passed": true
+    },
+    {
+      "name": "changed point rejected",
+      "passed": true
+    },
+    {
+      "name": "non-visible-only review rejected",
+      "passed": true
+    }
+  ]
+}

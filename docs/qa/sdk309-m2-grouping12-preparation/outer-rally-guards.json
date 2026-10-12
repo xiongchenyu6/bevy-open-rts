@@ -1,0 +1,23 @@
+{
+  "scope": "CPU control-flow only; original physical candidate/current-image/payment guards still required",
+  "passed": true,
+  "observations": [
+    {
+      "producer": "VehicleFactory",
+      "offset_count": 68,
+      "minimum": 5.5
+    },
+    {
+      "producer": "VehicleFactory",
+      "offset_count": 312,
+      "minimum": 3.2015621187164243
+    },
+    {
+      "producer": "Barracks",
+      "offset_count": 312,
+      "minimum": 3.2015621187164243
+    }
+  ],
+  "failure_propagates_and_restores_offsets": true,
+  "earlier_guard_expected_exact3_2_invalid": true
+}
