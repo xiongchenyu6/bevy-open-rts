@@ -1,0 +1,2684 @@
+[
+  {
+    "source": "scout-00-natural-arrival-progress-0000.ron",
+    "sha256": "5bd346003d39d684d0bf75d9dbcae36d9d39078a38ed5cd71e1e506439de8cc9",
+    "own_clock": 102.50955963134766,
+    "selected_own": [
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      },
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.841245651245117,
+          0.05000000074505806,
+          -15.28553295135498
+        ],
+        "health": 4.0,
+        "active": [
+          {
+            "kind": "Move",
+            "destination": [
+              -11.531558990478516,
+              0.0,
+              -15.12675666809082
+            ]
+          }
+        ],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 1.3192759595767491
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -14.120307922363281,
+          0.05000000074505806,
+          -15.476489067077637
+        ],
+        "health": 4.0,
+        "active": [
+          {
+            "kind": "Move",
+            "destination": [
+              -12.446937561035156,
+              0.0,
+              -15.965265274047852
+            ]
+          }
+        ],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 1.7432930180183737
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -16.652973175048828,
+          0.05000000074505806,
+          -15.968713760375977
+        ],
+        "health": 4.0,
+        "active": [
+          {
+            "kind": "Move",
+            "destination": [
+              -11.501745223999023,
+              0.0,
+              -18.383651733398438
+            ]
+          }
+        ],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 5.689206870665067
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -15.861655235290527,
+          0.05000000074505806,
+          -15.486650466918945
+        ],
+        "health": 4.0,
+        "active": [
+          {
+            "kind": "Move",
+            "destination": [
+              -12.25,
+              0.0,
+              -17.75
+            ]
+          }
+        ],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 4.262253470583337
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0001.ron",
+    "sha256": "5ad150b6e11e6366b43548e449b18563cf5a5226ec9ce49fcb66efc33988136a",
+    "own_clock": 103.59400177001953,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.691156387329102,
+          0.05000000074505806,
+          -15.137147903442383
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.15993532084444317
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.32580280303955,
+          0.05000000074505806,
+          -15.761106491088867
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.23739089758023071
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.937402725219727,
+          0.05000000074505806,
+          -16.40877342224121
+        ],
+        "health": 4.0,
+        "active": [
+          {
+            "kind": "Move",
+            "destination": [
+              -12.25,
+              0.0,
+              -17.75
+            ]
+          }
+        ],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.50712018085024
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -13.481058120727539,
+          0.05000000074505806,
+          -15.656325340270996
+        ],
+        "health": 4.0,
+        "active": [
+          {
+            "kind": "Move",
+            "destination": [
+              -11.501745223999023,
+              0.0,
+              -18.383651733398438
+            ]
+          }
+        ],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 3.3698648040841888
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0002.ron",
+    "sha256": "1ec82e0c5c88f3044e703756d95f0e63cb46af3b5e5c3af2d6c2d2f8d91417ed",
+    "own_clock": 104.730224609375,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.128520965576172,
+          0.05000000074505806,
+          -18.65616226196289
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 0.9142686699270888
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.818408966064453,
+          0.05000000074505806,
+          -17.821937561035156
+        ],
+        "health": 4.0,
+        "active": [
+          {
+            "kind": "Move",
+            "destination": [
+              -11.501745223999023,
+              0.0,
+              -18.383651733398438
+            ]
+          }
+        ],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.6448245784495555
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0003.ron",
+    "sha256": "b657646398085a619421e321f5dfb8d3c465ce258acd1f908c98d1c149f3c09c",
+    "own_clock": 105.79756927490234,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0004.ron",
+    "sha256": "c759ab283e0746398e17a89d27f6d3f229e6ef1e3299898262bc95f7e624a20c",
+    "own_clock": 106.89857482910156,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0005.ron",
+    "sha256": "a0490e6772ab1ae56aafd833f2407fe9f8e50e7c1701624e843bbd85b740eda4",
+    "own_clock": 107.9677963256836,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0006.ron",
+    "sha256": "bcd4ee0954cfe0777febb59cfc809f22489ef64cf1cb91d809dfb0de7c620137",
+    "own_clock": 109.06771850585938,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0007.ron",
+    "sha256": "4c8af3fecef1e6383d3ae2df9ce43a8438f848a13edcb059d2f3e7c1481d4e05",
+    "own_clock": 110.15229034423828,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0008.ron",
+    "sha256": "72d15cf4be57000d7fb502b9e2471afc548e55ca6c28074884b1571fe758af3d",
+    "own_clock": 111.22064208984375,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0009.ron",
+    "sha256": "7ca03c745067591a443315de232a0eb0966a7088c117596e5ebe2b2deed91b0c",
+    "own_clock": 112.27236938476562,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0010.ron",
+    "sha256": "a550fc7000c303b69eb27bcdd0871c70d2a4fd9ff6de3e6ea9737f69df488075",
+    "own_clock": 113.40620422363281,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0011.ron",
+    "sha256": "ea5755206926b320424b34f3471aafae0a4c4d7a849b8e06999b8ad73ce652a1",
+    "own_clock": 114.45794677734375,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0012.ron",
+    "sha256": "7188f5c76f7e6551cf6eecca75ffe972a09fcddeda137df4d9de4e1a867c701f",
+    "own_clock": 115.5417709350586,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0013.ron",
+    "sha256": "affdd1238c6fa5033dd9e782cf95edd30d542aa236c399208e900b08fcdfaa15",
+    "own_clock": 116.65057373046875,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0014.ron",
+    "sha256": "1268350b18eba57cd23ec86f421f82d3dac24e362c983f1cdcd582da42de2b45",
+    "own_clock": 117.71468353271484,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0015.ron",
+    "sha256": "7adba4834dfaec830a514435c3cc447a3db65a04a4fbac210c72b86141289778",
+    "own_clock": 118.76631164550781,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0016.ron",
+    "sha256": "3661b3631ecea4217b0635f3a116b00e15d33c1148ecf3b4e1f728fa98161cd0",
+    "own_clock": 119.81802368164062,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0017.ron",
+    "sha256": "ab7ac292f606806440deaecb5e2a7e968013f425210e0477816ae6cc9ddb169d",
+    "own_clock": 120.87008666992188,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0018.ron",
+    "sha256": "ea03bc6d65f6e65ee6f20a036c2bd56a256c53e9ac1c29b1db8c4be7bdcf4b7d",
+    "own_clock": 121.9222640991211,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0019.ron",
+    "sha256": "c7c4af0bc2a72c4d7c1537a872e17b4436098938d91910bfbca56c9f539de54b",
+    "own_clock": 123.02561950683594,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0020.ron",
+    "sha256": "6d1f64759a968d3750f44ffe6f878db54f4fb8dbda965faf2c4a972d3d0f1881",
+    "own_clock": 124.08441162109375,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0021.ron",
+    "sha256": "5aca862c7ee19c56ea31c24a5c763f5dc6168b67d74e7b75e6ac3f37bdc7eed3",
+    "own_clock": 125.13673400878906,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0022.ron",
+    "sha256": "1c096e6ef0fa0cd68969c5e05c359a8d8a032b86369245f425ad6093cf3b5b76",
+    "own_clock": 126.18714904785156,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0023.ron",
+    "sha256": "ffb958b63dcdde2c3d3c2c81e43dde2d58b64a2b9263c80668d4c6d3bb97ab92",
+    "own_clock": 127.24017333984375,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0024.ron",
+    "sha256": "e36125691e35ae7a7e60c1548f8991278a4819ee20411b861eb0d9c8b1d8a6d3",
+    "own_clock": 128.3238525390625,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0025.ron",
+    "sha256": "6746c910af4204bf66fb874a13571eb7422870e6e862fe57ccc02982f4e39f0e",
+    "own_clock": 129.45913696289062,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  },
+  {
+    "source": "scout-00-natural-arrival-progress-0026.ron",
+    "sha256": "694ed1df36c4243fb91b49a5e2ac103d8f3bf61f425e28401846694f17357b27",
+    "own_clock": 130.51486206054688,
+    "selected_own": [
+      {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      },
+      {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      },
+      {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      },
+      {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      },
+      {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    ]
+  }
+]

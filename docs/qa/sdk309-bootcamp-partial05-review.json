@@ -1,0 +1,21 @@
+{
+  "scope": "ActualSDK309 normal tutorial05 partial failure only; movement cause and graduation/replay unproven",
+  "passed": false,
+  "normal_exit": 0,
+  "forced_cleanup": false,
+  "wall_seconds": 292.1661347519839,
+  "all_png_hashes_verified": 29,
+  "all27_original_poll_save_hashes_verified": true,
+  "witnessed_arrivals": 4,
+  "unwitnessed_key": 1116691495441,
+  "unwitnessed_min_distance_m": 0.9142686699270888,
+  "unwitnessed_end_idle_healthy": true,
+  "runtime_fixture_scope": "OWN trajectory diagnosis only; original RON saved hashes do not authorize hidden information use",
+  "files": {
+    "docs/qa/sdk309-bootcamp-partial05/99-failure.png": "f9eff82a835c61d932b6a605163fe6026d891d81e3ca54ea89f50b13b0967d53",
+    "docs/qa/sdk309-bootcamp-partial05/auto-result.json": "4d2de5f73b47e6327ca38b58c1c69fd7cfe3c100104433327b15206790dd31ab",
+    "docs/qa/sdk309-bootcamp-partial05/png-sha256.json": "5d305c2cb6eaf3b891d928beb60153926905d0716c6e3fc76b888d58e15fbc35",
+    "docs/qa/sdk309-bootcamp-partial05/unique-own-trajectory.json": "c1b0d6109fcc6e273d35a6ae9cf489ebe7c6f3499060c401d1ae13c3e0a3866b",
+    "docs/qa/sdk309-bootcamp-partial05/reviewer-summary.json": "d6ae0e3bcf04850daa22c0ca2a8ca744f71eaa900b386e809a3552e1a7611c38"
+  }
+}

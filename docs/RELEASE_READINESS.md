@@ -24,6 +24,12 @@ A bounded regression or an older package cannot establish final release readines
   Normal exit0 and unchanged package/archive are verified
   ([preserved failure](qa/sdk309-bootcamp-partial04-review.json)); the cause
   requires trajectory evidence, so no path or arrival repair is claimed.
+  Attempt05 saves27 unique trajectory snapshots: four units have qualifying
+  arrivals, one Infantry is never observed within0.3m of its unchanged goal
+  and ends idle0.914–1.045m away. Normal exit0 and all29 PNG/27 save hashes
+  are independently verified ([preserved trajectory](qa/sdk309-bootcamp-partial05-review.json)).
+  A per-tick scheduled diagnostic must distinguish early order removal from
+  between-sample arrival followed by ordinary separation.
 - Previous source `4f8e588` prevents allied separation from displacing held units.
   Two genuine scheduled REDs show0.844m/0.817m drift; unchanged GREEN scenarios
   keep held translation exactly zero while friendly movement still works.

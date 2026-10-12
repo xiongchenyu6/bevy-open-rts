@@ -1,0 +1,191 @@
+{
+  "passed": false,
+  "reason": "Original30 natural Move / original300 attack bound exhausted",
+  "unique_progress_snapshots": 27,
+  "witness_count": 4,
+  "members": [
+    {
+      "key": 8589933250,
+      "id": "Drone",
+      "first_witness": {
+        "own_clock": 102.50955963134766,
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208,
+        "source_own_snapshot": "scout-00-natural-arrival-progress-0000.ron"
+      },
+      "qualifying_observation_count": 27,
+      "minimum_observed_distance": 0.16675093084654208,
+      "last_own": {
+        "key": 8589933250,
+        "id": "Drone",
+        "position": [
+          -12.333002090454102,
+          1.5,
+          -16.939016342163086
+        ],
+        "health": 6.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.173019409179688,
+          0.0,
+          -16.891990661621094
+        ],
+        "distance_xz": 0.16675093084654208
+      }
+    },
+    {
+      "key": 34359736642,
+      "id": "LightRifleInfantry",
+      "first_witness": {
+        "own_clock": 103.59400177001953,
+        "position": [
+          -12.32580280303955,
+          0.05000000074505806,
+          -15.761106491088867
+        ],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.23739089758023071,
+        "source_own_snapshot": "scout-00-natural-arrival-progress-0001.ron"
+      },
+      "qualifying_observation_count": 26,
+      "minimum_observed_distance": 0.23739089758023071,
+      "last_own": {
+        "key": 34359736642,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.285701751708984,
+          0.05000000074505806,
+          -15.754886627197266
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.446937561035156,
+          0.0,
+          -15.965265274047852
+        ],
+        "distance_xz": 0.26505878830883767
+      }
+    },
+    {
+      "key": 1116691495441,
+      "id": "LightRifleInfantry",
+      "first_witness": null,
+      "qualifying_observation_count": 0,
+      "minimum_observed_distance": 0.9142686699270888,
+      "last_own": {
+        "key": 1116691495441,
+        "id": "LightRifleInfantry",
+        "position": [
+          -12.215033531188965,
+          0.05000000074505806,
+          -18.794513702392578
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "distance_xz": 1.045098812757418
+      }
+    },
+    {
+      "key": 1211180775940,
+      "id": "LightRifleInfantry",
+      "first_witness": {
+        "own_clock": 105.79756927490234,
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445,
+        "source_own_snapshot": "scout-00-natural-arrival-progress-0003.ron"
+      },
+      "qualifying_observation_count": 24,
+      "minimum_observed_distance": 0.1849734737800445,
+      "last_own": {
+        "key": 1211180775940,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.548538208007812,
+          0.05000000074505806,
+          -18.204694747924805
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.501745223999023,
+          0.0,
+          -18.383651733398438
+        ],
+        "distance_xz": 0.1849734737800445
+      }
+    },
+    {
+      "key": 1262720383792,
+      "id": "LightRifleInfantry",
+      "first_witness": {
+        "own_clock": 103.59400177001953,
+        "position": [
+          -11.691156387329102,
+          0.05000000074505806,
+          -15.137147903442383
+        ],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.15993532084444317,
+        "source_own_snapshot": "scout-00-natural-arrival-progress-0001.ron"
+      },
+      "qualifying_observation_count": 26,
+      "minimum_observed_distance": 0.13737234707912194,
+      "last_own": {
+        "key": 1262720383792,
+        "id": "LightRifleInfantry",
+        "position": [
+          -11.668322563171387,
+          0.05000000074505806,
+          -15.113838195800781
+        ],
+        "health": 4.0,
+        "active": [],
+        "queued": [],
+        "original_actual_Move_goal": [
+          -11.531558990478516,
+          0.0,
+          -15.12675666809082
+        ],
+        "distance_xz": 0.13737234707912194
+      }
+    }
+  ],
+  "png_review": "Fresh focus and failure directly inspected; own military100%; lesson7 remains; enemyHQ never visible.",
+  "runtime_released": true
+}
