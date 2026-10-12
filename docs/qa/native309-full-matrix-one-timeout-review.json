@@ -1,0 +1,43 @@
+{
+  "scope": "Frozenformation309 deterministic fullcoverage; one unresolved600simulation timeout; NOT allPASS/currentFog/player acceptance",
+  "planned": 3726,
+  "counts": {
+    "completed": 3725,
+    "simulation_timeout": 1
+  },
+  "complete_coverage": true,
+  "integrity_verified": true,
+  "errors": [],
+  "failure_count": 1,
+  "driver_exit": 2,
+  "failed_case": {
+    "index": 3127,
+    "config": {
+      "map": "crossfire",
+      "factions": [
+        "chaos",
+        "chaos"
+      ],
+      "difficulties": [
+        "easy",
+        "beginner"
+      ],
+      "spawn_slots": [
+        1,
+        0
+      ],
+      "max_seconds": 600
+    },
+    "exit_code": 2,
+    "classification": "simulation_timeout",
+    "wall_seconds": 105.6301720039919,
+    "winning_teams": []
+  },
+  "old305_samecase_completed_clock": 406.8222351074219,
+  "next": "Samebounds currentoptimizedaudit reproduction and groundtarget/pathdiagnosis",
+  "files": {
+    "docs/qa/native309-full-matrix-one-timeout/result.json": "2d2e60d3c300b36caf7544bc4c29ab2e9254e1de8962ff4b40931c5c44871354",
+    "docs/qa/native309-full-matrix-one-timeout/case3127-status.json": "8f888669b40889ff61ef1716d90919ca5e8fca7e3f3609efd894249fdb4a6df1",
+    "docs/qa/native309-full-matrix-one-timeout/root-final-review.json": "69ed873fbb653dd564d4879476bc8621484faa3fae261c286498faa5f8134eba"
+  }
+}

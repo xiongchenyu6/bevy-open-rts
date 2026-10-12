@@ -1,0 +1,23 @@
+{
+  "index": 3127,
+  "config": {
+    "map": "crossfire",
+    "factions": [
+      "chaos",
+      "chaos"
+    ],
+    "difficulties": [
+      "easy",
+      "beginner"
+    ],
+    "spawn_slots": [
+      1,
+      0
+    ],
+    "max_seconds": 600
+  },
+  "exit_code": 2,
+  "classification": "simulation_timeout",
+  "wall_seconds": 105.6301720039919,
+  "winning_teams": []
+}

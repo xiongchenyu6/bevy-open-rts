@@ -531,3 +531,10 @@ A lossless first450-frame remux preserves every original encoded packet, decoded
 frame and PTS at native1920×1080/30fps, with no resampling, duplication or upscale.
 This proves the numeric video format only: full opening/interactions/combat/ending
 content, visible combat, completed objective and allfive media scenes remain open.
+
+Frozen formation309 now covers all3,726 cases:3,725 completed and oneCrossfire
+Chaos easy-versus-beginner case timed out at the original600-second simulation
+limit. Independent final integrity verification reports no errors, but this is
+not an all-pass result. The same historical305 configuration completed at406.82s;
+current-source reproduction and diagnosis remain open. See
+[full coverage and retained failure](qa/native309-full-matrix-one-timeout-review.json).
