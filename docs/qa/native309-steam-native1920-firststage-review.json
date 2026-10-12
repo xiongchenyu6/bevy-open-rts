@@ -1,0 +1,334 @@
+{
+  "scope": "SDK309 normal fullscreen1920 initialgameplay draft; zeroearnedSteamfive-scene acceptance/no video",
+  "actual_controller": {
+    "actual_exit": 0,
+    "scope": "Actualnative1920 initialgameplay draft only, not five scenes or Steamrelease",
+    "original_wall": 900,
+    "original_current_image_review": 45,
+    "actual_native_framebuffer_1920": true,
+    "initial_gameplay_image_sha256": "5e70560fe37e2cd86fe9b67d17c3fa72e0922b02537f0585f172c7d205103ed9",
+    "normal_exits": [
+      {
+        "pid": 192926,
+        "supervisor_pid": 192875,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "forced_cleanup": false,
+    "installation_unchanged": true,
+    "archive_unchanged": true,
+    "wall_seconds": 210.06957520300057,
+    "screenshots": {
+      "01/media-current-00.png": "15c43563aabe324162f3f517b633ea3aeb506e91b57a823fd6ca2982f4523130",
+      "01/media-current-01.png": "32e0f5c9206fc52f128ec5ac970f0afd4e9dedf3c827f22b0a6f7ae5aae7a0e3",
+      "01/media-current-02.png": "7fbb54bfcfc4885c98e31866c64a99f577f2054e19e450cdb29c1a6d2a94a869",
+      "01/media-current-03.png": "26cf000284a700edcc0346913d2afa806f7157b9a98b7ad4c53692ae18b371d3",
+      "01/media-current-04.png": "5e70560fe37e2cd86fe9b67d17c3fa72e0922b02537f0585f172c7d205103ed9"
+    }
+  },
+  "artifact": {
+    "actual_exit": 0,
+    "package": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native309-objective-hud-extracted-20261012/bevy-open-rts-linux-x86_64",
+    "archive": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/linux-native309-objective-hud-package-20261012/archive/bevy-open-rts-linux-x86_64.tar.gz",
+    "archive_sha256": "55d5e7385fd529c78c235ae7d6803fb9120ab5085a095ad5fd0eda104d27a37c",
+    "binary_sha256": "d7b5531d727c713b2bf582dd742913464990a5fc66a6417ea3f35494e2af7ed7",
+    "files": 399,
+    "inventory": null,
+    "native_pin": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/objective-hud-20261012/canonical-pin.json",
+    "scope": "OfficialSDK native309 package/extract integrity; new normal player/runtime acceptance pending"
+  },
+  "root_independent_review_sha256": "f7f3edb70f9b7634ebffade62f73b1a98374d3aaddc68a1782badb787888e322",
+  "current_reviewed_steps": [
+    {
+      "request": {
+        "step": 0,
+        "current_image": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-steam-media1920-firststage-20261012-03/01/media-current-00.png",
+        "image_sha256": "15c43563aabe324162f3f517b633ea3aeb506e91b57a823fd6ca2982f4523130",
+        "client_rect": {
+          "x": 0,
+          "y": 28,
+          "width": 1920,
+          "height": 1052
+        },
+        "window_rect": {
+          "x": 2,
+          "y": 0,
+          "width": 1916,
+          "height": 1050
+        },
+        "fullscreen_mode": 0,
+        "context": {
+          "app_screen": "MainMenu",
+          "assigned_slot": null,
+          "is_host": false,
+          "last_applied_tick": 0,
+          "last_sent_tick": 0,
+          "lobby": null,
+          "local_player_id": null,
+          "match_phase": "Running",
+          "observe_only": true,
+          "online_phase": "Home",
+          "protocol": 4,
+          "room_code": null,
+          "schema": 1
+        },
+        "original_review_seconds": 45,
+        "required": "Actual current UI or visible owned/gameplay review. No old/scaled coordinates, no setters/hidden enemies"
+      },
+      "review": {
+        "image_sha256": "15c43563aabe324162f3f517b633ea3aeb506e91b57a823fd6ca2982f4523130",
+        "current_visible_information_only": true,
+        "actions": [
+          {
+            "click": [
+              1678,
+              631
+            ]
+          }
+        ],
+        "wait_seconds": 2,
+        "purpose": "Current actualFullscreen button center; physicalpoint throughsourcepinnedprotocolcalibration"
+      }
+    },
+    {
+      "request": {
+        "step": 1,
+        "current_image": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-steam-media1920-firststage-20261012-03/01/media-current-01.png",
+        "image_sha256": "32e0f5c9206fc52f128ec5ac970f0afd4e9dedf3c827f22b0a6f7ae5aae7a0e3",
+        "client_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "window_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "fullscreen_mode": 1,
+        "context": {
+          "app_screen": "MainMenu",
+          "assigned_slot": null,
+          "is_host": false,
+          "last_applied_tick": 0,
+          "last_sent_tick": 0,
+          "lobby": null,
+          "local_player_id": null,
+          "match_phase": "Running",
+          "observe_only": true,
+          "online_phase": "Home",
+          "protocol": 4,
+          "room_code": null,
+          "schema": 1
+        },
+        "original_review_seconds": 45,
+        "required": "Actual current UI or visible owned/gameplay review. No old/scaled coordinates, no setters/hidden enemies"
+      },
+      "review": {
+        "image_sha256": "32e0f5c9206fc52f128ec5ac970f0afd4e9dedf3c827f22b0a6f7ae5aae7a0e3",
+        "current_visible_information_only": true,
+        "actions": [
+          {
+            "click": [
+              1680,
+              243
+            ]
+          }
+        ],
+        "wait_seconds": 2,
+        "purpose": "CurrentfullscreenmainmenuSkirmish buttoncenter directreview"
+      }
+    },
+    {
+      "request": {
+        "step": 2,
+        "current_image": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-steam-media1920-firststage-20261012-03/01/media-current-02.png",
+        "image_sha256": "7fbb54bfcfc4885c98e31866c64a99f577f2054e19e450cdb29c1a6d2a94a869",
+        "client_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "window_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "fullscreen_mode": 1,
+        "context": {
+          "app_screen": "SkirmishSetup",
+          "assigned_slot": null,
+          "is_host": false,
+          "last_applied_tick": 0,
+          "last_sent_tick": 0,
+          "lobby": null,
+          "local_player_id": null,
+          "match_phase": "Running",
+          "observe_only": true,
+          "online_phase": "Home",
+          "protocol": 4,
+          "room_code": null,
+          "schema": 1
+        },
+        "original_review_seconds": 45,
+        "required": "Actual current UI or visible owned/gameplay review. No old/scaled coordinates, no setters/hidden enemies"
+      },
+      "review": {
+        "image_sha256": "7fbb54bfcfc4885c98e31866c64a99f577f2054e19e450cdb29c1a6d2a94a869",
+        "current_visible_information_only": true,
+        "actions": [
+          {
+            "press": "Enter"
+          }
+        ],
+        "wait_seconds": 10,
+        "purpose": "CurrentactualStartMatch Enter: PlainSimple Rich32/16 HumanAlliance vsAIEasyDemon, no presets/statechanges"
+      }
+    },
+    {
+      "request": {
+        "step": 3,
+        "current_image": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-steam-media1920-firststage-20261012-03/01/media-current-03.png",
+        "image_sha256": "26cf000284a700edcc0346913d2afa806f7157b9a98b7ad4c53692ae18b371d3",
+        "client_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "window_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "fullscreen_mode": 1,
+        "context": {
+          "app_screen": "InMatch",
+          "assigned_slot": null,
+          "is_host": false,
+          "last_applied_tick": 0,
+          "last_sent_tick": 0,
+          "lobby": null,
+          "local_player_id": null,
+          "match_phase": "Running",
+          "observe_only": true,
+          "online_phase": "Home",
+          "protocol": 4,
+          "room_code": null,
+          "schema": 1
+        },
+        "original_review_seconds": 45,
+        "required": "Actual current UI or visible owned/gameplay review. No old/scaled coordinates, no setters/hidden enemies"
+      },
+      "review": {
+        "image_sha256": "26cf000284a700edcc0346913d2afa806f7157b9a98b7ad4c53692ae18b371d3",
+        "current_visible_information_only": true,
+        "actions": [
+          {
+            "click": [
+              416,
+              135
+            ]
+          },
+          {
+            "click": [
+              450,
+              920
+            ]
+          }
+        ],
+        "wait_seconds": 2,
+        "purpose": "CurrentvisibleBriefingX thenownedWorkerbody selection; no actorchanges/oldcoords"
+      }
+    },
+    {
+      "request": {
+        "step": 4,
+        "current_image": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/sdk309-steam-media1920-firststage-20261012-03/01/media-current-04.png",
+        "image_sha256": "5e70560fe37e2cd86fe9b67d17c3fa72e0922b02537f0585f172c7d205103ed9",
+        "client_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "window_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "fullscreen_mode": 1,
+        "context": {
+          "app_screen": "InMatch",
+          "assigned_slot": null,
+          "is_host": false,
+          "last_applied_tick": 0,
+          "last_sent_tick": 0,
+          "lobby": null,
+          "local_player_id": null,
+          "match_phase": "Running",
+          "observe_only": true,
+          "online_phase": "Home",
+          "protocol": 4,
+          "room_code": null,
+          "schema": 1
+        },
+        "original_review_seconds": 45,
+        "required": "Actual current UI or visible owned/gameplay review. No old/scaled coordinates, no setters/hidden enemies"
+      },
+      "review": {
+        "image_sha256": "5e70560fe37e2cd86fe9b67d17c3fa72e0922b02537f0585f172c7d205103ed9",
+        "current_visible_information_only": true,
+        "finish": true,
+        "purpose": "Native1920properinitialgameplay/ownedselectedWorker/HUD32ore16crystal; draftonlynoneof5earnedsceneclaims"
+      }
+    }
+  ],
+  "nativewindow_last_event": {
+    "browser_dpr": null,
+    "cursor_logical": [
+      450.0,
+      919.5
+    ],
+    "cursor_physical": [
+      450.0,
+      919.5
+    ],
+    "logical_size": [
+      1920.0,
+      1080.0
+    ],
+    "physical_size": [
+      1920,
+      1080
+    ],
+    "scale_factor": 1.0
+  },
+  "selected_owned_last_event": [
+    {
+      "local_entity": 8589933892,
+      "network_id": 3,
+      "type": "Worker"
+    }
+  ],
+  "upscaled_or_fixture": false,
+  "hostaudio_capture": false,
+  "failed_predecessors": [
+    "target/sdk309-steam-media1920-firststage-20261012-01/result.json",
+    "target/sdk309-steam-media1920-firststage-20261012-02/result.json"
+  ],
+  "all5earnedscenes_accepted": false,
+  "450frame30fps_accepted": false,
+  "portable_archive": {
+    "path": "target/sdk309-steam-media1920-firststage-20261012-03-evidence.tar.gz",
+    "sha256": "be6e4c70cb868f50741e424bdf88781b81a07b63ede85d62a1e9802caec760a4",
+    "scope": "Actual03 plus raw predecessor01/02 terminal/input failure records; local evidence not publishedSteammedia"
+  }
+}

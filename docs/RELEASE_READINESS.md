@@ -468,3 +468,16 @@ portable closed inputs. Recognized words do not establish waveform identity,
 logical audio identity, human listening or tone approval. Hello and Ready remain
 below the unchanged waveform threshold; no production audio defect is proven.
 Independent listening to these preserved clips is the safest next quality check.
+
+SDK309 Steam media first-stage03 uses the normal Fullscreen menu action and fresh
+Skirmish setup, producing five unscaled1920×1080 raw PNGs. Sway fullscreen1/client
+1920×1080 and native logical/physical viewport1920×1080 scale1 agree; current
+reviewed Worker selection resolves an owned Worker and its actual pointer location.
+The private input adapter calibrates current physical points to the existing
+1280×720 virtual-pointer protocol extent; it does not reuse scaled older UI points.
+Root directly reviews native gameplay and independently rehashes all five PNGs.
+Controller/game exit0 in210.07s; package399/archive unchanged, no forced cleanup or
+host audio capture. [Native viewport proof](qa/native309-steam-native1920-firststage-review.json)
+retains earlier client-identity/pointer-calibration failures. This establishes only
+normal initial gameplay at native resolution: earned economy, developed base,
+mixed army, combat, completed objective and450 genuine30fps video frames remain open.
