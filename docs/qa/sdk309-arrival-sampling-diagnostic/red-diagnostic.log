@@ -1,0 +1,163 @@
+warning: use of deprecated method `futures_channel::mpsc::UnboundedReceiver::<T>::try_next`: please use `try_recv` instead
+   --> crates/matchbox-socket/src/webrtc_socket/socket.rs:332:41
+    |
+332 |         while let Ok(Some(x)) = self.rx.try_next() {
+    |                                         ^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `futures_channel::mpsc::UnboundedReceiver::<T>::try_next`: please use `try_recv` instead
+   --> crates/matchbox-socket/src/webrtc_socket/socket.rs:565:48
+    |
+565 |         while let Ok(res) = self.peer_state_rx.try_next() {
+    |                                                ^^^^^^^^
+
+warning: `matchbox_socket` (lib) generated 2 warnings
+   Compiling bevy-open-rts-gui05-diagnostic v0.1.0 (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/move309-gui05-diagnostic-20261012/source)
+warning: unused import: `bevy::prelude::*`
+ --> src/capture_api/voice_audio.rs:5:5
+  |
+5 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `bevy::prelude::*`
+ --> src/orders/contact_planning.rs:3:5
+  |
+3 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `bevy::prelude::*`
+ --> src/economy/harvest_contact.rs:3:5
+  |
+3 | use bevy::prelude::*;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `resource`
+   --> src/ai/tests.rs:240:18
+    |
+240 |             for (resource, node, node_radius) in resources
+    |                  ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_resource`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `unit`
+   --> src/ai/tests.rs:558:18
+    |
+558 |         for (id, unit, position, radius) in
+    |                  ^^^^ help: if this is intentional, prefix it with an underscore: `_unit`
+
+warning: methods `with_map`, `with_starting_resources`, `with_visible_player`, `with_ai_difficulties`, and `with_startup_loadout` are never used
+   --> src/lib.rs:961:19
+    |
+959 | impl MatchSetupSettings {
+    | ----------------------- methods in this implementation
+960 |     #[cfg(test)]
+961 |     pub(crate) fn with_map(mut self, map_path: &'static str) -> Self {
+    |                   ^^^^^^^^
+...
+967 |     pub(crate) fn with_starting_resources(mut self, starting_resources: StartingResources) -> Self {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+973 |     pub(crate) fn with_visible_player(mut self, visible_player: VisiblePlayer) -> Self {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+979 |     pub(crate) fn with_ai_difficulties(mut self, ai_difficulties: AiDifficultySettings) -> Self {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+985 |     pub(crate) fn with_startup_loadout(mut self, startup_loadout: StartupLoadoutMode) -> Self {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `team_startup` is never used
+    --> src/lib.rs:4756:15
+     |
+4756 | pub(crate) fn team_startup(team: Team) -> &'static TeamStartup {
+     |               ^^^^^^^^^^^^
+
+warning: function `team_build_queue_len` is never used
+    --> src/lib.rs:6081:15
+     |
+6081 | pub(crate) fn team_build_queue_len(build_queue: &BuildQueue, team: Team) -> usize {
+     |               ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `free_position` is never used
+    --> src/lib.rs:7376:15
+     |
+7376 | pub(crate) fn free_position(origin: Vec3, seed: u32, radius: f32) -> Vec3 {
+     |               ^^^^^^^^^^^^^
+
+warning: function `skirmish_maps` is never used
+    --> src/maps.rs:1114:15
+     |
+1114 | pub(crate) fn skirmish_maps() -> &'static [SkirmishMapDef] {
+     |               ^^^^^^^^^^^^^
+
+warning: method `part_count` is never used
+   --> src/spawn.rs:402:19
+    |
+392 | impl ProceduralEntityModel {
+    | -------------------------- method in this implementation
+...
+402 |     pub(crate) fn part_count(self) -> usize {
+    |                   ^^^^^^^^^^
+
+warning: method `part_count` is never used
+   --> src/spawn.rs:433:19
+    |
+417 | impl FactionIdentityMarker {
+    | -------------------------- method in this implementation
+...
+433 |     pub(crate) fn part_count(self) -> usize {
+    |                   ^^^^^^^^^^
+
+warning: function `apply_rally_point_command` is never used
+   --> src/orders.rs:961:15
+    |
+961 | pub(crate) fn apply_rally_point_command(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `minimap_local_position` is never used
+    --> src/hud.rs:3666:15
+     |
+3666 | pub(crate) fn minimap_local_position(world: Vec3) -> Vec2 {
+     |               ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `minimap_world_position` is never used
+    --> src/hud.rs:3675:15
+     |
+3675 | pub(crate) fn minimap_world_position(local: Vec2) -> Vec3 {
+     |               ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `minimap_world_position_in_bounds` is never used
+    --> src/hud.rs:3687:15
+     |
+3687 | pub(crate) fn minimap_world_position_in_bounds(local: Vec2, bounds: MapBounds) -> Vec3 {
+     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `bevy-open-rts-gui05-diagnostic` (lib test) generated 16 warnings (run `cargo fix --lib -p bevy-open-rts-gui05-diagnostic --tests` to apply 5 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 18s
+     Running unittests src/lib.rs (/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/debug/deps/bevy_open_rts_gui05_diagnostic-2359a9931548e154)
+
+running 1 test
+OWN key=8589933250 goal=Vec3(-12.173019, 0.0, -16.89199) first_removal=Some((25, Vec3(-12.353892, 1.5, -16.945158), 0.18852527)) min=0.18852527 sampled_1_1sec_min=0.18852527 final=Vec3(-12.353892, 1.5, -16.945158) final_distance=0.18852527
+OWN key=34359736642 goal=Vec3(-12.446938, 0.0, -15.965265) first_removal=Some((43, Vec3(-12.516531, 0.05, -15.808875), 0.17117575)) min=0.1570482 sampled_1_1sec_min=0.2535367 final=Vec3(-12.259483, 0.05, -15.794556) final_distance=0.2535367
+OWN key=1116691495441 goal=Vec3(-12.25, 0.0, -17.75) first_removal=Some((72, Vec3(-12.304333, 0.05, -17.550072), 0.20717955)) min=0.035089593 sampled_1_1sec_min=0.7748667 final=Vec3(-12.278545, 0.05, -18.736612) final_distance=0.9870252
+OWN key=1211180775940 goal=Vec3(-11.501745, 0.0, -18.383652) first_removal=Some((99, Vec3(-11.544602, 0.05, -18.233196), 0.15644036)) min=0.15644036 sampled_1_1sec_min=0.15644036 final=Vec3(-11.544602, 0.05, -18.233196) final_distance=0.15644036
+OWN key=1262720383792 goal=Vec3(-11.531559, 0.0, -15.126757) first_removal=Some((38, Vec3(-11.728423, 0.05, -15.177177), 0.20321845)) min=0.14501494 sampled_1_1sec_min=0.14501494 final=Vec3(-11.676498, 0.05, -15.122077) final_distance=0.14501494
+
+thread 'gui05_move_diagnostic::original_gui05_cohort_keeps_genuine_arrival_and_settles_near_original_goals' (3929231) panicked at src/gui05_move_diagnostic.rs:53:5:
+completed formation move must settle near each original goal
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test gui05_move_diagnostic::original_gui05_cohort_keeps_genuine_arrival_and_settles_near_original_goals ... FAILED
+
+failures:
+
+failures:
+    gui05_move_diagnostic::original_gui05_cohort_keeps_genuine_arrival_and_settles_near_original_goals
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 310 filtered out; finished in 4.12s
+
+error: test failed, to rerun pass `--lib`

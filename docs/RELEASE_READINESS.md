@@ -7,6 +7,11 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Latest Verified Checkpoints
 
+- Current HUD source moves the objective tracker to the upper-right HUD
+  column after W28 Patrol frames show Drone-body overlap. Owned-file format
+  and all-target checks pass; fresh309 tests and four native builds pass.
+  The new layout has no rendered acceptance yet. W28 proofs below retain
+  their pre-change source03c979d scope.
 - Current worktree resolves physically blocked terrain formation endpoints. The
   genuine save-restored diagnostic changes4/5 arrivals to5/5 within the same
   30s; canonical tests now pass309/0/1ignored. All-target checking and four
@@ -28,8 +33,11 @@ A bounded regression or an older package cannot establish final release readines
   arrivals, one Infantry is never observed within0.3m of its unchanged goal
   and ends idle0.914–1.045m away. Normal exit0 and all29 PNG/27 save hashes
   are independently verified ([preserved trajectory](qa/sdk309-bootcamp-partial05-review.json)).
-  A per-tick scheduled diagnostic must distinguish early order removal from
-  between-sample arrival followed by ordinary separation.
+  A frozen per-tick scheduled diagnostic proves genuine arrival at0.207m,
+  followed by normal idle allied separation;1.1s sampling misses that window.
+  This is CPU diagnosis, not GUI proof, and the stronger final-settling
+  assertion is rejected as an original RED
+  ([diagnostic](qa/sdk309-arrival-sampling-diagnostic-review.json)).
 - Previous source `4f8e588` prevents allied separation from displacing held units.
   Two genuine scheduled REDs show0.844m/0.817m drift; unchanged GREEN scenarios
   keep held translation exactly zero while friendly movement still works.
@@ -96,6 +104,12 @@ A bounded regression or an older package cannot establish final release readines
   ([build proof](qa/web28-formation-shipping-build-review.json)). Browser
   runtime and public deployment remain pending; Wasm27 visual proofs below
   retain their older305 scope.
+  Actual W28 Worker default/closer selection and17-frame recurring Patrol
+  visual checks pass; notices expire after7.5s with clock exactly10.245503.
+  Root verifies all29 PNG hashes and actual browser/node/driver exits0
+  ([bounded browser review](qa/web28-runtime-review.json)). The objective
+  banner obscures some Drone frames; no exact route distance or newHUD
+  layout acceptance is claimed.
 - Wasm27 builds from the previous native305 Hold source: actual clean and
   build exit0 in655.457s. Independent checks verify143 sources,332 assets,
   four frozen compile paths,642 non-web inputs, exact Wasm bytes and gzip

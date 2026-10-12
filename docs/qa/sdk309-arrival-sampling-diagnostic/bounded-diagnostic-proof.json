@@ -1,0 +1,604 @@
+{
+  "scope": "CPU ONLY DIAGNOSTIC, never GUI/player evidence. Stronger final-settling assertion is explicitly rejected as RED for original arrival contract. No production change authorized or made.",
+  "source_commit": "03c979d4620f20069d1258f122e4a5196f655ae9",
+  "original_gui_failure": "target/sdk309-runtime4-bootcamp-auto-20261012-05",
+  "diagnostic_case": "exact original actual-Move SaveGame, zero-time PendingLoadedSave restoration; original5 ordinaryMove targets reissued throughproductionCommandQueue;900updates/30simseconds",
+  "genuine_arrival_original_point3_contract": {
+    "issued": 5,
+    "all5_per_tick_own_arrival": true,
+    "fifth_first_removal_tick": 72,
+    "fifth_first_removal_distance": 0.20717955,
+    "fifth_minimum_per_tick_distance": 0.035089593,
+    "fifth_sampled_1_1_second_minimum_distance": 0.7748667,
+    "fifth_final_distance": 0.9870252
+  },
+  "cause_proved_by_stages": "Normal movement reaches original goal and removes MoveOrder legally. Afterwards separate_units alone pushes the movable idle ally away; 1.1s original-save observations miss its short qualifying arrival window. No endpoint change or premature path completion proved.",
+  "own_raw_samples": [
+    "OWN key=8589933250 goal=Vec3(-12.173019, 0.0, -16.89199) first_removal=Some((25, Vec3(-12.353892, 1.5, -16.945158), 0.18852527)) min=0.18852527 sampled_1_1sec_min=0.18852527 final=Vec3(-12.353892, 1.5, -16.945158) final_distance=0.18852527",
+    "OWN key=34359736642 goal=Vec3(-12.446938, 0.0, -15.965265) first_removal=Some((43, Vec3(-12.516531, 0.05, -15.808875), 0.17117575)) min=0.1570482 sampled_1_1sec_min=0.2535367 final=Vec3(-12.259483, 0.05, -15.794556) final_distance=0.2535367",
+    "OWN key=1116691495441 goal=Vec3(-12.25, 0.0, -17.75) first_removal=Some((72, Vec3(-12.304333, 0.05, -17.550072), 0.20717955)) min=0.035089593 sampled_1_1sec_min=0.7748667 final=Vec3(-12.278545, 0.05, -18.736612) final_distance=0.9870252",
+    "OWN key=1211180775940 goal=Vec3(-11.501745, 0.0, -18.383652) first_removal=Some((99, Vec3(-11.544602, 0.05, -18.233196), 0.15644036)) min=0.15644036 sampled_1_1sec_min=0.15644036 final=Vec3(-11.544602, 0.05, -18.233196) final_distance=0.15644036",
+    "OWN key=1262720383792 goal=Vec3(-11.531559, 0.0, -15.126757) first_removal=Some((38, Vec3(-11.728423, 0.05, -15.177177), 0.20321845)) min=0.14501494 sampled_1_1sec_min=0.14501494 final=Vec3(-11.676498, 0.05, -15.122077) final_distance=0.14501494"
+  ],
+  "own_stage_samples": [
+    {
+      "goal": [
+        -12.25,
+        0.0,
+        -17.75
+      ],
+      "path": {
+        "goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "next": 3,
+        "waypoints": [
+          [
+            -16.75,
+            0.0,
+            -15.75
+          ],
+          [
+            -14.25,
+            0.0,
+            -15.25
+          ],
+          [
+            -12.25,
+            0.0,
+            -17.25
+          ],
+          [
+            -12.25,
+            0.0,
+            -17.75
+          ]
+        ]
+      },
+      "position": [
+        -12.364431381225586,
+        0.05000000074505806,
+        -17.33045768737793
+      ],
+      "stage": "before_move",
+      "tick": 70
+    },
+    {
+      "goal": [
+        -12.25,
+        0.0,
+        -17.75
+      ],
+      "path": {
+        "goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "next": 3,
+        "waypoints": [
+          [
+            -16.75,
+            0.0,
+            -15.75
+          ],
+          [
+            -14.25,
+            0.0,
+            -15.25
+          ],
+          [
+            -12.25,
+            0.0,
+            -17.25
+          ],
+          [
+            -12.25,
+            0.0,
+            -17.75
+          ]
+        ]
+      },
+      "position": [
+        -12.334609031677246,
+        0.05000000074505806,
+        -17.439796447753906
+      ],
+      "stage": "after_move",
+      "tick": 70
+    },
+    {
+      "goal": [
+        -12.25,
+        0.0,
+        -17.75
+      ],
+      "path": {
+        "goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "next": 3,
+        "waypoints": [
+          [
+            -16.75,
+            0.0,
+            -15.75
+          ],
+          [
+            -14.25,
+            0.0,
+            -15.25
+          ],
+          [
+            -12.25,
+            0.0,
+            -17.25
+          ],
+          [
+            -12.25,
+            0.0,
+            -17.75
+          ]
+        ]
+      },
+      "position": [
+        -12.334609031677246,
+        0.05000000074505806,
+        -17.439796447753906
+      ],
+      "stage": "after_separation",
+      "tick": 70
+    },
+    {
+      "goal": [
+        -12.25,
+        0.0,
+        -17.75
+      ],
+      "path": {
+        "goal": [
+          -12.25,
+          0.0,
+          -17.75
+        ],
+        "next": 3,
+        "waypoints": [
+          [
+            -16.75,
+            0.0,
+            -15.75
+          ],
+          [
+            -14.25,
+            0.0,
+            -15.25
+          ],
+          [
+            -12.25,
+            0.0,
+            -17.25
+          ],
+          [
+            -12.25,
+            0.0,
+            -17.75
+          ]
+        ]
+      },
+      "position": [
+        -12.334609031677246,
+        0.05000000074505806,
+        -17.439796447753906
+      ],
+      "stage": "before_move",
+      "tick": 71
+    },
+    {
+      "goal": [
+        -12.25,
+        0.0,
+        -17.75
+      ],
+      "path": null,
+      "position": [
+        -12.304786682128906,
+        0.05000000074505806,
+        -17.549135208129883
+      ],
+      "stage": "after_move",
+      "tick": 71
+    },
+    {
+      "goal": [
+        -12.25,
+        0.0,
+        -17.75
+      ],
+      "path": null,
+      "position": [
+        -12.304786682128906,
+        0.05000000074505806,
+        -17.549135208129883
+      ],
+      "stage": "after_separation",
+      "tick": 71
+    },
+    {
+      "goal": [
+        -12.25,
+        0.0,
+        -17.75
+      ],
+      "path": null,
+      "position": [
+        -12.304786682128906,
+        0.05000000074505806,
+        -17.549135208129883
+      ],
+      "stage": "before_move",
+      "tick": 72
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.304786682128906,
+        0.05000000074505806,
+        -17.549135208129883
+      ],
+      "stage": "after_move",
+      "tick": 72
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.304332733154297,
+        0.05000000074505806,
+        -17.550071716308594
+      ],
+      "stage": "after_separation",
+      "tick": 72
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.304332733154297,
+        0.05000000074505806,
+        -17.550071716308594
+      ],
+      "stage": "before_move",
+      "tick": 73
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.304332733154297,
+        0.05000000074505806,
+        -17.550071716308594
+      ],
+      "stage": "after_move",
+      "tick": 73
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.280595779418945,
+        0.05000000074505806,
+        -17.601099014282227
+      ],
+      "stage": "after_separation",
+      "tick": 73
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.280595779418945,
+        0.05000000074505806,
+        -17.601099014282227
+      ],
+      "stage": "before_move",
+      "tick": 74
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.280595779418945,
+        0.05000000074505806,
+        -17.601099014282227
+      ],
+      "stage": "after_move",
+      "tick": 74
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.257797241210938,
+        0.05000000074505806,
+        -17.652456283569336
+      ],
+      "stage": "after_separation",
+      "tick": 74
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.257797241210938,
+        0.05000000074505806,
+        -17.652456283569336
+      ],
+      "stage": "before_move",
+      "tick": 75
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.257797241210938,
+        0.05000000074505806,
+        -17.652456283569336
+      ],
+      "stage": "after_move",
+      "tick": 75
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.236045837402344,
+        0.05000000074505806,
+        -17.70414924621582
+      ],
+      "stage": "after_separation",
+      "tick": 75
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.236045837402344,
+        0.05000000074505806,
+        -17.70414924621582
+      ],
+      "stage": "before_move",
+      "tick": 76
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.236045837402344,
+        0.05000000074505806,
+        -17.70414924621582
+      ],
+      "stage": "after_move",
+      "tick": 76
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.215458869934082,
+        0.05000000074505806,
+        -17.756179809570312
+      ],
+      "stage": "after_separation",
+      "tick": 76
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.215458869934082,
+        0.05000000074505806,
+        -17.756179809570312
+      ],
+      "stage": "before_move",
+      "tick": 77
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.215458869934082,
+        0.05000000074505806,
+        -17.756179809570312
+      ],
+      "stage": "after_move",
+      "tick": 77
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.196166038513184,
+        0.05000000074505806,
+        -17.80853843688965
+      ],
+      "stage": "after_separation",
+      "tick": 77
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.196166038513184,
+        0.05000000074505806,
+        -17.80853843688965
+      ],
+      "stage": "before_move",
+      "tick": 78
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.196166038513184,
+        0.05000000074505806,
+        -17.80853843688965
+      ],
+      "stage": "after_move",
+      "tick": 78
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.178306579589844,
+        0.05000000074505806,
+        -17.861207962036133
+      ],
+      "stage": "after_separation",
+      "tick": 78
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.178306579589844,
+        0.05000000074505806,
+        -17.861207962036133
+      ],
+      "stage": "before_move",
+      "tick": 79
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.178306579589844,
+        0.05000000074505806,
+        -17.861207962036133
+      ],
+      "stage": "after_move",
+      "tick": 79
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.162030220031738,
+        0.05000000074505806,
+        -17.914155960083008
+      ],
+      "stage": "after_separation",
+      "tick": 79
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.162030220031738,
+        0.05000000074505806,
+        -17.914155960083008
+      ],
+      "stage": "before_move",
+      "tick": 80
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.162030220031738,
+        0.05000000074505806,
+        -17.914155960083008
+      ],
+      "stage": "after_move",
+      "tick": 80
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.147496223449707,
+        0.05000000074505806,
+        -17.967336654663086
+      ],
+      "stage": "after_separation",
+      "tick": 80
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.122345924377441,
+        0.05000000074505806,
+        -18.437923431396484
+      ],
+      "stage": "before_move",
+      "tick": 90
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.122345924377441,
+        0.05000000074505806,
+        -18.437923431396484
+      ],
+      "stage": "after_move",
+      "tick": 90
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.13376522064209,
+        0.05000000074505806,
+        -18.48593521118164
+      ],
+      "stage": "after_separation",
+      "tick": 90
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.278545379638672,
+        0.05000000074505806,
+        -18.73661231994629
+      ],
+      "stage": "before_move",
+      "tick": 99
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.278545379638672,
+        0.05000000074505806,
+        -18.73661231994629
+      ],
+      "stage": "after_move",
+      "tick": 99
+    },
+    {
+      "goal": null,
+      "path": null,
+      "position": [
+        -12.278545379638672,
+        0.05000000074505806,
+        -18.73661231994629
+      ],
+      "stage": "after_separation",
+      "tick": 99
+    }
+  ],
+  "frozen_evidence": "target/move309-gui05-diagnostic-20261012/diagnostic-red-frozen",
+  "frozen_executable_sha256": "4d9dc0f62784541a742de354e289b099b3e29d68ef5efa0725692b92f05e19c1",
+  "parent_decision": "Keep current production semantics; idle unheld units remain movable. Prepare dense normal Ctrl+S ACK sampling only, no new observer/setter, no GPU launch.",
+  "production_changed": false,
+  "actual_gui_repair_verified": false,
+  "release_gates_open": 9
+}

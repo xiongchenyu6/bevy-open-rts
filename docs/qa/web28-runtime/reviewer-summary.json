@@ -1,0 +1,202 @@
+{
+  "artifact": "Exact W28 source03c979d144/assets332, Wasm a20ccae14fd812f4e2a9316bdfc1942778e61380d5749c53b66d3dbc6c1dd7bd/buildccd67582387998c9; private loopback only",
+  "runs": {
+    "web28-worker-compact-20261012-01": {
+      "png_sha256": {
+        "00-menu.png": "35f6a5adcf2aa33683624ac95f055b484aabc20bb3645895a8ba3a8e3c2ae3ae",
+        "01-setup.png": "5e8ebd62753cf55839e6f97aaca6cb4ee3a42f477bacd0f69d589750040b4789",
+        "02-worker-default.png": "c331d8eca1aa77f0cd71d70e14ca038eb9132002c6e8c2ef1c8b273fb4674555",
+        "03-worker-closezoom.png": "f831689990b97c8e26c41fbe69c30922c7c4552dab37a8fe14902dc5562264bb"
+      },
+      "result": {
+        "actual_driver_exit": 0,
+        "failure": null,
+        "errors": [],
+        "wall_seconds": 35.526,
+        "original_wall_seconds": 240,
+        "normal_browser_closed": true,
+        "visual_adjudication_pending": true,
+        "scope": "Physical offline inputs/ownselection/card/dirtyclock; no offline ECS/Patrolflag/position proof"
+      },
+      "supervisor": {
+        "actual_exit": 0,
+        "node_exit": 0,
+        "driver_exit": 0,
+        "original240bound": true,
+        "original_current_review_seconds": 30,
+        "wasm_sha256": "a20ccae14fd812f4e2a9316bdfc1942778e61380d5749c53b66d3dbc6c1dd7bd",
+        "build_id": "ccd67582387998c9",
+        "browser_visual_acceptance_pending": true,
+        "separate_worker_recipe": true
+      },
+      "systemd_terminal": "MainPID=0\nResult=success\nExecMainStatus=0\nControlGroup=\n",
+      "gate_receipts": {
+        "00-menu-review.json": {
+          "reviewed_image_sha256": "35f6a5adcf2aa33683624ac95f055b484aabc20bb3645895a8ba3a8e3c2ae3ae",
+          "visible_information_only": true,
+          "point": [
+            1040,
+            237
+          ],
+          "note": "Visible Skirmish button; loading veil remains in this PNG.",
+          "mtime_ns": "1791766484132724168"
+        },
+        "02-worker-default-review.json": {
+          "reviewed_image_sha256": "c331d8eca1aa77f0cd71d70e14ca038eb9132002c6e8c2ef1c8b273fb4674555",
+          "visible_information_only": true,
+          "point": [
+            640,
+            332
+          ],
+          "note": "Worker body centered; compact mint arcs around feet, no huge ring.",
+          "mtime_ns": "1791766495586747326"
+        },
+        "03-worker-closezoom-review.json": {
+          "reviewed_image_sha256": "f831689990b97c8e26c41fbe69c30922c7c4552dab37a8fe14902dc5562264bb",
+          "visible_information_only": true,
+          "point": [
+            640,
+            329
+          ],
+          "note": "Same centered Worker body, compact mint arcs remain below body after closer wheel.",
+          "mtime_ns": "1791766504502059410"
+        }
+      }
+    },
+    "web28-long-patrol-20261012-01": {
+      "png_sha256": {
+        "00-menu.png": "0c999b5c5e2fbd1a5219f8c8c38dc161fb453b0743610dc046ef964a073b2ce2",
+        "01-setup.png": "5e8ebd62753cf55839e6f97aaca6cb4ee3a42f477bacd0f69d589750040b4789",
+        "02-match.png": "f1c299f1d0dd82664ee8c307525d2aef5b3590b7c3a19a13477c5882dbcb8ddb",
+        "03-current-notices.png": "f36a5aaf36b9adb30b1d3599af9e6ad16ef9d6600187291ae58cb325389b6ed3",
+        "04-expired-notices.png": "e13b97140ccaf2b9131be4f52c7a6ef43e7261c01d5503285e4f6ce7debfcaf3",
+        "05-before-Drone-selection.png": "44295f78aaafa54bbd7fc16fb5e9637889ebc4accbdf1b250a2e2ba955c17edd",
+        "06-selected-Drone.png": "8bfd79c421a3f8dd1d83989acbcb4f2859489a74e511638c1b92fe36446320b0",
+        "07-Patrol-mode.png": "7f3a44d546596fc380ca8834a1a10d39d126c50f6afde7f7eb0f676a88c45442",
+        "08-motion-00.png": "fa7ae3a85529084d4263b95fd99088d6df7304304e57386194a9e2573e7657f1",
+        "08-motion-01.png": "def33ffc8b28f6a433464e5e1e249aca48c8b36d03543c2ac807d49d7b78c5cc",
+        "08-motion-02.png": "00bd85ed2efdda0afb3a4bdb694b0a0b4716627290b2b13480c476a36e4edad3",
+        "08-motion-03.png": "2ef303a94c0eb0494498e9e9e305bfc5309d6c8f8578684f714501f89d6d8e21",
+        "08-motion-04.png": "f3d88183f9910d8b97bc5011b9edf02e43bdf5a8d41132670c6a19e4f754970b",
+        "08-motion-05.png": "6fa15d4aa77fa7727a12d0cb15fd61879d9fab36580d10d267f11f9b2bcd3f5f",
+        "08-motion-06.png": "195e6d9bb521a828f5868cb79781e064badb502cf6a6b44550e0d1bb8d21e9fd",
+        "08-motion-07.png": "c3ba6e8a8e91b1b054fbb53004e24d86a7faa4e333659b78c7ae9459a5a1a0cf",
+        "08-motion-08.png": "8ed328ba2d60148fef754d25e516376bcdbf0fefd7e6596baf1552fc364c875f",
+        "08-motion-09.png": "0905f0e7b9ff303852d75abf00ff638245ec13cccfd97293b0e12613a909761b",
+        "08-motion-10.png": "dc4a5cbaf3486049d3775095033b788d0a114933ae20a6219a951e11a72e0ed2",
+        "08-motion-11.png": "fc6c66ce113d7f7b5a273ba66805f14f0d36f1c2ef0fad6ddc71e7f89bb5cfac",
+        "08-motion-12.png": "acdc1fd9b73820aa2f49b73172dc6764af938c04a3c81d7affcf1fc875dbb51b",
+        "08-motion-13.png": "cc270530679aedbfaee92e12e4babbbef149f7bd9a6cf5e4ffdb27e53db75bfb",
+        "08-motion-14.png": "812a68136a66e12239d5f69deed468ff1f71e1b6debe9dc0a10b51ccf82510c0",
+        "08-motion-15.png": "45cafeb3af2340ef9786c36737f10208890979c90d7d367d85744aacbb5a90b1",
+        "08-motion-16.png": "11fe1ac0f72a6f5adf451b1d1e1c74b39c3448ee1e93c4953183319daf389a24"
+      },
+      "result": {
+        "actual_driver_exit": 0,
+        "failure": null,
+        "errors": [],
+        "wall_seconds": 80.879,
+        "original_wall_seconds": 240,
+        "normal_browser_closed": true,
+        "visual_adjudication_pending": true,
+        "scope": "Physical offline inputs/ownselection/card/dirtyclock; no offline ECS/Patrolflag/position proof"
+      },
+      "supervisor": {
+        "actual_exit": 0,
+        "node_exit": 0,
+        "driver_exit": 0,
+        "original240bound": true,
+        "original_current_review_seconds": 30,
+        "wasm_sha256": "a20ccae14fd812f4e2a9316bdfc1942778e61380d5749c53b66d3dbc6c1dd7bd",
+        "build_id": "ccd67582387998c9",
+        "browser_visual_acceptance_pending": true,
+        "separate_worker_recipe": false
+      },
+      "systemd_terminal": "MainPID=0\nResult=success\nExecMainStatus=0\nControlGroup=\n",
+      "gate_receipts": {
+        "02-match-review.json": {
+          "reviewed_image_sha256": "f1c299f1d0dd82664ee8c307525d2aef5b3590b7c3a19a13477c5882dbcb8ddb",
+          "visible_information_only": true,
+          "point": [
+            720,
+            180
+          ],
+          "note": "Clear terrain above HQ and right of Drone, outside HUD and actors.",
+          "mtime_ns": "1791766537264100260"
+        },
+        "00-menu-review.json": {
+          "reviewed_image_sha256": "0c999b5c5e2fbd1a5219f8c8c38dc161fb453b0743610dc046ef964a073b2ce2",
+          "visible_information_only": true,
+          "point": [
+            1040,
+            237
+          ],
+          "note": "Visible Skirmish button under loading veil.",
+          "mtime_ns": "1791766526942606503"
+        },
+        "06-selected-Drone-review.json": {
+          "reviewed_image_sha256": "8bfd79c421a3f8dd1d83989acbcb4f2859489a74e511638c1b92fe36446320b0",
+          "visible_information_only": true,
+          "point": [
+            1048,
+            676
+          ],
+          "note": "Enabled W circular arrows Patrol card visible bottom right.",
+          "mtime_ns": "1791766570584024581"
+        },
+        "05-before-Drone-selection-review.json": {
+          "reviewed_image_sha256": "44295f78aaafa54bbd7fc16fb5e9637889ebc4accbdf1b250a2e2ba955c17edd",
+          "visible_information_only": true,
+          "point": [
+            454,
+            123
+          ],
+          "note": "Airborne own Drone body visible above left HQ beside briefing edge.",
+          "mtime_ns": "1791766560133450995"
+        },
+        "07-Patrol-mode-review.json": {
+          "reviewed_image_sha256": "7f3a44d546596fc380ca8834a1a10d39d126c50f6afde7f7eb0f676a88c45442",
+          "visible_information_only": true,
+          "point": [
+            720,
+            180
+          ],
+          "note": "Clear public terrain above HQ, right of Drone; no actors or HUD at target.",
+          "mtime_ns": "1791766580407040666"
+        }
+      }
+    }
+  },
+  "worker_visual": "Default and closer normal-wheel PNG show same centered OWN Worker with compact mint foot arcs; no huge full ring. Input receipt same local_entity8589933893/network_id4.",
+  "motion_review": {
+    "08-motion-00.png": "Drone right of start, target pulse visible",
+    "08-motion-01.png": "Drone farther right; return endpoint shown",
+    "08-motion-02.png": "Drone right; heading changes",
+    "08-motion-03.png": "Drone returns left",
+    "08-motion-04.png": "Drone moves right again",
+    "08-motion-05.png": "Drone slightly left of prior",
+    "08-motion-06.png": "Drone returns farther left",
+    "08-motion-07.png": "Drone moves right",
+    "08-motion-08.png": "Drone returns left",
+    "08-motion-09.png": "Drone moves right",
+    "08-motion-10.png": "Drone returns left",
+    "08-motion-11.png": "Drone moves right",
+    "08-motion-12.png": "Drone near prior rightward location",
+    "08-motion-13.png": "Drone farther right",
+    "08-motion-14.png": "Drone returns left",
+    "08-motion-15.png": "Drone farther left",
+    "08-motion-16.png": "Drone rightward with target pulse"
+  },
+  "patrol_visual": "All17 original motion PNGs inspected directly. Recurring left/right travel with orientation changes and route endpoint changes is visible. Objective panel overlaps airborne Drone body in many frames, limiting body readability. Target appears visually relatively short; requested aim5-8m not numerically verified. No actual browser distance, ECS pose, Patrol component or Hold numeric claim.",
+  "notices_visual": "03-current-notices shows Saving is desktop-only and Tactical pause \u2014 orders still accepted (F10 resumes); 04-expired-notices after original7500ms shows neither.",
+  "paused_clock": {
+    "before": 10.245503425598145,
+    "after": 10.245503425598145,
+    "observer_fresh_actual_mouse_events": true,
+    "expected_save_notice": "Saving is desktop-only",
+    "browser_quicksave": false
+  },
+  "GPU_lane": "Worker terminal MainPID0 empty ControlGroup before primary launch; primary terminal MainPID0 empty ControlGroup. Workflow browser closed normally. Ambient user Chrome untouched.",
+  "no_public_deployment": true,
+  "source_helpers_edited": false
+}

@@ -1,0 +1,16 @@
+{
+  "scope": "CPU scheduled DIAGNOSTIC of old03c979d only, not GUI proof; no movement fix. Stronger final-settling failure is rejected as original RED.",
+  "frozen_executable_and_sources_independently_rehashed": true,
+  "all5_per_tick_arrival": true,
+  "fifth_move_removal_distance_m": 0.20717955,
+  "postarrival_idle_separation": true,
+  "slow_save_sampling_misses_arrival": true,
+  "actual05_gui_witnesses_remain": 4,
+  "GUI_repair_verified": false,
+  "files": {
+    "docs/qa/sdk309-arrival-sampling-diagnostic/freeze.json": "449da84e00d35f4c2f9b462e3d7b86dbeaaa70b3c77c1db633e4a1fb8d7220a4",
+    "docs/qa/sdk309-arrival-sampling-diagnostic/red-diagnostic.log": "ac4df3f8ea3cbb406fa63060e96f9d15e7483d49fac102c1e819ea7fe65eb678",
+    "docs/qa/sdk309-arrival-sampling-diagnostic/bounded-diagnostic-proof.json": "4d1ef5e7b16adb2d9bdd082e6ec632b8ef937f2dc8be4e672f1fd4edc9efd42d",
+    "docs/qa/sdk309-arrival-sampling-diagnostic/red-diagnostic-own-trace.json": "6f00b49fe56f9e138c19ba8abbefb1da5f74461d839bccea8acc09ba53bc5a10"
+  }
+}

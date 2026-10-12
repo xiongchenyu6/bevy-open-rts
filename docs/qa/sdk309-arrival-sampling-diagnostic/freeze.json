@@ -1,0 +1,13 @@
+{
+  "scope": "Diagnostic stronger final-settling assertion fails; original genuine per-tick arrival assertion PASSES for all5. This is NOT RED for original arrival contract.",
+  "executable_sha256": "4d9dc0f62784541a742de354e289b099b3e29d68ef5efa0725692b92f05e19c1",
+  "source_hashes": {
+    "src/combat.rs": "e0480644b2eae77972a90316281deac87ff48831e4b15d8eebc231917db230ca",
+    "src/nav.rs": "cd03e4c30b70921394533f73586419ed911e113a2644e8b09c8e4ab12082c9a6",
+    "src/nav/endpoints.rs": "42e39a947de33c5a569c196f5e6a3f930c752bc36a7f6059b032b0f60ec55bd3",
+    "src/lib.rs": "82ba4c3012672de4444724e1ff450962f5ae076446826e2f2c504c3479c69593",
+    "src/gui05_move_diagnostic.rs": "36930f7e71f377316a925ff9a253e71218c5da82fe3c19cc4880e82bc6f56a29",
+    "Cargo.toml": "07bf5ebc03af2bed8ae6a4054b0fb26f9d176818eed338a48861fb25c84dd246",
+    "Cargo.lock": "bd5a9f246df9a32a861bfc135bb9a314469305ad53d320119f73e68fcaccaf54"
+  }
+}
