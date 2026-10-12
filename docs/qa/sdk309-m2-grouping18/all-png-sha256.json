@@ -1,0 +1,17 @@
+{
+  "normal-M2-main-menu.png": "c295f32205cd3235b2268b8d4db941b091e87065a95d383229ef2af052581b0c",
+  "normal-M2-campaign-card.png": "4cec9b10da989213e0b5fb6d9bb3a4658f33f3648e4193b8722da5f42ea085f3",
+  "02/normal-initial-strike_the_outpost.png": "bb4bddccee72bce388e5111df60eb78b07ef61ad55f6351682588bc418f6f620",
+  "02/briefing-close-normal.png": "1202bbe7eb949dff6b6307752f4325fddbc9e1ed7c280c6790127deaae1bf7f1",
+  "02/economy-visible-ore-preview-initial.png": "42fc4a60cfc54e115369352ec96f0ecce01c620d1f5334f9c3d5e2f589323b13",
+  "02/economy-visible-ore-preview-home.png": "0f0011daeb242d5d1685e1f6477885b685aa00c631faf7d8aece4e5398f2e789",
+  "02/normal-zoom-PowerReactor-current.png": "2f216659946ec754d04cb03dd475196f2cd7b6e2ff66510efefbbe62088ea703",
+  "02/auto-01-PowerReactor-tab-tooltip.png": "018c4f1ffc5b0591edd7c0ff3c33712355d3c7460c0d63cca47e211df84d22c1",
+  "02/auto-01-PowerReactor-naturally-expired-notices.png": "755b27fc75b9dd65729e429ff23cdde038f9499212b924ef8e1566106b6e55ac",
+  "02/auto-01-PowerReactor-candidate-0-before-ghost.png": "a780badaa5435b5f91c991de356dfe12c3a2c5dcbc6460cdf19b41694a0d9d67",
+  "02/auto-01-PowerReactor-candidate-0-build-tooltip.png": "208d6f8a2e2b5ae1b1259c8b8e1cc488903888acc84c07b1db32c36ebcdbaee3",
+  "02/auto-01-PowerReactor-ghost-0.png": "ba75d907ebeae751d496df78588bc00dbc3999cc59baf81aa71dd4e2c092d7b0",
+  "02/auto-01-PowerReactor-completed.png": "4b2ae09e592642724ead34602df0c8b666264a3013fcfe02e854d4d2951543b1",
+  "02/normal-zoom-VehicleFactory-current.png": "03d4f627af31488305c2de26492bb8d2c788af8c5f417331ff2b987994f28649",
+  "02/actual-M2-failure.png": "7a4f4a5a2ea59c96bfe23ebc5df065cd4261bf47edd08ab442629572c6283442"
+}

@@ -1,0 +1,34 @@
+{
+  "image": "normal-zoom-VehicleFactory-current.png",
+  "image_sha256": "03d4f627af31488305c2de26492bb8d2c788af8c5f417331ff2b987994f28649",
+  "review_file": "camera-fit-review.json",
+  "kind": "current normal zoom-out OWN exact planned full ghost region",
+  "site": "VehicleFactory",
+  "bounds": [
+    [
+      376,
+      269
+    ],
+    [
+      527,
+      408
+    ]
+  ],
+  "normal_inputs": [
+    "Alt+C",
+    "pointer move 640 360",
+    "pointer axis 60 6",
+    [
+      {
+        "key": 106,
+        "seconds": 0.2777777777777778
+      },
+      {
+        "key": 103,
+        "seconds": 0.2222222222222222
+      }
+    ]
+  ],
+  "original_review_seconds": 45,
+  "deadline_utc_epoch": 1791776206.8746285
+}

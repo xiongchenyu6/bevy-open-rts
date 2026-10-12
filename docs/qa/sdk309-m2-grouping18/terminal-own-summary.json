@@ -1,0 +1,40 @@
+{
+  "scope": "Actual18 firstPower+normalpausedquietexpiry only; Factory/AA/adaptiveTankunexercised",
+  "passed": false,
+  "error": "Original45 normal camera fit review exhausted",
+  "paid_buildings": [
+    {
+      "id": "PowerReactor",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        713,
+        406
+      ],
+      "completed_count": 1,
+      "construction_wall": 13.643701336986851
+    }
+  ],
+  "notice_quiet_receipt": {
+    "wait_seconds": 9.21239132899791,
+    "original900_whole_wall_counts_wait": true,
+    "before_clock": 1.2461882829666138,
+    "after_clock": 1.2461882829666138,
+    "exact_OWN_selection_unchanged": true,
+    "last_state_source": "auto-01-PowerReactor-before.ron",
+    "no_extra_CtrlS_after_wait": true,
+    "PNG_sha256": "755b27fc75b9dd65729e429ff23cdde038f9499212b924ef8e1566106b6e55ac",
+    "no_additional_review_gate": true,
+    "existing_current_green1500_and_review45_still_required": true
+  },
+  "quiet_max_pixel_delta": 0.00041393407809664495,
+  "Factory_review_gate_age": 67.71824598312378,
+  "gate_not_consumed": true,
+  "PNG_count": 15,
+  "normal_exit": 0,
+  "forced_cleanup": false,
+  "installation_archive_unchanged": true,
+  "all9releasegates_open": true
+}

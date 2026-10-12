@@ -1,0 +1,15 @@
+[
+  {
+    "id": "PowerReactor",
+    "cost": [
+      3,
+      1
+    ],
+    "point": [
+      713,
+      406
+    ],
+    "completed_count": 1,
+    "construction_wall": 13.643701336986851
+  }
+]

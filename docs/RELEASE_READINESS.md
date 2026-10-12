@@ -7,6 +7,17 @@ A bounded regression or an older package cannot establish final release readines
 
 ## Latest Verified Checkpoints
 
+- Normal native M2 diagnostic18 verifies the first paid Power foundation and
+  completion, then fails the original45-second Factory camera review because
+  the gate arrives67.72 seconds after the request and is not consumed. Its
+  bounded natural paused wait removes the Game Saved notice with unchanged
+  simulation clock, selection and rendered view; Group/Idle notices remain.
+  Factory, AA and adaptive Tank behavior are untested. Root rehashes all15
+  PNGs; raw `passed` stays false, normal close exits0, package/archive remain
+  unchanged and the GPU is released
+  ([bounded reviewer-latency failure](qa/sdk309-m2-grouping18-review.json)).
+  All nine release gates remain open; no gameplay change follows from this
+  reviewer failure.
 - Normal native M2 diagnostic17 completes Power, Factory and Radar, then
   stops before AA placement: the toast-overlapped current ghost has1274
   changed green pixels against the unchanged1500 threshold. The original
