@@ -435,3 +435,14 @@ SupportPowerReady(.804575) remains below the unchanged.85 threshold and unaccept
 [Scoped support report](qa/native309-normal-support-audio-review.json) pins portable
 local evidence including independent runtime review. All17, human mix and
 Windows/browser acceptance remain open.
+
+SDK309 isolated Alt+I actual01 performs only ordinary idle-Worker selection inside
+the recording after HQ selection and3s settling. Root verifies the fresh healthy
+owned Worker receipt and actual selected-Worker screenshot. Controller and game
+exit0 in95.21s; package399/archive unchanged,5.231s closed stereo48k output is
+nonzero and unclipped. Identically resampling recording/reference to mono8k yields
+Hello(.749357), below unchanged.85; all32 references remain negative. A separate
+CPU-only native48k comparison also remains below threshold(.743923), so resampling
+rate alone does not explain the mismatch. [Alt+I report](qa/native309-isolated-alti-hello-review.json)
+preserves raw evidence and independent runtime review. Hello remains unaccepted;
+no production audio defect, logical identity or human quality approval is claimed.

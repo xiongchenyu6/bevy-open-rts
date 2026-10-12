@@ -1,0 +1,132 @@
+{
+  "scope": "SDK309 isolated ordinaryAltI ownedhealthyWorker selection; nonzerooutput butHello belowunchangedwaveformthreshold",
+  "actual_controller": {
+    "actual_exit": 0,
+    "original_wall_seconds": 600,
+    "natural_recipe": {
+      "earned_group9_worker_key": 8589933892,
+      "actual_AltI_selected_worker_key": 8589933888,
+      "hq_before_recording": {
+        "pending_placement": null,
+        "selected_owned": [
+          {
+            "local_entity": 8589933873,
+            "network_id": 1,
+            "type": "CommandCenter"
+          }
+        ]
+      },
+      "recalled_during_recording": {
+        "pending_placement": null,
+        "selected_owned": [
+          {
+            "local_entity": 8589933888,
+            "network_id": 3,
+            "type": "Worker"
+          }
+        ]
+      },
+      "only_AltI_selection_inside_recording": true,
+      "shipped_hello_duration": 1.575,
+      "tail_seconds": 2.075,
+      "accepted": false,
+      "waveform_review_pending": true,
+      "logical_audio_receipt_available": false
+    },
+    "normal_exits": [
+      {
+        "pid": 89405,
+        "supervisor_pid": 88861,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "forced_cleanup": false,
+    "installation_archive_unchanged": true,
+    "phases": [],
+    "wall_seconds": 95.2121922459919,
+    "screenshots": {
+      "01/voice-only-adjusted-options.png": "71a9b67f2155bb3bdfbfa451a5294a970dddbd4693851c7fa475d80cd59daaaf",
+      "01/isolated-hello-actual-worker-selected.png": "1efdab8dfc54172aa5ac578da12994188cbfd7bc5d90e53bad8d9f134cea480c"
+    },
+    "installation_unchanged": true,
+    "archive_unchanged": true,
+    "host_audio_environment_unchanged": true
+  },
+  "actual_selection_receipts": {
+    "earned_group9_worker_key": 8589933892,
+    "actual_AltI_selected_worker_key": 8589933888,
+    "hq_before_recording": {
+      "pending_placement": null,
+      "selected_owned": [
+        {
+          "local_entity": 8589933873,
+          "network_id": 1,
+          "type": "CommandCenter"
+        }
+      ]
+    },
+    "recalled_during_recording": {
+      "pending_placement": null,
+      "selected_owned": [
+        {
+          "local_entity": 8589933888,
+          "network_id": 3,
+          "type": "Worker"
+        }
+      ]
+    },
+    "only_AltI_selection_inside_recording": true,
+    "shipped_hello_duration": 1.575,
+    "tail_seconds": 2.075,
+    "accepted": false,
+    "waveform_review_pending": true,
+    "logical_audio_receipt_available": false
+  },
+  "private_game_identity": [
+    {
+      "phase": "isolated-worker-alti-hello",
+      "game_host_pid": 89405,
+      "game_namespace_pids": [
+        89405
+      ],
+      "pulse_reported_pid": 89405,
+      "single_game_playback_stream": true,
+      "monitor": "private rts_qa_game_only.monitor",
+      "recorder_exit": 0
+    }
+  ],
+  "pcm_metrics": {
+    "duration": 5.230958333333334,
+    "peak_pcm16": 17122,
+    "nonzero_samples": 100604,
+    "clipped_samples": 0,
+    "sha256": "4a9eb66e3a4f643e97cb36241d69c5eaf9438f76cfe8b29d6d8daa2ea3a4eb3b"
+  },
+  "comparisons": 32,
+  "threshold": 0.85,
+  "candidate_count": 0,
+  "Hello_coefficient": 0.7493574355533728,
+  "Hello_accepted": false,
+  "logical_audio_identity_proven": false,
+  "all17_accepted": false,
+  "human_mix_accepted": false,
+  "gpu_released": true,
+  "prior_grouprecall_silence_preserved": true,
+  "no_production_bug_claim": true,
+  "root_currentPNG_receipt_review_pending": false,
+  "root_runtime_review_sha256": "05e93a2d86e87c8b62b74391ef93d0d95a86029c29994c42479d7b47c4b2c3e3",
+  "additional_native48k_diagnostic": {
+    "scope": "CPU-only identical comparator rate diagnostic, not playback acceptance",
+    "directory": "target/native309-audio-native-rate-diagnostic-20261012",
+    "Hello_coefficient": 0.7439228566,
+    "candidate_count": 0,
+    "threshold": 0.85,
+    "no_production_bug_proven": true
+  },
+  "portable_archive": {
+    "path": "target/sdk309-isolated-alti-hello-20261012-01-evidence.tar.gz",
+    "sha256": "f4d0065df78f2dd21d8a69b0dda3c4bedec56a63f141151c88fe22b032e27b83",
+    "files": 39
+  }
+}
