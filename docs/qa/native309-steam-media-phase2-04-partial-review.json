@@ -1,0 +1,528 @@
+{
+  "scope": "ManagedSDK309 phase2actual04 partialearned economy/base/mixedarmy +exactnative450frameOreformat; failedcurrentScoutreview, no combat/ending/win acceptance",
+  "actual_controller": {
+    "actual_exit": 1,
+    "scope": "Actualnative1920 initialgameplay draft only, not five scenes or Steamrelease",
+    "original_wall": 900,
+    "original_current_image_review": 45,
+    "actual_native_framebuffer_1920": true,
+    "initial_gameplay_image_sha256": "38ee6dff3b896fc71339092df46559a5364f247e2cf87e6bcebf18a4fbf85825",
+    "error": "Original45 currentvisible scene target exhausted",
+    "error_type": "AssertionError",
+    "traceback": "Traceback (most recent call last):\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/native309-steam-media-phase2-prepared-20261012/run.py\", line 71, in <module>\n    result['phase2_workflows']=play(s);assert result['phase2_workflows']['actual_victory'],'Original900 boundedworkflow didnot earncompleteobjective; partialscenes retained'\n                               ~~~~^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/native309-steam-media-phase2-prepared-20261012/scenario.py\", line 105, in play\n    point,review=target_gate(s,o,f'current-visible-scout-{index}','Choose currentlyvisible clear ground or actuallyvisible enemyapproach; no hiddencoords. Mark actualvisiblecombat only fromcurrentimage.')\n                 ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/native309-steam-media-phase2-prepared-20261012/scenario.py\", line 31, in target_gate\n    while not gate.exists():s.check_wall();assert time.monotonic()<start+45,'Original45 currentvisible scene target exhausted';time.sleep(.1)\n                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Original45 currentvisible scene target exhausted\n",
+    "normal_exits": [
+      {
+        "pid": 371980,
+        "supervisor_pid": 371910,
+        "actual_exit": 0,
+        "normal_window_close": true
+      }
+    ],
+    "forced_cleanup": false,
+    "installation_unchanged": true,
+    "archive_unchanged": true,
+    "wall_seconds": 506.10576132300775,
+    "screenshots": {
+      "01/media-current-00.png": "15c43563aabe324162f3f517b633ea3aeb506e91b57a823fd6ca2982f4523130",
+      "01/media-current-01.png": "32e0f5c9206fc52f128ec5ac970f0afd4e9dedf3c827f22b0a6f7ae5aae7a0e3",
+      "01/media-current-02.png": "7fbb54bfcfc4885c98e31866c64a99f577f2054e19e450cdb29c1a6d2a94a869",
+      "01/media-current-03.png": "294b5c6fbbf2444be9c9d141a651f2115ed7e6014961f25948d0c36654fa7309",
+      "01/media-current-04.png": "38ee6dff3b896fc71339092df46559a5364f247e2cf87e6bcebf18a4fbf85825",
+      "01/economy-visible-ore-preview-initial.png": "fce25bb1303cc689e9bad0a29b19fd3db5364ce544740a8d55d8ad153462e8b4",
+      "01/economy-visible-ore-preview-home.png": "2d1a3ed9aed855e5f483be008a14bd9e567a88f11cb88ce4d100c477a1d5b836",
+      "01/economy-visible-ore-preview-pan0.png": "c243be57941ee80548b96f11e6a4b81c458c25511e1a5b28d91e2379d1ebb4ac",
+      "01/native1920-ordinary-ore-gameplay-actual-frame.png": "96cc6aec087b5b7ad37c5134c9291327a35e71ae9517cab8b6b3cc5b17988b66",
+      "01/native1920-earned-economy.png": "4a8754c9fb5fef40330ccca37bb8b85ab934db874c326ab28f854ecb532a169c",
+      "01/auto-01-PowerReactor-tab-tooltip.png": "f8ec4d7c0fcdce2d9797e27cbf1b51cac14881e5d8afa74c5bda0b9fa55bdc3b",
+      "01/auto-01-PowerReactor-candidate-0-before-ghost.png": "8256d69bf38618e787deeec9e2d52a5fcb791c6147774c8c6af99d025f18be6f",
+      "01/auto-01-PowerReactor-candidate-0-build-tooltip.png": "119f3fddff545786b8b9c7e9be2fcec8a721c0c2929b3933d5d73750410d077d",
+      "01/auto-01-PowerReactor-ghost-0.png": "799275143ebd6d40a87a390e640e70503b3818e6433c6030a427e13055a11e5e",
+      "01/auto-01-PowerReactor-completed.png": "b25caa1ebf8c275e2c6161374fe74905b7baa154a4970fbd454cc6eed399f77b",
+      "01/auto-02-Barracks-tab-tooltip.png": "912792006529e73939c3c50c63c9db94c7812807b98e3e7ab99e43c978b1ac00",
+      "01/auto-02-Barracks-candidate-0-before-ghost.png": "12a5713a26e1b165b811d3052ac0c86e976d9b87ff0e3faf69b009804c6fb415",
+      "01/auto-02-Barracks-candidate-0-build-tooltip.png": "fcdf2fb6781908f94451a65e40b2ddd6025b655cc91d41170cc1c27794e39f4f",
+      "01/auto-02-Barracks-ghost-0.png": "b8caa5313afb9f71b6de65627fc224b02b641d0516eb2c3eeb5937ebc1a50275",
+      "01/auto-02-Barracks-candidate-1-before-ghost.png": "df278733457b9d13087a783bd85352cce09bef8da6806a8420dfb1244bd4f59c",
+      "01/auto-02-Barracks-candidate-1-build-tooltip.png": "d2180dee3b6362cf254ba3679fca41589736098ae9a5f31b74599b1acd33a549",
+      "01/auto-02-Barracks-ghost-1.png": "9fabf61d62d36b1f65653af8df6bd0a98f9f432f3dd4516392648dd9336bb47e",
+      "01/auto-02-Barracks-completed.png": "4b74a1b24d40c42eec3a67908ba347a78433eb2c3d2ccdefcfc7cdab0ac053fc",
+      "01/auto-03-VehicleFactory-tab-tooltip.png": "630aedd35d18a99d3c8198fa10483738817421b194dd98b81173376af5e6dcef",
+      "01/auto-03-VehicleFactory-candidate-0-before-ghost.png": "882ad672dc9fa15c7c4fd146631b168b86aba0e998457d149ac2d89b1b757b5f",
+      "01/auto-03-VehicleFactory-candidate-0-build-tooltip.png": "d903390dfd38afada0d824fa286e6ba3f87e6dcba47f0cbef915e39a55ac944c",
+      "01/auto-03-VehicleFactory-ghost-0.png": "2ae083d71773e213fc1d5986f0ec6aabee9f246d41a715c0d7608306f81bf36b",
+      "01/auto-03-VehicleFactory-completed.png": "4803d6ec3b74ac644ff2183e7806974e4a17bc357da82104a3d9bf9b6ccfe1fe",
+      "01/native1920-earned-developed-base.png": "54927e84595daa31ad93d966ecdc9745f94604c81acd4795732441cb047e52d6",
+      "01/media-paid-LightRifleInfantry-0-tooltip.png": "7225d7b812f2368a3e3e39e8994fc9fe26834c31e6f2377042d172192f8115a6",
+      "01/media-paid-LightRifleInfantry-1-tooltip.png": "7ff43b6bae4066fc3bbeb16400f383a0a97b262d3cddc73c375ad6498548f588",
+      "01/media-paid-LightRifleInfantry-2-tooltip.png": "650bd13fb96ac8beb19dc9c320b33c4ac72bbc4099cd253bb65eca300a2f8c9c",
+      "01/media-paid-LightRifleInfantry-3-tooltip.png": "40a5b2a930736816efccb9636a3c0bcb9a93f228a468c51d92b4e94a5513ec6b",
+      "01/media-paid-LightRifleInfantry-4-tooltip.png": "44321b402169e32c38dc6c12859a35dfa8047c911d861b8b28dde9ceb12890bc",
+      "01/media-paid-Tank-0-tooltip.png": "dcfcd58dbdc388ff79378c4efad3327f17c102ebdba7c7a79e41b1c594b1df99",
+      "01/media-paid-Tank-1-tooltip.png": "76734f05b7911e0c2fe4278af6d33a3edd62b50625bf167cbebd06006f30bceb",
+      "01/media-paid-Tank-2-tooltip.png": "5a8245ef176dd0cd0467e0f8ff114bccf2a85654cab9ea0742c111ede66ce061",
+      "01/native1920-earned-mixed-army.png": "d75aa21aed40f0c8b61e0d6eb09f73730e5e492ad6e1e12e013e7c337b2768b0",
+      "01/current-visible-scout-0.png": "a00e90c43bc46efd4a3e276ddad48adba9db96e806d4a4a8a4020b6518a1d88f"
+    }
+  },
+  "managed_unit_terminal": {
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "InvocationID": "cd6dee121ba847e2b79f9175d5f822ba",
+    "RuntimeMaxUSec": "15min 40s",
+    "MainPID": "0",
+    "Result": "exit-code",
+    "ExecMainCode": "1",
+    "ExecMainStatus": "1",
+    "ControlGroup": "",
+    "Nice": "0"
+  },
+  "original900_45_30_preserved": true,
+  "reviewer_failure": {
+    "current_scout_gate_absent": true,
+    "root_reported_late_rejection_seconds": 61.67,
+    "late_approval_written": false,
+    "production_game_bug_claimed": false
+  },
+  "earned_economy": {
+    "actual_start": {
+      "initial_bank": [
+        32,
+        16
+      ],
+      "harvester_key": 8589933895,
+      "node": {
+        "key": 8589934036,
+        "kind": 0,
+        "position": [
+          -15.92648983001709,
+          0.0,
+          -7.863399505615234
+        ],
+        "amount": 240
+      },
+      "actual_public_body": {
+        "image": "economy-visible-ore-preview-pan0.png",
+        "image_sha256": "c243be57941ee80548b96f11e6a4b81c458c25511e1a5b28d91e2379d1ebb4ac",
+        "resource_entity": 8589934036,
+        "kind": "Ore",
+        "projected_body_point": [
+          871,
+          402
+        ],
+        "visible": true,
+        "loaded_mesh_count": 3,
+        "actual_glb_bounds": {
+          "center_screen": [
+            871.0111083984375,
+            402.1726989746094
+          ],
+          "ground_screen": [
+            871.8349609375,
+            410.8486328125
+          ],
+          "height_above_global_anchor": 0.3275500237941742,
+          "max": [
+            -15.697178840637207,
+            0.3275500237941742,
+            -7.610597133636475
+          ],
+          "min": [
+            -16.155797958374023,
+            0.029999999329447746,
+            -8.116202354431152
+          ],
+          "size": [
+            0.4586191177368164,
+            0.2975500226020813,
+            0.5056052207946777
+          ],
+          "top_screen": [
+            870.1716918945312,
+            393.3330993652344
+          ]
+        },
+        "actual_worker_key": 8589933895,
+        "camera_attempt": "pan0"
+      },
+      "normal_controls_only": true,
+      "income_proven": false
+    },
+    "actual_income_state": {
+      "clock": 81.9620590209961,
+      "ore": 44,
+      "crystal": 16,
+      "units": [
+        {
+          "key": 8589933892,
+          "id": "Worker",
+          "position": [
+            -18.0,
+            0.05000000074505806,
+            -15.0
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "Some((0, 0))"
+        },
+        {
+          "key": 8589933887,
+          "id": "Drone",
+          "position": [
+            -17.0,
+            1.5,
+            -20.0
+          ],
+          "active": [],
+          "queued": [],
+          "cargo_ron": "None"
+        },
+        {
+          "key": 8589933895,
+          "id": "Worker",
+          "position": [
+            -15.288026809692383,
+            0.05000000074505806,
+            -11.287211418151855
+          ],
+          "active": [
+            {
+              "kind": "Harvest",
+              "target": 8589934080,
+              "state": 1
+            }
+          ],
+          "queued": [],
+          "cargo_ron": "Some((2, 0))"
+        }
+      ],
+      "structures": [
+        {
+          "key": 8589933889,
+          "id": "CommandCenter",
+          "position": [
+            -15.0,
+            0.0,
+            -18.0
+          ],
+          "construction": null,
+          "cost": null
+        }
+      ],
+      "own_harvest_resources": [
+        {
+          "key": 8589934080,
+          "kind": 0,
+          "position": [
+            -15.503700256347656,
+            0.0,
+            -9.616700172424316
+          ],
+          "amount": 232
+        }
+      ],
+      "jobs": [],
+      "own_health": {
+        "8589933892": 6.0,
+        "8589933887": 6.0,
+        "8589933895": 6.0
+      }
+    },
+    "actual_known_previously_visible_node": {
+      "key": 8589934036,
+      "kind": 0,
+      "position": [
+        -15.92648983001709,
+        0.0,
+        -7.863399505615234
+      ],
+      "amount": 234
+    },
+    "actual_worker_cargo": "Some((2, 0))",
+    "no_paid_spending_during_interval": true
+  },
+  "actual_paid_completed_base": [
+    {
+      "id": "PowerReactor",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        1230,
+        310
+      ],
+      "completed_count": 1,
+      "construction_wall": 10.08505807700567
+    },
+    {
+      "id": "Barracks",
+      "cost": [
+        3,
+        1
+      ],
+      "point": [
+        600,
+        310
+      ],
+      "completed_count": 1,
+      "construction_wall": 12.115160246030428
+    },
+    {
+      "id": "VehicleFactory",
+      "cost": [
+        6,
+        0
+      ],
+      "point": [
+        960,
+        243
+      ],
+      "completed_count": 1,
+      "construction_wall": 12.347792784974445
+    },
+    {
+      "producer": "Barracks",
+      "unit": "LightRifleInfantry",
+      "queued_paid_count": 5,
+      "bank": [
+        51,
+        14
+      ]
+    },
+    {
+      "producer": "VehicleFactory",
+      "unit": "Tank",
+      "queued_paid_count": 3,
+      "bank": [
+        42,
+        11
+      ]
+    }
+  ],
+  "healthy_owned_mixed_army": {
+    "normal_controls": "CtrlAltA",
+    "selected": [
+      {
+        "local_entity": 8589933887,
+        "network_id": 2,
+        "type": "Drone"
+      },
+      {
+        "local_entity": 60129540001,
+        "network_id": 28,
+        "type": "LightRifleInfantry"
+      },
+      {
+        "local_entity": 107374180229,
+        "network_id": 31,
+        "type": "Tank"
+      },
+      {
+        "local_entity": 124554049423,
+        "network_id": 30,
+        "type": "LightRifleInfantry"
+      },
+      {
+        "local_entity": 146028885988,
+        "network_id": 26,
+        "type": "Tank"
+      },
+      {
+        "local_entity": 472446400526,
+        "network_id": 29,
+        "type": "Tank"
+      },
+      {
+        "local_entity": 476741367851,
+        "network_id": 24,
+        "type": "LightRifleInfantry"
+      },
+      {
+        "local_entity": 725849471021,
+        "network_id": 25,
+        "type": "LightRifleInfantry"
+      },
+      {
+        "local_entity": 1486058682608,
+        "network_id": 27,
+        "type": "LightRifleInfantry"
+      }
+    ],
+    "actual_healthy_owned_units": [
+      {
+        "key": 476741367851,
+        "id": "LightRifleInfantry",
+        "position": [
+          -17.02944564819336,
+          0.05000000074505806,
+          -22.0203857421875
+        ],
+        "active": [],
+        "queued": [],
+        "cargo_ron": "None"
+      },
+      {
+        "key": 146028885988,
+        "id": "Tank",
+        "position": [
+          -12.827483177185059,
+          0.05000000074505806,
+          -24.100000381469727
+        ],
+        "active": [],
+        "queued": [],
+        "cargo_ron": "None"
+      },
+      {
+        "key": 725849471021,
+        "id": "LightRifleInfantry",
+        "position": [
+          -18.054378509521484,
+          0.05000000074505806,
+          -18.97542953491211
+        ],
+        "active": [],
+        "queued": [],
+        "cargo_ron": "None"
+      },
+      {
+        "key": 1486058682608,
+        "id": "LightRifleInfantry",
+        "position": [
+          -19.73992919921875,
+          0.05000000074505806,
+          -23.077693939208984
+        ],
+        "active": [],
+        "queued": [],
+        "cargo_ron": "None"
+      },
+      {
+        "key": 472446400526,
+        "id": "Tank",
+        "position": [
+          -18.6502742767334,
+          0.05000000074505806,
+          -24.100000381469727
+        ],
+        "active": [],
+        "queued": [],
+        "cargo_ron": "None"
+      },
+      {
+        "key": 60129540001,
+        "id": "LightRifleInfantry",
+        "position": [
+          -20.038938522338867,
+          0.05000000074505806,
+          -19.0279598236084
+        ],
+        "active": [],
+        "queued": [],
+        "cargo_ron": "None"
+      },
+      {
+        "key": 124554049423,
+        "id": "LightRifleInfantry",
+        "position": [
+          -21.169466018676758,
+          0.05000000074505806,
+          -20.5437068939209
+        ],
+        "active": [],
+        "queued": [],
+        "cargo_ron": "None"
+      },
+      {
+        "key": 107374180229,
+        "id": "Tank",
+        "position": [
+          -10.976847648620605,
+          0.05000000074505806,
+          -23.37772560119629
+        ],
+        "active": [],
+        "queued": [],
+        "cargo_ron": "None"
+      },
+      {
+        "key": 8589933887,
+        "id": "Drone",
+        "position": [
+          -17.0,
+          1.5,
+          -20.0
+        ],
+        "active": [],
+        "queued": [],
+        "cargo_ron": "None"
+      }
+    ]
+  },
+  "video_format_proof": {
+    "scope": "CPU exact videoformat proof; ordinaryOre footage only, not fullSteamopening/combat/ending approval",
+    "actual_exit": 0,
+    "raw_frames": 477,
+    "first_cut_frames": 450,
+    "native_dimensions": [
+      1920,
+      1080
+    ],
+    "all477decoded": true,
+    "every450decodedframe_and_PTS_identical": true,
+    "every450encodedpacket_and_PTS_identical": true,
+    "source_timebase": 90000,
+    "PTS_step": 3000,
+    "source_fps_exact": 30,
+    "source_first450_pts": [
+      0,
+      1347000
+    ],
+    "raw_sha256": "1146668297dc8d5ab40efb3d7ba0511b3e880485a70b7ba87301f00399a0dc48",
+    "cut_sha256": "af8e6c93684bc410a81d6cab5cbf2b8c5d5f2cf87495c8af0dcf5156e7a18b3f",
+    "raw_frame_samples": [
+      {
+        "decoded_index": 0,
+        "path": "video-inspection/frame-01.png",
+        "sha256": "623c4f1753dbdb8866cb8604a55f3c15fe0f45334d89879ff118939ca97e0f05",
+        "dimensions": [
+          1920,
+          1080
+        ]
+      },
+      {
+        "decoded_index": 238,
+        "path": "video-inspection/frame-02.png",
+        "sha256": "1033b0643def31353acf6513f58b315534a0b2860ed587b763933060ddd6998d",
+        "dimensions": [
+          1920,
+          1080
+        ]
+      },
+      {
+        "decoded_index": 476,
+        "path": "video-inspection/frame-03.png",
+        "sha256": "2f3fc3631dac22ce2b89f3d8430ed49cb35112208fe1e6a89d151f0e37a44e1d",
+        "dimensions": [
+          1920,
+          1080
+        ]
+      }
+    ],
+    "no_reencode_fps_filter_interpolation_duplicates_upscale_audio": true,
+    "format_450_native30fps_proven": true,
+    "opening_interactions_combat_ending_video_accepted": false,
+    "five_earned_scenes_accepted": false
+  },
+  "all5earned_scenes_accepted": false,
+  "opening_interactions_combat_ending_video_accepted": false,
+  "no_hostaudio_mic_setters_upscale": true,
+  "GPU_released": true,
+  "no05_launched": true,
+  "portable_archive": {
+    "path": "target/sdk309-steam-media-phase2-20261012-04-partial-evidence.tar.gz",
+    "sha256": "337fc98778f4fc97dc71b5401f5fd9ffeaf2f44f48b46eef4d389cfabb08d658",
+    "files": 247,
+    "public_publish_or_source_offer": false
+  }
+}

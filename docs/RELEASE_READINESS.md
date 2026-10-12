@@ -495,3 +495,17 @@ retains raw video, receipts, current reviews, control audit and local portable
 archive. This establishes neither allfive earned media scenes nor450-frame/full
 opening-interaction-combat-ending video acceptance. A managed background systemd
 wrapper is prepared; no further actual run is inferred from that preparation.
+
+Managed Steam media phase2 actual04 earns visible Ore Harvest/returned income,
+paid completed Power3/1, Barracks3/1, VehicleFactory6/0, and a healthy owned army
+of five Rifle infantry, three Tanks and a Drone. The original45s first scout
+review expires; Root rejects its61.67s-late review without writing an approval.
+Controller fails after506.11s, game closes normally with exit0; package399/archive
+unchanged, no forced cleanup, systemd MainPID0/cgroup empty. This reviewer miss
+establishes no production game bug. [Scoped managed04 proof](qa/native309-steam-media-phase2-04-partial-review.json)
+preserves the exact unit, receipts, native images and raw477-frame Ore footage.
+All477 frames decode; every PTS advances exactly3000 ticks in a90000 timebase.
+A lossless first450-frame remux preserves every original encoded packet, decoded
+frame and PTS at native1920×1080/30fps, with no resampling, duplication or upscale.
+This proves the numeric video format only: full opening/interactions/combat/ending
+content, visible combat, completed objective and allfive media scenes remain open.
