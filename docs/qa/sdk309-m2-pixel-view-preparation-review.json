@@ -1,0 +1,13 @@
+{
+  "scope": "CPU actual15 same-pixel diagnostic and negative guards only; original15 failure preserved, M2win notverified",
+  "actual_CPU_preflight_exit": 0,
+  "actual15_projected_points": 659,
+  "maximum_actual15_pixel_delta": 0.0002286961747586247,
+  "same_rounded_pixels": true,
+  "subpixel_limit": 0.25,
+  "no_camera_setter_or_world_plan_change": true,
+  "files": {
+    "docs/qa/sdk309-m2-pixel-view-preparation/actual-import-check.json": "8a68d540fec2d91b0a526a6bbeedbe0206a883f540722c3d507fa16ce4f2bd05",
+    "docs/qa/sdk309-m2-pixel-view-preparation/view-preflight16.json": "cc0d44d2bbb57517202a97db11c738e5c062e38c604fc69d68249a6635b885aa"
+  }
+}
