@@ -51,7 +51,7 @@ jobs:
           python scripts/verify_package.py dist/bevy-open-rts-windows-x86_64.zip
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Retain package for download and runtime verification
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-desktop-x86_64
           path: |
