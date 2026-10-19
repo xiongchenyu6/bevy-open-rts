@@ -3,6 +3,7 @@ FROM rust:1.95-bookworm AS builder
 WORKDIR /source
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
+COPY crates/matchbox-socket ./crates/matchbox-socket
 COPY crates/open-bevy-net ./crates/open-bevy-net
 COPY crates/open-bevy-protocol ./crates/open-bevy-protocol
 COPY services/open-bevy-signaling ./services/open-bevy-signaling
