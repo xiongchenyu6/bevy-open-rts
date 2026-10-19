@@ -547,7 +547,11 @@ impl WebRtcTransport {
         // Matchbox queues packets before validating the peer's data channel.
         // A reconnect Hello sent during ICE gathering would otherwise panic
         // asynchronously when its message loop consumes the queued packet.
-        if !self.socket.connected_peers().any(|connected| connected == peer) {
+        if !self
+            .socket
+            .connected_peers()
+            .any(|connected| connected == peer)
+        {
             return Err(ClientError::TransportClosed);
         }
         self.socket

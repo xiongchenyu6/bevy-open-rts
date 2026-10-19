@@ -1,7 +1,10 @@
 use super::*;
 
 impl OnlineSession {
-    pub(super) fn hello_for_connected_peer(&mut self, peer: PeerId) -> Option<OnlineReliableMessage> {
+    pub(super) fn hello_for_connected_peer(
+        &mut self,
+        peer: PeerId,
+    ) -> Option<OnlineReliableMessage> {
         // Mesh guests are not the authority established by our Welcome.
         if self.is_host || (self.local_player_id.is_some() && self.host_peer != Some(peer)) {
             return None;

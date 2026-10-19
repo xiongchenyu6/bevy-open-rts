@@ -2415,64 +2415,64 @@ pub(crate) fn add_main_menu_scene(app: &mut App) -> &mut App {
             .before(assets_loading_reset::<AppScreen>),
     );
     app.add_systems(Startup, restore_player_preferences)
-    .add_systems(
-        Update,
-        persist_player_preferences
-            .after(options_menu_buttons)
-            .after(front_menu_buttons)
-            .after(toggle_language_hotkey),
-    )
-    .add_systems(
-        OnEnter(AppScreen::AssetLoading),
-        (queue_startup_loading_assets, setup_asset_loading_screen).chain(),
-    )
-    .add_systems(
-        Update,
-        update_asset_loading_screen.run_if(in_state(AppScreen::AssetLoading)),
-    )
-    .add_systems(OnEnter(AppScreen::MainMenu), setup_front_menu)
-    .add_systems(
-        Update,
-        (front_menu_buttons, resize_front_menu_roster_preview)
-            .run_if(in_state(AppScreen::MainMenu)),
-    )
-    .add_systems(OnEnter(AppScreen::SkirmishSetup), clear_active_mission)
-    .add_systems(OnEnter(AppScreen::CampaignMenu), setup_campaign_menu)
-    .add_systems(
-        Update,
-        campaign_menu_buttons.run_if(in_state(AppScreen::CampaignMenu)),
-    )
-    .add_systems(OnEnter(AppScreen::OptionsMenu), setup_options_menu)
-    .add_systems(
-        Update,
-        options_menu_buttons.run_if(in_state(AppScreen::OptionsMenu)),
-    )
-    .add_systems(OnEnter(AppScreen::CreditsMenu), setup_credits_menu)
-    .add_systems(
-        Update,
-        credits_menu_buttons.run_if(in_state(AppScreen::CreditsMenu)),
-    )
-    .add_systems(
-        OnEnter(AppScreen::SkirmishSetup),
-        (
-            restore_main_menu_selection_from_match_setup,
-            setup_main_menu,
+        .add_systems(
+            Update,
+            persist_player_preferences
+                .after(options_menu_buttons)
+                .after(front_menu_buttons)
+                .after(toggle_language_hotkey),
         )
-            .chain(),
-    )
-    .add_systems(
-        Update,
-        (
-            main_menu_scroll,
-            main_menu_buttons,
-            update_main_menu_summary,
-            update_main_menu_map_resource_controls,
-            update_skirmish_map_preview,
-            update_main_menu_lobby_slots,
+        .add_systems(
+            OnEnter(AppScreen::AssetLoading),
+            (queue_startup_loading_assets, setup_asset_loading_screen).chain(),
         )
-            .chain()
-            .run_if(in_state(AppScreen::SkirmishSetup)),
-    );
+        .add_systems(
+            Update,
+            update_asset_loading_screen.run_if(in_state(AppScreen::AssetLoading)),
+        )
+        .add_systems(OnEnter(AppScreen::MainMenu), setup_front_menu)
+        .add_systems(
+            Update,
+            (front_menu_buttons, resize_front_menu_roster_preview)
+                .run_if(in_state(AppScreen::MainMenu)),
+        )
+        .add_systems(OnEnter(AppScreen::SkirmishSetup), clear_active_mission)
+        .add_systems(OnEnter(AppScreen::CampaignMenu), setup_campaign_menu)
+        .add_systems(
+            Update,
+            campaign_menu_buttons.run_if(in_state(AppScreen::CampaignMenu)),
+        )
+        .add_systems(OnEnter(AppScreen::OptionsMenu), setup_options_menu)
+        .add_systems(
+            Update,
+            options_menu_buttons.run_if(in_state(AppScreen::OptionsMenu)),
+        )
+        .add_systems(OnEnter(AppScreen::CreditsMenu), setup_credits_menu)
+        .add_systems(
+            Update,
+            credits_menu_buttons.run_if(in_state(AppScreen::CreditsMenu)),
+        )
+        .add_systems(
+            OnEnter(AppScreen::SkirmishSetup),
+            (
+                restore_main_menu_selection_from_match_setup,
+                setup_main_menu,
+            )
+                .chain(),
+        )
+        .add_systems(
+            Update,
+            (
+                main_menu_scroll,
+                main_menu_buttons,
+                update_main_menu_summary,
+                update_main_menu_map_resource_controls,
+                update_skirmish_map_preview,
+                update_main_menu_lobby_slots,
+            )
+                .chain()
+                .run_if(in_state(AppScreen::SkirmishSetup)),
+        );
     add_online_scene(app)
 }
 

@@ -33,8 +33,7 @@ pub(in crate::online) fn record(
         &UiGlobalTransform,
         Option<&InheritedVisibility>,
     )>,
-    #[cfg(not(target_arch = "wasm32"))]
-    geometry: resource_geometry::Queries,
+    #[cfg(not(target_arch = "wasm32"))] geometry: resource_geometry::Queries,
 ) {
     if !observer.enabled {
         return;
@@ -84,12 +83,23 @@ pub(in crate::online) fn record(
     #[cfg(not(target_arch = "wasm32"))]
     let event = if resource_geometry::requested() {
         let mut event = event;
-        event.as_object_mut().expect("UI observation is an object").insert(
-            "native_resource_geometry".to_string(),
-            resource_geometry::snapshot(&geometry, &cameras, visible_player.team, cursor, cursor_ground),
-        );
         event
-    } else { event };
+            .as_object_mut()
+            .expect("UI observation is an object")
+            .insert(
+                "native_resource_geometry".to_string(),
+                resource_geometry::snapshot(
+                    &geometry,
+                    &cameras,
+                    visible_player.team,
+                    cursor,
+                    cursor_ground,
+                ),
+            );
+        event
+    } else {
+        event
+    };
     observer.last_ui_state = state;
     observer.ui_events.push_back(event);
     while observer.ui_events.len() > 40 {
