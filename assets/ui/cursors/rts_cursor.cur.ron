@@ -1,0 +1,19 @@
+(
+    image: (
+        path: "ui/cursors/rts_cursor_atlas.png",
+    ),
+    texture_atlas_layout: (
+        tile_size: (32, 32),
+        columns: 4,
+        rows: 1,
+    ),
+    hotspots: (
+        default: (2, 1),
+        overrides: {
+            0: (2, 1),
+            1: (16, 16),
+            2: (16, 16),
+            3: (16, 16),
+        },
+    ),
+)
