@@ -1,0 +1,39 @@
+name: Dependabot auto-merge
+
+# PR checks here are spread over several workflows, some path-filtered, so this
+# job cannot simply `needs:` them. It waits until every other check on the PR
+# has finished and merges only if none failed. Merging with
+# DEPENDABOT_MERGE_TOKEN (a PAT stored as a Dependabot secret) both allows
+# Actions bumps, which edit .github/workflows, and lets the merge commit
+# trigger the Pages deploy, which a GITHUB_TOKEN push would not.
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot-merge:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Wait for the other checks, then merge
+        env:
+          GH_TOKEN: ${{ secrets.DEPENDABOT_MERGE_TOKEN || github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          set -Eeuo pipefail
+          # Give the other workflows time to register their checks.
+          sleep 60
+          while :; do
+            buckets=$(gh pr checks "$PR_URL" --json name,bucket \
+              --jq '[.[] | select(.name != "dependabot-merge") | .bucket] | unique | join(" ")')
+            echo "Other checks: ${buckets:-none}"
+            case " $buckets " in
+              *" fail "*|*" cancel "*) echo "::error::A check failed; not merging"; exit 1 ;;
+              *" pending "*) sleep 60 ;;
+              *) break ;;
+            esac
+          done
+          gh pr merge "$PR_URL" --squash
