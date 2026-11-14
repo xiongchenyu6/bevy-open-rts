@@ -210,6 +210,70 @@ pub(crate) fn can_repair_order_target(
         && structure.is_none_or(|_| structure_is_constructed(under_construction))
 }
 
+/// Order acknowledgement at the clicked spot: a bold ring that snaps shut on
+/// the destination with four ticks converging on it, colored by order type
+/// (green move, red attack, gold harvest). Drawn with the thick HUD gizmo
+/// lines; the hairline world gizmos were easy to miss mid-fight.
+pub(crate) fn draw_click_marker(
+    gizmos: &mut Gizmos,
+    hud: &mut Gizmos<HudGizmos>,
+    position: Vec3,
+    marker: &ClickMarker,
+) {
+    let life = (marker.ttl / CLICK_MARKER_TTL_SECONDS).clamp(0.0, 1.0);
+    let alpha = 0.35 + life * 0.6;
+    let color = match marker.kind {
+        ClickMarkerKind::Move => Color::srgba(0.4, 1.0, 0.5, alpha),
+        ClickMarkerKind::Attack => Color::srgba(1.0, 0.28, 0.22, alpha),
+        ClickMarkerKind::Harvest => Color::srgba(0.98, 0.78, 0.28, alpha),
+    };
+    let center = Vec3::new(position.x, position.y + 0.05, position.z);
+    let radius = marker.radius;
+    hud.circle(
+        Isometry3d::new(center, Quat::from_rotation_arc(Vec3::Z, Vec3::Y)),
+        radius,
+        color,
+    );
+    // A fixed pip marks the exact destination while the ring closes on it.
+    draw_ring(gizmos, position, 0.08, color);
+    for direction in [Vec3::X, Vec3::NEG_X, Vec3::Z, Vec3::NEG_Z] {
+        hud.line(
+            center + direction * (radius + 0.28),
+            center + direction * (radius + 0.06),
+            color,
+        );
+    }
+    match marker.kind {
+        ClickMarkerKind::Move => {}
+        ClickMarkerKind::Harvest => {
+            // A little planted flag, so "go mine here" reads as a deploy
+            // order rather than a plain move.
+            let top = position + Vec3::Y * 1.1;
+            gizmos.line(position, top, color);
+            gizmos.line(top, top + Vec3::new(0.5, -0.2, 0.0), color);
+            gizmos.line(
+                top + Vec3::new(0.5, -0.2, 0.0),
+                position + Vec3::Y * 0.7,
+                color,
+            );
+        }
+        ClickMarkerKind::Attack => {
+            // Crosshair X — "attack here".
+            let r = radius.max(0.18);
+            hud.line(
+                center + Vec3::new(-r, 0.0, -r),
+                center + Vec3::new(r, 0.0, r),
+                color,
+            );
+            hud.line(
+                center + Vec3::new(-r, 0.0, r),
+                center + Vec3::new(r, 0.0, -r),
+                color,
+            );
+        }
+    }
+}
+
 pub(crate) fn update_click_markers(
     mut commands: Commands,
     time: Res<Time>,

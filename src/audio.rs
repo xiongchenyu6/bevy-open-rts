@@ -47,8 +47,6 @@ pub(crate) enum SoundEffectKind {
     SupportPowerReady,
     SupportPowerFire,
     SuperweaponWarning,
-    WeaponHit,
-    Explosion,
 }
 
 #[derive(Resource)]
@@ -137,8 +135,6 @@ impl SoundEffectKind {
             Self::SupportPowerReady => "sfx/support_power_ready.wav",
             Self::SupportPowerFire => "sfx/support_power_fire.wav",
             Self::SuperweaponWarning => "sfx/superweapon_warning.wav",
-            Self::WeaponHit => "sfx/weapon_hit.wav",
-            Self::Explosion => "sfx/explosion_small.wav",
         }
     }
 
@@ -162,8 +158,6 @@ impl SoundEffectKind {
             Self::SupportPowerReady => 0.63,
             Self::SupportPowerFire => 0.7,
             Self::SuperweaponWarning => 0.82,
-            Self::WeaponHit => 0.45,
-            Self::Explosion => 0.63,
         }
     }
 }

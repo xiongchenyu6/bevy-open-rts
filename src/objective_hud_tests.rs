@@ -30,6 +30,7 @@ fn resolved_match_removes_only_transient_combat_flashes() {
                     end_scale: 2.0,
                     material: Handle::default(),
                     emissive: LinearRgba::WHITE,
+                    peak_alpha: COMBAT_FLASH_PEAK_ALPHA,
                 },
             ))
             .id();

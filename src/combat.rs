@@ -710,6 +710,13 @@ pub(crate) fn update_support_effects(
             strike.team,
         ));
         strike_entities.push(entity);
+        // The detonation itself; the feel layer turns this into the blast.
+        spawn_strike_impact(
+            &mut commands,
+            transform.translation,
+            strike.radius,
+            strike.team,
+        );
         let pulse_height = 0.85 + strike.impact_scale * 0.28;
         let pulse_ttl = 0.12 + strike.impact_scale * 0.06;
         commands.spawn((
@@ -2762,38 +2769,24 @@ pub(crate) fn combat(
                     MatchScopedEntity,
                 ));
             }
-            if relations.are_allied(target_team, player_team) && applied_damage > 0.0 {
-                record_sound_audio_feedback(&mut audio_feedback, SoundEffectKind::WeaponHit);
-                if push_under_attack_log(&mut battle_log, to, target_is_structure) {
-                    record_voice_audio_feedback(
-                        &mut audio_feedback,
-                        if target_is_structure {
-                            UnitVoiceEvent::BaseUnderAttack
-                        } else {
-                            UnitVoiceEvent::UnitUnderAttack
-                        },
-                    );
-                }
+            if relations.are_allied(target_team, player_team)
+                && applied_damage > 0.0
+                && push_under_attack_log(&mut battle_log, to, target_is_structure)
+            {
+                record_voice_audio_feedback(
+                    &mut audio_feedback,
+                    if target_is_structure {
+                        UnitVoiceEvent::BaseUnderAttack
+                    } else {
+                        UnitVoiceEvent::UnitUnderAttack
+                    },
+                );
             }
-            // Muzzle flash at the barrel so shots read as fired, not conjured.
-            // Anchored siege shots get the cannon treatment: a much larger
-            // blast, a dust kick at the mount, and a fatter, longer tracer.
+            // Muzzle flash at the barrel so shots read as fired, not conjured;
+            // its size, hue and extras follow the weapon class. Anchored siege
+            // shots also get a fatter, longer tracer.
             let siege_shot = impact_kind == ImpactBurstKind::Siege;
-            spawn_combat_flash(
-                &mut commands,
-                from + Vec3::Y * 0.6,
-                if siege_shot { 0.4 } else { 0.22 },
-                if siege_shot { 0.75 } else { 0.34 },
-                if siege_shot { 0.16 } else { 0.1 },
-                if siege_shot {
-                    LinearRgba::new(1.25, 0.95, 0.6, 1.0)
-                } else {
-                    LinearRgba::new(1.0, 0.9, 0.55, 1.0)
-                },
-            );
-            if siege_shot {
-                spawn_landing_dust(&mut commands, from);
-            }
+            spawn_muzzle_flash(&mut commands, from, to, impact_kind);
             // Tracer from shooter to target (longer-lived so it's noticeable)…
             commands.spawn((
                 ShotPulse {
@@ -2837,11 +2830,8 @@ pub(crate) fn combat(
                     match_state.enemy_units_destroyed += 1;
                 }
                 kill_credits.0.push(source);
-                if relations.are_allied(target_team, player_team) {
-                    record_sound_audio_feedback(&mut audio_feedback, SoundEffectKind::Explosion);
-                    if !target_is_structure {
-                        record_voice_audio_feedback(&mut audio_feedback, UnitVoiceEvent::UnitLost);
-                    }
+                if relations.are_allied(target_team, player_team) && !target_is_structure {
+                    record_voice_audio_feedback(&mut audio_feedback, UnitVoiceEvent::UnitLost);
                 }
                 spawn_destruction_effects(
                     &mut commands,

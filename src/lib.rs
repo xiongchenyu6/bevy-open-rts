@@ -62,6 +62,8 @@ mod cutscene;
 pub(crate) use cutscene::*;
 mod combat_vfx;
 pub(crate) use combat_vfx::*;
+mod combat_feel;
+pub(crate) use combat_feel::*;
 mod factions;
 pub(crate) use factions::*;
 mod save;
@@ -2357,6 +2359,9 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<TerrainHeightField>()
         .init_resource::<TeamColorMaterials>()
         .init_resource::<CombatFlashMesh>()
+        .init_resource::<ShockwaveRingMesh>()
+        .init_resource::<CameraShake>()
+        .init_resource::<CombatAudioMixer>()
         .init_resource::<PlacementGhost>()
         .init_resource::<WeatherState>()
         .init_resource::<SupportFireClickGuard>()
@@ -3457,6 +3462,25 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .run_if(match_in_progress),
         ),
     )
+    // Presentation-only combat feel; reads effect entities, never sim state.
+    .add_systems(
+        Update,
+        (
+            (
+                flash_damaged_units,
+                emit_combat_feel,
+                update_secondary_explosions,
+                update_shockwave_rings,
+                play_combat_audio,
+            )
+                .chain()
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
+            apply_camera_shake
+                .after(RtsCameraSystemSet)
+                .run_if(match_in_progress),
+        ),
+    )
     .add_systems(
         Update,
         update_objective_tracker_hud
@@ -3471,6 +3495,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             update_match_end_charts,
             update_damage_numbers,
             clear_battle_hud_on_match_end,
+            clear_combat_feel_on_match_end,
         )
             .chain()
             .run_if(in_state(AppScreen::InMatch)),
@@ -6856,34 +6881,7 @@ pub(crate) fn draw_world_overlays(
         );
     }
     for (transform, marker) in &click_markers {
-        match marker.kind {
-            ClickMarkerKind::Move => draw_ring(
-                &mut gizmos,
-                transform.translation,
-                marker.radius,
-                Color::srgba(1.0, 1.0, 1.0, 0.55),
-            ),
-            ClickMarkerKind::Harvest => {
-                // gold ring + a little planted flag, so "go mine here" reads as a
-                // deploy order rather than a plain move.
-                let gold = Color::srgba(0.98, 0.78, 0.28, 0.9);
-                draw_ring(&mut gizmos, transform.translation, marker.radius, gold);
-                let base = transform.translation;
-                let top = base + Vec3::Y * 1.1;
-                gizmos.line(base, top, gold);
-                gizmos.line(top, top + Vec3::new(0.5, -0.2, 0.0), gold);
-                gizmos.line(top + Vec3::new(0.5, -0.2, 0.0), base + Vec3::Y * 0.7, gold);
-            }
-            ClickMarkerKind::Attack => {
-                // Red ring + crosshair X — "attack here".
-                let red = Color::srgba(1.0, 0.28, 0.22, 0.95);
-                draw_ring(&mut gizmos, transform.translation, marker.radius, red);
-                let c = Vec3::new(transform.translation.x, 0.06, transform.translation.z);
-                let r = marker.radius;
-                gizmos.line(c + Vec3::new(-r, 0.0, -r), c + Vec3::new(r, 0.0, r), red);
-                gizmos.line(c + Vec3::new(-r, 0.0, r), c + Vec3::new(r, 0.0, -r), red);
-            }
-        }
+        draw_click_marker(&mut gizmos, &mut hud, transform.translation, marker);
     }
     for (transform, selectable, supply_crate, visibility) in &supply_crates {
         if !visibility.visible {
@@ -7400,6 +7398,9 @@ mod match_tests;
 mod menu_lobby_tests;
 #[cfg(test)]
 mod objective_hud_tests;
+
+#[cfg(test)]
+mod combat_feel_tests;
 
 #[cfg(test)]
 mod emp_task_tests;

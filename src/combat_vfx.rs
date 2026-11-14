@@ -123,7 +123,11 @@ pub(crate) struct CombatFlash {
     pub(crate) end_scale: f32,
     pub(crate) material: Handle<StandardMaterial>,
     pub(crate) emissive: LinearRgba,
+    pub(crate) peak_alpha: f32,
 }
+
+/// Opacity of a regular flash at the instant it spawns.
+pub(crate) const COMBAT_FLASH_PEAK_ALPHA: f32 = 0.85;
 
 /// Spawns an expanding emissive flash at `position`. No-op in headless logic
 /// tests (no render-asset stores).
@@ -134,6 +138,28 @@ pub(crate) fn spawn_combat_flash(
     end_scale: f32,
     lifetime: f32,
     color: LinearRgba,
+) {
+    spawn_combat_flash_with_alpha(
+        commands,
+        position,
+        start_scale,
+        end_scale,
+        lifetime,
+        color,
+        COMBAT_FLASH_PEAK_ALPHA,
+    );
+}
+
+/// [`spawn_combat_flash`] with an explicit starting opacity, for translucent
+/// washes (hit flashes) that must not hide the model underneath.
+pub(crate) fn spawn_combat_flash_with_alpha(
+    commands: &mut Commands,
+    position: Vec3,
+    start_scale: f32,
+    end_scale: f32,
+    lifetime: f32,
+    color: LinearRgba,
+    peak_alpha: f32,
 ) {
     commands.queue(move |world: &mut World| {
         if !world.contains_resource::<Assets<Mesh>>()
@@ -162,7 +188,7 @@ pub(crate) fn spawn_combat_flash(
         let material = world
             .resource_mut::<Assets<StandardMaterial>>()
             .add(StandardMaterial {
-                base_color: Color::srgba(color.red, color.green, color.blue, 0.85),
+                base_color: Color::srgba(color.red, color.green, color.blue, peak_alpha),
                 emissive: color,
                 alpha_mode: AlphaMode::Blend,
                 unlit: true,
@@ -182,6 +208,7 @@ pub(crate) fn spawn_combat_flash(
                 end_scale,
                 material,
                 emissive: color,
+                peak_alpha,
             },
             MatchScopedEntity,
         ));
@@ -211,7 +238,7 @@ pub(crate) fn update_combat_flashes(
         transform.scale = Vec3::splat(scale);
         if let Some(mut material) = materials.get_mut(&flash.material) {
             material.emissive = flash.emissive * life;
-            material.base_color.set_alpha(life * 0.85);
+            material.base_color.set_alpha(life * flash.peak_alpha);
         }
     }
 }
@@ -815,7 +842,7 @@ pub(crate) fn draw_veterancy_promotion_effect(
 // Physical debris, sparks and scorch marks
 // ---------------------------------------------------------------------------
 
-fn vfx_hash01(seed: u64, salt: u32) -> f32 {
+pub(crate) fn vfx_hash01(seed: u64, salt: u32) -> f32 {
     let mut h = seed
         .wrapping_mul(0x9E37_79B9_7F4A_7C15)
         .wrapping_add(salt as u64)
