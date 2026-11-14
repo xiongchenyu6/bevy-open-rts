@@ -1928,6 +1928,7 @@ pub fn capture_match_phase_label(app: &mut App) -> &'static str {
 /// run id, signaling URL and report path come from the same
 /// `OPEN_BEVY_ONLINE_VERIFY_*` environment the windowed game reads, so two of
 /// these processes play a real host/client match over the real transport.
+#[cfg(not(target_arch = "wasm32"))]
 pub fn capture_run_online_verification_peer(max_seconds: u32) -> Result<bool, String> {
     let mut app = build_game_app(GameAppMode::Headless);
     let frame = std::time::Duration::from_secs_f32(1.0 / 60.0);
