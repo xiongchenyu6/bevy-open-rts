@@ -1,4 +1,9 @@
 //! Native-only original game-model portrait staging.
+// Native-only tool: the capture/export APIs it calls are not compiled for wasm32,
+// so the whole binary is configured out there to keep `cargo check --all-targets` clean.
+#![cfg_attr(target_arch = "wasm32", no_main)]
+#![cfg(not(target_arch = "wasm32"))]
+
 fn main() {
     let mut args = std::env::args().skip(1);
     let first = args.next();

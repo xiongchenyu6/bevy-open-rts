@@ -22,6 +22,11 @@
 //!   capture menu-return [path]           setup -> back -> command menu screenshot
 //!   capture factions <dir>               faction base/build smoke screenshots
 //!   capture model-harness <dir> [per-page] [page]
+// Native-only tool: the capture/export APIs it calls are not compiled for wasm32,
+// so the whole binary is configured out there to keep `cargo check --all-targets` clean.
+#![cfg_attr(target_arch = "wasm32", no_main)]
+#![cfg(not(target_arch = "wasm32"))]
+
 
 use std::env;
 use std::path::{Path, PathBuf};
