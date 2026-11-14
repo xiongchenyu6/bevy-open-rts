@@ -996,6 +996,23 @@ pub fn capture_stage_deployed_siege(app: &mut App) -> Option<Vec3> {
     Some(target_pos)
 }
 
+/// Queues an orbital strike on `position` exactly as firing the support power
+/// does: a pending strike that the real support-power system resolves.
+pub fn capture_stage_support_strike(app: &mut App, position: Vec3) {
+    let def = SupportPowerKind::OrbitalStrike.definition();
+    app.world_mut().spawn((
+        Transform::from_translation(position + Vec3::Y * 0.03),
+        PendingOrbitalStrike {
+            remaining: 0.2,
+            radius: def.radius,
+            damage: def.damage,
+            impact_scale: def.damage_scale,
+            team: Team::Player(0),
+        },
+        MatchScopedEntity,
+    ));
+}
+
 /// Capture-only durable siege target. Gameplay weapon, turret, projectile and
 /// impact systems remain unchanged; extra health keeps the proof clip active.
 #[derive(Component)]

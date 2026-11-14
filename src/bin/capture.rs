@@ -97,9 +97,10 @@ use bevy_open_rts::{
     capture_show_skirmish_setup_menu, capture_show_skirmish_setup_with_dropdown,
     capture_spawn_construction_showcase, capture_spawn_model_harness_page,
     capture_stage_art_combat, capture_stage_deployed_siege, capture_stage_player_radar,
-    capture_stage_worker_collecting, capture_start_mission, capture_startup_ready,
-    capture_tutorial_stage, capture_world_to_screen, capture_worst_model_alignment_offset,
-    capture_zoom_camera_closest, start_shared_match_scene_with_current_setup,
+    capture_stage_support_strike, capture_stage_worker_collecting, capture_start_mission,
+    capture_startup_ready, capture_tutorial_stage, capture_world_to_screen,
+    capture_worst_model_alignment_offset, capture_zoom_camera_closest,
+    start_shared_match_scene_with_current_setup,
 };
 
 #[path = "capture/campaign_bot.rs"]
@@ -494,6 +495,13 @@ fn main() {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("screenshots/deploy"));
             render_deployed_siege(&dir)
+        }
+        Some("combat-feel") => {
+            let dir = args
+                .next()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("screenshots/combat-feel"));
+            render_combat_feel(&dir)
         }
         Some("fog-edge") => {
             let dir = args
@@ -2249,6 +2257,55 @@ fn render_deployed_siege(dir: &Path) -> Result<(), String> {
             dir.join(format!("0{index}_siege_fire.png")),
         );
     }
+    Ok(())
+}
+
+/// Records `count` consecutive 1/30 s ticks as `<prefix>_NNN.png`, so effects
+/// that live for a handful of frames are actually caught.
+fn record_ticks(app: &mut App, handle: &Handle<Image>, dir: &Path, prefix: &str, count: usize) {
+    for index in 0..count {
+        app.update();
+        app.world_mut()
+            .spawn(Screenshot::image(handle.clone()))
+            .observe(save_to_disk(dir.join(format!("{prefix}_{index:03}.png"))));
+    }
+}
+
+/// Combat-feel proof on the real match scene: deployed siege fire, a
+/// support-power strike on the besieged structure, then a move order.
+fn render_combat_feel(dir: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    let mut app = start_match_app()?;
+    capture_dismiss_match_briefing(&mut app);
+    let handle = capture_handle(&app);
+    let Some(focus) = capture_stage_deployed_siege(&mut app) else {
+        return Err("no enemy structure to besiege".into());
+    };
+    for _ in 0..40 {
+        app.update();
+    }
+    capture_focus_camera_on(&mut app, focus + Vec3::new(-3.0, 0.0, 0.0));
+    for _ in 0..5 {
+        app.update();
+    }
+    record_ticks(&mut app, &handle, dir, "siege", 60);
+
+    capture_stage_support_strike(&mut app, focus + Vec3::new(-2.0, 0.0, 1.0));
+    record_ticks(&mut app, &handle, dir, "strike", 45);
+
+    select_all_player_army(&mut app);
+    let order_point = capture_world_to_screen(&mut app, focus + Vec3::new(-5.0, 0.0, 3.0))
+        .ok_or("order point is off screen")?;
+    capture_set_cursor(&mut app, order_point);
+    capture_mouse_button(&mut app, MouseButton::Right, true);
+    app.update();
+    capture_mouse_button(&mut app, MouseButton::Right, false);
+    record_ticks(&mut app, &handle, dir, "order", 10);
+
+    for _ in 0..FLUSH_TICKS {
+        app.update();
+    }
+    println!("[capture] wrote combat feel frames to {}", dir.display());
     Ok(())
 }
 
