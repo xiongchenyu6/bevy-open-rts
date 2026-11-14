@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { chromium } from "playwright-core";
+import { captureVisibleFrame } from "./visible_frame.mjs";
 
 const gameUrl = process.env.OPEN_BEVY_GAME_URL
   ?? "https://xiongchenyu6.github.io/bevy-open-rts/";
@@ -88,14 +89,15 @@ mkdirSync(outputDir, { recursive: true });
 
 const browser = await chromium.launch({
   executablePath,
-  headless: true,
+  headless: process.env.OPEN_BEVY_HEADED !== "1",
   args: softwareWebGpu
     ? [
         "--enable-unsafe-webgpu",
         "--enable-unsafe-swiftshader",
         "--ignore-gpu-blocklist",
         "--enable-features=Vulkan,UseSkiaRenderer,WebGPU",
-        "--use-angle=swiftshader",
+        "--use-angle=vulkan",
+        "--ozone-platform=x11",
         "--use-vulkan=swiftshader",
         "--disable-vulkan-surface",
         "--disable-gpu-sandbox",
@@ -193,7 +195,7 @@ try {
     };
   }, { serviceUrl: signalingUrl });
 
-  await page.screenshot({ path: `${outputDir}/main-menu.png` });
+  const renderedFrame = await captureVisibleFrame(page, `${outputDir}/main-menu.png`);
 
   const fatalDiagnostics = diagnostics.filter((message) =>
     /pageerror|requestfailed|boot failed|panicked at|RuntimeError/i.test(message),
@@ -217,6 +219,7 @@ try {
     executablePath,
     softwareWebGpu,
     bootAttempts,
+    renderedFrame,
     state,
     signaling,
     diagnostics,

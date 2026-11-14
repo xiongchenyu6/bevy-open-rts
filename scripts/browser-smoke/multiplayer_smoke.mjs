@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { chromium } from "playwright-core";
+import { captureVisibleFrame } from "./visible_frame.mjs";
 
 const gameUrl = process.env.OPEN_BEVY_GAME_URL
   ?? "https://xiongchenyu6.github.io/bevy-open-rts/";
@@ -70,7 +71,8 @@ function browserArgs() {
       "--enable-unsafe-swiftshader",
       "--ignore-gpu-blocklist",
       "--enable-features=Vulkan,UseSkiaRenderer,WebGPU",
-      "--use-angle=swiftshader",
+      "--use-angle=vulkan",
+      "--ozone-platform=x11",
       "--use-vulkan=swiftshader",
       "--disable-vulkan-surface",
       "--disable-gpu-sandbox",
@@ -244,32 +246,18 @@ async function waitForTerminalReport(page, role) {
   return report;
 }
 
-async function capturePage(context, page, path) {
-  const session = await context.newCDPSession(page);
-  try {
-    const { data } = await session.send("Page.captureScreenshot", {
-      format: "png",
-      fromSurface: true,
-      captureBeyondViewport: false,
-    });
-    writeFileSync(path, Buffer.from(data, "base64"));
-    return path;
-  } finally {
-    await session.detach();
-  }
-}
 
 mkdirSync(outputDir, { recursive: true });
 
 const browserOptions = {
   executablePath,
-  headless: true,
+  headless: process.env.OPEN_BEVY_HEADED !== "1",
   args: browserArgs(),
 };
 const browsers = await Promise.all(roles.map(() => chromium.launch(browserOptions)));
 
 try {
-  // Separate processes prevent headless Chrome from treating either real-time
+  // Separate processes prevent Chrome from treating either real-time
   // simulation as a background tab and reducing requestAnimationFrame to a
   // handful of ticks per minute. A single role is used by the native/browser
   // compatibility harness while the other peer runs as a desktop binary.
@@ -336,19 +324,18 @@ try {
     && relayRoutesPassed
     && fatalDiagnostics.length === 0;
 
-  // Publish the functional result before optional visual evidence so a slow
-  // software renderer cannot hide the authoritative client reports.
+  // Keep functional reports even if the required visual gate subsequently fails.
   console.log(JSON.stringify({ phase: "terminal-reports", passed, reports }, null, 2));
 
   const screenshotResults = await Promise.allSettled(clients.map((client) =>
-    capturePage(client.context, client.page, `${outputDir}/${client.role}-final.png`)
+    captureVisibleFrame(client.page, `${outputDir}/${client.role}-final.png`)
   ));
   const screenshotErrors = screenshotResults
     .filter((result) => result.status === "rejected")
     .map((result) => String(result.reason));
 
   const result = {
-    passed,
+    passed: passed && screenshotErrors.length === 0,
     runId,
     roles,
     gameUrl,
@@ -366,12 +353,13 @@ try {
     player: reports.player,
     diagnostics,
     screenshotErrors,
+    renderedFrames: screenshotResults.filter((r) => r.status === "fulfilled").map((r) => r.value),
     screenshots: roles.map((role) => `${outputDir}/${role}-final.png`),
   };
   writeFileSync(reportPath, `${JSON.stringify(result, null, 2)}\n`);
   console.log(JSON.stringify(result, null, 2));
 
-  if (!passed) {
+  if (!result.passed) {
     process.exitCode = 1;
   }
 } finally {
