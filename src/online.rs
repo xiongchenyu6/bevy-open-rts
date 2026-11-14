@@ -34,7 +34,7 @@ mod host_identity;
 mod lobby_ui;
 mod observer;
 
-const RTS_ONLINE_PROTOCOL: u16 = 4;
+const RTS_ONLINE_PROTOCOL: u16 = 5;
 const ONLINE_DEFAULT_SERVICE_URL: &str = "https://open-bevy-signaling.xiongchenyu6.workers.dev";
 const ONLINE_MAX_STATUS_BYTES: usize = 180;
 const ONLINE_PLAYER_RECONNECT_GRACE_SECONDS: f32 = 30.0;
@@ -860,6 +860,15 @@ enum OnlineTransientEventKind {
         to: [f32; 3],
         remaining: f32,
         team: OnlineEntityTeam,
+        /// Weapon class and full tracer lifetime for real weapon shots, so
+        /// clients can stage the muzzle flash and a class-distinct tracer.
+        weapon: Option<(OnlineImpactBurstKind, f32)>,
+    },
+    UnitDestruction {
+        position: [f32; 3],
+        remaining: f32,
+        radius: f32,
+        team: OnlineEntityTeam,
     },
     ImpactBurst {
         position: [f32; 3],
@@ -1092,7 +1101,24 @@ struct OnlineSnapshotBroadcastParams<'w, 's> {
     build_queue: Res<'w, BuildQueue>,
     support_cooldowns: Res<'w, SupportCooldowns>,
     match_state: Res<'w, MatchState>,
-    shot_pulses: Query<'w, 's, (&'static OnlineTransientEventId, &'static ShotPulse)>,
+    shot_pulses: Query<
+        'w,
+        's,
+        (
+            &'static OnlineTransientEventId,
+            &'static ShotPulse,
+            Option<&'static ShotWeaponClass>,
+        ),
+    >,
+    unit_deaths: Query<
+        'w,
+        's,
+        (
+            &'static OnlineTransientEventId,
+            &'static Transform,
+            &'static UnitDeathVfx,
+        ),
+    >,
     impact_bursts: Query<
         'w,
         's,
@@ -1514,6 +1540,7 @@ enum OnlineAsyncResult {
     },
 }
 
+mod combat_verification;
 mod control_verification;
 mod recovery;
 
@@ -1578,6 +1605,8 @@ struct OnlineVerificationConfig {
     run_id: String,
     service_url: String,
     human_ai_control: bool,
+    /// Stage and require weapon fire, a strike, deaths and a collapse.
+    combat: bool,
     #[cfg(not(target_arch = "wasm32"))]
     status_path: Option<String>,
 }
@@ -1597,6 +1626,7 @@ struct OnlineVerificationHarness {
     error: Option<String>,
     last_report: String,
     control: control_verification::ControlState,
+    combat: combat_verification::CombatState,
 }
 
 impl Default for OnlineVerificationHarness {
@@ -1620,6 +1650,7 @@ impl Default for OnlineVerificationHarness {
             error: None,
             last_report: String::new(),
             control: default(),
+            combat: default(),
         }
     }
 }
@@ -1640,6 +1671,15 @@ impl OnlineVerificationHarness {
         self.result = Some(result.to_string());
         self.stage = OnlineVerificationStage::Passed;
     }
+}
+
+/// Outcome of the scripted online verification harness for headless peers:
+/// `None` while it is still running (or disabled), `Some(passed)` once final.
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) fn online_verification_outcome(world: &World) -> Option<bool> {
+    let harness = world.get_resource::<OnlineVerificationHarness>()?;
+    (harness.stage.is_terminal() && !harness.last_report.is_empty())
+        .then_some(harness.stage == OnlineVerificationStage::Passed)
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -1663,6 +1703,7 @@ fn online_verification_config() -> Option<OnlineVerificationConfig> {
             .unwrap_or_else(|| ONLINE_DEFAULT_SERVICE_URL.to_string()),
         human_ai_control: std::env::var("OPEN_BEVY_ONLINE_VERIFY_MODE")
             .is_ok_and(|mode| mode == "human-ai"),
+        combat: std::env::var("OPEN_BEVY_ONLINE_VERIFY_MODE").is_ok_and(|mode| mode == "combat"),
         status_path: std::env::var("OPEN_BEVY_ONLINE_VERIFY_STATUS")
             .ok()
             .filter(|path| !path.trim().is_empty()),
@@ -1697,6 +1738,9 @@ fn online_verification_config() -> Option<OnlineVerificationConfig> {
         human_ai_control: params
             .get("online_mode")
             .is_some_and(|mode| mode == "human-ai"),
+        combat: params
+            .get("online_mode")
+            .is_some_and(|mode| mode == "combat"),
     })
 }
 
@@ -1855,6 +1899,15 @@ pub(crate) fn add_online_scene(app: &mut App) -> &mut App {
                 .after(poll_online_transport)
                 .after(apply_pending_online_snapshot)
                 .after(apply_online_player_commands),
+        )
+        .add_systems(
+            Update,
+            (
+                combat_verification::stage_host_combat,
+                combat_verification::tally_presentation,
+            )
+                .after(run_online_verification_harness)
+                .run_if(in_state(AppScreen::InMatch)),
         );
     app
 }
@@ -3063,7 +3116,13 @@ fn drive_online_verification_match(
                 params.harness.stage = OnlineVerificationStage::MatchEntered;
             }
 
-            if params.harness.command_observed {
+            let combat_pending = params
+                .harness
+                .config
+                .as_ref()
+                .is_some_and(|config| config.combat)
+                && !params.harness.combat.host_done;
+            if params.harness.command_observed && !combat_pending {
                 if params.harness.stage != OnlineVerificationStage::EndingMatch {
                     let mut anchors_destroyed = 0;
                     for (team, structure, mut health) in &mut params.structures {
@@ -3103,6 +3162,22 @@ fn drive_online_verification_match(
         (OnlineVerificationRole::Player, MatchPhase::HumanDefeat)
             if params.harness.command_observed && params.replication.last_applied_tick > 0 =>
         {
+            let missing = if params
+                .harness
+                .config
+                .as_ref()
+                .is_some_and(|config| config.combat)
+            {
+                params.harness.combat.missing()
+            } else {
+                Vec::new()
+            };
+            if !missing.is_empty() {
+                return Err(format!(
+                    "client combat evidence missing: {}",
+                    missing.join(", ")
+                ));
+            }
             params.harness.pass("defeat");
         }
         (OnlineVerificationRole::Host, MatchPhase::HumanDefeat) => {
@@ -3221,6 +3296,7 @@ fn publish_online_verification_status(params: &mut OnlineVerificationParams) {
         "game_clock": params.match_state.start_time_sec,
         "human_ai_control": config.human_ai_control,
         "control": config.human_ai_control.then(|| control_verification::report(&params.harness.control)),
+        "combat": config.combat.then(|| combat_verification::report(&params.harness)),
     });
     let Ok(report) = serde_json::to_string(&report) else {
         return;
@@ -3559,6 +3635,7 @@ fn poll_online_transport(
                     && let Some(snapshot) = replication.pending_snapshot.as_ref()
                 {
                     control_verification::record_snapshot(&mut verification, snapshot);
+                    combat_verification::record_snapshot(&mut verification, snapshot);
                     observer.record(snapshot);
                 }
             }
@@ -4743,6 +4820,7 @@ fn assign_online_transient_event_ids(
     session: Res<OnlineSession>,
     mut replication: ResMut<OnlineMatchReplication>,
     shot_pulses: Query<Entity, (Added<ShotPulse>, Without<OnlineTransientEventId>)>,
+    unit_deaths: Query<Entity, (Added<UnitDeathVfx>, Without<OnlineTransientEventId>)>,
     impact_bursts: Query<Entity, (Added<ImpactBurst>, Without<OnlineTransientEventId>)>,
     support_warnings: Query<Entity, (Added<SupportWarning>, Without<OnlineTransientEventId>)>,
     structure_destruction_vfx: Query<
@@ -4766,6 +4844,7 @@ fn assign_online_transient_event_ids(
 
     let mut added = HashSet::new();
     added.extend(shot_pulses.iter());
+    added.extend(unit_deaths.iter());
     added.extend(impact_bursts.iter());
     added.extend(support_warnings.iter());
     added.extend(structure_destruction_vfx.iter());
@@ -4931,6 +5010,7 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
         support_cooldowns,
         match_state,
         shot_pulses,
+        unit_deaths,
         impact_bursts,
         support_warnings,
         structure_destruction_vfx,
@@ -5026,14 +5106,32 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
         })
         .collect();
     let mut transient_events = Vec::new();
-    transient_events.extend(shot_pulses.iter().map(|(id, pulse)| OnlineTransientEvent {
-        id: id.0,
-        kind: OnlineTransientEventKind::ShotPulse {
-            from: pulse.from.to_array(),
-            to: pulse.to.to_array(),
-            remaining: pulse.ttl,
-            team: OnlineEntityTeam::from_game(pulse.team),
-        },
+    transient_events.extend(
+        shot_pulses
+            .iter()
+            .map(|(id, pulse, weapon)| OnlineTransientEvent {
+                id: id.0,
+                kind: OnlineTransientEventKind::ShotPulse {
+                    from: pulse.from.to_array(),
+                    to: pulse.to.to_array(),
+                    remaining: pulse.ttl,
+                    team: OnlineEntityTeam::from_game(pulse.team),
+                    weapon: weapon.map(|weapon| {
+                        (OnlineImpactBurstKind::from_game(weapon.kind), weapon.total)
+                    }),
+                },
+            }),
+    );
+    transient_events.extend(unit_deaths.iter().map(|(id, transform, death)| {
+        OnlineTransientEvent {
+            id: id.0,
+            kind: OnlineTransientEventKind::UnitDestruction {
+                position: transform.translation.to_array(),
+                remaining: death.remaining,
+                radius: death.radius,
+                team: OnlineEntityTeam::from_game(death.team),
+            },
+        }
     }));
     transient_events.extend(impact_bursts.iter().map(|(id, transform, burst)| {
         OnlineTransientEvent {
@@ -5153,6 +5251,7 @@ fn broadcast_online_world_snapshot(params: OnlineSnapshotBroadcastParams) {
     match socket.broadcast_snapshot(&payload) {
         Ok(()) => {
             control_verification::record_snapshot(&mut verification, &snapshot);
+            combat_verification::record_snapshot(&mut verification, &snapshot);
             observer.record(&snapshot);
             if let Some(baseline) = new_baseline {
                 replication.send_baseline = Some(baseline);
@@ -5184,16 +5283,50 @@ fn apply_online_transient_events(
                 to,
                 remaining,
                 team,
+                weapon,
             } => {
                 let from = Vec3::from_array(from);
                 let to = Vec3::from_array(to);
                 if remaining > 0.0 && remaining.is_finite() && from.is_finite() && to.is_finite() {
-                    commands.spawn((
+                    let mut pulse = commands.spawn((
                         ShotPulse {
                             from,
                             to,
                             ttl: remaining,
                             team: team.to_game(),
+                        },
+                        MatchScopedEntity,
+                    ));
+                    if let Some((kind, total)) = weapon
+                        && total.is_finite()
+                    {
+                        pulse.insert(ShotWeaponClass {
+                            kind: kind.to_game(),
+                            total: total.max(remaining),
+                        });
+                    }
+                }
+            }
+            OnlineTransientEventKind::UnitDestruction {
+                position,
+                remaining,
+                radius,
+                team,
+            } => {
+                let position = Vec3::from_array(position);
+                if remaining > 0.0
+                    && remaining.is_finite()
+                    && radius.is_finite()
+                    && position.is_finite()
+                {
+                    commands.spawn((
+                        Name::new("Replicated unit death"),
+                        Transform::from_translation(position),
+                        UnitDeathVfx {
+                            remaining,
+                            radius: radius.clamp(0.05, 8.0),
+                            team: team.to_game(),
+                            replica: true,
                         },
                         MatchScopedEntity,
                     ));
@@ -6513,9 +6646,69 @@ mod tests {
                     to: [4.0, 0.5, 5.0],
                     remaining: 0.4,
                     team: OnlineEntityTeam::Player(0),
+                    weapon: Some((OnlineImpactBurstKind::Siege, 0.5)),
                 },
             }],
         );
+    }
+
+    #[test]
+    fn client_restages_weapon_class_and_unit_death_from_transient_events() {
+        fn replay(mut commands: Commands, mut replication: ResMut<OnlineMatchReplication>) {
+            let events = vec![
+                OnlineTransientEvent {
+                    id: 7,
+                    kind: OnlineTransientEventKind::ShotPulse {
+                        from: [1.0, 0.6, 2.0],
+                        to: [4.0, 0.6, 5.0],
+                        remaining: 0.1,
+                        team: OnlineEntityTeam::Player(1),
+                        weapon: Some((OnlineImpactBurstKind::Electric, 0.13)),
+                    },
+                },
+                OnlineTransientEvent {
+                    id: 8,
+                    kind: OnlineTransientEventKind::UnitDestruction {
+                        position: [3.0, 0.0, 3.0],
+                        remaining: 0.5,
+                        radius: 0.7,
+                        team: OnlineEntityTeam::Player(1),
+                    },
+                },
+            ];
+            // The wire format must carry both additions unchanged.
+            let bytes = postcard::to_allocvec(&events).unwrap();
+            let decoded: Vec<OnlineTransientEvent> = postcard::from_bytes(&bytes).unwrap();
+            assert_eq!(decoded, events);
+            apply_online_transient_events(&mut commands, &mut replication, decoded);
+        }
+        let mut app = App::new();
+        app.init_resource::<OnlineMatchReplication>()
+            .add_systems(Update, replay);
+        // Replayed twice: host event ids must deduplicate the repeat.
+        app.update();
+        app.update();
+
+        let weapons: Vec<_> = app
+            .world_mut()
+            .query::<(&ShotPulse, &ShotWeaponClass)>()
+            .iter(app.world())
+            .map(|(_, weapon)| *weapon)
+            .collect();
+        assert_eq!(
+            weapons,
+            vec![ShotWeaponClass {
+                kind: ImpactBurstKind::Electric,
+                total: 0.13
+            }]
+        );
+        let deaths: Vec<_> = app
+            .world_mut()
+            .query::<(&Transform, &UnitDeathVfx)>()
+            .iter(app.world())
+            .map(|(transform, death)| (transform.translation, death.replica, death.radius))
+            .collect();
+        assert_eq!(deaths, vec![(Vec3::new(3.0, 0.0, 3.0), true, 0.7)]);
     }
 
     #[test]

@@ -1919,6 +1919,32 @@ pub fn capture_match_phase_label(app: &mut App) -> &'static str {
     match_phase_label(app.world().resource::<MatchState>().phase)
 }
 
+/// Runs one scripted online verification peer without a window. The role,
+/// run id, signaling URL and report path come from the same
+/// `OPEN_BEVY_ONLINE_VERIFY_*` environment the windowed game reads, so two of
+/// these processes play a real host/client match over the real transport.
+pub fn capture_run_online_verification_peer(max_seconds: u32) -> Result<bool, String> {
+    let mut app = build_game_app(GameAppMode::Headless);
+    let frame = std::time::Duration::from_secs_f32(1.0 / 60.0);
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(max_seconds.into());
+    while std::time::Instant::now() < deadline {
+        let started = std::time::Instant::now();
+        app.update();
+        if let Some(passed) = online_verification_outcome(app.world()) {
+            // Keep serving snapshots briefly so the other peer can finish too.
+            for _ in 0..180 {
+                app.update();
+                std::thread::sleep(frame);
+            }
+            return Ok(passed);
+        }
+        std::thread::sleep(frame.saturating_sub(started.elapsed()));
+    }
+    Err(format!(
+        "online verification peer did not finish within {max_seconds}s"
+    ))
+}
+
 /// Runs the default AI-vs-AI skirmish using the headless simulation path and
 /// returns the first non-running match phase. Used by capture/CI to prove that
 /// the economy -> production -> combat loop can finish a match.

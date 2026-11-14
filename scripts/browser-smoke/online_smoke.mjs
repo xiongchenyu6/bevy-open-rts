@@ -151,7 +151,7 @@ try {
         game_id: "bevy-open-rts",
         build_id: "browser-smoke",
         session_protocol: 1,
-        game_protocol: 4,
+        game_protocol: 5,
         max_peers: 2,
         visibility: "unlisted",
         metadata: { purpose: "browser-smoke" },

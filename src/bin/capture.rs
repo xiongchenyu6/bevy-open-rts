@@ -15,6 +15,7 @@
 //!   capture harvest <dir>                real input smoke: Worker right-clicks ore
 //!   capture assault <dir> [max-seconds]  real input smoke: select army/attack-move/win
 //!   capture match [max-seconds]          headless AI-vs-AI match must resolve
+//!   capture online-peer [max-seconds]    headless online verification peer (OPEN_BEVY_ONLINE_VERIFY_* env)
 //!   capture ai-duel <a> <b> [max-seconds] AI difficulty duel (beginner|easy|normal|hard)
 //!   capture arena <unitA> <unitB> [count] [max-seconds]  N-vs-N unit balance bout
 //!   capture menu [path]                  command menu screenshot
@@ -26,7 +27,6 @@
 // so the whole binary is configured out there to keep `cargo check --all-targets` clean.
 #![cfg_attr(target_arch = "wasm32", no_main)]
 #![cfg(not(target_arch = "wasm32"))]
-
 
 use std::env;
 use std::path::{Path, PathBuf};
@@ -427,6 +427,14 @@ fn main() {
                 .and_then(|s| s.parse().ok())
                 .unwrap_or(ASSAULT_DEFAULT_MAX_SECONDS);
             render_assault(&dir, max_seconds)
+        }
+        Some("online-peer") => {
+            let max_seconds = args.next().and_then(|s| s.parse().ok()).unwrap_or(300);
+            match bevy_open_rts::capture_run_online_verification_peer(max_seconds) {
+                Ok(true) => Ok(()),
+                Ok(false) => Err("online verification peer reported failure".into()),
+                Err(error) => Err(error),
+            }
         }
         Some("match") => {
             let max_seconds = args.next().and_then(|s| s.parse().ok()).unwrap_or(240);

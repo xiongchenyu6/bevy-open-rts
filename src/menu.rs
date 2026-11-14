@@ -76,6 +76,7 @@ pub(crate) enum OptionsMenuAction {
     CameraPanSpeedDown,
     ToggleEdgePan,
     ToggleDamageNumbers,
+    ToggleScreenShake,
     Back,
 }
 
@@ -102,6 +103,14 @@ pub(crate) struct MenuOptionsState {
     pub(crate) camera_edge_pan: bool,
     /// Show floating damage numbers over hit units/structures.
     pub(crate) damage_numbers: bool,
+    /// Shake the camera for nearby siege hits, strikes and collapsing buildings.
+    /// Defaulted on load so preferences saved before the toggle existed stay valid.
+    #[serde(default = "screen_shake_default")]
+    pub(crate) screen_shake: bool,
+}
+
+fn screen_shake_default() -> bool {
+    true
 }
 
 impl Default for MenuOptionsState {
@@ -118,6 +127,7 @@ impl Default for MenuOptionsState {
             camera_pan_speed: CAMERA_RTS_PAN_SPEED,
             camera_edge_pan: true,
             damage_numbers: false,
+            screen_shake: true,
         }
     }
 }
@@ -837,6 +847,30 @@ pub(crate) fn setup_options_menu(
                                 TextColor(Color::srgb(0.88, 0.88, 0.86)),
                             ));
                         });
+                    group
+                        .spawn(options_button(OptionsMenuAction::ToggleScreenShake, 32.0))
+                        .with_children(|button| {
+                            button.spawn((
+                                localized_text(
+                                    if options.screen_shake {
+                                        "镜头震动 开启"
+                                    } else {
+                                        "镜头震动 关闭"
+                                    },
+                                    if options.screen_shake {
+                                        "Screen Shake On"
+                                    } else {
+                                        "Screen Shake Off"
+                                    },
+                                ),
+                                TextFont {
+                                    font: font.clone().into(),
+                                    font_size: FontSize::Px(16.0),
+                                    ..default()
+                                },
+                                TextColor(Color::srgb(0.88, 0.88, 0.86)),
+                            ));
+                        });
                 });
                 spawn_options_group(
                     panel,
@@ -1095,6 +1129,10 @@ pub(crate) fn options_menu_buttons(
                 }
                 OptionsMenuAction::ToggleDamageNumbers => {
                     options.damage_numbers = !options.damage_numbers;
+                    rebuild = true;
+                }
+                OptionsMenuAction::ToggleScreenShake => {
+                    options.screen_shake = !options.screen_shake;
                     rebuild = true;
                 }
                 OptionsMenuAction::Back => next_state.set(AppScreen::MainMenu),

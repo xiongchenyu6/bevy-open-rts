@@ -88,7 +88,7 @@ curl -sS http://127.0.0.1:3536/v1/rooms \
     "game_id":"bevy-open-rts",
     "build_id":"0.1.0+git.abcdef0",
     "session_protocol":1,
-    "game_protocol":4,
+    "game_protocol":5,
     "max_peers":8,
     "visibility":"public",
     "metadata":{"map":"four-corners","mode":"skirmish"}
@@ -101,7 +101,7 @@ and a join token only for private rooms.
 ### Discover rooms
 
 ```text
-GET /v1/rooms?game_id=bevy-open-rts&game_protocol=4
+GET /v1/rooms?game_id=bevy-open-rts&game_protocol=5
 GET /v1/rooms/{game_id}/{game_protocol}/{room_code}
 ```
 
@@ -140,7 +140,7 @@ Bevy Open RTS uses host authority rather than lockstep:
 6. Clients interpolate remote transforms and reconcile locally predicted
    selections/order feedback.
 
-RTS protocol v4 emits a compressed full keyframe once per second and sends 10
+RTS protocol v5 emits a compressed full keyframe once per second and sends 10
 Hz deltas between keyframes. Each delta references the latest full keyframe,
 not another delta, and contains changed/new entities plus explicit removals.
 This keeps packets small without making later state depend on delivery of an

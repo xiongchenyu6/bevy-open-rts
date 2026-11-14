@@ -42,6 +42,32 @@ pub(crate) struct ShotPulse {
     pub(crate) team: Team,
 }
 
+/// Marks the tracer of a real weapon shot with its weapon class, so muzzle
+/// flashes and tracer styling can be derived wherever the pulse exists —
+/// on the host, offline, and on online clients that only receive the pulse.
+/// Presentation only; the simulation never reads it.
+#[derive(Component, Clone, Copy, Debug, PartialEq)]
+pub(crate) struct ShotWeaponClass {
+    pub(crate) kind: ImpactBurstKind,
+    /// The pulse's full lifetime, for tracer travel progress.
+    pub(crate) total: f32,
+}
+
+/// Announces that a unit just died at this entity's position. The host and
+/// offline games spawn the wreck and fireball directly; the marker exists so
+/// the death can be replicated and re-staged on online clients (`replica`).
+/// Presentation only; the simulation never reads it.
+#[derive(Component, Clone, Copy, Debug, PartialEq)]
+pub(crate) struct UnitDeathVfx {
+    pub(crate) remaining: f32,
+    pub(crate) radius: f32,
+    pub(crate) team: Team,
+    pub(crate) replica: bool,
+}
+
+/// Long enough to ride several 10 Hz snapshots, short enough to stay cheap.
+pub(crate) const UNIT_DEATH_VFX_LIFETIME_SECONDS: f32 = 0.6;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum ImpactBurstKind {
     Ballistic,
@@ -81,6 +107,19 @@ pub(crate) fn update_structure_destruction_vfx(
     mut commands: Commands,
     time: Res<Time>,
     mut effects: Query<(Entity, &mut StructureDestructionVfx)>,
+) {
+    for (entity, mut effect) in &mut effects {
+        effect.remaining -= time.delta_secs();
+        if effect.remaining <= 0.0 {
+            commands.entity(entity).try_despawn();
+        }
+    }
+}
+
+pub(crate) fn update_unit_death_vfx(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut effects: Query<(Entity, &mut UnitDeathVfx)>,
 ) {
     for (entity, mut effect) in &mut effects {
         effect.remaining -= time.delta_secs();
@@ -270,6 +309,35 @@ pub(crate) fn spawn_destruction_effects(
         spawn_fog_memory_structure_remnant(commands, Some(asset_server), position, radius);
         return;
     }
+    if is_structure {
+        spawn_death_presentation(commands, asset_server, position, radius, true);
+        spawn_structure_destruction_vfx(commands, position, radius, team);
+    } else {
+        spawn_death_presentation(commands, asset_server, position, radius, false);
+        commands.spawn((
+            Name::new("Unit death"),
+            Transform::from_translation(position),
+            UnitDeathVfx {
+                remaining: UNIT_DEATH_VFX_LIFETIME_SECONDS,
+                radius,
+                team,
+                replica: false,
+            },
+            MatchScopedEntity,
+        ));
+    }
+}
+
+/// Wreck, fireball, flung shards and scorch for something that just died.
+/// Shared by the simulation's own deaths and by deaths replayed on online
+/// clients from a replicated [`UnitDeathVfx`].
+pub(crate) fn spawn_death_presentation(
+    commands: &mut Commands,
+    asset_server: &AssetServer,
+    position: Vec3,
+    radius: f32,
+    is_structure: bool,
+) {
     spawn_combat_wreckage(commands, asset_server, position, radius);
     // A bright expanding fireball so a kill visibly booms (bigger for buildings).
     let boom = if is_structure {
@@ -301,9 +369,6 @@ pub(crate) fn spawn_destruction_effects(
         DebrisPalette::Ember,
     );
     spawn_scorch_mark(commands, position, (radius * 1.15).clamp(0.5, 2.6));
-    if is_structure {
-        spawn_structure_destruction_vfx(commands, position, radius, team);
-    }
 }
 
 pub(crate) fn spawn_combat_wreckage(

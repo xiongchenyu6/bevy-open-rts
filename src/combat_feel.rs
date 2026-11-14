@@ -129,9 +129,16 @@ pub(crate) fn structure_destruction_shake_strength(radius: f32) -> f32 {
 /// anything the simulation reads.
 pub(crate) fn apply_camera_shake(
     time: Res<Time>,
+    options: Option<Res<MenuOptionsState>>,
     mut shake: ResMut<CameraShake>,
     mut cameras: Query<&mut Transform, With<MainCamera>>,
 ) {
+    // The player can switch shake off in Options; drop any pending trauma so
+    // re-enabling it mid-match never replays an old blast.
+    if options.is_some_and(|options| !options.screen_shake) {
+        shake.clear();
+        return;
+    }
     shake.tick(time.delta_secs());
     let offset = shake.offset();
     if offset == Vec2::ZERO {
@@ -403,6 +410,123 @@ pub(crate) fn spawn_muzzle_flash(
 }
 
 // ---------------------------------------------------------------------------
+// Class-distinct tracers
+// ---------------------------------------------------------------------------
+
+/// One straight piece of a tracer, in world space, with its colour and alpha.
+pub(crate) type TracerSegment = (Vec3, Vec3, LinearRgba);
+
+/// How a weapon shot is drawn between muzzle and target, by weapon class.
+/// `life` runs 1.0 (just fired) to 0.0 (gone). Bullets are a short dash that
+/// travels, shells a fat slug with a fading wake, rockets a smoke trail behind
+/// a hot head, beams a steady twin line, arcs a jagged bolt, flamers a fan.
+pub(crate) fn tracer_segments(
+    kind: ImpactBurstKind,
+    from: Vec3,
+    to: Vec3,
+    life: f32,
+) -> Vec<TracerSegment> {
+    let life = life.clamp(0.0, 1.0);
+    let travel = 1.0 - life;
+    let span = to - from;
+    let length = span.length();
+    if length <= f32::EPSILON {
+        return Vec::new();
+    }
+    let dir = span / length;
+    let side = Vec3::new(-dir.z, 0.0, dir.x).normalize_or(Vec3::X);
+    let at = |t: f32| from + span * t.clamp(0.0, 1.0);
+    let rgba = |r: f32, g: f32, b: f32, a: f32| LinearRgba::new(r, g, b, a.clamp(0.0, 1.0));
+    match kind {
+        ImpactBurstKind::Ballistic => {
+            let head = (travel * 1.6).min(1.0);
+            vec![(
+                at(head - 0.28),
+                at(head),
+                rgba(1.0, 0.93, 0.6, 0.35 + 0.65 * life),
+            )]
+        }
+        ImpactBurstKind::Heavy | ImpactBurstKind::Siege => {
+            let width = if kind == ImpactBurstKind::Siege {
+                0.07
+            } else {
+                0.045
+            };
+            let head = (travel * 1.4).min(1.0);
+            let slug = rgba(1.0, 0.82, 0.42, 0.4 + 0.6 * life);
+            vec![
+                (at(0.0), at(head), rgba(0.85, 0.8, 0.72, 0.3 * life)),
+                (at(head - 0.2) + side * width, at(head) + side * width, slug),
+                (at(head - 0.2) - side * width, at(head) - side * width, slug),
+                (at(head - 0.2), at(head), slug),
+            ]
+        }
+        ImpactBurstKind::Explosive => {
+            let head = (travel * 1.25).min(1.0);
+            let lift = |t: f32| at(t) + Vec3::Y * (4.0 * t * (1.0 - t) * (length * 0.06).min(0.8));
+            let mut segments = Vec::with_capacity(5);
+            let steps = 4;
+            for step in 0..steps {
+                let a = head * step as f32 / steps as f32;
+                let b = head * (step + 1) as f32 / steps as f32;
+                let smoke = 0.18 + 0.32 * (step as f32 / steps as f32);
+                segments.push((
+                    lift(a),
+                    lift(b),
+                    rgba(0.78, 0.76, 0.72, smoke * (0.4 + 0.6 * life)),
+                ));
+            }
+            segments.push((
+                lift(head - 0.06),
+                lift(head),
+                rgba(1.0, 0.6, 0.2, 0.5 + 0.5 * life),
+            ));
+            segments
+        }
+        ImpactBurstKind::Energy => {
+            let glow = rgba(0.4, 0.95, 1.0, 0.9 * life);
+            vec![
+                (from + side * 0.03, to + side * 0.03, glow),
+                (from - side * 0.03, to - side * 0.03, glow),
+                (from, to, rgba(0.9, 1.0, 1.0, life)),
+            ]
+        }
+        ImpactBurstKind::Electric => {
+            let joints = 6;
+            let mut previous = from;
+            let mut segments = Vec::with_capacity(joints);
+            for joint in 1..=joints {
+                let t = joint as f32 / joints as f32;
+                // Deterministic zig-zag that re-rolls as the bolt ages.
+                let phase = (joint as f32 * 12.9898 + (life * 5.0).floor() * 78.233).sin();
+                let jitter = if joint == joints { 0.0 } else { phase * 0.22 };
+                let point = at(t) + side * jitter + Vec3::Y * jitter * 0.5;
+                segments.push((previous, point, rgba(0.62, 0.84, 1.0, 0.3 + 0.7 * life)));
+                previous = point;
+            }
+            segments
+        }
+        ImpactBurstKind::Fire => {
+            let reach = (0.35 + travel * 0.9).min(1.0);
+            let spread = 0.12 * length.min(4.0);
+            vec![
+                (from, at(reach), rgba(1.0, 0.62, 0.14, 0.85 * life)),
+                (
+                    from,
+                    at(reach * 0.9) + side * spread,
+                    rgba(1.0, 0.4, 0.08, 0.6 * life),
+                ),
+                (
+                    from,
+                    at(reach * 0.9) - side * spread,
+                    rgba(1.0, 0.4, 0.08, 0.6 * life),
+                ),
+            ]
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Layered impact audio
 // ---------------------------------------------------------------------------
 
@@ -612,6 +736,10 @@ pub(crate) fn emit_combat_feel(
     new_bursts: Query<(&Transform, &ImpactBurst), Added<ImpactBurst>>,
     new_destructions: Query<(&Transform, &StructureDestructionVfx), Added<StructureDestructionVfx>>,
     new_wrecks: Query<&Transform, Added<CombatWreckage>>,
+    new_shots: Query<(&ShotPulse, &ShotWeaponClass), Added<ShotWeaponClass>>,
+    new_deaths: Query<(&Transform, &UnitDeathVfx), Added<UnitDeathVfx>>,
+    asset_server: Option<Res<AssetServer>>,
+    options: Option<Res<MenuOptionsState>>,
 ) {
     let revealed = |position: Vec3| {
         position_revealed(
@@ -628,6 +756,32 @@ pub(crate) fn emit_combat_feel(
             CAMERA_SHAKE_FAR_DISTANCE,
         )
     };
+
+    // Muzzle flash for every weapon shot the player can see. Derived from the
+    // tracer itself, so online clients get it from the replicated pulse.
+    for (pulse, weapon) in &new_shots {
+        let (from, to) = (pulse.from - Vec3::Y * 0.6, pulse.to - Vec3::Y * 0.6);
+        if revealed(from) {
+            spawn_muzzle_flash(&mut commands, from, to, weapon.kind);
+        }
+    }
+
+    // Unit deaths replayed from the host: stage the same wreck and fireball
+    // the host spawned directly. The wreck then triggers its blast sound below
+    // on the next frame, exactly like a locally simulated death.
+    if let Some(asset_server) = asset_server.as_deref() {
+        for (transform, death) in &new_deaths {
+            if death.replica && revealed(transform.translation) {
+                spawn_death_presentation(
+                    &mut commands,
+                    asset_server,
+                    transform.translation,
+                    death.radius,
+                    false,
+                );
+            }
+        }
+    }
 
     for (transform, burst) in &new_bursts {
         let position = transform.translation;
@@ -706,6 +860,11 @@ pub(crate) fn emit_combat_feel(
             0.6 * audio_falloff(&camera, position),
         );
     }
+
+    // Shake switched off in Options: discard this frame's kicks as well.
+    if options.is_some_and(|options| !options.screen_shake) {
+        shake.clear();
+    }
 }
 
 /// The full support-power detonation: white-hot core, rolling fireball, a
@@ -757,6 +916,9 @@ pub(crate) struct HitFlashTracker {
 /// A unit under sustained fire flashes at most this often.
 pub(crate) const HIT_FLASH_INTERVAL_SECONDS: f32 = 0.2;
 
+/// A building under sustained fire flashes at most this often.
+pub(crate) const STRUCTURE_HIT_FLASH_INTERVAL_SECONDS: f32 = 0.35;
+
 /// Whether a health change from `previous` to `current` should flash now.
 pub(crate) fn hit_flash_due(previous: f32, current: f32, cooldown: f32) -> bool {
     cooldown <= 0.0 && current > 0.0 && current < previous - 0.01
@@ -772,15 +934,16 @@ type HitFlashUnit<'a> = (
     &'a Selectable,
     Option<&'a VisibilityState>,
     Option<&'a mut HitFlashTracker>,
+    Has<Structure>,
 );
 
 pub(crate) fn flash_damaged_units(
     mut commands: Commands,
     time: Res<Time>,
-    mut units: Query<HitFlashUnit, With<Unit>>,
+    mut units: Query<HitFlashUnit, Or<(With<Unit>, With<Structure>)>>,
 ) {
     let dt = time.delta_secs();
-    for (entity, health, transform, selectable, visibility, tracker) in &mut units {
+    for (entity, health, transform, selectable, visibility, tracker, is_structure) in &mut units {
         let Some(mut tracker) = tracker else {
             commands.entity(entity).try_insert(HitFlashTracker {
                 last_health: health.current,
@@ -792,6 +955,22 @@ pub(crate) fn flash_damaged_units(
         let due = hit_flash_due(tracker.last_health, health.current, tracker.cooldown);
         tracker.last_health = health.current;
         if !due || visibility.is_some_and(|visibility| !visibility.visible) {
+            continue;
+        }
+        if is_structure {
+            // Buildings are big and get hit in volleys: a softer, slower,
+            // warmer wash over the hull instead of a full white-out.
+            tracker.cooldown = STRUCTURE_HIT_FLASH_INTERVAL_SECONDS;
+            let radius = selectable.radius.clamp(0.8, 2.6);
+            spawn_combat_flash_with_alpha(
+                &mut commands,
+                transform.translation + Vec3::Y * (radius * 0.1),
+                radius * 0.95,
+                radius * 1.05,
+                0.12,
+                LinearRgba::new(1.5, 1.3, 1.0, 1.0),
+                0.3,
+            );
             continue;
         }
         tracker.cooldown = HIT_FLASH_INTERVAL_SECONDS;
@@ -1011,6 +1190,43 @@ mod tests {
                 .join(sample.audio_path());
             assert!(path.is_file(), "missing combat sample {}", path.display());
         }
+    }
+
+    #[test]
+    fn every_weapon_class_draws_its_own_tracer() {
+        let (from, to) = (Vec3::new(0.0, 0.6, 0.0), Vec3::new(6.0, 0.6, 2.0));
+        let kinds = [
+            ImpactBurstKind::Ballistic,
+            ImpactBurstKind::Explosive,
+            ImpactBurstKind::Energy,
+            ImpactBurstKind::Electric,
+            ImpactBurstKind::Fire,
+            ImpactBurstKind::Heavy,
+            ImpactBurstKind::Siege,
+        ];
+        let shapes: Vec<_> = kinds
+            .iter()
+            .map(|kind| tracer_segments(*kind, from, to, 0.5))
+            .collect();
+        for (index, shape) in shapes.iter().enumerate() {
+            assert!(!shape.is_empty(), "{:?} draws nothing", kinds[index]);
+            for (start, end, color) in shape {
+                assert!(start.is_finite() && end.is_finite());
+                assert!((0.0..=1.0).contains(&color.alpha));
+                // Nothing may be drawn far outside the muzzle-target span.
+                let reach = from.distance(to) + 1.0;
+                assert!(start.distance(from) <= reach && end.distance(from) <= reach);
+            }
+            for other in &shapes[index + 1..] {
+                assert_ne!(shape, other, "two weapon classes share a tracer");
+            }
+        }
+        // Beams are steady; bullets travel.
+        let beam = |life| tracer_segments(ImpactBurstKind::Energy, from, to, life)[2];
+        assert_eq!((beam(0.9).0, beam(0.9).1), (beam(0.2).0, beam(0.2).1));
+        let dash = |life| tracer_segments(ImpactBurstKind::Ballistic, from, to, life)[0].1;
+        assert!(dash(0.9).distance(from) < dash(0.5).distance(from));
+        assert!(tracer_segments(ImpactBurstKind::Siege, from, from, 0.5).is_empty());
     }
 
     #[test]

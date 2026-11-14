@@ -2782,18 +2782,22 @@ pub(crate) fn combat(
                     },
                 );
             }
-            // Muzzle flash at the barrel so shots read as fired, not conjured;
-            // its size, hue and extras follow the weapon class. Anchored siege
-            // shots also get a fatter, longer tracer.
+            // Anchored siege shots get a fatter, longer tracer.
             let siege_shot = impact_kind == ImpactBurstKind::Siege;
-            spawn_muzzle_flash(&mut commands, from, to, impact_kind);
-            // Tracer from shooter to target (longer-lived so it's noticeable)…
+            let tracer_ttl = if siege_shot { 0.22 } else { 0.13 };
+            // Tracer from shooter to target (longer-lived so it's noticeable);
+            // its weapon class drives the muzzle flash and tracer style, here
+            // and on online clients alike.
             commands.spawn((
                 ShotPulse {
                     from: from + Vec3::Y * 0.6,
                     to: to + Vec3::Y * 0.6,
-                    ttl: if siege_shot { 0.22 } else { 0.13 },
+                    ttl: tracer_ttl,
                     team,
+                },
+                ShotWeaponClass {
+                    kind: impact_kind,
+                    total: tracer_ttl,
                 },
                 MatchScopedEntity,
             ));

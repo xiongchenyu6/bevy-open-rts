@@ -2879,6 +2879,8 @@ pub(crate) fn add_headless_game_plugins(app: &mut App) -> &mut App {
     ))
     .add_message::<MouseMotion>()
     .add_message::<MouseWheel>()
+    // The online lobby reads typed text; headless verification peers pass through it.
+    .add_message::<bevy::input::keyboard::KeyboardInput>()
     .init_resource::<Assets<Mesh>>()
     .init_resource::<Assets<StandardMaterial>>()
     .init_asset::<Image>()
@@ -3458,6 +3460,9 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
             update_impact_bursts
+                .in_set(SimulationPhase::PostCombat)
+                .run_if(match_in_progress),
+            update_unit_death_vfx
                 .in_set(SimulationPhase::PostCombat)
                 .run_if(match_in_progress),
         ),
@@ -6623,7 +6628,7 @@ pub(crate) fn draw_world_overlays(
         ),
         Without<Selected>,
     >,
-    pulses: Query<&ShotPulse>,
+    pulses: Query<(&ShotPulse, Option<&ShotWeaponClass>)>,
     warnings: Query<(&Transform, &SupportWarning)>,
     reveals: Query<(&Transform, &TemporarySupportReveal)>,
     orbital_strikes: Query<(&Transform, &PendingOrbitalStrike)>,
@@ -6857,7 +6862,16 @@ pub(crate) fn draw_world_overlays(
             vfx.time.elapsed_secs(),
         );
     }
-    for pulse in &pulses {
+    for (pulse, weapon) in &pulses {
+        // Real weapon shots are drawn by weapon class, so a rifle burst, a
+        // shell, a rocket, a beam, an arc and a flame stream read differently.
+        if let Some(weapon) = weapon {
+            let life = pulse.ttl / weapon.total.max(0.01);
+            for (start, end, color) in tracer_segments(weapon.kind, pulse.from, pulse.to, life) {
+                hud.line(start, end, Color::LinearRgba(color));
+            }
+            continue;
+        }
         // Brighten the team color toward a hot muzzle/tracer hue so shots read as
         // attacks. Fade over the pulse's short life so many simultaneous shots
         // read as brief flashes, not a persistent spiderweb of beams.

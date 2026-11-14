@@ -4,7 +4,15 @@
 use super::*;
 
 fn running_match() -> App {
+    running_match_with(|_| {})
+}
+
+/// `configure` runs before the first frame, so option changes made there are
+/// the app's starting state and are never written to the player's real
+/// preferences file by the persistence system.
+fn running_match_with(configure: impl FnOnce(&mut App)) -> App {
     let mut app = build_game_app(GameAppMode::Headless);
+    configure(&mut app);
     app.insert_resource(bevy::time::TimeUpdateStrategy::ManualDuration(
         std::time::Duration::from_secs_f32(1.0 / 30.0),
     ));
@@ -35,6 +43,39 @@ fn simulation_fingerprint(app: &mut App) -> Vec<(Entity, [u32; 3], [u32; 2])> {
         .collect();
     actors.sort_by_key(|(entity, ..)| *entity);
     actors
+}
+
+fn spawn_weapon_pulse(commands: &mut Commands, from: Vec3, kind: ImpactBurstKind) {
+    commands.spawn((
+        ShotPulse {
+            from: from + Vec3::Y * 0.6,
+            to: from + Vec3::new(3.0, 0.6, 0.0),
+            ttl: 0.13,
+            team: Team::Player(1),
+        },
+        ShotWeaponClass { kind, total: 0.13 },
+        MatchScopedEntity,
+    ));
+}
+
+fn spawn_replicated_unit_death(commands: &mut Commands, position: Vec3) {
+    commands.spawn((
+        Transform::from_translation(position),
+        UnitDeathVfx {
+            remaining: UNIT_DEATH_VFX_LIFETIME_SECONDS,
+            radius: 0.6,
+            team: Team::Player(1),
+            replica: true,
+        },
+        MatchScopedEntity,
+    ));
+}
+
+fn count<F: bevy::ecs::query::QueryFilter>(app: &mut App) -> usize {
+    app.world_mut()
+        .query_filtered::<(), F>()
+        .iter(app.world())
+        .count()
 }
 
 fn spawn_strike_at_camera_focus(app: &mut App) {
@@ -126,6 +167,15 @@ fn combat_feel_never_writes_simulation_state() {
             let world = loud.world_mut();
             let mut commands = world.commands();
             spawn_structure_destruction_vfx(&mut commands, focus_before, 1.4, Team::Player(1));
+            // What an online client receives: weapon tracers and unit deaths.
+            for kind in [
+                ImpactBurstKind::Ballistic,
+                ImpactBurstKind::Siege,
+                ImpactBurstKind::Electric,
+            ] {
+                spawn_weapon_pulse(&mut commands, focus_before, kind);
+            }
+            spawn_replicated_unit_death(&mut commands, focus_before);
             world.flush();
         }
         quiet.update();
@@ -254,5 +304,129 @@ fn resolved_match_clears_in_flight_feel_effects_but_keeps_the_battlefield() {
             app.world().get::<CombatWreckage>(wreck).is_some(),
             "result cleanup removed wreckage"
         );
+    }
+}
+
+#[test]
+fn weapon_tracer_alone_stages_a_muzzle_flash() {
+    let mut app = running_match();
+    let focus = app.world().resource::<RtsCamera>().focus;
+    app.update();
+    let before = count::<With<CombatFlash>>(&mut app);
+    {
+        let world = app.world_mut();
+        let mut commands = world.commands();
+        spawn_weapon_pulse(&mut commands, focus, ImpactBurstKind::Heavy);
+        world.flush();
+    }
+    app.update();
+    assert!(
+        count::<With<CombatFlash>>(&mut app) > before,
+        "a weapon-class tracer must produce its muzzle flash without the firing code"
+    );
+}
+
+#[test]
+fn replicated_unit_death_stages_a_wreck_once_and_then_expires() {
+    let mut app = running_match();
+    let focus = app.world().resource::<RtsCamera>().focus;
+    app.update();
+    let wrecks = count::<With<CombatWreckage>>(&mut app);
+    {
+        let world = app.world_mut();
+        let mut commands = world.commands();
+        spawn_replicated_unit_death(&mut commands, focus);
+        world.flush();
+    }
+    app.update();
+    app.update();
+    assert_eq!(count::<With<CombatWreckage>>(&mut app), wrecks + 1);
+    for _ in 0..30 {
+        app.update();
+    }
+    assert_eq!(
+        count::<With<UnitDeathVfx>>(&mut app),
+        0,
+        "the death marker must expire"
+    );
+    assert_eq!(
+        count::<With<CombatWreckage>>(&mut app),
+        wrecks + 1,
+        "one death must stage exactly one wreck"
+    );
+}
+
+#[test]
+fn locally_simulated_unit_death_is_announced_but_not_staged_twice() {
+    let mut app = running_match();
+    let focus = app.world().resource::<RtsCamera>().focus;
+    app.update();
+    let wrecks = count::<With<CombatWreckage>>(&mut app);
+    {
+        let world = app.world_mut();
+        world.resource_scope(|world, asset_server: Mut<AssetServer>| {
+            let mut commands = world.commands();
+            spawn_destruction_effects(
+                &mut commands,
+                &asset_server,
+                focus,
+                0.6,
+                false,
+                Team::Player(1),
+                false,
+            );
+        });
+        world.flush();
+    }
+    assert_eq!(count::<With<UnitDeathVfx>>(&mut app), 1);
+    app.update();
+    app.update();
+    assert_eq!(count::<With<CombatWreckage>>(&mut app), wrecks + 1);
+}
+
+#[test]
+fn damaged_structure_is_flashed_without_the_flash_touching_its_health() {
+    let mut app = running_match();
+    app.update();
+    app.update();
+    let (structure, health) = app
+        .world_mut()
+        .query_filtered::<(Entity, &Health, &HitFlashTracker), With<Structure>>()
+        .iter(app.world())
+        .map(|(entity, health, _)| (entity, *health))
+        .next()
+        .expect("structures are tracked for hit flashes");
+    let damaged = health.current * 0.5;
+    app.world_mut()
+        .get_mut::<Health>(structure)
+        .unwrap()
+        .current = damaged;
+    app.update();
+    let tracker = app.world().get::<HitFlashTracker>(structure).unwrap();
+    assert!(
+        tracker.cooldown > HIT_FLASH_INTERVAL_SECONDS,
+        "a damaged building must flash on its own slower cadence"
+    );
+    let current = app.world().get::<Health>(structure).unwrap().current;
+    assert!(
+        current >= damaged && current < health.current,
+        "the hit flash must not change health: {current}"
+    );
+}
+
+#[test]
+fn screen_shake_option_off_keeps_the_camera_still() {
+    let mut app = running_match_with(|app| {
+        app.world_mut()
+            .resource_mut::<MenuOptionsState>()
+            .screen_shake = false;
+    });
+    assert!(!app.world().resource::<MenuOptionsState>().screen_shake);
+    spawn_strike_at_camera_focus(&mut app);
+    for _ in 0..3 {
+        app.update();
+        let shake = *app.world().resource::<CameraShake>();
+        assert_eq!(shake.trauma, 0.0);
+        assert_eq!(shake.offset(), Vec2::ZERO);
     }
 }
