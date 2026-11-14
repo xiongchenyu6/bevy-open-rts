@@ -158,8 +158,14 @@ pub(crate) struct CaptureCameraReady;
 /// instead of a hand-drawn approximation.
 pub fn build_capture_app(width: u32, height: u32) -> App {
     let mut app = App::new();
+    // Engine logs stay off so capture output is just the tool's own lines;
+    // set CAPTURE_LOG=1 to diagnose a stuck startup or a lost render device.
+    let mut plugins = DefaultPlugins.build();
+    if std::env::var_os("CAPTURE_LOG").is_none() {
+        plugins = plugins.disable::<bevy::log::LogPlugin>();
+    }
     app.add_plugins(
-        DefaultPlugins
+        plugins
             .set(WindowPlugin {
                 // A synthetic primary window (no winit / no OS surface) so the real
                 // mouse-input systems, which read `Window.cursor_position()`, have a
@@ -177,7 +183,6 @@ pub fn build_capture_app(width: u32, height: u32) -> App {
                 meta_check: AssetMetaCheck::Never,
                 ..default()
             })
-            .disable::<bevy::log::LogPlugin>()
             .disable::<bevy::winit::WinitPlugin>(),
     )
     .add_plugins(bevy::app::ScheduleRunnerPlugin::run_loop(

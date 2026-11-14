@@ -123,7 +123,8 @@ const MODEL_HARNESS_SETTLE_TICKS: usize = 180;
 const WARMUP_TICKS: usize = 90;
 /// Ticks to let the match scene populate (bases, units) before first capture.
 const MATCH_SETTLE_TICKS: usize = 60;
-const STARTUP_WAIT_TIMEOUT: Duration = Duration::from_secs(30);
+// Generous: a debug build on a busy machine can need well over a minute.
+const STARTUP_WAIT_TIMEOUT: Duration = Duration::from_secs(240);
 const STARTUP_POLL_INTERVAL: Duration = Duration::from_millis(10);
 /// Extra ticks after the final screenshot request so async readback/save lands.
 const FLUSH_TICKS: usize = 16;
