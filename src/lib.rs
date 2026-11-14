@@ -2582,7 +2582,7 @@ pub fn add_game_scenes(app: &mut App) -> &mut App {
 pub(crate) fn configure_scene_lighting(app: &mut App) {
     app.insert_resource(GlobalAmbientLight {
         color: Color::srgb(0.74, 0.84, 1.0),
-        brightness: 1000.0,
+        brightness: 620.0,
         affects_lightmapped_meshes: true,
     });
     app.insert_resource(bevy::light::DirectionalLightShadowMap { size: 2048 });
@@ -4656,7 +4656,7 @@ pub(crate) fn setup(
     commands.spawn((
         DirectionalLight {
             shadow_maps_enabled: true,
-            illuminance: 11_000.0,
+            illuminance: 13_500.0,
             color: Color::srgb(1.0, 0.97, 0.93),
             ..default()
         },

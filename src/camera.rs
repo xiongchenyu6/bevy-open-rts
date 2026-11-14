@@ -114,6 +114,7 @@ pub(crate) fn cinematic_camera_look() -> impl Bundle {
     use bevy::core_pipeline::tonemapping::Tonemapping;
     use bevy::light::ShadowFilteringMethod;
     use bevy::post_process::bloom::Bloom;
+    use bevy::render::view::{ColorGrading, ColorGradingGlobal, ColorGradingSection};
     (
         Tonemapping::AcesFitted,
         Bloom {
@@ -122,6 +123,19 @@ pub(crate) fn cinematic_camera_look() -> impl Bundle {
         },
         // Soft PCF so cascade edges read as gentle penumbra, not stair-steps.
         ShadowFilteringMethod::Gaussian,
+        // A little extra contrast and saturation: the sand stops reading as a
+        // flat haze and units separate from the ground. Free at runtime — it
+        // is folded into the existing tonemapping pass.
+        ColorGrading::with_identical_sections(
+            ColorGradingGlobal {
+                post_saturation: 1.06,
+                ..default()
+            },
+            ColorGradingSection {
+                contrast: 1.08,
+                ..default()
+            },
+        ),
     )
 }
 

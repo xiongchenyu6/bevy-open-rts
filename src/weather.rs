@@ -33,8 +33,8 @@ impl WeatherKind {
     pub(crate) fn params(self) -> WeatherParams {
         match self {
             Self::Clear => WeatherParams {
-                sun_lux: 11_000.0,
-                ambient: 1000.0,
+                sun_lux: 13_500.0,
+                ambient: 620.0,
                 fog_density: 0.0,
                 fog_color: Color::srgb(0.8, 0.7, 0.6),
                 rain: 0.0,
