@@ -4,7 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Bevy Open RTS</title>
-    <link rel="icon" href="data:," />
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="theme-color" content="#070d14" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Open RTS" />
     <link rel="stylesheet" href="styles.css" />
     <style>
       /* Loading overlay shown while the wasm bundle downloads + the engine boots. */
@@ -65,7 +71,7 @@
       This game needs WebGPU. Open it in a current Chrome or Edge browser.
     </div>
     <script type="module">
-      const buildId = "b0cf7b906c23e055";
+      const buildId = "f4b393ad2325c83f";
 
       const loading = document.getElementById("loading");
       const unsupported = document.getElementById("unsupported");
