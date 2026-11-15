@@ -229,7 +229,13 @@ pub(crate) fn spawn_combat_flash_with_alpha(
             .add(StandardMaterial {
                 base_color: Color::srgba(color.red, color.green, color.blue, peak_alpha),
                 emissive: color,
-                alpha_mode: AlphaMode::Blend,
+                // Fire adds light to what is behind it; only the translucent
+                // washes (hit flashes, backblast) blend like a tinted veil.
+                alpha_mode: if peak_alpha >= COMBAT_FLASH_PEAK_ALPHA {
+                    AlphaMode::Add
+                } else {
+                    AlphaMode::Blend
+                },
                 unlit: true,
                 ..default()
             });
@@ -276,8 +282,24 @@ pub(crate) fn update_combat_flashes(
         let scale = flash.start_scale + (flash.end_scale - flash.start_scale) * progress;
         transform.scale = Vec3::splat(scale);
         if let Some(mut material) = materials.get_mut(&flash.material) {
-            material.emissive = flash.emissive * life;
-            material.base_color.set_alpha(life * flash.peak_alpha);
+            // Start hotter than the base colour so the core blooms, then cool:
+            // fire loses its yellow first and dies as a dull red ember.
+            let heat = life * (1.0 + 1.4 * life);
+            let hot = flash.emissive;
+            let fire = hot.red >= hot.green && hot.red >= hot.blue;
+            let cool = if fire { life.sqrt() } else { 1.0 };
+            material.emissive = LinearRgba::new(
+                hot.red * heat,
+                hot.green * heat * cool,
+                hot.blue * heat * cool * cool,
+                1.0,
+            );
+            material.base_color = Color::srgba(
+                hot.red,
+                hot.green * cool,
+                hot.blue * cool * cool,
+                life * flash.peak_alpha,
+            );
         }
     }
 }
@@ -369,6 +391,18 @@ pub(crate) fn spawn_death_presentation(
         DebrisPalette::Ember,
     );
     spawn_scorch_mark(commands, position, (radius * 1.15).clamp(0.5, 2.6));
+    crate::combat_feel::spawn_fireball_cluster(
+        commands,
+        position,
+        (radius * 1.1).clamp(0.5, 2.6),
+        if is_structure { 7 } else { 4 },
+    );
+    crate::combat_feel::spawn_smoke_plume(
+        commands,
+        position,
+        if is_structure { 6 } else { 3 },
+        (radius * 0.9).clamp(0.45, 2.2),
+    );
 }
 
 pub(crate) fn spawn_combat_wreckage(

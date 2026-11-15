@@ -855,7 +855,12 @@ pub(crate) fn setup_match_briefing(commands: &mut Commands, font: Handle<Font>) 
 pub(crate) enum HudEconomyTooltip {
     Resource(ResourceKind),
     Power,
+    Radar,
 }
+
+/// The radar building icon shown over the minimap while the radar is offline.
+#[derive(Component)]
+pub(crate) struct MinimapRadarIcon;
 
 /// One resource icon and its live stockpile count.
 pub(crate) fn spawn_hud_resource_group(
@@ -936,6 +941,11 @@ pub(crate) fn update_resource_tooltip(
                 "Gather with workers and return to a refinery to fund construction and production."
             ),
         ),
+        HudEconomyTooltip::Radar => t(
+            "雷达离线\n小地图需要一座通电的雷达站。",
+            "Radar offline\nThe minimap needs a powered Radar Uplink.",
+        )
+        .to_string(),
         HudEconomyTooltip::Power => format!(
             "{}: {} / {}\n{}",
             t("电力消耗 / 供应", "Power used / capacity"),
@@ -1246,7 +1256,13 @@ pub(crate) fn setup_ui(
         MatchScopedEntity,
     ));
 
-    setup_minimap(commands, font.clone(), minimap_terrain, map_bounds);
+    setup_minimap(
+        commands,
+        font.clone(),
+        minimap_terrain,
+        map_bounds,
+        asset_server.load("ui/icons/RadarUplink.png"),
+    );
     setup_selection_drag_box(commands);
     setup_match_end_overlay(commands, font.clone());
     setup_match_menu_overlay(commands, font.clone());
@@ -1351,6 +1367,7 @@ pub(crate) fn setup_minimap(
     font: Handle<Font>,
     minimap_terrain: Option<Handle<Image>>,
     map_bounds: MapBounds,
+    radar_icon: Handle<Image>,
 ) {
     commands
         .spawn((
@@ -1364,7 +1381,7 @@ pub(crate) fn setup_minimap(
                 border: UiRect::all(px(1)),
                 ..default()
             },
-            BorderColor::all(Color::srgb(0.24, 0.31, 0.36)),
+            BorderColor::all(Color::srgb(0.38, 0.5, 0.56)),
             BackgroundColor(Color::srgba(0.025, 0.035, 0.04, 0.88)),
             MatchScopedEntity,
         ))
@@ -1400,6 +1417,23 @@ pub(crate) fn setup_minimap(
                 },
                 BackgroundColor(Color::srgba(0.035, 0.055, 0.058, 0.78)),
             ));
+            // Offline: the missing building's icon says what to do; the short
+            // caption and the hover tooltip spell it out.
+            parent.spawn((
+                MinimapRadarIcon,
+                HudEconomyTooltip::Radar,
+                Interaction::default(),
+                ImageNode::new(radar_icon).with_color(Color::srgba(0.62, 0.74, 0.8, 0.7)),
+                Node {
+                    position_type: PositionType::Absolute,
+                    left: px((MINIMAP_SIZE_PX - 64.0) * 0.5),
+                    top: px(26),
+                    width: px(64),
+                    height: px(64),
+                    ..default()
+                },
+                Visibility::Hidden,
+            ));
             parent.spawn((
                 Text::new(""),
                 TextFont {
@@ -1408,11 +1442,12 @@ pub(crate) fn setup_minimap(
                     ..default()
                 },
                 TextColor(Color::srgb(0.78, 0.86, 0.88)),
+                TextLayout::justify(Justify::Center),
                 Node {
                     position_type: PositionType::Absolute,
-                    left: px(10),
-                    right: px(10),
-                    top: px(56),
+                    left: px(6),
+                    right: px(6),
+                    top: px(96),
                     ..default()
                 },
                 MinimapStatusText,
@@ -4087,6 +4122,10 @@ pub(crate) fn update_minimap(
     mut root_q: Query<&mut BackgroundColor, With<MinimapRoot>>,
     mut terrain_image_q: Query<&mut Visibility, With<MinimapTerrainImage>>,
     mut status_text_q: Query<&mut Text, With<MinimapStatusText>>,
+    mut radar_icon_q: Query<
+        &mut Visibility,
+        (With<MinimapRadarIcon>, Without<MinimapTerrainImage>),
+    >,
     marker_q: Query<Entity, With<MinimapMarker>>,
     world_q: Query<(
         &Transform,
@@ -4124,6 +4163,13 @@ pub(crate) fn update_minimap(
             Visibility::Inherited
         } else {
             Visibility::Hidden
+        };
+    }
+    for mut visibility in &mut radar_icon_q {
+        *visibility = if radar_state == MinimapRadarState::Online {
+            Visibility::Hidden
+        } else {
+            Visibility::Inherited
         };
     }
     if radar_state != MinimapRadarState::Online {

@@ -3476,6 +3476,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 emit_combat_feel,
                 update_secondary_explosions,
                 update_shockwave_rings,
+                update_blast_smoke,
                 play_combat_audio,
             )
                 .chain()
@@ -4693,9 +4694,13 @@ pub(crate) fn setup(
     let terrain_detail = images
         .as_deref_mut()
         .map(|images| terrain_detail_texture(images, skirmish_map.size));
+    let terrain_normal = images
+        .as_deref_mut()
+        .map(|images| terrain_normal_texture(images, skirmish_map.size));
     let terrain_material = materials.add(StandardMaterial {
         base_color: Color::srgb(0.82, 0.6, 0.5),
         base_color_texture: terrain_detail.clone(),
+        normal_map_texture: terrain_normal,
         perceptual_roughness: 0.95,
         ..default()
     });

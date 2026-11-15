@@ -259,9 +259,22 @@ fn terrain_value_noise(x: f32, z: f32, wavelength: f32) -> f32 {
     h00 * (1.0 - sx) * (1.0 - sz) + h10 * sx * (1.0 - sz) + h01 * (1.0 - sx) * sz + h11 * sx * sz
 }
 
-/// Map-space soil variation: broad sediment beds, compacted patches and
-/// fine mineral grain. Shared by the terrain mesh and its baked detail map.
-pub(crate) fn terrain_vertex_color(x: f32, z: f32) -> [f32; 4] {
+fn smoothstep(edge0: f32, edge1: f32, value: f32) -> f32 {
+    let t = ((value - edge0) / (edge1 - edge0)).clamp(0.0, 1.0);
+    t * t * (3.0 - 2.0 * t)
+}
+
+/// One sample of the procedural ground: its tint and a small relief height
+/// (metres, for the baked normal map).
+struct Soil {
+    rgb: [f32; 3],
+    relief: f32,
+}
+
+/// Map-space soil: warm sand with sediment beds and mineral grain, blended
+/// into cool cracked hardpan flats and pale wind-blown dust drifts with
+/// ripples. Shared by the terrain mesh, its baked detail map and normal map.
+fn terrain_soil(x: f32, z: f32) -> Soil {
     let sediment = terrain_value_noise(x - 111.9, z + 71.2, 17.0);
     let patches = terrain_value_noise(x, z, 4.5);
     let gravel = terrain_value_noise(x + 43.7, z - 17.3, 0.38);
@@ -272,7 +285,81 @@ pub(crate) fn terrain_vertex_color(x: f32, z: f32) -> [f32; 4] {
     // Cooler mineral deposits interrupt the warm soil without competing with
     // player colors or resource silhouettes.
     let mineral = (patches - 0.55).max(0.0) * 0.4;
-    [tint, tint * (0.87 + mineral), tint * (0.72 + mineral), 1.0]
+    let mut rgb = [tint, tint * (0.87 + mineral), tint * (0.72 + mineral)];
+
+    // Hardpan flats: broad, darker, cooler ground with a ragged edge and a
+    // network of drying cracks.
+    let rock_field = terrain_value_noise(x + 301.3, z - 155.7, 23.0) * 0.65
+        + terrain_value_noise(x - 77.0, z + 19.0, 6.0) * 0.35;
+    let rock = smoothstep(0.5, 0.68, rock_field + (gravel - 0.5) * 0.12);
+    // Two crossed fine noise bands make short broken hairlines, not rings.
+    let crack_a = (terrain_value_noise(x + 9.1, z - 4.4, 0.7) - 0.5).abs();
+    let crack_b = (terrain_value_noise(x - 31.7, z + 12.9, 1.9) - 0.5).abs();
+    let crack = (1.0 - smoothstep(0.0, 0.014, crack_a)) * smoothstep(0.05, 0.2, crack_b) * rock;
+    let rock_shade = 0.82 + gravel * 0.3 + grain * 0.1;
+    let rock_rgb = [0.5 * rock_shade, 0.42 * rock_shade, 0.38 * rock_shade];
+
+    // Dust drifts: pale sand streaked along the prevailing wind, rippled.
+    let drift_field = terrain_value_noise(x * 0.35 + z * 0.9 + 57.0, z * 0.3 - x * 0.12, 8.0);
+    let drift = smoothstep(0.58, 0.8, drift_field) * (1.0 - rock);
+    let ripple = ((x * 0.55 + z * 1.9 + patches * 3.0) * 2.4).sin() * 0.5 + 0.5;
+    let drift_shade = 0.9 + ripple * 0.14;
+    let drift_rgb = [0.98 * drift_shade, 0.9 * drift_shade, 0.74 * drift_shade];
+
+    for channel in 0..3 {
+        rgb[channel] += (rock_rgb[channel] - rgb[channel]) * rock * 0.8;
+        rgb[channel] += (drift_rgb[channel] - rgb[channel]) * drift * 0.5;
+        rgb[channel] *= 1.0 - crack * 0.28;
+    }
+    let relief = gravel * 0.02 + grain * 0.006 + rock * (0.03 + gravel * 0.02) - crack * 0.03
+        + drift * ripple * 0.035;
+    Soil { rgb, relief }
+}
+
+pub(crate) fn terrain_vertex_color(x: f32, z: f32) -> [f32; 4] {
+    let [r, g, b] = terrain_soil(x, z).rgb;
+    [r, g, b, 1.0]
+}
+
+/// Bakes the soil relief into a tangent-space normal map so the sun picks out
+/// ripples, cracks and gravel instead of lighting a perfectly flat sheet.
+pub(crate) fn terrain_normal_texture(
+    images: &mut Assets<Image>,
+    size: (f32, f32),
+) -> Handle<Image> {
+    use bevy::image::ImageSampler;
+    use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat};
+    const RES: usize = 1024;
+    let step_x = size.0 / RES as f32;
+    let step_z = size.1 / RES as f32;
+    let mut data = Vec::with_capacity(RES * RES * 4);
+    for iz in 0..RES {
+        for ix in 0..RES {
+            let x = (ix as f32 / (RES - 1) as f32 - 0.5) * size.0;
+            let z = (iz as f32 / (RES - 1) as f32 - 0.5) * size.1;
+            let here = terrain_soil(x, z).relief;
+            let slope_x = (terrain_soil(x + step_x, z).relief - here) / step_x;
+            let slope_z = (terrain_soil(x, z + step_z).relief - here) / step_z;
+            let normal = Vec3::new(-slope_x, -slope_z, 1.0).normalize();
+            data.push(((normal.x * 0.5 + 0.5) * 255.0) as u8);
+            data.push(((normal.y * 0.5 + 0.5) * 255.0) as u8);
+            data.push(((normal.z * 0.5 + 0.5) * 255.0) as u8);
+            data.push(255);
+        }
+    }
+    let mut image = Image::new(
+        Extent3d {
+            width: RES as u32,
+            height: RES as u32,
+            depth_or_array_layers: 1,
+        },
+        TextureDimension::D2,
+        data,
+        TextureFormat::Rgba8Unorm,
+        bevy::asset::RenderAssetUsages::all(),
+    );
+    image.sampler = ImageSampler::linear();
+    images.add(image)
 }
 
 fn grid_terrain_mesh(
@@ -318,6 +405,9 @@ fn grid_terrain_mesh(
     mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, colors);
     mesh.insert_indices(Indices::U32(indices));
     mesh.compute_normals();
+    // Tangents let the baked soil normal map light the ground; without them
+    // the material simply falls back to the flat vertex normal.
+    let _ = mesh.generate_tangents();
     mesh
 }
 

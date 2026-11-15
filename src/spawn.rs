@@ -865,15 +865,13 @@ pub(crate) fn apply_team_color_materials(
                 .0
                 .entry((slot, is_unit))
                 .or_insert_with(|| {
-                    // A restrained luminous accent keeps units identifiable
-                    // at RTS zoom without making their armor look neon.
+                    // Saturated enough to tell sides apart at RTS zoom and in
+                    // shadow, with a faint self-glow, yet still paint, not neon.
                     let [r, g, b] = player_color_rgb(slot);
-                    let paint = [r * 0.55 + 0.035, g * 0.55 + 0.035, b * 0.55 + 0.035];
-                    let emissive = if is_unit {
-                        LinearRgba::rgb(paint[0] * 0.12, paint[1] * 0.12, paint[2] * 0.12)
-                    } else {
-                        LinearRgba::NONE
-                    };
+                    let paint = [r * 0.72 + 0.03, g * 0.72 + 0.03, b * 0.72 + 0.03];
+                    let glow = if is_unit { 0.16 } else { 0.07 };
+                    let emissive =
+                        LinearRgba::rgb(paint[0] * glow, paint[1] * glow, paint[2] * glow);
                     materials.add(StandardMaterial {
                         base_color: Color::srgb(paint[0], paint[1], paint[2]),
                         emissive,

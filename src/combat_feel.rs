@@ -410,6 +410,159 @@ pub(crate) fn spawn_muzzle_flash(
 }
 
 // ---------------------------------------------------------------------------
+// Smoke
+// ---------------------------------------------------------------------------
+
+/// A dark puff that rises, swells and thins out after something burns.
+#[derive(Component)]
+pub(crate) struct BlastSmoke {
+    remaining: f32,
+    total: f32,
+    delay: f32,
+    start_scale: f32,
+    end_scale: f32,
+    rise: f32,
+    drift: Vec3,
+    peak_alpha: f32,
+    material: Handle<StandardMaterial>,
+}
+
+/// A rolling fireball: a cluster of overlapping additive lobes that swell and
+/// burn out at different rates, so a blast reads as boiling fire instead of
+/// one flat disc. Offsets come from a position hash, never an RNG.
+pub(crate) fn spawn_fireball_cluster(
+    commands: &mut Commands,
+    position: Vec3,
+    radius: f32,
+    lobes: u32,
+) {
+    for index in 0..lobes {
+        let seed = position.x * 7.411 + position.z * 3.173 + index as f32 * 19.37;
+        let hash = |offset: f32| ((seed + offset).sin() * 43_758.547).fract().abs();
+        let angle = hash(1.0) * std::f32::consts::TAU;
+        let reach = radius * (0.25 + hash(2.0) * 0.5);
+        let offset = Vec3::new(
+            angle.cos() * reach,
+            radius * hash(3.0) * 0.45,
+            angle.sin() * reach,
+        );
+        let size = radius * (0.32 + hash(4.0) * 0.3);
+        // Inner lobes are hotter and die first; outer ones linger darker.
+        let heat = 1.0 - reach / radius;
+        let color = LinearRgba::new(1.5, 0.55 + heat * 0.8, 0.12 + heat * 0.5, 1.0);
+        spawn_combat_flash(
+            commands,
+            position + offset,
+            size * 0.35,
+            size,
+            0.32 + hash(5.0) * 0.3 + (1.0 - heat) * 0.15,
+            color,
+        );
+    }
+}
+
+/// A loose column of `count` smoke puffs over `position`. Placement comes
+/// from a position hash, never an RNG, so it is identical on every peer.
+pub(crate) fn spawn_smoke_plume(commands: &mut Commands, position: Vec3, count: u32, scale: f32) {
+    commands.queue(move |world: &mut World| {
+        if !world.contains_resource::<Assets<Mesh>>()
+            || !world.contains_resource::<Assets<StandardMaterial>>()
+        {
+            return;
+        }
+        // Shares the unit sphere the combat flashes already cache.
+        let mesh = match world
+            .get_resource::<CombatFlashMesh>()
+            .and_then(|mesh| mesh.0.clone())
+        {
+            Some(handle) => handle,
+            None => {
+                let handle = world.resource_mut::<Assets<Mesh>>().add(
+                    Sphere::new(1.0)
+                        .mesh()
+                        .ico(2)
+                        .unwrap_or_else(|_| Sphere::new(1.0).mesh().build()),
+                );
+                if let Some(mut cache) = world.get_resource_mut::<CombatFlashMesh>() {
+                    cache.0 = Some(handle.clone());
+                }
+                handle
+            }
+        };
+        for index in 0..count {
+            let seed = position.x * 12.9898 + position.z * 78.233 + index as f32 * 37.719;
+            let hash = |offset: f32| ((seed + offset).sin() * 43_758.547).fract().abs();
+            let offset = Vec3::new(hash(1.0) - 0.5, 0.0, hash(2.0) - 0.5) * scale * 1.1;
+            let shade = 0.2 + hash(3.0) * 0.12;
+            let peak_alpha = 0.26 + hash(4.0) * 0.12;
+            let lifetime = 1.3 + hash(5.0) * 0.9;
+            let material = world
+                .resource_mut::<Assets<StandardMaterial>>()
+                .add(StandardMaterial {
+                    base_color: Color::srgba(shade, shade * 0.95, shade * 0.9, 0.0),
+                    alpha_mode: AlphaMode::Blend,
+                    unlit: true,
+                    ..default()
+                });
+            world.spawn((
+                Name::new("Smoke puff"),
+                bevy::light::NotShadowCaster,
+                Mesh3d(mesh.clone()),
+                MeshMaterial3d(material.clone()),
+                Transform::from_translation(position + offset + Vec3::Y * (0.25 * scale))
+                    .with_scale(Vec3::ZERO),
+                BlastSmoke {
+                    remaining: lifetime,
+                    total: lifetime,
+                    delay: 0.05 + index as f32 * 0.07,
+                    start_scale: scale * (0.3 + hash(6.0) * 0.15),
+                    end_scale: scale * (0.7 + hash(7.0) * 0.35),
+                    rise: 0.7 + hash(8.0) * 0.7,
+                    drift: Vec3::new(0.35, 0.0, 0.2) * (0.5 + hash(9.0)),
+                    peak_alpha,
+                    material,
+                },
+                MatchScopedEntity,
+            ));
+        }
+    });
+}
+
+pub(crate) fn update_blast_smoke(
+    mut commands: Commands,
+    time: Res<Time>,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut puffs: Query<(Entity, &mut Transform, &mut BlastSmoke)>,
+) {
+    let Some(mut materials) = materials else {
+        return;
+    };
+    let dt = time.delta_secs();
+    for (entity, mut transform, mut puff) in &mut puffs {
+        if puff.delay > 0.0 {
+            puff.delay -= dt;
+            continue;
+        }
+        puff.remaining -= dt;
+        if puff.remaining <= 0.0 {
+            materials.remove(&puff.material);
+            commands.entity(entity).try_despawn();
+            continue;
+        }
+        let age = 1.0 - (puff.remaining / puff.total).clamp(0.0, 1.0);
+        // Swell fast, then keep creeping; fade in quickly and out slowly.
+        let swell = 1.0 - (1.0 - age) * (1.0 - age);
+        transform.scale =
+            Vec3::splat(puff.start_scale + (puff.end_scale - puff.start_scale) * swell);
+        transform.translation += (Vec3::Y * puff.rise * (1.0 - age * 0.6) + puff.drift) * dt;
+        let alpha = puff.peak_alpha * (age * 8.0).min(1.0) * (1.0 - age).powf(1.5);
+        if let Some(mut material) = materials.get_mut(&puff.material) {
+            material.base_color.set_alpha(alpha);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Class-distinct tracers
 // ---------------------------------------------------------------------------
 
@@ -899,6 +1052,8 @@ fn spawn_strike_explosion(commands: &mut Commands, position: Vec3, radius: f32) 
     spawn_debris_burst(commands, position, 12, 5.4, DebrisPalette::Ember);
     spawn_scorch_mark(commands, position, (radius * 0.8).clamp(0.8, 3.2));
     spawn_secondary_explosions(commands, position, radius, 3);
+    spawn_fireball_cluster(commands, position, (radius * 0.7).min(3.0), 9);
+    spawn_smoke_plume(commands, position, 7, (radius * 0.45).clamp(0.8, 2.4));
 }
 
 // ---------------------------------------------------------------------------
@@ -937,10 +1092,12 @@ type HitFlashUnit<'a> = (
     Has<Structure>,
 );
 
+type HitFlashTarget = Or<(With<Unit>, With<Structure>)>;
+
 pub(crate) fn flash_damaged_units(
     mut commands: Commands,
     time: Res<Time>,
-    mut units: Query<HitFlashUnit, Or<(With<Unit>, With<Structure>)>>,
+    mut units: Query<HitFlashUnit, HitFlashTarget>,
 ) {
     let dt = time.delta_secs();
     for (entity, health, transform, selectable, visibility, tracker, is_structure) in &mut units {
@@ -1001,6 +1158,7 @@ type InFlightFeelEffect = Or<(
     With<ShockwaveRing>,
     With<SecondaryExplosion>,
     With<DebrisChunk>,
+    With<BlastSmoke>,
 )>;
 
 pub(crate) fn clear_combat_feel_on_match_end(
