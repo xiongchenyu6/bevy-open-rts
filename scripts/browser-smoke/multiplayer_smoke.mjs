@@ -71,7 +71,10 @@ function browserArgs() {
       "--enable-unsafe-swiftshader",
       "--ignore-gpu-blocklist",
       "--enable-features=Vulkan,UseSkiaRenderer,WebGPU",
-      "--use-angle=vulkan",
+      // ANGLE must stay on SwiftShader here: with --use-angle=vulkan the hosted
+      // runner's GPU process drops to software compositing, WebGPU reports
+      // DeviceLost, and the headed canvas never presents a frame.
+      "--use-angle=swiftshader",
       "--ozone-platform=x11",
       "--use-vulkan=swiftshader",
       "--disable-vulkan-surface",
