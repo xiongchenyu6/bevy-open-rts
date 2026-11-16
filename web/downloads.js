@@ -113,16 +113,18 @@ export function createDownloadUI({worker, request, language}) {
     } catch (error) {
       if (id !== generation) return;
       console.warn('Resources remain incomplete', error); phase = 'error';
-    } finally { busy = false; render(); }
+    } finally { if (id === generation) { busy = false; render(); } }
   });
   async function back() {
+    const wasBusy = busy;
     generation++;
+    busy = false;
     if (mode === 'chapter') {
       window.rtsMatchDownload = {stage, status: 'cancelled'};
       void pinGroups([]).catch(() => {});
     }
     dialog.close();
-    if (busy && currentWorker) await request(currentWorker, 'CANCEL').catch(() => {});
+    if (wasBusy && currentWorker) await request(currentWorker, 'CANCEL').catch(() => {});
   }
   close.addEventListener('click', () => { void back(); });
   dialog.addEventListener('cancel', event => { event.preventDefault(); void back(); });
