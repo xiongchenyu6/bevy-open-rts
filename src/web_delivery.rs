@@ -317,8 +317,15 @@ pub(crate) fn touch_device() -> bool {
 // ResizeObserver's device-pixel box can differ from CSS coordinates under
 // browser zoom. Keep the renderer and pointer picking in the same coordinate space.
 fn sync_viewport(mut windows: Query<&mut Window, With<PrimaryWindow>>) {
-    let Some(browser) = web_sys::window() else { return; };
-    let Some(canvas) = browser.document().and_then(|d| d.get_element_by_id("bevy-canvas")) else { return; };
+    let Some(browser) = web_sys::window() else {
+        return;
+    };
+    let Some(canvas) = browser
+        .document()
+        .and_then(|d| d.get_element_by_id("bevy-canvas"))
+    else {
+        return;
+    };
     let rect = canvas.get_bounding_client_rect();
     let width = rect.width();
     let height = rect.height();
