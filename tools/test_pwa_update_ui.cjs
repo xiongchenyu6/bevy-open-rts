@@ -146,7 +146,9 @@ async function main() {
     pass('Back during a blocked chapter transfer cancels the download without entering a run');
 
     await page.evaluate(() => window.rtsPrepareMatch(0));
-    await page.waitForFunction(() => document.querySelector('#downloads-dialog').open && !document.querySelector('#downloads-confirm').disabled);
+    // The last verified file may finish as cancellation arrives. Retry must either
+    // offer remaining bytes or immediately prepare the already complete pack.
+    await page.waitForFunction(() => window.rtsMatchDownload.status === 'ready' || (document.querySelector('#downloads-dialog').open && !document.querySelector('#downloads-confirm').disabled));
     await page.setViewportSize({width: 844, height: 390});
     await page.evaluate(() => window.rtsSetLanguage('zh-CN'));
     assert.equal(await page.locator('#downloads-title').innerText(), '准备战场');
@@ -154,7 +156,7 @@ async function main() {
     assert.ok(bounds && bounds.x >= 0 && bounds.y >= 0 && bounds.x + bounds.width <= 845 && bounds.y + bounds.height <= 391, JSON.stringify(bounds));
     await page.screenshot({path: path.join(OUTPUT, 'chapter-download-mobile.png')});
     await page.evaluate(() => window.rtsSetLanguage('en'));
-    await page.locator('#downloads-confirm').click();
+    if (await page.evaluate(() => window.rtsMatchDownload.status !== 'ready')) await page.locator('#downloads-confirm').click();
     await page.waitForFunction(() => window.rtsMatchDownload.status === 'ready');
     assert.equal(await page.locator('#downloads-dialog').evaluate(node => node.open), true);
     await page.evaluate(() => window.rtsAssetsDecoded());

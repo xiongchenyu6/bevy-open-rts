@@ -7,7 +7,7 @@ on:
       - "Cargo.toml"
       - "Cargo.lock"
       # Formatting checks the full workspace, including the game sources.
-      - "src/**"
+      - "**/*.rs"
       - "crates/matchbox-socket/**"
       - "crates/open-bevy-net/**"
       - "crates/open-bevy-protocol/**"
@@ -20,7 +20,7 @@ on:
       - "Cargo.toml"
       - "Cargo.lock"
       # Formatting checks the full workspace, including the game sources.
-      - "src/**"
+      - "**/*.rs"
       - "crates/matchbox-socket/**"
       - "crates/open-bevy-net/**"
       - "crates/open-bevy-protocol/**"

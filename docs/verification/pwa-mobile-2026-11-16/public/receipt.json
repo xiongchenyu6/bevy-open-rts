@@ -1,0 +1,54 @@
+{
+  "url": "https://xiongchenyu6.github.io/bevy-open-rts/",
+  "revision": "ca742e7492098121be24d1350080bb2d3e14b330",
+  "manifestVersion": "bda10972be68191daa24b96afe45558ec44502bbd0c662a5ace2cf71b178a066",
+  "engineInputsSha256": "fc01086c77e793055efe943e705e3aec9050f75ee92937910f958b314ec6ae7d",
+  "verifiedFiles": [
+    {
+      "path": "downloads.js",
+      "sha256": "1e67c81a0b16fc3ea585a930aad6831dda585e7126ce06053d620786c77877dc",
+      "bytes": 9321
+    },
+    {
+      "path": "game-cache.js",
+      "sha256": "5704bb2aaf2a4a1f0a7f30d4708efb7f2359268e55326117687af7c9676f5fc8",
+      "bytes": 9996
+    },
+    {
+      "path": "pkg/bevy_open_rts.js",
+      "sha256": "a56854eebca1025e92c840974e1e9d5905df8b625ce117233526c39eca04ed82",
+      "bytes": 136093
+    },
+    {
+      "path": "pkg/bevy_open_rts_bg.wasm.gz",
+      "sha256": "fc2456a8fee3bf5c63a9e07ce7666022dcaeaae8e16001f59a80f5a905aa4212",
+      "bytes": 8626939
+    },
+    {
+      "path": "pwa.js",
+      "sha256": "b8b829ceb3ec79d7160f287f65db88992e8626eef89c9be0370c449080747329",
+      "bytes": 3934
+    },
+    {
+      "path": "touch.js",
+      "sha256": "19ae12bcda117d4d2fbe270be7ce7bf58c6634a4641dba62cf79e8f351b563f6",
+      "bytes": 3151
+    },
+    {
+      "path": "assets/models/kenney-spacekit/alien.glb",
+      "sha256": "c041e8ed0eff82f0b25b944a8107f1268ddbec9c2c93afedc4ee0e8b047d983d",
+      "bytes": 27784
+    },
+    {
+      "path": "assets/campaign/mission_01-v2.jpg",
+      "sha256": "6cd02c15357fef191b1c3368a676a1d60be1c22f8703b44be8a1f0c6370b9222",
+      "bytes": 534653
+    },
+    {
+      "path": "assets/fonts/WQY-LICENSE-AUTHORS.txt",
+      "sha256": "e980452a04c9e9dd7d6f0d8f72dd4c960f312207d64b849b73347beb02b9c3fa",
+      "bytes": 363560
+    }
+  ],
+  "passed": true
+}

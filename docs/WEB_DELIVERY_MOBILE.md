@@ -18,7 +18,7 @@ Short landscape viewports use a two-column front command menu with 48 px buttons
 
 ## Validation record
 
-Local mobile/offline and real two-peer online acceptance passed. Publication remains pending.
+Local mobile/offline, real two-peer online and published mobile/cold-offline acceptance passed.
 
 Validated locally before the live-render pass:
 
@@ -41,3 +41,14 @@ The startup UI test stubs the heavyweight engine and GPU capability and does not
 - Local network smoke must use allowed origin `http://localhost:8080` on IPv6 loopback. Port 8783 is not in the published signaling CORS allowlist; the unrelated IPv4 port-8080 service is preserved. No browser security flags or provider policy changes are used.
 
 - Final startup signaling smoke passed with no diagnostics. Two actual browser peers entered the same match, observed commands, and reached HumanVictory with both reports passing (`network-match.json`).
+
+## Hosted acceptance and CI
+
+Published `ca742e7` passed exact revision/engine SHA verification and real visible-center mobile menu → setup → cancel → download → rendered battle → complete Chromium restart offline → rendered battle, with zero browser errors. Evidence is under `docs/verification/pwa-mobile-2026-11-16/public/`. Screenshots were visually reviewed. The hosted engine and JavaScript plus one asset per group were independently hashed; the live worker checks every actually used asset.
+
+- Release pipeline (including startup, update/offline/touch and forced-relay two-browser match): https://github.com/xiongchenyu6/bevy-open-rts/actions/runs/43882430479 — passed.
+- Signaling protocol/WebSocket/WebRTC, clippy, WASM transport and production container: https://github.com/xiongchenyu6/bevy-open-rts/actions/runs/43882430161 — passed.
+- The failed earlier CI revealed an immediate-cancel/retry UI race. Back now releases its busy state immediately and late completions cannot modify a newer request. A deterministic delayed-completion test covers this ownership rule; the full 17-scenario startup UI suite also passes. A completed last file during cancellation is correctly reused instead of requiring a redundant download prompt.
+- Signaling's formatting gate checks the full workspace, so its path filter now covers all Rust sources instead of omitting game-only changes.
+
+Physical Android/iOS hardware remains untested; these are real Chromium/WebGPU games under a simulated touch viewport, not device-certification claims.

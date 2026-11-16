@@ -1,0 +1,19 @@
+PASS language switches before Start and during resource preparation without resetting loading state
+PASS actual Start button prepares resources before engine initialization
+PASS actual second Start initializes from saved resources with zero asset downloads
+PASS chapter preview reports required download without fetching combat and Back cancels before starting
+PASS Back during a blocked chapter transfer cancels the download without entering a run
+PASS chapter confirmation saves combat before signaling ready; mobile localized modal fits viewport
+PASS another chapter starts from the saved shared pack without another download prompt
+PASS delayed unawaited chapter release cannot clear the next chapter resource protection
+PASS offline manager downloads extras, protects live battle assets and removes extras without clearing launcher or progress
+PASS Back while final combat pin is in flight never signals ready afterward and releases the canceled expedition lease
+PASS update offer and both actions fit desktop, landscape phone and portrait viewports
+PASS Later starts the old engine instead of silently upgrading
+PASS update offer survives a full browser restart and natural worker activation
+PASS Download & update commits, reloads and starts the new engine
+PASS failed update shows retry while keeping Start available for previous engine
+PASS legacy network-only worker migrates through waiting worker and resumes Start after one reload
+PASS worker activating during its STATUS reply retains the inspected reference and prepares core
+
+17 real startup-UI scenarios passed; evidence: /home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/pwa-update-ui-tests

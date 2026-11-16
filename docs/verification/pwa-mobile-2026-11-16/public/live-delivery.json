@@ -1,0 +1,153 @@
+{
+  "url": "https://xiongchenyu6.github.io/bevy-open-rts/",
+  "passed": true,
+  "phases": [
+    {
+      "name": "mobile-menu",
+      "dimensions": {
+        "w": 844,
+        "h": 391,
+        "cssW": 844.4179077148438,
+        "cssH": 390.6865539550781,
+        "dpr": 0.9999999767169356,
+        "ready": "true"
+      },
+      "pixels": {
+        "visible": true,
+        "litFraction": 0.391357421875,
+        "brightnessRange": 213.66666666666666,
+        "colorBins": 87
+      }
+    },
+    {
+      "name": "mobile-setup",
+      "pixels": {
+        "visible": true,
+        "litFraction": 0.3388671875,
+        "brightnessRange": 212,
+        "colorBins": 99
+      }
+    },
+    {
+      "name": "battle-download",
+      "text": "Prepare battlefield\n\n5.3 MB to download\n\nSkirmishes and campaign missions share this battle pack. Offline play supports single-player; online rooms still need a connection.\n\nDownload & play\nBack",
+      "pixels": {
+        "visible": true,
+        "litFraction": 0.3984375,
+        "brightnessRange": 223.33333333333334,
+        "colorBins": 69
+      }
+    },
+    {
+      "name": "mobile-match",
+      "pixels": {
+        "visible": true,
+        "litFraction": 0.947265625,
+        "brightnessRange": 204.33333333333334,
+        "colorBins": 165
+      }
+    },
+    {
+      "name": "cold-offline-menu",
+      "dimensions": {
+        "w": 844,
+        "h": 391,
+        "cssW": 844.4179077148438,
+        "cssH": 390.6865539550781,
+        "dpr": 0.9999999767169356,
+        "ready": "true"
+      },
+      "pixels": {
+        "visible": true,
+        "litFraction": 0.391357421875,
+        "brightnessRange": 213.66666666666666,
+        "colorBins": 87
+      }
+    },
+    {
+      "name": "cold-offline-match",
+      "pixels": {
+        "visible": true,
+        "litFraction": 0.947021484375,
+        "brightnessRange": 204.33333333333334,
+        "colorBins": 165
+      }
+    }
+  ],
+  "errors": [],
+  "combatBefore": {
+    "type": "STATUS",
+    "version": "bda10972be68191daa24b96afe45558ec44502bbd0c662a5ace2cf71b178a066",
+    "revision": "ca742e7492098121be24d1350080bb2d3e14b330",
+    "wasmEncoding": "gzip",
+    "currentVersion": "bda10972be68191daa24b96afe45558ec44502bbd0c662a5ace2cf71b178a066",
+    "groups": [
+      {
+        "id": "core",
+        "totalBytes": 22519724,
+        "downloadBytes": 0,
+        "ready": true,
+        "installed": true
+      },
+      {
+        "id": "optional",
+        "totalBytes": 446567,
+        "downloadBytes": 446567,
+        "ready": false,
+        "installed": false
+      },
+      {
+        "id": "combat",
+        "totalBytes": 5580955,
+        "downloadBytes": 5580955,
+        "ready": false,
+        "installed": false
+      }
+    ],
+    "installedGroups": [
+      "core"
+    ],
+    "ready": false,
+    "downloadBytes": 5580955,
+    "totalBytes": 28100679,
+    "progress": []
+  },
+  "combatAfter": {
+    "type": "STATUS",
+    "version": "bda10972be68191daa24b96afe45558ec44502bbd0c662a5ace2cf71b178a066",
+    "revision": "ca742e7492098121be24d1350080bb2d3e14b330",
+    "wasmEncoding": "gzip",
+    "currentVersion": "bda10972be68191daa24b96afe45558ec44502bbd0c662a5ace2cf71b178a066",
+    "groups": [
+      {
+        "id": "core",
+        "totalBytes": 22519724,
+        "downloadBytes": 0,
+        "ready": true,
+        "installed": true
+      },
+      {
+        "id": "optional",
+        "totalBytes": 446567,
+        "downloadBytes": 446567,
+        "ready": false,
+        "installed": false
+      },
+      {
+        "id": "combat",
+        "totalBytes": 5580955,
+        "downloadBytes": 0,
+        "ready": true,
+        "installed": true
+      }
+    ],
+    "installedGroups": [
+      "core",
+      "combat"
+    ],
+    "ready": true,
+    "downloadBytes": 0,
+    "totalBytes": 28100679,
+    "progress": []
+  }
+}

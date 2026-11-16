@@ -154,6 +154,7 @@ jobs:
           node tools/test_pwa_cache.cjs
           node tools/test_pwa_demand.cjs
           node tools/test_pwa_update_ui.cjs
+          node tools/test_download_retry.cjs
           node tools/test_touch.cjs
 
       - name: Complete a two-browser online match
