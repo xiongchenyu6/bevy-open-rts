@@ -18,6 +18,11 @@ if [ -n "$sixteen_bit_pngs" ]; then
   exit 1
 fi
 
+engine_inputs_sha256="$(python3 tools/web_engine_inputs.py)"
+if [ -n "${WASM_REUSE_BASE_URL:-}" ] && python3 tools/reuse_web_engine.py --base-url "$WASM_REUSE_BASE_URL" --output web --fingerprint "$engine_inputs_sha256"; then
+  echo ">> reused verified engine bytes"
+else
+
 # The wasm-bindgen CLI MUST match the wasm-bindgen crate version, or the generated
 # JS glue and the wasm disagree and boot dies with
 #   "WebAssembly.Table.grow(): failed to grow table by 4"
@@ -34,23 +39,20 @@ wasm_bindgen_version_ok() {
 }
 
 resolve_wasm_bindgen() {
-  local cargo_home="${CARGO_HOME:-$HOME/.cargo}"
-  local cargo_bin="$cargo_home/bin/wasm-bindgen"
-  if [ -x "$cargo_bin" ] && wasm_bindgen_version_ok "$cargo_bin"; then
-    printf '%s\n' "$cargo_bin"
-    return
-  fi
-  if command -v wasm-bindgen >/dev/null 2>&1; then
-    local path_bin
-    path_bin="$(command -v wasm-bindgen)"
-    if wasm_bindgen_version_ok "$path_bin"; then
-      printf '%s\n' "$path_bin"
+  local pin_root="$ROOT/target/web-tools/wasm-bindgen-${WASM_BINDGEN_VERSION}"
+  local pin_bin="$pin_root/bin/wasm-bindgen"
+  local candidate
+  if [ -x "$pin_bin" ] && wasm_bindgen_version_ok "$pin_bin"; then printf '%s\n' "$pin_bin"; return; fi
+  for candidate in "${CARGO_HOME:-$HOME/.cargo}/bin/wasm-bindgen" "$(command -v wasm-bindgen || true)"; do
+    if [ -x "$candidate" ] && wasm_bindgen_version_ok "$candidate"; then
+      mkdir -p "$pin_root/bin"
+      cp "$candidate" "$pin_bin"
+      printf '%s\n' "$pin_bin"
       return
     fi
-  fi
-  echo ">> installing wasm-bindgen-cli ${WASM_BINDGEN_VERSION}" >&2
-  cargo install -q --locked wasm-bindgen-cli --version "${WASM_BINDGEN_VERSION}"
-  printf '%s\n' "$cargo_bin"
+  done
+  cargo install -q --locked --root "$pin_root" wasm-bindgen-cli --version "$WASM_BINDGEN_VERSION"
+  printf '%s\n' "$pin_bin"
 }
 
 WASM_BINDGEN_BIN="$(resolve_wasm_bindgen)"
@@ -97,8 +99,9 @@ WASM_OPT_BIN="$(resolve_wasm_opt || true)"
 cargo build --locked --release --target wasm32-unknown-unknown --features webgpu --bin bevy-open-rts
 WEB_CARGO_OUTPUT_DIR="${CARGO_TARGET_DIR:-target}"
 
-rm -rf web/pkg web/assets
+rm -rf web/pkg
 mkdir -p web/pkg
+wasm_bindgen_version_ok "$WASM_BINDGEN_BIN" || { echo "Pinned wasm-bindgen version changed" >&2; exit 1; }
 "$WASM_BINDGEN_BIN" \
   --target web \
   --out-dir web/pkg \
@@ -139,7 +142,9 @@ fi
 
 # Precompressed copy the loader streams with a real progress bar (GitHub Pages
 # serves the .gz verbatim, so bytes-received == the actual ~7 MB transfer).
-gzip -9 -kf web/pkg/bevy_open_rts_bg.wasm
+gzip -9 -n -kf web/pkg/bevy_open_rts_bg.wasm
+
+fi
 
 BUILD_ID="$(scripts/stamp_web_build_id.py \
   web/index.html \
@@ -150,5 +155,11 @@ echo "Stamped web build id: ${BUILD_ID}"
 # Runtime fonts are subsets; preserve full source fonts in the repository only.
 python3 - <<'PY_ASSETS'
 import shutil
+shutil.rmtree("web/assets", ignore_errors=True)
 shutil.copytree("assets", "web/assets", ignore=shutil.ignore_patterns("*.full.ttf"))
 PY_ASSETS
+
+python3 tools/package_web.py "$engine_inputs_sha256"
+if [ -n "${WASM_REUSE_BASE_URL:-}" ]; then
+  python3 tools/retain_web_releases.py target/web-dist --base-url "$WASM_REUSE_BASE_URL"
+fi

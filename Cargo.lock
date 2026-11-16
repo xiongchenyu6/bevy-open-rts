@@ -825,6 +825,7 @@ dependencies = [
  "bevy_rts_camera",
  "icu_provider",
  "iyes_progress",
+ "js-sys",
  "moonshine-kind",
  "open-bevy-net",
  "open-bevy-protocol",

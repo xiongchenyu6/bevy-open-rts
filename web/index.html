@@ -1,187 +1,58 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Bevy Open RTS</title>
-    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png" />
-    <link rel="manifest" href="./manifest.webmanifest" />
-    <meta name="theme-color" content="#070d14" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Open RTS" />
-    <link rel="stylesheet" href="styles.css" />
-    <style>
-      /* Loading overlay shown while the wasm bundle downloads + the engine boots. */
-      #loading {
-        position: fixed; inset: 0; z-index: 30; display: flex;
-        flex-direction: column; align-items: center; justify-content: center; gap: 1.2rem;
-        background: radial-gradient(circle at 50% 36%, #0e1a26 0%, #070d14 68%, #04070a 100%);
-        color: #cfe6f5; font-family: system-ui, sans-serif; text-align: center; padding: 2rem;
-        transition: opacity .5s ease;
-      }
-      #loading.hidden { opacity: 0; pointer-events: none; }
-      /* Radar-sweep mark — fits the RTS theme. */
-      #loading .radar {
-        width: 92px; height: 92px; border-radius: 50%;
-        border: 2px solid rgba(90, 200, 255, .35); position: relative;
-        box-shadow: 0 0 24px rgba(60, 170, 255, .25) inset;
-      }
-      #loading .radar::before {
-        content: ""; position: absolute; inset: -2px; border-radius: 50%;
-        background: conic-gradient(from 0deg, rgba(90,200,255,.55), rgba(90,200,255,0) 60%);
-        animation: sweep 1.6s linear infinite;
-      }
-      #loading .radar::after {
-        content: ""; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px;
-        margin: -3px 0 0 -3px; border-radius: 50%; background: #7fd2ff;
-        box-shadow: 0 0 10px #7fd2ff;
-      }
-      @keyframes sweep { to { transform: rotate(360deg); } }
-      #loading .title {
-        font-size: 2rem; font-weight: 800; letter-spacing: .16em; color: #8fd3ff;
-        text-shadow: 0 2px 0 rgba(0,0,0,.4);
-      }
-      #loading .bar {
-        width: 280px; max-width: 64vw; height: 8px; border-radius: 6px;
-        background: rgba(255,255,255,.10); overflow: hidden;
-      }
-      #loading .bar .fill {
-        height: 100%; width: 8%; border-radius: 6px;
-        background: linear-gradient(90deg, #2aa9ff, #7fe0ff, #2aa9ff);
-        transition: width .15s ease;
-      }
-      #loading .tip { font-size: .95rem; opacity: .85; min-height: 1.2em; }
-      #loading .sub { font-size: .8rem; opacity: .5; letter-spacing: .05em; }
-      #loading.error .radar::before { animation: none; }
-      #loading.error .title { color: #ff8c6b; }
-    </style>
-  </head>
-  <body>
-    <canvas id="bevy-canvas"></canvas>
-    <div id="loading">
-      <div class="radar"></div>
-      <div class="title">BEVY OPEN RTS</div>
-      <div class="bar"><div class="fill"></div></div>
-      <div class="tip">Loading game…</div>
-      <div class="sub">Classic real-time strategy</div>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Open RTS</title>
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-180.png" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#070d14" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Open RTS" />
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./pwa.css" />
+  <link rel="stylesheet" href="./game-cache.css" />
+</head>
+<body>
+  <div id="game-surface"><canvas id="bevy-canvas" tabindex="0"></canvas></div>
+  <main id="loading">
+    <nav id="language-switch" class="language-switch" aria-label="Language"><button data-language="en" aria-pressed="true">EN</button><button data-language="zh-CN" aria-pressed="false">简中</button></nav>
+    <div class="panel">
+      <div class="radar" aria-hidden="true"></div><h1>OPEN RTS</h1>
+      <p id="subtitle"></p><p id="status" aria-live="polite"></p>
+      <button id="start" type="button"></button>
+      <div class="bar"><div id="progress-fill"></div></div>
+      <p id="hint"></p>
+      <section id="cache-card" aria-live="polite"><p id="cache-status"></p><progress id="cache-progress" hidden max="1" value="0"></progress><div id="cache-actions"><button id="cache-update" hidden></button><button id="cache-later" hidden></button></div></section>
+      <section id="install-card" hidden><p id="install-summary"></p><button id="install-button" class="install-action"><span id="install-label"></span></button></section>
     </div>
-    <div id="unsupported" hidden>
-      This game needs WebGPU. Open it in a current Chrome or Edge browser.
-    </div>
-    <script type="module">
-      const buildId = "f4b393ad2325c83f";
-
-      const loading = document.getElementById("loading");
-      const unsupported = document.getElementById("unsupported");
-      const fill = document.querySelector("#loading .fill");
-      const tip = document.querySelector("#loading .tip");
-      const MB = (b) => (b / 1048576).toFixed(1);
-      const setPct = (p) => {
-        if (fill) fill.style.width = Math.max(4, Math.min(100, p)).toFixed(0) + "%";
-      };
-      const fail = (message) => {
-        loading.classList.add("error");
-        if (tip) tip.textContent = message;
-      };
-      const hideLoading = () => {
-        if (!loading || loading.classList.contains("hidden")) return;
-        loading.classList.add("hidden");
-        setTimeout(() => { loading.style.display = "none"; }, 600);
-      };
-
-      const canvas = document.getElementById("bevy-canvas");
-      const observeGameReadiness = () => {
-        const done = Number(canvas?.getAttribute("data-assets-done") || 0);
-        const total = Number(canvas?.getAttribute("data-assets-total") || 0);
-        if (canvas?.getAttribute("data-game-assets-ready") === "true" && total > 0 && done >= total) {
-          hideLoading();
-          return;
-        }
-        if (total > 0) {
-          const percentage = Math.min(100, Math.floor(done / total * 100));
-          setPct(percentage);
-          if (tip) tip.textContent = `Loading game… ${percentage}%`;
-        }
-      };
-      const readinessObserver = new MutationObserver(observeGameReadiness);
-      readinessObserver.observe(canvas, { attributes: true,
-        attributeFilter: ["data-assets-done", "data-assets-total", "data-game-assets-ready"] });
-
-      // Real wasm starts with the magic bytes \0asm — guards against a body that
-      // didn't actually decompress to a module.
-      const isWasm = (ab) => {
-        if (!ab || ab.byteLength < 8) return false;
-        const h = new Uint8Array(ab, 0, 4);
-        return h[0] === 0 && h[1] === 0x61 && h[2] === 0x73 && h[3] === 0x6d;
-      };
-
-      // Stream the raw gzip artifact (GitHub Pages serves it verbatim, so
-      // bytes-received == Content-Length == the real ~7 MB transfer → honest
-      // progress), then inflate it in the browser.
-      async function downloadWasm(url) {
-        if (typeof DecompressionStream !== "function") return null;
-        let resp;
-        try { resp = await fetch(url); } catch (_) { return null; }
-        if (!resp.ok || !resp.body) return null;
-        const total = +(resp.headers.get("Content-Length") || 0);
-        let received = 0;
-        const meter = new TransformStream({
-          transform(chunk, ctrl) {
-            received += chunk.length;
-            if (total) setPct((received / total) * 100);
-            if (tip)
-              tip.textContent = total
-                ? `Loading game… ${MB(received)} / ${MB(total)} MB`
-                : `Loading game… ${MB(received)} MB`;
-            ctrl.enqueue(chunk);
-          },
-        });
-        try {
-          const stream = resp.body
-            .pipeThrough(meter)
-            .pipeThrough(new DecompressionStream("gzip"));
-          const ab = await new Response(stream).arrayBuffer();
-          return isWasm(ab) ? ab : null;
-        } catch (_) {
-          return null;
-        }
-      }
-
-      // Bevy's winit escapes its run loop by throwing this; the app IS running.
-      const isControlFlow = (e) => `${e}`.includes("Using exceptions for control flow");
-
-      async function boot() {
-        const { default: init } = await import(`./pkg/bevy_open_rts.js?v=${buildId}`);
-        // 1) progress-tracked gzip stream; 2) fall back to wasm-bindgen's own fetch.
-        const bytes = await downloadWasm(`./pkg/bevy_open_rts_bg.wasm.gz?v=${buildId}`);
-        setPct(100);
-        if (tip) tip.textContent = "Loading game…";
-        if (bytes) {
-          await init({ module_or_path: bytes });
-        } else {
-          await init({ module_or_path: `./pkg/bevy_open_rts_bg.wasm?v=${buildId}` });
-        }
-      }
-
-      // Require an actual WebGPU adapter (not just navigator.gpu presence).
-      const adapter = "gpu" in navigator ? await navigator.gpu.requestAdapter() : null;
-      if (!adapter) {
-        unsupported.hidden = false;
-        hideLoading();
-      } else {
-        boot()
-          .then(observeGameReadiness)
-          .catch((e) => {
-            if (isControlFlow(e)) {
-              observeGameReadiness();
-              return;
-            }
-            console.error("boot failed:", e);
-            fail("Load failed — please reload");
-          });
-      }
-    </script>
-  </body>
+  </main>
+  <dialog id="install-dialog" aria-labelledby="install-title"><h2 id="install-title"></h2><ol id="install-steps"></ol><p id="install-note"></p><button id="install-close" class="install-action"></button></dialog>
+  <aside id="rotate" hidden><strong id="rotate-title"></strong><span id="rotate-copy"></span></aside>
+  <div id="unsupported" hidden></div>
+  <script type="module">
+    import {installTouchControls} from './touch.js';
+    import {setInstallLanguage} from './pwa.js';
+    import {setCacheLanguage, prepareGameCache, markGameStarted, consumeCacheResume} from './game-cache.js';
+    const buildId = "58b5ec6a00a43da5";
+    const canvas=document.querySelector('#bevy-canvas'), loading=document.querySelector('#loading'), start=document.querySelector('#start');
+    installTouchControls(canvas);
+    const status=document.querySelector('#status'), fill=document.querySelector('#progress-fill');
+    let language='en', phase='start', received=0, total=0;
+    const copy={en:{subtitle:'BUILD A BASE · COMMAND YOUR ARMY · HOLD THE FRONT',start:'Start game',loading:'Preparing command systems…',download:'Loading engine',assets:'Preparing interface',error:'Loading failed. Check your connection and try again.',unsupported:'This game needs WebGPU. Use a browser with WebGPU support.',hint:'Tap to select · Hold to issue an order · Drag to pan · Pinch to zoom',rotate:'Rotate your device',rotateCopy:'Landscape gives your battlefield more room.'},'zh-CN':{subtitle:'建设基地 · 指挥军队 · 守住前线',start:'开始游戏',loading:'正在准备指挥系统…',download:'正在加载引擎',assets:'正在准备界面',error:'加载失败，请检查网络后重试。',unsupported:'游戏需要 WebGPU，请使用支持 WebGPU 的浏览器。',hint:'点击选择 · 长按下达指令 · 拖动移动视角 · 双指缩放',rotate:'请横屏游玩',rotateCopy:'横屏可为战场保留更多空间。'}};
+    function render(){const t=copy[language];document.documentElement.lang=language;document.querySelector('#subtitle').textContent=t.subtitle;start.textContent=start.disabled?t.loading:t.start;status.textContent=(t[phase]||t.loading)+(total?` · ${(received/1048576).toFixed(1)} / ${(total/1048576).toFixed(1)} MB`:'');document.querySelector('#hint').textContent=t.hint;document.querySelector('#rotate-title').textContent=t.rotate;document.querySelector('#rotate-copy').textContent=t.rotateCopy;for(const b of document.querySelectorAll('[data-language]'))b.setAttribute('aria-pressed',String(b.dataset.language===language));setInstallLanguage(language);setCacheLanguage(language);}
+    window.rtsSetLanguage=value=>{language=value==='zh-CN'?'zh-CN':'en';try{localStorage.setItem('open-rts-language',language)}catch{}render();};
+    let saved;try{saved=localStorage.getItem('open-rts-language')}catch{}window.rtsSetLanguage(new URLSearchParams(location.search).get('lang')||saved||'en');
+    for(const b of document.querySelectorAll('[data-language]'))b.onclick=()=>window.rtsSetLanguage(b.dataset.language);
+    function ready(){const done=Number(canvas.dataset.assetsDone||0), count=Number(canvas.dataset.assetsTotal||0);if(canvas.dataset.gameAssetsReady==='true'&&count>0&&done>=count){loading.hidden=true;loading.classList.add('hidden');document.body.classList.add('playing');markGameStarted();canvas.focus();}else if(count>0){phase='assets';received=0;total=0;render();status.textContent+=` · ${done} / ${count}`;fill.style.width=`${done/count*100}%`;}}
+    new MutationObserver(ready).observe(canvas,{attributes:true,attributeFilter:['data-assets-done','data-assets-total','data-game-assets-ready']});
+    start.onclick=async()=>{document.querySelector('#unsupported').hidden=true;loading.classList.remove('error');start.disabled=true;phase='loading';render();try{const adapter=navigator.gpu?await navigator.gpu.requestAdapter():null;if(!adapter){document.querySelector('#unsupported').hidden=false;phase='unsupported';start.disabled=false;render();return;}await prepareGameCache();const {default:init}=await import(`./pkg/bevy_open_rts.js?v=${buildId}`);let bytes;if(typeof DecompressionStream==='function'){const response=await fetch(`./pkg/bevy_open_rts_bg.wasm.gz?v=${buildId}`);if(!response.ok)throw Error('Engine download failed');total=Number(response.headers.get('content-length')||0);received=0;phase='download';const meter=new TransformStream({transform(chunk,controller){received+=chunk.length;render();fill.style.width=`${total?received/total*100:0}%`;controller.enqueue(chunk);}});bytes=await new Response(response.body.pipeThrough(meter).pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();}phase='assets';received=0;total=0;render();await init({module_or_path:bytes||`./pkg/bevy_open_rts_bg.wasm?v=${buildId}`});ready();}catch(error){if(String(error).includes('Using exceptions for control flow')){ready();return;}console.error(error);loading.classList.add('error');phase='error';start.disabled=false;received=0;total=0;render();}};
+    if(consumeCacheResume())start.click();
+    const coarse=matchMedia('(pointer: coarse)');function viewport(){window.rtsTouchDevice=coarse.matches;document.body.classList.toggle('mobile',coarse.matches);document.querySelector('#rotate').hidden=!(coarse.matches&&innerHeight>innerWidth);}
+    coarse.addEventListener('change',viewport);addEventListener('resize',viewport);viewport();
+    canvas.addEventListener('contextmenu',e=>e.preventDefault());
+  </script>
+</body>
 </html>

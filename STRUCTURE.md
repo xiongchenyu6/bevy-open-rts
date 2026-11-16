@@ -273,3 +273,12 @@ Unit selection feedback uses `unit_selection_marker_radius` in selection.rs
 independently of Selectable's click/nav radius. Short corner arcs replace full
 unit rings, aircraft project a compact cross, and small-unit health bars follow
 the visual footprint. Structure brackets and resource markers keep their own sizes.
+
+Web delivery uses `web/game-cache.js` + `web/sw.js` for explicit immutable updates,
+`web/downloads.js` for shared battlefield preparation, and `src/web_delivery.rs`
+for the asset-reader and state-transition gate. `web/touch.js` settles mobile
+pointer intent before dispatching ordinary engine input; `src/mobile_layout.rs`
+keeps the short-landscape front menu usable. `tools/package_web.py` stages only
+runtime content into `target/web-dist/`, which is the Pages release artifact. Resource and
+touch browser regression scripts are in `tools/test_*.cjs`; delivery invariants
+and the current evidence live in `docs/WEB_DELIVERY_MOBILE.md`.

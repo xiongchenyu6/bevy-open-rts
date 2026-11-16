@@ -23,6 +23,8 @@ process.on("SIGINT", () => { running = false; });
 process.on("SIGTERM", () => { running = false; });
 try {
   await page.goto(gameUrl.toString(), { waitUntil: "domcontentloaded", timeout: 60000 });
+    await page.locator("#start").click();
+    void page.waitForSelector("#downloads-confirm:not([disabled])", {timeout: 120000}).then(() => page.locator("#downloads-confirm").click()).catch(() => {});
   while (running) {
     if (!firstReadyCaptured) {
       const ready = await page.evaluate(() => {

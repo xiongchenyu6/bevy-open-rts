@@ -181,3 +181,14 @@ without error output; final capture verifies 4.24m movement and 113 siege damage
 
 - [x] Exactnative279 privateUbuntu channel-volume/restart acceptance: five normal exits,10closedPCMchecks/all5Optionsdirectreview, no clipping/hostcapture, unchanged archive. Full officialRuntime4/audiohumanreview remain.
 - [ ] Verify both navigation fixes through full suite and a new optimizedpackage normalMission3; actualsaved-state REDs retained.
+
+## 2026-11-16 — PWA demand updates and touch RTS rollout
+
+- [x] Audit startup assets, match transitions and existing release gates.
+- [x] Implement SHA-256 immutable resources, safe explicit updates, shared combat pack, install guidance and preload language bridge.
+- [x] Implement actual reader/transition gate and match lease lifecycle.
+- [x] Add touch selection/orders/pan/zoom and compact front menu; bounded settings/campaign scrolling.
+- [ ] Verify native and WASM checks, real desktop/mobile rendering and interaction, cold offline launch, differential update fixtures, and two-peer multiplayer.
+- [ ] Publish through the existing release→Pages workflow; verify public receipt and visible build.
+
+Scope/evidence: `docs/WEB_DELIVERY_MOBILE.md`. Existing Steam and gameplay milestones remain separate.

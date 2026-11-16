@@ -1,3 +1,5 @@
+#[cfg(target_arch = "wasm32")]
+mod web_delivery;
 #[cfg(feature = "audio")]
 use bevy::audio::Volume;
 use bevy::{
@@ -21,6 +23,7 @@ use serde::Deserialize;
 use std::collections::{BTreeMap, VecDeque};
 
 mod capture_api;
+mod mobile_layout;
 pub use capture_api::*;
 mod audio;
 pub(crate) use audio::*;
@@ -2468,7 +2471,6 @@ pub(crate) fn add_main_menu_scene(app: &mut App) -> &mut App {
         .add_systems(
             Update,
             (
-                main_menu_scroll,
                 main_menu_buttons,
                 update_main_menu_summary,
                 update_main_menu_map_resource_controls,
@@ -2478,6 +2480,7 @@ pub(crate) fn add_main_menu_scene(app: &mut App) -> &mut App {
                 .chain()
                 .run_if(in_state(AppScreen::SkirmishSetup)),
         );
+    app.add_systems(Update, main_menu_scroll);
     add_online_scene(app)
 }
 
@@ -2611,6 +2614,7 @@ pub(crate) fn queue_startup_loading_assets(
         &mut retained,
         asset_server.load::<Image>(menu::MENU_BACKGROUND_PATH),
     );
+    #[cfg(not(target_arch = "wasm32"))]
     retain_loading_asset(
         &mut loading,
         &mut retained,
@@ -2669,6 +2673,9 @@ pub(crate) fn queue_startup_loading_assets(
                 &mut retained,
                 asset_server.load::<Image>(icon),
             );
+        }
+        if cfg!(target_arch = "wasm32") {
+            continue;
         }
         if entity.render_parts.is_empty()
             && ProceduralEntityModel::for_entity_id(entity.id).is_none()
@@ -2895,6 +2902,9 @@ pub(crate) fn add_headless_game_plugins(app: &mut App) -> &mut App {
 
 pub fn build_game_app(mode: GameAppMode) -> App {
     let mut app = App::new();
+    app.add_systems(Update, mobile_layout::compact_front_menu);
+    #[cfg(target_arch = "wasm32")]
+    web_delivery::install(&mut app);
     match mode {
         GameAppMode::Interactive => {
             app.add_plugins(

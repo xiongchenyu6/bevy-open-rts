@@ -88,13 +88,15 @@ jobs:
 
       - name: Build web artifacts
         run: bash scripts/build_web.sh
+        env:
+          WASM_REUSE_BASE_URL: https://xiongchenyu6.github.io/bevy-open-rts/
 
       # Upload the immutable build before runtime gates. A failed browser gate
       # still blocks release/deploy, while leaving a debuggable bundle behind.
       - name: Package web bundle
         run: |
           set -euo pipefail
-          (cd web && zip -r -q ../web-dist.zip .)
+          (cd target/web-dist && zip -r -q ../../web-dist.zip .)
           ls -la web-dist.zip
 
       - name: Upload web bundle (passes the build between jobs)
@@ -120,7 +122,7 @@ jobs:
           set -euo pipefail
           mkdir -p browser-smoke-output
           npm ci --prefix scripts/browser-smoke
-          python3 -m http.server 8080 --directory web \
+          python3 -m http.server 8080 --directory target/web-dist \
             > /tmp/open-bevy-browser-server.log 2>&1 &
           server_pid=$!
           cleanup() {
@@ -143,6 +145,17 @@ jobs:
           xvfb-run -a -s "-screen 0 1600x1000x24" npm --prefix scripts/browser-smoke run smoke 2>&1 \
             | tee browser-smoke-output/report.log
 
+      - name: Verify immutable updates, offline restart and touch intent
+        run: |
+          set -euo pipefail
+          export NODE_PATH="$PWD/scripts/browser-smoke/node_modules"
+          export CHROMIUM_EXECUTABLE_PATH="$(command -v google-chrome || command -v chromium)"
+          python3 -m unittest discover -s tools -p 'test_*.py'
+          node tools/test_pwa_cache.cjs
+          node tools/test_pwa_demand.cjs
+          node tools/test_pwa_update_ui.cjs
+          node tools/test_touch.cjs
+
       - name: Complete a two-browser online match
         env:
           OPEN_BEVY_GAME_URL: http://127.0.0.1:8080/
@@ -158,7 +171,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p browser-smoke-output/multiplayer
-          python3 -m http.server 8080 --directory web \
+          python3 -m http.server 8080 --directory target/web-dist \
             > /tmp/open-bevy-multiplayer-server.log 2>&1 &
           server_pid=$!
           cleanup() {

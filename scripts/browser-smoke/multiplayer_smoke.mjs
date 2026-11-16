@@ -200,10 +200,13 @@ async function bootVerificationClient(page, role) {
       waitUntil: "domcontentloaded",
       timeout: 60_000,
     });
+    await page.locator("#start").click();
+    void page.waitForSelector("#downloads-confirm:not([disabled])", {timeout: 120000}).then(() => page.locator("#downloads-confirm").click()).catch(() => {});
     await page.waitForFunction(
       () => {
         const loading = document.querySelector("#loading");
-        return loading?.classList.contains("hidden")
+        return document.querySelector("#unsupported")?.hidden === false
+          || loading?.classList.contains("hidden")
           || loading?.classList.contains("error");
       },
       undefined,

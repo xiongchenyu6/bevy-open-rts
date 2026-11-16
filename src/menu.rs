@@ -59,6 +59,8 @@ pub(crate) struct FrontMenuRosterPreview;
 
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum OptionsMenuAction {
+    #[cfg(target_arch = "wasm32")]
+    Downloads,
     ToggleFullscreen,
     ToggleLanguage,
     ToggleMouseRestricted,
@@ -308,7 +310,7 @@ pub(crate) fn setup_front_menu(
             },
         ))
         .with_children(|root| {
-            root.spawn(front_briefing_column_node())
+            root.spawn((Name::new("Front Briefing"), front_briefing_column_node()))
                 .with_children(|column| {
                     column.spawn((
                         Text::new("Open RTS"),
@@ -394,7 +396,7 @@ pub(crate) fn setup_front_menu(
                         });
                 });
 
-            root.spawn(front_command_panel_node())
+            root.spawn((Name::new("Front Commands"), front_command_panel_node()))
                 .with_children(|panel| {
                     panel.spawn((
                         localized_text("指挥菜单", "Command Menu"),
@@ -891,6 +893,18 @@ pub(crate) fn setup_options_menu(
                         },
                     )],
                 );
+                #[cfg(target_arch = "wasm32")]
+                spawn_options_group(
+                    panel,
+                    &font,
+                    "离线",
+                    "Offline",
+                    &[(
+                        OptionsMenuAction::Downloads,
+                        "下载与离线游玩",
+                        "Downloads & offline play",
+                    )],
+                );
                 panel
                     .spawn(options_button(OptionsMenuAction::Back, 48.0))
                     .with_children(|button| {
@@ -910,7 +924,12 @@ pub(crate) fn setup_options_menu(
 
 pub(crate) fn options_panel_node() -> impl Bundle {
     (
+        MainMenuScrollArea,
+        ScrollPosition::default(),
         Node {
+            max_height: Val::Percent(96.0),
+            overflow: Overflow::scroll_y(),
+            flex_shrink: 0.0,
             width: px(449),
             flex_direction: FlexDirection::Column,
             row_gap: px(10),
@@ -1135,6 +1154,8 @@ pub(crate) fn options_menu_buttons(
                     options.screen_shake = !options.screen_shake;
                     rebuild = true;
                 }
+                #[cfg(target_arch = "wasm32")]
+                OptionsMenuAction::Downloads => crate::web_delivery::open_downloads(),
                 OptionsMenuAction::Back => next_state.set(AppScreen::MainMenu),
             }
         }
@@ -1286,7 +1307,7 @@ pub(crate) fn setup_main_menu(
                     max_width: px(1040),
                     max_height: Val::Percent(100.0),
                     min_height: px(0),
-                    min_width: px(680),
+                    min_width: px(0),
                     flex_direction: FlexDirection::Column,
                     align_items: AlignItems::Stretch,
                     row_gap: px(8),
@@ -2529,7 +2550,11 @@ pub(crate) fn setup_campaign_menu(
         ))
         .with_children(|root| {
             root.spawn((
+                MainMenuScrollArea,
+                ScrollPosition::default(),
                 Node {
+                    max_height: Val::Percent(96.0),
+                    overflow: Overflow::scroll_y(),
                     width: Val::Percent(84.0),
                     max_width: px(780),
                     padding: UiRect::all(px(16)),

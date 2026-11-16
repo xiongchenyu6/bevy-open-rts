@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "gameUrl": "http://localhost:8080/",
+  "signalingUrl": "https://open-bevy-signaling.xiongchenyu6.workers.dev",
+  "executablePath": "/nix/store/cfxpl6qy25sgq5sa7shj4dbdsxwwp286-chromium-156.0.8078.73/bin/chromium",
+  "softwareWebGpu": true,
+  "bootAttempts": 1,
+  "renderedFrame": {
+    "visible": true,
+    "litFraction": 0.58349609375,
+    "brightnessRange": 229.33333333333331,
+    "colorBins": 116
+  },
+  "state": {
+    "webgpu": true,
+    "loadingHidden": true,
+    "loadingError": false,
+    "unsupportedHidden": true,
+    "canvasWidth": 1440,
+    "canvasHeight": 901
+  },
+  "signaling": {
+    "service": "open-bevy-signaling",
+    "hasTurn": true,
+    "roomCodeValid": true,
+    "firstEventType": "IdAssigned"
+  },
+  "diagnostics": [],
+  "screenshot": "/home/freeman.xiong/Documents/github/xiongchenyu6/bevy-open-rts/target/web-live/startup/main-menu.png"
+}

@@ -274,6 +274,10 @@ pub(crate) fn apply_camera_settings(
             .ok()
             .is_some_and(|window| cursor_is_over_interactive_button(window, &ui_buttons)),
     );
+    #[cfg(target_arch = "wasm32")]
+    if crate::web_delivery::touch_device() {
+        controls.edge_pan_width = 0.0;
+    }
 }
 
 pub(crate) fn effective_camera_edge_pan_width(

@@ -30,6 +30,8 @@ try {
     const completed = [];
     try {
       await page.goto(gameUrl, { waitUntil: "domcontentloaded", timeout: 60000 });
+    await page.locator("#start").click();
+    void page.waitForSelector("#downloads-confirm:not([disabled])", {timeout: 120000}).then(() => page.locator("#downloads-confirm").click()).catch(() => {});
       await page.waitForFunction(() => {
         const canvas = document.getElementById("bevy-canvas");
         return canvas?.getAttribute("data-game-assets-ready") === "true"
