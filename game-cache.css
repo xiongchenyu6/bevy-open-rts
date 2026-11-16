@@ -1,0 +1,23 @@
+#cache-card { max-width: 540px; margin: 12px auto; padding: 10px 14px; border: 1px solid #40616c; border-radius: 8px; background: #0d202c; }
+#cache-status { margin: 0; color: #bed5da; font-size: 13px; line-height: 1.5; }
+#cache-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+#cache-actions button { min-height: 44px; padding: 7px 16px; margin-top: 8px; border: 1px solid #e7b85e; border-radius: 5px; background: #e7b85e; color: #162126; font: inherit; font-size: 14px; font-weight: bold; cursor: pointer; }
+#cache-actions #cache-later { background: transparent; color: #e7b85e; }
+#cache-actions button:focus-visible { outline: 2px solid white; outline-offset: 2px; }
+#cache-progress { display: block; width: 100%; height: 8px; margin-top: 8px; accent-color: #2cb0c0; }
+@media (max-height: 540px) and (orientation: landscape) {
+  #cache-card { margin: 8px auto; padding: 6px 12px; }
+  #cache-status { font-size: 12px; }
+}
+#downloads-dialog { box-sizing: border-box; width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow-y: auto; border: 1px solid #c8a05b; border-radius: 12px; padding: 24px; background: #0d202c; color: #e9e4d4; font-family: inherit; }
+#downloads-dialog::backdrop { background: rgb(0 0 0 / .75); }
+#downloads-dialog h2 { margin: 0 0 16px; font-size: 24px; }
+#downloads-dialog p { font-size: 14px; line-height: 1.5; }
+#downloads-note { color: #9fb5bd; }
+#downloads-meter { width: 100%; accent-color: #2cb0c0; }
+.downloads-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.downloads-actions button { min-height: 44px; border: 1px solid #c8a05b; border-radius: 6px; padding: 10px 14px; background: transparent; color: #e9e4d4; font: inherit; cursor: pointer; }
+.downloads-actions button:disabled { opacity: .45; cursor: default; }
+.downloads-actions #downloads-confirm { background: #e7b85e; color: #162126; font-weight: bold; }
+.downloads-actions button:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+@media (max-height: 540px) { #downloads-dialog { padding: 16px; } #downloads-dialog h2 { font-size: 20px; margin-bottom: 8px; } .downloads-actions { margin-top: 10px; } }

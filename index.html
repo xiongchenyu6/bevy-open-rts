@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Open RTS</title>
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-180.png" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#070d14" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Open RTS" />
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./pwa.css" />
+  <link rel="stylesheet" href="./game-cache.css" />
+</head>
+<body>
+  <div id="game-surface"><canvas id="bevy-canvas" tabindex="0"></canvas></div>
+  <main id="loading">
+    <nav id="language-switch" class="language-switch" aria-label="Language"><button data-language="en" aria-pressed="true">EN</button><button data-language="zh-CN" aria-pressed="false">简中</button></nav>
+    <div class="panel">
+      <div class="radar" aria-hidden="true"></div><h1>OPEN RTS</h1>
+      <p id="subtitle"></p><p id="status" aria-live="polite"></p>
+      <button id="start" type="button"></button>
+      <div class="bar"><div id="progress-fill"></div></div>
+      <p id="hint"></p>
+      <section id="cache-card" aria-live="polite"><p id="cache-status"></p><progress id="cache-progress" hidden max="1" value="0"></progress><div id="cache-actions"><button id="cache-update" hidden></button><button id="cache-later" hidden></button></div></section>
+      <section id="install-card" hidden><p id="install-summary"></p><button id="install-button" class="install-action"><span id="install-label"></span></button></section>
+    </div>
+  </main>
+  <dialog id="install-dialog" aria-labelledby="install-title"><h2 id="install-title"></h2><ol id="install-steps"></ol><p id="install-note"></p><button id="install-close" class="install-action"></button></dialog>
+  <aside id="rotate" hidden><strong id="rotate-title"></strong><span id="rotate-copy"></span></aside>
+  <div id="unsupported" hidden></div>
+  <script type="module">
+    import {installTouchControls} from './touch.js';
+    import {setInstallLanguage} from './pwa.js';
+    import {setCacheLanguage, prepareGameCache, markGameStarted, consumeCacheResume} from './game-cache.js';
+    const buildId = "bf025a2aa9d606f1";
+    const canvas=document.querySelector('#bevy-canvas'), loading=document.querySelector('#loading'), start=document.querySelector('#start');
+    installTouchControls(canvas);
+    const status=document.querySelector('#status'), fill=document.querySelector('#progress-fill');
+    let language='en', phase='start', received=0, total=0;
+    const copy={en:{subtitle:'BUILD A BASE · COMMAND YOUR ARMY · HOLD THE FRONT',start:'Start game',loading:'Preparing command systems…',download:'Loading engine',assets:'Preparing interface',error:'Loading failed. Check your connection and try again.',unsupported:'This game needs WebGPU. Use a browser with WebGPU support.',hint:'Tap to select · Hold to issue an order · Drag to pan · Pinch to zoom',rotate:'Rotate your device',rotateCopy:'Landscape gives your battlefield more room.'},'zh-CN':{subtitle:'建设基地 · 指挥军队 · 守住前线',start:'开始游戏',loading:'正在准备指挥系统…',download:'正在加载引擎',assets:'正在准备界面',error:'加载失败，请检查网络后重试。',unsupported:'游戏需要 WebGPU，请使用支持 WebGPU 的浏览器。',hint:'点击选择 · 长按下达指令 · 拖动移动视角 · 双指缩放',rotate:'请横屏游玩',rotateCopy:'横屏可为战场保留更多空间。'}};
+    function render(){const t=copy[language];document.documentElement.lang=language;document.querySelector('#subtitle').textContent=t.subtitle;start.textContent=start.disabled?t.loading:t.start;status.textContent=(t[phase]||t.loading)+(total?` · ${(received/1048576).toFixed(1)} / ${(total/1048576).toFixed(1)} MB`:'');document.querySelector('#hint').textContent=t.hint;document.querySelector('#rotate-title').textContent=t.rotate;document.querySelector('#rotate-copy').textContent=t.rotateCopy;for(const b of document.querySelectorAll('[data-language]'))b.setAttribute('aria-pressed',String(b.dataset.language===language));setInstallLanguage(language);setCacheLanguage(language);}
+    window.rtsSetLanguage=value=>{language=value==='zh-CN'?'zh-CN':'en';try{localStorage.setItem('open-rts-language',language)}catch{}render();};
+    let saved;try{saved=localStorage.getItem('open-rts-language')}catch{}window.rtsSetLanguage(new URLSearchParams(location.search).get('lang')||saved||'en');
+    for(const b of document.querySelectorAll('[data-language]'))b.onclick=()=>window.rtsSetLanguage(b.dataset.language);
+    function ready(){const done=Number(canvas.dataset.assetsDone||0), count=Number(canvas.dataset.assetsTotal||0);if(canvas.dataset.gameAssetsReady==='true'&&count>0&&done>=count){loading.hidden=true;loading.classList.add('hidden');document.body.classList.add('playing');markGameStarted();canvas.focus();}else if(count>0){phase='assets';received=0;total=0;render();status.textContent+=` · ${done} / ${count}`;fill.style.width=`${done/count*100}%`;}}
+    new MutationObserver(ready).observe(canvas,{attributes:true,attributeFilter:['data-assets-done','data-assets-total','data-game-assets-ready']});
+    start.onclick=async()=>{document.querySelector('#unsupported').hidden=true;loading.classList.remove('error');start.disabled=true;phase='loading';render();try{const adapter=navigator.gpu?await navigator.gpu.requestAdapter():null;if(!adapter){document.querySelector('#unsupported').hidden=false;phase='unsupported';start.disabled=false;render();return;}await prepareGameCache();const {default:init}=await import(`./pkg/bevy_open_rts.js?v=${buildId}`);let bytes;if(typeof DecompressionStream==='function'){const response=await fetch(`./pkg/bevy_open_rts_bg.wasm.gz?v=${buildId}`);if(!response.ok)throw Error('Engine download failed');total=Number(response.headers.get('content-length')||0);received=0;phase='download';const meter=new TransformStream({transform(chunk,controller){received+=chunk.length;render();fill.style.width=`${total?received/total*100:0}%`;controller.enqueue(chunk);}});bytes=await new Response(response.body.pipeThrough(meter).pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();}phase='assets';received=0;total=0;render();await init({module_or_path:bytes||`./pkg/bevy_open_rts_bg.wasm?v=${buildId}`});ready();}catch(error){if(String(error).includes('Using exceptions for control flow')){ready();return;}console.error(error);loading.classList.add('error');phase='error';start.disabled=false;received=0;total=0;render();}};
+    if(consumeCacheResume())start.click();
+    const coarse=matchMedia('(pointer: coarse)');function viewport(){window.rtsTouchDevice=coarse.matches;document.body.classList.toggle('mobile',coarse.matches);document.querySelector('#rotate').hidden=!(coarse.matches&&innerHeight>innerWidth);}
+    coarse.addEventListener('change',viewport);addEventListener('resize',viewport);viewport();
+    canvas.addEventListener('contextmenu',e=>e.preventDefault());
+  </script>
+</body>
+</html>

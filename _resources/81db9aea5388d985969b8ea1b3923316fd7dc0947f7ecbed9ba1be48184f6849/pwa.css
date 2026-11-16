@@ -1,0 +1,34 @@
+[hidden] { display: none !important; }
+#loading { overflow-y: auto; align-items: safe center; }
+#install-card { margin: 16px auto 0; padding: 12px 16px; max-width: 440px; border: 1px solid #b98f47; border-radius: 12px; background: #102631; }
+#install-card p { margin: 4px 0 10px; color: #adc3c9; font-size: 14px; }
+.install-action { min-height: 44px; padding: 8px 18px; border: 1px solid #e7b85e; border-radius: 6px; background: #e7b85e; color: #162126; font: inherit; font-weight: bold; cursor: pointer; }
+.install-action svg { width: 20px; height: 20px; vertical-align: middle; margin-right: 8px; }
+#install-dialog { width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 24px); overflow-y: auto; padding: 24px; border: 1px solid #b98f47; border-radius: 14px; background: #10202b; color: #fff4d6; font-family: system-ui, sans-serif; }
+#install-dialog::backdrop { background: #000b; }
+#install-dialog h2 { margin: 0 0 14px; }
+#install-steps { padding-left: 24px; color: #c6d3d8; line-height: 1.6; }
+#install-steps li { padding: 6px 0; }
+#install-note { color: #adc3c9; font-size: 14px; }
+#install-dialog button { width: 100%; }
+#rotate { pointer-events: none; }
+body:not(.playing) #rotate { display: none; }
+@media (max-height: 540px) and (orientation: landscape) {
+  #loading { padding: 12px max(18px, env(safe-area-inset-right)) 12px max(18px, env(safe-area-inset-left)); }
+  #loading .panel { width: min(760px, 100%); padding-top: 0; }
+  .sigil { width: 30px; height: 30px; margin-bottom: 12px; }
+  h1 { font-size: clamp(22px, 4vw, 36px); letter-spacing: .04em; }
+  .subtitle { margin: 4px 0 8px; font-size: 11px; }
+  #status { margin: 8px 0; font-size: 13px; }
+  #start { min-height: 44px; margin: 0; }
+  .progress { margin-top: 8px; }
+  .hint { margin: 6px 0; font-size: 11px; }
+  #install-card { display: flex; align-items: center; gap: 12px; justify-content: center; margin-top: 10px; padding: 8px 12px; max-width: 580px; }
+  #install-card p { text-align: left; margin: 0; flex: 1; }
+  .language-switch { top: 8px; right: max(8px, env(safe-area-inset-right)); }
+  .language-switch button { min-height: 44px; min-width: 44px; padding: 0 8px; }
+}
+@media (orientation: portrait) {
+  #loading .panel { padding-top: 58px; }
+  h1 { font-size: clamp(26px, 8vw, 42px); }
+}
