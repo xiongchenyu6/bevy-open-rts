@@ -10,7 +10,415 @@
 //! events without any new wire data. There is deliberately no hit-stop: an
 //! RTS must never stall its clock for one explosion.
 
+use bevy::ecs::system::SystemParam;
+use bevy::post_process::effect_stack::{ChromaticAberration, Vignette};
+
 use crate::*;
+
+// ---------------------------------------------------------------------------
+// Dynamic post-process impacts (chromatic aberration + damage/HQ vignette)
+// and combat hit/kill-streak state
+// ---------------------------------------------------------------------------
+
+/// Subtle baseline chromatic aberration during active matches (keeps edges crisp).
+pub(crate) const POST_PROCESS_BASE_CHROMA: f32 = 0.0015;
+
+/// Upper cap for peak impact chromatic aberration pulse.
+pub(crate) const POST_PROCESS_MAX_CHROMA: f32 = 0.036;
+
+/// Chromatic pulse decay rate (~150ms snap back to baseline).
+pub(crate) const POST_PROCESS_CHROMA_DECAY_PER_SEC: f32 = 0.22;
+
+/// Subtle baseline vignette framing for the live RTS camera.
+pub(crate) const POST_PROCESS_BASE_VIGNETTE_INTENSITY: f32 = 0.18;
+
+/// Damage-alert vignette decay rate.
+pub(crate) const POST_PROCESS_VIGNETTE_DECAY_PER_SEC: f32 = 2.4;
+
+/// Player Command Center HP ratio below which a gentle crimson heartbeat vignette activates.
+pub(crate) const HQ_ALERT_HEALTH_THRESHOLD: f32 = 0.35;
+
+/// Time window before the combat hit/kill streak decays back to zero.
+pub(crate) const COMBAT_STREAK_DECAY_SECONDS: f32 = 3.0;
+
+/// Duration of the HUD badge pop-scale animation on each streak increment.
+pub(crate) const COMBAT_STREAK_POP_SECONDS: f32 = 0.16;
+
+/// Minimum streak count before the right-side streak HUD badge reveals itself.
+pub(crate) const COMBAT_STREAK_HUD_THRESHOLD: u32 = 3;
+
+/// Contact audio pitch escalation per streak hit (+2.5%), capped at 8 steps (+20%).
+pub(crate) const COMBAT_STREAK_PITCH_STEP: f32 = 0.025;
+pub(crate) const COMBAT_STREAK_PITCH_MAX_STEPS: u32 = 8;
+
+/// Duration (75ms) of the real unit mesh emissive hit-flash material swap.
+pub(crate) const UNIT_MESH_HIT_FLASH_SECONDS: f32 = 0.075;
+
+pub(crate) fn default_match_chromatic_aberration() -> ChromaticAberration {
+    ChromaticAberration {
+        color_lut: None,
+        intensity: POST_PROCESS_BASE_CHROMA,
+        max_samples: 4,
+    }
+}
+
+pub(crate) fn default_match_vignette() -> Vignette {
+    Vignette {
+        intensity: POST_PROCESS_BASE_VIGNETTE_INTENSITY,
+        radius: 0.92,
+        smoothness: 2.8,
+        roundness: 0.92,
+        color: Color::srgb(0.03, 0.035, 0.05),
+        edge_compensation: 0.86,
+        center: Vec2::new(0.5, 0.5),
+    }
+}
+
+/// Presentation-only state driving dynamic `ChromaticAberration` impact pulses
+/// and crimson `Vignette` damage/HQ-alert pulses on `MainCamera`.
+#[derive(Resource, Clone, Copy, Debug, Default)]
+pub(crate) struct PostProcessImpactState {
+    pub(crate) chroma_pulse: f32,
+    pub(crate) damage_vignette: f32,
+}
+
+impl PostProcessImpactState {
+    /// Pulses chromatic aberration on heavy blasts, support strikes, and structure
+    /// destructions (`strength` is already distance-attenuated in `0..=1`).
+    pub(crate) fn spike_chroma(&mut self, strength: f32) {
+        if strength >= 0.08 {
+            let bonus = (0.008 + (strength - 0.08) * 0.03).clamp(0.008, 0.034);
+            self.chroma_pulse = self.chroma_pulse.max(bonus);
+        }
+    }
+
+    /// Pulses the crimson damage/alert vignette (`strength` in `0..=1`).
+    pub(crate) fn spike_damage_vignette(&mut self, strength: f32) {
+        let strength = strength.clamp(0.0, 1.0);
+        if strength > 0.0 {
+            self.damage_vignette = self.damage_vignette.max(strength);
+        }
+    }
+
+    pub(crate) fn tick(&mut self, delta_secs: f32) {
+        let dt = delta_secs.max(0.0);
+        self.chroma_pulse = (self.chroma_pulse - POST_PROCESS_CHROMA_DECAY_PER_SEC * dt).max(0.0);
+        self.damage_vignette =
+            (self.damage_vignette - POST_PROCESS_VIGNETTE_DECAY_PER_SEC * dt).max(0.0);
+    }
+
+    pub(crate) fn clear(&mut self) {
+        *self = Self::default();
+    }
+}
+
+pub(crate) fn impact_chroma_intensity(chroma_pulse: f32) -> f32 {
+    (POST_PROCESS_BASE_CHROMA + chroma_pulse.max(0.0))
+        .clamp(POST_PROCESS_BASE_CHROMA, POST_PROCESS_MAX_CHROMA)
+}
+
+/// Maps the player's highest surviving HQ health fraction into a `0..=1` low-HP
+/// urgency factor once below [`HQ_ALERT_HEALTH_THRESHOLD`] (35%).
+pub(crate) fn hq_low_health_ratio(best_hq_fraction: Option<f32>) -> f32 {
+    let Some(frac) = best_hq_fraction else {
+        return 0.0;
+    };
+    let frac = frac.clamp(0.0, 1.0);
+    if frac < HQ_ALERT_HEALTH_THRESHOLD {
+        ((HQ_ALERT_HEALTH_THRESHOLD - frac) / HQ_ALERT_HEALTH_THRESHOLD).clamp(0.0, 1.0)
+    } else {
+        0.0
+    }
+}
+
+/// Computes live `(intensity, color)` for the camera `Vignette`, blending a
+/// subtle dark framing baseline with crimson damage flashes and a gentle
+/// low-HQ heartbeat pulse.
+pub(crate) fn damage_vignette_params(
+    damage_flash: f32,
+    hq_low_ratio: f32,
+    elapsed_secs: f32,
+) -> (f32, Color) {
+    let base_r = 0.03_f32;
+    let base_g = 0.035_f32;
+    let base_b = 0.05_f32;
+    let hq_low = hq_low_ratio.clamp(0.0, 1.0);
+    let heartbeat = if hq_low > 0.0 {
+        hq_low * (0.45 + 0.55 * (elapsed_secs * 5.2).sin().abs())
+    } else {
+        0.0
+    };
+    let crimson = (damage_flash.clamp(0.0, 1.0) * 0.85 + heartbeat * 0.65).clamp(0.0, 1.0);
+    let intensity = POST_PROCESS_BASE_VIGNETTE_INTENSITY + crimson * 0.44;
+    let color = Color::srgb(
+        base_r.lerp(0.58, crimson),
+        base_g.lerp(0.02, crimson),
+        base_b.lerp(0.03, crimson),
+    );
+    (intensity, color)
+}
+
+/// Presentation-only combo/kill-streak tracker driving pitch-escalating contact
+/// audio and the auto-hiding bilingual right-side streak HUD badge.
+#[derive(Resource, Clone, Copy, Debug, Default)]
+pub(crate) struct CombatStreakState {
+    pub(crate) streak_hits: u32,
+    pub(crate) streak_timer: f32,
+    pub(crate) pop_secs: f32,
+}
+
+impl CombatStreakState {
+    pub(crate) fn register_hit(&mut self) -> u32 {
+        self.streak_hits = self.streak_hits.saturating_add(1);
+        self.streak_timer = COMBAT_STREAK_DECAY_SECONDS;
+        self.pop_secs = COMBAT_STREAK_POP_SECONDS;
+        self.streak_hits
+    }
+
+    pub(crate) fn tick(&mut self, delta_secs: f32) {
+        let dt = delta_secs.max(0.0);
+        if self.streak_timer > 0.0 {
+            self.streak_timer = (self.streak_timer - dt).max(0.0);
+            if self.streak_timer <= 0.0 {
+                self.streak_hits = 0;
+            }
+        }
+        self.pop_secs = (self.pop_secs - dt).max(0.0);
+    }
+
+    pub(crate) fn clear(&mut self) {
+        *self = Self::default();
+    }
+}
+
+/// Slight pitch escalation (+2.5% per hit, capped at +20%) on consecutive
+/// visible hostile impacts/kills: `1.0 + min(streak - 1, 8) * 0.025`.
+pub(crate) fn streak_pitch_multiplier(streak_hits: u32) -> f32 {
+    1.0 + (streak_hits
+        .saturating_sub(1)
+        .min(COMBAT_STREAK_PITCH_MAX_STEPS) as f32)
+        * COMBAT_STREAK_PITCH_STEP
+}
+
+/// Marker for the right-side auto-hiding bilingual hit/kill-streak HUD badge root.
+#[derive(Component)]
+pub(crate) struct CombatStreakHudRoot;
+
+/// Marker for the text inside [`CombatStreakHudRoot`].
+#[derive(Component)]
+pub(crate) struct CombatStreakHudText;
+
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct CombatStreakBadgeStyle {
+    pub(crate) visible: bool,
+    pub(crate) label: String,
+    pub(crate) text_color: Color,
+    pub(crate) border_color: Color,
+    pub(crate) background_color: Color,
+    pub(crate) scale: f32,
+}
+
+pub(crate) fn combat_streak_badge_style(
+    streak_hits: u32,
+    pop_secs: f32,
+    language: Language,
+) -> CombatStreakBadgeStyle {
+    let visible = streak_hits >= COMBAT_STREAK_HUD_THRESHOLD;
+    let scale = if pop_secs > 0.0 {
+        1.0 + (pop_secs / COMBAT_STREAK_POP_SECONDS).clamp(0.0, 1.0) * 0.26
+    } else {
+        1.0
+    };
+    let label = if visible {
+        match language {
+            Language::Zh => format!("连击 x{streak_hits}"),
+            Language::En => format!("STREAK x{streak_hits}"),
+        }
+    } else {
+        String::new()
+    };
+    // Color tiers: 3+ amber, 10+ orange, 20+ blazing gold.
+    let (text_color, border_color, background_color) = if streak_hits >= 20 {
+        (
+            Color::srgb(1.0, 0.94, 0.48),
+            Color::srgba(1.0, 0.82, 0.22, 0.98),
+            Color::srgba(0.14, 0.09, 0.015, 0.92),
+        )
+    } else if streak_hits >= 10 {
+        (
+            Color::srgb(1.0, 0.58, 0.18),
+            Color::srgba(1.0, 0.46, 0.12, 0.94),
+            Color::srgba(0.11, 0.04, 0.015, 0.88),
+        )
+    } else {
+        (
+            Color::srgb(1.0, 0.84, 0.36),
+            Color::srgba(0.95, 0.72, 0.22, 0.88),
+            Color::srgba(0.08, 0.05, 0.02, 0.86),
+        )
+    };
+    CombatStreakBadgeStyle {
+        visible,
+        label,
+        text_color,
+        border_color,
+        background_color,
+        scale,
+    }
+}
+
+/// Spawns the sleek right-side bilingual hit/kill-streak HUD badge (hidden until 3+ hits).
+pub(crate) fn setup_combat_streak_hud(commands: &mut Commands, font: Handle<Font>) {
+    commands
+        .spawn((
+            Name::new("Combat Streak Badge"),
+            CombatStreakHudRoot,
+            GlobalZIndex(19),
+            Visibility::Hidden,
+            UiTransform::IDENTITY,
+            Node {
+                position_type: PositionType::Absolute,
+                right: px(14),
+                top: px(OBJECTIVE_TRACKER_TOP_PX + 76.0),
+                padding: UiRect::axes(px(12.0), px(6.0)),
+                border: UiRect::all(px(1.5)),
+                border_radius: BorderRadius::all(px(5.0)),
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                ..default()
+            },
+            BackgroundColor(Color::srgba(0.08, 0.05, 0.02, 0.86)),
+            BorderColor::all(Color::srgba(0.95, 0.72, 0.22, 0.88)),
+            MatchScopedEntity,
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                CombatStreakHudText,
+                Text::new(""),
+                TextFont {
+                    font: font.into(),
+                    font_size: FontSize::Px(17.0),
+                    ..default()
+                },
+                TextColor(Color::srgb(1.0, 0.84, 0.36)),
+            ));
+        });
+}
+
+#[allow(clippy::type_complexity)]
+pub(crate) fn update_post_process_impacts(
+    mut commands: Commands,
+    time: Res<Time>,
+    options: Option<Res<MenuOptionsState>>,
+    visible_player: Option<Res<VisiblePlayer>>,
+    mut post_process: ResMut<PostProcessImpactState>,
+    mut streak: ResMut<CombatStreakState>,
+    structures: Query<(&Team, &Structure, &Health), Without<UnderConstruction>>,
+    mut cameras: Query<
+        (
+            Entity,
+            Option<&mut ChromaticAberration>,
+            Option<&mut Vignette>,
+        ),
+        With<MainCamera>,
+    >,
+) {
+    let dt = time.delta_secs();
+    let elapsed = time.elapsed_secs();
+    post_process.tick(dt);
+    streak.tick(dt);
+
+    if options.is_some_and(|options| !options.screen_shake) {
+        post_process.chroma_pulse = 0.0;
+    }
+
+    let best_hq_fraction = if visible_player
+        .as_deref()
+        .is_some_and(|vp| vp.is_spectator())
+    {
+        None
+    } else {
+        let player_team = visible_player
+            .as_deref()
+            .map_or(Team::Player(0), |vp| vp.team);
+        let mut best: Option<f32> = None;
+        for (team, structure, health) in &structures {
+            if *team == player_team
+                && structure.id == "CommandCenter"
+                && health.max > 0.0
+                && health.current > 0.0
+            {
+                let frac = (health.current / health.max).clamp(0.0, 1.0);
+                best = Some(best.map_or(frac, |prev| prev.max(frac)));
+            }
+        }
+        best
+    };
+
+    let hq_low = hq_low_health_ratio(best_hq_fraction);
+    let chroma_val = impact_chroma_intensity(post_process.chroma_pulse);
+    let (vig_intensity, vig_color) =
+        damage_vignette_params(post_process.damage_vignette, hq_low, elapsed);
+
+    for (cam_entity, chroma, vignette) in &mut cameras {
+        if let Some(mut chroma) = chroma {
+            chroma.intensity = chroma_val;
+        } else {
+            let mut next = default_match_chromatic_aberration();
+            next.intensity = chroma_val;
+            commands.entity(cam_entity).try_insert(next);
+        }
+        if let Some(mut vignette) = vignette {
+            vignette.intensity = vig_intensity;
+            vignette.color = vig_color;
+        } else {
+            let mut next = default_match_vignette();
+            next.intensity = vig_intensity;
+            next.color = vig_color;
+            commands.entity(cam_entity).try_insert(next);
+        }
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub(crate) fn update_combat_streak_hud(
+    locale: Option<Res<Locale>>,
+    streak: Res<CombatStreakState>,
+    mut root_q: Query<
+        (
+            &mut Visibility,
+            &mut BackgroundColor,
+            &mut BorderColor,
+            &mut UiTransform,
+        ),
+        With<CombatStreakHudRoot>,
+    >,
+    mut text_q: Query<(&mut Text, &mut TextColor), With<CombatStreakHudText>>,
+) {
+    let language = locale.as_deref().map_or_else(current_language, |l| l.0);
+    let style = combat_streak_badge_style(streak.streak_hits, streak.pop_secs, language);
+    for (mut visibility, mut bg, mut border, mut ui_tf) in &mut root_q {
+        let wanted = if style.visible {
+            Visibility::Inherited
+        } else {
+            Visibility::Hidden
+        };
+        if *visibility != wanted {
+            *visibility = wanted;
+        }
+        *bg = BackgroundColor(style.background_color);
+        *border = BorderColor::all(style.border_color);
+        ui_tf.scale = Vec2::splat(style.scale);
+    }
+    if style.visible {
+        for (mut text, mut tc) in &mut text_q {
+            if text.0 != style.label {
+                text.0 = style.label.clone();
+            }
+            tc.0 = style.text_color;
+        }
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Camera shake
@@ -1764,15 +2172,52 @@ fn position_revealed(
     })
 }
 
+/// Bundled presentation-only outputs for [`emit_combat_feel`] (keeps the system
+/// comfortably below Bevy's 16-parameter limit).
+#[derive(SystemParam)]
+pub(crate) struct CombatFeelOutputs<'w> {
+    shake: ResMut<'w, CameraShake>,
+    mixer: ResMut<'w, CombatAudioMixer>,
+    post_process: ResMut<'w, PostProcessImpactState>,
+    streak: ResMut<'w, CombatStreakState>,
+}
+
+fn is_allied_to_viewer(
+    team: Team,
+    visible_player: Option<&VisiblePlayer>,
+    relations: Option<&TeamRelations>,
+) -> bool {
+    let viewer = visible_player.map_or(Team::Player(0), |vp| vp.team);
+    relations.map_or(team == viewer, |rel| rel.are_allied(viewer, team))
+}
+
+fn is_hostile_to_viewer(
+    team: Team,
+    visible_player: Option<&VisiblePlayer>,
+    relations: Option<&TeamRelations>,
+) -> bool {
+    let viewer = visible_player.map_or(Team::Player(0), |vp| vp.team);
+    relations.map_or(team != viewer && team != Team::Neutral, |rel| {
+        rel.are_enemies(viewer, team)
+    })
+}
+
+fn is_local_player_team(team: Team, visible_player: Option<&VisiblePlayer>) -> bool {
+    match visible_player {
+        Some(vp) if vp.is_spectator() => false,
+        Some(vp) => vp.team == team,
+        None => team == Team::Player(0),
+    }
+}
+
 /// Reacts to the effect entities the simulation spawned this frame: big ones
-/// get a shockwave, secondary pops, camera shake and a layered blast; every
-/// visible hit gets its weapon-class sound.
+/// get a shockwave, secondary pops, camera shake, chromatic pulse and a layered
+/// blast; every visible hit gets its weapon-class sound with combo pitch scaling.
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn emit_combat_feel(
     mut commands: Commands,
     camera: Res<RtsCamera>,
-    mut shake: ResMut<CameraShake>,
-    mut mixer: ResMut<CombatAudioMixer>,
+    mut outputs: CombatFeelOutputs,
     visible_player: Option<Res<VisiblePlayer>>,
     relations: Option<Res<TeamRelations>>,
     revealers: FogRevealers,
@@ -1818,6 +2263,11 @@ pub(crate) fn emit_combat_feel(
         if !revealed(position) {
             continue;
         }
+        if is_hostile_to_viewer(death.team, visible_player.as_deref(), relations.as_deref()) {
+            outputs.streak.register_hit();
+        } else if is_local_player_team(death.team, visible_player.as_deref()) {
+            outputs.post_process.spike_damage_vignette(0.42);
+        }
         if death.replica
             && let Some(asset_server) = asset_server.as_deref()
         {
@@ -1852,7 +2302,9 @@ pub(crate) fn emit_combat_feel(
             5.2,
             LinearRgba::new(1.55, 0.88, 0.3, 1.0),
         );
-        shake.kick_zoom_punch(0.24 * shake_falloff(position));
+        outputs
+            .shake
+            .kick_zoom_punch(0.24 * shake_falloff(position));
     }
 
     for (transform, burst) in &new_bursts {
@@ -1860,9 +2312,21 @@ pub(crate) fn emit_combat_feel(
         if !revealed(position) {
             continue;
         }
+        let allied_hit =
+            is_allied_to_viewer(burst.team, visible_player.as_deref(), relations.as_deref());
+        let streak_pitch = if allied_hit {
+            let count = outputs.streak.register_hit();
+            streak_pitch_multiplier(count)
+        } else {
+            1.0
+        };
         let falloff = shake_falloff(position);
-        shake.kick(impact_shake_strength(burst) * falloff);
-        shake.kick_zoom_punch(impact_zoom_punch_strength(burst) * falloff);
+        let shake_strength = impact_shake_strength(burst) * falloff;
+        outputs.shake.kick(shake_strength);
+        outputs
+            .shake
+            .kick_zoom_punch(impact_zoom_punch_strength(burst) * falloff);
+        outputs.post_process.spike_chroma(shake_strength);
         let loudness = audio_falloff(&camera, position);
         let jitter = pitch_jitter(position);
         let flash_tint = impact_flash_color(burst.kind);
@@ -1871,9 +2335,21 @@ pub(crate) fn emit_combat_feel(
             spawn_contact_hit_core(&mut commands, position, burst.radius * 0.48, flash_tint);
             spawn_impact_cross_glint(&mut commands, position, burst.radius * 0.85, flash_tint);
             spawn_razor_hit_sparks(&mut commands, position, Vec3::Y, 14, 7.2, flash_tint);
-            mixer.request(CombatSample::Blast, 0.5 * jitter, loudness);
-            mixer.request(CombatSample::Blast, 0.8 * jitter, 0.7 * loudness);
-            mixer.request(CombatSample::Hit, 0.45, 0.5 * loudness);
+            outputs.mixer.request(
+                CombatSample::Blast,
+                (0.5 * jitter * streak_pitch).clamp(0.4, 2.6),
+                loudness,
+            );
+            outputs.mixer.request(
+                CombatSample::Blast,
+                (0.8 * jitter * streak_pitch).clamp(0.4, 2.6),
+                0.7 * loudness,
+            );
+            outputs.mixer.request(
+                CombatSample::Hit,
+                (0.45 * streak_pitch).clamp(0.4, 2.6),
+                0.5 * loudness,
+            );
             continue;
         }
         // Crisp 85ms contact hit-flash core + directional razor sparks on every visible hit.
@@ -1911,7 +2387,11 @@ pub(crate) fn emit_combat_feel(
             .into_iter()
             .flatten()
         {
-            mixer.request(sample, speed * jitter, volume * loudness);
+            outputs.mixer.request(
+                sample,
+                (speed * jitter * streak_pitch).clamp(0.4, 2.6),
+                volume * loudness,
+            );
         }
         let ring = match burst.kind {
             ImpactBurstKind::Siege => Some((2.4, LinearRgba::new(1.3, 0.9, 0.5, 1.0))),
@@ -1946,9 +2426,21 @@ pub(crate) fn emit_combat_feel(
         if !revealed(position) {
             continue;
         }
+        let streak_pitch =
+            if is_hostile_to_viewer(effect.team, visible_player.as_deref(), relations.as_deref()) {
+                let count = outputs.streak.register_hit();
+                streak_pitch_multiplier(count)
+            } else {
+                if is_local_player_team(effect.team, visible_player.as_deref()) {
+                    outputs.post_process.spike_damage_vignette(0.85);
+                }
+                1.0
+            };
         let falloff = shake_falloff(position);
-        shake.kick(structure_destruction_shake_strength(effect.radius) * falloff);
-        shake.kick_zoom_punch(0.68 * falloff);
+        let shake_strength = structure_destruction_shake_strength(effect.radius) * falloff;
+        outputs.shake.kick(shake_strength);
+        outputs.shake.kick_zoom_punch(0.68 * falloff);
+        outputs.post_process.spike_chroma(shake_strength);
         let blast_color = LinearRgba::new(1.45, 0.8, 0.3, 1.0);
         spawn_shockwave_ring(
             &mut commands,
@@ -1963,8 +2455,16 @@ pub(crate) fn emit_combat_feel(
         spawn_razor_hit_sparks(&mut commands, position, Vec3::Y, 12, 6.4, blast_color);
         spawn_secondary_explosions(&mut commands, position, effect.radius, 3);
         let loudness = audio_falloff(&camera, position);
-        mixer.request(CombatSample::Blast, 0.58, 0.95 * loudness);
-        mixer.request(CombatSample::Hit, 0.5, 0.45 * loudness);
+        outputs.mixer.request(
+            CombatSample::Blast,
+            (0.58 * streak_pitch).clamp(0.4, 2.6),
+            0.95 * loudness,
+        );
+        outputs.mixer.request(
+            CombatSample::Hit,
+            (0.5 * streak_pitch).clamp(0.4, 2.6),
+            0.45 * loudness,
+        );
     }
 
     for transform in &new_wrecks {
@@ -1972,16 +2472,17 @@ pub(crate) fn emit_combat_feel(
         if !revealed(position) {
             continue;
         }
-        mixer.request(
+        outputs.mixer.request(
             CombatSample::Blast,
             0.95 * pitch_jitter(position),
             0.6 * audio_falloff(&camera, position),
         );
     }
 
-    // Shake switched off in Options: discard this frame's kicks as well.
+    // Shake switched off in Options: discard this frame's kicks and chromatic pulse.
     if options.is_some_and(|options| !options.screen_shake) {
-        shake.clear();
+        outputs.shake.clear();
+        outputs.post_process.chroma_pulse = 0.0;
     }
 }
 
@@ -2044,17 +2545,156 @@ pub(crate) fn hit_flash_due(previous: f32, current: f32, cooldown: f32) -> bool 
     cooldown <= 0.0 && current > 0.0 && current < previous - 0.01
 }
 
-/// Washes a unit white for a few frames whenever it loses health. Derived from
-/// [`Health`] alone, so it works identically for direct hits, splash, support
-/// powers, and for units that only exist as online replicas.
+/// Cached warm-white emissive opaque material shared across all 75ms unit mesh
+/// hit-flashes. Reusing one `AlphaMode::Opaque` asset avoids per-hit material
+/// churn and extra WebGPU pipeline permutations while keeping original imported
+/// materials strictly immutable.
+#[derive(Resource, Default)]
+pub(crate) struct UnitHitFlashMaterial(pub(crate) Option<Handle<StandardMaterial>>);
+
+/// Temporary 75ms emissive hit-flash applied to a struck unit's descendant mesh
+/// materials (skipping health bars, decals, selection rings, and faction markers)
+/// and restored cleanly to the exact original `Handle<StandardMaterial>`.
+#[derive(Component)]
+pub(crate) struct UnitMeshHitFlash {
+    pub(crate) remaining: f32,
+    pub(crate) original: Handle<StandardMaterial>,
+}
+
+fn is_hit_flash_decoration_name(name: &str) -> bool {
+    let lower = name.to_ascii_lowercase();
+    lower.contains("health")
+        || lower.contains("selection")
+        || lower.contains("decal")
+        || lower.contains("ring")
+        || lower.contains("shadow")
+        || lower.contains("aura")
+        || lower.contains("marker")
+}
+
+/// Queues a 75ms opaque warm-white emissive material swap on a visible damaged
+/// unit's body meshes, preserving the exact original handle across rapid re-hits.
+pub(crate) fn queue_unit_mesh_hit_flash(commands: &mut Commands, target: Entity) {
+    commands.queue(move |world: &mut World| {
+        if world.get_entity(target).is_err()
+            || !world.contains_resource::<Assets<StandardMaterial>>()
+        {
+            return;
+        }
+        let flash_mat = match world
+            .get_resource::<UnitHitFlashMaterial>()
+            .and_then(|cache| cache.0.clone())
+        {
+            Some(handle) => handle,
+            None => {
+                let handle =
+                    world
+                        .resource_mut::<Assets<StandardMaterial>>()
+                        .add(StandardMaterial {
+                            base_color: Color::srgb(1.0, 0.97, 0.90),
+                            emissive: LinearRgba::new(3.6, 3.25, 2.55, 1.0),
+                            alpha_mode: AlphaMode::Opaque,
+                            perceptual_roughness: 0.35,
+                            ..default()
+                        });
+                if let Some(mut cache) = world.get_resource_mut::<UnitHitFlashMaterial>() {
+                    cache.0 = Some(handle.clone());
+                }
+                handle
+            }
+        };
+
+        // Walk up to 5 levels of descendants, skipping ground markers, health bars,
+        // decals, selection rings, and non-opaque overlay/VFX meshes.
+        let mut stack = vec![(target, 0_u8)];
+        let mut mesh_entities = Vec::new();
+        while let Some((node, depth)) = stack.pop() {
+            if world.get::<ContextualFactionMarker>(node).is_some() {
+                continue;
+            }
+            if world
+                .get::<Name>(node)
+                .is_some_and(|name| is_hit_flash_decoration_name(name.as_str()))
+            {
+                continue;
+            }
+            if let Some(mat) = world.get::<MeshMaterial3d<StandardMaterial>>(node) {
+                let already_flashing = world.get::<UnitMeshHitFlash>(node).is_some();
+                let eligible = already_flashing
+                    || world
+                        .resource::<Assets<StandardMaterial>>()
+                        .get(&mat.0)
+                        .is_none_or(|asset| {
+                            matches!(asset.alpha_mode, AlphaMode::Opaque | AlphaMode::Mask(_))
+                        });
+                if eligible {
+                    mesh_entities.push(node);
+                }
+            }
+            if depth < 5
+                && let Some(children) = world.get::<Children>(node)
+            {
+                for child in children.iter() {
+                    stack.push((child, depth + 1));
+                }
+            }
+        }
+
+        for mesh_entity in mesh_entities {
+            // Preserve the true original material if already mid-flash!
+            let original = if let Some(existing) = world.get::<UnitMeshHitFlash>(mesh_entity) {
+                existing.original.clone()
+            } else if let Some(mat) = world.get::<MeshMaterial3d<StandardMaterial>>(mesh_entity) {
+                mat.0.clone()
+            } else {
+                continue;
+            };
+            if let Ok(mut em) = world.get_entity_mut(mesh_entity) {
+                em.insert((
+                    MeshMaterial3d(flash_mat.clone()),
+                    UnitMeshHitFlash {
+                        remaining: UNIT_MESH_HIT_FLASH_SECONDS,
+                        original,
+                    },
+                ));
+            }
+        }
+    });
+}
+
+pub(crate) fn update_unit_mesh_hit_flashes(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut flashes: Query<(
+        Entity,
+        &mut UnitMeshHitFlash,
+        &mut MeshMaterial3d<StandardMaterial>,
+    )>,
+) {
+    let dt = time.delta_secs();
+    for (entity, mut flash, mut mat) in &mut flashes {
+        flash.remaining -= dt;
+        if flash.remaining <= 0.0 {
+            mat.0 = flash.original.clone();
+            commands.entity(entity).try_remove::<UnitMeshHitFlash>();
+        }
+    }
+}
+
+/// Washes a unit white for a few frames whenever it loses health, applies the
+/// 75ms emissive mesh hit-flash on visible units, and triggers a crimson damage
+/// vignette pulse when the local player's units or structures take heavy damage.
+/// Derived from [`Health`] alone, so it works identically for direct hits,
+/// splash, support powers, and online replicas.
 type HitFlashUnit<'a> = (
     Entity,
+    &'a Team,
     &'a Health,
     &'a Transform,
     &'a Selectable,
     Option<&'a VisibilityState>,
     Option<&'a mut HitFlashTracker>,
-    Has<Structure>,
+    Option<&'a Structure>,
 );
 
 type HitFlashTarget = Or<(With<Unit>, With<Structure>)>;
@@ -2062,10 +2702,13 @@ type HitFlashTarget = Or<(With<Unit>, With<Structure>)>;
 pub(crate) fn flash_damaged_units(
     mut commands: Commands,
     time: Res<Time>,
+    visible_player: Option<Res<VisiblePlayer>>,
+    mut post_process: Option<ResMut<PostProcessImpactState>>,
     mut units: Query<HitFlashUnit, HitFlashTarget>,
 ) {
     let dt = time.delta_secs();
-    for (entity, health, transform, selectable, visibility, tracker, is_structure) in &mut units {
+    for (entity, team, health, transform, selectable, visibility, tracker, structure) in &mut units
+    {
         let Some(mut tracker) = tracker else {
             commands.entity(entity).try_insert(HitFlashTracker {
                 last_health: health.current,
@@ -2074,12 +2717,36 @@ pub(crate) fn flash_damaged_units(
             continue;
         };
         tracker.cooldown = (tracker.cooldown - dt).max(0.0);
-        let due = hit_flash_due(tracker.last_health, health.current, tracker.cooldown);
+        let previous = tracker.last_health;
+        let damage_drop = (previous - health.current).max(0.0);
+        let due = hit_flash_due(previous, health.current, tracker.cooldown);
         tracker.last_health = health.current;
+
+        // Crimson vignette alert when the player's own structures or units take heavy damage.
+        if damage_drop > 0.01
+            && is_local_player_team(*team, visible_player.as_deref())
+            && let Some(post_process) = post_process.as_deref_mut()
+        {
+            let drop_frac = if health.max > 0.0 {
+                (damage_drop / health.max).clamp(0.0, 1.0)
+            } else {
+                0.0
+            };
+            if let Some(structure) = structure {
+                if structure.id == "CommandCenter" {
+                    post_process.spike_damage_vignette((0.75 + drop_frac * 1.5).clamp(0.75, 1.0));
+                } else if damage_drop >= 10.0 || drop_frac >= 0.05 {
+                    post_process.spike_damage_vignette((0.5 + drop_frac * 1.5).clamp(0.5, 0.9));
+                }
+            } else if damage_drop >= 15.0 || drop_frac >= 0.20 {
+                post_process.spike_damage_vignette((0.45 + drop_frac).clamp(0.45, 0.85));
+            }
+        }
+
         if !due || visibility.is_some_and(|visibility| !visibility.visible) {
             continue;
         }
-        if is_structure {
+        if structure.is_some() {
             // Buildings are big and get hit in volleys: a softer, slower,
             // warmer wash over the hull instead of a full white-out.
             tracker.cooldown = STRUCTURE_HIT_FLASH_INTERVAL_SECONDS;
@@ -2096,6 +2763,7 @@ pub(crate) fn flash_damaged_units(
             continue;
         }
         tracker.cooldown = HIT_FLASH_INTERVAL_SECONDS;
+        queue_unit_mesh_hit_flash(&mut commands, entity);
         let radius = selectable.radius.clamp(0.3, 1.2);
         spawn_combat_flash_with_alpha(
             &mut commands,
@@ -2131,12 +2799,19 @@ type InFlightFeelEffect = Or<(
     With<TreadDustPuff>,
 )>;
 
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
 pub(crate) fn clear_combat_feel_on_match_end(
     mut commands: Commands,
     match_state: Res<MatchState>,
-    mut shake: ResMut<CameraShake>,
-    mut mixer: ResMut<CombatAudioMixer>,
+    mut outputs: CombatFeelOutputs,
     transients: Query<Entity, InFlightFeelEffect>,
+    mut mesh_flashes: Query<(
+        Entity,
+        &UnitMeshHitFlash,
+        &mut MeshMaterial3d<StandardMaterial>,
+    )>,
+    mut cameras: Query<(Option<&mut ChromaticAberration>, Option<&mut Vignette>), With<MainCamera>>,
+    mut streak_hud: Query<(&mut Visibility, &mut UiTransform), With<CombatStreakHudRoot>>,
 ) {
     if match_state.is_running() {
         return;
@@ -2144,8 +2819,32 @@ pub(crate) fn clear_combat_feel_on_match_end(
     for entity in &transients {
         commands.entity(entity).try_despawn();
     }
-    shake.clear();
-    mixer.clear();
+    for (entity, flash, mut mat) in &mut mesh_flashes {
+        mat.0 = flash.original.clone();
+        commands.entity(entity).try_remove::<UnitMeshHitFlash>();
+    }
+    outputs.shake.clear();
+    outputs.mixer.clear();
+    outputs.post_process.clear();
+    outputs.streak.clear();
+
+    let base_chroma = impact_chroma_intensity(0.0);
+    let (base_vig_intensity, base_vig_color) = damage_vignette_params(0.0, 0.0, 0.0);
+    for (chroma, vignette) in &mut cameras {
+        if let Some(mut chroma) = chroma {
+            chroma.intensity = base_chroma;
+        }
+        if let Some(mut vignette) = vignette {
+            vignette.intensity = base_vig_intensity;
+            vignette.color = base_vig_color;
+        }
+    }
+    for (mut visibility, mut ui_tf) in &mut streak_hud {
+        if *visibility != Visibility::Hidden {
+            *visibility = Visibility::Hidden;
+        }
+        ui_tf.scale = Vec2::ONE;
+    }
 }
 
 #[cfg(test)]
@@ -2435,5 +3134,269 @@ mod tests {
             "gravity must pull number down on ballistic arc"
         );
         assert!(late.x.abs() > 0.3, "number must fan out laterally");
+    }
+
+    #[test]
+    fn streak_pitch_escalates_by_two_and_a_half_percent_and_caps_at_twenty_percent() {
+        assert!((streak_pitch_multiplier(0) - 1.0).abs() < 1e-6);
+        assert!((streak_pitch_multiplier(1) - 1.0).abs() < 1e-6);
+        assert!((streak_pitch_multiplier(2) - 1.025).abs() < 1e-6);
+        assert!((streak_pitch_multiplier(5) - 1.10).abs() < 1e-6);
+        assert!((streak_pitch_multiplier(9) - 1.20).abs() < 1e-6);
+        assert!((streak_pitch_multiplier(25) - 1.20).abs() < 1e-6);
+
+        let mut streak = CombatStreakState::default();
+        assert_eq!(streak.register_hit(), 1);
+        assert_eq!(streak.register_hit(), 2);
+        assert!((streak.streak_timer - COMBAT_STREAK_DECAY_SECONDS).abs() < 1e-6);
+        assert!((streak.pop_secs - COMBAT_STREAK_POP_SECONDS).abs() < 1e-6);
+
+        streak.tick(1.5);
+        assert_eq!(streak.streak_hits, 2);
+        assert_eq!(streak.pop_secs, 0.0);
+
+        streak.tick(2.0);
+        assert_eq!(streak.streak_hits, 0);
+        assert_eq!(streak.streak_timer, 0.0);
+    }
+
+    #[test]
+    fn post_process_chromatic_and_vignette_curves_pulse_and_decay_cleanly() {
+        let mut state = PostProcessImpactState::default();
+        // Tiny kicks below threshold do not pulse chromatic aberration.
+        state.spike_chroma(0.05);
+        assert_eq!(state.chroma_pulse, 0.0);
+        assert_eq!(
+            impact_chroma_intensity(state.chroma_pulse),
+            POST_PROCESS_BASE_CHROMA
+        );
+
+        // Heavy blast pulses chroma proportionally and stays within cap.
+        state.spike_chroma(0.9);
+        let peak = impact_chroma_intensity(state.chroma_pulse);
+        assert!(peak > POST_PROCESS_BASE_CHROMA + 0.015);
+        assert!(peak <= POST_PROCESS_MAX_CHROMA);
+
+        state.spike_damage_vignette(0.8);
+        let (base_vig, base_col) = damage_vignette_params(0.0, 0.0, 0.0);
+        let (hurt_vig, hurt_col) = damage_vignette_params(state.damage_vignette, 0.0, 0.0);
+        assert!(hurt_vig > base_vig + 0.2);
+        assert!(hurt_col.to_srgba().red > base_col.to_srgba().red + 0.3);
+
+        // HQ below 35% HP triggers gentle heartbeat pulse.
+        assert_eq!(hq_low_health_ratio(None), 0.0);
+        assert_eq!(hq_low_health_ratio(Some(0.35)), 0.0);
+        assert_eq!(hq_low_health_ratio(Some(0.8)), 0.0);
+        let low = hq_low_health_ratio(Some(0.175));
+        assert!((low - 0.5).abs() < 1e-5);
+        let (beat_a, _) = damage_vignette_params(0.0, low, 0.0);
+        let (beat_b, _) = damage_vignette_params(0.0, low, 0.30);
+        assert!(beat_a > base_vig);
+        assert!(
+            beat_b > beat_a,
+            "low-HQ vignette must pulse like a heartbeat"
+        );
+
+        // Decays back to exact baseline.
+        for _ in 0..30 {
+            state.tick(0.05);
+        }
+        assert_eq!(state.chroma_pulse, 0.0);
+        assert_eq!(state.damage_vignette, 0.0);
+        assert_eq!(
+            impact_chroma_intensity(state.chroma_pulse),
+            POST_PROCESS_BASE_CHROMA
+        );
+    }
+
+    #[test]
+    fn combat_streak_hud_badge_hides_below_three_and_escalates_tiers_bilingually() {
+        let hidden = combat_streak_badge_style(2, 0.1, Language::En);
+        assert!(!hidden.visible);
+
+        let amber_en = combat_streak_badge_style(3, COMBAT_STREAK_POP_SECONDS, Language::En);
+        assert!(amber_en.visible);
+        assert_eq!(amber_en.label, "STREAK x3");
+        assert!(amber_en.scale > 1.2);
+
+        let amber_zh = combat_streak_badge_style(5, 0.0, Language::Zh);
+        assert!(amber_zh.visible);
+        assert_eq!(amber_zh.label, "连击 x5");
+        assert_eq!(amber_zh.scale, 1.0);
+
+        let orange = combat_streak_badge_style(12, 0.0, Language::En);
+        assert_eq!(orange.label, "STREAK x12");
+        assert_ne!(orange.border_color, amber_en.border_color);
+
+        let gold = combat_streak_badge_style(24, 0.0, Language::Zh);
+        assert_eq!(gold.label, "连击 x24");
+        assert_ne!(gold.border_color, orange.border_color);
+        assert_ne!(gold.border_color, amber_en.border_color);
+    }
+
+    #[test]
+    fn unit_mesh_hit_flash_swaps_cached_opaque_emissive_skips_decorations_and_restores() {
+        let mut app = App::new();
+        app.insert_resource(Time::<()>::default())
+            .init_resource::<Assets<StandardMaterial>>()
+            .init_resource::<UnitHitFlashMaterial>()
+            .add_systems(Update, update_unit_mesh_hit_flashes);
+
+        let body_original = app
+            .world_mut()
+            .resource_mut::<Assets<StandardMaterial>>()
+            .add(StandardMaterial {
+                base_color: Color::srgb(0.2, 0.4, 0.8),
+                alpha_mode: AlphaMode::Opaque,
+                ..default()
+            });
+        let marker_mat = app
+            .world_mut()
+            .resource_mut::<Assets<StandardMaterial>>()
+            .add(StandardMaterial::default());
+        let ring_mat = app
+            .world_mut()
+            .resource_mut::<Assets<StandardMaterial>>()
+            .add(StandardMaterial::default());
+        let glow_mat = app
+            .world_mut()
+            .resource_mut::<Assets<StandardMaterial>>()
+            .add(StandardMaterial {
+                alpha_mode: AlphaMode::Add,
+                ..default()
+            });
+
+        let unit = app.world_mut().spawn(Transform::default()).id();
+        let body_mesh = app
+            .world_mut()
+            .spawn((
+                Name::new("Chassis"),
+                MeshMaterial3d(body_original.clone()),
+                ChildOf(unit),
+            ))
+            .id();
+        let faction_marker = app
+            .world_mut()
+            .spawn((
+                ContextualFactionMarker,
+                MeshMaterial3d(marker_mat.clone()),
+                ChildOf(unit),
+            ))
+            .id();
+        let selection_ring = app
+            .world_mut()
+            .spawn((
+                Name::new("Selection Ring"),
+                MeshMaterial3d(ring_mat.clone()),
+                ChildOf(unit),
+            ))
+            .id();
+        let additive_vfx = app
+            .world_mut()
+            .spawn((
+                Name::new("Thruster Glow"),
+                MeshMaterial3d(glow_mat.clone()),
+                ChildOf(unit),
+            ))
+            .id();
+
+        {
+            let mut cmds = app.world_mut().commands();
+            queue_unit_mesh_hit_flash(&mut cmds, unit);
+        }
+        app.world_mut().flush();
+        app.update();
+
+        let flashed_handle = app
+            .world()
+            .get::<MeshMaterial3d<StandardMaterial>>(body_mesh)
+            .unwrap()
+            .0
+            .clone();
+        assert_ne!(flashed_handle, body_original);
+        let flash_asset = app
+            .world()
+            .resource::<Assets<StandardMaterial>>()
+            .get(&flashed_handle)
+            .expect("cached hit-flash material exists");
+        assert_eq!(flash_asset.alpha_mode, AlphaMode::Opaque);
+        assert!(flash_asset.emissive.red > 2.0);
+        // Decorations and additive meshes untouched!
+        assert_eq!(
+            app.world()
+                .get::<MeshMaterial3d<StandardMaterial>>(faction_marker)
+                .unwrap()
+                .0,
+            marker_mat
+        );
+        assert_eq!(
+            app.world()
+                .get::<MeshMaterial3d<StandardMaterial>>(selection_ring)
+                .unwrap()
+                .0,
+            ring_mat
+        );
+        assert_eq!(
+            app.world()
+                .get::<MeshMaterial3d<StandardMaterial>>(additive_vfx)
+                .unwrap()
+                .0,
+            glow_mat
+        );
+        // Original imported material remains completely immutable!
+        assert_eq!(
+            app.world()
+                .resource::<Assets<StandardMaterial>>()
+                .get(&body_original)
+                .unwrap()
+                .base_color,
+            Color::srgb(0.2, 0.4, 0.8)
+        );
+
+        // Rapid re-hit mid-flash preserves true original handle and reuses cached flash material.
+        app.world_mut()
+            .resource_mut::<Time<()>>()
+            .advance_by(std::time::Duration::from_secs_f32(0.04));
+        app.update();
+        {
+            let mut cmds = app.world_mut().commands();
+            queue_unit_mesh_hit_flash(&mut cmds, unit);
+        }
+        app.world_mut().flush();
+        assert_eq!(
+            app.world()
+                .get::<UnitMeshHitFlash>(body_mesh)
+                .unwrap()
+                .original,
+            body_original
+        );
+        assert_eq!(
+            app.world()
+                .get::<MeshMaterial3d<StandardMaterial>>(body_mesh)
+                .unwrap()
+                .0,
+            flashed_handle,
+            "second hit must reuse the single cached hit-flash material handle"
+        );
+
+        // Still flashing after 40ms, then restores exact original handle after 75ms.
+        app.world_mut()
+            .resource_mut::<Time<()>>()
+            .advance_by(std::time::Duration::from_secs_f32(0.04));
+        app.update();
+        assert!(app.world().get::<UnitMeshHitFlash>(body_mesh).is_some());
+
+        app.world_mut()
+            .resource_mut::<Time<()>>()
+            .advance_by(std::time::Duration::from_secs_f32(0.04));
+        app.update();
+        assert_eq!(
+            app.world()
+                .get::<MeshMaterial3d<StandardMaterial>>(body_mesh)
+                .unwrap()
+                .0,
+            body_original
+        );
+        assert!(app.world().get::<UnitMeshHitFlash>(body_mesh).is_none());
     }
 }

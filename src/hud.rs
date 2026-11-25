@@ -1268,6 +1268,7 @@ pub(crate) fn setup_ui(
     setup_match_menu_overlay(commands, font.clone());
     setup_match_briefing(commands, font.clone());
     setup_support_power_panel(commands, font.clone(), asset_server);
+    setup_combat_streak_hud(commands, font.clone());
 
     // godot: production queue stacked directly above the command grid, both pinned to
     // the bottom-right corner. A column container so the queue always hugs the top of

@@ -2369,7 +2369,10 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<WeaponArcSmearMesh>()
         .init_resource::<CrossGlintMesh>()
         .init_resource::<TreadDustPuffMesh>()
+        .init_resource::<UnitHitFlashMaterial>()
         .init_resource::<CameraShake>()
+        .init_resource::<PostProcessImpactState>()
+        .init_resource::<CombatStreakState>()
         .init_resource::<CombatAudioMixer>()
         .init_resource::<PlacementGhost>()
         .init_resource::<WeatherState>()
@@ -3492,6 +3495,7 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
         (
             (
                 flash_damaged_units,
+                update_unit_mesh_hit_flashes,
                 emit_combat_feel,
                 update_secondary_explosions,
                 update_shockwave_rings,
@@ -3501,6 +3505,8 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 update_weapon_arc_smears,
                 update_tread_dust_puffs,
                 update_blast_smoke,
+                update_post_process_impacts,
+                update_combat_streak_hud,
                 play_combat_audio,
             )
                 .chain()
@@ -4117,9 +4123,17 @@ pub(crate) fn apply_match_setup_settings(
 pub(crate) fn reset_match_transient_resources(
     mut build_queue: ResMut<BuildQueue>,
     mut latest_battle_event: ResMut<LatestBattleEvent>,
+    mut camera_shake: ResMut<CameraShake>,
+    mut combat_audio: ResMut<CombatAudioMixer>,
+    mut post_process: ResMut<PostProcessImpactState>,
+    mut combat_streak: ResMut<CombatStreakState>,
 ) {
     *build_queue = BuildQueue::default();
     *latest_battle_event = LatestBattleEvent::default();
+    camera_shake.clear();
+    combat_audio.clear();
+    post_process.clear();
+    combat_streak.clear();
 }
 
 pub(crate) fn begin_match_from_setup(
@@ -4677,6 +4691,8 @@ pub(crate) fn setup(
         },
         bevy::camera::Hdr,
         cinematic_camera_look(),
+        default_match_chromatic_aberration(),
+        default_match_vignette(),
         MainCamera,
         MatchScopedEntity,
     ));

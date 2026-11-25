@@ -827,7 +827,7 @@ pub(crate) fn apply_team_color_materials(
     >,
     mut unpainted: Query<
         (Entity, &mut MeshMaterial3d<StandardMaterial>),
-        Without<TeamColorProcessed>,
+        (Without<TeamColorProcessed>, Without<UnitMeshHitFlash>),
     >,
     parents: Query<&ChildOf>,
     roots: Query<(&Team, Has<UnderConstruction>, Has<Unit>), Or<(With<Unit>, With<Structure>)>>,

@@ -552,3 +552,206 @@ fn strike_and_shots_spawn_additive_juice_and_zoom_punch_then_clear_on_match_end(
         0.0
     );
 }
+
+#[test]
+fn post_process_chroma_and_crimson_vignette_react_to_strikes_and_hq_danger_and_reset() {
+    use bevy::post_process::effect_stack::{ChromaticAberration, Vignette};
+
+    let mut app = running_match();
+    // Baseline subtle chromatic aberration & vignette are attached on MainCamera.
+    let (base_chroma, base_vig) = {
+        let mut q = app
+            .world_mut()
+            .query_filtered::<(&ChromaticAberration, &Vignette), With<MainCamera>>();
+        let (c, v) = q.single(app.world()).expect("MainCamera has post-process");
+        (c.intensity, v.intensity)
+    };
+    assert!((base_chroma - POST_PROCESS_BASE_CHROMA).abs() < 1e-5);
+    assert!((base_vig - POST_PROCESS_BASE_VIGNETTE_INTENSITY).abs() < 1e-5);
+
+    // Strike at focus pulses ChromaticAberration above baseline.
+    spawn_strike_at_camera_focus(&mut app);
+    app.update();
+    let pulsed_chroma = app
+        .world_mut()
+        .query_filtered::<&ChromaticAberration, With<MainCamera>>()
+        .single(app.world())
+        .unwrap()
+        .intensity;
+    assert!(
+        pulsed_chroma > POST_PROCESS_BASE_CHROMA + 0.01,
+        "strike must pulse ChromaticAberration, got {pulsed_chroma}"
+    );
+
+    // Dropping player HQ below 35% HP triggers crimson vignette heartbeat.
+    let hq = app
+        .world_mut()
+        .query::<(Entity, &Team, &Structure, &Health)>()
+        .iter(app.world())
+        .find(|(_, team, structure, _)| {
+            **team == Team::Player(0) && structure.id == "CommandCenter"
+        })
+        .map(|(entity, _, _, health)| (entity, health.max))
+        .expect("normal match has a player CommandCenter");
+    app.world_mut().get_mut::<Health>(hq.0).unwrap().current = hq.1 * 0.2;
+    app.update();
+    let vig_alert = app
+        .world_mut()
+        .query_filtered::<&Vignette, With<MainCamera>>()
+        .single(app.world())
+        .unwrap();
+    assert!(
+        vig_alert.intensity > POST_PROCESS_BASE_VIGNETTE_INTENSITY + 0.1,
+        "low HQ HP must boost crimson vignette, got {}",
+        vig_alert.intensity
+    );
+    assert!(
+        vig_alert.color.to_srgba().red > 0.2,
+        "damage/HQ vignette must shift crimson"
+    );
+
+    // Match end resets post-process cleanly back to baseline.
+    app.world_mut().resource_mut::<MatchState>().phase = MatchPhase::HumanVictory;
+    app.update();
+    let (end_chroma, end_vig) = {
+        let mut q = app
+            .world_mut()
+            .query_filtered::<(&ChromaticAberration, &Vignette), With<MainCamera>>();
+        let (c, v) = q.single(app.world()).unwrap();
+        (c.intensity, v.intensity)
+    };
+    assert!((end_chroma - POST_PROCESS_BASE_CHROMA).abs() < 1e-5);
+    assert!((end_vig - POST_PROCESS_BASE_VIGNETTE_INTENSITY).abs() < 1e-5);
+}
+
+#[test]
+fn screen_shake_off_suppresses_chromatic_aberration_pulse() {
+    use bevy::post_process::effect_stack::ChromaticAberration;
+
+    let mut app = running_match_with(|app| {
+        app.world_mut()
+            .resource_mut::<MenuOptionsState>()
+            .screen_shake = false;
+    });
+    spawn_strike_at_camera_focus(&mut app);
+    app.update();
+    let chroma = app
+        .world_mut()
+        .query_filtered::<&ChromaticAberration, With<MainCamera>>()
+        .single(app.world())
+        .unwrap()
+        .intensity;
+    assert!(
+        (chroma - POST_PROCESS_BASE_CHROMA).abs() < 1e-5,
+        "screen_shake=false must suppress chromatic pulse, got {chroma}"
+    );
+}
+
+#[test]
+fn combat_streak_reveals_hud_badge_at_three_hits_and_clears_on_match_end() {
+    let mut app = running_match();
+    let focus = app.world().resource::<RtsCamera>().focus;
+    app.update();
+
+    // Hidden initially.
+    let initial_vis = *app
+        .world_mut()
+        .query_filtered::<&Visibility, With<CombatStreakHudRoot>>()
+        .single(app.world())
+        .expect("streak badge spawned in match HUD");
+    assert_eq!(initial_vis, Visibility::Hidden);
+
+    // Three visible allied impacts reveal the streak badge with pop scale.
+    {
+        let world = app.world_mut();
+        let mut commands = world.commands();
+        for _ in 0..3 {
+            spawn_impact_burst(
+                &mut commands,
+                focus,
+                0.6,
+                14.0,
+                false,
+                Team::Player(0),
+                ImpactBurstKind::Heavy,
+            );
+        }
+        world.flush();
+    }
+    app.update();
+    assert_eq!(app.world().resource::<CombatStreakState>().streak_hits, 3);
+    let (vis, scale) = {
+        let mut q = app
+            .world_mut()
+            .query_filtered::<(&Visibility, &UiTransform), With<CombatStreakHudRoot>>();
+        let (v, tf) = q.single(app.world()).unwrap();
+        (*v, tf.scale.x)
+    };
+    assert_ne!(vis, Visibility::Hidden, "badge must reveal at 3+ hits");
+    assert!(scale > 1.0, "badge must pop-scale on increment");
+
+    // Match end clears streak and hides badge cleanly.
+    app.world_mut().resource_mut::<MatchState>().phase = MatchPhase::HumanVictory;
+    app.update();
+    assert_eq!(app.world().resource::<CombatStreakState>().streak_hits, 0);
+    let end_vis = *app
+        .world_mut()
+        .query_filtered::<&Visibility, With<CombatStreakHudRoot>>()
+        .single(app.world())
+        .unwrap();
+    assert_eq!(end_vis, Visibility::Hidden);
+}
+
+#[test]
+fn damaged_visible_unit_triggers_75ms_mesh_hit_flash_and_clears_on_match_end() {
+    let mut app = running_match();
+    app.update();
+    app.update();
+    let (unit, health) = app
+        .world_mut()
+        .query_filtered::<(Entity, &Health, &VisibilityState), With<Unit>>()
+        .iter(app.world())
+        .find(|(_, _, visibility)| visibility.visible)
+        .map(|(entity, health, _)| (entity, *health))
+        .expect("normal match has a visible unit");
+
+    let original_mat = app
+        .world_mut()
+        .resource_mut::<Assets<StandardMaterial>>()
+        .add(StandardMaterial::default());
+    let mesh_child = app
+        .world_mut()
+        .spawn((
+            Name::new("Unit Hull"),
+            MeshMaterial3d(original_mat.clone()),
+            ChildOf(unit),
+        ))
+        .id();
+
+    // Damage unit -> swaps mesh child to cached hit-flash handle.
+    app.world_mut().get_mut::<Health>(unit).unwrap().current = (health.current - 5.0).max(1.0);
+    app.update();
+    assert!(
+        app.world().get::<UnitMeshHitFlash>(mesh_child).is_some(),
+        "damaged visible unit must apply 75ms mesh hit-flash"
+    );
+    assert_ne!(
+        app.world()
+            .get::<MeshMaterial3d<StandardMaterial>>(mesh_child)
+            .unwrap()
+            .0,
+        original_mat
+    );
+
+    // Match end immediately restores original material handle.
+    app.world_mut().resource_mut::<MatchState>().phase = MatchPhase::HumanDefeat;
+    app.update();
+    assert_eq!(
+        app.world()
+            .get::<MeshMaterial3d<StandardMaterial>>(mesh_child)
+            .unwrap()
+            .0,
+        original_mat
+    );
+    assert!(app.world().get::<UnitMeshHitFlash>(mesh_child).is_none());
+}
