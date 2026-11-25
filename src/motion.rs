@@ -2638,6 +2638,11 @@ fn charge_windup_motion_for_unit(id: &str, deployed: bool) -> MotionId {
     }
 }
 
+/// Marks a `Unit` whose direct recentered visual children have already been
+/// scanned for `MotionRigPart`, avoiding per-frame child list walks.
+#[derive(Component)]
+pub(crate) struct MotionRigBound;
+
 /// Ensures every live `Unit` has a presentation-only `MotionState` and tags
 /// its direct visual children (after `ModelRecentered` settles) with
 /// `MotionRigPart`.
@@ -2645,7 +2650,10 @@ fn charge_windup_motion_for_unit(id: &str, deployed: bool) -> MotionId {
 pub(crate) fn ensure_unit_motion_rigs(
     mut commands: Commands,
     units_without_state: Query<(Entity, &Health, &Transform), (With<Unit>, Without<MotionState>)>,
-    recentered_units: Query<(Entity, &Children), (With<Unit>, With<ModelRecentered>)>,
+    recentered_units: Query<
+        (Entity, &Children),
+        (With<Unit>, With<ModelRecentered>, Without<MotionRigBound>),
+    >,
     candidate_parts: Query<
         (&Transform, Option<&Name>),
         (
@@ -2682,6 +2690,7 @@ pub(crate) fn ensure_unit_motion_rigs(
                 rest_scale: transform.scale,
             });
         }
+        commands.entity(root).try_insert(MotionRigBound);
     }
 }
 
@@ -2691,6 +2700,7 @@ type UnitMotionCore<'a> = (
     &'a Transform,
     &'a Health,
     &'a MovementDomain,
+    Option<&'a VisibilityState>,
     &'a mut MotionState,
 );
 
@@ -2735,7 +2745,7 @@ pub(crate) fn update_unit_motions(
     let inv_dt = 1.0 / dt.max(1e-4);
 
     for (
-        (unit, team, transform, health, domain, mut motion),
+        (unit, team, transform, health, domain, visibility, mut motion),
         (weapon, attack_order, move_order, harvest_order, hold_position, veterancy),
         (
             building,
@@ -2748,6 +2758,7 @@ pub(crate) fn update_unit_motions(
         ),
     ) in &mut units
     {
+        let visible = visibility.is_none_or(|v| v.visible);
         let infantry = is_infantry_unit(unit);
         let walker = is_walker_unit_id(unit.id);
         let airborne = *domain == MovementDomain::Air;
@@ -2842,14 +2853,16 @@ pub(crate) fn update_unit_motions(
         // 5. Siege deploy / undeploy transitions + ground shock-ring on anchor!
         if deployed && !motion.was_deployed {
             motion.request(MotionId::SiegeDeployAnchor, true);
-            crate::combat_feel::spawn_additive_shock_ring(
-                &mut commands,
-                transform.translation,
-                0.28,
-                1.35,
-                0.28,
-                LinearRgba::new(1.35, 0.95, 0.35, 1.0),
-            );
+            if visible {
+                crate::combat_feel::spawn_additive_shock_ring(
+                    &mut commands,
+                    transform.translation,
+                    0.28,
+                    1.35,
+                    0.28,
+                    LinearRgba::new(1.35, 0.95, 0.35, 1.0),
+                );
+            }
         } else if !deployed && motion.was_deployed {
             motion.request(MotionId::SiegeUndeployPack, true);
         }
@@ -2873,7 +2886,7 @@ pub(crate) fn update_unit_motions(
             }
         }
 
-        // 7. Abrupt stop skid + tread/boot dust puff!
+        // 7. Abrupt stop skid + tread/boot dust puff (visible units only)!
         if motion.was_moving && !moving && !airborne && !emp_disabled {
             let skid = if infantry {
                 MotionId::SprintSkidStop
@@ -2881,12 +2894,14 @@ pub(crate) fn update_unit_motions(
                 MotionId::TankBrakeDip
             };
             motion.request(skid, false);
-            crate::combat_feel::spawn_tread_dust_puff(
-                &mut commands,
-                transform.translation,
-                *transform.forward(),
-                if infantry { 0.55 } else { 1.05 },
-            );
+            if visible {
+                crate::combat_feel::spawn_tread_dust_puff(
+                    &mut commands,
+                    transform.translation,
+                    *transform.forward(),
+                    if infantry { 0.55 } else { 1.05 },
+                );
+            }
         }
         motion.was_moving = moving;
 

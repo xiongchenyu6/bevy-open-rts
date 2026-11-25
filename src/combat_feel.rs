@@ -338,7 +338,6 @@ pub(crate) fn spawn_shockwave_ring(
         world.spawn((
             Name::new("Shockwave ring"),
             bevy::light::NotShadowCaster,
-            bevy::light::NotShadowReceiver,
             Mesh3d(mesh),
             MeshMaterial3d(material.clone()),
             Transform::from_translation(Vec3::new(position.x, 0.075, position.z))
@@ -600,9 +599,17 @@ pub(crate) fn build_dust_puff_mesh(radius: f32) -> Mesh {
         .unwrap_or_else(|_| Sphere::new(r).mesh().build())
 }
 
+/// Hard caps on concurrent transient impact VFX so WebGPU / SwiftShader never
+/// stalls on shader permutations or per-frame material churn during big fights.
+const MAX_ACTIVE_RAZOR_SPARKS: usize = 48;
+const MAX_ACTIVE_CONTACT_CORES: usize = 16;
+const MAX_ACTIVE_CROSS_GLINTS: usize = 12;
+const MAX_ACTIVE_ARC_SMEARS: usize = 16;
+const MAX_ACTIVE_TREAD_DUST: usize = 24;
+
 /// Spawns `count` directional additive razor hit-sparks fanning away from an
 /// impact along `reflection_dir` (strictly `AlphaMode::Add`, `unlit: true`,
-/// `NotShadowCaster`, `NotShadowReceiver`).
+/// `NotShadowCaster`).
 pub(crate) fn spawn_razor_hit_sparks(
     commands: &mut Commands,
     position: Vec3,
@@ -617,6 +624,12 @@ pub(crate) fn spawn_razor_hit_sparks(
         {
             return;
         }
+        let active = world.query::<&ImpactRazorSpark>().iter(world).count();
+        let allowed = MAX_ACTIVE_RAZOR_SPARKS.saturating_sub(active);
+        if allowed == 0 {
+            return;
+        }
+        let spawn_count = (count as usize).min(allowed) as u32;
         let mesh = match world
             .get_resource::<RazorSparkMesh>()
             .and_then(|cache| cache.0.clone())
@@ -634,7 +647,7 @@ pub(crate) fn spawn_razor_hit_sparks(
         };
         let seed = ((position.x.to_bits() as u64) << 32) ^ (position.z.to_bits() as u64);
         let bias = Vec3::new(reflection_dir.x, 0.0, reflection_dir.z).normalize_or_zero();
-        for index in 0..count {
+        for index in 0..spawn_count {
             let h = |salt: u32| vfx_hash01(seed, index.wrapping_mul(37).wrapping_add(salt));
             let angle = h(1) * std::f32::consts::TAU;
             let spread = Vec3::new(angle.cos(), 0.25 + h(2) * 0.9, angle.sin()).normalize();
@@ -667,7 +680,6 @@ pub(crate) fn spawn_razor_hit_sparks(
             world.spawn((
                 Name::new("Razor hit spark"),
                 bevy::light::NotShadowCaster,
-                bevy::light::NotShadowReceiver,
                 Mesh3d(mesh.clone()),
                 MeshMaterial3d(material.clone()),
                 Transform::from_translation(position + Vec3::Y * 0.32)
@@ -732,7 +744,7 @@ pub(crate) fn update_razor_hit_sparks(
 }
 
 /// Spawns a blazing **85ms** additive white-hot contact hit-flash core at the
-/// impact point (`AlphaMode::Add`, `unlit: true`, `NotShadowCaster`, `NotShadowReceiver`).
+/// impact point (`AlphaMode::Add`, `unlit: true`, `NotShadowCaster`).
 pub(crate) fn spawn_contact_hit_core(
     commands: &mut Commands,
     position: Vec3,
@@ -742,6 +754,7 @@ pub(crate) fn spawn_contact_hit_core(
     commands.queue(move |world: &mut World| {
         if !world.contains_resource::<Assets<Mesh>>()
             || !world.contains_resource::<Assets<StandardMaterial>>()
+            || world.query::<&ContactHitCore>().iter(world).count() >= MAX_ACTIVE_CONTACT_CORES
         {
             return;
         }
@@ -782,7 +795,6 @@ pub(crate) fn spawn_contact_hit_core(
         world.spawn((
             Name::new("Contact hit core"),
             bevy::light::NotShadowCaster,
-            bevy::light::NotShadowReceiver,
             Mesh3d(mesh),
             MeshMaterial3d(material.clone()),
             Transform::from_translation(position + Vec3::Y * 0.34)
@@ -841,7 +853,7 @@ pub(crate) fn update_contact_hit_cores(
 }
 
 /// Spawns a 4-point crit/heavy additive cross-glint (`AlphaMode::Add`,
-/// `unlit: true`, `cull_mode: None`, `NotShadowCaster`, `NotShadowReceiver`).
+/// `unlit: true`, `cull_mode: None`, `NotShadowCaster`).
 pub(crate) fn spawn_impact_cross_glint(
     commands: &mut Commands,
     position: Vec3,
@@ -851,6 +863,7 @@ pub(crate) fn spawn_impact_cross_glint(
     commands.queue(move |world: &mut World| {
         if !world.contains_resource::<Assets<Mesh>>()
             || !world.contains_resource::<Assets<StandardMaterial>>()
+            || world.query::<&ImpactCrossGlint>().iter(world).count() >= MAX_ACTIVE_CROSS_GLINTS
         {
             return;
         }
@@ -895,7 +908,6 @@ pub(crate) fn spawn_impact_cross_glint(
         world.spawn((
             Name::new("Impact cross glint"),
             bevy::light::NotShadowCaster,
-            bevy::light::NotShadowReceiver,
             Mesh3d(mesh),
             MeshMaterial3d(material.clone()),
             Transform::from_translation(position + Vec3::Y * 0.42)
@@ -985,6 +997,7 @@ pub(crate) fn spawn_weapon_arc_smear(
     commands.queue(move |world: &mut World| {
         if !world.contains_resource::<Assets<Mesh>>()
             || !world.contains_resource::<Assets<StandardMaterial>>()
+            || world.query::<&WeaponArcSmear>().iter(world).count() >= MAX_ACTIVE_ARC_SMEARS
         {
             return;
         }
@@ -1021,7 +1034,6 @@ pub(crate) fn spawn_weapon_arc_smear(
         world.spawn((
             Name::new("Weapon arc smear"),
             bevy::light::NotShadowCaster,
-            bevy::light::NotShadowReceiver,
             Mesh3d(mesh),
             MeshMaterial3d(material.clone()),
             Transform::from_translation(origin)
@@ -1076,7 +1088,8 @@ pub(crate) fn update_weapon_arc_smears(
     }
 }
 
-/// Spawns a pair of faceted tread / skid / landing dust puffs kicking outward.
+/// Spawns a pair of faceted tread / skid / landing dust puffs kicking outward
+/// using the shared unlit `AlphaMode::Add` pipeline (no extra blend/shadow variants).
 pub(crate) fn spawn_tread_dust_puff(
     commands: &mut Commands,
     position: Vec3,
@@ -1086,6 +1099,7 @@ pub(crate) fn spawn_tread_dust_puff(
     commands.queue(move |world: &mut World| {
         if !world.contains_resource::<Assets<Mesh>>()
             || !world.contains_resource::<Assets<StandardMaterial>>()
+            || world.query::<&TreadDustPuff>().iter(world).count() >= MAX_ACTIVE_TREAD_DUST
         {
             return;
         }
@@ -1110,8 +1124,9 @@ pub(crate) fn spawn_tread_dust_puff(
             let material = world
                 .resource_mut::<Assets<StandardMaterial>>()
                 .add(StandardMaterial {
-                    base_color: Color::srgba(0.76, 0.65, 0.52, 0.3),
-                    alpha_mode: AlphaMode::Blend,
+                    base_color: Color::srgba(0.62, 0.52, 0.38, 0.24),
+                    emissive: LinearRgba::new(0.22, 0.18, 0.12, 1.0),
+                    alpha_mode: AlphaMode::Add,
                     unlit: true,
                     ..default()
                 });
@@ -1119,7 +1134,6 @@ pub(crate) fn spawn_tread_dust_puff(
             world.spawn((
                 Name::new("Tread dust puff"),
                 bevy::light::NotShadowCaster,
-                bevy::light::NotShadowReceiver,
                 Mesh3d(mesh.clone()),
                 MeshMaterial3d(material.clone()),
                 Transform::from_translation(position + offset).with_scale(Vec3::splat(0.1 * scale)),
@@ -1129,7 +1143,7 @@ pub(crate) fn spawn_tread_dust_puff(
                     ttl: 0.55,
                     start_scale: 0.1 * scale,
                     end_scale: 0.38 * scale,
-                    peak_alpha: 0.3,
+                    peak_alpha: 0.24,
                     material,
                 },
                 MatchScopedEntity,
@@ -1161,8 +1175,9 @@ pub(crate) fn update_tread_dust_puffs(
         transform.scale = Vec3::splat(s);
         transform.translation += puff.velocity * (1.0 - 0.65 * p) * dt;
         if let Some(mut mat) = materials.get_mut(&puff.material) {
-            let alpha = puff.peak_alpha * (1.0 - p).powf(1.4);
-            mat.base_color.set_alpha(alpha);
+            let fade = (1.0 - p).powf(1.4);
+            mat.base_color.set_alpha(puff.peak_alpha * fade);
+            mat.emissive = LinearRgba::new(0.22 * fade, 0.18 * fade, 0.12 * fade, 1.0);
         }
     }
 }

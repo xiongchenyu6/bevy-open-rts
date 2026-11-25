@@ -242,7 +242,6 @@ pub(crate) fn spawn_combat_flash_with_alpha(
         world.spawn((
             Name::new("Combat flash"),
             bevy::light::NotShadowCaster,
-            bevy::light::NotShadowReceiver,
             Mesh3d(mesh),
             MeshMaterial3d(material.clone()),
             Transform::from_translation(position + Vec3::Y * (end_scale * 0.4))
@@ -1396,7 +1395,6 @@ pub(crate) fn spawn_heal_sparkle(commands: &mut Commands, position: Vec3) {
         world.spawn((
             Name::new("Heal sparkle"),
             bevy::light::NotShadowCaster,
-            bevy::light::NotShadowReceiver,
             Mesh3d(mesh),
             MeshMaterial3d(material.clone()),
             Transform::from_translation(position + jitter).with_scale(Vec3::splat(0.01)),
