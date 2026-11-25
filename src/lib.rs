@@ -56,6 +56,8 @@ mod placement_ghost;
 pub(crate) use placement_ghost::*;
 mod limb_animation;
 pub(crate) use limb_animation::*;
+mod motion;
+pub(crate) use motion::*;
 mod structure_ambience;
 mod structure_details;
 pub(crate) use structure_ambience::*;
@@ -2363,6 +2365,10 @@ pub(crate) fn add_shared_match_resources(app: &mut App) -> &mut App {
         .init_resource::<TeamColorMaterials>()
         .init_resource::<CombatFlashMesh>()
         .init_resource::<ShockwaveRingMesh>()
+        .init_resource::<RazorSparkMesh>()
+        .init_resource::<WeaponArcSmearMesh>()
+        .init_resource::<CrossGlintMesh>()
+        .init_resource::<TreadDustPuffMesh>()
         .init_resource::<CameraShake>()
         .init_resource::<CombatAudioMixer>()
         .init_resource::<PlacementGhost>()
@@ -3375,15 +3381,18 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
             (
                 update_construction_work_pulses,
                 animate_construction_workers,
-                // Unit/vehicle/aircraft animation.
+                // Unit/vehicle/aircraft animation + 120-action procedural motion engine.
                 (
                     tag_unit_limbs,
+                    ensure_unit_motion_rigs,
+                    update_unit_motions,
                     animate_unit_limbs,
                     face_attack_targets,
                     tag_turret_nodes,
                     animate_turret_nodes,
                     animate_tank_spinners,
                     animate_airframes,
+                    apply_unit_motion_poses,
                     manage_deploy_outriggers,
                 )
                     .chain(),
@@ -3486,6 +3495,11 @@ pub(crate) fn add_runtime_systems(app: &mut App) -> &mut App {
                 emit_combat_feel,
                 update_secondary_explosions,
                 update_shockwave_rings,
+                update_razor_hit_sparks,
+                update_contact_hit_cores,
+                update_impact_cross_glints,
+                update_weapon_arc_smears,
+                update_tread_dust_puffs,
                 update_blast_smoke,
                 play_combat_audio,
             )

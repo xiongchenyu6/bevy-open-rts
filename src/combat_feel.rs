@@ -20,6 +20,12 @@ use crate::*;
 /// purpose: the camera sits 6-11 units up, so this is roughly 1-2% of the view.
 pub(crate) const CAMERA_SHAKE_MAX_OFFSET: f32 = 0.16;
 
+/// Largest forward camera zoom punch, in world units, on massive blasts.
+pub(crate) const CAMERA_ZOOM_PUNCH_MAX: f32 = 0.42;
+
+/// Duration (85ms) of the white-hot additive impact contact core.
+pub(crate) const CONTACT_HIT_CORE_SECONDS: f32 = 0.085;
+
 /// Trauma lost per second; a full-strength kick settles in about 0.6 s.
 pub(crate) const CAMERA_SHAKE_DECAY_PER_SECOND: f32 = 1.7;
 
@@ -44,6 +50,10 @@ pub(crate) struct CameraShake {
     pub(crate) trauma: f32,
     pub(crate) budget: f32,
     pub(crate) clock: f32,
+    /// Instantaneous forward zoom punch displacement (0..=CAMERA_ZOOM_PUNCH_MAX).
+    pub(crate) zoom_punch: f32,
+    /// Spring velocity for critically-damped zoom punch recovery.
+    pub(crate) zoom_punch_velocity: f32,
 }
 
 impl Default for CameraShake {
@@ -52,6 +62,8 @@ impl Default for CameraShake {
             trauma: 0.0,
             budget: CAMERA_SHAKE_BUDGET_MAX,
             clock: 0.0,
+            zoom_punch: 0.0,
+            zoom_punch_velocity: 0.0,
         }
     }
 }
@@ -68,15 +80,46 @@ impl CameraShake {
         self.trauma = self.trauma.max(strength);
     }
 
-    pub(crate) fn tick(&mut self, delta_secs: f32) {
-        self.clock += delta_secs;
-        self.trauma = (self.trauma - CAMERA_SHAKE_DECAY_PER_SECOND * delta_secs).max(0.0);
-        self.budget = (self.budget + CAMERA_SHAKE_BUDGET_REGEN_PER_SECOND * delta_secs)
-            .min(CAMERA_SHAKE_BUDGET_MAX);
+    /// Requests a zero-drift forward impact zoom punch (`strength` in `0..=1`,
+    /// already distance-attenuated). Snaps in fast and springs back cleanly.
+    pub(crate) fn kick_zoom_punch(&mut self, strength: f32) {
+        let strength = strength.clamp(0.0, 1.0);
+        if strength < CAMERA_SHAKE_MIN_KICK {
+            return;
+        }
+        let target_impulse = CAMERA_ZOOM_PUNCH_MAX * strength;
+        self.zoom_punch = self.zoom_punch.max(target_impulse * 0.65);
+        self.zoom_punch_velocity = self.zoom_punch_velocity.max(target_impulse * 9.0);
     }
 
-    /// Camera-plane displacement (x = right, y = up) for the current trauma.
-    /// Squared trauma keeps small kicks subtle and big ones punchy.
+    pub(crate) fn tick(&mut self, delta_secs: f32) {
+        let dt = delta_secs.clamp(0.0, 0.1);
+        self.clock += dt;
+        self.trauma = (self.trauma - CAMERA_SHAKE_DECAY_PER_SECOND * dt).max(0.0);
+        self.budget =
+            (self.budget + CAMERA_SHAKE_BUDGET_REGEN_PER_SECOND * dt).min(CAMERA_SHAKE_BUDGET_MAX);
+
+        // Critically-damped spring back to exact 0.0 for camera zoom punch.
+        if self.zoom_punch.abs() > 1e-4 || self.zoom_punch_velocity.abs() > 1e-4 {
+            let omega = 18.0_f32;
+            let f = 1.0 + omega * dt;
+            let inv_f = 1.0 / (f * f);
+            let next_vel =
+                (self.zoom_punch_velocity - self.zoom_punch * (omega * omega * dt)) * inv_f;
+            let next_pos = (self.zoom_punch
+                + (self.zoom_punch_velocity + self.zoom_punch * omega) * dt)
+                * (-omega * dt).exp();
+            self.zoom_punch = next_pos.clamp(-CAMERA_ZOOM_PUNCH_MAX * 0.15, CAMERA_ZOOM_PUNCH_MAX);
+            self.zoom_punch_velocity = next_vel;
+            if self.zoom_punch.abs() < 1e-4 && self.zoom_punch_velocity.abs() < 1e-3 {
+                self.zoom_punch = 0.0;
+                self.zoom_punch_velocity = 0.0;
+            }
+        }
+    }
+
+    /// Damped 3-harmonic camera-plane displacement (x = right, y = up) for the
+    /// current trauma. Squared trauma keeps small kicks subtle and big ones punchy.
     pub(crate) fn offset(&self) -> Vec2 {
         let amplitude = CAMERA_SHAKE_MAX_OFFSET * self.trauma * self.trauma;
         if amplitude <= 0.0 {
@@ -84,9 +127,27 @@ impl CameraShake {
         }
         let t = self.clock;
         Vec2::new(
-            (t * 71.0).sin() * 0.6 + (t * 113.0 + 1.3).sin() * 0.4,
-            (t * 83.0 + 0.7).sin() * 0.6 + (t * 127.0 + 2.1).sin() * 0.4,
+            (t * 67.0).sin() * 0.55
+                + (t * 113.0 + 1.3).sin() * 0.30
+                + (t * 179.0 + 2.7).sin() * 0.15,
+            (t * 79.0 + 0.7).sin() * 0.55
+                + (t * 127.0 + 2.1).sin() * 0.30
+                + (t * 193.0 + 0.4).sin() * 0.15,
         ) * amplitude
+    }
+
+    /// Forward-axis impact zoom punch offset (world units, zero-drift).
+    pub(crate) fn zoom_punch_offset(&self) -> f32 {
+        self.zoom_punch.max(0.0)
+    }
+
+    /// Subtle micro-roll (radians) coupled to trauma for crisp blast percussion.
+    pub(crate) fn roll_offset(&self) -> f32 {
+        if self.trauma <= 0.0 {
+            return 0.0;
+        }
+        let amp = 0.011 * self.trauma * self.trauma;
+        ((self.clock * 59.0 + 0.5).sin() * 0.65 + (self.clock * 107.0 + 1.9).sin() * 0.35) * amp
     }
 
     pub(crate) fn clear(&mut self) {
@@ -119,13 +180,26 @@ pub(crate) fn impact_shake_strength(burst: &ImpactBurst) -> f32 {
     }
 }
 
+/// Forward camera zoom punch strength for an impact burst (0 for rifle fire).
+pub(crate) fn impact_zoom_punch_strength(burst: &ImpactBurst) -> f32 {
+    if is_strike_burst(burst) {
+        return 0.95;
+    }
+    match burst.kind {
+        ImpactBurstKind::Siege => 0.42,
+        ImpactBurstKind::Explosive | ImpactBurstKind::Heavy if burst.power >= 1.5 => 0.22,
+        ImpactBurstKind::Electric if burst.power >= 1.6 => 0.2,
+        _ => 0.0,
+    }
+}
+
 pub(crate) fn structure_destruction_shake_strength(radius: f32) -> f32 {
     (0.38 + radius * 0.1).clamp(0.4, 0.7)
 }
 
-/// Decays the shake and nudges the match camera. `bevy_rts_camera` rewrites
-/// the camera transform from its own state every frame, so the offset never
-/// accumulates and never feeds back into camera focus, picking state or
+/// Decays the shake + zoom punch and nudges the match camera. `bevy_rts_camera`
+/// rewrites the camera transform from its own state every frame, so the offset
+/// never accumulates and never feeds back into camera focus, picking state or
 /// anything the simulation reads.
 pub(crate) fn apply_camera_shake(
     time: Res<Time>,
@@ -141,12 +215,18 @@ pub(crate) fn apply_camera_shake(
     }
     shake.tick(time.delta_secs());
     let offset = shake.offset();
-    if offset == Vec2::ZERO {
+    let zoom = shake.zoom_punch_offset();
+    let roll = shake.roll_offset();
+    if offset == Vec2::ZERO && zoom == 0.0 && roll == 0.0 {
         return;
     }
     for mut transform in &mut cameras {
-        let displacement = transform.right() * offset.x + transform.up() * offset.y;
+        let displacement =
+            transform.right() * offset.x + transform.up() * offset.y + *transform.forward() * zoom;
         transform.translation += displacement;
+        if roll != 0.0 {
+            transform.rotate_local_z(roll);
+        }
     }
 }
 
@@ -204,6 +284,17 @@ pub(crate) struct ShockwaveRing {
     pub(crate) peak_alpha: f32,
 }
 
+pub(crate) fn spawn_additive_shock_ring(
+    commands: &mut Commands,
+    position: Vec3,
+    start_radius: f32,
+    end_radius: f32,
+    ttl: f32,
+    color: LinearRgba,
+) {
+    spawn_shockwave_ring(commands, position, start_radius, end_radius, ttl, color);
+}
+
 pub(crate) fn spawn_shockwave_ring(
     commands: &mut Commands,
     position: Vec3,
@@ -226,20 +317,20 @@ pub(crate) fn spawn_shockwave_ring(
             None => {
                 let handle = world
                     .resource_mut::<Assets<Mesh>>()
-                    .add(Annulus::new(0.9, 1.0).mesh().resolution(48));
+                    .add(Annulus::new(0.86, 1.0).mesh().resolution(48));
                 if let Some(mut cache) = world.get_resource_mut::<ShockwaveRingMesh>() {
                     cache.0 = Some(handle.clone());
                 }
                 handle
             }
         };
-        let peak_alpha = 0.5;
+        let peak_alpha = 0.72;
         let material = world
             .resource_mut::<Assets<StandardMaterial>>()
             .add(StandardMaterial {
                 base_color: Color::srgba(color.red, color.green, color.blue, peak_alpha),
-                emissive: color,
-                alpha_mode: AlphaMode::Blend,
+                emissive: color * 1.4,
+                alpha_mode: AlphaMode::Add,
                 unlit: true,
                 cull_mode: None,
                 ..default()
@@ -247,9 +338,10 @@ pub(crate) fn spawn_shockwave_ring(
         world.spawn((
             Name::new("Shockwave ring"),
             bevy::light::NotShadowCaster,
+            bevy::light::NotShadowReceiver,
             Mesh3d(mesh),
             MeshMaterial3d(material.clone()),
-            Transform::from_translation(Vec3::new(position.x, 0.07, position.z))
+            Transform::from_translation(Vec3::new(position.x, 0.075, position.z))
                 .with_rotation(Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2))
                 .with_scale(Vec3::splat(start_radius)),
             ShockwaveRing {
@@ -278,6 +370,7 @@ pub(crate) fn update_shockwave_rings(
         ring.age += time.delta_secs();
         let progress = (ring.age / ring.ttl).clamp(0.0, 1.0);
         if progress >= 1.0 {
+            materials.remove(&ring.material);
             commands.entity(entity).try_despawn();
             continue;
         }
@@ -286,8 +379,790 @@ pub(crate) fn update_shockwave_rings(
         let radius = ring.start_radius + (ring.end_radius - ring.start_radius) * eased;
         transform.scale = Vec3::splat(radius);
         if let Some(mut material) = materials.get_mut(&ring.material) {
-            let fade = 1.0 - progress;
-            material.base_color.set_alpha(ring.peak_alpha * fade * fade);
+            let fade = (1.0 - progress) * (1.0 - progress);
+            material.base_color.set_alpha(ring.peak_alpha * fade);
+            let srgb = material.base_color.to_linear();
+            material.emissive = LinearRgba::new(
+                srgb.red * fade * 1.4,
+                srgb.green * fade * 1.4,
+                srgb.blue * fade * 1.4,
+                1.0,
+            );
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// AAA Additive Impact VFX: Razor Sparks, 85ms Contact Core, Crit Cross-Glint,
+// Tapered Weapon Arc Smears, and Tread/Skid Dust Puffs
+// ---------------------------------------------------------------------------
+
+/// Shared elongated razor spark mesh cache.
+#[derive(Resource, Default)]
+pub(crate) struct RazorSparkMesh(pub(crate) Option<Handle<Mesh>>);
+
+/// Shared crescent arc smear mesh cache.
+#[derive(Resource, Default)]
+pub(crate) struct WeaponArcSmearMesh(pub(crate) Option<Handle<Mesh>>);
+
+/// Shared crossed-blade crit glint mesh cache.
+#[derive(Resource, Default)]
+pub(crate) struct CrossGlintMesh(pub(crate) Option<Handle<Mesh>>);
+
+/// Shared faceted dust puff mesh cache.
+#[derive(Resource, Default)]
+pub(crate) struct TreadDustPuffMesh(pub(crate) Option<Handle<Mesh>>);
+
+/// Directional razor-thin additive impact spark that stretches along velocity.
+#[derive(Component)]
+pub(crate) struct ImpactRazorSpark {
+    pub(crate) velocity: Vec3,
+    pub(crate) age: f32,
+    pub(crate) ttl: f32,
+    pub(crate) base_length: f32,
+    pub(crate) base_color: LinearRgba,
+    pub(crate) material: Handle<StandardMaterial>,
+}
+
+/// Blazing 85ms white-hot additive contact hit-flash core.
+#[derive(Component)]
+pub(crate) struct ContactHitCore {
+    pub(crate) age: f32,
+    pub(crate) ttl: f32,
+    pub(crate) start_scale: f32,
+    pub(crate) peak_scale: f32,
+    pub(crate) base_color: LinearRgba,
+    pub(crate) material: Handle<StandardMaterial>,
+}
+
+/// 4-point star / crossed additive glint on heavy, crit, or finisher hits.
+#[derive(Component)]
+pub(crate) struct ImpactCrossGlint {
+    pub(crate) age: f32,
+    pub(crate) ttl: f32,
+    pub(crate) peak_scale: f32,
+    pub(crate) spin_rate: f32,
+    pub(crate) base_color: LinearRgba,
+    pub(crate) material: Handle<StandardMaterial>,
+}
+
+/// Tapered crescent weapon muzzle/slash arc smear (`AlphaMode::Add`).
+#[derive(Component)]
+pub(crate) struct WeaponArcSmear {
+    pub(crate) age: f32,
+    pub(crate) ttl: f32,
+    pub(crate) start_scale: f32,
+    pub(crate) end_scale: f32,
+    pub(crate) sweep_rate: f32,
+    pub(crate) base_color: LinearRgba,
+    pub(crate) material: Handle<StandardMaterial>,
+}
+
+/// Faceted tread / braking skid / landing dust puff.
+#[derive(Component)]
+pub(crate) struct TreadDustPuff {
+    pub(crate) velocity: Vec3,
+    pub(crate) age: f32,
+    pub(crate) ttl: f32,
+    pub(crate) start_scale: f32,
+    pub(crate) end_scale: f32,
+    pub(crate) peak_alpha: f32,
+    pub(crate) material: Handle<StandardMaterial>,
+}
+
+/// Builds a double-sided tapered crescent arc ribbon in the XZ plane (centered
+/// around `-Z`, sweeping `arc_radians`), razor-thin at both tips and thickest
+/// at mid-arc so muzzle/slash sweeps read crisply from RTS camera angles.
+pub(crate) fn build_tapered_arc_smear_mesh(
+    inner_radius: f32,
+    outer_radius: f32,
+    arc_radians: f32,
+    segments: usize,
+) -> Mesh {
+    use bevy::asset::RenderAssetUsages;
+    use bevy::mesh::{Indices, PrimitiveTopology};
+
+    let segs = segments.max(4);
+    let inner_r = inner_radius.max(0.05);
+    let outer_r = outer_radius.max(inner_r + 0.05);
+    let half_arc = arc_radians.clamp(0.2, std::f32::consts::TAU * 0.9) * 0.5;
+    let mid_r = (inner_r + outer_r) * 0.5;
+    let half_band = (outer_r - inner_r) * 0.5;
+
+    let mut positions = Vec::with_capacity((segs + 1) * 2);
+    let mut normals = Vec::with_capacity((segs + 1) * 2);
+    let mut uvs = Vec::with_capacity((segs + 1) * 2);
+    let mut indices = Vec::with_capacity(segs * 6);
+
+    for i in 0..=segs {
+        let t = i as f32 / segs as f32;
+        let angle = -half_arc + t * (2.0 * half_arc);
+        // Taper smoothly to razor tips at t = 0 and t = 1.
+        let taper = (t * std::f32::consts::PI).sin().powf(0.85);
+        let r_in = mid_r - half_band * taper;
+        let r_out = mid_r + half_band * taper;
+        // Centered around -Z (forward).
+        let dir = Vec3::new(angle.sin(), 0.0, -angle.cos());
+        positions.push((dir * r_in).to_array());
+        positions.push((dir * r_out).to_array());
+        normals.push([0.0, 1.0, 0.0]);
+        normals.push([0.0, 1.0, 0.0]);
+        uvs.push([t, 0.0]);
+        uvs.push([t, 1.0]);
+    }
+
+    for i in 0..segs {
+        let base = (i * 2) as u32;
+        indices.extend_from_slice(&[base, base + 1, base + 2, base + 1, base + 3, base + 2]);
+    }
+
+    let mut mesh = Mesh::new(
+        PrimitiveTopology::TriangleList,
+        RenderAssetUsages::default(),
+    );
+    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, positions);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
+    mesh.insert_indices(Indices::U32(indices));
+    mesh
+}
+
+/// Builds a crisp 4-point star cross-glint (two orthogonal diamond blades in XZ +
+/// one vertical accent blade) for heavy/crit/finisher impacts.
+pub(crate) fn build_cross_glint_mesh(radius: f32, thickness: f32) -> Mesh {
+    use bevy::asset::RenderAssetUsages;
+    use bevy::mesh::{Indices, PrimitiveTopology};
+
+    let r = radius.max(0.1);
+    let w = thickness.clamp(0.01, r * 0.4);
+    let mut positions = Vec::with_capacity(18);
+    let mut normals = Vec::with_capacity(18);
+    let mut uvs = Vec::with_capacity(18);
+    let mut indices = Vec::with_capacity(24);
+
+    let mut push_diamond = |a: Vec3, b: Vec3, c: Vec3, d: Vec3, n: Vec3| {
+        let base = positions.len() as u32;
+        for (p, uv) in [
+            (a, [0.5, 0.0]),
+            (b, [1.0, 0.5]),
+            (c, [0.5, 1.0]),
+            (d, [0.0, 0.5]),
+        ] {
+            positions.push(p.to_array());
+            normals.push(n.to_array());
+            uvs.push(uv);
+        }
+        indices.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
+    };
+
+    // Blade along X in XZ plane
+    push_diamond(
+        Vec3::new(-r, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, w),
+        Vec3::new(r, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, -w),
+        Vec3::Y,
+    );
+    // Blade along Z in XZ plane
+    push_diamond(
+        Vec3::new(0.0, 0.0, -r),
+        Vec3::new(w, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, r),
+        Vec3::new(-w, 0.0, 0.0),
+        Vec3::Y,
+    );
+    // Vertical spike blade along Y
+    push_diamond(
+        Vec3::new(0.0, -r * 0.75, 0.0),
+        Vec3::new(w, 0.0, 0.0),
+        Vec3::new(0.0, r * 0.95, 0.0),
+        Vec3::new(-w, 0.0, 0.0),
+        Vec3::Z,
+    );
+
+    let mut mesh = Mesh::new(
+        PrimitiveTopology::TriangleList,
+        RenderAssetUsages::default(),
+    );
+    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, positions);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
+    mesh.insert_indices(Indices::U32(indices));
+    mesh
+}
+
+/// Builds a lightweight faceted octahedron-like dust puff mesh for tread/skid clouds.
+pub(crate) fn build_dust_puff_mesh(radius: f32) -> Mesh {
+    let r = radius.max(0.05);
+    Sphere::new(r)
+        .mesh()
+        .ico(1)
+        .unwrap_or_else(|_| Sphere::new(r).mesh().build())
+}
+
+/// Spawns `count` directional additive razor hit-sparks fanning away from an
+/// impact along `reflection_dir` (strictly `AlphaMode::Add`, `unlit: true`,
+/// `NotShadowCaster`, `NotShadowReceiver`).
+pub(crate) fn spawn_razor_hit_sparks(
+    commands: &mut Commands,
+    position: Vec3,
+    reflection_dir: Vec3,
+    count: u32,
+    speed: f32,
+    color: LinearRgba,
+) {
+    commands.queue(move |world: &mut World| {
+        if !world.contains_resource::<Assets<Mesh>>()
+            || !world.contains_resource::<Assets<StandardMaterial>>()
+        {
+            return;
+        }
+        let mesh = match world
+            .get_resource::<RazorSparkMesh>()
+            .and_then(|cache| cache.0.clone())
+        {
+            Some(handle) => handle,
+            None => {
+                let handle = world
+                    .resource_mut::<Assets<Mesh>>()
+                    .add(Cuboid::new(0.026, 0.026, 0.36));
+                if let Some(mut cache) = world.get_resource_mut::<RazorSparkMesh>() {
+                    cache.0 = Some(handle.clone());
+                }
+                handle
+            }
+        };
+        let seed = ((position.x.to_bits() as u64) << 32) ^ (position.z.to_bits() as u64);
+        let bias = Vec3::new(reflection_dir.x, 0.0, reflection_dir.z).normalize_or_zero();
+        for index in 0..count {
+            let h = |salt: u32| vfx_hash01(seed, index.wrapping_mul(37).wrapping_add(salt));
+            let angle = h(1) * std::f32::consts::TAU;
+            let spread = Vec3::new(angle.cos(), 0.25 + h(2) * 0.9, angle.sin()).normalize();
+            let dir = (spread + bias * 0.85).normalize_or(Vec3::Y);
+            let pace = speed * (0.65 + h(3) * 0.85);
+            let velocity = dir * pace;
+            let ttl = 0.14 + h(4) * 0.14;
+            let base_length = 0.75 + h(5) * 0.85;
+            let spark_color = LinearRgba::new(
+                (color.red * 1.5 + 0.35).min(3.5),
+                (color.green * 1.4 + 0.25).min(3.5),
+                (color.blue * 1.3 + 0.15).min(3.5),
+                1.0,
+            );
+            let material = world
+                .resource_mut::<Assets<StandardMaterial>>()
+                .add(StandardMaterial {
+                    base_color: Color::srgba(
+                        spark_color.red.min(1.0),
+                        spark_color.green.min(1.0),
+                        spark_color.blue.min(1.0),
+                        0.95,
+                    ),
+                    emissive: spark_color,
+                    alpha_mode: AlphaMode::Add,
+                    unlit: true,
+                    ..default()
+                });
+            let rot = Quat::from_rotation_arc(Vec3::Z, dir);
+            world.spawn((
+                Name::new("Razor hit spark"),
+                bevy::light::NotShadowCaster,
+                bevy::light::NotShadowReceiver,
+                Mesh3d(mesh.clone()),
+                MeshMaterial3d(material.clone()),
+                Transform::from_translation(position + Vec3::Y * 0.32)
+                    .with_rotation(rot)
+                    .with_scale(Vec3::new(1.0, 1.0, base_length)),
+                ImpactRazorSpark {
+                    velocity,
+                    age: 0.0,
+                    ttl,
+                    base_length,
+                    base_color: spark_color,
+                    material,
+                },
+                MatchScopedEntity,
+            ));
+        }
+    });
+}
+
+pub(crate) fn update_razor_hit_sparks(
+    mut commands: Commands,
+    time: Res<Time>,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut sparks: Query<(Entity, &mut ImpactRazorSpark, &mut Transform)>,
+) {
+    let Some(mut materials) = materials else {
+        return;
+    };
+    let dt = time.delta_secs();
+    for (entity, mut spark, mut transform) in &mut sparks {
+        spark.age += dt;
+        if spark.age >= spark.ttl {
+            materials.remove(&spark.material);
+            commands.entity(entity).try_despawn();
+            continue;
+        }
+        let life = (1.0 - spark.age / spark.ttl).clamp(0.0, 1.0);
+        spark.velocity.y -= 12.5 * dt;
+        spark.velocity *= (1.0 - 2.2 * dt).max(0.5);
+        transform.translation += spark.velocity * dt;
+        if transform.translation.y < 0.04 {
+            transform.translation.y = 0.04;
+            spark.velocity.y = spark.velocity.y.abs() * 0.35;
+        }
+        let speed = spark.velocity.length();
+        if speed > 0.05 {
+            transform.rotation = Quat::from_rotation_arc(Vec3::Z, spark.velocity / speed);
+        }
+        let stretch = (spark.base_length * (0.35 + life * 0.95)).max(0.15);
+        transform.scale = Vec3::new(0.45 + 0.55 * life, 0.45 + 0.55 * life, stretch);
+        if let Some(mut mat) = materials.get_mut(&spark.material) {
+            let fade = life * life;
+            mat.base_color.set_alpha(0.95 * fade);
+            mat.emissive = LinearRgba::new(
+                spark.base_color.red * fade,
+                spark.base_color.green * fade,
+                spark.base_color.blue * fade,
+                1.0,
+            );
+        }
+    }
+}
+
+/// Spawns a blazing **85ms** additive white-hot contact hit-flash core at the
+/// impact point (`AlphaMode::Add`, `unlit: true`, `NotShadowCaster`, `NotShadowReceiver`).
+pub(crate) fn spawn_contact_hit_core(
+    commands: &mut Commands,
+    position: Vec3,
+    radius: f32,
+    tint: LinearRgba,
+) {
+    commands.queue(move |world: &mut World| {
+        if !world.contains_resource::<Assets<Mesh>>()
+            || !world.contains_resource::<Assets<StandardMaterial>>()
+        {
+            return;
+        }
+        let mesh = match world
+            .get_resource::<CombatFlashMesh>()
+            .and_then(|cache| cache.0.clone())
+        {
+            Some(handle) => handle,
+            None => {
+                let handle = world.resource_mut::<Assets<Mesh>>().add(
+                    Sphere::new(1.0)
+                        .mesh()
+                        .ico(2)
+                        .unwrap_or_else(|_| Sphere::new(1.0).mesh().build()),
+                );
+                if let Some(mut cache) = world.get_resource_mut::<CombatFlashMesh>() {
+                    cache.0 = Some(handle.clone());
+                }
+                handle
+            }
+        };
+        let core_color = LinearRgba::new(
+            (1.9 + tint.red * 0.5).min(3.2),
+            (1.8 + tint.green * 0.5).min(3.2),
+            (1.65 + tint.blue * 0.5).min(3.2),
+            1.0,
+        );
+        let material = world
+            .resource_mut::<Assets<StandardMaterial>>()
+            .add(StandardMaterial {
+                base_color: Color::srgba(1.0, 0.98, 0.94, 0.98),
+                emissive: core_color,
+                alpha_mode: AlphaMode::Add,
+                unlit: true,
+                ..default()
+            });
+        let peak_scale = radius.clamp(0.18, 1.35);
+        world.spawn((
+            Name::new("Contact hit core"),
+            bevy::light::NotShadowCaster,
+            bevy::light::NotShadowReceiver,
+            Mesh3d(mesh),
+            MeshMaterial3d(material.clone()),
+            Transform::from_translation(position + Vec3::Y * 0.34)
+                .with_scale(Vec3::splat(peak_scale * 0.45)),
+            ContactHitCore {
+                age: 0.0,
+                ttl: CONTACT_HIT_CORE_SECONDS,
+                start_scale: peak_scale * 0.45,
+                peak_scale,
+                base_color: core_color,
+                material,
+            },
+            MatchScopedEntity,
+        ));
+    });
+}
+
+pub(crate) fn update_contact_hit_cores(
+    mut commands: Commands,
+    time: Res<Time>,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut cores: Query<(Entity, &mut ContactHitCore, &mut Transform)>,
+) {
+    let Some(mut materials) = materials else {
+        return;
+    };
+    let dt = time.delta_secs();
+    for (entity, mut core, mut transform) in &mut cores {
+        core.age += dt;
+        if core.age >= core.ttl {
+            materials.remove(&core.material);
+            commands.entity(entity).try_despawn();
+            continue;
+        }
+        let p = (core.age / core.ttl).clamp(0.0, 1.0);
+        // Fast pop in the first 35% of 85ms, then crisp shrink-burnout.
+        let scale = if p < 0.35 {
+            let t = p / 0.35;
+            core.start_scale + (core.peak_scale - core.start_scale) * (1.0 - (1.0 - t).powi(2))
+        } else {
+            let t = (p - 0.35) / 0.65;
+            core.peak_scale * (1.0 - 0.65 * t)
+        };
+        transform.scale = Vec3::splat(scale.max(0.02));
+        if let Some(mut mat) = materials.get_mut(&core.material) {
+            let life = (1.0 - p) * (1.0 - p);
+            mat.base_color.set_alpha(0.98 * life);
+            mat.emissive = LinearRgba::new(
+                core.base_color.red * life,
+                core.base_color.green * life,
+                core.base_color.blue * life,
+                1.0,
+            );
+        }
+    }
+}
+
+/// Spawns a 4-point crit/heavy additive cross-glint (`AlphaMode::Add`,
+/// `unlit: true`, `cull_mode: None`, `NotShadowCaster`, `NotShadowReceiver`).
+pub(crate) fn spawn_impact_cross_glint(
+    commands: &mut Commands,
+    position: Vec3,
+    scale: f32,
+    color: LinearRgba,
+) {
+    commands.queue(move |world: &mut World| {
+        if !world.contains_resource::<Assets<Mesh>>()
+            || !world.contains_resource::<Assets<StandardMaterial>>()
+        {
+            return;
+        }
+        let mesh = match world
+            .get_resource::<CrossGlintMesh>()
+            .and_then(|cache| cache.0.clone())
+        {
+            Some(handle) => handle,
+            None => {
+                let handle = world
+                    .resource_mut::<Assets<Mesh>>()
+                    .add(build_cross_glint_mesh(1.0, 0.14));
+                if let Some(mut cache) = world.get_resource_mut::<CrossGlintMesh>() {
+                    cache.0 = Some(handle.clone());
+                }
+                handle
+            }
+        };
+        let hot = LinearRgba::new(
+            (color.red * 1.8 + 0.4).min(3.6),
+            (color.green * 1.7 + 0.35).min(3.6),
+            (color.blue * 1.6 + 0.3).min(3.6),
+            1.0,
+        );
+        let material = world
+            .resource_mut::<Assets<StandardMaterial>>()
+            .add(StandardMaterial {
+                base_color: Color::srgba(
+                    hot.red.min(1.0),
+                    hot.green.min(1.0),
+                    hot.blue.min(1.0),
+                    0.95,
+                ),
+                emissive: hot,
+                alpha_mode: AlphaMode::Add,
+                unlit: true,
+                cull_mode: None,
+                ..default()
+            });
+        let seed = ((position.x.to_bits() as u64) << 32) ^ (position.z.to_bits() as u64);
+        let yaw = vfx_hash01(seed, 59) * std::f32::consts::FRAC_PI_2;
+        world.spawn((
+            Name::new("Impact cross glint"),
+            bevy::light::NotShadowCaster,
+            bevy::light::NotShadowReceiver,
+            Mesh3d(mesh),
+            MeshMaterial3d(material.clone()),
+            Transform::from_translation(position + Vec3::Y * 0.42)
+                .with_rotation(Quat::from_rotation_y(yaw))
+                .with_scale(Vec3::splat(scale * 0.3)),
+            ImpactCrossGlint {
+                age: 0.0,
+                ttl: 0.16,
+                peak_scale: scale.clamp(0.4, 2.6),
+                spin_rate: 2.8,
+                base_color: hot,
+                material,
+            },
+            MatchScopedEntity,
+        ));
+    });
+}
+
+pub(crate) fn update_impact_cross_glints(
+    mut commands: Commands,
+    time: Res<Time>,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut glints: Query<(Entity, &mut ImpactCrossGlint, &mut Transform)>,
+) {
+    let Some(mut materials) = materials else {
+        return;
+    };
+    let dt = time.delta_secs();
+    for (entity, mut glint, mut transform) in &mut glints {
+        glint.age += dt;
+        if glint.age >= glint.ttl {
+            materials.remove(&glint.material);
+            commands.entity(entity).try_despawn();
+            continue;
+        }
+        let p = (glint.age / glint.ttl).clamp(0.0, 1.0);
+        let snap = if p < 0.25 {
+            p / 0.25
+        } else {
+            1.0 - ((p - 0.25) / 0.75).powi(2)
+        };
+        transform.scale = Vec3::splat((glint.peak_scale * snap).max(0.03));
+        transform.rotate_y(glint.spin_rate * dt);
+        if let Some(mut mat) = materials.get_mut(&glint.material) {
+            let fade = (1.0 - p) * (1.0 - p);
+            mat.base_color.set_alpha(0.95 * fade);
+            mat.emissive = LinearRgba::new(
+                glint.base_color.red * fade,
+                glint.base_color.green * fade,
+                glint.base_color.blue * fade,
+                1.0,
+            );
+        }
+    }
+}
+
+/// Spawns a tapered additive weapon muzzle / slash arc smear oriented from
+/// `from` toward `to` (`AlphaMode::Add`, `unlit: true`, `NotShadowCaster`, `NotShadowReceiver`).
+pub(crate) fn spawn_weapon_arc_smear(
+    commands: &mut Commands,
+    from: Vec3,
+    to: Vec3,
+    kind: ImpactBurstKind,
+) {
+    let aim = Vec3::new(to.x - from.x, 0.0, to.z - from.z).normalize_or(Vec3::NEG_Z);
+    let yaw = f32::atan2(-aim.x, -aim.z);
+    let (start_scale, end_scale, ttl, sweep_rate, color) = match kind {
+        ImpactBurstKind::Siege => (0.55, 1.45, 0.16, 2.2, LinearRgba::new(1.6, 1.05, 0.42, 1.0)),
+        ImpactBurstKind::Heavy => (0.42, 1.05, 0.13, 2.6, LinearRgba::new(1.5, 1.15, 0.58, 1.0)),
+        ImpactBurstKind::Explosive => {
+            (0.38, 0.92, 0.14, 2.0, LinearRgba::new(1.4, 0.72, 0.24, 1.0))
+        }
+        ImpactBurstKind::Energy => (0.36, 0.88, 0.13, 3.8, LinearRgba::new(0.45, 1.45, 1.8, 1.0)),
+        ImpactBurstKind::Electric => (0.4, 0.96, 0.12, 4.4, LinearRgba::new(0.65, 1.1, 2.0, 1.0)),
+        ImpactBurstKind::Fire => (
+            0.48,
+            1.25,
+            0.19,
+            3.2,
+            LinearRgba::new(1.65, 0.55, 0.12, 1.0),
+        ),
+        ImpactBurstKind::Ballistic => {
+            (0.24, 0.56, 0.09, 3.4, LinearRgba::new(1.3, 1.12, 0.65, 1.0))
+        }
+    };
+    let origin = from + aim * 0.36 + Vec3::Y * 0.56;
+    commands.queue(move |world: &mut World| {
+        if !world.contains_resource::<Assets<Mesh>>()
+            || !world.contains_resource::<Assets<StandardMaterial>>()
+        {
+            return;
+        }
+        let mesh = match world
+            .get_resource::<WeaponArcSmearMesh>()
+            .and_then(|cache| cache.0.clone())
+        {
+            Some(handle) => handle,
+            None => {
+                let handle = world
+                    .resource_mut::<Assets<Mesh>>()
+                    .add(build_tapered_arc_smear_mesh(0.28, 0.68, 1.75, 14));
+                if let Some(mut cache) = world.get_resource_mut::<WeaponArcSmearMesh>() {
+                    cache.0 = Some(handle.clone());
+                }
+                handle
+            }
+        };
+        let material = world
+            .resource_mut::<Assets<StandardMaterial>>()
+            .add(StandardMaterial {
+                base_color: Color::srgba(
+                    color.red.min(1.0),
+                    color.green.min(1.0),
+                    color.blue.min(1.0),
+                    0.88,
+                ),
+                emissive: color,
+                alpha_mode: AlphaMode::Add,
+                unlit: true,
+                cull_mode: None,
+                ..default()
+            });
+        world.spawn((
+            Name::new("Weapon arc smear"),
+            bevy::light::NotShadowCaster,
+            bevy::light::NotShadowReceiver,
+            Mesh3d(mesh),
+            MeshMaterial3d(material.clone()),
+            Transform::from_translation(origin)
+                .with_rotation(Quat::from_rotation_y(yaw))
+                .with_scale(Vec3::splat(start_scale)),
+            WeaponArcSmear {
+                age: 0.0,
+                ttl,
+                start_scale,
+                end_scale,
+                sweep_rate,
+                base_color: color,
+                material,
+            },
+            MatchScopedEntity,
+        ));
+    });
+}
+
+pub(crate) fn update_weapon_arc_smears(
+    mut commands: Commands,
+    time: Res<Time>,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut smears: Query<(Entity, &mut WeaponArcSmear, &mut Transform)>,
+) {
+    let Some(mut materials) = materials else {
+        return;
+    };
+    let dt = time.delta_secs();
+    for (entity, mut smear, mut transform) in &mut smears {
+        smear.age += dt;
+        if smear.age >= smear.ttl {
+            materials.remove(&smear.material);
+            commands.entity(entity).try_despawn();
+            continue;
+        }
+        let p = (smear.age / smear.ttl).clamp(0.0, 1.0);
+        let ease = 1.0 - (1.0 - p).powi(3);
+        let s = smear.start_scale + (smear.end_scale - smear.start_scale) * ease;
+        transform.scale = Vec3::new(s, 1.0, s);
+        transform.rotate_y(smear.sweep_rate * dt);
+        if let Some(mut mat) = materials.get_mut(&smear.material) {
+            let fade = (1.0 - p) * (1.0 - p);
+            mat.base_color.set_alpha(0.88 * fade);
+            mat.emissive = LinearRgba::new(
+                smear.base_color.red * fade,
+                smear.base_color.green * fade,
+                smear.base_color.blue * fade,
+                1.0,
+            );
+        }
+    }
+}
+
+/// Spawns a pair of faceted tread / skid / landing dust puffs kicking outward.
+pub(crate) fn spawn_tread_dust_puff(
+    commands: &mut Commands,
+    position: Vec3,
+    forward: Vec3,
+    scale: f32,
+) {
+    commands.queue(move |world: &mut World| {
+        if !world.contains_resource::<Assets<Mesh>>()
+            || !world.contains_resource::<Assets<StandardMaterial>>()
+        {
+            return;
+        }
+        let mesh = match world
+            .get_resource::<TreadDustPuffMesh>()
+            .and_then(|cache| cache.0.clone())
+        {
+            Some(handle) => handle,
+            None => {
+                let handle = world
+                    .resource_mut::<Assets<Mesh>>()
+                    .add(build_dust_puff_mesh(1.0));
+                if let Some(mut cache) = world.get_resource_mut::<TreadDustPuffMesh>() {
+                    cache.0 = Some(handle.clone());
+                }
+                handle
+            }
+        };
+        let fwd = Vec3::new(forward.x, 0.0, forward.z).normalize_or(Vec3::NEG_Z);
+        let side = Vec3::new(-fwd.z, 0.0, fwd.x);
+        for sign in [-1.0_f32, 1.0] {
+            let material = world
+                .resource_mut::<Assets<StandardMaterial>>()
+                .add(StandardMaterial {
+                    base_color: Color::srgba(0.76, 0.65, 0.52, 0.3),
+                    alpha_mode: AlphaMode::Blend,
+                    unlit: true,
+                    ..default()
+                });
+            let offset = side * (0.24 * scale * sign) - fwd * (0.18 * scale) + Vec3::Y * 0.1;
+            world.spawn((
+                Name::new("Tread dust puff"),
+                bevy::light::NotShadowCaster,
+                bevy::light::NotShadowReceiver,
+                Mesh3d(mesh.clone()),
+                MeshMaterial3d(material.clone()),
+                Transform::from_translation(position + offset).with_scale(Vec3::splat(0.1 * scale)),
+                TreadDustPuff {
+                    velocity: side * (0.55 * sign) - fwd * 0.4 + Vec3::Y * 0.45,
+                    age: 0.0,
+                    ttl: 0.55,
+                    start_scale: 0.1 * scale,
+                    end_scale: 0.38 * scale,
+                    peak_alpha: 0.3,
+                    material,
+                },
+                MatchScopedEntity,
+            ));
+        }
+    });
+}
+
+pub(crate) fn update_tread_dust_puffs(
+    mut commands: Commands,
+    time: Res<Time>,
+    materials: Option<ResMut<Assets<StandardMaterial>>>,
+    mut puffs: Query<(Entity, &mut TreadDustPuff, &mut Transform)>,
+) {
+    let Some(mut materials) = materials else {
+        return;
+    };
+    let dt = time.delta_secs();
+    for (entity, mut puff, mut transform) in &mut puffs {
+        puff.age += dt;
+        if puff.age >= puff.ttl {
+            materials.remove(&puff.material);
+            commands.entity(entity).try_despawn();
+            continue;
+        }
+        let p = (puff.age / puff.ttl).clamp(0.0, 1.0);
+        let swell = 1.0 - (1.0 - p) * (1.0 - p);
+        let s = puff.start_scale + (puff.end_scale - puff.start_scale) * swell;
+        transform.scale = Vec3::splat(s);
+        transform.translation += puff.velocity * (1.0 - 0.65 * p) * dt;
+        if let Some(mut mat) = materials.get_mut(&puff.material) {
+            let alpha = puff.peak_alpha * (1.0 - p).powf(1.4);
+            mat.base_color.set_alpha(alpha);
         }
     }
 }
@@ -910,30 +1785,59 @@ pub(crate) fn emit_combat_feel(
         )
     };
 
-    // Muzzle flash for every weapon shot the player can see. Derived from the
-    // tracer itself, so online clients get it from the replicated pulse.
+    // Muzzle flash + tapered weapon arc smear for every visible shot.
+    // Derived from the tracer itself, so online clients get it identically.
     for (pulse, weapon) in &new_shots {
         let (from, to) = (pulse.from - Vec3::Y * 0.6, pulse.to - Vec3::Y * 0.6);
         if revealed(from) {
             spawn_muzzle_flash(&mut commands, from, to, weapon.kind);
+            spawn_weapon_arc_smear(&mut commands, from, to, weapon.kind);
         }
     }
 
-    // Unit deaths replayed from the host: stage the same wreck and fireball
-    // the host spawned directly. The wreck then triggers its blast sound below
-    // on the next frame, exactly like a locally simulated death.
-    if let Some(asset_server) = asset_server.as_deref() {
-        for (transform, death) in &new_deaths {
-            if death.replica && revealed(transform.translation) {
-                spawn_death_presentation(
-                    &mut commands,
-                    asset_server,
-                    transform.translation,
-                    death.radius,
-                    false,
-                );
-            }
+    // Unit deaths: stage replica wreck/fireball if replicated, AND emit the
+    // visceral unit-kill finisher shock-ring + cross-glint + razor sparks +
+    // subtle camera zoom punch when visible.
+    for (transform, death) in &new_deaths {
+        let position = transform.translation;
+        if !revealed(position) {
+            continue;
         }
+        if death.replica
+            && let Some(asset_server) = asset_server.as_deref()
+        {
+            spawn_death_presentation(&mut commands, asset_server, position, death.radius, false);
+        }
+        let r = death.radius.clamp(0.45, 2.2);
+        spawn_additive_shock_ring(
+            &mut commands,
+            position,
+            r * 0.3,
+            r * 2.15,
+            0.34,
+            LinearRgba::new(1.55, 0.85, 0.28, 1.0),
+        );
+        spawn_contact_hit_core(
+            &mut commands,
+            position,
+            r * 0.65,
+            LinearRgba::new(1.6, 1.15, 0.5, 1.0),
+        );
+        spawn_impact_cross_glint(
+            &mut commands,
+            position,
+            r * 1.35,
+            LinearRgba::new(1.65, 1.05, 0.38, 1.0),
+        );
+        spawn_razor_hit_sparks(
+            &mut commands,
+            position,
+            Vec3::Y,
+            8,
+            5.2,
+            LinearRgba::new(1.55, 0.88, 0.3, 1.0),
+        );
+        shake.kick_zoom_punch(0.24 * shake_falloff(position));
     }
 
     for (transform, burst) in &new_bursts {
@@ -941,15 +1845,52 @@ pub(crate) fn emit_combat_feel(
         if !revealed(position) {
             continue;
         }
-        shake.kick(impact_shake_strength(burst) * shake_falloff(position));
+        let falloff = shake_falloff(position);
+        shake.kick(impact_shake_strength(burst) * falloff);
+        shake.kick_zoom_punch(impact_zoom_punch_strength(burst) * falloff);
         let loudness = audio_falloff(&camera, position);
         let jitter = pitch_jitter(position);
+        let flash_tint = impact_flash_color(burst.kind);
         if is_strike_burst(burst) {
             spawn_strike_explosion(&mut commands, position, burst.radius);
+            spawn_contact_hit_core(&mut commands, position, burst.radius * 0.48, flash_tint);
+            spawn_impact_cross_glint(&mut commands, position, burst.radius * 0.85, flash_tint);
+            spawn_razor_hit_sparks(&mut commands, position, Vec3::Y, 14, 7.2, flash_tint);
             mixer.request(CombatSample::Blast, 0.5 * jitter, loudness);
             mixer.request(CombatSample::Blast, 0.8 * jitter, 0.7 * loudness);
             mixer.request(CombatSample::Hit, 0.45, 0.5 * loudness);
             continue;
+        }
+        // Crisp 85ms contact hit-flash core + directional razor sparks on every visible hit.
+        let core_radius = (0.18 + burst.power * 0.14).clamp(0.2, 0.72);
+        spawn_contact_hit_core(&mut commands, position, core_radius, flash_tint);
+        let spark_count = match burst.kind {
+            ImpactBurstKind::Siege => 10,
+            ImpactBurstKind::Heavy | ImpactBurstKind::Explosive | ImpactBurstKind::Electric => 7,
+            ImpactBurstKind::Energy | ImpactBurstKind::Fire => 5,
+            ImpactBurstKind::Ballistic => 3,
+        };
+        let spark_speed = 3.4 + burst.power * 1.4;
+        spawn_razor_hit_sparks(
+            &mut commands,
+            position,
+            Vec3::Y,
+            spark_count,
+            spark_speed,
+            flash_tint,
+        );
+        // Crit / heavy / electric / siege cross-glint accent.
+        if matches!(
+            burst.kind,
+            ImpactBurstKind::Siege | ImpactBurstKind::Heavy | ImpactBurstKind::Electric
+        ) || burst.power >= 1.25
+        {
+            spawn_impact_cross_glint(
+                &mut commands,
+                position,
+                (0.42 + burst.power * 0.32).clamp(0.45, 1.55),
+                flash_tint,
+            );
         }
         for (sample, speed, volume) in impact_sound_layers(burst.kind, burst.power)
             .into_iter()
@@ -964,6 +1905,9 @@ pub(crate) fn emit_combat_feel(
             }
             ImpactBurstKind::Heavy if burst.power >= 1.2 => {
                 Some((1.5, LinearRgba::new(1.15, 0.85, 0.5, 1.0)))
+            }
+            ImpactBurstKind::Electric if burst.power >= 1.0 => {
+                Some((1.65, LinearRgba::new(0.55, 0.95, 1.65, 1.0)))
             }
             _ => None,
         };
@@ -987,15 +1931,21 @@ pub(crate) fn emit_combat_feel(
         if !revealed(position) {
             continue;
         }
-        shake.kick(structure_destruction_shake_strength(effect.radius) * shake_falloff(position));
+        let falloff = shake_falloff(position);
+        shake.kick(structure_destruction_shake_strength(effect.radius) * falloff);
+        shake.kick_zoom_punch(0.68 * falloff);
+        let blast_color = LinearRgba::new(1.45, 0.8, 0.3, 1.0);
         spawn_shockwave_ring(
             &mut commands,
             position,
             effect.radius * 0.4,
             effect.radius * 2.4,
             0.5,
-            LinearRgba::new(1.25, 0.7, 0.28, 1.0),
+            blast_color,
         );
+        spawn_contact_hit_core(&mut commands, position, effect.radius * 0.55, blast_color);
+        spawn_impact_cross_glint(&mut commands, position, effect.radius * 1.1, blast_color);
+        spawn_razor_hit_sparks(&mut commands, position, Vec3::Y, 12, 6.4, blast_color);
         spawn_secondary_explosions(&mut commands, position, effect.radius, 3);
         let loudness = audio_falloff(&camera, position);
         mixer.request(CombatSample::Blast, 0.58, 0.95 * loudness);
@@ -1159,6 +2109,11 @@ type InFlightFeelEffect = Or<(
     With<SecondaryExplosion>,
     With<DebrisChunk>,
     With<BlastSmoke>,
+    With<ImpactRazorSpark>,
+    With<ContactHitCore>,
+    With<ImpactCrossGlint>,
+    With<WeaponArcSmear>,
+    With<TreadDustPuff>,
 )>;
 
 pub(crate) fn clear_combat_feel_on_match_end(
@@ -1397,5 +2352,73 @@ mod tests {
             !hit_flash_due(10.0, 0.0, 0.0),
             "the death blast covers kills"
         );
+    }
+
+    #[test]
+    fn camera_zoom_punch_snaps_in_and_returns_to_exact_zero() {
+        let mut shake = CameraShake::default();
+        assert_eq!(shake.zoom_punch_offset(), 0.0);
+        shake.kick_zoom_punch(0.9);
+        assert!(
+            shake.zoom_punch_offset() > 0.1,
+            "zoom punch must kick forward immediately"
+        );
+        assert!(shake.zoom_punch_offset() <= CAMERA_ZOOM_PUNCH_MAX + 1e-5);
+        for _ in 0..90 {
+            shake.tick(1.0 / 60.0);
+            assert!(shake.zoom_punch_offset() <= CAMERA_ZOOM_PUNCH_MAX + 1e-5);
+        }
+        assert_eq!(
+            shake.zoom_punch_offset(),
+            0.0,
+            "zoom punch must return cleanly with zero drift"
+        );
+    }
+
+    #[test]
+    fn tapered_arc_smear_and_cross_glint_and_dust_meshes_are_well_formed() {
+        let smear = build_tapered_arc_smear_mesh(0.28, 0.68, 1.75, 12);
+        let smear_pos = smear.attribute(Mesh::ATTRIBUTE_POSITION).unwrap().len();
+        let smear_norm = smear.attribute(Mesh::ATTRIBUTE_NORMAL).unwrap().len();
+        let smear_uv = smear.attribute(Mesh::ATTRIBUTE_UV_0).unwrap().len();
+        assert_eq!(smear_pos, (12 + 1) * 2);
+        assert_eq!(smear_pos, smear_norm);
+        assert_eq!(smear_pos, smear_uv);
+        let smear_idx = smear.indices().expect("smear indices");
+        assert_eq!(smear_idx.len(), 12 * 6);
+        assert!(smear_idx.iter().all(|i| i < smear_pos));
+
+        let glint = build_cross_glint_mesh(1.0, 0.14);
+        let glint_pos = glint.attribute(Mesh::ATTRIBUTE_POSITION).unwrap().len();
+        assert_eq!(glint_pos, 12);
+        assert_eq!(glint.indices().expect("glint indices").len(), 18);
+
+        let dust = build_dust_puff_mesh(0.5);
+        assert!(dust.attribute(Mesh::ATTRIBUTE_POSITION).unwrap().len() >= 12);
+        assert!(dust.indices().expect("dust indices").len() >= 36);
+    }
+
+    #[test]
+    fn ballistic_damage_number_curves_overshoot_arc_and_snap_fade() {
+        let start = damage_number_pop_scale(0.0);
+        let peak = damage_number_pop_scale(0.14);
+        let mid = damage_number_pop_scale(0.5);
+        let end = damage_number_pop_scale(1.0);
+        assert!(start < 0.7 && peak > 1.35 && (mid - 1.0).abs() < 1e-3 && end < mid);
+
+        assert_eq!(damage_number_alpha(0.0), 1.0);
+        assert_eq!(damage_number_alpha(0.65), 1.0);
+        assert!(damage_number_alpha(0.85) < 0.8);
+        assert_eq!(damage_number_alpha(1.0), 0.0);
+
+        let vel = Vec3::new(0.8, 2.8, -0.5);
+        let apex = damage_number_ballistic_offset(vel, 0.45);
+        let late = damage_number_ballistic_offset(vel, 0.8);
+        assert!(apex.y > 0.5, "number must pop upward");
+        assert!(
+            late.y < apex.y,
+            "gravity must pull number down on ballistic arc"
+        );
+        assert!(late.x.abs() > 0.3, "number must fan out laterally");
     }
 }

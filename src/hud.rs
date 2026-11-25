@@ -3958,14 +3958,57 @@ pub(crate) struct PendingDamageNumber {
     pub(crate) amount: f32,
 }
 
-/// A live on-screen damage floater rising above its world anchor.
+/// A live on-screen ballistic damage floater with overshoot pop scale,
+/// deterministic fan scatter, gravity arc, and late snap-fade.
 #[derive(Component)]
 pub(crate) struct DamageNumber {
     pub(crate) world: Vec3,
+    pub(crate) velocity: Vec3,
+    pub(crate) base_font_size: f32,
     pub(crate) remaining: f32,
 }
 
 pub(crate) const DAMAGE_NUMBER_LIFETIME_SEC: f32 = 0.8;
+
+/// Overshoot pop scale curve: snaps from 0.55 -> 1.42 at `t = 0.14`, settles
+/// to 1.0, then trims slightly during late snap-fade.
+pub(crate) fn damage_number_pop_scale(progress: f32) -> f32 {
+    let p = progress.clamp(0.0, 1.0);
+    if p < 0.14 {
+        let t = p / 0.14;
+        0.55 + (1.42 - 0.55) * (1.0 - (1.0 - t).powi(3))
+    } else if p < 0.34 {
+        let t = (p - 0.14) / 0.2;
+        1.42 + (1.0 - 1.42) * (t * t * (3.0 - 2.0 * t))
+    } else if p < 0.72 {
+        1.0
+    } else {
+        let t = (p - 0.72) / 0.28;
+        1.0 - 0.22 * t * t
+    }
+}
+
+/// Late snap-fade alpha: holds crisp at 1.0 through the apex, then vanishes cleanly.
+pub(crate) fn damage_number_alpha(progress: f32) -> f32 {
+    let p = progress.clamp(0.0, 1.0);
+    if p <= 0.68 {
+        1.0
+    } else {
+        let t = (p - 0.68) / 0.32;
+        (1.0 - t * t).clamp(0.0, 1.0)
+    }
+}
+
+/// Ballistic arc offset from initial fan-scatter velocity and gravity.
+pub(crate) fn damage_number_ballistic_offset(velocity: Vec3, elapsed_secs: f32) -> Vec3 {
+    let t = elapsed_secs.max(0.0);
+    let gravity = 5.4;
+    Vec3::new(
+        velocity.x * t,
+        velocity.y * t - 0.5 * gravity * t * t,
+        velocity.z * t,
+    )
+}
 
 pub(crate) fn update_damage_numbers(
     mut commands: Commands,
@@ -3974,25 +4017,67 @@ pub(crate) fn update_damage_numbers(
     asset_server: Res<AssetServer>,
     camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     pending: Query<(Entity, &PendingDamageNumber)>,
-    mut floaters: Query<(Entity, &mut DamageNumber, &mut Node, &mut TextColor)>,
+    mut floaters: Query<(
+        Entity,
+        &mut DamageNumber,
+        &mut Node,
+        &mut TextFont,
+        &mut TextColor,
+    )>,
 ) {
     for (entity, request) in &pending {
         if options.damage_numbers {
+            let amount = request.amount.max(1.0);
+            let crit_tier = amount >= 50.0;
+            let heavy_tier = amount >= 25.0;
+            let base_font_size = if crit_tier {
+                18.0
+            } else if heavy_tier {
+                15.5
+            } else {
+                13.0
+            };
+            let color = if crit_tier {
+                Color::srgba(1.0, 0.86, 0.24, 1.0)
+            } else if heavy_tier {
+                Color::srgba(1.0, 0.64, 0.24, 1.0)
+            } else {
+                Color::srgba(1.0, 0.42, 0.3, 1.0)
+            };
+            let label = if crit_tier {
+                format!("-{amount:.0}!")
+            } else {
+                format!("-{amount:.0}")
+            };
+            let seed = ((request.position.x.to_bits() as u64) << 32)
+                ^ (request.position.z.to_bits() as u64)
+                ^ (amount.to_bits() as u64).wrapping_mul(0x9E37_79B9);
+            let angle = vfx_hash01(seed, 17) * std::f32::consts::TAU;
+            let fan_speed = 0.55 + vfx_hash01(seed, 29) * 0.75;
+            let up_speed = if crit_tier {
+                3.1
+            } else if heavy_tier {
+                2.75
+            } else {
+                2.4
+            };
             commands.spawn((
-                Text::new(format!("-{:.0}", request.amount.max(1.0))),
+                Text::new(label),
                 TextFont {
                     font: asset_server.load(UI_FONT_PATH).into(),
-                    font_size: FontSize::Px(13.0),
+                    font_size: FontSize::Px(base_font_size * damage_number_pop_scale(0.0)),
                     ..default()
                 },
-                TextColor(Color::srgba(1.0, 0.42, 0.3, 1.0)),
+                TextColor(color),
                 Node {
                     position_type: PositionType::Absolute,
                     ..default()
                 },
                 GlobalZIndex(40),
                 DamageNumber {
-                    world: request.position,
+                    world: request.position + Vec3::Y * 0.65,
+                    velocity: Vec3::new(angle.cos() * fan_speed, up_speed, angle.sin() * fan_speed),
+                    base_font_size,
                     remaining: DAMAGE_NUMBER_LIFETIME_SEC,
                 },
                 MatchScopedEntity,
@@ -4006,19 +4091,22 @@ pub(crate) fn update_damage_numbers(
     let Ok((camera, camera_transform)) = camera_q.single() else {
         return;
     };
-    for (entity, mut floater, mut node, mut color) in &mut floaters {
+    for (entity, mut floater, mut node, mut font, mut color) in &mut floaters {
         floater.remaining -= time.delta_secs();
         if floater.remaining <= 0.0 {
             commands.entity(entity).despawn();
             continue;
         }
-        let progress = 1.0 - floater.remaining / DAMAGE_NUMBER_LIFETIME_SEC;
-        let anchor = floater.world + Vec3::Y * (0.8 + progress * 0.9);
+        let elapsed = (DAMAGE_NUMBER_LIFETIME_SEC - floater.remaining).max(0.0);
+        let progress = (elapsed / DAMAGE_NUMBER_LIFETIME_SEC).clamp(0.0, 1.0);
+        let anchor = floater.world + damage_number_ballistic_offset(floater.velocity, elapsed);
         match camera.world_to_viewport(camera_transform, anchor) {
             Ok(screen) => {
-                node.left = px(screen.x - 8.0);
+                let scale = damage_number_pop_scale(progress);
+                font.font_size = FontSize::Px(floater.base_font_size * scale);
+                node.left = px(screen.x - 8.0 * scale);
                 node.top = px(screen.y);
-                color.0.set_alpha(1.0 - progress);
+                color.0.set_alpha(damage_number_alpha(progress));
             }
             Err(_) => {
                 commands.entity(entity).despawn();

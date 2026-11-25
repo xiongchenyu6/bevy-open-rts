@@ -242,6 +242,7 @@ pub(crate) fn spawn_combat_flash_with_alpha(
         world.spawn((
             Name::new("Combat flash"),
             bevy::light::NotShadowCaster,
+            bevy::light::NotShadowReceiver,
             Mesh3d(mesh),
             MeshMaterial3d(material.clone()),
             Transform::from_translation(position + Vec3::Y * (end_scale * 0.4))
@@ -1395,6 +1396,7 @@ pub(crate) fn spawn_heal_sparkle(commands: &mut Commands, position: Vec3) {
         world.spawn((
             Name::new("Heal sparkle"),
             bevy::light::NotShadowCaster,
+            bevy::light::NotShadowReceiver,
             Mesh3d(mesh),
             MeshMaterial3d(material.clone()),
             Transform::from_translation(position + jitter).with_scale(Vec3::splat(0.01)),
@@ -1408,7 +1410,7 @@ pub(crate) fn spawn_heal_sparkle(commands: &mut Commands, position: Vec3) {
     });
 }
 
-/// A ring of kicked-up dust plus a soft pop where a paradropped unit lands.
+/// A ring of kicked-up dust plus a soft pop and additive shock-ring where a paradropped unit lands.
 pub(crate) fn spawn_landing_dust(commands: &mut Commands, position: Vec3) {
     spawn_combat_flash(
         commands,
@@ -1418,6 +1420,15 @@ pub(crate) fn spawn_landing_dust(commands: &mut Commands, position: Vec3) {
         0.25,
         LinearRgba::new(1.1, 1.0, 0.85, 1.0),
     );
+    crate::combat_feel::spawn_additive_shock_ring(
+        commands,
+        position,
+        0.22,
+        1.15,
+        0.28,
+        LinearRgba::new(1.15, 0.95, 0.62, 1.0),
+    );
+    crate::combat_feel::spawn_tread_dust_puff(commands, position, Vec3::NEG_Z, 0.95);
     commands.queue(move |world: &mut World| {
         if !world.contains_resource::<Assets<Mesh>>()
             || !world.contains_resource::<Assets<StandardMaterial>>()

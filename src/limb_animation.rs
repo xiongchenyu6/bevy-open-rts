@@ -154,25 +154,27 @@ pub(crate) fn limb_pose(kind: LimbKind, activity: LimbActivity, t: f32, seed: f3
     (Quat::IDENTITY, 0.0)
 }
 
+type LimbRootQuery<'a> = (
+    Option<&'a HarvestOrder>,
+    Has<ConstructionWorkPulse>,
+    Has<MoveOrder>,
+    Has<AttackOrder>,
+    Option<&'a Weapon>,
+    Option<&'a MotionState>,
+);
+
 /// Poses unit limbs from what the owning unit is doing; restores the exact
-/// rest pose when idle.
+/// rest pose when idle. Composes expressive overrides from `MotionState`
+/// (EMP tremor, burning flail, victory cheer, hold-line brace) cleanly.
 pub(crate) fn animate_unit_limbs(
     time: Res<Time>,
-    roots: Query<
-        (
-            Option<&HarvestOrder>,
-            Has<ConstructionWorkPulse>,
-            Has<MoveOrder>,
-            Has<AttackOrder>,
-            Option<&Weapon>,
-        ),
-        With<Unit>,
-    >,
+    roots: Query<LimbRootQuery, With<Unit>>,
     mut limbs: Query<(&Limb, &mut Transform)>,
 ) {
     let t = time.elapsed_secs();
     for (limb, mut transform) in &mut limbs {
-        let Ok((harvest, building, moving, attacking, weapon)) = roots.get(limb.root) else {
+        let Ok((harvest, building, moving, attacking, weapon, motion)) = roots.get(limb.root)
+        else {
             continue;
         };
         let activity = LimbActivity {
@@ -182,7 +184,53 @@ pub(crate) fn animate_unit_limbs(
             aiming: attacking,
             moving,
         };
-        let (rotation, bob) = limb_pose(limb.kind, activity, t, limb.seed);
+        let (mut rotation, mut bob) = limb_pose(limb.kind, activity, t, limb.seed);
+        if let Some(motion) = motion {
+            match motion.active {
+                MotionId::VictoryFistPump | MotionId::SquadVictoryCheer => {
+                    let wave = (t * 9.0 + limb.seed).sin();
+                    match limb.kind {
+                        LimbKind::ArmLeft | LimbKind::ArmRight => {
+                            rotation = Quat::from_rotation_x(-2.45 + wave * 0.35);
+                        }
+                        LimbKind::Body => {
+                            bob += (t * 9.0 + limb.seed).sin().abs() * 0.03;
+                        }
+                        _ => {}
+                    }
+                }
+                MotionId::EmpDisruptedTremor | MotionId::EmpStunWobble => {
+                    let jitter = (t * 48.0 + limb.seed).sin();
+                    match limb.kind {
+                        LimbKind::ArmLeft => {
+                            rotation = Quat::from_rotation_x(-0.35 + jitter * 0.25);
+                        }
+                        LimbKind::ArmRight => {
+                            rotation = Quat::from_rotation_x(-0.35 - jitter * 0.25);
+                        }
+                        _ => {}
+                    }
+                }
+                MotionId::BurningFlailPanic => {
+                    let flail = (t * 16.0 + limb.seed).sin();
+                    match limb.kind {
+                        LimbKind::ArmLeft => {
+                            rotation = Quat::from_rotation_x(-1.7 + flail * 0.8);
+                        }
+                        LimbKind::ArmRight => {
+                            rotation = Quat::from_rotation_x(-1.7 - flail * 0.8);
+                        }
+                        _ => {}
+                    }
+                }
+                MotionId::SquadHoldLineBrace => {
+                    if matches!(limb.kind, LimbKind::ArmLeft | LimbKind::ArmRight) {
+                        rotation = Quat::from_rotation_x(-0.95);
+                    }
+                }
+                _ => {}
+            }
+        }
         if rotation != Quat::IDENTITY || bob != 0.0 {
             transform.rotation = limb.rest_rotation * rotation;
             transform.translation = limb.rest_translation + Vec3::Y * bob;

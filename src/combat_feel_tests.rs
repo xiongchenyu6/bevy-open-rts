@@ -428,5 +428,127 @@ fn screen_shake_option_off_keeps_the_camera_still() {
         let shake = *app.world().resource::<CameraShake>();
         assert_eq!(shake.trauma, 0.0);
         assert_eq!(shake.offset(), Vec2::ZERO);
+        assert_eq!(shake.zoom_punch_offset(), 0.0);
     }
+}
+
+#[test]
+fn units_wire_live_motion_state_react_to_damage_and_emp_without_drifting_root() {
+    let mut app = running_match();
+    app.update();
+    app.update();
+    // Pick a human team unit and hold it stationary so any root translation
+    // change could only come from the motion system (which must never write it).
+    let (unit, health) = app
+        .world_mut()
+        .query_filtered::<(Entity, &Team, &Health), With<Unit>>()
+        .iter(app.world())
+        .find(|(_, team, _)| **team == Team::Player(0))
+        .map(|(e, _, h)| (e, *h))
+        .expect("normal match has a human unit");
+    {
+        let mut em = app.world_mut().entity_mut(unit);
+        em.remove::<MoveOrder>();
+        em.remove::<HarvestOrder>();
+        em.insert(HoldPosition { enabled: true });
+    }
+    app.update();
+    let initial_pos = app.world().get::<Transform>(unit).unwrap().translation;
+    assert!(
+        app.world().get::<MotionState>(unit).is_some(),
+        "every unit must receive a live MotionState"
+    );
+
+    // Damage the unit -> triggers directional flinch + 62.5Hz impact micro-tremor.
+    app.world_mut().get_mut::<Health>(unit).unwrap().current = (health.current * 0.7).max(1.0);
+    app.update();
+    let motion = *app.world().get::<MotionState>(unit).unwrap();
+    assert!(
+        motion.tremor_remaining > 0.0,
+        "health drop must engage 62.5Hz impact micro-tremor"
+    );
+    assert_eq!(
+        motion.active.spec().category,
+        MotionCategory::HitReaction,
+        "damage must switch unit into hit reaction motion, got {:?}",
+        motion.active
+    );
+    assert_eq!(
+        app.world().get::<Transform>(unit).unwrap().translation,
+        initial_pos,
+        "motion engine must never mutate unit root Transform.translation"
+    );
+
+    // Apply EMP -> transitions into EMP stun wobble / tremor.
+    app.world_mut()
+        .entity_mut(unit)
+        .insert(EmpDisabled { remaining: 2.0 });
+    app.update();
+    let emp_motion = *app.world().get::<MotionState>(unit).unwrap();
+    assert!(
+        matches!(
+            emp_motion.active,
+            MotionId::EmpStunWobble | MotionId::EmpDisruptedTremor
+        ),
+        "EMP must drive EMP wobble/tremor motion, got {:?}",
+        emp_motion.active
+    );
+    assert_eq!(
+        app.world().get::<Transform>(unit).unwrap().translation,
+        initial_pos,
+        "EMP motion must never mutate unit root Transform.translation"
+    );
+}
+
+#[test]
+fn strike_and_shots_spawn_additive_juice_and_zoom_punch_then_clear_on_match_end() {
+    let mut app = running_match();
+    let focus = app.world().resource::<RtsCamera>().focus;
+    app.update();
+    {
+        let world = app.world_mut();
+        let mut commands = world.commands();
+        spawn_strike_impact(&mut commands, focus, 4.8, Team::Player(0));
+        spawn_weapon_pulse(&mut commands, focus, ImpactBurstKind::Heavy);
+        spawn_replicated_unit_death(&mut commands, focus);
+        world.flush();
+    }
+    app.update();
+    assert!(
+        app.world().resource::<CameraShake>().zoom_punch_offset() > 0.0,
+        "strike at focus must trigger camera impact zoom punch"
+    );
+    assert!(
+        count::<With<ContactHitCore>>(&mut app) > 0,
+        "impacts must spawn 85ms additive contact hit cores"
+    );
+    assert!(
+        count::<With<ImpactRazorSpark>>(&mut app) > 0,
+        "impacts must spawn directional additive razor sparks"
+    );
+    assert!(
+        count::<With<ImpactCrossGlint>>(&mut app) > 0,
+        "strikes/kills must spawn additive cross-glints"
+    );
+    assert!(
+        count::<With<WeaponArcSmear>>(&mut app) > 0,
+        "weapon tracers must spawn tapered additive arc smears"
+    );
+    assert!(
+        count::<With<ShockwaveRing>>(&mut app) > 0,
+        "strikes/kills must spawn additive finisher shock-rings"
+    );
+
+    // Resolving the match must clear all in-flight juice cleanly.
+    app.world_mut().resource_mut::<MatchState>().phase = MatchPhase::HumanVictory;
+    app.update();
+    assert_eq!(count::<With<ContactHitCore>>(&mut app), 0);
+    assert_eq!(count::<With<ImpactRazorSpark>>(&mut app), 0);
+    assert_eq!(count::<With<ImpactCrossGlint>>(&mut app), 0);
+    assert_eq!(count::<With<WeaponArcSmear>>(&mut app), 0);
+    assert_eq!(count::<With<TreadDustPuff>>(&mut app), 0);
+    assert_eq!(
+        app.world().resource::<CameraShake>().zoom_punch_offset(),
+        0.0
+    );
 }
